@@ -68,6 +68,7 @@ namespace LastBreath.Player
         private IUiElementsManager? _uiElements;
         private IWorldClock? _worldClock;
         private IPlayerLifecycleConfigProvider? _lifecycleConfigProvider;
+        private IPlayerStatsProvider? _playerStats;
         private IRestRecoveryService? _restRecovery;
         private IFightable? _lastDamageSource;
 
@@ -181,6 +182,8 @@ namespace LastBreath.Player
             _uiElements = GameServiceProvider.Instance.GetServices<IUiElementsManager>().FirstOrDefault();
             _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
             _lifecycleConfigProvider = GameServiceProvider.Instance.GetService<IPlayerLifecycleConfigProvider>();
+            // The unarmed baseline is content (SharedData/PlayerStats), shared with the passive-tree tool.
+            _playerStats = GameServiceProvider.Instance.GetService<IPlayerStatsProvider>();
             // Rest at a campfire: the recovery zones heal any registered non-fighting participant.
             _restRecovery = GameServiceProvider.Instance.GetService<IRestRecoveryService>();
             _restRecovery?.RegisterParticipant(this, () => GlobalPosition);
@@ -612,31 +615,13 @@ namespace LastBreath.Player
             }
         }
 
+        // Every parameter gets a base, not only the ones the profile names: a stat the data leaves out
+        // is explicitly zeroed instead of keeping whatever the component held.
         private void SetBaseValuesForParameters()
         {
             foreach (EntityParameter entityParameter in Enum.GetValues<EntityParameter>())
-                Parameters.SetBaseValueForParameter(entityParameter, GetUnarmedBaseValue(entityParameter));
+                Parameters.SetBaseValueForParameter(entityParameter, _playerStats!.UnarmedValue(entityParameter));
         }
-
-        private static float GetUnarmedBaseValue(EntityParameter parameter) => parameter switch
-        {
-            EntityParameter.Health => 1000,
-            EntityParameter.Barrier => 100,
-            EntityParameter.Mana => 500,
-            EntityParameter.Intelligence or EntityParameter.Strength or EntityParameter.Dexterity => 5f,
-            EntityParameter.Evade or EntityParameter.Armor or EntityParameter.Accuracy => 300,
-            EntityParameter.CriticalChance => 0.05f,
-            // A rare treat, not a machine gun: extra attacks chain (each one re-rolls), so a high
-            // base made attack series balloon to 2-3x their planned length. Items/passives are
-            // the intended source of this stat.
-            EntityParameter.AdditionalHitChance => 0.05f,
-            EntityParameter.CriticalDamage => 1.5f,
-            EntityParameter.MulticastChance => 0f,
-            EntityParameter.PhysicalDamage => 100,
-            EntityParameter.SpellDamage => 50,
-            EntityParameter.MoveSpeed => 500,
-            _ => 0f
-        };
 
         // Weapon replaces the base of these parameters (not a modifier): base = weapon stats, unarmed profile otherwise.
         private void OnEquipmentChanged(EquipmentPiece piece, IEquipItem? item)
@@ -645,14 +630,14 @@ namespace LastBreath.Player
             var weapon = Equipment.Weapon;
             // The FOLDED weapon stats (scaled base with the whole local bucket, like weapon.Damage):
             // the weapon consumes its local lines itself, so none arrive as separate modifiers.
-            Parameters.SetBaseValueForParameter(EntityParameter.PhysicalDamage, weapon?.Damage ?? GetUnarmedBaseValue(EntityParameter.PhysicalDamage));
+            Parameters.SetBaseValueForParameter(EntityParameter.PhysicalDamage, weapon?.Damage ?? _playerStats!.UnarmedValue(EntityParameter.PhysicalDamage));
             Parameters.SetBaseValueForParameter(EntityParameter.CriticalChance, FoldedWeaponStat(weapon, EntityParameter.CriticalChance));
             Parameters.SetBaseValueForParameter(EntityParameter.CriticalDamage, FoldedWeaponStat(weapon, EntityParameter.CriticalDamage));
         }
 
         private float FoldedWeaponStat(IWeaponItem? weapon, EntityParameter parameter)
         {
-            if (weapon == null) return GetUnarmedBaseValue(parameter);
+            if (weapon == null) return _playerStats!.UnarmedValue(parameter);
             (float baseValue, float localBonus) = weapon.GetStatBreakdown(parameter);
             return baseValue + localBonus;
         }

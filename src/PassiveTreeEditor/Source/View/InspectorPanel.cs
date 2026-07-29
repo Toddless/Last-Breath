@@ -2,7 +2,6 @@ namespace PassiveTreeEditor.Source.View
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using Core.Enums;
     using Godot;
     using Io;
@@ -15,10 +14,6 @@ namespace PassiveTreeEditor.Source.View
     /// </summary>
     public partial class InspectorPanel : VBoxContainer
     {
-        /// <summary>Item id of the "no stance" entry — outside the enum so it can never be mistaken
-        /// for a stance value.</summary>
-        private const int NoStanceId = 100;
-
         private AbilityCatalog? _abilities;
         private TreeCanvas? _canvas;
 
@@ -39,23 +34,19 @@ namespace PassiveTreeEditor.Source.View
 
         public void Rebuild()
         {
-            foreach (Node child in GetChildren())
-            {
-                RemoveChild(child);
-                child.QueueFree();
-            }
+            this.ClearContent();
 
             if (_canvas is null) return;
 
             if (_canvas.Selection.Count == 0)
             {
-                AddChild(Hint("Nothing selected.\n\nSelect mode: click a node, drag to move, box-drag to\nmulti-select, Delete removes. Middle or right mouse\ndrag pans, wheel zooms, F frames the tree."));
+                AddChild(EditorControls.Wrapped("Nothing selected.\n\nSelect mode: click a node, drag to move, box-drag to\nmulti-select, Delete removes. Middle or right mouse\ndrag pans, wheel zooms, F frames the tree."));
                 return;
             }
 
             if (_canvas.Selection.Count > 1)
             {
-                AddChild(Hint($"{_canvas.Selection.Count} nodes selected.\nDrag moves them together; Delete removes them."));
+                AddChild(EditorControls.Wrapped($"{_canvas.Selection.Count} nodes selected.\nDrag moves them together; Delete removes them."));
                 return;
             }
 
@@ -65,20 +56,6 @@ namespace PassiveTreeEditor.Source.View
             BuildIdentity(node);
             BuildText(node);
             BuildModifiers(node);
-        }
-
-        private static Label Hint(string text) => new()
-        {
-            Text = text,
-            AutowrapMode = TextServer.AutowrapMode.WordSmart,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill
-        };
-
-        private static Label Caption(string text)
-        {
-            var label = new Label { Text = text };
-            label.AddThemeFontSizeOverride("font_size", 13);
-            return label;
         }
 
         private void Changed()
@@ -95,7 +72,7 @@ namespace PassiveTreeEditor.Source.View
 
         private void BuildIdentity(PassiveNode node)
         {
-            AddChild(Caption("NODE"));
+            AddChild(EditorControls.Caption("NODE"));
 
             var grid = new GridContainer { Columns = 2, SizeFlagsHorizontal = SizeFlags.ExpandFill };
             AddChild(grid);
@@ -129,27 +106,15 @@ namespace PassiveTreeEditor.Source.View
             grid.AddChild(idEdit);
 
             grid.AddChild(new Label { Text = "Kind" });
-            var kindPicker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-            int kindSelected = 0;
-            int kindIndex = 0;
-            foreach (PassiveNodeKind kind in Enum.GetValues<PassiveNodeKind>())
+            grid.AddChild(EditorControls.Picker(node.Kind, kind =>
             {
-                kindPicker.AddItem(kind.ToString(), (int)kind);
-                if (kind == node.Kind) kindSelected = kindIndex;
-                kindIndex++;
-            }
-
-            kindPicker.Selected = kindSelected;
-            kindPicker.ItemSelected += index =>
-            {
-                node.Kind = (PassiveNodeKind)kindPicker.GetItemId((int)index);
+                node.Kind = kind;
                 ChangedTotals();
                 Rebuild();
-            };
-            grid.AddChild(kindPicker);
+            }));
 
             grid.AddChild(new Label { Text = "Stance" });
-            grid.AddChild(StancePicker(node.Stance, value =>
+            grid.AddChild(EditorControls.OptionalPicker<Stance>(node.Stance, value =>
             {
                 node.Stance = value;
                 Changed();
@@ -160,7 +125,7 @@ namespace PassiveTreeEditor.Source.View
             if (node.Stance is not null)
             {
                 grid.AddChild(new Label { Text = "Hybrid" });
-                grid.AddChild(StancePicker(node.HybridStance, value =>
+                grid.AddChild(EditorControls.OptionalPicker<Stance>(node.HybridStance, value =>
                 {
                     node.HybridStance = value;
                     Changed();
@@ -188,46 +153,9 @@ namespace PassiveTreeEditor.Source.View
             grid.AddChild(AbilityPicker(node));
         }
 
-        /// <summary>
-        /// A stance dropdown with an explicit "no stance" entry. The entry carries a deliberately
-        /// out-of-range id: Godot substitutes the item index for a negative id, and index 0 collides
-        /// with <see cref="Stance.Dexterity"/> — which silently turned "—" into Dexterity.
-        /// </summary>
-        private static OptionButton StancePicker(Stance? current, Action<Stance?> apply)
-        {
-            var picker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-            picker.AddItem("—", NoStanceId);
-
-            int selected = 0;
-            int index = 1;
-
-            foreach (Stance stance in Enum.GetValues<Stance>())
-            {
-                picker.AddItem(stance.ToString(), (int)stance);
-                if (current == stance) selected = index;
-                index++;
-            }
-
-            picker.Selected = selected;
-            picker.ItemSelected += choice =>
-            {
-                int id = picker.GetItemId((int)choice);
-                apply(id == NoStanceId ? null : (Stance)id);
-            };
-
-            return picker;
-        }
-
         private SpinBox PositionBox(PassiveNode node, bool horizontal)
         {
-            var box = new SpinBox
-            {
-                MinValue = -100000,
-                MaxValue = 100000,
-                Step = 1,
-                Value = horizontal ? node.X : node.Y,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill
-            };
+            SpinBox box = EditorControls.Number(horizontal ? node.X : node.Y, 1);
 
             box.ValueChanged += value =>
             {
@@ -279,7 +207,7 @@ namespace PassiveTreeEditor.Source.View
         private void BuildText(PassiveNode node)
         {
             bool isRule = NodeKindRules.For(node.Kind).UsesRuleText;
-            AddChild(Caption(isRule ? "RULE TEXT" : "NOTES"));
+            AddChild(EditorControls.Caption(isRule ? "RULE TEXT" : "NOTES"));
 
             var text = new TextEdit
             {
@@ -301,12 +229,12 @@ namespace PassiveTreeEditor.Source.View
         private void BuildModifiers(PassiveNode node)
         {
             NodeKindRule rule = NodeKindRules.For(node);
-            AddChild(Caption($"MODIFIERS  {node.Modifiers.Count}/{rule.MaxModifiers}"
-                             + (node.IsHybrid ? "   hybrid" : string.Empty)));
+            AddChild(EditorControls.Caption($"MODIFIERS  {node.Modifiers.Count}/{rule.MaxModifiers}"
+                                           + (node.IsHybrid ? "   hybrid" : string.Empty)));
 
             if (rule.MaxModifiers == 0 && node.Modifiers.Count == 0)
             {
-                AddChild(Hint("This node class carries no modifier lines."));
+                AddChild(EditorControls.Wrapped("This node class carries no modifier lines."));
                 return;
             }
 
@@ -332,23 +260,11 @@ namespace PassiveTreeEditor.Source.View
             var top = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             box.AddChild(top);
 
-            var parameterPicker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-            int parameterSelected = 0;
-            int parameterIndex = 0;
-            foreach (EntityParameter parameter in Enum.GetValues<EntityParameter>())
+            top.AddChild(EditorControls.Picker(line.Parameter, parameter =>
             {
-                parameterPicker.AddItem(parameter.ToString(), (int)parameter);
-                if (parameter == line.Parameter) parameterSelected = parameterIndex;
-                parameterIndex++;
-            }
-
-            parameterPicker.Selected = parameterSelected;
-            parameterPicker.ItemSelected += pick =>
-            {
-                line.Parameter = (EntityParameter)parameterPicker.GetItemId((int)pick);
+                line.Parameter = parameter;
                 ChangedTotals();
-            };
-            top.AddChild(parameterPicker);
+            }));
 
             var remove = new Button { Text = "×" };
             remove.Pressed += () =>
@@ -362,38 +278,25 @@ namespace PassiveTreeEditor.Source.View
             var bottom = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             box.AddChild(bottom);
 
+            // The hint label comes first: the value-type callback writes into it, so it has to exist
+            // before the picker that captures it is built.
             var hint = new Label { CustomMinimumSize = new Vector2(64, 0) };
 
-            var typePicker = new OptionButton();
-            int typeSelected = 0;
-            int typeIndex = 0;
-            foreach (ModifierValueType type in ValueTypes())
+            OptionButton typePicker = EditorControls.Picker(ValueTypes(), line.ValueType, type =>
             {
-                typePicker.AddItem(type.ToString(), (int)type);
-                if (type == line.ValueType) typeSelected = typeIndex;
-                typeIndex++;
-            }
-
-            typePicker.Selected = typeSelected;
-            bottom.AddChild(typePicker);
-
-            var value = new SpinBox
-            {
-                MinValue = -100000,
-                MaxValue = 100000,
-                Step = 0.001,
-                Value = line.Value,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill
-            };
-            bottom.AddChild(value);
-            bottom.AddChild(hint);
-
-            typePicker.ItemSelected += pick =>
-            {
-                line.ValueType = (ModifierValueType)typePicker.GetItemId((int)pick);
+                line.ValueType = type;
                 hint.Text = ValueHint(line);
                 ChangedTotals();
-            };
+            });
+
+            // The value box owns the free width of the row: the number is what gets typed, the type
+            // is picked once.
+            typePicker.SizeFlagsHorizontal = SizeFlags.Fill;
+            bottom.AddChild(typePicker);
+
+            SpinBox value = EditorControls.Number(line.Value, 0.001);
+            bottom.AddChild(value);
+            bottom.AddChild(hint);
 
             value.ValueChanged += amount =>
             {
@@ -412,8 +315,13 @@ namespace PassiveTreeEditor.Source.View
             };
             condition.TextChanged += text =>
             {
+                bool wasConditional = line.IsConditional;
                 line.Condition = text;
-                ChangedTotals();
+
+                // Only the presence of a condition reaches the totals; its wording does not, so typing
+                // inside an existing condition costs a redraw instead of a resummation.
+                if (line.IsConditional == wasConditional) Changed();
+                else ChangedTotals();
             };
             box.AddChild(condition);
 
@@ -432,6 +340,6 @@ namespace PassiveTreeEditor.Source.View
         private static string ValueHint(ModifierLine line) =>
             line.ValueType == ModifierValueType.Flat
                 ? string.Empty
-                : $"= {(line.Value * 100f).ToString("0.##", CultureInfo.InvariantCulture)}%";
+                : $"= {EditorControls.Percent(line.Value)}";
     }
 }

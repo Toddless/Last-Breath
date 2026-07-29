@@ -43,9 +43,7 @@ namespace PassiveTreeEditor.Source.Simulation
                 if (node.Kind == PassiveNodeKind.Start)
                     _taken.Add(node.Id);
 
-            List<string> reachable = Reachable(document, _taken);
-            var kept = new HashSet<string>(reachable, StringComparer.Ordinal);
-            _taken.IntersectWith(kept);
+            _taken.IntersectWith(Reachable(document, _taken));
 
             Recount(document);
         }
@@ -54,7 +52,7 @@ namespace PassiveTreeEditor.Source.Simulation
         {
             PassiveNode? node = document.Find(id);
             if (node is null || _taken.Contains(id)) return false;
-            if (node.Kind == PassiveNodeKind.Start) return false;
+            if (!NodeKindRules.CostsPoint(node.Kind)) return false;
             if (Spent >= budget) return false;
 
             foreach (string neighbour in document.Neighbours(id))
@@ -69,6 +67,8 @@ namespace PassiveTreeEditor.Source.Simulation
             if (!CanTake(document, id, budget)) return false;
 
             _taken.Add(id);
+
+            // Unconditional because CanTake already refused every class that costs no point.
             Spent++;
             return true;
         }
@@ -82,7 +82,7 @@ namespace PassiveTreeEditor.Source.Simulation
         {
             PassiveNode? node = document.Find(id);
             if (node is null || !_taken.Contains(id)) return false;
-            if (node.Kind == PassiveNodeKind.Start) return false;
+            if (!NodeKindRules.CostsPoint(node.Kind)) return false;
 
             var remaining = new HashSet<string>(_taken, StringComparer.Ordinal);
             remaining.Remove(id);
@@ -95,6 +95,8 @@ namespace PassiveTreeEditor.Source.Simulation
             if (!CanRefund(document, id)) return false;
 
             _taken.Remove(id);
+
+            // Unconditional because CanRefund already refused every class that costs no point.
             Spent--;
             return true;
         }
@@ -142,10 +144,18 @@ namespace PassiveTreeEditor.Source.Simulation
         {
             if (route.Count == 0 || Spent + route.Count > budget) return false;
 
+            // The budget pre-check is not the only way a step can be refused — adjacency can fail on a
+            // route that did not come from PathTo — so the promise is kept by rollback, not by luck.
+            var takenBefore = new HashSet<string>(_taken, StringComparer.Ordinal);
+            int spentBefore = Spent;
+
             foreach (string id in route)
             {
                 if (Take(document, id, budget)) continue;
 
+                _taken.Clear();
+                _taken.UnionWith(takenBefore);
+                Spent = spentBefore;
                 return false;
             }
 
@@ -177,7 +187,7 @@ namespace PassiveTreeEditor.Source.Simulation
         }
 
         /// <summary>Breadth-first walk from every seed, stepping only through the given set.</summary>
-        private static List<string> Reachable(PassiveTreeDocument document, HashSet<string> allowed)
+        private static HashSet<string> Reachable(PassiveTreeDocument document, HashSet<string> allowed)
         {
             var visited = new HashSet<string>(StringComparer.Ordinal);
             var queue = new Queue<string>();
@@ -194,7 +204,7 @@ namespace PassiveTreeEditor.Source.Simulation
                         queue.Enqueue(neighbour);
             }
 
-            return [.. visited];
+            return visited;
         }
     }
 }

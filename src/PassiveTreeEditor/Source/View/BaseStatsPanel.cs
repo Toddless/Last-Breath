@@ -1,6 +1,7 @@
 namespace PassiveTreeEditor.Source.View
 {
     using System;
+    using System.Collections.Generic;
     using Core.Enums;
     using Godot;
     using Simulation;
@@ -11,43 +12,52 @@ namespace PassiveTreeEditor.Source.View
     /// </summary>
     public partial class BaseStatsPanel : VBoxContainer
     {
-        private BaseStatProfile _profile = BaseStatProfile.Unarmed();
+        private BaseStatProfile _profile = new();
+        private BaseStatProfile _baseline = new();
 
         public event Action? ProfileChanged;
 
         public BaseStatProfile Profile => _profile;
 
-        public void SetProfile(BaseStatProfile profile)
+        /// <summary>The profile to edit and the baseline "reset" returns to. Both come from the data
+        /// catalog, so the panel never carries its own copy of the game's numbers.</summary>
+        public void Initialize(BaseStatProfile profile, BaseStatProfile baseline)
         {
             _profile = profile;
+            _baseline = baseline;
             Rebuild();
+        }
+
+        /// <summary>What this session actually changed. A value still equal to the baseline is left out, so
+        /// a later edit to the PlayerStats catalog reaches an untouched stat instead of being shadowed by a
+        /// stored copy of its own old value.</summary>
+        public BaseStatProfile Overrides()
+        {
+            var overrides = new BaseStatProfile();
+
+            // Approximate, not exact: the value round-trips through a double-valued SpinBox, so nudging
+            // a stat and putting it back must not register as an edit.
+            foreach (KeyValuePair<EntityParameter, float> pair in _profile.Values)
+                if (!Mathf.IsEqualApprox(pair.Value, _baseline[pair.Key]))
+                    overrides[pair.Key] = pair.Value;
+
+            return overrides;
         }
 
         public void Rebuild()
         {
-            foreach (Node child in GetChildren())
-            {
-                RemoveChild(child);
-                child.QueueFree();
-            }
+            this.ClearContent();
 
             SizeFlagsHorizontal = SizeFlags.ExpandFill;
 
-            var caption = new Label { Text = "BASE VALUES" };
-            caption.AddThemeFontSizeOverride("font_size", 13);
-            AddChild(caption);
-
-            AddChild(new Label
-            {
-                Text = "Seeded from the unarmed player profile.",
-                AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill
-            });
+            AddChild(EditorControls.Caption("BASE VALUES"));
+            AddChild(EditorControls.Wrapped("Seeded from the unarmed player profile."));
 
             var reset = new Button { Text = "Reset to unarmed" };
             reset.Pressed += () =>
             {
-                _profile = BaseStatProfile.Unarmed();
+                // A copy per reset: the baseline has to survive being edited afterwards.
+                _profile = _baseline.Copy();
                 Rebuild();
                 ProfileChanged?.Invoke();
             };
@@ -63,14 +73,7 @@ namespace PassiveTreeEditor.Source.View
 
                 grid.AddChild(new Label { Text = parameter.ToString() });
 
-                var box = new SpinBox
-                {
-                    MinValue = -100000,
-                    MaxValue = 100000,
-                    Step = 0.01,
-                    Value = _profile[parameter],
-                    SizeFlagsHorizontal = SizeFlags.ExpandFill
-                };
+                SpinBox box = EditorControls.Number(_profile[parameter], 0.01);
 
                 EntityParameter captured = parameter;
                 box.ValueChanged += value =>

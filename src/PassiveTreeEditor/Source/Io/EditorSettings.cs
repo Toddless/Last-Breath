@@ -69,7 +69,9 @@ namespace PassiveTreeEditor.Source.Io
     {
         public string TreePath { get; set; } = string.Empty;
 
-        public BaseStatProfile BaseStats { get; set; } = BaseStatProfile.Unarmed();
+        /// <summary>Saved overrides only, empty when nothing was saved. The baseline lives in the
+        /// PlayerStats catalog, which is not loaded yet when settings are read.</summary>
+        public BaseStatProfile BaseStats { get; set; } = new();
     }
 
     public sealed class EditorSettingsDto

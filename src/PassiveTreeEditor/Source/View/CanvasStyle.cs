@@ -1,5 +1,8 @@
 namespace PassiveTreeEditor.Source.View
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Core.Enums;
     using Godot;
     using Model;
@@ -76,17 +79,36 @@ namespace PassiveTreeEditor.Source.View
 
         // ── per-node look ──────────────────────────────────────────────────────────────────────
 
-        public static float Radius(PassiveNodeKind kind) => kind switch
+        /// <summary>Shape, size and caption per class in one place: a new class is one row here plus
+        /// its rules, never a sweep through the drawing code.</summary>
+        private static readonly Dictionary<PassiveNodeKind, NodeVisual> s_visuals = new()
         {
-            PassiveNodeKind.Small => 5.6f,
-            PassiveNodeKind.Notable => 12f,
-            PassiveNodeKind.Keystone => 17f,
-            PassiveNodeKind.AbilityUnlock => 11f,
-            PassiveNodeKind.SocketTier2 => 6f,
-            PassiveNodeKind.SocketTier3 => 7.5f,
-            PassiveNodeKind.Start => 14f,
-            _ => 6f
+            [PassiveNodeKind.Small] = new NodeVisual(NodeShape.Circle, 5.6f, false),
+            [PassiveNodeKind.Notable] = new NodeVisual(NodeShape.Hexagon, 12f, true),
+            [PassiveNodeKind.Keystone] = new NodeVisual(NodeShape.RotatedHexagon, 17f, true),
+            [PassiveNodeKind.AbilityUnlock] = new NodeVisual(NodeShape.Circle, 11f, true),
+            [PassiveNodeKind.SocketTier2] = new NodeVisual(NodeShape.Square, 6f, false),
+            [PassiveNodeKind.SocketTier3] = new NodeVisual(NodeShape.Diamond, 7.5f, false),
+            [PassiveNodeKind.Start] = new NodeVisual(NodeShape.Circle, 14f, true)
         };
+
+        /// <summary>The keystone's hexagon is turned off its neighbours' axis, so it reads as another
+        /// shape at a glance instead of as a larger notable.</summary>
+        public const float KeystoneRotationDegrees = 22.5f;
+
+        /// <summary>The largest node on the board — the world-space reach a pick query has to cover.</summary>
+        public static float MaxRadius { get; } = s_visuals.Values.Max(visual => visual.Radius);
+
+        /// <summary>Fails on the first draw if a class was added to the enum but not to the table —
+        /// the alternative is a node that silently draws as whatever the fallback happened to be.</summary>
+        static CanvasStyle()
+        {
+            foreach (PassiveNodeKind kind in Enum.GetValues<PassiveNodeKind>())
+                if (!s_visuals.ContainsKey(kind))
+                    throw new InvalidOperationException($"CanvasStyle has no visual for {kind}");
+        }
+
+        public static NodeVisual Visual(PassiveNodeKind kind) => s_visuals[kind];
 
         /// <summary>Hue of the node: its ray, the wedge it bridges when it is a hybrid, or gold when
         /// it belongs to no ray at all (the neutral core).</summary>
@@ -134,13 +156,6 @@ namespace PassiveTreeEditor.Source.View
 
         public static Color SelectionStroke => s_selectStroke;
 
-        /// <summary>Only these classes carry a caption; small and socket nodes would just add noise.</summary>
-        public static bool IsLabelled(PassiveNodeKind kind) => kind
-            is PassiveNodeKind.Start
-            or PassiveNodeKind.AbilityUnlock
-            or PassiveNodeKind.Keystone
-            or PassiveNodeKind.Notable;
-
         public static string ShortLabel(PassiveNode node)
         {
             if (!string.IsNullOrWhiteSpace(node.Title)) return node.Title;
@@ -161,6 +176,19 @@ namespace PassiveTreeEditor.Source.View
         Taken,
         OnPath
     }
+
+    public enum NodeShape
+    {
+        Circle,
+        Hexagon,
+        RotatedHexagon,
+        Square,
+        Diamond
+    }
+
+    /// <param name="Radius">World units, the mockup's own sizes.</param>
+    /// <param name="Labelled">Small nodes and sockets stay mute — captions on them turn the wheel into noise.</param>
+    public readonly record struct NodeVisual(NodeShape Shape, float Radius, bool Labelled);
 
     public readonly record struct NodeLook(Color Fill, Color Outline, float OutlineWidth);
 }

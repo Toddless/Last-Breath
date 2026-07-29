@@ -13,8 +13,6 @@ namespace PassiveTreeEditor.Source.Simulation
     /// </summary>
     public static class StatSummary
     {
-        private const string ModifierSource = "PassiveTree";
-
         public static TreeSummary Build(PassiveTreeDocument document, AllocationState allocation, BaseStatProfile baseStats)
         {
             var accumulators = new Dictionary<EntityParameter, ParameterAccumulator>();
@@ -66,28 +64,17 @@ namespace PassiveTreeEditor.Source.Simulation
 
         private static void Describe(PassiveNode node, TreeSummary summary)
         {
-            string label = string.IsNullOrWhiteSpace(node.Title) ? node.Id : node.Title;
-
-            switch (node.Kind)
+            if (node.Kind == PassiveNodeKind.Keystone)
             {
-                case PassiveNodeKind.Keystone:
-                    summary.Keystones.Add(string.IsNullOrWhiteSpace(node.Description) ? label : $"{label} — {node.Description}");
-                    break;
-                case PassiveNodeKind.Start:
-                case PassiveNodeKind.AbilityUnlock:
-                    summary.Abilities.Add(node.AbilityId);
-                    break;
-                case PassiveNodeKind.SocketTier2:
-                    summary.SocketsTier2.Add(node.AbilityId);
-                    break;
-                case PassiveNodeKind.SocketTier3:
-                    summary.SocketsTier3.Add(node.AbilityId);
-                    break;
-                case PassiveNodeKind.Small:
-                case PassiveNodeKind.Notable:
-                default:
-                    break;
+                string label = string.IsNullOrWhiteSpace(node.Title) ? node.Id : node.Title;
+                summary.Keystones.Add(string.IsNullOrWhiteSpace(node.Description) ? label : $"{label} — {node.Description}");
+                return;
             }
+
+            // An empty reference is something Check reports, not a blank entry in the totals.
+            if (!NodeKindRules.For(node.Kind).RequiresAbility || string.IsNullOrWhiteSpace(node.AbilityId)) return;
+
+            summary.UnlocksOf(node.Kind).Add(node.AbilityId);
         }
 
         private sealed class ParameterAccumulator
@@ -102,7 +89,7 @@ namespace PassiveTreeEditor.Source.Simulation
 
             public void Add(EntityParameter parameter, ModifierLine line)
             {
-                _modifiers.Add(new SimpleModifier(parameter, line.ValueType, line.Value, ModifierSource));
+                _modifiers.Add(new SimpleModifier(parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource));
                 _lines++;
                 if (line.IsConditional) _conditionalLines++;
 
@@ -151,18 +138,30 @@ namespace PassiveTreeEditor.Source.Simulation
 
     public sealed class TreeSummary
     {
+        private readonly Dictionary<PassiveNodeKind, List<string>> _unlocks = [];
+
         public List<ParameterTotal> Parameters { get; } = [];
 
         public List<string> Keystones { get; } = [];
 
-        public List<string> Abilities { get; } = [];
-
-        public List<string> SocketsTier2 { get; } = [];
-
-        public List<string> SocketsTier3 { get; } = [];
+        /// <summary>Ability references grouped by the class of node that granted them. A class with
+        /// nothing taken has no entry at all, so the panel never prints an empty row.</summary>
+        public IReadOnlyDictionary<PassiveNodeKind, List<string>> Unlocks => _unlocks;
 
         public int ConditionalLines { get; set; }
 
-        public bool IsEmpty => Parameters.Count == 0 && Keystones.Count == 0 && Abilities.Count == 0;
+        public bool IsEmpty => Parameters.Count == 0 && Keystones.Count == 0 && _unlocks.Count == 0;
+
+        /// <summary>The write end of <see cref="Unlocks"/>: the list for a class, created on demand.</summary>
+        public List<string> UnlocksOf(PassiveNodeKind kind)
+        {
+            if (!_unlocks.TryGetValue(kind, out List<string>? list))
+            {
+                list = [];
+                _unlocks[kind] = list;
+            }
+
+            return list;
+        }
     }
 }

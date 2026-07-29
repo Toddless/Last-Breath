@@ -356,8 +356,9 @@ namespace PassiveTreeEditor.Source.View
 
             foreach (PassiveNode node in _drawCandidates)
             {
+                NodeVisual visual = CanvasStyle.Visual(node.Kind);
                 Vector2 center = ToScreen(node.X, node.Y);
-                float radius = CanvasStyle.Radius(node.Kind) * _zoom;
+                float radius = visual.Radius * _zoom;
                 if (radius < 1.5f) radius = 1.5f;
 
                 bool taken = _allocation.IsTaken(node.Id);
@@ -371,7 +372,7 @@ namespace PassiveTreeEditor.Source.View
                 bool hovered = _hovered == node.Id;
                 Color outline = hovered ? CanvasStyle.Gold1 : look.Outline;
 
-                DrawNodeShape(node.Kind, center, radius, look.Fill, outline, look.OutlineWidth * MathF.Max(0.6f, _zoom));
+                DrawNodeShape(visual.Shape, center, radius, look.Fill, outline, look.OutlineWidth * MathF.Max(0.6f, _zoom));
 
                 // The frontier ring is editor-only feedback: it says "this one is legal next".
                 if (Mode == EditorMode.Simulate && !taken && state == NodeState.Idle && _frontier.Contains(node.Id))
@@ -382,7 +383,7 @@ namespace PassiveTreeEditor.Source.View
                     DrawArc(center, radius + 5f * _zoom, 0f, Mathf.Tau, 28, CanvasStyle.SelectionStroke,
                         MathF.Max(1.5f, 2f * _zoom), true);
 
-                if (!showLabels || !CanvasStyle.IsLabelled(node.Kind)) continue;
+                if (!showLabels || !visual.Labelled) continue;
 
                 string text = CanvasStyle.ShortLabel(node);
                 if (text.Length == 0) continue;
@@ -396,30 +397,28 @@ namespace PassiveTreeEditor.Source.View
             }
         }
 
-        /// <summary>Shape per class, straight from the mockup: hexagon for a notable, bigger rotated
-        /// hexagon for a keystone, upright square for a T2 socket, diamond for T3, circles elsewhere.</summary>
-        private void DrawNodeShape(PassiveNodeKind kind, Vector2 center, float radius, Color fill, Color outline, float outlineWidth)
+        /// <summary>The mockup's shapes, drawn from the shape alone: which class wears which is the
+        /// visual table's business, so a new class that reuses a shape costs nothing here.</summary>
+        private void DrawNodeShape(NodeShape shape, Vector2 center, float radius, Color fill, Color outline, float outlineWidth)
         {
             float width = MathF.Max(1f, outlineWidth);
 
-            switch (kind)
+            switch (shape)
             {
-                case PassiveNodeKind.Notable:
+                case NodeShape.Hexagon:
                     DrawPolygonShape(center, radius, 6, 0f, fill, outline, width);
                     break;
-                case PassiveNodeKind.Keystone:
-                    DrawPolygonShape(center, radius, 6, Mathf.DegToRad(22.5f), fill, outline, width);
+                case NodeShape.RotatedHexagon:
+                    DrawPolygonShape(center, radius, 6, Mathf.DegToRad(CanvasStyle.KeystoneRotationDegrees), fill, outline, width);
                     break;
-                case PassiveNodeKind.SocketTier2:
+                case NodeShape.Square:
                     // Half-extent to circumradius: an upright square through four polygon vertices.
                     DrawPolygonShape(center, radius * SquareCircumradius, 4, Mathf.Tau / 8f, fill, outline, width);
                     break;
-                case PassiveNodeKind.SocketTier3:
+                case NodeShape.Diamond:
                     DrawPolygonShape(center, radius * SquareCircumradius, 4, 0f, fill, outline, width);
                     break;
-                case PassiveNodeKind.Small:
-                case PassiveNodeKind.AbilityUnlock:
-                case PassiveNodeKind.Start:
+                case NodeShape.Circle:
                 default:
                     DrawCircle(center, radius, fill);
                     DrawArc(center, radius, 0f, Mathf.Tau, 28, outline, width, true);
@@ -729,7 +728,7 @@ namespace PassiveTreeEditor.Source.View
             // Small nodes shrink to a couple of pixels when the whole tree is on screen; the slack
             // keeps them clickable without making overlapping picks ambiguous when zoomed in.
             float slack = PickScreenSlack / _zoom;
-            float reach = 30f + slack;
+            float reach = CanvasStyle.MaxRadius + slack;
 
             _pickCandidates.Clear();
             _document.Index.Query(world.X - reach, world.Y - reach, world.X + reach, world.Y + reach, _pickCandidates);
@@ -739,7 +738,7 @@ namespace PassiveTreeEditor.Source.View
 
             foreach (PassiveNode node in _pickCandidates)
             {
-                float radius = CanvasStyle.Radius(node.Kind) + slack;
+                float radius = CanvasStyle.Visual(node.Kind).Radius + slack;
                 float deltaX = node.X - world.X;
                 float deltaY = node.Y - world.Y;
                 float distance = deltaX * deltaX + deltaY * deltaY;

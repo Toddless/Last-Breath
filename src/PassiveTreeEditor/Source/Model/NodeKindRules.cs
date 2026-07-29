@@ -1,5 +1,6 @@
 namespace PassiveTreeEditor.Source.Model
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -18,6 +19,15 @@ namespace PassiveTreeEditor.Source.Model
             [PassiveNodeKind.SocketTier3] = new NodeKindRule(0, 0, true, false),
             [PassiveNodeKind.Start] = new NodeKindRule(0, 0, true, false)
         };
+
+        /// <summary>Fails on the first use if a class was added to the enum but not to the table —
+        /// louder and earlier than the lookup miss it would otherwise become mid-draw.</summary>
+        static NodeKindRules()
+        {
+            foreach (PassiveNodeKind kind in Enum.GetValues<PassiveNodeKind>())
+                if (!s_rules.ContainsKey(kind))
+                    throw new InvalidOperationException($"NodeKindRules has no entry for {kind}");
+        }
 
         public static NodeKindRule For(PassiveNodeKind kind) => s_rules[kind];
 

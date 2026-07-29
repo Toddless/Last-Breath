@@ -3,6 +3,8 @@ namespace PassiveTreeEditor.Source.View
     using System;
     using System.Collections.Generic;
     using Core.Data.GameData;
+    using Core.Entity;
+    using Core.Enums;
     using Core.Localization;
     using Godot;
     using Io;
@@ -21,6 +23,10 @@ namespace PassiveTreeEditor.Source.View
         private readonly AbilityCatalog _abilities = new();
         private readonly PassiveTreeProvider _treeProvider = new();
         private readonly AllocationState _allocation = new();
+
+        // The game's own baseline reader (Core): the tool measures the tree on the numbers the player
+        // actually starts with, and a bad profile is reported through the game's Tracker, not here.
+        private readonly PlayerStatsProvider _playerStats = new();
 
         // The game's own display units for parameters, read from the Formatting catalog — the tooltip
         // must not decide on its own what counts as a percent.
@@ -51,8 +57,7 @@ namespace PassiveTreeEditor.Source.View
 
         public override void _ExitTree()
         {
-            _settings.TreePath = _pathEdit.Text;
-            _settings.BaseStats = _baseStats.Profile;
+            CaptureSettings();
             EditorSettings.Save(_settings);
         }
 
@@ -236,7 +241,6 @@ namespace PassiveTreeEditor.Source.View
         private void WireEvents()
         {
             _inspector.Initialize(_canvas, _abilities);
-            _baseStats.SetProfile(_settings.BaseStats);
 
             _canvas.SelectionChanged += () => _inspector.Rebuild();
             _canvas.DocumentChanged += OnDocumentChanged;
@@ -254,11 +258,13 @@ namespace PassiveTreeEditor.Source.View
         {
             var failures = new List<string>();
             var source = new FileSystemDataSource(ToolPaths.SharedDataRoot);
-            var participants = new IGameDataParticipant[] { _abilities, _treeProvider, _parameterFormats };
+            var participants = new IGameDataParticipant[] { _abilities, _treeProvider, _playerStats, _parameterFormats };
             var service = new GameDataService(source, participants);
 
             service.LoadFailed += (catalog, exception) => failures.Add($"{catalog}: {exception.Message}");
             service.LoadAll();
+
+            ApplyBaseStats();
 
             // A custom path from the last session wins over the catalog copy; otherwise the tree the
             // data pipeline just read is the document.
@@ -278,7 +284,20 @@ namespace PassiveTreeEditor.Source.View
                       + (failures.Count > 0 ? $", {failures.Count} catalog(s) unavailable" : string.Empty)
                       + (issues.Count > 0 ? $", {issues.Count} data issue(s)" : string.Empty));
 
-            if (issues.Count > 0) ShowMessage("Tree data issues", issues);
+            if (issues.Count > 0) ShowMessage("Data issues", issues);
+        }
+
+        /// <summary>Settings are read before any catalog exists, so the profile can only be assembled
+        /// here: the data baseline first, then whatever the last session edited on top of it.</summary>
+        private void ApplyBaseStats()
+        {
+            BaseStatProfile baseline = BaseStatProfile.From(_playerStats.Unarmed);
+            BaseStatProfile profile = baseline.Copy();
+
+            foreach (KeyValuePair<EntityParameter, float> pair in _settings.BaseStats.Values)
+                profile[pair.Key] = pair.Value;
+
+            _baseStats.Initialize(profile, baseline);
         }
 
         private void AdoptDocument(PassiveTreeDocument document)
@@ -315,7 +334,8 @@ namespace PassiveTreeEditor.Source.View
 
         private void SaveTree()
         {
-            string path = _pathEdit.Text.Trim();
+            CaptureSettings();
+            string path = _settings.TreePath;
 
             try
             {
@@ -328,9 +348,17 @@ namespace PassiveTreeEditor.Source.View
             }
 
             _dirty = false;
-            _settings.TreePath = path;
             EditorSettings.Save(_settings);
             SetStatus($"saved {_canvas.Document.Nodes.Count} node(s) to {path}");
+        }
+
+        /// <summary>The single place the settings snapshot is assembled. "Reset to unarmed" hands the
+        /// panel a brand-new profile instance, so anything holding on to the old one goes stale without
+        /// a word — both save paths have to re-read the live values instead of trusting an alias.</summary>
+        private void CaptureSettings()
+        {
+            _settings.TreePath = _pathEdit.Text.Trim();
+            _settings.BaseStats = _baseStats.Overrides();
         }
 
         private void RunValidation()
@@ -360,7 +388,7 @@ namespace PassiveTreeEditor.Source.View
         private void OnHovered(PassiveNode? node)
         {
             if (node is null) _tooltip.HideTip();
-            else _tooltip.ShowFor(node, GetLocalMousePosition(), Size);
+            else _tooltip.ShowFor(node, GetGlobalMousePosition());
         }
 
         private void MarkDirty()

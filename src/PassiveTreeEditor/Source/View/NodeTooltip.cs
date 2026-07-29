@@ -2,6 +2,7 @@ namespace PassiveTreeEditor.Source.View
 {
     using Core.Localization;
     using Core.Modifiers;
+    using Core.Views.UI;
     using Godot;
     using Model;
 
@@ -59,31 +60,23 @@ namespace PassiveTreeEditor.Source.View
 
         public void HideTip() => Visible = false;
 
-        /// <summary>Fills in the node and places the card next to the cursor, kept inside
-        /// <paramref name="bounds"/> so it never hangs off the window edge.</summary>
-        public void ShowFor(PassiveNode node, Vector2 mouse, Vector2 bounds)
+        /// <summary>Fills in the node and places the card next to the cursor, kept inside the viewport
+        /// so it never hangs off the window edge.</summary>
+        public void ShowFor(PassiveNode node, Vector2 mouseGlobal)
         {
             Build(node);
 
             Visible = true;
 
-            // Minimum size rather than Size: the children were added this frame and layout has not
-            // run yet, so Size is still whatever the previous node needed.
-            Vector2 size = GetCombinedMinimumSize();
-            float x = Mathf.Clamp(mouse.X + CursorOffset, 0f, Mathf.Max(0f, bounds.X - size.X));
-            float y = Mathf.Clamp(mouse.Y + CursorOffset, 0f, Mathf.Max(0f, bounds.Y - size.Y));
-
-            Position = new Vector2(x, y);
-            Size = size;
+            // Children were added this frame and layout has not run, so Size is still what the previous
+            // node needed — PlaceClamped reads Size, so it has to be set first.
+            Size = GetCombinedMinimumSize();
+            UiPlacement.PlaceClamped(this, mouseGlobal, new Vector2(CursorOffset, CursorOffset));
         }
 
         private void Build(PassiveNode node)
         {
-            foreach (Node child in _content.GetChildren())
-            {
-                _content.RemoveChild(child);
-                child.QueueFree();
-            }
+            _content.ClearContent();
 
             _content.AddChild(Header(node));
 
@@ -123,7 +116,7 @@ namespace PassiveTreeEditor.Source.View
         {
             string text = _formatter is null
                 ? $"{line.Parameter} {line.ValueType} {line.Value}"
-                : _formatter.Format(new SimpleModifier(line.Parameter, line.ValueType, line.Value, "tree"));
+                : _formatter.Format(new SimpleModifier(line.Parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource));
 
             return line.IsConditional ? $"{text}  ({line.Condition})" : text;
         }

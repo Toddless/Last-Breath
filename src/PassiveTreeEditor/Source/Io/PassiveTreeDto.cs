@@ -1,6 +1,7 @@
 namespace PassiveTreeEditor.Source.Io
 {
     using System.Collections.Generic;
+    using Model;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -12,7 +13,7 @@ namespace PassiveTreeEditor.Source.Io
     {
         [JsonProperty("version")] public int Version { get; set; } = PassiveTreeFormat.Version;
 
-        [JsonProperty("budget")] public int Budget { get; set; } = 65;
+        [JsonProperty("budget")] public int Budget { get; set; } = PassiveTreeDocument.DefaultBudget;
 
         [JsonProperty("nodes")] public List<PassiveNodeDto> Nodes { get; set; } = [];
 

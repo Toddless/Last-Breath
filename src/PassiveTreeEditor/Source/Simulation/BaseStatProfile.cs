@@ -4,9 +4,8 @@ namespace PassiveTreeEditor.Source.Simulation
     using Core.Enums;
 
     /// <summary>
-    /// The character the tree is measured on top of. Seeded from the unarmed profile in
-    /// <c>Main/Player/Player.cs</c> (<c>GetUnarmedBaseValue</c>) and editable, so a cluster can be
-    /// judged against real gear instead of a naked character.
+    /// The character the tree is measured on top of. Seeded from the <c>PlayerStats</c> data catalog
+    /// and editable, so a cluster can be judged against real gear instead of a naked character.
     /// </summary>
     public sealed class BaseStatProfile
     {
@@ -20,28 +19,23 @@ namespace PassiveTreeEditor.Source.Simulation
 
         public IReadOnlyDictionary<EntityParameter, float> Values => _values;
 
-        /// <summary>The player's unarmed baseline, kept in sync with the game by hand — the tool must
-        /// not construct a Player, which would drag the whole battle stack into the editor.</summary>
-        public static BaseStatProfile Unarmed()
+        /// <summary>An editable profile seeded from a read-only data baseline (the PlayerStats catalog).</summary>
+        public static BaseStatProfile From(IReadOnlyDictionary<EntityParameter, float> values)
         {
             var profile = new BaseStatProfile();
-            profile[EntityParameter.Health] = 1000;
-            profile[EntityParameter.Barrier] = 100;
-            profile[EntityParameter.Mana] = 500;
-            profile[EntityParameter.Intelligence] = 5f;
-            profile[EntityParameter.Strength] = 5f;
-            profile[EntityParameter.Dexterity] = 5f;
-            profile[EntityParameter.Evade] = 300;
-            profile[EntityParameter.Armor] = 300;
-            profile[EntityParameter.Accuracy] = 300;
-            profile[EntityParameter.CriticalChance] = 0.05f;
-            profile[EntityParameter.AdditionalHitChance] = 0.05f;
-            profile[EntityParameter.CriticalDamage] = 1.5f;
-            profile[EntityParameter.MulticastChance] = 0f;
-            profile[EntityParameter.PhysicalDamage] = 100;
-            profile[EntityParameter.SpellDamage] = 50;
-            profile[EntityParameter.MoveSpeed] = 500;
+            foreach (KeyValuePair<EntityParameter, float> pair in values) profile._values[pair.Key] = pair.Value;
+
             return profile;
+        }
+
+        /// <summary>An independent profile with the same values. A baseline that is handed out is
+        /// edited in place by the panel, so it has to stop being the baseline as it leaves.</summary>
+        public BaseStatProfile Copy()
+        {
+            var copy = new BaseStatProfile();
+            foreach (KeyValuePair<EntityParameter, float> pair in _values) copy._values[pair.Key] = pair.Value;
+
+            return copy;
         }
     }
 }

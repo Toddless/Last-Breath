@@ -45,6 +45,11 @@ namespace PassiveTreeEditor.Source.Model
 
         public const int DefaultBudget = 62;
 
+        /// <summary>Stamped on every modifier a tree node contributes. The game takes a node back by
+        /// dropping modifiers of this source (<c>RemoveModifierBySource</c>), so two spellings of it
+        /// would mean lines that can be granted and never revoked.</summary>
+        public const string ModifierSource = "PassiveTree";
+
         public PassiveNode? Find(string id) => _byId.GetValueOrDefault(id);
 
         public bool Contains(string id) => _byId.ContainsKey(id);

@@ -1,7 +1,10 @@
 namespace PassiveTreeEditor.Source.View
 {
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using Godot;
+    using Model;
     using Simulation;
 
     /// <summary>
@@ -15,19 +18,15 @@ namespace PassiveTreeEditor.Source.View
 
         public void Rebuild(TreeSummary summary, AllocationState allocation, int budget)
         {
-            foreach (Node child in GetChildren())
-            {
-                RemoveChild(child);
-                child.QueueFree();
-            }
+            this.ClearContent();
 
             SizeFlagsHorizontal = SizeFlags.ExpandFill;
 
-            AddChild(Caption($"POINTS   spent {allocation.Spent} / {budget}   left {budget - allocation.Spent}"));
+            AddChild(EditorControls.Caption($"POINTS   spent {allocation.Spent} / {budget}   left {budget - allocation.Spent}"));
 
             if (summary.IsEmpty)
             {
-                AddChild(Wrapped("Nothing allocated yet. Switch to Simulate mode and click a node next to a start point."));
+                AddChild(EditorControls.Wrapped("Nothing allocated yet. Switch to Simulate mode and click a node next to a start point."));
                 return;
             }
 
@@ -36,26 +35,12 @@ namespace PassiveTreeEditor.Source.View
             BuildKeystones(summary);
         }
 
-        private static Label Caption(string text)
-        {
-            var label = new Label { Text = text };
-            label.AddThemeFontSizeOverride("font_size", 13);
-            return label;
-        }
-
-        private static Label Wrapped(string text) => new()
-        {
-            Text = text,
-            AutowrapMode = TextServer.AutowrapMode.WordSmart,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill
-        };
-
         private static string Signed(float value, bool percent)
         {
             if (Mathf.IsZeroApprox(value)) return "—";
 
             string body = percent
-                ? (value * 100f).ToString("0.##", CultureInfo.InvariantCulture) + "%"
+                ? EditorControls.Percent(value)
                 : value.ToString("0.###", CultureInfo.InvariantCulture);
 
             return value > 0 ? "+" + body : body;
@@ -65,26 +50,22 @@ namespace PassiveTreeEditor.Source.View
 
         private void BuildUnlocks(TreeSummary summary)
         {
-            if (summary.Abilities.Count > 0)
-                AddChild(Wrapped($"Abilities ({summary.Abilities.Count}): {string.Join(", ", summary.Abilities)}"));
-
-            if (summary.SocketsTier2.Count > 0)
-                AddChild(Wrapped($"T2 sockets ({summary.SocketsTier2.Count}): {string.Join(", ", summary.SocketsTier2)}"));
-
-            if (summary.SocketsTier3.Count > 0)
-                AddChild(Wrapped($"T3 sockets ({summary.SocketsTier3.Count}): {string.Join(", ", summary.SocketsTier3)}"));
+            // Sorted by class: a dictionary has no order of its own, and rows that swap places
+            // between rebuilds read as if the allocation changed.
+            foreach (KeyValuePair<PassiveNodeKind, List<string>> pair in summary.Unlocks.OrderBy(pair => pair.Key))
+                AddChild(EditorControls.Wrapped($"{pair.Key} ({pair.Value.Count}): {string.Join(", ", pair.Value)}"));
         }
 
         private void BuildParameters(TreeSummary summary)
         {
             if (summary.Parameters.Count == 0) return;
 
-            AddChild(Caption("PARAMETERS"));
+            AddChild(EditorControls.Caption("PARAMETERS"));
 
             var grid = new GridContainer { Columns = s_headers.Length, SizeFlagsHorizontal = SizeFlags.ExpandFill };
             AddChild(grid);
 
-            foreach (string header in s_headers) grid.AddChild(Caption(header));
+            foreach (string header in s_headers) grid.AddChild(EditorControls.Caption(header));
 
             foreach (ParameterTotal total in summary.Parameters)
             {
@@ -102,15 +83,15 @@ namespace PassiveTreeEditor.Source.View
             }
 
             if (summary.ConditionalLines > 0)
-                AddChild(Wrapped($"{summary.ConditionalLines} conditional line(s) counted as always active."));
+                AddChild(EditorControls.Wrapped($"{summary.ConditionalLines} conditional line(s) counted as always active."));
         }
 
         private void BuildKeystones(TreeSummary summary)
         {
             if (summary.Keystones.Count == 0) return;
 
-            AddChild(Caption("KEYSTONES (not evaluated)"));
-            foreach (string keystone in summary.Keystones) AddChild(Wrapped("• " + keystone));
+            AddChild(EditorControls.Caption("KEYSTONES (not evaluated)"));
+            foreach (string keystone in summary.Keystones) AddChild(EditorControls.Wrapped("• " + keystone));
         }
     }
 }
