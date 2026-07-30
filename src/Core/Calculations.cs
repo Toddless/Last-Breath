@@ -6,6 +6,7 @@
     using Battle;
     using Context;
     using Entity;
+    using Entity.Components;
     using Entity.NpcModifiers;
     using Enums;
     using Events;
@@ -53,23 +54,59 @@
 
         /// <summary>
         /// Defender-side mitigation — the single place that knows how each damage type is reduced.
-        /// Pipeline order: outgoing modifiers (source) -> incoming modifiers (target) -> mitigation per component -> barrier -> health.
+        /// Pipeline order: outgoing modifiers (source) -> incoming modifiers (target) -> mitigation per component
+        /// -> suppression -> shield -> barrier -> stage guard -> health.
         /// Rules: Physical and Bleed — armor scaled by the source's armor penetration; Fire/Cold/Lightning —
         /// the matching resistance (fraction 0..1) scaled by the source's resistance penetration; Burning — fire
         /// resistance the same way (but the "attacks ignore resistances" flag never covers it — that mark is
         /// attack-side); Pure and Poison pass through untouched.
         /// Mitigated values are written back per component (<see cref="IDamageContext.Set"/>),
         /// so UI and statistics see the real post-mitigation damage split.
+        /// <paramref name="rnd"/> is the stream the suppression roll burns; callers that own one pass it in.
         /// </summary>
-        public static void CalculateMitigation(IDamageContext context, IFightable target)
+        // TODO:
+        // Параметр rnd временный: пока его не передают, подавление роллит на анонимном генераторе, созданном
+        // на этот удар. Проводку боевых стримов делает T-13 «Проводка бойцов» — после неё параметр становится
+        // обязательным, и компилятор заставит каждую точку вызова назвать свой стрим.
+        public static void CalculateMitigation(IDamageContext context, IFightable target, IRandomNumberGenerator? rnd = null)
         {
             // Snapshot: Set() mutates the collection we are iterating
             foreach ((DamageType type, float damage) in context.DamageComponents.ToArray())
                 context.Set(type, MitigateComponent(type, damage, context, target));
+
+            ApplySuppression(context, target, rnd);
         }
 
-        // TODO:
-        // Подавление (Suppress) пока что мертвый стат. Необходимо брать в расчет значение DamageCause и для всех способностей рассчитывать вероятность снижения урона
+        /// <summary>
+        /// Suppression — the defender's chance (<see cref="EntityParameter.SuppressChance"/>) to take a fraction
+        /// (<see cref="EntityParameter.Suppress"/>) less of an incoming hit.
+        /// Position: AFTER per-type mitigation and BEFORE the absorption chain, so the suppressed number is what
+        /// shields, barriers and the stage guard soak and what the log shows — mitigation stays the only place
+        /// that knows damage types, and suppression stays type-agnostic.
+        /// Every <see cref="DamageCause"/> is covered: the stat is player-facing as plain "incoming damage"
+        /// defence (character window, item rolls, six crafting resources, the passive tree's Suppression notable),
+        /// and a cause whitelist would have to be authored data rather than a code constant.
+        /// One roll per hit, not per component: a hit is either suppressed or it is not.
+        /// A defender without the stat never touches the stream, so nobody else's rolls shift.
+        /// The roll needs no preview guard: previewing is an ability-activation concept
+        /// (<see cref="Battle.Abilities.IAbilityActivationContext.IsPreview"/>), no preview path builds a
+        /// <see cref="DamageContext"/> and none reaches TakeDamage — there is no second pass to burn a roll on.
+        /// </summary>
+        private static void ApplySuppression(IDamageContext context, IFightable target, IRandomNumberGenerator? rnd)
+        {
+            // Bounds (chance 0..1, fraction 0..0.75) live in EntityParametersComponent's table.
+            float chance = target.Parameters.GetValueForParameter(EntityParameter.SuppressChance);
+            float suppression = target.Parameters.GetValueForParameter(EntityParameter.Suppress);
+            if (chance <= 0 || suppression <= 0 || context.TotalDamage <= 0) return;
+
+            var generator = rnd ?? new DefaultRandomNumberGenerator();
+            if (!ChanceSuccessful(chance, generator.RandFloat())) return;
+
+            // Snapshot: Set() mutates the collection we are iterating
+            foreach ((DamageType type, float damage) in context.DamageComponents.ToArray())
+                context.Set(type, damage * (1 - suppression));
+        }
+
         private static float MitigateComponent(DamageType type, float damage, IDamageContext context, IFightable target)
         {
             if (s_resistanceByType.TryGetValue(type, out (EntityParameter Resistance, EntityParameter Penetration) elemental))
