@@ -12,6 +12,7 @@ namespace LastBreath.Helpers
     using Core.Data.NpcData;
     using Core.Entity;
     using Core.Enums;
+    using Core.Localization;
     using Core.Modifiers;
     using Core.Narrative;
     using Core.Narrative.Facts;
@@ -24,14 +25,22 @@ namespace LastBreath.Helpers
     using Godot;
 
     /// <summary>
-    /// Debug-build console (autoload, F12): drive quests, facts, influence, reputation, the passive
-    /// tree, player vitals/stats, items, world time and NPC spawns without UI. The one place UI is
+    /// Debug-build console (autoload, F12): drive and inspect quests, facts, influence, reputation,
+    /// the passive tree, player vitals/stats, items, world time and NPC spawns without UI. Systems
+    /// that have no game interface yet are accepted by hand through here. The one place UI is
     /// built in code on purpose — it must not depend on anything it tests. Services resolve lazily
     /// per command so the autoload never races the provider bootstrap.
     /// </summary>
     public partial class DebugConsole : CanvasLayer
     {
         private const string ModifierSource = "debugConsole";
+
+        private const string PassiveTreeUsage =
+            "passive tree | passive frontier | passive node <nodeId> | passive take <nodeId> | passive refund <nodeId> | passive dump | passive respec";
+
+        /// <summary>How many frontier rows one answer prints: the whole frontier of a wide allocation
+        /// would scroll the useful lines out of the console.</summary>
+        private const int FrontierLimit = 25;
 
         private readonly List<string> _history = [];
         private int _historyIndex;
@@ -391,6 +400,8 @@ namespace LastBreath.Helpers
             switch (args.Length > 1 ? args[1].ToLowerInvariant() : "tree")
             {
                 case "tree": PrintTreeState(tree); break;
+                case "frontier": PrintFrontier(tree); break;
+                case "node" when args.Length > 2: PrintNode(tree, args[2]); break;
                 case "take" when args.Length > 2: PrintAllocation(tree, "take", args[2], tree.Take(args[2])); break;
                 case "refund" when args.Length > 2: PrintAllocation(tree, "refund", args[2], tree.Refund(args[2])); break;
                 case "dump": PrintTreeModifiers(tree); break;
@@ -399,7 +410,7 @@ namespace LastBreath.Helpers
                     Print($"Respec done. {PointsOf(tree)}");
                     break;
                 default:
-                    Print("passive tree | passive take <nodeId> | passive refund <nodeId> | passive dump | passive respec");
+                    Print(PassiveTreeUsage);
                     break;
             }
         }
@@ -411,6 +422,44 @@ namespace LastBreath.Helpers
             Print(tree.TakenNodes.Count == 0
                 ? "Taken: none"
                 : $"Taken: {string.Join(", ", tree.TakenNodes.OrderBy(id => id, StringComparer.Ordinal))}");
+        }
+
+        /// <summary>
+        /// What can be bought right now, so a node can be picked without opening the 155-node catalog.
+        /// Adjacency is not recomputed here: a node is listed when <see cref="IPassiveTreeService.CheckTake"/>
+        /// says it would succeed, so the list can never disagree with what <c>passive take</c> does.
+        /// </summary>
+        private void PrintFrontier(IPassiveTreeService tree)
+        {
+            List<PassiveNode> available = tree.Tree.Nodes
+                .Where(node => tree.CheckTake(node.Id) == AllocationResult.Success)
+                .OrderBy(node => node.Id, StringComparer.Ordinal)
+                .ToList();
+
+            Print($"Frontier: {available.Count} node(s) available, {Math.Min(available.Count, FrontierLimit)} shown. {PointsOf(tree)}");
+            foreach (PassiveNode node in available.Take(FrontierLimit)) Print($"  {HeadlineOf(node)}");
+        }
+
+        /// <summary>
+        /// One node in full: what it is, whether the character holds it, what it would cost, what it
+        /// touches and what it grants. The availability verdict is the service's own answer, printed
+        /// through the same wording a refused purchase uses.
+        /// </summary>
+        private void PrintNode(IPassiveTreeService tree, string nodeId)
+        {
+            PassiveNode? node = tree.Tree.Find(nodeId);
+            if (node == null)
+            {
+                Print($"[color=red]node {nodeId}: {ReasonOf(tree.Tree, nodeId, AllocationResult.UnknownNode)}[/color]");
+                return;
+            }
+
+            var formatter = Service<ModifierFormatter>();
+            Print(HeadlineOf(node));
+            Print($"  taken: {tree.IsTaken(node.Id)}, costs a point: {NodeKindRules.CostsPoint(node.Kind)}, take now: {ReasonOf(tree.Tree, node.Id, tree.CheckTake(node.Id))}");
+            if (node.AbilityId.Length > 0) Print($"  ability: {node.AbilityId}");
+            Print($"  neighbours: {Listed(tree.Tree.Neighbours(node.Id).OrderBy(id => id, StringComparer.Ordinal))}");
+            Print($"  lines: {Listed(node.Modifiers.Select(line => FormatTreeLine(formatter, line)))}");
         }
 
         private void PrintAllocation(IPassiveTreeService tree, string action, string nodeId, AllocationResult result)
@@ -438,14 +487,18 @@ namespace LastBreath.Helpers
                 return;
             }
 
+            var formatter = Service<ModifierFormatter>();
+            var formats = Service<IParameterFormatProvider>();
             var player = Service<IPlayerAccessor>().Player;
             bool carried = player != null && parameters.Any(parameter => player.ParameterModifiers.GetModifiers(parameter)
                 .Any(modifier => modifier.Source == PassiveTreeDocument.ModifierSource));
 
             foreach (var parameter in parameters)
             {
-                string lines = string.Join(", ", tree.ParameterSource.GetModifiers(parameter).Select(FormatTreeModifier));
-                string resolved = carried ? $" → player {player!.Parameters.GetValueForParameter(parameter)}" : string.Empty;
+                string lines = string.Join(", ", tree.ParameterSource.GetModifiers(parameter).Select(modifier => FormatTreeModifier(formatter, modifier)));
+                string resolved = carried
+                    ? $" → player {ParameterValueText.Format(formats, parameter, player!.Parameters.GetValueForParameter(parameter))}"
+                    : string.Empty;
                 Print($"{parameter}: {lines}{resolved}");
             }
 
@@ -454,20 +507,37 @@ namespace LastBreath.Helpers
                 : $"Source \"{PassiveTreeDocument.ModifierSource}\" is NOT registered on the player — the character carries none of this yet");
         }
 
-        private static string FormatTreeModifier(IModifierInstance modifier)
-        {
-            bool percent = modifier.ModifierValueType != ModifierValueType.Flat;
-            string value = (percent ? modifier.Value * 100 : modifier.Value).ToString("+0.###;-0.###", CultureInfo.InvariantCulture);
-            return $"{value}{(percent ? "%" : string.Empty)} {modifier.ModifierValueType} ({modifier.Source})";
-        }
+        // Units come from ParameterFormats.json through the game's own formatter, so a parameter that
+        // stores a fraction reads as a percent here exactly as it does on the character sheet.
+        private static string FormatTreeModifier(ModifierFormatter formatter, IModifierInstance modifier) =>
+            $"{Signed(formatter, modifier.ModifierValueType, modifier.EntityParameter, modifier.Value)} {modifier.ModifierValueType} ({modifier.Source})";
+
+        private static string FormatTreeLine(ModifierFormatter formatter, ModifierLine line) =>
+            $"{Signed(formatter, line.ValueType, line.Parameter, line.Value)} {line.Parameter} {line.ValueType}{(line.IsConditional ? $" if \"{line.Condition}\"" : string.Empty)}";
+
+        /// <summary>The formatter renders the magnitude with its unit and carries the minus sign; the
+        /// plus is a console convention and the only thing added on top of it.</summary>
+        private static string Signed(ModifierFormatter formatter, ModifierValueType valueType, EntityParameter parameter, float value) =>
+            (value < 0 ? string.Empty : "+") + formatter.FormatValue(valueType, parameter, value);
 
         private static string PointsOf(IPassiveTreeService tree) =>
             $"Points: {tree.TotalPoints} granted, {tree.SpentPoints} spent, {tree.AvailablePoints} left, {tree.TakenNodes.Count} node(s) taken";
 
+        private static string Listed(IEnumerable<string> parts)
+        {
+            string joined = string.Join(", ", parts);
+            return joined.Length == 0 ? "none" : joined;
+        }
+
+        private static string HeadlineOf(PassiveNode node) => $"{TitledOf(node)} [{node.Kind}]";
+
+        private static string TitledOf(PassiveNode node) =>
+            string.IsNullOrWhiteSpace(node.Title) ? node.Id : $"{node.Id} \"{node.Title}\"";
+
         private static string NameOf(PassiveTreeDocument document, string nodeId)
         {
             var node = document.Find(nodeId);
-            return node == null || string.IsNullOrWhiteSpace(node.Title) ? nodeId : $"{nodeId} \"{node.Title}\"";
+            return node == null ? nodeId : TitledOf(node);
         }
 
         // The refusal spelled out. NotConnected covers two different dead ends — a node the allocation
@@ -713,7 +783,7 @@ namespace LastBreath.Helpers
             Print("[b]Abilities:[/b] ability list | ability learn <abilityId>");
             Print("[b]Items:[/b] item add <itemId> [amount] [rarity] | inv clear");
             Print("[b]Masteries:[/b] influence [exp <n>] | martial [exp <n>] | craft [exp <n>]");
-            Print("[b]Passive tree:[/b] passive tree | passive take <nodeId> | passive refund <nodeId> | passive dump | passive respec");
+            Print($"[b]Passive tree:[/b] {PassiveTreeUsage}");
             Print("[b]Reputation:[/b] rep add <faction> <delta> | rep set <faction> <level> | raid");
             Print("[b]World:[/b] time [set <hour> [minute]|scale <x>] | spawn [list|<npcId> [level] [rarity]]");
             Print("[b]Narrative:[/b] quest list | quest <accept|decline|abandon|fail|turnin> <questId> | fact set <key> [amount] | fact dump [prefix]");

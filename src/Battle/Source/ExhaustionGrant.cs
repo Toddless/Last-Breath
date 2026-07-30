@@ -11,7 +11,8 @@ namespace Battle.Source
     /// <summary>
     /// Wires exhaustion onto a combatant (see <see cref="ExhaustionModifier"/>): the rule is global —
     /// player and NPCs alike — so the single attach point is shared by both entity kinds and both
-    /// projects. A sandbox without combat rules, or a zeroed surcharge in data, attaches nothing.
+    /// projects. A surcharge zeroed in the combat rules attaches nothing: that is the whole of the
+    /// degradation, the rules themselves are required and their absence is an error, not a mode.
     /// The wiring is symmetric: <see cref="Detach"/> takes back the modifier and all three
     /// subscriptions, and a repeated <see cref="Attach(IFightable)"/> keeps the single set it already
     /// gave instead of doubling the surcharge.
@@ -55,7 +56,7 @@ namespace Battle.Source
 
         /// <summary>Called from the combatant's destruction: the surcharge leaves the modifier
         /// handler and the three reactions leave the combat bus. A combatant that was never wired
-        /// (no rules, zeroed surcharge) detaches to a no-op.</summary>
+        /// (zeroed surcharge) detaches to a no-op.</summary>
         public static void Detach(IFightable owner)
         {
             if (!s_wiring.TryGetValue(owner, out Wiring? wiring)) return;
