@@ -41,7 +41,7 @@ namespace Core.Items.Grants
         public void Detach(IFightable owner)
         {
             if (_skill == null) return;
-            owner.PassiveSkills.RemoveSkill(_skill.Id);
+            owner.PassiveSkills.RemoveSkill(_skill);
             _skill = null;
         }
 
