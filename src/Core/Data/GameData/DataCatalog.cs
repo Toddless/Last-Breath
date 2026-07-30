@@ -33,6 +33,7 @@ namespace Core.Data.GameData
         public const string Recipes = "Recipes";
         public const string CraftingAdditives = "CraftingAdditives";
         public const string CraftingMastery = "CraftingMastery";
+        public const string MartialArtMastery = "MartialArtMastery";
         public const string ItemEffects = "ItemEffects";
         public const string Resources = "Resources";
         public const string Trade = "Trade";

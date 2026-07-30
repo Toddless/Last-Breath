@@ -1,17 +1,29 @@
-﻿namespace Battle.Source
+namespace Battle.Source
 {
     using System;
+    using System.Collections.Generic;
+    using System.Numerics;
+    using Core;
     using Core.Battle;
+    using Core.Data.GameData;
     using Core.Localization;
     using Core.MessageBus;
     using Core.MessageBus.Messages;
+    using Core.PassiveTree.Allocation;
     using Godot;
+    using Newtonsoft.Json;
 
-    public class MartialArtMastery(IGameMessageBus bus) : IMartialArtMastery, Core.Session.ISessionResettable
+    /// <summary>
+    /// Martial art mastery. Levels are counted from ZERO, so the fifty levels of the curve are fifty
+    /// level ups — and fifty passive tree points, one per level. Curve tuning lives in the
+    /// MartialArtMastery catalog; the constructor reads nothing.
+    /// The passive tree is optional: only the game project owns an allocation, so the battle sandbox
+    /// resolves null and the points go nowhere.
+    /// </summary>
+    public class MartialArtMastery(IGameMessageBus bus, Func<IPassiveTreeService?>? passiveTree = null)
+        : IMartialArtMastery, IGameDataParticipant, Core.Session.ISessionResettable
     {
-        private const float ExpFactor = 1.8f;
-        private const int BaseExp = 50;
-        private const int MaxLevel = 50;
+        private MartialArtMasteryData _config = new();
 
         public string Id => "Mastery_Martial_Art";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
@@ -40,23 +52,38 @@
             }
         }
 
-        public int CurrentLevel
-        {
-            get => field + BonusLevel;
-            private set
-            {
-                if (value == field) return;
-                field = value;
-                CurrentLevelChange?.Invoke(field);
-            }
-        } = 1;
+        public int CurrentLevel => EarnedLevel + BonusLevel;
 
-        public int MaximumLevel => MaxLevel;
+        public int MaximumLevel => _config.MaxLevel;
 
         public string Description => Localization.LocalizeDescription(Id);
         public string DisplayName => Localization.Localize(Id);
 
+        public IReadOnlyList<string> Catalogs => [DataCatalog.MartialArtMastery];
+
         public event Action<int>? BonusLevelChange, CurrentLevelChange, ExperienceChange;
+
+        /// <summary>Levels earned by experience: the only number the save keeps and the only one the
+        /// tree budget is counted from. Equipment levels are added on top by <see cref="CurrentLevel"/>
+        /// and never earned into this one.</summary>
+        private int EarnedLevel
+        {
+            get;
+            set
+            {
+                if (value == field) return;
+                field = value;
+                GrantPassivePoints();
+                CurrentLevelChange?.Invoke(CurrentLevel);
+            }
+        }
+
+        public void Apply(string catalog, GameDataFile file)
+        {
+            var parsed = JsonConvert.DeserializeObject<MartialArtMasteryData>(file.Json)
+                         ?? throw new InvalidOperationException($"Failed to deserialize martial art mastery config '{file.FileName}'");
+            _config = Sanitized(parsed, file.FileName);
+        }
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag);
@@ -66,13 +93,13 @@
             // TODO: Calculate exp up to max level (need for progress bar)
             if (experience <= 0) return;
             CurrentExperience += experience;
-            if (CurrentLevel >= MaxLevel) return;
+            if (CurrentLevel >= MaximumLevel) return;
             CheckForLevel();
         }
 
         public void RestoreState(int baseLevel, int experience)
         {
-            CurrentLevel = Mathf.Clamp(baseLevel, 1, MaxLevel);
+            EarnedLevel = Mathf.Clamp(baseLevel, 0, MaximumLevel);
             CurrentExperience = Mathf.Max(0, experience);
         }
 
@@ -80,43 +107,71 @@
         public void ResetSession()
         {
             BonusLevel = 0;
-            RestoreState(1, 0);
+            RestoreState(0, 0);
         }
 
         public void AddBonusLevel() => BonusLevel++;
 
         public void RemoveBonusLevel() => BonusLevel--;
 
-        public int ExpToNextLevelRemain() => CurrentLevel >= MaxLevel ? 0 : Mathf.Max(0, ExpToNextLevel(CurrentLevel) - CurrentExperience);
+        public int ExpToNextLevelRemain() => CurrentLevel >= MaximumLevel ? 0 : Mathf.Max(0, ExpToNextLevel(CurrentLevel) - CurrentExperience);
 
-        public int ExpToNextLevelTotal() => CurrentLevel >= MaxLevel ? 0 : ExpToNextLevel(CurrentLevel);
+        public int ExpToNextLevelTotal() => CurrentLevel >= MaximumLevel ? 0 : ExpToNextLevel(CurrentLevel);
+
+        /// <summary>A curve number that is not positive is reported and replaced by the shipped default:
+        /// a zero cap or a zero cost would hand out every level — and every tree point — at once.</summary>
+        private static MartialArtMasteryData Sanitized(MartialArtMasteryData parsed, string fileName)
+        {
+            var defaults = new MartialArtMasteryData();
+            return parsed with
+            {
+                MaxLevel = Positive(parsed.MaxLevel, defaults.MaxLevel, "maxLevel", fileName),
+                BaseExp = Positive(parsed.BaseExp, defaults.BaseExp, "baseExp", fileName),
+                ExpFactor = Positive(parsed.ExpFactor, defaults.ExpFactor, "expFactor", fileName),
+            };
+        }
+
+        private static T Positive<T>(T value, T fallback, string field, string fileName) where T : INumber<T>
+        {
+            if (value > T.Zero) return value;
+
+            Tracker.TrackError($"Martial art mastery '{fileName}': '{field}' must be positive but is {value}, falling back to {fallback}");
+            return fallback;
+        }
 
         private float GetProgressFactor() =>
-            Mathf.Clamp((CurrentLevel + BonusLevel - 1) / ((float)MaxLevel + BonusLevel - 1), 0f, 1f) + 1;
+            Mathf.Clamp((CurrentLevel + BonusLevel - 1) / ((float)MaximumLevel + BonusLevel - 1), 0f, 1f) + 1;
+
+        /// <summary>One tree point per earned level. The total is STATED, never added to: a save applied
+        /// twice restates the same budget instead of duplicating it.</summary>
+        private void GrantPassivePoints() => passiveTree?.Invoke()?.SetTotalPoints(EarnedLevel);
 
         // Same piece of code like within Crafting mastery class.
         // I don't want to couple two projects via a Core library to reduce code duplication
         private void CheckForLevel()
         {
-            while (CurrentLevel < MaxLevel)
+            while (CurrentLevel < MaximumLevel)
             {
                 int need = ExpToNextLevel(CurrentLevel);
-                if (CurrentExperience >= need)
-                {
-                    CurrentExperience -= need;
-                    CurrentLevel++;
-                    bus.PublishMessageAsync(new SendNotificationMessageMessage("Notification_Martial_Art_Mastery_Level_Up"));
-                }
-                else break;
+                if (CurrentExperience < need) break;
+
+                CurrentExperience -= need;
+                EarnedLevel++; // the earned base, never the effective level: ++ on the sum would inflate the save
+                bus.PublishMessageAsync(new SendNotificationMessageMessage("Notification_Martial_Art_Mastery_Level_Up"));
             }
         }
 
+        /// <summary>Cost of the level being BOUGHT: the curve is indexed by the target level, so the
+        /// first level up (0 -> 1) costs baseExp instead of baseExp x 0^factor = nothing. The old
+        /// "raise the argument to 1" guard is gone together with the level-1 start it served — on a
+        /// zero-based scale it charged the same price for the first two levels.</summary>
         private int ExpToNextLevel(int level)
         {
-            if (level < 1) level = 1;
-            if (level >= MaxLevel) return int.MaxValue;
-            float value = BaseExp * Mathf.Pow(level, ExpFactor);
-            return Mathf.RoundToInt(value);
+            if (level >= MaximumLevel) return int.MaxValue;
+
+            // Unbalanced RemoveBonusLevel can push the effective level below zero; the first level still costs.
+            int target = Mathf.Max(1, level + 1);
+            return Mathf.RoundToInt(_config.BaseExp * Mathf.Pow(target, _config.ExpFactor));
         }
     }
 }

@@ -23,6 +23,7 @@
     using Core.Narrative.Facts;
     using Core.Narrative.Influence;
     using Core.Narrative.Quests;
+    using Core.PassiveTree.Allocation;
     using Core.Reputation;
     using Core.Save;
     using Core.Save.Participants;
@@ -43,7 +44,14 @@
     {
         public static IServiceCollection AddBattleSystemModuleDependencies(this IServiceCollection services)
         {
-            services.AddSingleton<IMartialArtMastery, MartialArtMastery>();
+            // Spelled out instead of AddGameDataParticipant: the mastery hands its earned levels to the
+            // passive tree as points, and the tree service belongs to the game project alone — the
+            // sandbox resolves null through the lazy accessor and the grant simply goes nowhere.
+            services.AddSingleton(sp => new MartialArtMastery(
+                sp.GetRequiredService<IGameMessageBus>(),
+                sp.GetService<IPassiveTreeService>));
+            services.AddSingleton<IMartialArtMastery>(sp => sp.GetRequiredService<MartialArtMastery>());
+            services.AddSingleton<IGameDataParticipant>(sp => sp.GetRequiredService<MartialArtMastery>());
             services.AddGameDataParticipant<IAbilityProvider, AbilityProvider>();
             services.AddSingleton<IAbilityUnlockService, AbilityUnlockService>();
             // Shared on purpose: control resistance and arena rules must exist in every project

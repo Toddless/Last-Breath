@@ -101,7 +101,7 @@ namespace LastBreathTest.BattleSystemTests
 
             mastery.ResetSession();
 
-            Assert.AreEqual(1, mastery.CurrentLevel);
+            Assert.AreEqual(0, mastery.CurrentLevel); // mastery counts from zero: a fresh game has no levels
             Assert.AreEqual(0, mastery.CurrentExperience);
             Assert.AreEqual(0, mastery.BonusLevel);
         }
