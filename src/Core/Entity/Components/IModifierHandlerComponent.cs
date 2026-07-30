@@ -24,6 +24,7 @@ namespace Core.Entity.Components
         void Remove(IHealModifier modifier);
         void Remove(IManaRecoveryModifier modifier);
         void Remove(IEffectApplicationModifier modifier);
+        void Remove(IIncomingEffectModifier modifier);
         void Remove(IAbilityActivationModifier modifier);
 
         void Apply(IAttackContext context);
