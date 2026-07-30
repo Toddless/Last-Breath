@@ -11,6 +11,7 @@ namespace Core.Session
     using Narrative.Facts;
     using Narrative.Influence;
     using Narrative.Quests;
+    using PassiveTree.Allocation;
     using Reputation;
     using Save;
     using Services;
@@ -35,6 +36,7 @@ namespace Core.Session
                 Add<IWorldFactsService>();
                 Add<IInfluenceMastery>();
                 Add<IMartialArtMastery>();
+                Add<IPassiveTreeService>(); // after the mastery that grants the points its allocation spends
                 Add<ICraftingMastery>();
                 Add<IRecipeKnowledge>(); // scroll-learned recipes are per-playthrough
                 Add<IInventory>();

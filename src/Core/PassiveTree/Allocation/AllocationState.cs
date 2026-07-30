@@ -45,6 +45,19 @@ namespace Core.PassiveTree.Allocation
             Resync(document);
         }
 
+        /// <summary>
+        /// Takes the set as it stands, with no tree to measure it against — a restore that arrived
+        /// before the catalog did. Nothing is checked and nothing is dropped, because a check against
+        /// a tree that is not there would drop everything. What the set costs stays as it was: the
+        /// price of a node cannot be read without the node, and the next <see cref="Resync"/> settles
+        /// both the set and the spend.
+        /// </summary>
+        public void Adopt(IEnumerable<string> nodes)
+        {
+            _taken.Clear();
+            _taken.UnionWith(nodes);
+        }
+
         /// <summary>Drops anything that stopped existing or stopped being reachable after an edit, and
         /// recounts the spend from what is left — what a dropped node cost is no longer owed.</summary>
         public void Resync(PassiveTreeDocument document)

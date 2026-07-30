@@ -45,7 +45,12 @@ namespace Core.Save
             using var _ = loadScope.Begin();
             foreach (var participant in _participants.OrderBy(p => p.RestoreOrder))
             {
-                if (!file.Sections.TryGetValue(participant.SectionId, out var section)) continue;
+                if (!file.Sections.TryGetValue(participant.SectionId, out var section))
+                {
+                    RestoreMissingSection(participant);
+                    continue;
+                }
+
                 if (section.Version > participant.Version)
                 {
                     SectionRestoreFailed?.Invoke(participant.SectionId, new InvalidOperationException(
@@ -61,6 +66,21 @@ namespace Core.Save
                 {
                     SectionRestoreFailed?.Invoke(participant.SectionId, e);
                 }
+            }
+        }
+
+        /// <summary>Tells the participant the file has no section of it, reported the same way a
+        /// failed restore is. Skipping it silently is what leaves the previous file's state standing
+        /// in a system that outlives the scene.</summary>
+        private void RestoreMissingSection(ISaveParticipant participant)
+        {
+            try
+            {
+                participant.RestoreMissingSection();
+            }
+            catch (Exception e)
+            {
+                SectionRestoreFailed?.Invoke(participant.SectionId, e);
             }
         }
     }

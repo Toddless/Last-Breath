@@ -3,13 +3,16 @@ namespace Core.PassiveTree.Allocation
     using System;
     using System.Collections.Generic;
     using Entity.Components;
+    using Session;
 
     /// <summary>
     /// Owns the allocation and keeps the modifier source in step with it. The document is read lazily
     /// from the provider on every access: the data catalog is loaded after the container is built, and
     /// a reload hands out a fresh document that the allocation has to be re-checked against.
+    /// The service is a singleton and outlives the scene, so it also owns the two ways a playthrough
+    /// ends: a new game resets it, and a loaded file replaces the allocation wholesale.
     /// </summary>
-    public sealed class PassiveTreeService(IPassiveTreeProvider provider) : IPassiveTreeService
+    public sealed class PassiveTreeService(IPassiveTreeProvider provider) : IPassiveTreeService, ISessionResettable
     {
         private readonly AllocationState _allocation = new();
         private readonly PassiveTreeParameterSource _source = new();
@@ -66,8 +69,29 @@ namespace Core.PassiveTree.Allocation
         public void RestoreState(IReadOnlyCollection<string> takenNodes)
         {
             PassiveTreeDocument tree = SyncedTree();
+            if (tree.Nodes.Count == 0)
+            {
+                // Nothing to check the set against. It is held as it stands rather than dropped, so
+                // the next capture writes back what the file carried instead of an empty section —
+                // a tree that failed to load must not turn one bad launch into a permanent loss.
+                // The check happens on the first document that does load.
+                _allocation.Adopt(takenNodes);
+                Publish(tree);
+                return;
+            }
+
             _allocation.Restore(tree, takenNodes);
             Publish(tree);
+        }
+
+        /// <summary>Back to the state a fresh character is in: no points granted, nothing taken but
+        /// the free seeds, and the contribution of the old allocation gone from every fighter it
+        /// reached. Mastery zeroes its own total in the same pass, so an allocation left standing
+        /// here would be one the character can neither pay for nor undo.</summary>
+        public void ResetSession()
+        {
+            SetTotalPoints(0);
+            Respec();
         }
 
         /// <summary>The allocation after the document it is measured against has been adopted. Every
@@ -80,12 +104,20 @@ namespace Core.PassiveTree.Allocation
             return _allocation;
         }
 
-        /// <summary>Adopts the document the provider currently holds. Allocation survives a reload
-        /// where it still makes sense and is dropped where it does not.</summary>
+        /// <summary>
+        /// Adopts the document the provider currently holds. Allocation survives a reload where it
+        /// still makes sense and is dropped where it does not.
+        /// A document without nodes is never adopted: that is what the reader hands out when the file
+        /// fails to parse, and what the provider holds before the catalog is read at all. Adopting it
+        /// would measure the allocation against nothing and wipe every node — so the last document
+        /// that did load stays in force, and a broken file costs the player the tree's content for
+        /// that launch instead of his allocation forever.
+        /// </summary>
         private PassiveTreeDocument SyncedTree()
         {
             PassiveTreeDocument tree = provider.Tree;
             if (ReferenceEquals(tree, _synced)) return tree;
+            if (tree.Nodes.Count == 0) return _synced ?? tree;
 
             _synced = tree;
             _allocation.Resync(tree);
