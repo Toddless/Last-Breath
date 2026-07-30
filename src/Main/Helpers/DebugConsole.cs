@@ -17,15 +17,17 @@ namespace LastBreath.Helpers
     using Core.Narrative.Facts;
     using Core.Narrative.Influence;
     using Core.Narrative.Quests;
+    using Core.PassiveTree;
+    using Core.PassiveTree.Allocation;
     using Core.Save;
     using Core.Services;
     using Godot;
 
     /// <summary>
-    /// Debug-build console (autoload, F12): drive quests, facts, influence, reputation, player
-    /// vitals/stats, items, world time and NPC spawns without UI. The one place UI is built in
-    /// code on purpose — it must not depend on anything it tests. Services resolve lazily per
-    /// command so the autoload never races the provider bootstrap.
+    /// Debug-build console (autoload, F12): drive quests, facts, influence, reputation, the passive
+    /// tree, player vitals/stats, items, world time and NPC spawns without UI. The one place UI is
+    /// built in code on purpose — it must not depend on anything it tests. Services resolve lazily
+    /// per command so the autoload never races the provider bootstrap.
     /// </summary>
     public partial class DebugConsole : CanvasLayer
     {
@@ -112,6 +114,7 @@ namespace LastBreath.Helpers
                 case "fact": ExecuteFact(args); break;
                 case "influence": ExecuteInfluence(args); break;
                 case "martial": ExecuteMartial(args); break;
+                case "passive": ExecutePassiveTree(args); break;
                 case "craft": ExecuteCraft(args); break;
                 case "rep": ExecuteReputation(args); break;
                 case "item": ExecuteItem(args); break;
@@ -380,6 +383,108 @@ namespace LastBreath.Helpers
             Print($"Martial Art: level {mastery.CurrentLevel}/{mastery.MaximumLevel}, exp {mastery.CurrentExperience}, to next {mastery.ExpToNextLevelRemain()}");
         }
 
+        // The tree has no game UI yet, so this is the only way to drive it by hand. Every branch is a
+        // call into IPassiveTreeService: the console shows its answer, it never decides anything.
+        private void ExecutePassiveTree(string[] args)
+        {
+            var tree = Service<IPassiveTreeService>();
+            switch (args.Length > 1 ? args[1].ToLowerInvariant() : "tree")
+            {
+                case "tree": PrintTreeState(tree); break;
+                case "take" when args.Length > 2: PrintAllocation(tree, "take", args[2], tree.Take(args[2])); break;
+                case "refund" when args.Length > 2: PrintAllocation(tree, "refund", args[2], tree.Refund(args[2])); break;
+                case "dump": PrintTreeModifiers(tree); break;
+                case "respec":
+                    tree.Respec();
+                    Print($"Respec done. {PointsOf(tree)}");
+                    break;
+                default:
+                    Print("passive tree | passive take <nodeId> | passive refund <nodeId> | passive dump | passive respec");
+                    break;
+            }
+        }
+
+        private void PrintTreeState(IPassiveTreeService tree)
+        {
+            Print($"Passive tree: {tree.Tree.Nodes.Count} node(s), design budget {tree.Tree.Budget}");
+            Print(PointsOf(tree));
+            Print(tree.TakenNodes.Count == 0
+                ? "Taken: none"
+                : $"Taken: {string.Join(", ", tree.TakenNodes.OrderBy(id => id, StringComparer.Ordinal))}");
+        }
+
+        private void PrintAllocation(IPassiveTreeService tree, string action, string nodeId, AllocationResult result)
+        {
+            if (result != AllocationResult.Success)
+            {
+                Print($"[color=red]{action} {nodeId}: refused — {ReasonOf(tree.Tree, nodeId, result)}[/color]");
+                return;
+            }
+
+            Print($"{action} {NameOf(tree.Tree, nodeId)}: ok. {PointsOf(tree)}");
+        }
+
+        /// <summary>
+        /// What the taken nodes contribute, read straight off the modifier source the tree publishes and
+        /// grouped by parameter. The resolved player value is shown only when the character actually
+        /// carries that source — otherwise the tree holds these lines and the character does not.
+        /// </summary>
+        private void PrintTreeModifiers(IPassiveTreeService tree)
+        {
+            var parameters = tree.ParameterSource.AffectedParameters.OrderBy(parameter => parameter.ToString(), StringComparer.Ordinal).ToList();
+            if (parameters.Count == 0)
+            {
+                Print($"No parametric lines from {tree.TakenNodes.Count} taken node(s)");
+                return;
+            }
+
+            var player = Service<IPlayerAccessor>().Player;
+            bool carried = player != null && parameters.Any(parameter => player.ParameterModifiers.GetModifiers(parameter)
+                .Any(modifier => modifier.Source == PassiveTreeDocument.ModifierSource));
+
+            foreach (var parameter in parameters)
+            {
+                string lines = string.Join(", ", tree.ParameterSource.GetModifiers(parameter).Select(FormatTreeModifier));
+                string resolved = carried ? $" → player {player!.Parameters.GetValueForParameter(parameter)}" : string.Empty;
+                Print($"{parameter}: {lines}{resolved}");
+            }
+
+            Print(carried
+                ? $"Source \"{PassiveTreeDocument.ModifierSource}\" is registered on the player"
+                : $"Source \"{PassiveTreeDocument.ModifierSource}\" is NOT registered on the player — the character carries none of this yet");
+        }
+
+        private static string FormatTreeModifier(IModifierInstance modifier)
+        {
+            bool percent = modifier.ModifierValueType != ModifierValueType.Flat;
+            string value = (percent ? modifier.Value * 100 : modifier.Value).ToString("+0.###;-0.###", CultureInfo.InvariantCulture);
+            return $"{value}{(percent ? "%" : string.Empty)} {modifier.ModifierValueType} ({modifier.Source})";
+        }
+
+        private static string PointsOf(IPassiveTreeService tree) =>
+            $"Points: {tree.TotalPoints} granted, {tree.SpentPoints} spent, {tree.AvailablePoints} left, {tree.TakenNodes.Count} node(s) taken";
+
+        private static string NameOf(PassiveTreeDocument document, string nodeId)
+        {
+            var node = document.Find(nodeId);
+            return node == null || string.IsNullOrWhiteSpace(node.Title) ? nodeId : $"{nodeId} \"{node.Title}\"";
+        }
+
+        // The refusal spelled out. NotConnected covers two different dead ends — a node the allocation
+        // has not reached yet, and a node no allocation can ever reach — so the wording splits them.
+        private static string ReasonOf(PassiveTreeDocument document, string nodeId, AllocationResult result) => result switch
+        {
+            AllocationResult.UnknownNode => "no node with that id in the tree",
+            AllocationResult.AlreadyTaken => "already taken",
+            AllocationResult.NotTaken => "not taken",
+            AllocationResult.Granted => "granted with the character: seeds are never bought and never given back",
+            AllocationResult.NotEnoughPoints => "not enough points (martial art levels grant them: martial exp <n>)",
+            AllocationResult.NotConnected when document.Neighbours(nodeId).Count == 0 => "the node has no links at all: nothing can ever reach it",
+            AllocationResult.NotConnected => "not adjacent to anything already taken",
+            AllocationResult.WouldOrphan => "not the end of a branch: giving it back would leave what is behind it hanging",
+            _ => result.ToString()
+        };
+
         private void ExecuteCraft(string[] args)
         {
             var mastery = Service<ICraftingMastery>();
@@ -608,6 +713,7 @@ namespace LastBreath.Helpers
             Print("[b]Abilities:[/b] ability list | ability learn <abilityId>");
             Print("[b]Items:[/b] item add <itemId> [amount] [rarity] | inv clear");
             Print("[b]Masteries:[/b] influence [exp <n>] | martial [exp <n>] | craft [exp <n>]");
+            Print("[b]Passive tree:[/b] passive tree | passive take <nodeId> | passive refund <nodeId> | passive dump | passive respec");
             Print("[b]Reputation:[/b] rep add <faction> <delta> | rep set <faction> <level> | raid");
             Print("[b]World:[/b] time [set <hour> [minute]|scale <x>] | spawn [list|<npcId> [level] [rarity]]");
             Print("[b]Narrative:[/b] quest list | quest <accept|decline|abandon|fail|turnin> <questId> | fact set <key> [amount] | fact dump [prefix]");

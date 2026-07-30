@@ -11,10 +11,10 @@ namespace Core.Save.Participants
     using Services;
 
     /// <summary>
-    /// The learned set is mostly derived (AbilityUnlockService re-learns by mastery threshold
-    /// right when mastery restores), but it is persisted anyway: future sources of abilities
-    /// (items, seals) won't be derivable. What only this section knows: slot layout per stance,
-    /// chosen upgrades (by stable Id) and the active stance.
+    /// The learned set is mostly derived (AbilityUnlockService learns every non-hidden ability the
+    /// book does not hold), but it is persisted anyway: future sources of abilities (items, seals)
+    /// won't be derivable. What only this section knows: slot layout per stance, chosen upgrades
+    /// (by stable Id) and the active stance.
     /// </summary>
     public class AbilityBookSaveParticipant(IPlayerAccessor playerAccessor, IAbilityProvider abilityProvider) : ISaveParticipant
     {

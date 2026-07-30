@@ -48,7 +48,8 @@
             // service drops the message rather than crashing.
             _provider.GetService<NotificationService>().Setup(_layerManager, CreateNotificationPopup);
 
-            // Resolve once so it subscribes to mastery/player changes and auto-learns unlocked abilities.
+            // Resolve once: the service catches the player's book up on every non-hidden ability it
+            // does not hold yet, and keeps watching the accessor for a new player.
             _provider.GetService<IAbilityUnlockService>();
             // Spoils of battle land on this world's floor (cleared on exit — the node dies with the scene).
             _provider.GetService<ILootOrchestrator>().SetFloorToSpawnItems(_mainWorld);

@@ -42,7 +42,8 @@
             // internal stuff
             _uiElementProvider.RegisterPopupFactory(typeof(IKeywordTooltipPopup), () => KeywordTooltipPopup.Initialize().Instantiate<KeywordTooltipPopup>());
 
-            // Resolve once so it subscribes to mastery/player changes and auto-learns unlocked abilities.
+            // Resolve once: the service catches the player's book up on every non-hidden ability it
+            // does not hold yet, and keeps watching the accessor for a new player.
             _provider.GetService<IAbilityUnlockService>();
             var mastery = _provider.GetService<IMartialArtMastery>();
             mastery.AddExperience(500000);
