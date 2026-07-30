@@ -2,6 +2,7 @@ namespace Battle.Internal.Player
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Core;
     using Core.Ai.World;
@@ -17,6 +18,7 @@ namespace Battle.Internal.Player
     using Core.Enums;
     using Core.Events;
     using Core.Items;
+    using Core.PassiveTree.Allocation;
     using Core.Services;
     using Godot;
     using Source;
@@ -67,6 +69,11 @@ namespace Battle.Internal.Player
         private IWorldClock? _worldClock;
         private IPlayerLifecycleConfigProvider? _lifecycleConfigProvider;
         private IRestRecoveryService? _restRecovery;
+        private IPassiveTreeService? _passiveTree;
+
+        /// <summary>The fighter's own roll stream behind the domain contract: defensive rolls
+        /// (suppression) burn it instead of an anonymous generator built for a single hit.</summary>
+        private IRandomNumberGenerator CombatRolls => field ??= new GodotRandomNumberGenerator(_rnd);
 
         /// <summary>Body state after a defeat; non-null only while lying dead (NPC burn scans read it).</summary>
         public PlayerLifecycle? Lifecycle { get; private set; }
@@ -163,6 +170,20 @@ namespace Battle.Internal.Player
 
         public override void _EnterTree() => _restRecovery?.RegisterParticipant(this, () => GlobalPosition);
 
+        /// <summary>The destruction point of the fighter. Everything _Ready registered on objects that
+        /// outlive the node is taken back here and not in _ExitTree: the battle flow reparents the
+        /// player (world ↔ arena), which fires _ExitTree while the fighter goes on living.</summary>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_passiveTree != null) ParameterModifiers.UnregisterSource(_passiveTree.ParameterSource);
+                Battle.Source.ExhaustionGrant.Detach(this);
+            }
+
+            base.Dispose(disposing);
+        }
+
         private void OnReparented()
         {
             // Parented also fires during scene instantiation, before the camera enters the tree —
@@ -191,6 +212,11 @@ namespace Battle.Internal.Player
             Parameters.Initialize(ParameterModifiers.GetModifiers);
             Equipment = new EquipmentComponent(this);
             ParameterModifiers.RegisterSource(Equipment);
+            // The tree reaches the fighter through the same channel as the gear — a registered source,
+            // never lines written onto the entity, so a respec cannot leave a contribution behind.
+            // Optional service: this sandbox does not carry the tree, so it gets no contribution.
+            _passiveTree = GameServiceProvider.Instance.GetServices<IPassiveTreeService>().FirstOrDefault();
+            if (_passiveTree != null) ParameterModifiers.RegisterSource(_passiveTree.ParameterSource);
             Equipment.EquipmentChanged += OnEquipmentChanged;
             Effects = new EffectsComponent(this);
             PassiveSkills = new PassiveSkillsComponent(this);
@@ -360,7 +386,7 @@ namespace Battle.Internal.Player
             context.Source.ModifierHandler.Apply(context);
             // passive/effects that react right before we are about to take some damage
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
-            Calculations.CalculateMitigation(context, this);
+            Calculations.CalculateMitigation(context, this, CombatRolls);
 
             // Post-mitigation absorption layers (shield → barrier → stage guard); the leftover hits health.
             float remaining = _damageChain.Apply(context, this, context.TotalDamage);

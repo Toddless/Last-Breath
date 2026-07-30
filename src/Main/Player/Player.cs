@@ -21,6 +21,7 @@ namespace LastBreath.Player
     using Core.Enums;
     using Core.Events;
     using Core.Items;
+    using Core.PassiveTree.Allocation;
     using Core.Services;
     using Core.Views.UI;
     using Godot;
@@ -70,7 +71,12 @@ namespace LastBreath.Player
         private IPlayerLifecycleConfigProvider? _lifecycleConfigProvider;
         private IPlayerStatsProvider? _playerStats;
         private IRestRecoveryService? _restRecovery;
+        private IPassiveTreeService? _passiveTree;
         private IFightable? _lastDamageSource;
+
+        /// <summary>The fighter's own roll stream behind the domain contract: defensive rolls
+        /// (suppression) burn it instead of an anonymous generator built for a single hit.</summary>
+        private IRandomNumberGenerator CombatRolls => field ??= new GodotRandomNumberGenerator(_rnd);
 
         /// <summary>Body state after a defeat; non-null only while lying dead (NPC burn scans read it).</summary>
         public PlayerLifecycle? Lifecycle { get; private set; }
@@ -194,6 +200,11 @@ namespace LastBreath.Player
             Parameters.Initialize(ParameterModifiers.GetModifiers);
             Equipment = new EquipmentComponent(this);
             ParameterModifiers.RegisterSource(Equipment);
+            // The tree reaches the fighter through the same channel as the gear — a registered source,
+            // never lines written onto the entity, so a respec cannot leave a contribution behind.
+            // Optional service: a project without the tree (the battle sandbox) gets no contribution.
+            _passiveTree = GameServiceProvider.Instance.GetServices<IPassiveTreeService>().FirstOrDefault();
+            if (_passiveTree != null) ParameterModifiers.RegisterSource(_passiveTree.ParameterSource);
             Equipment.EquipmentChanged += OnEquipmentChanged;
             Effects = new EffectsComponent(this);
             PassiveSkills = new PassiveSkillsComponent(this);
@@ -228,6 +239,20 @@ namespace LastBreath.Player
         public override void _ExitTree() => _restRecovery?.UnregisterParticipant(this);
 
         public override void _EnterTree() => _restRecovery?.RegisterParticipant(this, () => GlobalPosition);
+
+        /// <summary>The destruction point of the fighter. Everything _Ready registered on objects that
+        /// outlive the node is taken back here and not in _ExitTree: the battle flow reparents the
+        /// player (world ↔ arena), which fires _ExitTree while the fighter goes on living.</summary>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_passiveTree != null) ParameterModifiers.UnregisterSource(_passiveTree.ParameterSource);
+                ExhaustionGrant.Detach(this);
+            }
+
+            base.Dispose(disposing);
+        }
 
         public override void _PhysicsProcess(double delta)
         {
@@ -382,7 +407,7 @@ namespace LastBreath.Player
             context.Source.ModifierHandler.Apply(context);
             // passive/effects that react right before we are about to take some damage
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
-            Calculations.CalculateMitigation(context, this);
+            Calculations.CalculateMitigation(context, this, CombatRolls);
 
             // Post-mitigation absorption layers (shield → barrier → stage guard); the leftover hits health.
             float remaining = _damageChain.Apply(context, this, context.TotalDamage);

@@ -81,6 +81,10 @@ namespace Battle.Internal.Npc
         private readonly RandomNumberGenerator _rnd = new();
         [Export] private AnimationsComponent? _animationsComponent;
 
+        /// <summary>The fighter's own roll stream behind the domain contract: defensive rolls
+        /// (suppression) burn it instead of an anonymous generator built for a single hit.</summary>
+        private IRandomNumberGenerator CombatRolls => field ??= new GodotRandomNumberGenerator(_rnd);
+
         [Export] public string Id { get; private set; } = string.Empty;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         [Export] public string[] Tags { get; private set; } = [];
@@ -599,7 +603,7 @@ namespace Battle.Internal.Npc
             ModifierHandler.Apply(context);
             context.Source.ModifierHandler.Apply(context);
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
-            Calculations.CalculateMitigation(context, this);
+            Calculations.CalculateMitigation(context, this, CombatRolls);
 
             // Post-mitigation absorption layers (shield → barrier → stage guard); the leftover hits health.
             float remaining = _damageChain.Apply(context, this, context.TotalDamage);
@@ -988,6 +992,7 @@ namespace Battle.Internal.Npc
         {
             if (!disposing) return;
 
+            Battle.Source.ExhaustionGrant.Detach(this);
             _npcRegistry?.Unregister(this);
             _recovery?.UnregisterParticipant(this);
             _smartPoints?.Release(InstanceId);

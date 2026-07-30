@@ -17,6 +17,10 @@ namespace LastBreathTest.BattleSystemTests
     {
         private const float ArmorScalingFactor = 10000f; // mirror of Calculations' curve constant
 
+        /// <summary>Mitigation by type rolls nothing. Suppression shares the call and demands a stream,
+        /// but none of the hits here has an ability origin, so it never reaches this one.</summary>
+        private static readonly IRandomNumberGenerator NoRolls = Mock.Of<IRandomNumberGenerator>();
+
         [TestMethod]
         public void AttackContext_SeedsPhysicalAndWeaponElementals()
         {
@@ -74,7 +78,7 @@ namespace LastBreathTest.BattleSystemTests
             var target = Fighter((EntityParameter.FireResistance, 0.8f));
             var context = Damage(source, DamageType.Fire, 100f);
 
-            Calculations.CalculateMitigation(context, target.Object);
+            Calculations.CalculateMitigation(context, target.Object, NoRolls);
 
             // 0.8 resistance × (1 − 0.5 penetration) = 0.4 → 60 damage through
             Assert.AreEqual(60f, context.DamageComponents[DamageType.Fire], 0.001f);
@@ -88,7 +92,7 @@ namespace LastBreathTest.BattleSystemTests
             context.Add(DamageType.Fire, 100f);
             context.IgnoreResistances = true;
 
-            Calculations.CalculateMitigation(context, target.Object);
+            Calculations.CalculateMitigation(context, target.Object, NoRolls);
 
             Assert.AreEqual(100f, context.DamageComponents[DamageType.Fire], 0.001f, "the flag skips elemental resistances");
             Assert.AreEqual(50f, context.DamageComponents[DamageType.Burning], 0.001f, "burning ticks are resisted regardless — the flag is an attack-side mark");
@@ -100,12 +104,12 @@ namespace LastBreathTest.BattleSystemTests
             var target = Fighter((EntityParameter.Armor, ArmorScalingFactor)); // curve → 50% reduction
             var context = Damage(Fighter(), DamageType.Bleed, 100f);
 
-            Calculations.CalculateMitigation(context, target.Object);
+            Calculations.CalculateMitigation(context, target.Object, NoRolls);
             Assert.AreEqual(50f, context.DamageComponents[DamageType.Bleed], 0.001f);
 
             var piercingSource = Fighter((EntityParameter.ArmorPenetration, 1f));
             var pierced = Damage(piercingSource, DamageType.Bleed, 100f);
-            Calculations.CalculateMitigation(pierced, target.Object);
+            Calculations.CalculateMitigation(pierced, target.Object, NoRolls);
             Assert.AreEqual(100f, pierced.DamageComponents[DamageType.Bleed], 0.001f, "full armor penetration applies to bleed like to a physical hit");
         }
 
@@ -118,7 +122,7 @@ namespace LastBreathTest.BattleSystemTests
             var context = Damage(Fighter(), DamageType.Poison, 100f);
             context.Add(DamageType.Pure, 100f);
 
-            Calculations.CalculateMitigation(context, target.Object);
+            Calculations.CalculateMitigation(context, target.Object, NoRolls);
 
             Assert.AreEqual(100f, context.DamageComponents[DamageType.Poison]);
             Assert.AreEqual(100f, context.DamageComponents[DamageType.Pure]);

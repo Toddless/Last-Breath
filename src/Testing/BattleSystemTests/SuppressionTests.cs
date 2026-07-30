@@ -16,9 +16,8 @@ namespace LastBreathTest.BattleSystemTests
     /// delivery — both a direct ability context and an attack stamped with <c>SourceAbilityId</c> — one roll per
     /// hit, every component scaled), its place in the pipeline (after mitigation, before the absorption chain) and
     /// the fact that an unsuppressable hit — no ability origin, or a defender without the stat — never burns a
-    /// roll. Both call shapes are covered: the seeded/scripted stream tests take the explicit-generator overload,
-    /// the two ProductionCall tests use the two-argument form the four combat call sites actually use, so the
-    /// fallback generator inside Calculations is executed too.</summary>
+    /// roll. The stream is always the caller's: the four combat call sites name the fighter's own generator, so
+    /// every roll here is scripted and the resolve stays reproducible.</summary>
     [TestClass]
     public class SuppressionTests
     {
@@ -48,31 +47,6 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(100f, context.DamageComponents[DamageType.Physical], 0.001f);
             Assert.AreEqual(0, rnd.Draws, "a defender without the stat must not shift anybody else's rolls");
-        }
-
-        [TestMethod]
-        public void ProductionCall_WithoutAGenerator_SuppressesAtFullChance()
-        {
-            // The four combat call sites pass no generator, so this is the branch that actually runs in battle:
-            // Calculations falls back to its own generator. At chance 1 the outcome cannot depend on the stream,
-            // so the assertion stays deterministic while still executing the fallback.
-            var target = Defender((EntityParameter.SuppressChance, 1f), (EntityParameter.Suppress, 0.5f));
-            var context = Damage(DamageCause.Ability, (DamageType.Physical, 100f));
-
-            Calculations.CalculateMitigation(context, target.Object);
-
-            Assert.AreEqual(50f, context.DamageComponents[DamageType.Physical], 0.001f, "the fallback generator must roll, not skip the mechanic");
-        }
-
-        [TestMethod]
-        public void ProductionCall_WithoutAGenerator_LeavesDamageUntouchedAtZeroChance()
-        {
-            var target = Defender((EntityParameter.SuppressChance, 0f), (EntityParameter.Suppress, 0.5f));
-            var context = Damage(DamageCause.Ability, (DamageType.Physical, 100f));
-
-            Calculations.CalculateMitigation(context, target.Object);
-
-            Assert.AreEqual(100f, context.DamageComponents[DamageType.Physical], 0.001f);
         }
 
         [TestMethod]

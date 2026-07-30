@@ -62,13 +62,11 @@
         /// attack-side); Pure and Poison pass through untouched.
         /// Mitigated values are written back per component (<see cref="IDamageContext.Set"/>),
         /// so UI and statistics see the real post-mitigation damage split.
-        /// <paramref name="rnd"/> is the stream the suppression roll burns; callers that own one pass it in.
+        /// <paramref name="rnd"/> is the stream the suppression roll burns. It is required rather than
+        /// defaulted: a hit resolved on a generator nobody named is a hit nobody can reproduce, and the
+        /// caller owning the target already owns a stream.
         /// </summary>
-        // TODO:
-        // Параметр rnd временный: пока его не передают, подавление роллит на анонимном генераторе, созданном
-        // на этот удар. Проводку боевых стримов делает T-13 «Проводка бойцов» — после неё параметр становится
-        // обязательным, и компилятор заставит каждую точку вызова назвать свой стрим.
-        public static void CalculateMitigation(IDamageContext context, IFightable target, IRandomNumberGenerator? rnd = null)
+        public static void CalculateMitigation(IDamageContext context, IFightable target, IRandomNumberGenerator rnd)
         {
             // Snapshot: Set() mutates the collection we are iterating
             foreach ((DamageType type, float damage) in context.DamageComponents.ToArray())
@@ -94,7 +92,7 @@
         /// (<see cref="Battle.Abilities.IAbilityActivationContext.IsPreview"/>), no preview path builds a
         /// <see cref="DamageContext"/> and none reaches TakeDamage — there is no second pass to burn a roll on.
         /// </summary>
-        private static void ApplySuppression(IDamageContext context, IFightable target, IRandomNumberGenerator? rnd)
+        private static void ApplySuppression(IDamageContext context, IFightable target, IRandomNumberGenerator rnd)
         {
             if (!OriginatesFromAbility(context)) return;
 
@@ -103,8 +101,7 @@
             float suppression = target.Parameters.GetValueForParameter(EntityParameter.Suppress);
             if (chance <= 0 || suppression <= 0 || context.TotalDamage <= 0) return;
 
-            var generator = rnd ?? new DefaultRandomNumberGenerator();
-            if (!ChanceSuccessful(chance, generator.RandFloat())) return;
+            if (!ChanceSuccessful(chance, rnd.RandFloat())) return;
 
             // Snapshot: Set() mutates the collection we are iterating
             foreach ((DamageType type, float damage) in context.DamageComponents.ToArray())
