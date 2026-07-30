@@ -8,6 +8,8 @@
 
     public class Strength(IParameterModifiersComponent manager) : EntityAttribute(GetEffects(), manager,  new Modifier(ModifierValueType.Flat, EntityParameter.Strength, 0f))
     {
+        private const float HealthPerPoint = 10f;
+
         public override int Total
         {
             get;
@@ -25,15 +27,8 @@
             Total = Mathf.RoundToInt(value);
         }
 
-        private static IEnumerable<IModifier> GetEffects()
-        {
-            yield return new Modifier(ModifierValueType.Flat, EntityParameter.PhysicalDamage, 5f);
-
-            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Armor, 50f);
-
-            yield return new Modifier(ModifierValueType.Increase, EntityParameter.HealthRecovery, 0.01f);
-
-            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Health, 10f);
-        }
+        /// <summary>Strength grants health and nothing else. One point is worth 1% of the unarmed health
+        /// base — the same share of its parameter that Dexterity and Intelligence give of theirs.</summary>
+        private static IEnumerable<IModifier> GetEffects() => [new Modifier(ModifierValueType.Flat, EntityParameter.Health, HealthPerPoint)];
     }
 }

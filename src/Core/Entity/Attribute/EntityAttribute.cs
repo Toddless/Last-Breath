@@ -9,7 +9,6 @@
 
     public abstract class EntityAttribute : IEntityAttribute
     {
-        // TODO: Add new effect to attributes (e.g int will give the player increase spell damage) as
         private readonly List<IModifierInstance> _instances = [];
         private readonly IParameterModifiersComponent _manager;
         private readonly IModifierInstance _investedAmountModifier;
@@ -32,13 +31,13 @@
 
         protected EntityAttribute(IEnumerable<IModifier> modifiers, IParameterModifiersComponent manager, IModifier mod)
         {
-            // TODO: Add id and instance id as source
             _manager = manager;
-            _investedAmountModifier = new SimpleModifier(mod.EntityParameter, mod.ModifierValueType, mod.Value, string.Empty);
+            string source = SourceOf(mod.EntityParameter);
+            _investedAmountModifier = new SimpleModifier(mod.EntityParameter, mod.ModifierValueType, mod.Value, source);
             _manager.AddModifier(_investedAmountModifier);
             foreach (var modifier in modifiers)
             {
-                var instance = new SimpleModifier(modifier.EntityParameter, modifier.ModifierValueType, modifier.Value, string.Empty);
+                var instance = new SimpleModifier(modifier.EntityParameter, modifier.ModifierValueType, modifier.Value, source);
                 _instances.Add(instance);
             }
         }
@@ -68,6 +67,12 @@
 
             _manager.UpdateModifiers(_instances);
         }
+
+        /// <summary>Modifier source of an attribute, derived from the parameter that identifies it.
+        /// Every modifier an attribute mints carries it, so <c>RemoveModifierBySource</c> drops the
+        /// contribution of exactly one attribute; the source also has to stay stable across updates —
+        /// <c>UpdateModifier(s)</c> matches an existing modifier by source and value type.</summary>
+        private static string SourceOf(EntityParameter attribute) => $"Attribute_{attribute}";
 
         private void UpdateInvestedAmount()
         {

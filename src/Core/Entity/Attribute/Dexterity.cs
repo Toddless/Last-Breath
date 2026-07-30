@@ -9,6 +9,8 @@
     public class Dexterity(IParameterModifiersComponent manager)
         : EntityAttribute(GetModifiers(), manager, new Modifier(ModifierValueType.Flat, EntityParameter.Dexterity, 0f))
     {
+        private const float EvadePerPoint = 3f;
+
         public override int Total
         {
             get;
@@ -27,15 +29,8 @@
         }
 
 
-        private static IEnumerable<IModifier> GetModifiers()
-        {
-            yield return new Modifier(ModifierValueType.Increase, EntityParameter.CriticalChance, 0.01f);
-
-            yield return new Modifier(ModifierValueType.Increase, EntityParameter.CriticalDamage, 0.01f);
-
-            yield return new Modifier(ModifierValueType.Increase, EntityParameter.AdditionalHitChance, 0.01f);
-
-            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Evade, 1f);
-        }
+        /// <summary>Dexterity grants evasion and nothing else. One point is worth 1% of the unarmed evade
+        /// base — the same share of its parameter that Strength and Intelligence give of theirs.</summary>
+        private static IEnumerable<IModifier> GetModifiers() => [new Modifier(ModifierValueType.Flat, EntityParameter.Evade, EvadePerPoint)];
     }
 }
