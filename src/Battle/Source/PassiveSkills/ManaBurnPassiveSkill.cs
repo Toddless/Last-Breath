@@ -48,7 +48,7 @@
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not ManaBurnPassiveSkill mana) return false;
-            return mana.PercentToBurn > PercentToBurn;
+            return PercentToBurn > mana.PercentToBurn;
         }
     }
 }

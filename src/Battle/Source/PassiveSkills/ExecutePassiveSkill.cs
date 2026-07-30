@@ -46,7 +46,7 @@
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not ExecutePassiveSkill execute) return false;
-            return execute.Threshold > Threshold;
+            return Threshold > execute.Threshold;
         }
 
         private bool CanExecute(IFightable fightable)

@@ -55,7 +55,7 @@
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not CounterAttackPassiveSkill counter) return false;
-            return counter.Chance > Chance;
+            return Chance > counter.Chance;
         }
     }
 }

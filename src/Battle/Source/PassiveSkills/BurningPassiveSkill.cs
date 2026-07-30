@@ -62,10 +62,12 @@
 
         public override ISkill Copy() => new BurningPassiveSkill(PercentFromDamage, BurningDuration, BurningStacks);
 
+        /// <summary>Strength is the tick size: duration and stacks only spread the same
+        /// <see cref="PercentFromDamage"/> share of the hit over more turns.</summary>
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not BurningPassiveSkill burning) return false;
-            return burning.PercentFromDamage > PercentFromDamage;
+            return PercentFromDamage > burning.PercentFromDamage;
         }
     }
 }

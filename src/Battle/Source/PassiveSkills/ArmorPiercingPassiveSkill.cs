@@ -27,6 +27,8 @@ namespace Battle.Source.PassiveSkills
 
         public override ISkill Copy() => new ArmorPiercingPassiveSkill();
 
+        /// <summary>Parameterless switch — every instance drives penetration to the same 100%,
+        /// so no instance can be stronger and the incoming one may always replace this one.</summary>
         public override bool IsStronger(ISkill skill) => false;
     }
 }

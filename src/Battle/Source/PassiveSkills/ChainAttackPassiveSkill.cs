@@ -28,6 +28,8 @@
 
         public override ISkill Copy() => new ChainAttackPassiveSkill();
 
+        /// <summary>Parameterless: the series chance and damage come from the owner's parameters,
+        /// not from the skill, so no instance can be stronger than another.</summary>
         public override bool IsStronger(ISkill skill) => false;
     }
 }

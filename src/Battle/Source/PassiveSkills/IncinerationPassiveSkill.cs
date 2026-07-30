@@ -33,6 +33,8 @@ namespace Battle.Source.PassiveSkills
 
         public override ISkill Copy() => new IncinerationPassiveSkill();
 
+        /// <summary>Parameterless kill switch — every instance behaves identically,
+        /// so no instance can be stronger than another.</summary>
         public override bool IsStronger(ISkill skill) => false;
     }
 }

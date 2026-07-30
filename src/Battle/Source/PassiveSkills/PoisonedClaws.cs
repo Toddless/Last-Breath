@@ -65,7 +65,8 @@
         {
             if (skill is not PoisonedClaws claws) return false;
 
-            return claws.PercentFromDamage > PercentFromDamage;
+            // Strength is the tick size; PoisonDuration only spreads the same share over more turns.
+            return PercentFromDamage > claws.PercentFromDamage;
         }
     }
 }

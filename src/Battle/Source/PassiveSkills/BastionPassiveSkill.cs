@@ -57,7 +57,7 @@ namespace Battle.Source.PassiveSkills
         public override ISkill Copy() => new BastionPassiveSkill(Reduce);
 
         public override bool IsStronger(ISkill skill) =>
-            skill is BastionPassiveSkill bastion && bastion.Reduce > Reduce;
+            skill is BastionPassiveSkill bastion && Reduce > bastion.Reduce;
 
         /// <summary>Incoming-damage gate: one charge per rearm; the owner's own dealt damage
         /// (the handler runs for both directions) never consumes it.</summary>

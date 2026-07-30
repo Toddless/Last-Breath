@@ -34,6 +34,12 @@
         public float HealthPercent { get; }
         public float DamageBonus { get; }
 
+        /// <summary>Strength measure for collisions: both fields drive the effect and pull in opposite
+        /// directions — a SMALLER step (<see cref="HealthPercent"/>) fires more often, a bigger
+        /// <see cref="DamageBonus"/> pays more per step. Their ratio is the damage gained per unit
+        /// of missing health.</summary>
+        private float BonusPerLostHealth => HealthPercent > 0 ? DamageBonus / HealthPercent : 0;
+
         public override void Attach(IFightable owner)
         {
             Owner = owner;
@@ -64,7 +70,7 @@
         {
             if (skill is not TrappedBeastPassiveSkill beast) return false;
 
-            return beast.HealthPercent > HealthPercent;
+            return BonusPerLostHealth > beast.BonusPerLostHealth;
         }
     }
 }

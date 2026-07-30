@@ -50,7 +50,7 @@ namespace Battle.Source.PassiveSkills
         {
             if (skill is not VampireAttackPassiveSkill vampire) return false;
 
-            return vampire.LeachPercent > LeachPercent;
+            return LeachPercent > vampire.LeachPercent;
         }
     }
 }

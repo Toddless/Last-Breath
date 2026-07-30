@@ -58,7 +58,8 @@
         {
             if (skill is not EchoPassiveSkill later) return false;
 
-            return later.DelayedDamage > DelayedDamage;
+            // Strength is the deferred share of every hit; Turns only says how far it is pushed back.
+            return DelayedDamage > later.DelayedDamage;
         }
 
         private void OnBeforeDamageTaken(BeforeDamageTakenEvent evnt)

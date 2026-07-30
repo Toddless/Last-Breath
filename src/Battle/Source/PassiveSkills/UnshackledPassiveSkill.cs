@@ -45,6 +45,8 @@ namespace Battle.Source.PassiveSkills
 
         public override ISkill Copy() => new UnshackledPassiveSkill();
 
+        /// <summary>Parameterless: one charge per battle in every instance, so no instance can be
+        /// stronger than another. Replacing rearms the charge — deliberate, a fresh grant is fresh.</summary>
         public override bool IsStronger(ISkill skill) => false;
     }
 }

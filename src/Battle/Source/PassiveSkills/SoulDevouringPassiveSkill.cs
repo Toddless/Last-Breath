@@ -46,7 +46,7 @@
         {
             if (skill is not SoulDevouringPassiveSkill soul) return false;
 
-            return soul.BarrierRecoveryAmount > BarrierRecoveryAmount;
+            return BarrierRecoveryAmount > soul.BarrierRecoveryAmount;
         }
     }
 }

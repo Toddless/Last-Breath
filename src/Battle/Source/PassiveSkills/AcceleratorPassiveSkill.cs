@@ -55,6 +55,6 @@ namespace Battle.Source.PassiveSkills
         public override ISkill Copy() => new AcceleratorPassiveSkill(Amount);
 
         public override bool IsStronger(ISkill skill) =>
-            skill is AcceleratorPassiveSkill accelerator && accelerator.Amount > Amount;
+            skill is AcceleratorPassiveSkill accelerator && Amount > accelerator.Amount;
     }
 }

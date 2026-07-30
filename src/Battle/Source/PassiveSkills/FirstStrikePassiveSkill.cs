@@ -53,6 +53,6 @@ namespace Battle.Source.PassiveSkills
         public override ISkill Copy() => new FirstStrikePassiveSkill(Bonus);
 
         public override bool IsStronger(ISkill skill) =>
-            skill is FirstStrikePassiveSkill first && first.Bonus > Bonus;
+            skill is FirstStrikePassiveSkill first && Bonus > first.Bonus;
     }
 }

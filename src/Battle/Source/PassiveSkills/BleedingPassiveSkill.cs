@@ -67,11 +67,14 @@
         public override ISkill Copy() => new BleedingPassiveSkill(PercentFromDamage, BleedDuration, MaxStack);
 
 
+        /// <summary>Strength is the tick size: duration and stacks only spread the same
+        /// <see cref="PercentFromDamage"/> share of the hit over more turns. Comparing them instead
+        /// left pairs that differ only in tick size undecidable, so the later skill won by accident.</summary>
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not BleedingPassiveSkill bleed) return false;
 
-            return BleedDuration > bleed.BleedDuration && MaxStack > bleed.MaxStack;
+            return PercentFromDamage > bleed.PercentFromDamage;
         }
     }
 }

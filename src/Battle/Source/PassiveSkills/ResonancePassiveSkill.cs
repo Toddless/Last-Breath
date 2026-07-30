@@ -77,8 +77,10 @@ namespace Battle.Source.PassiveSkills
 
         public override ISkill Copy() => new ResonancePassiveSkill(SpellDamagePerStack, MulticastPerStack);
 
+        /// <summary>Spell damage per stack decides: it is the always-on half of the stack, while
+        /// multicast chance only pays out on a roll.</summary>
         public override bool IsStronger(ISkill skill) =>
-            skill is ResonancePassiveSkill resonance && resonance.SpellDamagePerStack > SpellDamagePerStack;
+            skill is ResonancePassiveSkill resonance && SpellDamagePerStack > resonance.SpellDamagePerStack;
 
         private void UpdateModifiers()
         {

@@ -79,7 +79,7 @@ namespace Battle.Source.PassiveSkills
         public override ISkill Copy() => new ManaResonancePassiveSkill(Rate);
 
         public override bool IsStronger(ISkill skill) =>
-            skill is ManaResonancePassiveSkill resonance && resonance.Rate > Rate;
+            skill is ManaResonancePassiveSkill resonance && Rate > resonance.Rate;
 
         /// <summary>Outgoing mutator: adds the flat resonance bonus to the first hit of each cast,
         /// scaling the existing components proportionally so the damage-type split is preserved.</summary>

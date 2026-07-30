@@ -26,6 +26,8 @@ namespace Battle.Source.PassiveSkills
 
         public override ISkill Copy() => new NoCriticalHitsPassiveSkill();
 
+        /// <summary>Parameterless: every instance overrides crit chance to the same zero,
+        /// so no instance can be stronger than another.</summary>
         public override bool IsStronger(ISkill skill) => false;
     }
 }

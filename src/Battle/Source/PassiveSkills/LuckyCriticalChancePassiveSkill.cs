@@ -21,6 +21,8 @@
 
         public override ISkill Copy() => new LuckyCriticalChancePassiveSkill();
 
+        /// <summary>Parameterless: the decorator rerolls the same crit chance for every instance,
+        /// so no instance can be stronger than another.</summary>
         public override bool IsStronger(ISkill skill) => false;
     }
 }

@@ -52,7 +52,9 @@ namespace Battle.Source.PassiveSkills
 
         public override ISkill Copy() => new DecompositionPassiveSkill(duration, MaxStacks, ReduceBy);
 
+        /// <summary>Strength is the armor shred per stack; <see cref="MaxStacks"/> only sets how
+        /// long it takes to reach the same ceiling.</summary>
         public override bool IsStronger(ISkill skill) =>
-            skill is DecompositionPassiveSkill decomposition && decomposition.ReduceBy > ReduceBy;
+            skill is DecompositionPassiveSkill decomposition && ReduceBy > decomposition.ReduceBy;
     }
 }

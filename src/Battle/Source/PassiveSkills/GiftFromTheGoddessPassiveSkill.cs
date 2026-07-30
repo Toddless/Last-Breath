@@ -47,7 +47,7 @@
         {
             if (skill is not GiftFromTheGoddessPassiveSkill gift) return false;
 
-            return gift.Chance > Chance;
+            return Chance > gift.Chance;
         }
     }
 }
