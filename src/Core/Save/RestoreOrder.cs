@@ -15,6 +15,11 @@ namespace Core.Save
 
         public const int Mastery = 10;
 
+        /// <summary>Passive tree allocation: after Mastery, which hands out the points the allocation
+        /// spends, and before Items so the tree's modifier source is in place when equipment — the
+        /// other source on the same parameters — settles.</summary>
+        public const int PassiveTree = 15;
+
         /// <summary>Inventory + equipment: the parameter modifier sources.</summary>
         public const int Items = 20;
 
