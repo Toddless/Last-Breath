@@ -12,16 +12,18 @@ namespace LastBreathTest.BattleSystemTests
     using Moq;
 
     /// <summary>Suppression: the defender's chance (<c>SuppressChance</c>) to take a fraction (<c>Suppress</c>)
-    /// less of an incoming ABILITY hit. Pins the rule itself (ability hits only, one roll per hit, every
-    /// component scaled), its place in the pipeline (after mitigation, before the absorption chain) and the fact
-    /// that an unsuppressable hit — wrong cause or a defender without the stat — never burns a roll. Both call
-    /// shapes are covered: the seeded/scripted stream tests take the explicit-generator overload, the two
-    /// ProductionCall tests use the two-argument form the four combat call sites actually use, so the fallback
-    /// generator inside Calculations is executed too.</summary>
+    /// less of an incoming hit that ORIGINATES FROM AN ABILITY. Pins the rule itself (ability origin regardless of
+    /// delivery — both a direct ability context and an attack stamped with <c>SourceAbilityId</c> — one roll per
+    /// hit, every component scaled), its place in the pipeline (after mitigation, before the absorption chain) and
+    /// the fact that an unsuppressable hit — no ability origin, or a defender without the stat — never burns a
+    /// roll. Both call shapes are covered: the seeded/scripted stream tests take the explicit-generator overload,
+    /// the two ProductionCall tests use the two-argument form the four combat call sites actually use, so the
+    /// fallback generator inside Calculations is executed too.</summary>
     [TestClass]
     public class SuppressionTests
     {
         private const float ArmorScalingFactor = 10000f; // mirror of Calculations' curve constant
+        private const string AbilityStamp = "Ability_DoubleStrike";
 
         [TestMethod]
         public void FullChance_ReducesEveryComponentByTheSuppressFraction()
@@ -131,6 +133,66 @@ namespace LastBreathTest.BattleSystemTests
                 Calculations.CalculateMitigation(context, target.Object, rnd);
 
                 Assert.AreEqual(0, rnd.Draws, $"cause {cause} must not reach the stream and shift anybody else's rolls");
+            }
+        }
+
+        [TestMethod]
+        public void AttackStampedWithAnAbility_IsSuppressed()
+        {
+            // Str/Dex abilities (DoubleStrike, SeriesOfAttacks, BerserkFury, HeadButt, IncreasingPressure) deliver
+            // through real attacks: ComposeAttackDamage builds Cause = Attack and carries the ability's stamp.
+            var target = Defender((EntityParameter.SuppressChance, 1f), (EntityParameter.Suppress, 0.25f));
+            var context = Damage(DamageCause.Attack, (DamageType.Physical, 100f));
+            context.SourceAbilityId = AbilityStamp;
+
+            Calculations.CalculateMitigation(context, target.Object, new ScriptedRandom(0f));
+
+            Assert.AreEqual(75f, context.DamageComponents[DamageType.Physical], 0.001f,
+                "an ability delivered through attacks is still ability damage");
+        }
+
+        [TestMethod]
+        public void BasicAttack_IsNotSuppressedAndBurnsNoRoll()
+        {
+            var target = Defender((EntityParameter.SuppressChance, 1f), (EntityParameter.Suppress, 0.25f));
+            var context = Damage(DamageCause.Attack, (DamageType.Physical, 100f));
+            // A roll that would succeed — only the origin gate can keep it undrawn.
+            var rnd = new ScriptedRandom(0f);
+
+            Calculations.CalculateMitigation(context, target.Object, rnd);
+
+            Assert.AreEqual(100f, context.DamageComponents[DamageType.Physical], 0.001f,
+                "an unstamped attack is a plain basic attack — the layer does not cover it");
+            Assert.AreEqual(0, rnd.Draws, "a basic attack must not shift anybody else's rolls");
+        }
+
+        [TestMethod]
+        public void DirectAbilityDamage_WithoutAStamp_IsSuppressed()
+        {
+            // Int abilities (Armageddon, ChainLightning, Discharge, IceShards, IceBlocks, PoisonExplosion, ...)
+            // build the damage context themselves and never stamp SourceAbilityId — the cause alone covers them.
+            var target = Defender((EntityParameter.SuppressChance, 1f), (EntityParameter.Suppress, 0.25f));
+            var context = Damage(DamageCause.Ability, (DamageType.Fire, 100f));
+
+            Calculations.CalculateMitigation(context, target.Object, new ScriptedRandom(0f));
+
+            Assert.AreEqual(75f, context.DamageComponents[DamageType.Fire], 0.001f);
+        }
+
+        [TestMethod]
+        public void EffectAndPassiveDamage_WithoutAStamp_IsNotSuppressedAndBurnsNoRoll()
+        {
+            foreach (var cause in new[] { DamageCause.Effect, DamageCause.Passive })
+            {
+                var target = Defender((EntityParameter.SuppressChance, 1f), (EntityParameter.Suppress, 0.25f));
+                var context = Damage(cause, (DamageType.Poison, 100f));
+                var rnd = new ScriptedRandom(0f);
+
+                Calculations.CalculateMitigation(context, target.Object, rnd);
+
+                Assert.AreEqual(100f, context.DamageComponents[DamageType.Poison], 0.001f,
+                    $"a {cause} hit carries no ability origin");
+                Assert.AreEqual(0, rnd.Draws, $"cause {cause} must not reach the stream");
             }
         }
 

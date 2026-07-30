@@ -79,14 +79,16 @@
 
         /// <summary>
         /// Suppression — the defender's chance (<see cref="EntityParameter.SuppressChance"/>) to take a fraction
-        /// (<see cref="EntityParameter.Suppress"/>) less of an incoming ABILITY hit. It is a layer of defence
-        /// against abilities: hits of any other <see cref="DamageCause"/> (attacks, effects, passives, items,
-        /// the environment) pass through untouched and never reach the roll.
+        /// (<see cref="EntityParameter.Suppress"/>) less of an incoming hit that originates from an ability.
+        /// It is a layer of defence against abilities, and it follows origin rather than delivery: an ability that
+        /// hits through real attacks is covered exactly like one that builds its damage directly
+        /// (see <see cref="OriginatesFromAbility"/>). A basic attack, a damage-over-time tick, a passive, an item
+        /// and the environment pass through untouched and never reach the roll.
         /// Position: AFTER per-type mitigation and BEFORE the absorption chain, so the suppressed number is what
         /// shields, barriers and the stage guard soak and what the log shows — mitigation stays the only place
         /// that knows damage types, and suppression stays type-agnostic.
         /// One roll per hit, not per component: a hit is either suppressed or it is not.
-        /// A hit that cannot be suppressed — wrong cause, or a defender without the stat — never touches the
+        /// A hit that cannot be suppressed — no ability origin, or a defender without the stat — never touches the
         /// stream, so nobody else's rolls shift.
         /// The roll needs no preview guard: previewing is an ability-activation concept
         /// (<see cref="Battle.Abilities.IAbilityActivationContext.IsPreview"/>), no preview path builds a
@@ -94,7 +96,7 @@
         /// </summary>
         private static void ApplySuppression(IDamageContext context, IFightable target, IRandomNumberGenerator? rnd)
         {
-            if (context.Cause != DamageCause.Ability) return;
+            if (!OriginatesFromAbility(context)) return;
 
             // Bounds (chance 0..1, fraction 0..0.75) live in EntityParametersComponent's table.
             float chance = target.Parameters.GetValueForParameter(EntityParameter.SuppressChance);
@@ -108,6 +110,14 @@
             foreach ((DamageType type, float damage) in context.DamageComponents.ToArray())
                 context.Set(type, damage * (1 - suppression));
         }
+
+        /// <summary>Whether the hit was born of an ability, whichever way it was delivered: abilities that damage
+        /// directly declare <see cref="DamageCause.Ability"/>, while abilities that damage through real attacks
+        /// arrive as <see cref="DamageCause.Attack"/> carrying the caster's
+        /// <see cref="IDamageContext.SourceAbilityId"/> (stamped on the attack, moved over by
+        /// <see cref="ComposeAttackDamage"/>). A basic attack carries neither mark.</summary>
+        private static bool OriginatesFromAbility(IDamageContext context)
+            => context.Cause == DamageCause.Ability || !string.IsNullOrEmpty(context.SourceAbilityId);
 
         private static float MitigateComponent(DamageType type, float damage, IDamageContext context, IFightable target)
         {
