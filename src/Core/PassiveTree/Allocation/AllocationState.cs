@@ -32,7 +32,21 @@ namespace Core.PassiveTree.Allocation
                     _taken.Add(node.Id);
         }
 
-        /// <summary>Drops anything that stopped existing or stopped being reachable after an edit.</summary>
+        /// <summary>
+        /// Replaces the whole set with a restored one — a save file, wholesale rather than node by
+        /// node. What arrives is not trusted: it is put through the same re-check an edited tree goes
+        /// through, so ids the tree no longer knows and anything that lost its route to a seed drop
+        /// out instead of becoming an allocation the take/refund rules could never have produced.
+        /// </summary>
+        public void Restore(PassiveTreeDocument document, IEnumerable<string> nodes)
+        {
+            _taken.Clear();
+            _taken.UnionWith(nodes);
+            Resync(document);
+        }
+
+        /// <summary>Drops anything that stopped existing or stopped being reachable after an edit, and
+        /// recounts the spend from what is left — what a dropped node cost is no longer owed.</summary>
         public void Resync(PassiveTreeDocument document)
         {
             foreach (string id in new List<string>(_taken))
@@ -63,9 +77,6 @@ namespace Core.PassiveTree.Allocation
 
             return AllocationResult.NotConnected;
         }
-
-        public bool CanTake(PassiveTreeDocument document, string id, int budget) =>
-            CheckTake(document, id, budget) == AllocationResult.Success;
 
         /// <summary>Buys the node when the rules allow it; returns the same reason <see cref="CheckTake"/> would.</summary>
         public AllocationResult TryTake(PassiveTreeDocument document, string id, int budget)
@@ -102,9 +113,6 @@ namespace Core.PassiveTree.Allocation
                 ? AllocationResult.Success
                 : AllocationResult.WouldOrphan;
         }
-
-        public bool CanRefund(PassiveTreeDocument document, string id) =>
-            CheckRefund(document, id) == AllocationResult.Success;
 
         /// <summary>Gives the node back when the rules allow it; returns the same reason <see cref="CheckRefund"/> would.</summary>
         public AllocationResult TryRefund(PassiveTreeDocument document, string id)

@@ -2,6 +2,7 @@ namespace Core.PassiveTree
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Entity.Components;
     using Enums;
     using Modifiers;
@@ -18,10 +19,13 @@ namespace Core.PassiveTree
 
         public event Action<IReadOnlyCollection<EntityParameter>>? SourceChanged;
 
-        public IReadOnlyCollection<EntityParameter> AffectedParameters => _modifiers.Keys;
+        /// <summary>A snapshot, not the live key set: a consumer walks these to react to the source,
+        /// and a reaction that ends in another <see cref="Rebuild"/> would invalidate the collection
+        /// mid-walk. The same reason the map itself is never handed out.</summary>
+        public IReadOnlyCollection<EntityParameter> AffectedParameters => _modifiers.Keys.ToHashSet();
 
         public IEnumerable<IModifierInstance> GetModifiers(EntityParameter parameter) =>
-            _modifiers.TryGetValue(parameter, out List<IModifierInstance>? lines) ? lines : [];
+            _modifiers.TryGetValue(parameter, out List<IModifierInstance>? lines) ? lines.ToArray() : [];
 
         /// <summary>
         /// Replaces the whole map with what the given nodes carry and announces every parameter that

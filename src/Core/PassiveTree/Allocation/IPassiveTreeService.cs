@@ -37,11 +37,22 @@ namespace Core.PassiveTree.Allocation
 
         bool IsTaken(string nodeId);
 
+        /// <summary>The answer <see cref="Take"/> would give, without buying anything — what a canvas
+        /// or a console asks to show whether a node is available and why it is not.</summary>
+        AllocationResult CheckTake(string nodeId);
+
         AllocationResult Take(string nodeId);
 
         AllocationResult Refund(string nodeId);
 
         /// <summary>Drops the whole allocation back to the granted seeds.</summary>
         void Respec();
+
+        /// <summary>Replaces the whole allocation with a saved one. Wholesale rather than node by
+        /// node: a set replayed through purchases would depend on the order it was written in. The
+        /// set is re-checked against the current tree, so nodes that stopped existing or stopped
+        /// being connected do not come back. Points are not part of it — the granted total belongs
+        /// to mastery and is restored before this.</summary>
+        void RestoreState(IReadOnlyCollection<string> takenNodes);
     }
 }

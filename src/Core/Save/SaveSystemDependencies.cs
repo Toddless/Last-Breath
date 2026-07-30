@@ -14,7 +14,7 @@ namespace Core.Save
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Participants;
-    using PassiveTree;
+    using PassiveTree.Allocation;
     using Services;
 
     /// <summary>
@@ -52,11 +52,10 @@ namespace Core.Save
                 // Optional: only projects with the crafting module write the learned-recipes section.
                 if (sp.GetService<Crafting.IRecipeKnowledge>() is { } recipeKnowledge)
                     manager.Register(new RecipeKnowledgeSaveParticipant(recipeKnowledge));
-                // Optional: the tree lives only where both its allocation state and its catalog are
-                // registered; a project without them doesn't write the section.
-                if (sp.GetService<IPassiveTreeSaveState>() is { } passiveTree
-                    && sp.GetService<IPassiveTreeProvider>() is { } passiveTreeData)
-                    manager.Register(new PassiveTreeSaveParticipant(passiveTree, passiveTreeData));
+                // Optional: only projects that registered the tree service write the section (the
+                // service carries its own catalog, so one lookup answers for both).
+                if (sp.GetService<IPassiveTreeService>() is { } passiveTree)
+                    manager.Register(new PassiveTreeSaveParticipant(passiveTree));
                 manager.Register(new EquipmentSaveParticipant(sp.GetRequiredService<IPlayerAccessor>(), sp.GetRequiredService<EquipItemSaveConverter>()));
                 // The bag lives only in projects that have both an inventory and item data (Main);
                 // a sandbox without them simply doesn't write the section.

@@ -208,18 +208,72 @@ namespace LastBreathTest.BattleSystemTests
         public void TheTakenSetAnnouncesEveryChange()
         {
             IPassiveTreeService service = ShippedService(points: 5);
+            Assert.IsTrue(service.TakenNodes.Count > 0, "adopting the loaded document puts the granted seeds in the set");
+
             int changes = 0;
             service.AllocationChanged += () => changes++;
-
-            Assert.IsTrue(service.Tree.Nodes.Count > 0);
-            Assert.AreEqual(1, changes, "adopting the loaded document is itself a change: the granted seeds enter the set");
 
             service.Take(FirstNode);
             service.Take("no_such_node");
             service.Refund(FirstNode);
             service.Respec();
 
-            Assert.AreEqual(4, changes, "a refused request must not announce a change");
+            Assert.AreEqual(3, changes, "a refused request must not announce a change");
+        }
+
+        [TestMethod]
+        public void EveryAccessorAdoptsTheDocument_NotOnlyTheTreeGetter()
+        {
+            // The save participant and the modifier wiring never ask for Tree. An accessor that
+            // answered before the document was adopted would report an empty allocation — and a
+            // capture would write an empty section over a real one.
+            var provider = new TreeProviderStub(SyntheticTree());
+            var service = new PassiveTreeService(provider);
+            service.SetTotalPoints(1);
+
+            Assert.IsTrue(service.TakenNodes.Contains(SyntheticSeed), "TakenNodes answered before the document was adopted");
+            Assert.AreEqual(AllocationResult.Success, service.Take(SyntheticNode));
+            Assert.AreEqual(1, service.SpentPoints);
+
+            // The catalog was reloaded underneath and the bought node went with it.
+            provider.Tree = SeedOnlyTree();
+
+            Assert.IsFalse(service.IsTaken(SyntheticNode), "IsTaken answered from the document that was replaced");
+            Assert.AreEqual(0, service.SpentPoints, "SpentPoints answered from the document that was replaced");
+        }
+
+        [TestMethod]
+        public void CheckTake_GivesTheAnswerWithoutBuying()
+        {
+            IPassiveTreeService service = ShippedService(points: 1);
+
+            Assert.AreEqual(AllocationResult.Success, service.CheckTake(FirstNode));
+            Assert.AreEqual(0, service.SpentPoints, "a check must not spend a point");
+            Assert.IsFalse(service.IsTaken(FirstNode), "a check must not take the node");
+            Assert.AreEqual(AllocationResult.UnknownNode, service.CheckTake("no_such_node"));
+
+            service.Take(FirstNode);
+
+            Assert.AreEqual(AllocationResult.AlreadyTaken, service.CheckTake(FirstNode));
+            Assert.AreEqual(AllocationResult.NotEnoughPoints, service.CheckTake(SecondNode));
+        }
+
+        [TestMethod]
+        public void TheSourceHandsOutSnapshots_NotTheCollectionsItRebuilds()
+        {
+            // RegisterSource walks AffectedParameters while announcing the source; a handler that ends
+            // in another Rebuild would empty the live key set out from under that walk.
+            IPassiveTreeService service = ShippedService(points: 5);
+            service.Take(FirstNode);
+            IReadOnlyCollection<EntityParameter> affected = service.ParameterSource.AffectedParameters;
+            IEnumerable<IModifierInstance> lines = service.ParameterSource.GetModifiers(EntityParameter.Strength);
+
+            service.Respec();
+
+            Assert.IsTrue(affected.Count > 0, "the live key set was handed out — the rebuild emptied it mid-walk");
+            Assert.AreEqual(1, lines.Count(), "the line list was handed out live — the rebuild changed it after the fact");
+            Assert.IsFalse(lines is ICollection<IModifierInstance> { IsReadOnly: false },
+                "the source handed out the list it edits — a caller could rewrite the tree's contribution in place");
         }
 
         private static EntityParameter[] Attributes =>
@@ -227,22 +281,34 @@ namespace LastBreathTest.BattleSystemTests
 
         private const string SyntheticNode = "small_1";
 
+        private const string SyntheticSeed = "start";
+
         private static int TreeLinesFor(Fighter fighter, EntityParameter parameter) =>
             fighter.Modifiers.GetModifiers(parameter).Count(modifier => modifier.Source == PassiveTreeDocument.ModifierSource);
 
         private static IPassiveTreeService ShippedService(int points) => Service(ShippedTree(), points);
 
+        private static IPassiveTreeService SyntheticService(int points, params ModifierLine[] lines) =>
+            Service(SyntheticTree(lines), points);
+
         /// <summary>A seed with one Small node hanging off it — the smallest tree a purchase can happen on.</summary>
-        private static IPassiveTreeService SyntheticService(int points, params ModifierLine[] lines)
+        private static PassiveTreeDocument SyntheticTree(params ModifierLine[] lines)
         {
-            var document = new PassiveTreeDocument();
-            document.AddNode(new PassiveNode { Id = "start", Kind = PassiveNodeKind.Start, Stance = Stance.Strength });
+            PassiveTreeDocument document = SeedOnlyTree();
             var node = new PassiveNode { Id = SyntheticNode, Kind = PassiveNodeKind.Small, Stance = Stance.Strength };
             foreach (ModifierLine line in lines) node.Modifiers.Add(line);
             document.AddNode(node);
-            document.Link("start", SyntheticNode);
+            document.Link(SyntheticSeed, SyntheticNode);
 
-            return Service(document, points);
+            return document;
+        }
+
+        /// <summary>The same tree after its only purchasable node was deleted from the catalog.</summary>
+        private static PassiveTreeDocument SeedOnlyTree()
+        {
+            var document = new PassiveTreeDocument();
+            document.AddNode(new PassiveNode { Id = SyntheticSeed, Kind = PassiveNodeKind.Start, Stance = Stance.Strength });
+            return document;
         }
 
         private static IPassiveTreeService Service(PassiveTreeDocument document, int points)
@@ -301,9 +367,11 @@ namespace LastBreathTest.BattleSystemTests
                 modifiers.Where(modifier => modifier.EntityParameter == parameter);
         }
 
+        /// <summary>Stands in for the data pipeline, including a reload: the document can be swapped
+        /// the way a catalog reload swaps it.</summary>
         private sealed class TreeProviderStub(PassiveTreeDocument tree) : IPassiveTreeProvider
         {
-            public PassiveTreeDocument Tree { get; } = tree;
+            public PassiveTreeDocument Tree { get; set; } = tree;
 
             public IReadOnlyList<string> Issues => [];
         }
