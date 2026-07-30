@@ -20,6 +20,7 @@ namespace LastBreath.Services
     using Core.Narrative.Influence;
     using Core.Narrative.Quests;
     using Core.PassiveTree;
+    using Core.PassiveTree.Allocation;
     using Core.Reputation;
     using Core.Save;
     using Core.Save.Participants;
@@ -78,6 +79,7 @@ namespace LastBreath.Services
             services.AddGameDataParticipant<IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>();
             services.AddGameDataParticipant<IPlayerStatsProvider, PlayerStatsProvider>();
             services.AddGameDataParticipant<IPassiveTreeProvider, PassiveTreeProvider>();
+            services.AddSingleton<IPassiveTreeService, PassiveTreeService>();
             services.AddSingleton<INpcPopulationService, NpcPopulationService>();
             services.AddSingleton<INpcSkirmishService, NpcSkirmishService>();
             services.AddSingleton<INpcWorldSpawner, BattleNpcWorldSpawner>();
