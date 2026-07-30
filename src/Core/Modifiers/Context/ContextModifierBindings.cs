@@ -14,7 +14,11 @@
     }
 
     /// <summary>Maps a data-level context line to the concrete pipeline modifier it stands for.
-    /// Whole-number knobs (durations, stacks) read the floored value.</summary>
+    /// Whole-number knobs (durations, stacks) read the floored value. Every knob that carries a number hands
+    /// the modifier a <c>() => entry.Value</c> reader, never the number itself: lines are attached on equip
+    /// and their value keeps moving afterwards (sharpening, ascension), and nothing re-attaches them.
+    /// The one binding without a reader is <see cref="ContextParameter.AttacksIgnoreResistances"/> — a flag,
+    /// it has no value to read.</summary>
     internal static class ContextModifierBindings
     {
         public static IContextModifierBinding Create(ContextModifierEntry entry) => entry.Parameter switch
@@ -64,7 +68,7 @@
             new DamageBinding(owner => new AddedElementalDamageContextModifier(owner, element, () => entry.Value, DamageCause.Attack));
 
         private static IContextModifierBinding DamageTakenReduction(ContextModifierEntry entry, DamageCause cause) =>
-            new DamageBinding(owner => new IncomingDamageReductionContextModifier(owner, entry.Value, cause));
+            new DamageBinding(owner => new IncomingDamageReductionContextModifier(owner, () => entry.Value, cause));
 
         private static IContextModifierBinding DotTakenReduction(ContextModifierEntry entry, DamageType status) =>
             new DamageBinding(owner => new DotDamageTakenReductionContextModifier(owner, () => entry.Value, status));
