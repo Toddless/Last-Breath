@@ -6,9 +6,9 @@ namespace PassiveTreeEditor.Source.View
     using Core.Entity;
     using Core.Enums;
     using Core.Localization;
+    using Core.PassiveTree;
     using Godot;
     using Io;
-    using Model;
     using Simulation;
     using EditorSettings = Io.EditorSettings;
 

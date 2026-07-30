@@ -1,7 +1,6 @@
-namespace PassiveTreeEditor.Source.Io
+namespace Core.PassiveTree
 {
     using System.Collections.Generic;
-    using Model;
     using Newtonsoft.Json;
 
     /// <summary>

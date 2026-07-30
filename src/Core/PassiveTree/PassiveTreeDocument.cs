@@ -1,13 +1,13 @@
-namespace PassiveTreeEditor.Source.Model
+namespace Core.PassiveTree
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
     /// <summary>
-    /// The tree being edited: nodes, undirected links and the point budget. Every structural change
-    /// goes through this class so the id lookup, the adjacency map and the spatial index can never
-    /// drift apart from the node list.
+    /// The tree itself: nodes, undirected links and the point budget. Every structural change goes
+    /// through this class so the id lookup, the adjacency map and the spatial index can never drift
+    /// apart from the node list.
     /// </summary>
     public sealed class PassiveTreeDocument
     {
@@ -45,9 +45,9 @@ namespace PassiveTreeEditor.Source.Model
 
         public const int DefaultBudget = 62;
 
-        /// <summary>Stamped on every modifier a tree node contributes. The game takes a node back by
-        /// dropping modifiers of this source (<c>RemoveModifierBySource</c>), so two spellings of it
-        /// would mean lines that can be granted and never revoked.</summary>
+        /// <summary>Stamped on every modifier a tree node contributes. Taking a node back means
+        /// dropping the modifiers carrying this source, so two spellings of it would mean lines that
+        /// can be granted and never revoked.</summary>
         public const string ModifierSource = "PassiveTree";
 
         public PassiveNode? Find(string id) => _byId.GetValueOrDefault(id);
@@ -167,7 +167,7 @@ namespace PassiveTreeEditor.Source.Model
             }
         }
 
-        /// <summary>Content problems worth showing the designer. Not a gate: the tool never refuses
+        /// <summary>Content problems worth showing the designer. Not a gate: authoring never refuses
         /// to save a half-finished tree, it only says what is unfinished.</summary>
         public List<string> Validate()
         {

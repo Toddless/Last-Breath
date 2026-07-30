@@ -1,6 +1,6 @@
-namespace PassiveTreeEditor.Source.Model
+namespace Core.PassiveTree
 {
-    using Core.Enums;
+    using Enums;
 
     /// <summary>
     /// One player-facing stat line of a node: which parameter, which value bucket, how much.
@@ -16,9 +16,9 @@ namespace PassiveTreeEditor.Source.Model
         public float Value { get; set; }
 
         /// <summary>
-        /// Free text describing when the line applies; empty means always. The summator counts
-        /// conditional lines as if they were always on and flags the total, because the tool has no
-        /// battle state to evaluate a condition against.
+        /// Free text describing when the line applies; empty means always. Nothing evaluates it yet —
+        /// readers that have no battle state (the editor's summator) count conditional lines as if
+        /// they were always on and flag the total.
         /// </summary>
         public string Condition { get; set; } = string.Empty;
 

@@ -3,9 +3,9 @@ namespace PassiveTreeEditor.Source.View
     using System;
     using System.Collections.Generic;
     using Core.Enums;
+    using Core.PassiveTree;
     using Godot;
     using Io;
-    using Model;
 
     /// <summary>
     /// Properties of the selected node. Rebuilt wholesale on every selection change — a node has a

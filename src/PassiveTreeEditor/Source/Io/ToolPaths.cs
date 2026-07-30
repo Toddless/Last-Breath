@@ -1,6 +1,8 @@
 namespace PassiveTreeEditor.Source.Io
 {
     using System.IO;
+    using Core.Data.GameData;
+    using Core.PassiveTree;
     using Godot;
 
     /// <summary>
@@ -18,7 +20,7 @@ namespace PassiveTreeEditor.Source.Io
         /// back a Godot path and <c>Path.Combine</c> appends the platform separator, so the mixed
         /// result is what ends up quoted in the settings file and in the path field.</summary>
         public static string DefaultTreePath =>
-            Path.Combine(SharedDataRoot, PassiveTreeFormat.Catalog, PassiveTreeFormat.DefaultFileName)
+            Path.Combine(SharedDataRoot, DataCatalog.PassiveTree, PassiveTreeFormat.DefaultFileName)
                 .Replace('\\', '/');
 
         /// <summary>Tool-only settings (base stat profile, last opened file). Never game data — it

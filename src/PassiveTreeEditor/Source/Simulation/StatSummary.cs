@@ -4,7 +4,7 @@ namespace PassiveTreeEditor.Source.Simulation
     using Core;
     using Core.Enums;
     using Core.Modifiers;
-    using Model;
+    using Core.PassiveTree;
 
     /// <summary>
     /// What the current allocation is actually worth. The final number is produced by the game's own

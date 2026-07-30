@@ -4,8 +4,8 @@ namespace PassiveTreeEditor.Source.View
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
+    using Core.PassiveTree;
     using Godot;
-    using Model;
 
     /// <summary>
     /// The visual vocabulary of the canvas, ported from the Umbral passive-tree mockup: shape and

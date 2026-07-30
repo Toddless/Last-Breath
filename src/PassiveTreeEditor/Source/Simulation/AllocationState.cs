@@ -2,7 +2,7 @@ namespace PassiveTreeEditor.Source.Simulation
 {
     using System;
     using System.Collections.Generic;
-    using Model;
+    using Core.PassiveTree;
 
     /// <summary>
     /// "As in game" allocation: which nodes are taken, what that costs, and what may still be taken

@@ -2,8 +2,8 @@ namespace PassiveTreeEditor.Source.View
 {
     using System;
     using System.Collections.Generic;
+    using Core.PassiveTree;
     using Godot;
-    using Model;
     using Simulation;
 
     /// <summary>

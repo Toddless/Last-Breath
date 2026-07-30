@@ -1,4 +1,4 @@
-namespace PassiveTreeEditor.Source.Model
+namespace Core.PassiveTree
 {
     /// <summary>
     /// The node classes of the martial-arts tree. The name is what lands in JSON, so renaming a

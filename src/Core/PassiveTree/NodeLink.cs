@@ -1,4 +1,4 @@
-namespace PassiveTreeEditor.Source.Model
+namespace Core.PassiveTree
 {
     /// <summary>
     /// An undirected edge. Endpoints are normalized on creation so that A→B and B→A are the same

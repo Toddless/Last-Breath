@@ -1,11 +1,11 @@
-namespace PassiveTreeEditor.Source.Model
+namespace Core.PassiveTree
 {
     using System;
     using System.Collections.Generic;
 
     /// <summary>
-    /// Per-class content rules, in one table instead of scattered switches. The editor uses these to
-    /// gate its controls and to report violations; it never silently rewrites the author's data.
+    /// Per-class content rules, in one table instead of scattered switches. Authoring tools use these
+    /// to gate their controls and to report violations; nothing silently rewrites the author's data.
     /// </summary>
     public static class NodeKindRules
     {

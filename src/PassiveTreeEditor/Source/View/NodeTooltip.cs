@@ -2,9 +2,9 @@ namespace PassiveTreeEditor.Source.View
 {
     using Core.Localization;
     using Core.Modifiers;
+    using Core.PassiveTree;
     using Core.Views.UI;
     using Godot;
-    using Model;
 
     /// <summary>
     /// What a node gives, shown at the cursor. Modifier lines go through the game's own

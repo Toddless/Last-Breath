@@ -1,17 +1,10 @@
-namespace PassiveTreeEditor.Source.Io
+namespace Core.PassiveTree
 {
-    /// <summary>Format-wide constants shared by the writer, the reader and the game-side provider.</summary>
+    /// <summary>Format-wide constants shared by the writer, the reader and the data participant.</summary>
     public static class PassiveTreeFormat
     {
         /// <summary>Bumped only when a change stops old files from loading correctly.</summary>
         public const int Version = 1;
-
-        /// <summary>
-        /// The data catalog (subfolder of a project's data root) the tree lives in. The game side
-        /// mirrors this as a constant in <c>Core.Data.GameData.DataCatalog</c> when the tree is wired
-        /// into the real bootstrap; the editor keeps its own copy so it depends on nothing unreleased.
-        /// </summary>
-        public const string Catalog = "PassiveTree";
 
         public const string DefaultFileName = "PassiveTree.json";
 

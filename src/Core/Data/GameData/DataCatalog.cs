@@ -24,6 +24,7 @@ namespace Core.Data.GameData
         public const string Recovery = "Recovery";
         public const string Player = "Player";
         public const string PlayerStats = "PlayerStats";
+        public const string PassiveTree = "PassiveTree";
         public const string LootTables = "LootTables";
         public const string LootConfiguration = "LootConfiguration";
         public const string Items = "Items";

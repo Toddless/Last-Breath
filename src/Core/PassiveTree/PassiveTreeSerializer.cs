@@ -1,4 +1,4 @@
-namespace PassiveTreeEditor.Source.Io
+namespace Core.PassiveTree
 {
     using System;
     using System.Collections.Generic;
@@ -6,9 +6,8 @@ namespace PassiveTreeEditor.Source.Io
     using System.IO;
     using System.Linq;
     using System.Text;
-    using Core.Data;
-    using Core.Enums;
-    using Model;
+    using Data;
+    using Enums;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -60,7 +59,7 @@ namespace PassiveTreeEditor.Source.Io
             }
 
             if (dto.Version > PassiveTreeFormat.Version)
-                issues.Add($"file version {dto.Version} is newer than this editor understands ({PassiveTreeFormat.Version})");
+                issues.Add($"file version {dto.Version} is newer than this build understands ({PassiveTreeFormat.Version})");
 
             return FromDto(dto, issues);
         }

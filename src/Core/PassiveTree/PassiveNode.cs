@@ -1,7 +1,7 @@
-namespace PassiveTreeEditor.Source.Model
+namespace Core.PassiveTree
 {
     using System.Collections.Generic;
-    using Core.Enums;
+    using Enums;
 
     /// <summary>
     /// A single point on the tree. Identity is <see cref="Id"/> — links, allocation and the save

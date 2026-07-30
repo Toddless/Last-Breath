@@ -3,8 +3,8 @@ namespace PassiveTreeEditor.Source.View
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using Core.PassiveTree;
     using Godot;
-    using Model;
     using Simulation;
 
     /// <summary>
