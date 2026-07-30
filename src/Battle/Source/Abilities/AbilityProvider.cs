@@ -37,9 +37,6 @@
         /// <summary>The stance an ability belongs to — the ability book partitions by it on Learn.</summary>
         public Stance GetAbilityStance(string abilityId) => GetBaseData(abilityId).Stance;
 
-        /// <summary>The mastery level at which the ability becomes learnable.</summary>
-        public int GetMasteryLevel(string abilityId) => GetBaseData(abilityId).MasteryLevel;
-
         /// <summary>Internal-cast-only ability (boss reactions): never learnable, never shown in trees.</summary>
         public bool IsHidden(string abilityId) => GetBaseData(abilityId).Hidden;
 

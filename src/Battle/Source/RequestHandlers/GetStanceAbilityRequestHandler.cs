@@ -1,10 +1,10 @@
 namespace Battle.Source.RequestHandlers
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Core;
-    using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Constants;
     using Core.MessageBus;
@@ -14,13 +14,13 @@ namespace Battle.Source.RequestHandlers
     using Godot;
 
     /// <summary>
-    /// Fills the mastery tree: every ability of the stance (from the provider, not just learned ones),
-    /// ordered by unlock threshold, with state derived from the current mastery level. Reconcile runs
-    /// first so late-loaded ability data / a freshly set player are reflected.
+    /// Fills the stance tree: every ability of the stance (from the provider, not just learned ones)
+    /// in a stable ordinal order by id, available when the player's book already holds it. Reconcile
+    /// runs first so late-loaded ability data / a freshly set player are reflected.
     /// </summary>
     public class GetStanceAbilityRequestHandler(
         IAbilityProvider abilityProvider,
-        IMartialArtMastery mastery,
+        IPlayerAccessor playerAccessor,
         IAbilityUnlockService unlockService)
         : IRequestHandler<GetStanceAbilityRequest, IReadOnlyList<AbilitySlotView>>
     {
@@ -28,20 +28,24 @@ namespace Battle.Source.RequestHandlers
         {
             unlockService.Reconcile(notify: false);
 
+            var learnedIds = LearnedIds();
             var views = abilityProvider.KnownAbilityIds
                 .Where(id => !abilityProvider.IsHidden(id)) // boss reactions never surface in the tree
                 .Where(id => abilityProvider.GetAbilityStance(id) == request.Stance)
-                .OrderBy(abilityProvider.GetMasteryLevel)
-                .Select(ToView)
+                .OrderBy(id => id, StringComparer.Ordinal) // catalog enumeration order is not a contract
+                .Select(id => ToView(id, learnedIds))
                 .ToList();
             return Task.FromResult<IReadOnlyList<AbilitySlotView>>(views);
         }
 
-        private AbilitySlotView ToView(string abilityId)
+        /// <summary>Ids the player already owns: the tree shows what the book holds, whatever granted it.</summary>
+        private HashSet<string> LearnedIds() =>
+            playerAccessor.Player?.AbilityBook.AllAbilities.Select(ability => ability.Id).ToHashSet() ?? [];
+
+        private AbilitySlotView ToView(string abilityId, IReadOnlySet<string> learnedIds)
         {
-            int unlockLevel = abilityProvider.GetMasteryLevel(abilityId);
-            var state = mastery.CurrentLevel >= unlockLevel ? AbilityState.Available : AbilityState.Locked;
-            return new AbilitySlotView(abilityId, LoadIcon(abilityId), state, unlockLevel);
+            var state = learnedIds.Contains(abilityId) ? AbilityState.Available : AbilityState.Locked;
+            return new AbilitySlotView(abilityId, LoadIcon(abilityId), state);
         }
 
         /// <summary>A missing icon is a report and an empty slot image, not an engine error.</summary>

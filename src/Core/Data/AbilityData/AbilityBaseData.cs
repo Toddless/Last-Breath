@@ -16,9 +16,6 @@
         [JsonProperty("targetType")] public AbilityTargetType TargetType { get; init; } = AbilityTargetType.Enemy;
         /// <summary>Target cap for the <c>Few*</c> modes; ignored by single-target/self.</summary>
         [JsonProperty("maxTargets")] public int MaxTargets { get; init; } = 1;
-        /// <summary>The mastery level at which the ability becomes learnable.</summary>
-        [JsonProperty("masteryLevel")] public int MasteryLevel { get; init; } = 1;
-
         /// <summary>Internal-cast-only ability (boss reactions): never learnable, never shown in trees.</summary>
         [JsonProperty("hidden")] public bool Hidden { get; init; }
         [JsonProperty("damage")] public float Damage { get; init; }

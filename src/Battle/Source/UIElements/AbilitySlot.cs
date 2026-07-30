@@ -14,7 +14,6 @@ namespace Battle.Source.UIElements
         private static readonly Color s_lockedTint = new(0.4f, 0.4f, 0.4f);
 
         [Export] private TextureRect? _abilityIcon, _upgradeOne, _upgradeTwo, _upgradeThree;
-        [Export] private Label? _unlockLevel;
 
         private string _abilityId = string.Empty;
         private AbilityState _state = AbilityState.Locked;
@@ -35,9 +34,6 @@ namespace Battle.Source.UIElements
             _state = view.State;
             _abilityIcon?.Texture = view.Icon;
             Modulate = view.State == AbilityState.Available ? Colors.White : s_lockedTint;
-
-            _unlockLevel?.Visible = view.State == AbilityState.Locked;
-            _unlockLevel?.Text = view.State == AbilityState.Locked ? view.UnlockLevel.ToString() : string.Empty;
         }
 
         // TODO: react on upgrade change to reflect chosen upgrades on the slot.

@@ -78,7 +78,6 @@
         private readonly Dictionary<int, IAbilityUpgrade> _currentUpgrades = [];
         public ITargetingStrategy Targeting { get; set; } = TargetingStrategyFactory.From(data);
         public int CostValue => (int)this[AbilityParameter.CostValue];
-        public int MasteryLevel { get; set; } = data.MasteryLevel;
         public string Id { get; } = data.Id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = data.Tags;

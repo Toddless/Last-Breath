@@ -12,7 +12,6 @@
         float Cooldown { get; }
         int CooldownLeft { get; set; }
         int CostValue { get; }
-        int MasteryLevel { get; set; }
         Costs CostType { get; }
         Stance Stance { get; }
 

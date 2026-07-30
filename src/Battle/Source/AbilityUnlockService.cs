@@ -2,7 +2,6 @@ namespace Battle.Source
 {
     using System;
     using System.Linq;
-    using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Entity;
     using Core.MessageBus;
@@ -11,14 +10,12 @@ namespace Battle.Source
     using Core.Services;
 
     /// <summary>
-    /// Owns the "mastery threshold -> ability becomes available" rule (variant A: reaching the
-    /// threshold auto-learns the ability into the player's book; the book auto-equips into the
-    /// first free slot). The UI never runs this logic — it only reads the resulting state.
+    /// Keeps the player's ability book in sync with the ability catalog: every non-hidden ability the
+    /// book does not hold yet is learned into it (the book auto-equips into the first free slot).
+    /// The UI never runs this logic — it only reads the resulting state.
     ///
-    /// Reconcile runs on every mastery level change (notifying the player of freshly unlocked
-    /// abilities) and once when the player is set (silent catch-up on the already-earned levels).
-    /// The read handlers also call <see cref="Reconcile"/> defensively so the window is correct
-    /// even if the ability data finished loading after those events fired.
+    /// Reconcile runs once when the player is set (silent catch-up) and defensively from the read
+    /// handlers, so a window is correct even if the ability data finished loading after that event.
     /// </summary>
     public class AbilityUnlockService : IDisposable, IAbilityUnlockService
     {
@@ -26,24 +23,20 @@ namespace Battle.Source
 
         private readonly IPlayerAccessor _playerAccessor;
         private readonly IAbilityProvider _abilityProvider;
-        private readonly IMartialArtMastery _mastery;
         private readonly IGameMessageBus _messageBus;
         private readonly ILoadScope _loadScope;
 
         public AbilityUnlockService(
             IPlayerAccessor playerAccessor,
             IAbilityProvider abilityProvider,
-            IMartialArtMastery mastery,
             IGameMessageBus messageBus,
             ILoadScope loadScope)
         {
             _playerAccessor = playerAccessor;
             _abilityProvider = abilityProvider;
-            _mastery = mastery;
             _messageBus = messageBus;
             _loadScope = loadScope;
 
-            _mastery.CurrentLevelChange += OnLevelChanged;
             _playerAccessor.PlayerChanged += OnPlayerChanged;
 
             // Children run _Ready before their parent: the player registers with the accessor
@@ -51,13 +44,9 @@ namespace Battle.Source
             if (_playerAccessor.Player != null) Reconcile(notify: false);
         }
 
-        public void Dispose()
-        {
-            _mastery.CurrentLevelChange -= OnLevelChanged;
-            _playerAccessor.PlayerChanged -= OnPlayerChanged;
-        }
+        public void Dispose() => _playerAccessor.PlayerChanged -= OnPlayerChanged;
 
-        /// <summary>Learns every ability whose threshold the player has reached but hasn't learned yet.</summary>
+        /// <summary>Learns every non-hidden ability the player's book does not hold yet.</summary>
         public void Reconcile(bool notify)
         {
             var book = _playerAccessor.Player?.AbilityBook;
@@ -69,20 +58,17 @@ namespace Battle.Source
             {
                 if (_abilityProvider.IsHidden(abilityId)) continue; // boss reactions are not for the player's book
                 if (learnedIds.Contains(abilityId)) continue;
-                if (_abilityProvider.GetMasteryLevel(abilityId) > _mastery.CurrentLevel) continue;
 
                 var ability = _abilityProvider.CreateAbility(abilityId);
                 book.Learn(_abilityProvider.GetAbilityStance(abilityId), ability);
                 // TODO:
                 // what message and what was learned
-                if (notify && !_loadScope.IsLoading) // restoring mastery re-learns silently
+                if (notify && !_loadScope.IsLoading) // a restored book re-learns silently
                 {
                     _messageBus.PublishMessageAsync(new SendNotificationMessageMessage(UnlockNotificationId));
                 }
             }
         }
-
-        private void OnLevelChanged(int _) => Reconcile(notify: true);
 
         private void OnPlayerChanged(IPlayer _) => Reconcile(notify: false);
     }
