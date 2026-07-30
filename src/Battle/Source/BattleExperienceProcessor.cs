@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core;
     using Core.Battle;
     using Core.Data;
     using Core.Entity;
@@ -15,6 +17,32 @@
 
         /// <summary>A fled enemy is a partial victory: half the experience of a kill.</summary>
         private const float FledExperienceFactor = 0.5f;
+
+        /// <summary>Experience bonus per NPC type. The ladder mirrors the loot budget one
+        /// (Regular → Archon): a more dangerous type is never worth less than a lesser one.</summary>
+        private static readonly Dictionary<EntityType, float> s_typeMultipliers = new()
+        {
+            [EntityType.Regular] = 0.05f,
+            [EntityType.Special] = 0.1f,
+            [EntityType.Elit] = 0.15f,
+            [EntityType.Unique] = 0.25f,
+            [EntityType.Boss] = 0.4f,
+            [EntityType.Archon] = 0.9f
+        };
+
+        /// <summary>Experience bonus per NPC rarity. The scale of Rarity is inverted (Legendary = 0 …
+        /// Common = 4), so the ladder is written by quality, not by the numeric value of the member.</summary>
+        private static readonly Dictionary<Rarity, float> s_rarityMultipliers = new()
+        {
+            [Rarity.Common] = 0.05f,
+            [Rarity.Uncommon] = 0.06f,
+            [Rarity.Rare] = 0.07f,
+            [Rarity.Epic] = 0.15f,
+            [Rarity.Legendary] = 0.3f,
+            [Rarity.Unique] = 0.5f,
+            [Rarity.Mythic] = 0.9f
+        };
+
         private readonly IGameServiceProvider _gameServiceProvider;
         private readonly IBattleEventBus _battleEventBus;
         private readonly IFightable _player;
@@ -84,26 +112,19 @@
 
         private float CalculateTotalMultiplier(EntityType type, Rarity rarity) => 1f + (NpcTypeToMultiplier(type) + RarityToMultiplier(rarity));
 
-        private float NpcTypeToMultiplier(EntityType npcEntityType) => npcEntityType switch
-        {
-            EntityType.Regular => 0.05f,
-            EntityType.Special => 0.7f,
-            EntityType.Elit => 0.15f,
-            EntityType.Unique => 0.25f,
-            EntityType.Boss => 0.4f,
-            EntityType.Archon => 0.9f,
-            _ => 0f
-        };
+        private float NpcTypeToMultiplier(EntityType npcEntityType) => LookupMultiplier(s_typeMultipliers, npcEntityType);
 
-        private float RarityToMultiplier(Rarity npcRarity) => npcRarity switch
+        private float RarityToMultiplier(Rarity npcRarity) => LookupMultiplier(s_rarityMultipliers, npcRarity);
+
+        /// <summary>A member missing from the ladder is a gap in the catalog, not a reward of zero:
+        /// the kill is paid at the weakest known rate and the gap is reported.</summary>
+        private float LookupMultiplier<TKey>(IReadOnlyDictionary<TKey, float> multipliers, TKey member) where TKey : notnull
         {
-            Rarity.Common => 0.05f,
-            Rarity.Rare => 0.07f,
-            Rarity.Epic => 0.15f,
-            Rarity.Legendary => 0.3f,
-            Rarity.Unique => 0.5f,
-            Rarity.Mythic => 0.9f,
-            _ => 0f
-        };
+            if (multipliers.TryGetValue(member, out float multiplier)) return multiplier;
+
+            float weakestKnown = multipliers.Values.Min();
+            Tracker.TrackError($"No experience multiplier for {typeof(TKey).Name}.{member}; paid at the weakest known rate {weakestKnown}.", this);
+            return weakestKnown;
+        }
     }
 }
