@@ -12,11 +12,12 @@ namespace LastBreathTest.BattleSystemTests
     using Moq;
 
     /// <summary>Suppression: the defender's chance (<c>SuppressChance</c>) to take a fraction (<c>Suppress</c>)
-    /// less of an incoming hit. Pins the rule itself (one roll per hit, every component scaled, every damage
-    /// cause covered), its place in the pipeline (after mitigation, before the absorption chain) and the fact
-    /// that a defender without the stat never burns a roll. Both call shapes are covered: the seeded/scripted
-    /// stream tests take the explicit-generator overload, the two ProductionCall tests use the two-argument form
-    /// the four combat call sites actually use, so the fallback generator inside Calculations is executed too.</summary>
+    /// less of an incoming ABILITY hit. Pins the rule itself (ability hits only, one roll per hit, every
+    /// component scaled), its place in the pipeline (after mitigation, before the absorption chain) and the fact
+    /// that an unsuppressable hit — wrong cause or a defender without the stat — never burns a roll. Both call
+    /// shapes are covered: the seeded/scripted stream tests take the explicit-generator overload, the two
+    /// ProductionCall tests use the two-argument form the four combat call sites actually use, so the fallback
+    /// generator inside Calculations is executed too.</summary>
     [TestClass]
     public class SuppressionTests
     {
@@ -26,7 +27,7 @@ namespace LastBreathTest.BattleSystemTests
         public void FullChance_ReducesEveryComponentByTheSuppressFraction()
         {
             var target = Defender((EntityParameter.SuppressChance, 1f), (EntityParameter.Suppress, 0.5f));
-            var context = Damage(DamageCause.Attack, (DamageType.Physical, 100f), (DamageType.Poison, 40f));
+            var context = Damage(DamageCause.Ability, (DamageType.Physical, 100f), (DamageType.Poison, 40f));
 
             Calculations.CalculateMitigation(context, target.Object, new ScriptedRandom(0f));
 
@@ -38,7 +39,7 @@ namespace LastBreathTest.BattleSystemTests
         public void ZeroChance_LeavesDamageUntouchedAndBurnsNoRoll()
         {
             var target = Defender((EntityParameter.SuppressChance, 0f), (EntityParameter.Suppress, 0.5f));
-            var context = Damage(DamageCause.Attack, (DamageType.Physical, 100f));
+            var context = Damage(DamageCause.Ability, (DamageType.Physical, 100f));
             var rnd = new ScriptedRandom(0f);
 
             Calculations.CalculateMitigation(context, target.Object, rnd);
@@ -54,7 +55,7 @@ namespace LastBreathTest.BattleSystemTests
             // Calculations falls back to its own generator. At chance 1 the outcome cannot depend on the stream,
             // so the assertion stays deterministic while still executing the fallback.
             var target = Defender((EntityParameter.SuppressChance, 1f), (EntityParameter.Suppress, 0.5f));
-            var context = Damage(DamageCause.Attack, (DamageType.Physical, 100f));
+            var context = Damage(DamageCause.Ability, (DamageType.Physical, 100f));
 
             Calculations.CalculateMitigation(context, target.Object);
 
@@ -65,7 +66,7 @@ namespace LastBreathTest.BattleSystemTests
         public void ProductionCall_WithoutAGenerator_LeavesDamageUntouchedAtZeroChance()
         {
             var target = Defender((EntityParameter.SuppressChance, 0f), (EntityParameter.Suppress, 0.5f));
-            var context = Damage(DamageCause.Attack, (DamageType.Physical, 100f));
+            var context = Damage(DamageCause.Ability, (DamageType.Physical, 100f));
 
             Calculations.CalculateMitigation(context, target.Object);
 
@@ -87,7 +88,7 @@ namespace LastBreathTest.BattleSystemTests
         public void OneRollPerHit_NotPerComponent()
         {
             var target = Defender((EntityParameter.SuppressChance, 0.5f), (EntityParameter.Suppress, 0.5f));
-            var context = Damage(DamageCause.Attack, (DamageType.Physical, 100f), (DamageType.Pure, 100f), (DamageType.Poison, 100f));
+            var context = Damage(DamageCause.Ability, (DamageType.Physical, 100f), (DamageType.Pure, 100f), (DamageType.Poison, 100f));
             // A per-component roll would succeed on the first draw and fail on the next two.
             var rnd = new ScriptedRandom(0f, 0.99f, 0.99f);
 
@@ -100,7 +101,7 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void EveryDamageCauseIsSuppressed()
+        public void OnlyAbilityDamageIsSuppressed()
         {
             foreach (var cause in Enum.GetValues<DamageCause>())
             {
@@ -109,7 +110,27 @@ namespace LastBreathTest.BattleSystemTests
 
                 Calculations.CalculateMitigation(context, target.Object, new ScriptedRandom(0f));
 
-                Assert.AreEqual(75f, context.DamageComponents[DamageType.Physical], 0.001f, $"cause {cause} must obey suppression");
+                float expected = cause == DamageCause.Ability ? 75f : 100f;
+                Assert.AreEqual(expected, context.DamageComponents[DamageType.Physical], 0.001f,
+                    $"suppression is a defence against abilities only; cause {cause}");
+            }
+        }
+
+        [TestMethod]
+        public void NonAbilityCause_BurnsNoRoll()
+        {
+            foreach (var cause in Enum.GetValues<DamageCause>())
+            {
+                if (cause == DamageCause.Ability) continue;
+
+                var target = Defender((EntityParameter.SuppressChance, 1f), (EntityParameter.Suppress, 0.25f));
+                var context = Damage(cause, (DamageType.Physical, 100f));
+                // A roll that would succeed — only the cause gate can keep it undrawn.
+                var rnd = new ScriptedRandom(0f);
+
+                Calculations.CalculateMitigation(context, target.Object, rnd);
+
+                Assert.AreEqual(0, rnd.Draws, $"cause {cause} must not reach the stream and shift anybody else's rolls");
             }
         }
 
@@ -124,7 +145,7 @@ namespace LastBreathTest.BattleSystemTests
             int suppressed = 0;
             for (int i = 0; i < hits; i++)
             {
-                var context = Damage(DamageCause.Effect, (DamageType.Physical, 100f));
+                var context = Damage(DamageCause.Ability, (DamageType.Physical, 100f));
                 Calculations.CalculateMitigation(context, target.Object, rnd);
                 if (context.DamageComponents[DamageType.Physical] < 100f) suppressed++;
             }
@@ -143,7 +164,7 @@ namespace LastBreathTest.BattleSystemTests
                 (EntityParameter.Suppress, 0.5f),
                 (EntityParameter.Armor, ArmorScalingFactor));
             WithAbsorption(target, currentHealth: 500f, barrier: 100f);
-            var context = Damage(DamageCause.Attack, (DamageType.Physical, 200f));
+            var context = Damage(DamageCause.Ability, (DamageType.Physical, 200f));
 
             Calculations.CalculateMitigation(context, target.Object, new ScriptedRandom(0f));
             Assert.AreEqual(50f, context.TotalDamage, 0.001f, "armor then suppression");
