@@ -205,8 +205,6 @@ namespace Battle.Internal.Player
             // Rest at a campfire: the recovery zones heal any registered non-fighting participant.
             _restRecovery = GameServiceProvider.Instance.GetService<IRestRecoveryService>();
             _restRecovery?.RegisterParticipant(this, () => GlobalPosition);
-            // The player is a scene node, not a container-built service: self-register for UI/services
-            GameServiceProvider.Instance.GetService<IPlayerAccessor>().Set(this);
             Parameters = new EntityParametersComponent();
             ParameterModifiers = new ParameterModifiersComponent();
             Parameters.Initialize(ParameterModifiers.GetModifiers);
@@ -243,6 +241,12 @@ namespace Battle.Internal.Player
             _stances.Add(Stance.Intelligence, new IntelligenceStance(this));
             _stances.Add(Stance.Strength, new StrengthStance(this));
             _stances.Add(Stance.Dexterity, new DexterityStance(this));
+            // The player is a scene node, not a container-built service: self-register for UI/services.
+            // The announcement is the LAST line of _Ready because PlayerChanged subscribers read the
+            // fighter right away — the ability book and the parameter component among them. Registering
+            // before the components exist made the signal useless: every handler bailed on a null field,
+            // so a second scene in the same process (menu → new game) left the book empty.
+            GameServiceProvider.Instance.GetService<IPlayerAccessor>().Set(this);
         }
 
         public override void _PhysicsProcess(double delta)
