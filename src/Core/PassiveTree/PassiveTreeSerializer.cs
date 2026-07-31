@@ -8,6 +8,7 @@ namespace Core.PassiveTree
     using System.Text;
     using Data;
     using Enums;
+    using Modifiers.Context;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -223,16 +224,20 @@ namespace Core.PassiveTree
             try
             {
                 var parameter = ParseMember<ContextParameter>(dto.Parameter);
+                var valueType = ParseMember<ModifierValueType>(dto.ValueType);
 
-                // A knob with no binding throws the moment something attaches it, which in battle means a
-                // crash far away from the file that caused it. The line loses its place on load instead.
-                if (!ContextKnobs.IsBound(parameter))
-                    throw new FormatException($"context parameter '{dto.Parameter}' reaches no battle pipeline");
+                // Both halves are the knob's own business, not the author's. A knob with no binding throws
+                // the moment something attaches it, which in battle means a crash far away from the file
+                // that caused it; picking the wrong kind of line is silent everywhere downstream, where
+                // the pinned switch value reads as a full-strength bonus. The line loses its place on
+                // load instead. The refusal names the member rather than the authored text, which costs
+                // nothing here: a name ParseMember cannot resolve never gets this far.
+                if (ContextKnobs.WhyRefused(parameter, valueType) is { } refusal) throw new FormatException(refusal);
 
                 return new ContextModifierLine
                 {
                     Parameter = parameter,
-                    ValueType = ParseMember<ModifierValueType>(dto.ValueType),
+                    ValueType = valueType,
                     Value = dto.Value ?? 0f,
                     Condition = dto.Condition ?? string.Empty
                 };

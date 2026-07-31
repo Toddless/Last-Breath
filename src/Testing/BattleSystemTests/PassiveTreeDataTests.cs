@@ -3,6 +3,7 @@ namespace LastBreathTest.BattleSystemTests
     using System.Text;
     using Core.Data.GameData;
     using Core.Enums;
+    using Core.Modifiers.Context;
     using Core.PassiveTree;
 
     /// <summary>
@@ -296,6 +297,76 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(ContextModifierLine.FlagValue, line.Value, 0.0001f, "a switch was read as a quantity");
             StringAssert.Contains(PassiveTreeSerializer.Serialize(document), "\"valueType\": \"Flag\"");
             Assert.IsFalse(PassiveTreeSerializer.Serialize(document).Contains("0.42"), "a flag was written back with a number to edit");
+        }
+
+        [TestMethod]
+        public void FlagOnAKnobThatCarriesAValueIsReportedAndCostsOnlyThatLine()
+        {
+            // Healing efficiency reads a number. Written as a switch it stops being "+15% healing" and
+            // becomes the pinned 1 — a keystone handing out +100% healing that nobody typed, and nothing
+            // notices until the line reaches the heal pipeline.
+            const string json = """
+                {
+                    "version": 1,
+                    "budget": 10,
+                    "nodes": [
+                        {
+                            "id": "keystone_1",
+                            "kind": "Keystone",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "contextModifiers": [
+                                { "parameter": "HealingEfficiency", "valueType": "flag" },
+                                { "parameter": "HealingEfficiency", "valueType": "Increase", "value": 0.15 }
+                            ]
+                        }
+                    ],
+                    "edges": []
+                }
+                """;
+            List<string> issues = [];
+
+            PassiveNode? node = PassiveTreeSerializer.Deserialize(json, issues).Find("keystone_1");
+
+            Assert.IsNotNull(node);
+            Assert.AreEqual(1, node.ContextModifiers.Count, "a switch was accepted on a knob that reads a value");
+            Assert.AreEqual(ModifierValueType.Increase, node.ContextModifiers[0].ValueType);
+            Assert.AreEqual(0.15f, node.ContextModifiers[0].Value, 0.0001f);
+            Assert.AreEqual(1, issues.Count, string.Join("; ", issues));
+        }
+
+        [TestMethod]
+        public void NumberOnASwitchKnobIsReportedAndCostsOnlyThatLine()
+        {
+            // The other half of the same rule: a switch has no reader, so an amount authored on it is a
+            // number no pipeline will ever look at — the node would promise a magnitude it cannot deliver.
+            const string json = """
+                {
+                    "version": 1,
+                    "budget": 10,
+                    "nodes": [
+                        {
+                            "id": "keystone_1",
+                            "kind": "Keystone",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "contextModifiers": [
+                                { "parameter": "AttacksIgnoreResistances", "valueType": "Increase", "value": 0.35 },
+                                { "parameter": "AttacksIgnoreResistances", "valueType": "flag" }
+                            ]
+                        }
+                    ],
+                    "edges": []
+                }
+                """;
+            List<string> issues = [];
+
+            PassiveNode? node = PassiveTreeSerializer.Deserialize(json, issues).Find("keystone_1");
+
+            Assert.IsNotNull(node);
+            Assert.AreEqual(1, node.ContextModifiers.Count, "an amount was accepted on a knob that reads nothing");
+            Assert.AreEqual(ModifierValueType.Flag, node.ContextModifiers[0].ValueType);
+            Assert.AreEqual(1, issues.Count, string.Join("; ", issues));
         }
 
         [TestMethod]

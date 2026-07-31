@@ -346,7 +346,7 @@ namespace LastBreathTest.BattleSystemTests
                     {
                         "id": "Test_Pool",
                         "modifiersPool": [
-                            { "parameter": "HealingEfficiency", "modifierType": "flag", "weight": 40, "affix": "Suffix" },
+                            { "parameter": "AttacksIgnoreResistances", "modifierType": "flag", "weight": 40, "affix": "Suffix" },
                             { "parameter": "Health", "modifierType": "flag", "weight": 40, "affix": "Prefix" }
                         ]
                     }
@@ -361,6 +361,85 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(Core.Enums.ModifierValueType.Flag, flag.ValueType);
             Assert.IsTrue(flag.Value.IsFixed, "A flag never rolls.");
             Assert.AreEqual(1f, flag.Value.Min, 0.001f);
+        }
+
+        [TestMethod]
+        public void ParsePool_FlagOnAKnobThatCarriesAValue_IsRefused()
+        {
+            const string json = """
+            {
+                "pools": [
+                    {
+                        "id": "Test_Pool",
+                        "modifiersPool": [
+                            { "parameter": "HealingEfficiency", "modifierType": "flag", "weight": 40, "affix": "Suffix" },
+                            { "parameter": "HealingEfficiency", "modifierType": "inc", "value": 0.15, "weight": 40, "affix": "Suffix" }
+                        ]
+                    }
+                ]
+            }
+            """;
+
+            var pool = CreateParser().ParseEquipItemModifierPools(json)["Test_Pool"];
+
+            // The knob reads a value, so a flag on it is not a switch — it is the authored amount thrown
+            // away and replaced by the pinned 1, which on healing efficiency means +100% for free.
+            var line = (ContextDescriptor)pool.Single();
+            Assert.AreEqual(Core.Enums.ModifierValueType.Increase, line.ValueType);
+            Assert.AreEqual(0.15f, line.Value.Min, 0.001f);
+        }
+
+        [TestMethod]
+        public void ParsePool_AmountOnASwitchKnob_IsRefused()
+        {
+            const string json = """
+            {
+                "pools": [
+                    {
+                        "id": "Test_Pool",
+                        "modifiersPool": [
+                            { "parameter": "AttacksIgnoreResistances", "modifierType": "inc", "value": 0.35, "weight": 40, "affix": "Suffix" },
+                            { "parameter": "AttacksIgnoreResistances", "modifierType": "flag", "weight": 40, "affix": "Suffix" }
+                        ]
+                    }
+                ]
+            }
+            """;
+
+            var pool = CreateParser().ParseEquipItemModifierPools(json)["Test_Pool"];
+
+            // Nothing reads a number off a switch: the entry would roll and scale a value that never
+            // reaches a pipeline, and the line would claim an affix slot for a lie.
+            var line = (ContextDescriptor)pool.Single();
+            Assert.AreEqual(Core.Enums.ModifierValueType.Flag, line.ValueType);
+        }
+
+        [TestMethod]
+        public void ParsePool_KnobNameThatIsAListOfNames_IsRefused()
+        {
+            const string json = """
+            {
+                "pools": [
+                    {
+                        "id": "Test_Pool",
+                        "modifiersPool": [
+                            { "parameter": "AttackPureConversion, AttacksIgnoreResistances", "modifierType": "inc", "value": 0.35, "weight": 40, "affix": "Suffix" },
+                            { "parameter": "AttackPureConversion", "modifierType": "inc", "value": 0.35, "weight": 40, "affix": "Suffix" }
+                        ]
+                    }
+                ]
+            }
+            """;
+
+            var pool = CreateParser().ParseEquipItemModifierPools(json)["Test_Pool"];
+
+            // Enum.TryParse accepts a comma-separated list of names for ANY enum, not only a [Flags] one,
+            // and ORs them together: these two make 28, a number no member has. Neither name exists in
+            // EntityParameter, so the entry walks past that branch and arrives here as a knob that cannot
+            // exist — an ordinary data file minting a member with no binding, which throws not here but on
+            // equip. Only the knob's own refusal stops it; nothing downstream would.
+            var line = (ContextDescriptor)pool.Single();
+            Assert.AreEqual(Core.Enums.ContextParameter.AttackPureConversion, line.Parameter);
         }
 
         [TestMethod]

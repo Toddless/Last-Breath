@@ -10,6 +10,7 @@ namespace Core.Data
     using LootTable;
     using Enums;
     using Modifiers;
+    using Modifiers.Context;
     using Crafting;
     using Items;
     using Newtonsoft.Json;
@@ -389,7 +390,20 @@ namespace Core.Data
             }
 
             if (EnumParser.TryParseEnum<ContextParameter>(modifier.Parameter, out var contextParameter))
+            {
+                // The knob, not the entry, decides whether it takes a line at all and whether that line is a
+                // switch or an amount. A knob with no binding throws the moment the item is equipped, far
+                // from the pool that named it; a flag written on a knob that reads a value never rolls and
+                // never scales — it reaches the battle pipeline as the pinned 1, which is the whole effect
+                // handed out for free.
+                if (ContextKnobs.WhyRefused(contextParameter, type) is { } refusal)
+                {
+                    Tracker.TrackError($"Skipping modifier of '{context}': {refusal}");
+                    return null;
+                }
+
                 return new ContextDescriptor(contextParameter, type, range) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor };
+            }
 
             Tracker.TrackError($"Skipping modifier of '{context}': '{modifier.Parameter}' is neither an EntityParameter nor a ContextParameter");
             return null;

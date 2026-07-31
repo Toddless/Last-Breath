@@ -109,7 +109,18 @@ namespace Core.Reputation
             return _relations.GetPlayerRelation(target) <= deed.NoPenaltyFloor ? 0 : deed.Entry.Reputation;
         }
 
-        /// <summary>Each repetition against the same faction shrinks the delta; the counter is per session.</summary>
+        /// <summary>Each repetition against the same faction shrinks the delta; the counter is per session.
+        /// Loading a save begins a session, so it clears these counters along with the rest of the session
+        /// state: saving part-way down the decay and loading back pays the deed at full price again. What
+        /// that reload is worth depends on the deed. Where one declares a no-penalty floor it buys nothing
+        /// that deed could not reach anyway: the floor is measured against the standing itself (see
+        /// <see cref="MainDelta"/>), which travels in the save file, so once the standing has sunk to the
+        /// floor the penalty is zero however often the deed repeats. A deed that declares no floor never
+        /// meets one — its delta reaches the faction as the deed wrote it, thinned by nothing but the
+        /// decay above. The bonus paid to the factions hostile to the target is that same case for a
+        /// different reason: it comes in by the other call in <see cref="ApplyDeed"/> and never passes
+        /// through <see cref="MainDelta"/> at all. On both the decay is the only brake on repetition, and
+        /// a reload releases it.</summary>
         private void ApplyToFaction(Deed deed, Fractions faction, int delta)
         {
             int repeats = _repeats.GetValueOrDefault((deed.Entry.Id, faction));

@@ -3,6 +3,7 @@ namespace PassiveTreeEditor.Source.View
     using System;
     using System.Collections.Generic;
     using Core.Enums;
+    using Core.Modifiers.Context;
     using Core.PassiveTree;
     using Godot;
     using Io;
@@ -14,6 +15,15 @@ namespace PassiveTreeEditor.Source.View
     /// </summary>
     public partial class InspectorPanel : VBoxContainer
     {
+        /// <summary>What a line carrying a number may be. Flag is deliberately absent: it is a switch,
+        /// and a switch belongs only to the context knobs whose binding reads no value at all.</summary>
+        private static readonly ModifierValueType[] s_numericValueTypes =
+        [
+            ModifierValueType.Flat,
+            ModifierValueType.Increase,
+            ModifierValueType.Multiplicative
+        ];
+
         private AbilityCatalog? _abilities;
         private TreeCanvas? _canvas;
 
@@ -291,7 +301,7 @@ namespace PassiveTreeEditor.Source.View
             // before the picker that captures it is built.
             var hint = new Label { CustomMinimumSize = new Vector2(64, 0) };
 
-            OptionButton typePicker = EditorControls.Picker(ParameterValueTypes(), line.ValueType, type =>
+            OptionButton typePicker = EditorControls.Picker(s_numericValueTypes, line.ValueType, type =>
             {
                 line.ValueType = type;
                 hint.Text = ValueHint(line.ValueType, line.Value);
@@ -321,7 +331,8 @@ namespace PassiveTreeEditor.Source.View
         }
 
         /// <summary>A context line: same shape as a parametric one, aimed at a pipeline knob instead of
-        /// a parameter. Flag belongs to this row only — a switch has no place in parameter math.</summary>
+        /// a parameter. Flag belongs to this row only — a switch has no place in parameter math — and
+        /// within the row only to the knobs that are switches.</summary>
         private Control ContextRow(PassiveNode node, int index)
         {
             ContextModifierLine line = node.ContextModifiers[index];
@@ -335,7 +346,17 @@ namespace PassiveTreeEditor.Source.View
             top.AddChild(EditorControls.Picker(ContextKnobs.Bound, line.Parameter, parameter =>
             {
                 line.Parameter = parameter;
+
+                // The knob owns which kind of line it takes, so swapping it re-picks a type the new knob
+                // accepts. The authored number is left untouched: it means nothing while the knob is a
+                // switch, and it is still there when a knob that reads a value comes back. The type is not
+                // carried the same way — a line written as Flat or Multiplicative returns as Increase.
+                // Saving while the knob is a switch is what ends the number's life; see the value box.
+                if (ContextKnobs.WhyRefused(parameter, line.ValueType) is not null)
+                    line.ValueType = ContextKnobs.IsFlag(parameter) ? ModifierValueType.Flag : ModifierValueType.Increase;
+
                 ChangedTotals();
+                Rebuild();
             }));
             top.AddChild(RemoveButton(() => node.ContextModifiers.RemoveAt(index)));
 
@@ -345,13 +366,9 @@ namespace PassiveTreeEditor.Source.View
             var hint = new Label { CustomMinimumSize = new Vector2(64, 0) };
             SpinBox value = EditorControls.Number(line.Value, 0.001);
 
-            OptionButton typePicker = EditorControls.Picker(line.ValueType, type =>
+            OptionButton typePicker = EditorControls.Picker(ContextValueTypes(line.Parameter), line.ValueType, type =>
             {
                 line.ValueType = type;
-
-                // A switch carries no number: the box shows the pinned value and stops taking input.
-                value.Editable = !line.IsFlag;
-                value.Value = line.Value;
                 hint.Text = ValueHint(line.ValueType, line.Value);
                 ChangedTotals();
             });
@@ -361,9 +378,16 @@ namespace PassiveTreeEditor.Source.View
             bottom.AddChild(value);
             bottom.AddChild(hint);
 
+            // A switch carries no number: the box shows the pinned value and neither takes input nor
+            // writes back, so the number a numeric knob left behind survives a detour through a switch
+            // and back — in this row, for as long as it lives. It does not survive the file: a flag line
+            // is written with no value at all, so a save while the knob is a switch loses the number and
+            // a reload brings the row back at zero.
             value.Editable = !line.IsFlag;
             value.ValueChanged += amount =>
             {
+                if (line.IsFlag) return;
+
                 line.Value = (float)amount;
                 hint.Text = ValueHint(line.ValueType, line.Value);
                 ChangedTotals();
@@ -413,14 +437,11 @@ namespace PassiveTreeEditor.Source.View
             return edit;
         }
 
-        /// <summary>Flag is deliberately absent: it is legal on context knobs only, and a parametric
-        /// line always targets an <see cref="EntityParameter"/>.</summary>
-        private static IEnumerable<ModifierValueType> ParameterValueTypes() =>
-        [
-            ModifierValueType.Flat,
-            ModifierValueType.Increase,
-            ModifierValueType.Multiplicative
-        ];
+        /// <summary>What a context line on this knob may be. A switch takes nothing but Flag, and a knob
+        /// that reads a value never takes it — both readers refuse the other half, so the tool must not
+        /// be able to offer it.</summary>
+        private static IReadOnlyList<ModifierValueType> ContextValueTypes(ContextParameter parameter) =>
+            ContextKnobs.IsFlag(parameter) ? [ModifierValueType.Flag] : s_numericValueTypes;
 
         private static string ValueHint(ModifierValueType valueType, float value) => valueType switch
         {
