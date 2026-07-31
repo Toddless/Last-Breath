@@ -35,9 +35,11 @@ namespace Core.Modifiers
         /// the line was bound.</summary>
         public Func<float>? Live { get; init; }
 
-        /// <summary>Where the pipeline modifier this line stands for runs, when the line overrides it.
-        /// Null — the ordinary case — leaves each modifier class in the slot it picked for its own rule,
-        /// which is where the knobs that must run late or last already put themselves.</summary>
+        /// <summary>The slot the line's source asks the pipeline modifier to run in, so everything one
+        /// source hands out can be ordered as a group. Null — the ordinary case — asks for nothing. The ask
+        /// is a default and not an override: a modifier class that picked a slot for its own rule keeps it,
+        /// which leaves the knobs that must run late or last where they put themselves however they are
+        /// handed over.</summary>
         public ContextModifierPriority? Priority { get; init; }
 
         public float Weight { get; set; } = weight;

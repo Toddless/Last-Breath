@@ -96,6 +96,11 @@ namespace Core.PassiveTree.Context
         /// allocation changes without the modifier being touched.
         /// <para>A switch knob is held the same way. Its binding reads no number at all, so what its lines
         /// add up to never leaves this object — one taken switch is the whole of the rule.</para>
+        /// <para>The slot the entry asks for covers the knobs that named none: what the build is has to
+        /// stand ahead of the passing tweaks at <see cref="ContextModifierPriority.Normal"/> rather than
+        /// land among them in whatever order things were attached. A knob whose modifier picked its own
+        /// slot is left in it — a node carrying a conversion must not drag it off the end of the pipeline
+        /// it was written to see.</para>
         /// </summary>
         private sealed class Knob
         {
@@ -107,7 +112,7 @@ namespace Core.PassiveTree.Context
                 Entry = new ContextModifierEntry(parameter, BucketOf(parameter), 0f)
                 {
                     Priority = ContextModifierPriority.Innate,
-                    Live = () => ContextKnobTotals.Sum(Lines)
+                    Live = () => ContextKnobTotals.AsRead(parameter, Lines)
                 };
 
             /// <summary>The bucket the entry is built with. Nothing on this path reads it — bindings are

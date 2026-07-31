@@ -35,6 +35,27 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void TheWholeUnitKnobsAreExactlyTheOnesWhoseBindingReadsAFlooredValue()
+        {
+            // Read off the same attempt as switch-ness and pinned for the same reason. A knob counted in
+            // turns, stacks or points drops the fraction of whatever its lines add up to, so anything that
+            // reports what an allocation is worth has to know which knobs those are — and swapping a
+            // floored view for a plain one silently changes what every build carries.
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    ContextParameter.BleedDuration,
+                    ContextParameter.BurningStacks,
+                    ContextParameter.HealthOnHit,
+                    ContextParameter.ManaOnHit
+                },
+                ContextKnobs.Whole.ToArray(),
+                "the whole-unit knobs changed: " + string.Join(", ", ContextKnobs.Whole));
+
+            Assert.IsFalse(ContextKnobs.IsWhole(ContextParameter.HealingEfficiency));
+        }
+
+        [TestMethod]
         public void AKnobNobodyWiredRefusesEveryLine()
         {
             // The readers ask one question before they build a line, so it has to answer for the knob's

@@ -8,6 +8,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Modifiers.Context;
     using Core.PassiveTree;
     using Core.PassiveTree.Allocation;
+    using Core.PassiveTree.Context;
     using Core.Session;
     using Moq;
 
@@ -104,6 +105,39 @@ namespace LastBreathTest.BattleSystemTests
             Healed(fighter);
 
             CollectionAssert.AreEqual(new[] { 200f }, seen, "the tree ran after the Normal slot instead of before it");
+        }
+
+        [TestMethod]
+        public void TheSlotTheTreeAsksFor_IsForTheKnobsThatPickedNone()
+        {
+            // The tree asks its modifiers to run at Innate so what the build IS stands ahead of the
+            // passing tweaks at Normal instead of landing among them in attachment order. The ask is a
+            // default and not an override: a conversion is written to be the last word on a hit — nothing
+            // may run after it — and the node that grants one must not drag it to the front of the queue.
+            Assert.AreEqual(
+                ContextModifierPriority.Absolute,
+                SlotOf(ContextParameter.PhysicalToFire),
+                "a taken node moved a conversion off the slot its own class picked");
+
+            Assert.AreEqual(
+                ContextModifierPriority.Innate,
+                SlotOf(ContextParameter.HealingEfficiency),
+                "a knob that picked no slot of its own lost the one the tree asks for");
+        }
+
+        [TestMethod]
+        public void AWholeUnitKnobsTotal_IsAnsweredAsThePipelineReadsIt()
+        {
+            // A reader of an allocation and the fighter carrying it ask one method, so the panel that
+            // reports on five half-turns of bleed cannot credit the build with a turn no fight grants.
+            List<ContextModifierLine> halves = [.. Enumerable.Range(0, 5).Select(_ =>
+                new ContextModifierLine { Parameter = ContextParameter.BleedDuration, ValueType = ModifierValueType.Flat, Value = 0.5f })];
+
+            Assert.AreEqual(2f, ContextKnobTotals.AsRead(ContextParameter.BleedDuration, halves), Tolerance);
+
+            // A knob that is not counted in whole units keeps every bit of its total: the fraction is the
+            // whole point of it.
+            Assert.AreEqual(2.5f, ContextKnobTotals.AsRead(ContextParameter.HealingEfficiency, halves), Tolerance);
         }
 
         [TestMethod]
@@ -216,6 +250,21 @@ namespace LastBreathTest.BattleSystemTests
             fighter.ModifierHandler.Apply(new EffectApplicationContext(fighter, fighter, effect.Object));
 
             return effect.Object.Duration;
+        }
+
+        /// <summary>The slot of the single modifier one taken node leaves on a fighter. Whichever pipeline
+        /// the knob belongs to: the one thing handed to the handler is the modifier that stands for it.</summary>
+        private static ContextModifierPriority SlotOf(ContextParameter parameter)
+        {
+            IPassiveTreeService service = Allocation(1, parameter, ModifierValueType.Increase, 0.5f);
+            var handler = new Mock<IModifierHandlerComponent>();
+
+            service.ContextSource.Attach(Fighter(handler));
+
+            var modifier = handler.Invocations.Single().Arguments[0] as ContextModifier;
+            Assert.IsNotNull(modifier, $"{parameter} reached no pipeline as a context modifier");
+
+            return modifier!.Priority;
         }
 
         private static IFightable Fighter(Mock<IModifierHandlerComponent>? handler = null, string id = "fighter")

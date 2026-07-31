@@ -69,8 +69,8 @@ namespace PassiveTreeEditor.Source.Simulation
                 summary.ConditionalLines += conditional;
                 summary.Context.Add(new ContextTotal(
                     knob.Key,
-                    UnitOf(knob.Value),
-                    ContextKnobTotals.Sum(knob.Value),
+                    BucketOf(knob.Value),
+                    ContextKnobTotals.AsRead(knob.Key, knob.Value),
                     knob.Value.Count,
                     conditional));
             }
@@ -81,16 +81,16 @@ namespace PassiveTreeEditor.Source.Simulation
             return summary;
         }
 
-        /// <summary>How a knob's total is read. A bucket decides nothing about what a context line does —
-        /// bindings are chosen by the parameter and read the line's value — so all it says is the unit the
-        /// author wrote the number in: Flat is a whole amount, Increase and Multiplicative a percent, and a
-        /// switch carries no number at all. Lines that disagree are one knob written in two units; the
-        /// total is still one number and is read as a percent, which is the form that shows all of it.</summary>
-        private static ModifierValueType UnitOf(List<ContextModifierLine> lines)
+        /// <summary>The bucket the knob's lines were written in — a note on the authoring and nothing the
+        /// total is read through: a binding is chosen by the parameter and reads the value, so the same
+        /// number does the same thing written as Flat or as Increase, and only the wording of a line's own
+        /// sentence follows the bucket. Null where the lines disagree, which is one knob written two ways
+        /// and worth pointing at rather than papering over with whichever bucket won.</summary>
+        private static ModifierValueType? BucketOf(List<ContextModifierLine> lines)
         {
             ModifierValueType first = lines[0].ValueType;
 
-            return lines.TrueForAll(line => line.ValueType == first) ? first : ModifierValueType.Increase;
+            return lines.TrueForAll(line => line.ValueType == first) ? first : null;
         }
 
         private static void Describe(PassiveNode node, TreeSummary summary)
@@ -167,15 +167,18 @@ namespace PassiveTreeEditor.Source.Simulation
         int Lines,
         int ConditionalLines);
 
-    /// <param name="ValueType">The unit the total is read in, not a bucket of its own: every line the knob
-    /// carries is in this one number.</param>
-    /// <param name="Value">Sum of every taken line feeding the knob — what a fighter would end up carrying
-    /// for it. A switch sums to the number of switches taken, one being enough.</param>
+    /// <param name="Bucket">The bucket every line feeding the knob was written in, null where they
+    /// disagree. Authoring provenance only — a knob's value is read the way its binding reads it, never
+    /// the way its bucket is spelled.</param>
+    /// <param name="Value">What a fighter would end up carrying for the knob: every taken line added up
+    /// and then read the way the pipeline reads it, so a whole-unit knob shows the turns it really grants
+    /// and not the fraction that dies at the binding. A switch sums to the number of switches taken, one
+    /// being enough.</param>
     /// <param name="ConditionalLines">How many of the lines carry a condition and were counted as if
     /// always on.</param>
     public sealed record ContextTotal(
         ContextParameter Parameter,
-        ModifierValueType ValueType,
+        ModifierValueType? Bucket,
         float Value,
         int Lines,
         int ConditionalLines);

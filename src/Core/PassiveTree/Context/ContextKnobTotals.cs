@@ -2,6 +2,7 @@ namespace Core.PassiveTree.Context
 {
     using System.Collections.Generic;
     using Enums;
+    using Modifiers.Context;
 
     /// <summary>
     /// What an allocation says about the battle pipelines: the context lines of the taken nodes, sorted
@@ -59,6 +60,18 @@ namespace Core.PassiveTree.Context
             foreach (ContextModifierLine line in lines) total += line.Value;
 
             return total;
+        }
+
+        /// <summary>What the knob is worth to a pipeline: the total, cut to a whole number where the knob
+        /// is counted in whole units — its binding reads the floored value, so half a turn of bleed feeds
+        /// nothing however the lines behind it were written. The tree's own modifier answers with this and
+        /// so does the authoring summary, which is what stops a panel from crediting an allocation with a
+        /// fraction no fight will ever see.</summary>
+        public static float AsRead(ContextParameter parameter, IEnumerable<ContextModifierLine> lines)
+        {
+            float total = Sum(lines);
+
+            return ContextKnobs.IsWhole(parameter) ? (int)total : total;
         }
     }
 }

@@ -7,18 +7,20 @@ namespace Core.Modifiers.Context
     /// <summary>
     /// What the binding table says about a context knob, asked of the table itself instead of restated
     /// as a second list — so wiring a knob, dropping one, or changing what its binding does with the
-    /// line's value needs no edit here. Two answers come out of it: whether the knob reaches a battle
-    /// pipeline at all, and whether it is a switch or carries a number.
-    /// Authoring leans on both: the editor offers only knobs that are wired and only the value types
-    /// each one accepts, and the two readers — the tree file and the item pools — refuse a line the knob
-    /// cannot take. An unbound knob throws the moment it is attached and a switch pinned onto a knob
+    /// line's value needs no edit here. Three answers come out of it: whether the knob reaches a battle
+    /// pipeline at all, whether it is a switch or carries a number, and whether the number it carries is
+    /// read whole.
+    /// Authoring leans on the first two: the editor offers only knobs that are wired and only the value
+    /// types each one accepts, and the two readers — the tree file and the item pools — refuse a line the
+    /// knob cannot take. An unbound knob throws the moment it is attached and a switch pinned onto a knob
     /// that expects an amount reaches battle as a bonus nobody authored; neither is a failure a data
-    /// file may be able to plant.
+    /// file may be able to plant. The third answers to whoever reports what an allocation is worth.
     /// </summary>
     public static class ContextKnobs
     {
         private static readonly List<ContextParameter> s_bound = [];
         private static readonly List<ContextParameter> s_flags = [];
+        private static readonly List<ContextParameter> s_whole = [];
 
         static ContextKnobs() => Probe();
 
@@ -29,11 +31,20 @@ namespace Core.Modifiers.Context
         /// exists and carries no number to roll, scale or author.</summary>
         public static IReadOnlyList<ContextParameter> Flags => s_flags;
 
+        /// <summary>The knobs counted in whole units — turns, stacks, points of health or mana. Their
+        /// binding reads the floored value, so the fraction of whatever the lines add up to reaches no
+        /// pipeline.</summary>
+        public static IReadOnlyList<ContextParameter> Whole => s_whole;
+
         /// <summary>Also false for a value outside the enum: a numeric "parameter" in a file parses into
         /// a member that does not exist, and it has no binding either.</summary>
         public static bool IsBound(ContextParameter parameter) => s_bound.Contains(parameter);
 
         public static bool IsFlag(ContextParameter parameter) => s_flags.Contains(parameter);
+
+        /// <summary>Whether the knob's value is read as a whole number: what a reader has to apply before
+        /// it says out loud what a knob is worth, or it will report a fraction the pipeline drops.</summary>
+        public static bool IsWhole(ContextParameter parameter) => s_whole.Contains(parameter);
 
         /// <summary>Why the knob refuses this line, or null when it takes it — the single question both
         /// readers ask before they build one. A knob nobody wired refuses every line: it reaches no
@@ -54,9 +65,10 @@ namespace Core.Modifiers.Context
                 : $"context parameter '{parameter}' is a switch — a line written as {valueType} carries a number nothing reads";
         }
 
-        /// <summary>Builds every knob's binding once and reads both facts off the attempt: whether a
-        /// binding exists, and whether it took a view of the line's value. Nothing is attached to an
-        /// entity, so the probe leaves no trace on anything.</summary>
+        /// <summary>Builds every knob's binding once and reads every fact off the attempt: whether a
+        /// binding exists, whether it took a view of the line's value, and whether the view it took was
+        /// the floored one. Nothing is attached to an entity, so the probe leaves no trace on
+        /// anything.</summary>
         private static void Probe()
         {
             foreach (ContextParameter parameter in Enum.GetValues<ContextParameter>())
@@ -75,6 +87,7 @@ namespace Core.Modifiers.Context
 
                 s_bound.Add(parameter);
                 if (!views.Taken) s_flags.Add(parameter);
+                if (views.Whole) s_whole.Add(parameter);
             }
         }
     }

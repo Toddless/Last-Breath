@@ -3,7 +3,7 @@ namespace PassiveTreeEditor.Source.View
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using Core.Enums;
+    using Core.Modifiers.Context;
     using Core.PassiveTree;
     using Godot;
     using Simulation;
@@ -17,7 +17,7 @@ namespace PassiveTreeEditor.Source.View
     {
         private static readonly string[] s_headers = ["Parameter", "Flat", "Increase", "More", "Base", "Total"];
 
-        private static readonly string[] s_contextHeaders = ["Knob", "Unit", "Sum", "Lines"];
+        private static readonly string[] s_contextHeaders = ["Knob", "Written as", "Total", "Lines"];
 
         public void Rebuild(TreeSummary summary, AllocationState allocation, int budget)
         {
@@ -97,6 +97,10 @@ namespace PassiveTreeEditor.Source.View
         /// the one number a fighter carries, whichever buckets the lines behind it were written in. They
         /// are never folded into the parameter totals: nothing about a knob passes through the parameter
         /// formula, and a row in that table would claim otherwise.
+        /// <para>The total is printed bare. Knobs have no entry in the parameter format catalog and the
+        /// bucket of a line governs no more than the wording of that line's own sentence, so dressing the
+        /// sum in a unit here would be the panel inventing one: what the number means is the binding's
+        /// business, and the row says what the binding will be handed.</para>
         /// </summary>
         private void BuildContext(TreeSummary summary)
         {
@@ -114,11 +118,13 @@ namespace PassiveTreeEditor.Source.View
                 string name = total.Parameter.ToString();
                 if (total.ConditionalLines > 0) name += $" ({total.ConditionalLines} cond.)";
 
-                bool isFlag = total.ValueType == ModifierValueType.Flag;
+                // Switch-ness comes off the binding table, like everywhere else a knob's kind is needed:
+                // a switch carries no number for the row to print, however its lines were written.
+                bool isFlag = ContextKnobs.IsFlag(total.Parameter);
 
                 grid.AddChild(new Label { Text = name });
-                grid.AddChild(new Label { Text = isFlag ? "flag" : total.ValueType.ToString() });
-                grid.AddChild(new Label { Text = isFlag ? "on" : Signed(total.Value, total.ValueType != ModifierValueType.Flat) });
+                grid.AddChild(new Label { Text = total.Bucket?.ToString() ?? "mixed" });
+                grid.AddChild(new Label { Text = isFlag ? "on" : Signed(total.Value, percent: false) });
                 grid.AddChild(new Label { Text = total.Lines.ToString(CultureInfo.InvariantCulture) });
             }
         }

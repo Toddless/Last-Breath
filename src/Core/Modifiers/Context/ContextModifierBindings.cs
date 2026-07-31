@@ -9,9 +9,9 @@
 
     internal interface IContextModifierBinding
     {
-        /// <summary>Puts the modifier in the slot the line asked for instead of the one its class picked.
-        /// Null keeps the class's own slot. Called while the binding is built, so the slot is always taken
-        /// before the modifier is registered — a handler sorts on registration.</summary>
+        /// <summary>Puts the modifier in the slot the line's source asked for, where its class picked none
+        /// of its own. Null asks for nothing. Called while the binding is built, so the slot is always
+        /// taken before the modifier is registered — a handler sorts on registration.</summary>
         void SlotAt(ContextModifierPriority? priority);
 
         void Attach(IFightable owner);
@@ -25,8 +25,8 @@
     /// Taking no view at all is what makes a knob a switch — it has no value to read — and it is the only
     /// mark of one: <see cref="ContextKnobs"/> reads the answer back off this table rather than keeping a
     /// second list of names beside it.
-    /// A line may also name the slot its modifier runs in, which is applied here, before the modifier ever
-    /// reaches a handler.</summary>
+    /// The source of a line may also name the slot its modifiers run in, which is taken here — before the
+    /// modifier ever reaches a handler, and only where the class named no slot of its own.</summary>
     internal static class ContextModifierBindings
     {
         public static IContextModifierBinding Create(ContextModifierEntry entry) => Create(entry, new ValueViews());
@@ -106,12 +106,20 @@
         private static IContextModifierBinding DotTakenReduction(ContextModifierEntry entry, ValueViews views, DamageType status) =>
             Damage(entry, views, (owner, value) => new DotDamageTakenReductionContextModifier(owner, value, status));
 
-        /// <summary>Moves a freshly built modifier into the slot the line named. Everything the table builds
-        /// is a <see cref="ContextModifier"/>; anything else keeps whatever order it declares for itself
-        /// rather than being forced into one it cannot carry.</summary>
+        /// <summary>Moves a freshly built modifier into the slot the line's source named — and only where
+        /// the class left itself in the default one. A class that picked a slot picked it for a rule that
+        /// stands on it (a conversion has to see the final number, so nothing may run after it), while a
+        /// source names a slot to order the modifiers it hands out as a group; the group order is the
+        /// weaker claim of the two and yields wherever they meet. That the class expressed no preference is
+        /// read off the instance the table has just built, so no list of which knobs mind is kept anywhere.
+        /// Everything the table builds is a <see cref="ContextModifier"/>; anything else keeps whatever
+        /// order it declares for itself rather than being forced into one it cannot carry.</summary>
         private static void Slot(object modifier, ContextModifierPriority? priority)
         {
-            if (priority is { } slot && modifier is ContextModifier context) context.Priority = slot;
+            if (priority is not { } slot || modifier is not ContextModifier context) return;
+            if (context.Priority != ContextModifierPriority.Normal) return;
+
+            context.Priority = slot;
         }
 
         /// <summary>Hands out the live views of a line's value and remembers whether any binding asked for
@@ -122,6 +130,11 @@
         {
             /// <summary>False for a switch: its binding had no number to look at.</summary>
             public bool Taken { get; private set; }
+
+            /// <summary>True when the view handed out was a floored one: the knob is counted in whole
+            /// units and the fraction of its value never reaches a pipeline. Recorded for the same reason
+            /// as <see cref="Taken"/> — the table is the only place that decides it.</summary>
+            public bool Whole { get; private set; }
 
             public Func<float> Of(ContextModifierEntry entry)
             {
@@ -134,6 +147,7 @@
             public Func<int> WholeOf(ContextModifierEntry entry)
             {
                 Taken = true;
+                Whole = true;
 
                 return () => entry.WholeValue;
             }
@@ -144,6 +158,7 @@
             public Func<float> WholeAmountOf(ContextModifierEntry entry)
             {
                 Taken = true;
+                Whole = true;
 
                 return () => entry.WholeValue;
             }
