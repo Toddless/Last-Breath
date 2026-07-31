@@ -20,6 +20,7 @@ namespace LastBreath.Helpers
     using Core.Narrative.Quests;
     using Core.PassiveTree;
     using Core.PassiveTree.Allocation;
+    using Core.PassiveTree.Context;
     using Core.Save;
     using Core.Services;
     using Godot;
@@ -473,12 +474,21 @@ namespace LastBreath.Helpers
             Print($"{action} {NameOf(tree.Tree, nodeId)}: ok. {PointsOf(tree)}");
         }
 
+        /// <summary>Everything the taken nodes contribute. The tree feeds two channels that never meet —
+        /// parameters and battle pipelines — and a dump that showed one of them would call an allocation
+        /// empty while half of it is on the character.</summary>
+        private void PrintTreeModifiers(IPassiveTreeService tree)
+        {
+            PrintTreeParameters(tree);
+            PrintTreeKnobs(tree);
+        }
+
         /// <summary>
-        /// What the taken nodes contribute, read straight off the modifier source the tree publishes and
+        /// The parametric channel, read straight off the modifier source the tree publishes and
         /// grouped by parameter. The resolved player value is shown only when the character actually
         /// carries that source — otherwise the tree holds these lines and the character does not.
         /// </summary>
-        private void PrintTreeModifiers(IPassiveTreeService tree)
+        private void PrintTreeParameters(IPassiveTreeService tree)
         {
             var parameters = tree.ParameterSource.AffectedParameters.OrderBy(parameter => parameter.ToString(), StringComparer.Ordinal).ToList();
             if (parameters.Count == 0)
@@ -505,6 +515,29 @@ namespace LastBreath.Helpers
             Print(carried
                 ? $"Source \"{PassiveTreeDocument.ModifierSource}\" is registered on the player"
                 : $"Source \"{PassiveTreeDocument.ModifierSource}\" is NOT registered on the player — the character carries none of this yet");
+        }
+
+        /// <summary>
+        /// The context channel: one row per pipeline knob holding everything taken for it, which is what a
+        /// fighter carries — the tree folds every line feeding a knob into a single modifier, so a
+        /// per-line dump would print numbers no pipeline ever reads. The total is bare: knobs have no
+        /// entry in the parameter format catalog, and the bucket a line is written in decides nothing
+        /// beyond the wording of its own sentence.
+        /// </summary>
+        private void PrintTreeKnobs(IPassiveTreeService tree)
+        {
+            Dictionary<ContextParameter, List<ContextModifierLine>> knobs = ContextKnobTotals.Gather(tree.Tree, tree.TakenNodes);
+            if (knobs.Count == 0)
+            {
+                Print($"No context knobs from {tree.TakenNodes.Count} taken node(s)");
+                return;
+            }
+
+            foreach (KeyValuePair<ContextParameter, List<ContextModifierLine>> knob in knobs.OrderBy(pair => pair.Key.ToString(), StringComparer.Ordinal))
+            {
+                string total = ContextKnobTotals.Sum(knob.Value).ToString("0.###", CultureInfo.InvariantCulture);
+                Print($"{knob.Key}: {total} from {knob.Value.Count} line(s)");
+            }
         }
 
         // Units come from ParameterFormats.json through the game's own formatter, so a parameter that

@@ -20,7 +20,26 @@ namespace Core.Modifiers
         public ContextParameter Parameter { get; } = parameter;
         public ModifierValueType ValueType { get; } = valueType;
         public float BaseValue { get; } = baseValue;
-        public float Value { get; set; } = baseValue;
+
+        /// <summary>What the line is worth right now. Normally its own number, moved by whatever re-values
+        /// it; when the amount is computed elsewhere (<see cref="Live"/>) the stored number steps aside, so
+        /// every reader keeps asking one property whichever kind of line it holds.</summary>
+        public float Value
+        {
+            get => Live is null ? field : Live();
+            set => field = value;
+        } = baseValue;
+
+        /// <summary>Set when the amount belongs to someone else and has to be answered for at the moment it
+        /// is read — a total that several contributors add up to, and that must not be a snapshot taken when
+        /// the line was bound.</summary>
+        public Func<float>? Live { get; init; }
+
+        /// <summary>Where the pipeline modifier this line stands for runs, when the line overrides it.
+        /// Null — the ordinary case — leaves each modifier class in the slot it picked for its own rule,
+        /// which is where the knobs that must run late or last already put themselves.</summary>
+        public ContextModifierPriority? Priority { get; init; }
+
         public float Weight { get; set; } = weight;
 
         // Roll provenance, stamped by the materializer (see SimpleModifier for the field contract).
@@ -53,7 +72,10 @@ namespace Core.Modifiers
         }
 
         public ContextModifierEntry Copy() =>
-            new(Parameter, ValueType, BaseValue, Weight) { Value = Value, Affix = Affix, GroupId = GroupId, RolledRange = RolledRange };
+            new(Parameter, ValueType, BaseValue, Weight)
+            {
+                Value = Value, Affix = Affix, GroupId = GroupId, RolledRange = RolledRange, Live = Live, Priority = Priority
+            };
 
         /// <summary>Drops the current binding off the owner it was added to. The recorded owner is the only
         /// correct target: the modifier instance sits in that entity's handler, whoever asked for the release.</summary>

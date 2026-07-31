@@ -2,13 +2,15 @@ namespace Core.PassiveTree.Allocation
 {
     using System;
     using System.Collections.Generic;
+    using Context;
     using Entity.Components;
     using Session;
 
     /// <summary>
-    /// Owns the allocation and keeps the modifier source in step with it. The document is read lazily
-    /// from the provider on every access: the data catalog is loaded after the container is built, and
-    /// a reload hands out a fresh document that the allocation has to be re-checked against.
+    /// Owns the allocation and keeps both contribution channels — parameters and pipeline knobs — in step
+    /// with it. The document is read lazily from the provider on every access: the data catalog is loaded
+    /// after the container is built, and a reload hands out a fresh document that the allocation has to be
+    /// re-checked against.
     /// The service is a singleton and outlives the scene, so it also owns the two ways a playthrough
     /// ends: a new game resets it, and a loaded file replaces the allocation wholesale.
     /// </summary>
@@ -16,6 +18,7 @@ namespace Core.PassiveTree.Allocation
     {
         private readonly AllocationState _allocation = new();
         private readonly PassiveTreeParameterSource _source = new();
+        private readonly PassiveTreeContextSource _context = new();
 
         private PassiveTreeDocument? _synced;
 
@@ -24,6 +27,8 @@ namespace Core.PassiveTree.Allocation
         public PassiveTreeDocument Tree => SyncedTree();
 
         public IParameterModifierSource ParameterSource => _source;
+
+        public IPassiveTreeContextSource ContextSource => _context;
 
         public IReadOnlyCollection<string> TakenNodes => SyncedAllocation().Taken;
 
@@ -125,9 +130,12 @@ namespace Core.PassiveTree.Allocation
             return tree;
         }
 
+        /// <summary>The one place the allocation turns into a contribution. Both channels are rebuilt from
+        /// the taken set together, so neither can be left holding what the other has already given up.</summary>
         private void Publish(PassiveTreeDocument tree)
         {
             _source.Rebuild(tree, _allocation.Taken);
+            _context.Rebuild(tree, _allocation.Taken);
             AllocationChanged?.Invoke();
         }
     }

@@ -2,6 +2,7 @@ namespace Core.PassiveTree.Allocation
 {
     using System;
     using System.Collections.Generic;
+    using Context;
     using Entity.Components;
 
     /// <summary>
@@ -22,6 +23,11 @@ namespace Core.PassiveTree.Allocation
         /// modifier component. Registering it is the only channel — nothing writes tree lines into
         /// the entity's own modifier list.</summary>
         IParameterModifierSource ParameterSource { get; }
+
+        /// <summary>The other half of the contribution: the pipeline knobs the taken nodes tune, folded to
+        /// one modifier per knob. Reaches a fighter by being attached to it rather than by being registered
+        /// — context modifiers live in the fighter's own handler — so whoever attaches it detaches it.</summary>
+        IPassiveTreeContextSource ContextSource { get; }
 
         IReadOnlyCollection<string> TakenNodes { get; }
 

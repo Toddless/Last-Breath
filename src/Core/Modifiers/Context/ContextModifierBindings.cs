@@ -9,6 +9,11 @@
 
     internal interface IContextModifierBinding
     {
+        /// <summary>Puts the modifier in the slot the line asked for instead of the one its class picked.
+        /// Null keeps the class's own slot. Called while the binding is built, so the slot is always taken
+        /// before the modifier is registered — a handler sorts on registration.</summary>
+        void SlotAt(ContextModifierPriority? priority);
+
         void Attach(IFightable owner);
         void Detach(IFightable owner);
     }
@@ -19,12 +24,22 @@
     /// equip and their value keeps moving afterwards (sharpening, ascension), and nothing re-attaches them.
     /// Taking no view at all is what makes a knob a switch — it has no value to read — and it is the only
     /// mark of one: <see cref="ContextKnobs"/> reads the answer back off this table rather than keeping a
-    /// second list of names beside it.</summary>
+    /// second list of names beside it.
+    /// A line may also name the slot its modifier runs in, which is applied here, before the modifier ever
+    /// reaches a handler.</summary>
     internal static class ContextModifierBindings
     {
         public static IContextModifierBinding Create(ContextModifierEntry entry) => Create(entry, new ValueViews());
 
-        public static IContextModifierBinding Create(ContextModifierEntry entry, ValueViews views) => entry.Parameter switch
+        public static IContextModifierBinding Create(ContextModifierEntry entry, ValueViews views)
+        {
+            IContextModifierBinding binding = Build(entry, views);
+            binding.SlotAt(entry.Priority);
+
+            return binding;
+        }
+
+        private static IContextModifierBinding Build(ContextModifierEntry entry, ValueViews views) => entry.Parameter switch
         {
             ContextParameter.HealingEfficiency => new HealBinding(new HealingBonusContextModifier(views.Of(entry))),
             ContextParameter.BleedDuration => new EffectApplicationBinding(new EffectDurationBonusContextModifier(StatusEffects.Bleed, views.WholeOf(entry))),
@@ -91,6 +106,14 @@
         private static IContextModifierBinding DotTakenReduction(ContextModifierEntry entry, ValueViews views, DamageType status) =>
             Damage(entry, views, (owner, value) => new DotDamageTakenReductionContextModifier(owner, value, status));
 
+        /// <summary>Moves a freshly built modifier into the slot the line named. Everything the table builds
+        /// is a <see cref="ContextModifier"/>; anything else keeps whatever order it declares for itself
+        /// rather than being forced into one it cannot carry.</summary>
+        private static void Slot(object modifier, ContextModifierPriority? priority)
+        {
+            if (priority is { } slot && modifier is ContextModifier context) context.Priority = slot;
+        }
+
         /// <summary>Hands out the live views of a line's value and remembers whether any binding asked for
         /// one. A modifier is given the view rather than the number because the line keeps being re-valued
         /// under it; the record of who asked is what lets the table be questioned about a knob's kind
@@ -128,18 +151,22 @@
 
         private sealed class HealBinding(IHealModifier modifier) : IContextModifierBinding
         {
+            public void SlotAt(ContextModifierPriority? priority) => Slot(modifier, priority);
             public void Attach(IFightable owner) => owner.ModifierHandler.Add(modifier);
             public void Detach(IFightable owner) => owner.ModifierHandler.Remove(modifier);
         }
 
         private sealed class EffectApplicationBinding(IEffectApplicationModifier modifier) : IContextModifierBinding
         {
+            public void SlotAt(ContextModifierPriority? priority) => Slot(modifier, priority);
             public void Attach(IFightable owner) => owner.ModifierHandler.Add(modifier);
             public void Detach(IFightable owner) => owner.ModifierHandler.Remove(modifier);
         }
 
         private sealed class AttackModifierBinding(IAttackModifier modifier) : IContextModifierBinding
         {
+            public void SlotAt(ContextModifierPriority? priority) => Slot(modifier, priority);
+
             public void Attach(IFightable owner) => owner.ModifierHandler.Add(modifier);
 
             public void Detach(IFightable owner) => owner.ModifierHandler.Remove(modifier);
@@ -147,6 +174,8 @@
 
         private sealed class ActivationBinding(IAbilityActivationModifier modifier) : IContextModifierBinding
         {
+            public void SlotAt(ContextModifierPriority? priority) => Slot(modifier, priority);
+
             public void Attach(IFightable owner) => owner.ModifierHandler.Add(modifier);
 
             public void Detach(IFightable owner) => owner.ModifierHandler.Remove(modifier);
@@ -157,10 +186,16 @@
         private sealed class DamageBinding(Func<IFightable, IDamageModifier> create) : IContextModifierBinding
         {
             private IDamageModifier? _modifier;
+            private ContextModifierPriority? _priority;
+
+            /// <summary>Remembered rather than applied: there is no modifier to place until the owner is
+            /// known, and the slot is taken on the instance the attach builds.</summary>
+            public void SlotAt(ContextModifierPriority? priority) => _priority = priority;
 
             public void Attach(IFightable owner)
             {
                 _modifier = create(owner);
+                Slot(_modifier, _priority);
                 owner.ModifierHandler.Add(_modifier);
             }
 

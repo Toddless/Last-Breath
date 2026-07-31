@@ -1,10 +1,12 @@
 namespace PassiveTreeEditor.Source.Simulation
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Core;
     using Core.Enums;
     using Core.Modifiers;
     using Core.PassiveTree;
+    using Core.PassiveTree.Context;
 
     /// <summary>
     /// What the current allocation is actually worth. The final number is produced by the game's own
@@ -16,7 +18,6 @@ namespace PassiveTreeEditor.Source.Simulation
         public static TreeSummary Build(PassiveTreeDocument document, AllocationState allocation, BaseStatProfile baseStats)
         {
             var accumulators = new Dictionary<EntityParameter, ParameterAccumulator>();
-            var knobs = new Dictionary<(ContextParameter Parameter, ModifierValueType ValueType), ContextAccumulator>();
             var summary = new TreeSummary();
 
             foreach (string id in allocation.Taken)
@@ -25,7 +26,6 @@ namespace PassiveTreeEditor.Source.Simulation
                 if (node is null) continue;
 
                 Describe(node, summary);
-                foreach (ContextModifierLine line in node.ContextModifiers) Accumulate(line, knobs, summary);
 
                 foreach (ModifierLine line in node.Modifiers)
                 {
@@ -61,38 +61,36 @@ namespace PassiveTreeEditor.Source.Simulation
             summary.Parameters.Sort(static (first, second) =>
                 string.CompareOrdinal(first.Parameter.ToString(), second.Parameter.ToString()));
 
-            foreach (KeyValuePair<(ContextParameter Parameter, ModifierValueType ValueType), ContextAccumulator> pair in knobs)
-                summary.Context.Add(pair.Value.ToTotal(pair.Key.Parameter, pair.Key.ValueType));
+            // Context lines go through the game's own grouping and summer: one row per knob holding the
+            // number the fighter's single modifier for that knob reads.
+            foreach (KeyValuePair<ContextParameter, List<ContextModifierLine>> knob in ContextKnobTotals.Gather(document, allocation.Taken))
+            {
+                int conditional = knob.Value.Count(line => line.IsConditional);
+                summary.ConditionalLines += conditional;
+                summary.Context.Add(new ContextTotal(
+                    knob.Key,
+                    UnitOf(knob.Value),
+                    ContextKnobTotals.Sum(knob.Value),
+                    knob.Value.Count,
+                    conditional));
+            }
 
             summary.Context.Sort(static (first, second) =>
-            {
-                int byKnob = string.CompareOrdinal(first.Parameter.ToString(), second.Parameter.ToString());
-                return byKnob != 0 ? byKnob : first.ValueType.CompareTo(second.ValueType);
-            });
+                string.CompareOrdinal(first.Parameter.ToString(), second.Parameter.ToString()));
 
             return summary;
         }
 
-        /// <summary>
-        /// Context lines are summed per knob and per bucket — which is exactly what reaches a fighter,
-        /// since a pipeline reads one modifier per knob and stacking one per node would compound them.
-        /// The total stays out of the parameter table: no context knob takes part in parameter math.
-        /// </summary>
-        private static void Accumulate(
-            ContextModifierLine line,
-            Dictionary<(ContextParameter Parameter, ModifierValueType ValueType), ContextAccumulator> knobs,
-            TreeSummary summary)
+        /// <summary>How a knob's total is read. A bucket decides nothing about what a context line does —
+        /// bindings are chosen by the parameter and read the line's value — so all it says is the unit the
+        /// author wrote the number in: Flat is a whole amount, Increase and Multiplicative a percent, and a
+        /// switch carries no number at all. Lines that disagree are one knob written in two units; the
+        /// total is still one number and is read as a percent, which is the form that shows all of it.</summary>
+        private static ModifierValueType UnitOf(List<ContextModifierLine> lines)
         {
-            if (line.IsConditional) summary.ConditionalLines++;
+            ModifierValueType first = lines[0].ValueType;
 
-            (ContextParameter Parameter, ModifierValueType ValueType) key = (line.Parameter, line.ValueType);
-            if (!knobs.TryGetValue(key, out ContextAccumulator? accumulator))
-            {
-                accumulator = new ContextAccumulator();
-                knobs[key] = accumulator;
-            }
-
-            accumulator.Add(line);
+            return lines.TrueForAll(line => line.ValueType == first) ? first : ModifierValueType.Increase;
         }
 
         private static void Describe(PassiveNode node, TreeSummary summary)
@@ -153,23 +151,6 @@ namespace PassiveTreeEditor.Source.Simulation
                 _lines,
                 _conditionalLines);
         }
-
-        private sealed class ContextAccumulator
-        {
-            private float _value;
-            private int _lines;
-            private int _conditionalLines;
-
-            public void Add(ContextModifierLine line)
-            {
-                _value += line.Value;
-                _lines++;
-                if (line.IsConditional) _conditionalLines++;
-            }
-
-            public ContextTotal ToTotal(ContextParameter parameter, ModifierValueType valueType) =>
-                new(parameter, valueType, _value, _lines, _conditionalLines);
-        }
     }
 
     /// <param name="Flat">Sum of the Flat bucket, added to the base before any scaling.</param>
@@ -186,8 +167,10 @@ namespace PassiveTreeEditor.Source.Simulation
         int Lines,
         int ConditionalLines);
 
-    /// <param name="Value">Sum of the taken lines in this bucket — what a fighter would end up carrying
-    /// for the knob. A flag bucket sums to the number of switches taken, one being enough.</param>
+    /// <param name="ValueType">The unit the total is read in, not a bucket of its own: every line the knob
+    /// carries is in this one number.</param>
+    /// <param name="Value">Sum of every taken line feeding the knob — what a fighter would end up carrying
+    /// for it. A switch sums to the number of switches taken, one being enough.</param>
     /// <param name="ConditionalLines">How many of the lines carry a condition and were counted as if
     /// always on.</param>
     public sealed record ContextTotal(

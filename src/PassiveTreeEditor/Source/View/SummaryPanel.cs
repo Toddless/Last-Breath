@@ -17,7 +17,7 @@ namespace PassiveTreeEditor.Source.View
     {
         private static readonly string[] s_headers = ["Parameter", "Flat", "Increase", "More", "Base", "Total"];
 
-        private static readonly string[] s_contextHeaders = ["Knob", "Bucket", "Sum", "Lines"];
+        private static readonly string[] s_contextHeaders = ["Knob", "Unit", "Sum", "Lines"];
 
         public void Rebuild(TreeSummary summary, AllocationState allocation, int budget)
         {
@@ -93,9 +93,10 @@ namespace PassiveTreeEditor.Source.View
         }
 
         /// <summary>
-        /// Pipeline knobs, summed per knob and bucket and shown in their own table. They are never
-        /// folded into the parameter totals: nothing about a knob passes through the parameter formula,
-        /// and a row in that table would claim otherwise.
+        /// Pipeline knobs in their own table, one row per knob holding everything taken for it — that is
+        /// the one number a fighter carries, whichever buckets the lines behind it were written in. They
+        /// are never folded into the parameter totals: nothing about a knob passes through the parameter
+        /// formula, and a row in that table would claim otherwise.
         /// </summary>
         private void BuildContext(TreeSummary summary)
         {

@@ -210,6 +210,9 @@ namespace LastBreath.Player
             Strength = new Strength(ParameterModifiers);
             Intelligence = new Intelligence(ParameterModifiers);
             ModifierHandler = new ModifierHandlerComponent();
+            // The tree's other channel: its context lines are pushed into this handler as one modifier per
+            // knob, so the wiring waits for the handler to exist. Taken back in Dispose.
+            _passiveTree?.ContextSource.Attach(this);
             AbilityBook = new AbilityBookComponent(this);
             Effects.EffectsChanged += OnEffectsChanged;
             ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
@@ -251,7 +254,12 @@ namespace LastBreath.Player
         {
             if (disposing)
             {
-                if (_passiveTree != null) ParameterModifiers.UnregisterSource(_passiveTree.ParameterSource);
+                if (_passiveTree != null)
+                {
+                    ParameterModifiers.UnregisterSource(_passiveTree.ParameterSource);
+                    _passiveTree.ContextSource.Detach(this);
+                }
+
                 ExhaustionGrant.Detach(this);
             }
 
