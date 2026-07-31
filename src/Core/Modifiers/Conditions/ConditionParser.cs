@@ -2,15 +2,15 @@ namespace Core.Modifiers.Conditions
 {
     using System;
     using System.Collections.Generic;
-    using Interfaces;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// The single entry point from data to a live predicate. Types resolve through the registered
-    /// factories, so a new predicate never touches this class; a type nobody registered is reported
-    /// and refused, never silently downgraded to "always on".
+    /// One catalog record into one live predicate. Types resolve through the registered factories, so a
+    /// new predicate never touches this class; a type nobody registered is reported and refused, never
+    /// silently downgraded to "always on". The catalog owns the ids — this class only reads the
+    /// definition under one.
     /// </summary>
-    public class ConditionParser : IConditionParser
+    public class ConditionParser
     {
         private readonly Dictionary<string, IConditionFactory> _factories;
 
@@ -25,7 +25,7 @@ namespace Core.Modifiers.Conditions
                     Tracker.TrackError($"Condition type '{factory.Type}' is registered more than once — keeping the factory registered first");
         }
 
-        /// <summary>The parser every host gets until one registers its own factory set.</summary>
+        /// <summary>The shipped factory set assembled without a container — tests and tooling.</summary>
         public static ConditionParser Default(ConditionTuning? tuning = null) => new(BuiltInFactories(tuning));
 
         /// <summary>Every predicate shipped with the game, ready for individual DI registration.</summary>
@@ -38,30 +38,25 @@ namespace Core.Modifiers.Conditions
             new StanceConditionFactory(),
         ];
 
-        public bool TryParse(JToken? token, out ICondition? condition)
+        /// <summary>
+        /// The predicate the record describes, or null when the record is broken or names a type nobody
+        /// registered — reported first, so the entry costs itself and nothing else. The inversion flag is
+        /// common to every type and is applied here rather than in the factories.
+        /// </summary>
+        public OwnerCondition? Parse(JObject record)
         {
-            condition = null;
-            if (token == null || token.Type == JTokenType.Null) return true;
-
-            if (token is not JObject json)
-            {
-                Tracker.TrackError($"Condition must be a json object, got: {token.Type}");
-                return false;
-            }
-
-            string type = json.Value<string>(ConditionFields.Type) ?? string.Empty;
+            string type = record.Value<string>(ConditionFields.Type) ?? string.Empty;
             if (!_factories.TryGetValue(type, out var factory))
             {
                 Tracker.TrackError($"Condition type '{type}' has no registered factory — skipping the entry");
-                return false;
+                return null;
             }
 
-            var built = Build(factory, json, type);
-            if (built == null) return false;
+            var built = Build(factory, record, type);
+            if (built == null) return null;
 
-            built.Negate = json.Value<bool?>(ConditionFields.Negate) ?? false;
-            condition = built;
-            return true;
+            built.Negate = record.Value<bool?>(ConditionFields.Negate) ?? false;
+            return built;
         }
 
         private static OwnerCondition? Build(IConditionFactory factory, JObject json, string type)

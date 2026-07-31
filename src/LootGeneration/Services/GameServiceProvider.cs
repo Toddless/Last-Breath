@@ -2,6 +2,7 @@ namespace LootGeneration.Services
 {
     using Core.Data;
     using Core.Data.GameData;
+    using Core.Modifiers.Conditions;
     using Core.Services;
     using Internal;
     using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ namespace LootGeneration.Services
             services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
             services.AddSingleton<IDataParser, DataParser>();
             services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>();
+            services.AddConditionCatalog();
             // LootGeneration has no crafting module: the minting seam registers here directly
             // (mirrors CraftingSystemModuleDependencies).
             services.AddSingleton<Core.Modifiers.IModifierMaterializer, Core.Modifiers.ModifierMaterializer>();

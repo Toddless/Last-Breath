@@ -39,6 +39,7 @@ namespace Core.Data.GameData
         public const string Trade = "Trade";
         public const string Traders = "Traders";
         public const string ModifierPools = "ModifierPools";
+        public const string Conditions = "Conditions";
         public const string UpgradeCosts = "UpgradeCosts";
     }
 }

@@ -1,0 +1,132 @@
+{
+    "conditions": [
+        {
+            "id": "Health_Below_30",
+            "type": "ResourceThreshold",
+            "resource": "Health",
+            "value": 0.3
+        },
+        {
+            "id": "Health_Below_50",
+            "type": "ResourceThreshold",
+            "resource": "Health",
+            "value": 0.5
+        },
+        {
+            "id": "Health_Above_70",
+            "type": "ResourceThreshold",
+            "resource": "Health",
+            "value": 0.7,
+            "negate": true
+        },
+        {
+            "id": "Mana_Below_30",
+            "type": "ResourceThreshold",
+            "resource": "Mana",
+            "value": 0.3
+        },
+        {
+            "id": "Barrier_Below_50",
+            "type": "ResourceThreshold",
+            "resource": "Barrier",
+            "value": 0.5
+        },
+        {
+            "id": "Health_Full",
+            "type": "ResourceState",
+            "resource": "Health",
+            "state": "Full"
+        },
+        {
+            "id": "Health_Wounded",
+            "type": "ResourceState",
+            "resource": "Health",
+            "state": "Full",
+            "negate": true
+        },
+        {
+            "id": "Mana_Empty",
+            "type": "ResourceState",
+            "resource": "Mana",
+            "state": "Empty"
+        },
+        {
+            "id": "Barrier_Holds",
+            "type": "ResourceState",
+            "resource": "Barrier",
+            "state": "Empty",
+            "negate": true
+        },
+        {
+            "id": "Barrier_Broken",
+            "type": "ResourceState",
+            "resource": "Barrier",
+            "state": "Empty"
+        },
+        {
+            "id": "Under_Control",
+            "type": "Status",
+            "statuses": [ "Control" ]
+        },
+        {
+            "id": "Stunned_Or_Frozen",
+            "type": "Status",
+            "statuses": [ "Stun", "Freeze" ]
+        },
+        {
+            "id": "Damaged_Over_Turns",
+            "type": "Status",
+            "statuses": [ "DamageOverTime" ]
+        },
+        {
+            "id": "Clean_Of_Debuffs",
+            "type": "Status",
+            "statuses": [ "Debuff" ],
+            "negate": true
+        },
+        {
+            "id": "Shielded",
+            "type": "Effect",
+            "scope": "Shield"
+        },
+        {
+            "id": "Two_Debuffs_Carried",
+            "type": "Effect",
+            "scope": "Debuff",
+            "count": 2
+        },
+        {
+            "id": "Buffed",
+            "type": "Effect",
+            "scope": "Buff"
+        },
+        {
+            "id": "No_Effects_Carried",
+            "type": "Effect",
+            "scope": "Any",
+            "negate": true
+        },
+        {
+            "id": "Frostbite_Three_Stacks",
+            "type": "Effect",
+            "scope": "Stacks",
+            "effectId": "Effect_Frostbite",
+            "count": 3
+        },
+        {
+            "id": "Stance_Dexterity",
+            "type": "Stance",
+            "stance": "Dexterity"
+        },
+        {
+            "id": "Stance_Strength",
+            "type": "Stance",
+            "stance": "Strength"
+        },
+        {
+            "id": "Stance_Intelligence",
+            "type": "Stance",
+            "stance": "Intelligence"
+        }
+    ]
+}

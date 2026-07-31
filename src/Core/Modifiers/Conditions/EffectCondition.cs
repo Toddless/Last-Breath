@@ -68,10 +68,10 @@ namespace Core.Modifiers.Conditions
         public OwnerCondition? Create(JObject json)
         {
             var scope = EnumParser.ParseEnum<EffectScope>(json.Value<string>(ConditionFields.Scope) ?? string.Empty);
-            string id = json.Value<string>(ConditionFields.Id) ?? string.Empty;
+            string id = json.Value<string>(ConditionFields.EffectId) ?? string.Empty;
             if (scope == EffectScope.Stacks && id.Length == 0)
             {
-                Tracker.TrackError($"Skipping condition '{Type}': scope '{scope}' counts stacks of one effect and needs an '{ConditionFields.Id}'");
+                Tracker.TrackError($"Skipping condition '{Type}': scope '{scope}' counts stacks of one effect and needs an '{ConditionFields.EffectId}'");
                 return null;
             }
 

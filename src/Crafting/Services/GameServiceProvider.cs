@@ -3,6 +3,7 @@ namespace Crafting.Services
     using Core.Data;
     using Core.Data.GameData;
     using Core.Inventory;
+    using Core.Modifiers.Conditions;
     using Core.Services;
     using Core.Views.UI;
     using Internal;
@@ -31,6 +32,7 @@ namespace Crafting.Services
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>();
+            services.AddConditionCatalog();
             services.AddCraftingSystemModuleDependencies();
             services.AddGameData("res://Internal/Data/", "res://Internal/Data/Shared/");
         }

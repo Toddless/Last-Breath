@@ -13,6 +13,7 @@ namespace LastBreath.Services
     using Core.MessageBus;
     using Core.MessageBus.Messages;
     using Core.MessageBus.Requests;
+    using Core.Modifiers.Conditions;
     using Core.Narrative.Actions;
     using Core.Narrative.Conditions;
     using Core.Narrative.Dialogues;
@@ -78,6 +79,7 @@ namespace LastBreath.Services
             services.AddGameDataParticipant<IWorldClock, GameWorldClock>();
             services.AddGameDataParticipant<IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>();
             services.AddGameDataParticipant<IPlayerStatsProvider, PlayerStatsProvider>();
+            services.AddConditionCatalog();
             services.AddGameDataParticipant<IPassiveTreeProvider, PassiveTreeProvider>();
             services.AddSingleton<IPassiveTreeService, PassiveTreeService>();
             services.AddSingleton<INpcPopulationService, NpcPopulationService>();

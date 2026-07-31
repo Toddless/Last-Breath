@@ -14,6 +14,14 @@ namespace Core.Modifiers.Conditions
     /// <summary>Property names of a condition record, in one place: the format spec the data follows.</summary>
     public static class ConditionFields
     {
+        /// <summary>The array a catalog file holds its entries under — the one name that belongs to the
+        /// file rather than to a record.</summary>
+        public const string Entries = "conditions";
+
+        /// <summary>What the entry is called in the catalog. A consumer carries this and nothing else,
+        /// so the whole record is written once and read by everyone who names it.</summary>
+        public const string Id = "id";
+
         /// <summary>Which predicate the entry builds — see <see cref="ConditionTypes"/>.</summary>
         public const string Type = "type";
 
@@ -37,8 +45,10 @@ namespace Core.Modifiers.Conditions
         /// <summary>Which effects are counted — see <see cref="EffectScope"/>; required.</summary>
         public const string Scope = "scope";
 
-        /// <summary>Effect id counted by the Stacks scope; required by that scope only.</summary>
-        public const string Id = "id";
+        /// <summary>Which effect the Stacks scope counts; required by that scope only. Named apart from
+        /// <see cref="Id"/> because both live in the same flat record and mean different things: one is
+        /// what the entry is called, the other is what it looks for.</summary>
+        public const string EffectId = "effectId";
 
         /// <summary>How many the scope must find; absent means one.</summary>
         public const string Count = "count";
