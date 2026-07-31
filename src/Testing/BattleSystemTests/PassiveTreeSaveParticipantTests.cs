@@ -160,6 +160,61 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsFalse(file.Sections.ContainsKey("passiveTree"));
         }
 
+        [TestMethod]
+        public void ASecondLoadWithoutTheSection_EmptiesTheTreeTheFirstOneFilled()
+        {
+            // Two loads in one session: a save taken after the tree shipped, then one taken before
+            // it did. The service outlives both, so "no section" has to mean "no allocation" — read
+            // as "nothing to apply" it leaves the first save's nodes on a character that never
+            // bought them, and the next capture writes them into the second save's file.
+            IPassiveTreeService tree = ServiceOn(Chain(First, Second), points: 5);
+            ISaveManager manager = ManagerFor(tree);
+            var failures = new List<string>();
+            manager.SectionRestoreFailed += (section, _) => failures.Add(section);
+
+            manager.Restore(FileWith(JToken.FromObject(new PassiveTreeSaveData { Allocated = [Seed, First, Second] })));
+
+            Assert.AreEqual(2, tree.SpentPoints, "the fixture never loaded the first save");
+
+            manager.Restore(new SaveFile());
+
+            CollectionAssert.AreEquivalent(new[] { Seed }, tree.TakenNodes.ToArray(),
+                "the first save's nodes outlived the file that replaced it");
+            Assert.AreEqual(0, tree.SpentPoints);
+            Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
+        }
+
+        [TestMethod]
+        public void ATreeThatFailedToLoad_IsNotCapturedAsAnEmptySection()
+        {
+            var provider = new TreeProviderStub(Chain(First));
+            var tree = new PassiveTreeService(provider);
+            tree.SetTotalPoints(5);
+            tree.Take(First);
+
+            List<string> issues = [];
+            provider.Tree = PassiveTreeSerializer.Deserialize("{ \"nodes\": [", issues);
+
+            Assert.AreEqual(1, issues.Count, "the fixture must actually be a file that failed to parse");
+            CollectionAssert.AreEquivalent(new[] { Seed, First },
+                new PassiveTreeSaveParticipant(tree).Capture().ToObject<PassiveTreeSaveData>()!.Allocated,
+                "a broken catalog wrote an empty section over an honest one — the loss becomes permanent");
+        }
+
+        [TestMethod]
+        public void ARestoreArrivingWithoutACatalog_IsHeldRatherThanLost()
+        {
+            // The file parses, the tree does not: nothing exists to check the saved ids against. They
+            // are held as they stand so the next capture writes back what the file carried; the check
+            // happens on the first document that does load.
+            var tree = new PassiveTreeService(new TreeProviderStub(new PassiveTreeDocument()));
+            var participant = new PassiveTreeSaveParticipant(tree);
+
+            participant.Restore(JToken.FromObject(new PassiveTreeSaveData { Allocated = [Seed, First] }), savedVersion: 1);
+
+            CollectionAssert.AreEquivalent(new[] { Seed, First }, participant.Capture().ToObject<PassiveTreeSaveData>()!.Allocated);
+        }
+
         private static SaveFile FileWith(JToken section)
         {
             var file = new SaveFile();
@@ -210,9 +265,11 @@ namespace LastBreathTest.BattleSystemTests
             return document;
         }
 
+        /// <summary>Stands in for the data pipeline, including a reload: the document can be swapped
+        /// the way a catalog reload swaps it.</summary>
         private sealed class TreeProviderStub(PassiveTreeDocument tree) : IPassiveTreeProvider
         {
-            public PassiveTreeDocument Tree { get; } = tree;
+            public PassiveTreeDocument Tree { get; set; } = tree;
 
             public IReadOnlyList<string> Issues => [];
         }

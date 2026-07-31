@@ -6,6 +6,9 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Modifiers;
     using Core.PassiveTree;
     using Core.PassiveTree.Allocation;
+    using Core.Save;
+    using Core.Session;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// The tree reaches a fighter through a single channel — a registered modifier source — and never
@@ -275,6 +278,82 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsFalse(lines is ICollection<IModifierInstance> { IsReadOnly: false },
                 "the source handed out the list it edits — a caller could rewrite the tree's contribution in place");
         }
+
+        [TestMethod]
+        public void ANewSession_DropsTheAllocationAndTheTotalThatPaidForIt()
+        {
+            // The service is a singleton and outlives the scene: a second "New game" in one process
+            // would otherwise hand the fresh character the previous playthrough's nodes — with the
+            // mastery that paid for them already back at zero, so nothing could be bought either.
+            var fighter = new Fighter();
+            IPassiveTreeService service = ShippedService(points: 5);
+            fighter.Modifiers.RegisterSource(service.ParameterSource);
+            fighter.Parameters.SetBaseValueForParameter(EntityParameter.Strength, BaseStrength);
+            service.Take(FirstNode);
+            service.Take(SecondNode);
+
+            int changes = 0;
+            service.AllocationChanged += () => changes++;
+
+            ((ISessionResettable)service).ResetSession();
+
+            Assert.AreEqual(0, service.TotalPoints, "the granted total survived the new game");
+            Assert.AreEqual(0, service.SpentPoints);
+            CollectionAssert.AreEquivalent(SeedsOf(service), service.TakenNodes.ToArray(), "only the free seeds start a character");
+            Assert.AreEqual(BaseStrength, fighter[EntityParameter.Strength], 0f, "the fresh character wears the old playthrough's stats");
+            Assert.AreEqual(0, TreeLinesFor(fighter, EntityParameter.Strength));
+            Assert.AreEqual(1, changes, "the reset must announce itself — the source is rebuilt behind it");
+        }
+
+        [TestMethod]
+        public void TheSessionResetStack_ReachesTheTree()
+        {
+            // No stand-in for the wiring: the reset has to reach the tree through the container the
+            // game builds, not only through a hand-made cast.
+            IPassiveTreeService service = ShippedService(points: 5);
+            service.Take(FirstNode);
+
+            var services = new ServiceCollection();
+            services.AddSingleton<LoadScope>();
+            services.AddSingleton(service);
+            services.AddSessionReset();
+
+            services.BuildServiceProvider().GetRequiredService<ISessionResetService>().ResetSession();
+
+            Assert.AreEqual(0, service.SpentPoints, "the registered reset stack does not know about the tree");
+            Assert.AreEqual(0, service.TotalPoints);
+        }
+
+        [TestMethod]
+        public void ADocumentThatFailedToParse_DoesNotEatTheAllocation()
+        {
+            const float nodeStrength = 4f;
+            var fighter = new Fighter();
+            var provider = new TreeProviderStub(SyntheticTree(new ModifierLine
+            {
+                Parameter = EntityParameter.Strength, ValueType = ModifierValueType.Flat, Value = nodeStrength
+            }));
+            var service = new PassiveTreeService(provider);
+            fighter.Modifiers.RegisterSource(service.ParameterSource);
+            fighter.Parameters.SetBaseValueForParameter(EntityParameter.Strength, BaseStrength);
+            service.SetTotalPoints(1);
+
+            Assert.AreEqual(AllocationResult.Success, service.Take(SyntheticNode));
+
+            // Exactly what the reader hands out when the file does not parse: a document with nothing
+            // in it. Read as content it means "every node was deleted"; it means the file is broken.
+            List<string> issues = [];
+            provider.Tree = PassiveTreeSerializer.Deserialize("{ \"nodes\": [", issues);
+
+            Assert.AreEqual(1, issues.Count, "the fixture must actually be a file that failed to parse");
+            Assert.IsTrue(service.IsTaken(SyntheticNode), "a broken file took the allocation with it");
+            Assert.AreEqual(1, service.SpentPoints, "a broken file also refunded what the allocation cost");
+            Assert.AreEqual(BaseStrength + nodeStrength, fighter[EntityParameter.Strength], 0f, "the node's contribution was dropped");
+            Assert.IsNotNull(service.Tree.Find(SyntheticNode), "the last document that did load must stay in force");
+        }
+
+        private static string[] SeedsOf(IPassiveTreeService service) =>
+            service.Tree.Nodes.Where(node => node.Kind == PassiveNodeKind.Start).Select(node => node.Id).ToArray();
 
         private static EntityParameter[] Attributes =>
             [EntityParameter.Strength, EntityParameter.Dexterity, EntityParameter.Intelligence];
