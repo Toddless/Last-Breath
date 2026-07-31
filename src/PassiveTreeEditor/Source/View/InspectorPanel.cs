@@ -229,10 +229,10 @@ namespace PassiveTreeEditor.Source.View
         private void BuildModifiers(PassiveNode node)
         {
             NodeKindRule rule = NodeKindRules.For(node);
-            AddChild(EditorControls.Caption($"MODIFIERS  {node.Modifiers.Count}/{rule.MaxModifiers}"
+            AddChild(EditorControls.Caption($"MODIFIERS  {node.LineCount}/{rule.MaxModifiers}"
                                            + (node.IsHybrid ? "   hybrid" : string.Empty)));
 
-            if (rule.MaxModifiers == 0 && node.Modifiers.Count == 0)
+            if (rule.MaxModifiers == 0 && node.LineCount == 0)
             {
                 AddChild(EditorControls.Wrapped("This node class carries no modifier lines."));
                 return;
@@ -241,15 +241,32 @@ namespace PassiveTreeEditor.Source.View
             // Lines left over from a kind change are still shown so they can be removed by hand. The
             // tool never silently drops authored content — Check reports the excess instead.
             for (int index = 0; index < node.Modifiers.Count; index++) AddChild(ModifierRow(node, index));
+            for (int index = 0; index < node.ContextModifiers.Count; index++) AddChild(ContextRow(node, index));
 
-            var add = new Button { Text = "+ line", Disabled = node.Modifiers.Count >= rule.MaxModifiers };
-            add.Pressed += () =>
+            var buttons = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            buttons.AddChild(AddButton("+ line", node, rule, () => node.Modifiers.Add(new ModifierLine())));
+            buttons.AddChild(AddButton("+ context", node, rule, () => node.ContextModifiers.Add(new ContextModifierLine())));
+            AddChild(buttons);
+        }
+
+        /// <summary>Both channels share the node's line budget, so both buttons close at the same count.</summary>
+        private Button AddButton(string text, PassiveNode node, NodeKindRule rule, Action add)
+        {
+            var button = new Button
             {
-                node.Modifiers.Add(new ModifierLine());
+                Text = text,
+                Disabled = node.LineCount >= rule.MaxModifiers,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+
+            button.Pressed += () =>
+            {
+                add();
                 ChangedTotals();
                 Rebuild();
             };
-            AddChild(add);
+
+            return button;
         }
 
         private Control ModifierRow(PassiveNode node, int index)
@@ -265,15 +282,7 @@ namespace PassiveTreeEditor.Source.View
                 line.Parameter = parameter;
                 ChangedTotals();
             }));
-
-            var remove = new Button { Text = "×" };
-            remove.Pressed += () =>
-            {
-                node.Modifiers.RemoveAt(index);
-                ChangedTotals();
-                Rebuild();
-            };
-            top.AddChild(remove);
+            top.AddChild(RemoveButton(() => node.Modifiers.RemoveAt(index)));
 
             var bottom = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             box.AddChild(bottom);
@@ -282,10 +291,10 @@ namespace PassiveTreeEditor.Source.View
             // before the picker that captures it is built.
             var hint = new Label { CustomMinimumSize = new Vector2(64, 0) };
 
-            OptionButton typePicker = EditorControls.Picker(ValueTypes(), line.ValueType, type =>
+            OptionButton typePicker = EditorControls.Picker(ParameterValueTypes(), line.ValueType, type =>
             {
                 line.ValueType = type;
-                hint.Text = ValueHint(line);
+                hint.Text = ValueHint(line.ValueType, line.Value);
                 ChangedTotals();
             });
 
@@ -301,45 +310,123 @@ namespace PassiveTreeEditor.Source.View
             value.ValueChanged += amount =>
             {
                 line.Value = (float)amount;
-                hint.Text = ValueHint(line);
+                hint.Text = ValueHint(line.ValueType, line.Value);
                 ChangedTotals();
             };
 
-            hint.Text = ValueHint(line);
-
-            var condition = new LineEdit
-            {
-                Text = line.Condition,
-                PlaceholderText = "condition (optional)",
-                SizeFlagsHorizontal = SizeFlags.ExpandFill
-            };
-            condition.TextChanged += text =>
-            {
-                bool wasConditional = line.IsConditional;
-                line.Condition = text;
-
-                // Only the presence of a condition reaches the totals; its wording does not, so typing
-                // inside an existing condition costs a redraw instead of a resummation.
-                if (line.IsConditional == wasConditional) Changed();
-                else ChangedTotals();
-            };
-            box.AddChild(condition);
+            hint.Text = ValueHint(line.ValueType, line.Value);
+            box.AddChild(ConditionEdit(line.Condition, () => line.IsConditional, text => line.Condition = text));
 
             return box;
         }
 
-        /// <summary>Flag is deliberately absent: it is legal on context parameters only, and a tree
+        /// <summary>A context line: same shape as a parametric one, aimed at a pipeline knob instead of
+        /// a parameter. Flag belongs to this row only — a switch has no place in parameter math.</summary>
+        private Control ContextRow(PassiveNode node, int index)
+        {
+            ContextModifierLine line = node.ContextModifiers[index];
+
+            var box = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            var top = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            box.AddChild(top);
+
+            // Only wired knobs are offered. A line naming a knob no pipeline reads is refused when the
+            // file is loaded, so the tool must not be able to author one in the first place.
+            top.AddChild(EditorControls.Picker(ContextKnobs.Bound, line.Parameter, parameter =>
+            {
+                line.Parameter = parameter;
+                ChangedTotals();
+            }));
+            top.AddChild(RemoveButton(() => node.ContextModifiers.RemoveAt(index)));
+
+            var bottom = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            box.AddChild(bottom);
+
+            var hint = new Label { CustomMinimumSize = new Vector2(64, 0) };
+            SpinBox value = EditorControls.Number(line.Value, 0.001);
+
+            OptionButton typePicker = EditorControls.Picker(line.ValueType, type =>
+            {
+                line.ValueType = type;
+
+                // A switch carries no number: the box shows the pinned value and stops taking input.
+                value.Editable = !line.IsFlag;
+                value.Value = line.Value;
+                hint.Text = ValueHint(line.ValueType, line.Value);
+                ChangedTotals();
+            });
+
+            typePicker.SizeFlagsHorizontal = SizeFlags.Fill;
+            bottom.AddChild(typePicker);
+            bottom.AddChild(value);
+            bottom.AddChild(hint);
+
+            value.Editable = !line.IsFlag;
+            value.ValueChanged += amount =>
+            {
+                line.Value = (float)amount;
+                hint.Text = ValueHint(line.ValueType, line.Value);
+                ChangedTotals();
+            };
+
+            hint.Text = ValueHint(line.ValueType, line.Value);
+            box.AddChild(ConditionEdit(line.Condition, () => line.IsConditional, text => line.Condition = text));
+
+            return box;
+        }
+
+        private Button RemoveButton(Action remove)
+        {
+            var button = new Button { Text = "×" };
+
+            button.Pressed += () =>
+            {
+                remove();
+                ChangedTotals();
+                Rebuild();
+            };
+
+            return button;
+        }
+
+        /// <summary>The free-text condition field of either line channel. Only the presence of a
+        /// condition reaches the totals; its wording does not, so typing inside an existing condition
+        /// costs a redraw instead of a resummation.</summary>
+        private LineEdit ConditionEdit(string current, Func<bool> isConditional, Action<string> apply)
+        {
+            var edit = new LineEdit
+            {
+                Text = current,
+                PlaceholderText = "condition (optional)",
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+
+            edit.TextChanged += text =>
+            {
+                bool wasConditional = isConditional();
+                apply(text);
+
+                if (isConditional() == wasConditional) Changed();
+                else ChangedTotals();
+            };
+
+            return edit;
+        }
+
+        /// <summary>Flag is deliberately absent: it is legal on context knobs only, and a parametric
         /// line always targets an <see cref="EntityParameter"/>.</summary>
-        private static IEnumerable<ModifierValueType> ValueTypes() =>
+        private static IEnumerable<ModifierValueType> ParameterValueTypes() =>
         [
             ModifierValueType.Flat,
             ModifierValueType.Increase,
             ModifierValueType.Multiplicative
         ];
 
-        private static string ValueHint(ModifierLine line) =>
-            line.ValueType == ModifierValueType.Flat
-                ? string.Empty
-                : $"= {EditorControls.Percent(line.Value)}";
+        private static string ValueHint(ModifierValueType valueType, float value) => valueType switch
+        {
+            ModifierValueType.Flag => "switch",
+            ModifierValueType.Flat => string.Empty,
+            _ => $"= {EditorControls.Percent(value)}"
+        };
     }
 }

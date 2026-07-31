@@ -182,11 +182,14 @@ namespace Core.PassiveTree
             {
                 NodeKindRule rule = NodeKindRules.For(node);
 
-                if (node.Modifiers.Count < rule.MinModifiers)
-                    issues.Add($"{node.Id}: {node.Kind} needs at least {rule.MinModifiers} modifier line(s), has {node.Modifiers.Count}");
+                // Both channels count against one limit: a line is content whichever road it takes to
+                // the fighter, and counting only the parametric ones would let a node carry a second
+                // payload nobody budgeted for.
+                if (node.LineCount < rule.MinModifiers)
+                    issues.Add($"{node.Id}: {node.Kind} needs at least {rule.MinModifiers} modifier line(s), has {node.LineCount}");
 
-                if (node.Modifiers.Count > rule.MaxModifiers)
-                    issues.Add($"{node.Id}: {node.Kind} allows at most {rule.MaxModifiers} modifier line(s), has {node.Modifiers.Count}");
+                if (node.LineCount > rule.MaxModifiers)
+                    issues.Add($"{node.Id}: {node.Kind} allows at most {rule.MaxModifiers} modifier line(s), has {node.LineCount}");
 
                 if (rule.RequiresAbility && string.IsNullOrWhiteSpace(node.AbilityId))
                     issues.Add($"{node.Id}: {node.Kind} must reference an ability");

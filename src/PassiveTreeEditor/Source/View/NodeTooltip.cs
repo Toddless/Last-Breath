@@ -18,6 +18,7 @@ namespace PassiveTreeEditor.Source.View
 
         private VBoxContainer _content = null!;
         private ModifierFormatter? _formatter;
+        private ContextModifierFormatter? _contextFormatter;
         private ILocalizationProvider? _localization;
 
         public override void _Ready()
@@ -36,9 +37,10 @@ namespace PassiveTreeEditor.Source.View
             AddChild(_content);
         }
 
-        public void Initialize(ModifierFormatter formatter, ILocalizationProvider localization)
+        public void Initialize(ModifierFormatter formatter, ContextModifierFormatter contextFormatter, ILocalizationProvider localization)
         {
             _formatter = formatter;
+            _contextFormatter = contextFormatter;
             _localization = localization;
         }
 
@@ -84,6 +86,7 @@ namespace PassiveTreeEditor.Source.View
                 _content.AddChild(Row(Translate(node.AbilityId), CanvasStyle.Ink1));
 
             foreach (ModifierLine line in node.Modifiers) _content.AddChild(Row(Describe(line), CanvasStyle.Ink2));
+            foreach (ContextModifierLine line in node.ContextModifiers) _content.AddChild(Row(Describe(line), CanvasStyle.Ink2));
 
             if (!string.IsNullOrWhiteSpace(node.Description))
                 _content.AddChild(Row(node.Description, CanvasStyle.Ink3));
@@ -117,6 +120,18 @@ namespace PassiveTreeEditor.Source.View
             string text = _formatter is null
                 ? $"{line.Parameter} {line.ValueType} {line.Value}"
                 : _formatter.Format(new SimpleModifier(line.Parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource));
+
+            return line.IsConditional ? $"{text}  ({line.Condition})" : text;
+        }
+
+        /// <summary>The context line reads through the game's own knob templates. The entry handed to the
+        /// formatter exists for the sentence and nothing else — it is never attached to anyone, because
+        /// what a fighter gets is the sum of the taken lines, not one modifier per node.</summary>
+        private string Describe(ContextModifierLine line)
+        {
+            string text = _contextFormatter is null
+                ? $"{line.Parameter} {line.ValueType} {line.Value}"
+                : _contextFormatter.Format(new ContextModifierEntry(line.Parameter, line.ValueType, line.Value));
 
             return line.IsConditional ? $"{text}  ({line.Condition})" : text;
         }

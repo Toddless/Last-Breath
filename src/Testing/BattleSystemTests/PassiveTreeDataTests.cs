@@ -156,6 +156,207 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void ContextLineSurvivesSaveAndLoadOnItsOwnChannel()
+        {
+            var document = new PassiveTreeDocument { Budget = 20 };
+            var node = new PassiveNode { Id = "notable_1", Kind = PassiveNodeKind.Notable };
+            node.Modifiers.Add(new ModifierLine { Parameter = EntityParameter.Armor, ValueType = ModifierValueType.Increase, Value = 0.06f });
+            node.ContextModifiers.Add(new ContextModifierLine
+            {
+                Parameter = ContextParameter.HealingEfficiency,
+                ValueType = ModifierValueType.Increase,
+                Value = 0.15f,
+                Condition = "while below half health"
+            });
+            document.AddNode(node);
+            List<string> issues = [];
+
+            PassiveNode? reloaded = PassiveTreeSerializer
+                .Deserialize(PassiveTreeSerializer.Serialize(document), issues)
+                .Find("notable_1");
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            Assert.IsNotNull(reloaded);
+            Assert.AreEqual(1, reloaded.Modifiers.Count, "the parametric channel did not survive on its own");
+            Assert.AreEqual(1, reloaded.ContextModifiers.Count);
+            Assert.AreEqual(ContextParameter.HealingEfficiency, reloaded.ContextModifiers[0].Parameter);
+            Assert.AreEqual(ModifierValueType.Increase, reloaded.ContextModifiers[0].ValueType);
+            Assert.AreEqual(0.15f, reloaded.ContextModifiers[0].Value, 0.0001f);
+            Assert.AreEqual("while below half health", reloaded.ContextModifiers[0].Condition);
+            Assert.AreEqual(2, reloaded.LineCount);
+        }
+
+        [TestMethod]
+        public void ContextLinesAreWrittenInTheCanonicalShape()
+        {
+            // The writer emits LF whatever the host does, so the expectation is normalized to match.
+            string canonical = """
+                {
+                    "version": 1,
+                    "budget": 20,
+                    "nodes": [
+                        {
+                            "id": "notable_1",
+                            "kind": "Notable",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "modifiers": [
+                                {
+                                    "parameter": "Armor",
+                                    "valueType": "Increase",
+                                    "value": 0.06
+                                }
+                            ],
+                            "contextModifiers": [
+                                {
+                                    "parameter": "HealingEfficiency",
+                                    "valueType": "Increase",
+                                    "value": 0.15
+                                },
+                                {
+                                    "parameter": "AttacksIgnoreResistances",
+                                    "valueType": "Flag"
+                                }
+                            ]
+                        }
+                    ],
+                    "edges": []
+                }
+
+                """.ReplaceLineEndings("\n");
+            List<string> issues = [];
+
+            string rewritten = PassiveTreeSerializer.Serialize(PassiveTreeSerializer.Deserialize(canonical, issues));
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            Assert.AreEqual(canonical, rewritten, "load+save changed a file carrying context lines");
+        }
+
+        [TestMethod]
+        public void FlagOnAParametricLineIsReportedAndCostsOnlyThatLine()
+        {
+            const string json = """
+                {
+                    "version": 1,
+                    "budget": 10,
+                    "nodes": [
+                        {
+                            "id": "notable_1",
+                            "kind": "Notable",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "modifiers": [
+                                { "parameter": "Armor", "valueType": "flag" },
+                                { "parameter": "Armor", "valueType": "Increase", "value": 0.06 }
+                            ]
+                        }
+                    ],
+                    "edges": []
+                }
+                """;
+            List<string> issues = [];
+
+            PassiveNode? node = PassiveTreeSerializer.Deserialize(json, issues).Find("notable_1");
+
+            Assert.IsNotNull(node);
+            Assert.AreEqual(1, node.Modifiers.Count, "a flag became a parameter modifier nothing can read");
+            Assert.AreEqual(ModifierValueType.Increase, node.Modifiers[0].ValueType);
+            Assert.AreEqual(1, issues.Count, string.Join("; ", issues));
+        }
+
+        [TestMethod]
+        public void FlagContextLineCarriesNoAuthoredNumber()
+        {
+            const string json = """
+                {
+                    "version": 1,
+                    "budget": 10,
+                    "nodes": [
+                        {
+                            "id": "keystone_1",
+                            "kind": "Keystone",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "contextModifiers": [
+                                { "parameter": "AttacksIgnoreResistances", "valueType": "flag", "value": 0.42 }
+                            ]
+                        }
+                    ],
+                    "edges": []
+                }
+                """;
+            List<string> issues = [];
+
+            PassiveTreeDocument document = PassiveTreeSerializer.Deserialize(json, issues);
+            ContextModifierLine? line = document.Find("keystone_1")?.ContextModifiers[0];
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            Assert.IsNotNull(line);
+            Assert.IsTrue(line.IsFlag);
+            Assert.AreEqual(ContextModifierLine.FlagValue, line.Value, 0.0001f, "a switch was read as a quantity");
+            StringAssert.Contains(PassiveTreeSerializer.Serialize(document), "\"valueType\": \"Flag\"");
+            Assert.IsFalse(PassiveTreeSerializer.Serialize(document).Contains("0.42"), "a flag was written back with a number to edit");
+        }
+
+        [TestMethod]
+        public void ContextLineNamingSomethingOutsideTheEnumIsReportedAndSkipped()
+        {
+            // A bare number parses into every enum, so "999" would become a member that does not exist —
+            // and a context knob that does not exist has no binding to throw in battle later.
+            const string json = """
+                {
+                    "version": 1,
+                    "budget": 10,
+                    "nodes": [
+                        {
+                            "id": "notable_1",
+                            "kind": "Notable",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "contextModifiers": [
+                                { "parameter": "999", "valueType": "Increase", "value": 0.15 },
+                                { "parameter": "BleedDamage", "valueType": "Increase", "value": 0.35 }
+                            ]
+                        }
+                    ],
+                    "edges": []
+                }
+                """;
+            List<string> issues = [];
+
+            PassiveNode? node = PassiveTreeSerializer.Deserialize(json, issues).Find("notable_1");
+
+            Assert.IsNotNull(node);
+            Assert.AreEqual(1, node.ContextModifiers.Count);
+            Assert.AreEqual(ContextParameter.BleedDamage, node.ContextModifiers[0].Parameter);
+            Assert.AreEqual(1, issues.Count, string.Join("; ", issues));
+        }
+
+        [TestMethod]
+        public void EveryContextKnobIsAuthorableBecauseEveryKnobIsWired()
+        {
+            // The reader refuses a knob that reaches no pipeline. While every member is wired that gate
+            // costs nothing; the day a member ships without a binding, the file loses the line instead of
+            // the battle losing the fight.
+            CollectionAssert.AreEquivalent(Enum.GetValues<ContextParameter>(), ContextKnobs.Bound.ToArray());
+        }
+
+        [TestMethod]
+        public void BothLineChannelsCountAgainstTheSameNodeBudget()
+        {
+            var document = new PassiveTreeDocument();
+            var node = new PassiveNode { Id = "small_1", Kind = PassiveNodeKind.Small, Stance = Stance.Strength };
+            node.Modifiers.Add(new ModifierLine { Parameter = EntityParameter.Armor, ValueType = ModifierValueType.Increase, Value = 0.06f });
+            node.ContextModifiers.Add(new ContextModifierLine { Parameter = ContextParameter.BleedDamage, Value = 0.1f });
+            document.AddNode(node);
+
+            List<string> issues = document.Validate();
+
+            Assert.IsTrue(issues.Any(issue => issue.Contains("small_1") && issue.Contains("at most 1")),
+                "a second payload slipped past the per-class line limit: " + string.Join("; ", issues));
+        }
+
+        [TestMethod]
         public void ProviderReportsBrokenRecordsAndStillPublishesTheRestOfTheTree()
         {
             const string json = """

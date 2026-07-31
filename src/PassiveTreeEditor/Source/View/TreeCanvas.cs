@@ -828,6 +828,7 @@ namespace PassiveTreeEditor.Source.View
                     node.Description = template.Description;
 
                     foreach (ModifierLine line in template.Modifiers) node.Modifiers.Add(line.Copy());
+                    foreach (ContextModifierLine line in template.ContextModifiers) node.ContextModifiers.Add(line.Copy());
                 }
             }
             else

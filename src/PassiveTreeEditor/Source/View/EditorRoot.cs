@@ -107,7 +107,10 @@ namespace PassiveTreeEditor.Source.View
             // Added last so it draws over the canvas and the side panel.
             _tooltip = new NodeTooltip();
             AddChild(_tooltip);
-            _tooltip.Initialize(new ModifierFormatter(_localization, _parameterFormats), _localization);
+            _tooltip.Initialize(
+                new ModifierFormatter(_localization, _parameterFormats),
+                new ContextModifierFormatter(_localization),
+                _localization);
         }
 
         private Control BuildToolbar()

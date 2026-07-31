@@ -114,7 +114,8 @@ namespace Core.PassiveTree
             Title = NullIfBlank(node.Title),
             Description = NullIfBlank(node.Description),
             AbilityId = NullIfBlank(node.AbilityId),
-            Modifiers = node.Modifiers.Count == 0 ? null : node.Modifiers.Select(ToDto).ToList()
+            Modifiers = node.Modifiers.Count == 0 ? null : node.Modifiers.Select(ToDto).ToList(),
+            ContextModifiers = node.ContextModifiers.Count == 0 ? null : node.ContextModifiers.Select(ToDto).ToList()
         };
 
         private static ModifierLineDto ToDto(ModifierLine line) => new()
@@ -122,6 +123,14 @@ namespace Core.PassiveTree
             Parameter = line.Parameter.ToString(),
             ValueType = line.ValueType.ToString(),
             Value = MathF.Round(line.Value, PassiveTreeFormat.ValueDecimals),
+            Condition = NullIfBlank(line.Condition)
+        };
+
+        private static ContextModifierLineDto ToDto(ContextModifierLine line) => new()
+        {
+            Parameter = line.Parameter.ToString(),
+            ValueType = line.ValueType.ToString(),
+            Value = line.IsFlag ? null : MathF.Round(line.Value, PassiveTreeFormat.ValueDecimals),
             Condition = NullIfBlank(line.Condition)
         };
 
@@ -152,9 +161,9 @@ namespace Core.PassiveTree
                 var node = new PassiveNode
                 {
                     Id = dto.Id,
-                    Kind = EnumParser.ParseEnum<PassiveNodeKind>(dto.Kind),
-                    Stance = string.IsNullOrWhiteSpace(dto.Stance) ? null : EnumParser.ParseEnum<Stance>(dto.Stance),
-                    HybridStance = string.IsNullOrWhiteSpace(dto.HybridStance) ? null : EnumParser.ParseEnum<Stance>(dto.HybridStance),
+                    Kind = ParseMember<PassiveNodeKind>(dto.Kind),
+                    Stance = string.IsNullOrWhiteSpace(dto.Stance) ? null : ParseMember<Stance>(dto.Stance),
+                    HybridStance = string.IsNullOrWhiteSpace(dto.HybridStance) ? null : ParseMember<Stance>(dto.HybridStance),
                     X = dto.X,
                     Y = dto.Y,
                     Title = dto.Title ?? string.Empty,
@@ -166,6 +175,12 @@ namespace Core.PassiveTree
                 {
                     ModifierLine? line = FromDto(lineDto, dto.Id, issues);
                     if (line is not null) node.Modifiers.Add(line);
+                }
+
+                foreach (ContextModifierLineDto lineDto in dto.ContextModifiers ?? [])
+                {
+                    ContextModifierLine? line = FromDto(lineDto, dto.Id, issues);
+                    if (line is not null) node.ContextModifiers.Add(line);
                 }
 
                 return node;
@@ -181,10 +196,17 @@ namespace Core.PassiveTree
         {
             try
             {
+                var valueType = ParseMember<ModifierValueType>(dto.ValueType);
+
+                // A switch is meaningless in parameter math — the formula has no place to read it from —
+                // so the line is refused here instead of becoming a modifier the resolver silently drops.
+                if (valueType == ModifierValueType.Flag)
+                    throw new FormatException($"'{dto.Parameter}' is an entity parameter — a flag has no meaning in parameter math");
+
                 return new ModifierLine
                 {
-                    Parameter = EnumParser.ParseEnum<EntityParameter>(dto.Parameter),
-                    ValueType = EnumParser.ParseEnum<ModifierValueType>(dto.ValueType),
+                    Parameter = ParseMember<EntityParameter>(dto.Parameter),
+                    ValueType = valueType,
                     Value = dto.Value,
                     Condition = dto.Condition ?? string.Empty
                 };
@@ -194,6 +216,46 @@ namespace Core.PassiveTree
                 issues.Add($"node '{nodeId}', modifier line: {exception.Message}, skipped");
                 return null;
             }
+        }
+
+        private static ContextModifierLine? FromDto(ContextModifierLineDto dto, string nodeId, List<string> issues)
+        {
+            try
+            {
+                var parameter = ParseMember<ContextParameter>(dto.Parameter);
+
+                // A knob with no binding throws the moment something attaches it, which in battle means a
+                // crash far away from the file that caused it. The line loses its place on load instead.
+                if (!ContextKnobs.IsBound(parameter))
+                    throw new FormatException($"context parameter '{dto.Parameter}' reaches no battle pipeline");
+
+                return new ContextModifierLine
+                {
+                    Parameter = parameter,
+                    ValueType = ParseMember<ModifierValueType>(dto.ValueType),
+                    Value = dto.Value ?? 0f,
+                    Condition = dto.Condition ?? string.Empty
+                };
+            }
+            catch (FormatException exception)
+            {
+                issues.Add($"node '{nodeId}', context line: {exception.Message}, skipped");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Stricter than <see cref="EnumParser"/> alone, which accepts a bare number for any enum: a
+        /// "parameter": "42" would parse into a member that does not exist and produce a line nothing
+        /// can ever read.
+        /// </summary>
+        private static TEnum ParseMember<TEnum>(string value) where TEnum : struct, Enum
+        {
+            TEnum member = EnumParser.ParseEnum<TEnum>(value);
+
+            return Enum.IsDefined(member)
+                ? member
+                : throw new FormatException($"'{value}' is not a valid {typeof(TEnum).Name}");
         }
 
         private static string? NullIfBlank(string value) => string.IsNullOrWhiteSpace(value) ? null : value;

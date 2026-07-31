@@ -3,6 +3,7 @@ namespace PassiveTreeEditor.Source.View
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using Core.Enums;
     using Core.PassiveTree;
     using Godot;
     using Simulation;
@@ -15,6 +16,8 @@ namespace PassiveTreeEditor.Source.View
     public partial class SummaryPanel : VBoxContainer
     {
         private static readonly string[] s_headers = ["Parameter", "Flat", "Increase", "More", "Base", "Total"];
+
+        private static readonly string[] s_contextHeaders = ["Knob", "Bucket", "Sum", "Lines"];
 
         public void Rebuild(TreeSummary summary, AllocationState allocation, int budget)
         {
@@ -32,7 +35,13 @@ namespace PassiveTreeEditor.Source.View
 
             BuildUnlocks(summary);
             BuildParameters(summary);
+            BuildContext(summary);
             BuildKeystones(summary);
+
+            // Both channels feed this count, so it lives outside either table — a tree of context-only
+            // conditionals must not lose the warning with the parameter grid it never had.
+            if (summary.ConditionalLines > 0)
+                AddChild(EditorControls.Wrapped($"{summary.ConditionalLines} conditional line(s) counted as always active."));
         }
 
         private static string Signed(float value, bool percent)
@@ -81,9 +90,36 @@ namespace PassiveTreeEditor.Source.View
                 grid.AddChild(new Label { Text = Plain(total.BaseValue) });
                 grid.AddChild(new Label { Text = Plain(total.Total) });
             }
+        }
 
-            if (summary.ConditionalLines > 0)
-                AddChild(EditorControls.Wrapped($"{summary.ConditionalLines} conditional line(s) counted as always active."));
+        /// <summary>
+        /// Pipeline knobs, summed per knob and bucket and shown in their own table. They are never
+        /// folded into the parameter totals: nothing about a knob passes through the parameter formula,
+        /// and a row in that table would claim otherwise.
+        /// </summary>
+        private void BuildContext(TreeSummary summary)
+        {
+            if (summary.Context.Count == 0) return;
+
+            AddChild(EditorControls.Caption("CONTEXT KNOBS (battle pipelines, outside parameter math)"));
+
+            var grid = new GridContainer { Columns = s_contextHeaders.Length, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            AddChild(grid);
+
+            foreach (string header in s_contextHeaders) grid.AddChild(EditorControls.Caption(header));
+
+            foreach (ContextTotal total in summary.Context)
+            {
+                string name = total.Parameter.ToString();
+                if (total.ConditionalLines > 0) name += $" ({total.ConditionalLines} cond.)";
+
+                bool isFlag = total.ValueType == ModifierValueType.Flag;
+
+                grid.AddChild(new Label { Text = name });
+                grid.AddChild(new Label { Text = isFlag ? "flag" : total.ValueType.ToString() });
+                grid.AddChild(new Label { Text = isFlag ? "on" : Signed(total.Value, total.ValueType != ModifierValueType.Flat) });
+                grid.AddChild(new Label { Text = total.Lines.ToString(CultureInfo.InvariantCulture) });
+            }
         }
 
         private void BuildKeystones(TreeSummary summary)

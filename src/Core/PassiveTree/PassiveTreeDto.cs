@@ -46,6 +46,9 @@ namespace Core.PassiveTree
 
         [JsonProperty("modifiers", NullValueHandling = NullValueHandling.Ignore)]
         public List<ModifierLineDto>? Modifiers { get; set; }
+
+        [JsonProperty("contextModifiers", NullValueHandling = NullValueHandling.Ignore)]
+        public List<ContextModifierLineDto>? ContextModifiers { get; set; }
     }
 
     public sealed class ModifierLineDto
@@ -55,6 +58,21 @@ namespace Core.PassiveTree
         [JsonProperty("valueType")] public string ValueType { get; set; } = string.Empty;
 
         [JsonProperty("value")] public float Value { get; set; }
+
+        [JsonProperty("condition", NullValueHandling = NullValueHandling.Ignore)]
+        public string? Condition { get; set; }
+    }
+
+    /// <summary>The context line's own record. A flag writes no <c>value</c> at all — the number is not
+    /// authored, so writing one back would invite an author to edit it.</summary>
+    public sealed class ContextModifierLineDto
+    {
+        [JsonProperty("parameter")] public string Parameter { get; set; } = string.Empty;
+
+        [JsonProperty("valueType")] public string ValueType { get; set; } = string.Empty;
+
+        [JsonProperty("value", NullValueHandling = NullValueHandling.Ignore)]
+        public float? Value { get; set; }
 
         [JsonProperty("condition", NullValueHandling = NullValueHandling.Ignore)]
         public string? Condition { get; set; }

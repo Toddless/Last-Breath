@@ -38,5 +38,16 @@ namespace Core.PassiveTree
         public string AbilityId { get; set; } = string.Empty;
 
         public List<ModifierLine> Modifiers { get; } = [];
+
+        /// <summary>
+        /// Pipeline knobs the node tunes. A separate channel from <see cref="Modifiers"/> because the two
+        /// reach a fighter by different roads — parameter resolution on one side, context pipelines on the
+        /// other — exactly the way an item keeps its two kinds of lines apart.
+        /// </summary>
+        public List<ContextModifierLine> ContextModifiers { get; } = [];
+
+        /// <summary>Everything the node says in lines, both channels. The per-class content limits count
+        /// content, not the road a line takes.</summary>
+        public int LineCount => Modifiers.Count + ContextModifiers.Count;
     }
 }
