@@ -3,6 +3,7 @@ namespace LastBreathTest.BattleSystemTests
     using System.Text;
     using Core.Data.GameData;
     using Core.Enums;
+    using Core.Modifiers.Conditions;
     using Core.Modifiers.Context;
     using Core.PassiveTree;
 
@@ -72,6 +73,28 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(provider.Tree.Nodes.Count > 0, "the catalog produced an empty tree");
             Assert.IsTrue(provider.Tree.Links.Count > 0, "the catalog produced a tree without edges");
             Assert.IsTrue(provider.Tree.Budget > 0, "the catalog produced a tree without a point budget");
+        }
+
+        [TestMethod]
+        public void EveryConditionTheShippedTreeNamesIsInTheShippedCatalog()
+        {
+            // A condition is a reference across two hand-written files, and the reader of the tree cannot
+            // check it: the catalog is only consulted when the allocation turns into a contribution. An id
+            // nobody defined therefore costs the line it guards — silently, at the far end of the game —
+            // and the draft this tree grew out of wrote its conditions as English sentences.
+            var tree = new PassiveTreeProvider();
+            var catalog = new ConditionProvider(ConditionParser.Default());
+            new GameDataService(new FileSystemDataSource(SharedDataRoot()), [tree, catalog]).LoadAll();
+
+            string[] named = [.. tree.Tree.Nodes
+                .SelectMany(node => node.Modifiers.Select(line => line.Condition)
+                    .Concat(node.ContextModifiers.Select(line => line.Condition)))
+                .Where(condition => condition.Length > 0)
+                .Distinct(StringComparer.Ordinal)];
+
+            foreach (string condition in named)
+                Assert.IsTrue(catalog.TryResolve(condition, out _),
+                    $"the shipped tree gates a line on '{condition}', which the Conditions catalog does not hold — the line is dropped wherever it is read");
         }
 
         [TestMethod]

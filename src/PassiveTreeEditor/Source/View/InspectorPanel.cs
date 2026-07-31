@@ -3,6 +3,7 @@ namespace PassiveTreeEditor.Source.View
     using System;
     using System.Collections.Generic;
     using Core.Enums;
+    using Core.Modifiers.Conditions;
     using Core.Modifiers.Context;
     using Core.PassiveTree;
     using Godot;
@@ -25,6 +26,7 @@ namespace PassiveTreeEditor.Source.View
         ];
 
         private AbilityCatalog? _abilities;
+        private ConditionProvider? _conditions;
         private TreeCanvas? _canvas;
 
         /// <summary>A cosmetic edit: the canvas needs a redraw, the totals do not.</summary>
@@ -34,10 +36,11 @@ namespace PassiveTreeEditor.Source.View
         /// which id. Kept separate so that typing a title does not rebuild the totals per keystroke.</summary>
         public event Action? TotalsChanged;
 
-        public void Initialize(TreeCanvas canvas, AbilityCatalog abilities)
+        public void Initialize(TreeCanvas canvas, AbilityCatalog abilities, ConditionProvider conditions)
         {
             _canvas = canvas;
             _abilities = abilities;
+            _conditions = conditions;
             SizeFlagsHorizontal = SizeFlags.ExpandFill;
             AddThemeConstantOverride("separation", 6);
         }
@@ -179,31 +182,12 @@ namespace PassiveTreeEditor.Source.View
             return box;
         }
 
-        private OptionButton AbilityPicker(PassiveNode node)
-        {
-            var picker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-            List<string> ids = ["", .. AbilityIds()];
-
-            // A hand-written id that is not in the catalog stays selectable instead of being silently
-            // reset — the tool never edits data it does not understand.
-            if (!string.IsNullOrEmpty(node.AbilityId) && !ids.Contains(node.AbilityId)) ids.Add(node.AbilityId);
-
-            int selected = 0;
-            for (int index = 0; index < ids.Count; index++)
+        private OptionButton AbilityPicker(PassiveNode node) =>
+            EditorControls.IdPicker(AbilityIds(), node.AbilityId, id =>
             {
-                picker.AddItem(ids[index].Length == 0 ? "—" : ids[index], index);
-                if (ids[index] == node.AbilityId) selected = index;
-            }
-
-            picker.Selected = selected;
-            picker.ItemSelected += index =>
-            {
-                node.AbilityId = ids[picker.GetItemId((int)index)];
+                node.AbilityId = id;
                 ChangedTotals();
-            };
-
-            return picker;
-        }
+            });
 
         private List<string> AbilityIds()
         {
@@ -325,7 +309,7 @@ namespace PassiveTreeEditor.Source.View
             };
 
             hint.Text = ValueHint(line.ValueType, line.Value);
-            box.AddChild(ConditionEdit(line.Condition, () => line.IsConditional, text => line.Condition = text));
+            box.AddChild(ConditionPicker(line.Condition, id => line.Condition = id));
 
             return box;
         }
@@ -394,7 +378,7 @@ namespace PassiveTreeEditor.Source.View
             };
 
             hint.Text = ValueHint(line.ValueType, line.Value);
-            box.AddChild(ConditionEdit(line.Condition, () => line.IsConditional, text => line.Condition = text));
+            box.AddChild(ConditionPicker(line.Condition, id => line.Condition = id));
 
             return box;
         }
@@ -413,29 +397,16 @@ namespace PassiveTreeEditor.Source.View
             return button;
         }
 
-        /// <summary>The free-text condition field of either line channel. Only the presence of a
-        /// condition reaches the totals; its wording does not, so typing inside an existing condition
-        /// costs a redraw instead of a resummation.</summary>
-        private LineEdit ConditionEdit(string current, Func<bool> isConditional, Action<string> apply)
-        {
-            var edit = new LineEdit
+        /// <summary>The condition field of either line channel, offering the catalog and nothing else.
+        /// A condition is a reference: the game resolves the id when it builds the contribution and drops
+        /// the whole line when the catalog has no such entry, so an id that could be typed would be a way
+        /// to author a line that quietly never applies.</summary>
+        private OptionButton ConditionPicker(string current, Action<string> apply) =>
+            EditorControls.IdPicker(_conditions?.Ids ?? [], current, id =>
             {
-                Text = current,
-                PlaceholderText = "condition (optional)",
-                SizeFlagsHorizontal = SizeFlags.ExpandFill
-            };
-
-            edit.TextChanged += text =>
-            {
-                bool wasConditional = isConditional();
-                apply(text);
-
-                if (isConditional() == wasConditional) Changed();
-                else ChangedTotals();
-            };
-
-            return edit;
-        }
+                apply(id);
+                ChangedTotals();
+            }, emptyLabel: "— always");
 
         /// <summary>What a context line on this knob may be. A switch takes nothing but Flag, and a knob
         /// that reads a value never takes it — both readers refuse the other half, so the tool must not

@@ -31,8 +31,10 @@ namespace Core.PassiveTree
         }
 
         /// <summary>
-        /// Free text describing when the line applies; empty means always. Same shape as the parametric
-        /// line's condition, so both channels answer to one evaluator once there is one.
+        /// Id of the predicate that gates the line, from the Conditions catalog; empty means the line
+        /// always applies. Same shape as the parametric line's condition — both channels resolve it
+        /// against the same catalog — but it costs a knob nothing to hold: the knob's total is added up
+        /// when a pipeline reads it, so a line that stops holding simply stops being added.
         /// </summary>
         public string Condition { get; set; } = string.Empty;
 

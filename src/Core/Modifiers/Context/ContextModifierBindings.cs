@@ -22,9 +22,12 @@
     /// Whole-number knobs (durations, stacks) read the floored value. A knob that carries a number takes it
     /// as a live view from <see cref="ValueViews"/> and never as the number itself: lines are attached on
     /// equip and their value keeps moving afterwards (sharpening, ascension), and nothing re-attaches them.
-    /// Taking no view at all is what makes a knob a switch — it has no value to read — and it is the only
+    /// Asking for no amount is what makes a knob a switch — it has no number to read — and it is the only
     /// mark of one: <see cref="ContextKnobs"/> reads the answer back off this table rather than keeping a
-    /// second list of names beside it.
+    /// second list of names beside it. Every view a binding needs, the amounts and the presence a switch
+    /// reads, is taken while the binding is built and never inside an attach-time factory: the table is
+    /// read by asking it to build, and a view asked for only once an entity turns up would be asked for by
+    /// nothing at all.
     /// The source of a line may also name the slot its modifiers run in, which is taken here — before the
     /// modifier ever reaches a handler, and only where the class named no slot of its own.</summary>
     internal static class ContextModifierBindings
@@ -55,9 +58,9 @@
             ContextParameter.PhysicalToCold => ElementalConversion(entry, views, DamageType.Cold),
             ContextParameter.PhysicalToLightning => ElementalConversion(entry, views, DamageType.Lightning),
 
-            // The one switch: nothing to read, so no view is taken and the line is on because it exists.
-            ContextParameter.AttacksIgnoreResistances =>
-                new DamageBinding(owner => new IgnoreResistancesContextModifier(owner, DamageCause.Attack)),
+            // The one switch: no amount is asked for, so the knob carries no number. What it does read is
+            // the presence of its line, which is not an amount and leaves the knob a switch.
+            ContextParameter.AttacksIgnoreResistances => Presence(entry, views),
             ContextParameter.AddedFireDamage => AddedElemental(entry, views, DamageType.Fire),
             ContextParameter.AddedColdDamage => AddedElemental(entry, views, DamageType.Cold),
             ContextParameter.AddedLightningDamage => AddedElemental(entry, views, DamageType.Lightning),
@@ -84,14 +87,24 @@
         /// <summary>An owner-gated damage knob that carries a number. The view is taken here, while the
         /// binding is built, and not inside the attach-time factory: what the table says about a knob has
         /// to be answerable without an entity to attach it to. Taking the view is also what declares the
-        /// knob numeric, so an owner-gated switch has no route through here — it needs a
-        /// <see cref="DamageBinding"/> built by hand, reading nothing, the way
-        /// <see cref="ContextParameter.AttacksIgnoreResistances"/> is.</summary>
+        /// knob numeric, so an owner-gated switch has no route through here — it reads a presence instead,
+        /// through <see cref="Presence"/>.</summary>
         private static IContextModifierBinding Damage(ContextModifierEntry entry, ValueViews views, Func<IFightable, Func<float>, IDamageModifier> create)
         {
             Func<float> value = views.Of(entry);
 
             return new DamageBinding(owner => create(owner, value));
+        }
+
+        /// <summary>An owner-gated switch: <see cref="Damage"/> with a presence where the amount would be.
+        /// The view is taken here for the same reason the amount is — the table is questioned by asking it
+        /// to build a binding, and a view the attach-time factory would ask for is one the question never
+        /// reaches. Presence is not an amount, so taking it leaves the knob a switch.</summary>
+        private static IContextModifierBinding Presence(ContextModifierEntry entry, ValueViews views)
+        {
+            Func<bool> isOn = views.PresenceOf(entry);
+
+            return new DamageBinding(owner => new IgnoreResistancesContextModifier(owner, DamageCause.Attack, isOn));
         }
 
         private static IContextModifierBinding ElementalConversion(ContextModifierEntry entry, ValueViews views, DamageType element) =>
@@ -123,9 +136,9 @@
         }
 
         /// <summary>Hands out the live views of a line's value and remembers whether any binding asked for
-        /// one. A modifier is given the view rather than the number because the line keeps being re-valued
-        /// under it; the record of who asked is what lets the table be questioned about a knob's kind
-        /// without building a second catalogue that can disagree with it.</summary>
+        /// an amount. A modifier is given the view rather than the number because the line keeps being
+        /// re-valued under it; the record of who asked for what is what lets the table be questioned about
+        /// a knob's kind without building a second catalogue that can disagree with it.</summary>
         internal sealed class ValueViews
         {
             /// <summary>False for a switch: its binding had no number to look at.</summary>
@@ -162,6 +175,15 @@
 
                 return () => entry.WholeValue;
             }
+
+            /// <summary>Whether the switch is on, for a binding that asks for no amount. Deliberately
+            /// leaves <see cref="Taken"/> alone: this is not a number the pipeline scales anything by, and
+            /// a knob that answered it would stop being a switch — the one it is on today would move out
+            /// of <see cref="ContextKnobs.Flags"/> and both readers would start refusing the flag lines
+            /// that are already written for it. A line pinned to one is on, which is what a switch that
+            /// simply exists comes to; a source whose switch can go quiet (a line held up by a condition)
+            /// answers zero and the modifier stands down without being detached.</summary>
+            public Func<bool> PresenceOf(ContextModifierEntry entry) => () => entry.Value != 0f;
         }
 
         private sealed class HealBinding(IHealModifier modifier) : IContextModifierBinding

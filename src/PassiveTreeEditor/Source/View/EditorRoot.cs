@@ -6,6 +6,7 @@ namespace PassiveTreeEditor.Source.View
     using Core.Entity;
     using Core.Enums;
     using Core.Localization;
+    using Core.Modifiers.Conditions;
     using Core.PassiveTree;
     using Godot;
     using Io;
@@ -23,6 +24,11 @@ namespace PassiveTreeEditor.Source.View
         private readonly AbilityCatalog _abilities = new();
         private readonly PassiveTreeProvider _treeProvider = new();
         private readonly AllocationState _allocation = new();
+
+        // The game's own condition catalog, read through the same participant contract as everything
+        // else here: the ids a line may name are the ids the game will resolve, with no list of them
+        // kept in the tool to fall out of date.
+        private readonly ConditionProvider _conditions = new(ConditionParser.Default());
 
         // The game's own baseline reader (Core): the tool measures the tree on the numbers the player
         // actually starts with, and a bad profile is reported through the game's Tracker, not here.
@@ -243,7 +249,7 @@ namespace PassiveTreeEditor.Source.View
 
         private void WireEvents()
         {
-            _inspector.Initialize(_canvas, _abilities);
+            _inspector.Initialize(_canvas, _abilities, _conditions);
 
             _canvas.SelectionChanged += () => _inspector.Rebuild();
             _canvas.DocumentChanged += OnDocumentChanged;
@@ -261,7 +267,7 @@ namespace PassiveTreeEditor.Source.View
         {
             var failures = new List<string>();
             var source = new FileSystemDataSource(ToolPaths.SharedDataRoot);
-            var participants = new IGameDataParticipant[] { _abilities, _treeProvider, _playerStats, _parameterFormats };
+            var participants = new IGameDataParticipant[] { _abilities, _treeProvider, _playerStats, _parameterFormats, _conditions };
             var service = new GameDataService(source, participants);
 
             service.LoadFailed += (catalog, exception) => failures.Add($"{catalog}: {exception.Message}");

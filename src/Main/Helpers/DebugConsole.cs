@@ -518,11 +518,19 @@ namespace LastBreath.Helpers
         }
 
         /// <summary>
-        /// The context channel: one row per pipeline knob holding everything taken for it, which is what a
-        /// fighter carries — the tree folds every line feeding a knob into a single modifier, so a
-        /// per-line dump would print numbers no pipeline ever reads. The total is bare: knobs have no
-        /// entry in the parameter format catalog, and the bucket a line is written in decides nothing
-        /// beyond the wording of its own sentence.
+        /// The context channel: one row per pipeline knob holding everything taken for it — the tree folds
+        /// every line feeding a knob into a single modifier, so a per-line dump would print numbers no
+        /// pipeline ever reads. The total is the allocation's, read in the unit the knob is counted in, so
+        /// a knob taken in whole turns is never credited with a fraction that dies at the binding. It is
+        /// bare of units otherwise: knobs have no entry in the parameter format catalog, and the bucket a
+        /// line is written in decides nothing beyond the wording of its own sentence.
+        /// <para>A knob with conditional lines is printed twice over: the total counting all of them, which
+        /// is what the allocation holds, and beside it what the modifier standing behind the knob reads at
+        /// this moment. The two part where a condition is off — the same divergence the parametric rows
+        /// show per line as [on]/[off], which a folded knob has no room for. A line naming an id the
+        /// catalog does not hold parts them as well, and only here: the total counts it, the knob's
+        /// modifier does not, and the parametric channel drops such a line before it can be printed at
+        /// all.</para>
         /// </summary>
         private void PrintTreeKnobs(IPassiveTreeService tree)
         {
@@ -535,15 +543,23 @@ namespace LastBreath.Helpers
 
             foreach (KeyValuePair<ContextParameter, List<ContextModifierLine>> knob in knobs.OrderBy(pair => pair.Key.ToString(), StringComparer.Ordinal))
             {
-                string total = ContextKnobTotals.Sum(knob.Value).ToString("0.###", CultureInfo.InvariantCulture);
-                Print($"{knob.Key}: {total} from {knob.Value.Count} line(s)");
+                string total = Rounded(ContextKnobTotals.AsRead(knob.Key, knob.Value));
+                int conditional = knob.Value.Count(line => line.IsConditional);
+                string gated = conditional > 0
+                    ? $", {conditional} conditional — {Rounded(tree.ContextSource.ValueOf(knob.Key))} in force now"
+                    : string.Empty;
+                Print($"{knob.Key}: {total} from {knob.Value.Count} line(s){gated}");
             }
         }
 
+        private static string Rounded(float value) => value.ToString("0.###", CultureInfo.InvariantCulture);
+
         // Units come from ParameterFormats.json through the game's own formatter, so a parameter that
-        // stores a fraction reads as a percent here exactly as it does on the character sheet.
+        // stores a fraction reads as a percent here exactly as it does on the character sheet. A line held
+        // up by a condition is named as one: it is in the source and out of the character's value.
         private static string FormatTreeModifier(ModifierFormatter formatter, IModifierInstance modifier) =>
-            $"{Signed(formatter, modifier.ModifierValueType, modifier.EntityParameter, modifier.Value)} {modifier.ModifierValueType} ({modifier.Source})";
+            $"{Signed(formatter, modifier.ModifierValueType, modifier.EntityParameter, modifier.Value)} {modifier.ModifierValueType} ({modifier.Source})"
+            + (modifier is IConditionalModifier conditional ? conditional.IsActive ? " [on]" : " [off]" : string.Empty);
 
         private static string FormatTreeLine(ModifierFormatter formatter, ModifierLine line) =>
             $"{Signed(formatter, line.ValueType, line.Parameter, line.Value)} {line.Parameter} {line.ValueType}{(line.IsConditional ? $" if \"{line.Condition}\"" : string.Empty)}";

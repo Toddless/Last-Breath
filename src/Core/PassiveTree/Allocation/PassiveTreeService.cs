@@ -4,6 +4,7 @@ namespace Core.PassiveTree.Allocation
     using System.Collections.Generic;
     using Context;
     using Entity.Components;
+    using Modifiers.Conditions;
     using Session;
 
     /// <summary>
@@ -14,13 +15,26 @@ namespace Core.PassiveTree.Allocation
     /// The service is a singleton and outlives the scene, so it also owns the two ways a playthrough
     /// ends: a new game resets it, and a loaded file replaces the allocation wholesale.
     /// </summary>
-    public sealed class PassiveTreeService(IPassiveTreeProvider provider) : IPassiveTreeService, ISessionResettable
+    public sealed class PassiveTreeService : IPassiveTreeService, ISessionResettable
     {
         private readonly AllocationState _allocation = new();
-        private readonly PassiveTreeParameterSource _source = new();
-        private readonly PassiveTreeContextSource _context = new();
+        private readonly IPassiveTreeProvider _provider;
+        private readonly PassiveTreeParameterSource _source;
+        private readonly PassiveTreeContextSource _context;
 
         private PassiveTreeDocument? _synced;
+
+        /// <summary>Only one channel is ever handed a fighter — the pipeline knobs are pushed into his
+        /// handler while the parameters are pulled from a registered source — and the predicates of both
+        /// read the state of that same fighter. The sighting is passed on here so the pulled channel does
+        /// not need a second wiring of its own on every fighter that carries a tree.</summary>
+        public PassiveTreeService(IPassiveTreeProvider provider, IConditionProvider conditions)
+        {
+            _provider = provider;
+            _source = new PassiveTreeParameterSource(conditions);
+            _context = new PassiveTreeContextSource(conditions);
+            _context.OwnerChanged += _source.Follow;
+        }
 
         public event Action? AllocationChanged;
 
@@ -120,7 +134,7 @@ namespace Core.PassiveTree.Allocation
         /// </summary>
         private PassiveTreeDocument SyncedTree()
         {
-            PassiveTreeDocument tree = provider.Tree;
+            PassiveTreeDocument tree = _provider.Tree;
             if (ReferenceEquals(tree, _synced)) return tree;
             if (tree.IsEmpty) return _synced ?? tree;
 

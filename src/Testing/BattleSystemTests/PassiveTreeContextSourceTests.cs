@@ -141,6 +141,21 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void TheModifierAKnobStandsBehind_ReadsTheTotalTheWayThePipelineDoes()
+        {
+            // The seam between the knob and the answer above it. A knob handing over the raw sum would
+            // grant the same two turns in a fight — the binding floors what it reads either way — so
+            // nothing in a battle would ever show it; what it would quietly change is every reading of
+            // what the build is worth, which is the one place the fraction is visible.
+            IPassiveTreeService service = Allocation(5, ContextParameter.BleedDuration, ModifierValueType.Flat, 0.5f);
+
+            Assert.AreEqual(2f, service.ContextSource.ValueOf(ContextParameter.BleedDuration), Tolerance,
+                "the knob's modifier reads the bare sum — 2.5 turns of bleed no pipeline will ever grant");
+            Assert.AreEqual(0f, service.ContextSource.ValueOf(ContextParameter.HealingEfficiency), Tolerance,
+                "a knob the allocation feeds nothing to answered with something");
+        }
+
+        [TestMethod]
         public void RefundingShrinksTheTotal_AndTheLastRefundTakesTheKnobAway()
         {
             IPassiveTreeService service = Allocation(3, ContextParameter.HealingEfficiency, ModifierValueType.Increase, 0.1f);
@@ -162,7 +177,7 @@ namespace LastBreathTest.BattleSystemTests
         public void ANodeTakenAfterTheFighterWasWired_ReachesItWithoutBeingReAttached()
         {
             var service = new PassiveTreeService(new TreeProviderStub(
-                Chain(ContextParameter.HealingEfficiency, 0.5f, Buckets(1, ModifierValueType.Increase))));
+                Chain(ContextParameter.HealingEfficiency, 0.5f, Buckets(1, ModifierValueType.Increase))), ConditionCatalogs.Empty());
             service.SetTotalPoints(1);
             IFightable fighter = Fighter();
 
@@ -284,7 +299,7 @@ namespace LastBreathTest.BattleSystemTests
         /// in several buckets at once.</summary>
         private static IPassiveTreeService Allocation(ContextParameter parameter, float value, IReadOnlyList<ModifierValueType> buckets)
         {
-            var service = new PassiveTreeService(new TreeProviderStub(Chain(parameter, value, buckets)));
+            var service = new PassiveTreeService(new TreeProviderStub(Chain(parameter, value, buckets)), ConditionCatalogs.Empty());
             service.SetTotalPoints(buckets.Count);
 
             for (int index = 1; index <= buckets.Count; index++)

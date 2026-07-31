@@ -98,6 +98,30 @@ namespace PassiveTreeEditor.Source.View
         public static OptionButton Picker<T>(T current, Action<T> apply) where T : struct, Enum =>
             Picker(Enum.GetValues<T>(), current, apply);
 
+        /// <summary>
+        /// Dropdown over a catalog of ids, with an explicit "no value" entry first. Typing is not
+        /// offered: an id is a reference into a catalog, so the catalog is the whole of what may be
+        /// picked — an id written by hand is a reference to nothing, and nothing here can tell the author
+        /// so. An id already on the data that the catalog does not hold stays selectable all the same:
+        /// the tool never silently rewrites what it does not understand, it only refuses to invent more.
+        /// </summary>
+        public static OptionButton IdPicker(IEnumerable<string> catalog, string current, Action<string> apply, string emptyLabel = "—")
+        {
+            var picker = new OptionButton { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
+            List<string> ids = [string.Empty, .. catalog];
+
+            if (current.Length > 0 && !ids.Contains(current)) ids.Add(current);
+
+            for (int index = 0; index < ids.Count; index++)
+            {
+                picker.AddItem(ids[index].Length == 0 ? emptyLabel : ids[index], index);
+                if (ids[index] == current) picker.Selected = index;
+            }
+
+            picker.ItemSelected += index => apply(ids[picker.GetItemId((int)index)]);
+            return picker;
+        }
+
         /// <summary>The same dropdown plus an explicit "no value" entry, for a member that is
         /// optional rather than defaulted.</summary>
         public static OptionButton OptionalPicker<T>(T? current, Action<T?> apply, string emptyLabel = "—")

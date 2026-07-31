@@ -446,7 +446,7 @@
                     "parameter": "Evade",
                     "valueType": "Flat",
                     "value": 500.0,
-                    "condition": "Until getting an attack"
+                    "condition": "Health_Full"
                 },
                 {
                     "parameter": "Evade",

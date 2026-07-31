@@ -143,7 +143,7 @@ namespace LastBreathTest.BattleSystemTests
             // source, so taking the source off has to take the whole contribution with it — and leave
             // the allocation itself alone, because the character did not sell anything back.
             var fighter = new Fighter();
-            var service = new PassiveTreeService(new TreeProviderStub(SyntheticTree()));
+            var service = new PassiveTreeService(new TreeProviderStub(SyntheticTree()), ConditionCatalogs.Empty());
             service.SetTotalPoints(1);
             fighter.Modifiers.RegisterSource(service.ParameterSource);
             fighter.Parameters.SetBaseValueForParameter(EntityParameter.Strength, BaseStrength);
@@ -161,7 +161,7 @@ namespace LastBreathTest.BattleSystemTests
         public void TheTreeSourceIsIdempotent_ASecondRegistrationDoesNotDoubleTheNode()
         {
             var fighter = new Fighter();
-            var service = new PassiveTreeService(new TreeProviderStub(SyntheticTree()));
+            var service = new PassiveTreeService(new TreeProviderStub(SyntheticTree()), ConditionCatalogs.Empty());
             service.SetTotalPoints(1);
             fighter.Parameters.SetBaseValueForParameter(EntityParameter.Strength, BaseStrength);
 

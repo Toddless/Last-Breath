@@ -4,6 +4,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Modifiers;
+    using Core.Modifiers.Conditions;
     using Core.PassiveTree;
     using Core.PassiveTree.Allocation;
     using Core.Save;
@@ -28,6 +29,11 @@ namespace LastBreathTest.BattleSystemTests
         private const float ChainStrengthPerNode = 2f;
 
         private const float BaseStrength = 10f;
+
+        /// <summary>Flat Strength carried by the one gated line the fixtures below hang on a node.</summary>
+        private const float ConditionalGrant = 4f;
+
+        private const float CarrierHealth = 100f;
 
         [TestMethod]
         public void TakingANode_RaisesTheParameter_AndRefundingReturnsItExactly()
@@ -81,11 +87,21 @@ namespace LastBreathTest.BattleSystemTests
 
             service.Take(FirstNode);
 
-            Assert.IsFalse(fighter.Modifiers.EntityModifiers.Values.SelectMany(lines => lines)
-                    .Any(modifier => modifier.Source == PassiveTreeDocument.ModifierSource),
-                "the tree wrote into the entity's own modifier list — that is the double-count channel");
+            AssertNothingOfTheTreeIsOwnedBy(fighter.Modifiers);
             Assert.AreEqual(1, TreeLinesFor(fighter, EntityParameter.Strength),
                 "one taken node with one Strength line must resolve to exactly one modifier");
+
+            // The conditional line is the one with a second way in: its predicate has to be pointed at the
+            // fighter, and the call that does that sits beside the one that also writes the modifier into
+            // his list. Taken together the line lands twice — once where he pulls it from, once where he
+            // keeps his own — and the copy he keeps is the one a respec cannot reach.
+            ConditionOwner carrier = WoundedCarrier(out IPassiveTreeService gated);
+
+            Assert.AreEqual(AllocationResult.Success, gated.Take(SyntheticNode));
+
+            AssertNothingOfTheTreeIsOwnedBy(carrier.ParameterModifiers);
+            Assert.AreEqual(BaseStrength + ConditionalGrant, carrier.Parameters.GetValueForParameter(EntityParameter.Strength), 0f,
+                "the armed line reached the character by a second route as well as through the source");
         }
 
         [TestMethod]
@@ -231,7 +247,7 @@ namespace LastBreathTest.BattleSystemTests
             // answered before the document was adopted would report an empty allocation — and a
             // capture would write an empty section over a real one.
             var provider = new TreeProviderStub(SyntheticTree());
-            var service = new PassiveTreeService(provider);
+            var service = new PassiveTreeService(provider, ConditionCatalogs.Empty());
             service.SetTotalPoints(1);
 
             Assert.IsTrue(service.TakenNodes.Contains(SyntheticSeed), "TakenNodes answered before the document was adopted");
@@ -333,7 +349,7 @@ namespace LastBreathTest.BattleSystemTests
             {
                 Parameter = EntityParameter.Strength, ValueType = ModifierValueType.Flat, Value = nodeStrength
             }));
-            var service = new PassiveTreeService(provider);
+            var service = new PassiveTreeService(provider, ConditionCatalogs.Empty());
             fighter.Modifiers.RegisterSource(service.ParameterSource);
             fighter.Parameters.SetBaseValueForParameter(EntityParameter.Strength, BaseStrength);
             service.SetTotalPoints(1);
@@ -365,6 +381,35 @@ namespace LastBreathTest.BattleSystemTests
         private static int TreeLinesFor(Fighter fighter, EntityParameter parameter) =>
             fighter.Modifiers.GetModifiers(parameter).Count(modifier => modifier.Source == PassiveTreeDocument.ModifierSource);
 
+        private static void AssertNothingOfTheTreeIsOwnedBy(IParameterModifiersComponent modifiers) =>
+            Assert.IsFalse(modifiers.EntityModifiers.Values.SelectMany(lines => lines)
+                    .Any(modifier => modifier.Source == PassiveTreeDocument.ModifierSource),
+                "the tree wrote into the entity's own modifier list — that is the double-count channel");
+
+        /// <summary>A fighter whose state already answers the predicate, wired to a tree whose one
+        /// purchasable node carries a line gated on it. Wired the way a player is: the parametric half is
+        /// registered, the context half is handed over, and it is the hand-over that tells the predicates
+        /// whom to read.</summary>
+        private static ConditionOwner WoundedCarrier(out IPassiveTreeService service)
+        {
+            service = Service(SyntheticTree(new ModifierLine
+            {
+                Parameter = EntityParameter.Strength,
+                ValueType = ModifierValueType.Flat,
+                Value = ConditionalGrant,
+                Condition = ConditionCatalogs.WhileWounded
+            }), points: 1, ConditionCatalogs.Wounded());
+
+            var carrier = new ConditionOwner();
+            carrier.SetMaximum(EntityParameter.Health, CarrierHealth);
+            carrier.CurrentHealth = CarrierHealth * (ConditionCatalogs.WoundedShare - 0.1f);
+            carrier.Parameters.SetBaseValueForParameter(EntityParameter.Strength, BaseStrength);
+            carrier.ParameterModifiers.RegisterSource(service.ParameterSource);
+            service.ContextSource.Attach(carrier);
+
+            return carrier;
+        }
+
         private static IPassiveTreeService ShippedService(int points) => Service(ShippedTree(), points);
 
         private static IPassiveTreeService SyntheticService(int points, params ModifierLine[] lines) =>
@@ -390,9 +435,12 @@ namespace LastBreathTest.BattleSystemTests
             return document;
         }
 
-        private static IPassiveTreeService Service(PassiveTreeDocument document, int points)
+        private static IPassiveTreeService Service(PassiveTreeDocument document, int points) =>
+            Service(document, points, ConditionCatalogs.Empty());
+
+        private static IPassiveTreeService Service(PassiveTreeDocument document, int points, ConditionProvider conditions)
         {
-            var service = new PassiveTreeService(new TreeProviderStub(document));
+            var service = new PassiveTreeService(new TreeProviderStub(document), conditions);
             service.SetTotalPoints(points);
             return service;
         }

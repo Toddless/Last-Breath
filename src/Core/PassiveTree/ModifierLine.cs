@@ -16,9 +16,10 @@ namespace Core.PassiveTree
         public float Value { get; set; }
 
         /// <summary>
-        /// Free text describing when the line applies; empty means always. Nothing evaluates it yet —
-        /// readers that have no battle state (the editor's summator) count conditional lines as if
-        /// they were always on and flag the total.
+        /// Id of the predicate that gates the line, from the Conditions catalog; empty means the line
+        /// always applies. A reader with a fighter to answer it against resolves the id and counts the
+        /// line only while it holds; one without battle state (the editor's summator) counts conditional
+        /// lines as if they were always on and flags the total.
         /// </summary>
         public string Condition { get; set; } = string.Empty;
 

@@ -257,7 +257,9 @@
             return (sumAdditions * sumIncreases) * sumMultiplicative;
         }
 
-        /// <summary>Conditional modifiers stay in the list permanently and are skipped while their condition is off.</summary>
+        /// <summary>A conditional modifier is skipped while its condition is off instead of being taken
+        /// away — wherever the resolver reached it from, the entity's own list or a source it pulls from.
+        /// A flip is a recalculation and never a rewiring.</summary>
         private static bool IsModifierActive(IModifier modifier) => modifier is not IConditionalModifier { IsActive: false };
     }
 }

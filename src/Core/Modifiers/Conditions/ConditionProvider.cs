@@ -22,7 +22,16 @@ namespace Core.Modifiers.Conditions
         /// settles the duplicate check below, so one id can never become two definitions.</summary>
         private readonly Dictionary<string, ICondition> _conditions = new(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>The same ids in a settled order, ordered once per file read rather than once per
+        /// reader: an inspector asks for the pick list on every line it draws.</summary>
+        private readonly List<string> _ids = [];
+
         public IReadOnlyList<string> Catalogs => [DataCatalog.Conditions];
+
+        /// <summary>Every id the catalog answers to, in a stable order — the pick list of an authoring
+        /// tool. Only definitions that were actually built are in it, so a tool offering these cannot
+        /// hand a line an id the game will refuse.</summary>
+        public IReadOnlyList<string> Ids => _ids;
 
         public void Apply(string catalog, GameDataFile file)
         {
@@ -32,6 +41,10 @@ namespace Core.Modifiers.Conditions
 
             foreach (var entry in entries)
                 Read(entry, file.FileName);
+
+            _ids.Clear();
+            _ids.AddRange(_conditions.Keys);
+            _ids.Sort(StringComparer.OrdinalIgnoreCase);
         }
 
         public bool TryResolve(string? id, out ICondition? condition)

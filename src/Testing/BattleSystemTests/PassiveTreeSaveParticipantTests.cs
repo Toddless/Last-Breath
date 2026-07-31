@@ -188,7 +188,7 @@ namespace LastBreathTest.BattleSystemTests
         public void ATreeThatFailedToLoad_IsNotCapturedAsAnEmptySection()
         {
             var provider = new TreeProviderStub(Chain(First));
-            var tree = new PassiveTreeService(provider);
+            var tree = new PassiveTreeService(provider, ConditionCatalogs.Empty());
             tree.SetTotalPoints(5);
             tree.Take(First);
 
@@ -207,7 +207,7 @@ namespace LastBreathTest.BattleSystemTests
             // The file parses, the tree does not: nothing exists to check the saved ids against. They
             // are held as they stand so the next capture writes back what the file carried; the check
             // happens on the first document that does load.
-            var tree = new PassiveTreeService(new TreeProviderStub(new PassiveTreeDocument()));
+            var tree = new PassiveTreeService(new TreeProviderStub(new PassiveTreeDocument()), ConditionCatalogs.Empty());
             var participant = new PassiveTreeSaveParticipant(tree);
 
             participant.Restore(JToken.FromObject(new PassiveTreeSaveData { Allocated = [Seed, First] }), savedVersion: 1);
@@ -242,7 +242,7 @@ namespace LastBreathTest.BattleSystemTests
 
         private static IPassiveTreeService ServiceOn(PassiveTreeDocument document, int points)
         {
-            var service = new PassiveTreeService(new TreeProviderStub(document));
+            var service = new PassiveTreeService(new TreeProviderStub(document), ConditionCatalogs.Empty());
             service.SetTotalPoints(points);
             return service;
         }
