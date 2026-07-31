@@ -19,8 +19,10 @@ namespace Core.Save
         /// </summary>
         SaveFile Capture(SaveMetadata metadata, SaveFile? previous = null);
 
-        /// <summary>Applies the file inside a load scope, participants ordered by RestoreOrder.
-        /// Missing sections are skipped; failing ones are reported and skipped.</summary>
+        /// <summary>Resets the session to its fresh-game state, then applies the file inside a load
+        /// scope, participants ordered by RestoreOrder. The reset is the baseline the sections are
+        /// deltas on: a section the file does not carry leaves the fresh value standing, not the state
+        /// of the file loaded before it. Failing sections are reported and skipped.</summary>
         void Restore(SaveFile file);
     }
 }

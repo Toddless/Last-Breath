@@ -69,7 +69,7 @@ namespace Core.PassiveTree.Allocation
         public void RestoreState(IReadOnlyCollection<string> takenNodes)
         {
             PassiveTreeDocument tree = SyncedTree();
-            if (tree.Nodes.Count == 0)
+            if (tree.IsEmpty)
             {
                 // Nothing to check the set against. It is held as it stands rather than dropped, so
                 // the next capture writes back what the file carried instead of an empty section —
@@ -117,7 +117,7 @@ namespace Core.PassiveTree.Allocation
         {
             PassiveTreeDocument tree = provider.Tree;
             if (ReferenceEquals(tree, _synced)) return tree;
-            if (tree.Nodes.Count == 0) return _synced ?? tree;
+            if (tree.IsEmpty) return _synced ?? tree;
 
             _synced = tree;
             _allocation.Resync(tree);

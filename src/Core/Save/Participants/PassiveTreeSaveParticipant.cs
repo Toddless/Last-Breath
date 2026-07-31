@@ -42,7 +42,7 @@ namespace Core.Save.Participants
         /// it until a document arrives to check it.</summary>
         private List<string> KnownNodes(IReadOnlyCollection<string> saved)
         {
-            if (tree.Tree.Nodes.Count == 0) return [.. saved];
+            if (tree.Tree.IsEmpty) return [.. saved];
 
             List<string> known = new(saved.Count);
 

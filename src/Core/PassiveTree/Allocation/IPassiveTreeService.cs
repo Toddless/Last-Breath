@@ -51,8 +51,10 @@ namespace Core.PassiveTree.Allocation
         /// <summary>Replaces the whole allocation with a saved one. Wholesale rather than node by
         /// node: a set replayed through purchases would depend on the order it was written in. The
         /// set is re-checked against the current tree, so nodes that stopped existing or stopped
-        /// being connected do not come back. Points are not part of it — the granted total belongs
-        /// to mastery and is restored before this.</summary>
+        /// being connected do not come back — unless there is no tree to check against
+        /// (<see cref="PassiveTreeDocument.IsEmpty"/>), in which case the set is held as it stands
+        /// until a document loads. Points are not part of it — the granted total belongs to mastery
+        /// and is restored before this.</summary>
         void RestoreState(IReadOnlyCollection<string> takenNodes);
     }
 }

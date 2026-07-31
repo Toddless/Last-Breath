@@ -23,6 +23,11 @@ namespace Core.PassiveTree
 
         public IReadOnlyList<PassiveNode> Nodes => _nodes;
 
+        /// <summary>No content at all: what the provider holds before the catalog is read and what the
+        /// reader hands out for a file that failed to parse. An allocation cannot be checked against
+        /// such a document — there is nothing for its ids to be missing from.</summary>
+        public bool IsEmpty => _nodes.Count == 0;
+
         public IReadOnlyCollection<NodeLink> Links => _links;
 
         /// <summary>The spatial grid, rebuilt on first use after a change. Lazy on purpose: loading a

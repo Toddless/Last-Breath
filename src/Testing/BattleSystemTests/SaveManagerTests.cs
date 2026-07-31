@@ -1,6 +1,18 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using Battle.Source;
+    using Core.Ai.World.Time;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Entity;
+    using Core.Items.Grants;
+    using Core.MessageBus;
+    using Core.Reputation;
     using Core.Save;
+    using Core.Services;
+    using Core.Session;
+    using Microsoft.Extensions.DependencyInjection;
+    using Moq;
     using Newtonsoft.Json.Linq;
 
     [TestClass]
@@ -168,6 +180,85 @@ namespace LastBreathTest.BattleSystemTests
             var file = _manager.Capture(new SaveMetadata());
 
             Assert.AreEqual(0, file.Sections.Count);
+        }
+
+        [TestMethod]
+        public void RestoreStartsFromTheFreshSessionState()
+        {
+            var order = new List<string>();
+            bool loadingDuringSection = false;
+            var manager = new SaveManager(_loadScope, () => SessionResetting(() => order.Add("reset")));
+            manager.Register(new FakeParticipant("mastery")
+            {
+                OnRestore = _ =>
+                {
+                    order.Add("mastery");
+                    loadingDuringSection = _loadScope.IsLoading;
+                }
+            });
+
+            manager.Restore(FileWithSections("mastery"));
+
+            CollectionAssert.AreEqual(new[] { "reset", "mastery" }, order,
+                "the sections are deltas on the fresh session, so the reset has to come first");
+            Assert.IsTrue(loadingDuringSection, "the reset's own load scope closed the restore's");
+        }
+
+        [TestMethod]
+        public void AFileFromTheFutureIsRejectedBeforeTheSessionIsTouched()
+        {
+            bool reset = false;
+            var manager = new SaveManager(_loadScope, () => SessionResetting(() => reset = true));
+
+            Assert.ThrowsException<InvalidOperationException>(() =>
+                manager.Restore(new SaveFile { FormatVersion = SaveFile.CurrentFormatVersion + 1 }));
+
+            Assert.IsFalse(reset, "a file the game refuses to read must not wipe the running playthrough");
+        }
+
+        [TestMethod]
+        public void AMissingSectionLandsOnTheFreshValueNotOnThePreviousFile()
+        {
+            // Mastery stands in for every service that holds its own state and outlives the scene.
+            // Without the reset the level of the file loaded before this one stays on the character —
+            // and the next save writes it into the file that never carried it.
+            var mastery = new MartialArtMastery(Mock.Of<IGameMessageBus>());
+            ISaveManager manager = SaveStackWith(mastery);
+            mastery.AddExperience(10_000);
+            Assert.IsTrue(mastery.CurrentLevel > 0, "the setup must actually level up");
+
+            manager.Restore(new SaveFile()); // a file written before the mastery section existed
+
+            Assert.AreEqual(0, mastery.CurrentLevel);
+            Assert.AreEqual(0, mastery.CurrentExperience);
+        }
+
+        /// <summary>A reset service holding one participant, standing in for the whole list.</summary>
+        private ISessionResetService SessionResetting(Action onReset)
+        {
+            var service = new SessionResetService(_loadScope);
+            var participant = new Mock<ISessionResettable>();
+            participant.Setup(resettable => resettable.ResetSession()).Callback(onReset);
+            service.Register(participant.Object);
+            return service;
+        }
+
+        /// <summary>The save stack and the session reset exactly as a project composes them: no
+        /// stand-in for the wiring that has to hand the manager its reset service.</summary>
+        private static ISaveManager SaveStackWith(IMartialArtMastery mastery)
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton(mastery);
+            services.AddSingleton(Mock.Of<IWorldClock>());
+            services.AddSingleton(Mock.Of<IFactionRelationService>());
+            services.AddSingleton(Mock.Of<IPlayerAccessor>());
+            services.AddSingleton(Mock.Of<IAbilityProvider>());
+            services.AddSingleton(Mock.Of<IGrantFactory>());
+            services.AddSingleton(Mock.Of<ISpawnPointRegistry>(registry => registry.All == new List<IPersistentSpawnPoint>()));
+            services.AddSaveSystem();
+            services.AddSessionReset();
+
+            return services.BuildServiceProvider().GetRequiredService<ISaveManager>();
         }
 
         private static SaveFile FileWithSections(params string[] sectionIds)

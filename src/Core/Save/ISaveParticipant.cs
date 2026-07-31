@@ -27,11 +27,14 @@ namespace Core.Save
 
         /// <summary>
         /// Applies "the file carries no section of mine" — a file written before the section existed,
-        /// or by a build that did not have it. Does nothing by default: a system whose state lives on
-        /// the objects other sections rebuild has nothing left to do. A system that holds its state
-        /// itself and outlives the scene (a singleton) overrides this to return to the fresh-game
-        /// state, because the alternative is the previous file's state silently surviving the file
-        /// that replaced it — and being written back into it by the next save.
+        /// or by a build that did not have it. Does nothing by default, and for most participants that
+        /// is the whole answer: the restore starts by resetting the session (see
+        /// <see cref="ISaveManager.Restore"/>), so a service registered as
+        /// <see cref="Session.ISessionResettable"/> is already back at its fresh-game value when the
+        /// section turns out to be missing.
+        /// Override it where the fresh-game state is NOT the session reset's to give — state owned by
+        /// the scene, which is built before the file is applied and cannot be rebuilt by resetting a
+        /// singleton.
         /// </summary>
         void RestoreMissingSection()
         {

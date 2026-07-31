@@ -36,7 +36,9 @@ namespace Core.Save
             services.AddSingleton(sp => new EquipItemSaveConverter(sp.GetRequiredService<IGrantFactory>()));
             services.AddSingleton<ISaveManager>(sp =>
             {
-                var manager = new SaveManager(sp.GetRequiredService<LoadScope>());
+                // The reset service is passed as a factory, not resolved here: it holds the save
+                // service, which holds this manager (see SaveManager).
+                var manager = new SaveManager(sp.GetRequiredService<LoadScope>(), sp.GetService<Session.ISessionResetService>);
                 manager.Register(new WorldClockSaveParticipant(sp.GetRequiredService<IWorldClock>()));
                 manager.Register(new FactionRelationsSaveParticipant(sp.GetRequiredService<IFactionRelationService>()));
                 // Optional like the npcWorld section: a project without the personal layer doesn't write it.

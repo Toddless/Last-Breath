@@ -3,8 +3,12 @@ namespace Core.Save
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Session;
 
-    public class SaveManager(LoadScope loadScope) : ISaveManager
+    /// <param name="sessionReset">Resolved lazily: the reset list holds the save service, which holds
+    /// this manager, so a direct dependency would close a DI cycle. Absent in a project that composes
+    /// the save stack without session reset.</param>
+    public class SaveManager(LoadScope loadScope, Func<ISessionResetService?>? sessionReset = null) : ISaveManager
     {
         private readonly List<ISaveParticipant> _participants = [];
 
@@ -41,6 +45,13 @@ namespace Core.Save
             if (file.FormatVersion > SaveFile.CurrentFormatVersion)
                 throw new InvalidOperationException(
                     $"Save format {file.FormatVersion} is newer than the supported {SaveFile.CurrentFormatVersion}.");
+
+            // A file is a whole playthrough, not a patch on the running one: every session-stateful
+            // singleton goes back to its fresh-game values before the first section lands. That is what
+            // makes a section the file does not carry mean "the default", instead of whatever the file
+            // loaded before it left in a service that outlives the scene. Runs before the scope opens —
+            // the reset carries a scope of its own and LoadScope does not nest.
+            sessionReset?.Invoke()?.ResetSession();
 
             using var _ = loadScope.Begin();
             foreach (var participant in _participants.OrderBy(p => p.RestoreOrder))

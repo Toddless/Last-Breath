@@ -96,7 +96,9 @@ namespace Core.Save
         {
             if (_pendingLoad == null) return;
             var file = _pendingLoad;
-            _pendingLoad = null; // cleared first: a throwing section must not re-apply forever
+            // Cleared first: a throwing section must not re-apply forever, and the restore opens with a
+            // session reset that reaches this service — the file has to be out of the field by then.
+            _pendingLoad = null;
             _manager.Restore(file);
         }
 
