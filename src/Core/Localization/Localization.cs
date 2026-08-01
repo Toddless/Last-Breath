@@ -44,6 +44,11 @@ namespace Core.Localization
 
         public static string Format<T>(T obj, TextFormat format) => obj == null ? string.Empty : Service.Format(obj, format);
 
+        /// <summary>A rendered line joined to the clause of the condition holding it up; unchanged when the
+        /// line names none.</summary>
+        public static string WithCondition(string line, string? conditionId, TextFormat format = TextFormat.Plain) =>
+            ConditionalLineText.Join(Service.Provider, line, conditionId, format);
+
         /// <summary>The roll spread of a materialized item line ("40–60") for the Alt reveal; null when fixed.</summary>
         public static string? FormatRolledRange(object line, TextFormat format = TextFormat.Plain) =>
             Service.FormatRolledRange(line, format);

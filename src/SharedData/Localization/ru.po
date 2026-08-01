@@ -453,6 +453,126 @@ msgstr ""
 msgid "Modifier_Multiplicative_Range"
 msgstr ""
 
+msgid "Modifier_Conditional"
+msgstr ""
+
+msgid "Condition_Health_Below_30"
+msgstr ""
+
+msgid "Condition_Health_Below_50"
+msgstr ""
+
+msgid "Condition_Health_Above_70"
+msgstr ""
+
+msgid "Condition_Mana_Below_30"
+msgstr ""
+
+msgid "Condition_Barrier_Below_50"
+msgstr ""
+
+msgid "Condition_Health_Full"
+msgstr ""
+
+msgid "Condition_Health_Wounded"
+msgstr ""
+
+msgid "Condition_Mana_Empty"
+msgstr ""
+
+msgid "Condition_Barrier_Holds"
+msgstr ""
+
+msgid "Condition_Barrier_Broken"
+msgstr ""
+
+msgid "Condition_Under_Control"
+msgstr ""
+
+msgid "Condition_Stunned_Or_Frozen"
+msgstr ""
+
+msgid "Condition_Damaged_Over_Turns"
+msgstr ""
+
+msgid "Condition_Clean_Of_Debuffs"
+msgstr ""
+
+msgid "Condition_Shielded"
+msgstr ""
+
+msgid "Condition_Two_Debuffs_Carried"
+msgstr ""
+
+msgid "Condition_Buffed"
+msgstr ""
+
+msgid "Condition_No_Effects_Carried"
+msgstr ""
+
+msgid "Condition_Frostbite_Three_Stacks"
+msgstr ""
+
+msgid "Condition_Stance_Dexterity"
+msgstr ""
+
+msgid "Condition_Stance_Strength"
+msgstr ""
+
+msgid "Condition_Stance_Intelligence"
+msgstr ""
+
+msgid "Condition_Target_Health_Below_30"
+msgstr ""
+
+msgid "Condition_Target_Health_Below_50"
+msgstr ""
+
+msgid "Condition_Target_Wounded"
+msgstr ""
+
+msgid "Condition_Target_Barrier_Below_50"
+msgstr ""
+
+msgid "Condition_Target_Under_Control"
+msgstr ""
+
+msgid "Condition_Target_Bleeding"
+msgstr ""
+
+msgid "Condition_Target_Poisoned"
+msgstr ""
+
+msgid "Condition_Target_Burning"
+msgstr ""
+
+msgid "Condition_Target_Damaged_Over_Turns"
+msgstr ""
+
+msgid "Condition_Target_Clean_Of_Debuffs"
+msgstr ""
+
+msgid "Condition_Turn_First_Attack"
+msgstr ""
+
+msgid "Condition_Turn_First_Ability"
+msgstr ""
+
+msgid "Condition_Turn_Second_Attack_Onwards"
+msgstr ""
+
+msgid "Condition_Turn_Undamaged"
+msgstr ""
+
+msgid "Condition_Turn_Unattacked"
+msgstr ""
+
+msgid "Condition_Battle_Before_Turn_4"
+msgstr ""
+
+msgid "Condition_Battle_From_Turn_5"
+msgstr ""
+
 msgid "Context_Modifier_HealingEfficiency_Range"
 msgstr ""
 

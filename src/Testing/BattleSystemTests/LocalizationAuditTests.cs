@@ -76,6 +76,8 @@ namespace LastBreathTest.BattleSystemTests
             ("AbilityUpgrades", NestedIds("Abilities", "abilities", "upgrades"), true),
             ("Npc", CatalogIds("Npc", "npcs"), false),
             ("NpcModifiers", NestedIds("NpcModifiers", "mods", "modifiers"), true),
+            // A condition is worded under a key derived from its id, not under the id itself
+            ("Conditions", CatalogIds("Conditions", "conditions").Select(Core.Localization.ConditionalLineText.ClauseKey).ToList(), false),
         ];
 
         private static List<string> CatalogIds(string catalog, string arrayProperty) =>

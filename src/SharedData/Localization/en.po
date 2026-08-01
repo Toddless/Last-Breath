@@ -1599,6 +1599,132 @@ msgstr "{min}–{max} increased {parameter}"
 msgid "Modifier_Multiplicative_Range"
 msgstr "{min}–{max} more {parameter}"
 
+# A line held up by a condition: {line} = the rendered line, {condition} = the clause below.
+
+msgid "Modifier_Conditional"
+msgstr "{line} {condition}"
+
+# ------------------------------
+# Condition clauses: keyed Condition_<id> after the Conditions catalog
+# ------------------------------
+
+msgid "Condition_Health_Below_30"
+msgstr "while below 30% health"
+
+msgid "Condition_Health_Below_50"
+msgstr "while below 50% health"
+
+msgid "Condition_Health_Above_70"
+msgstr "while above 70% health"
+
+msgid "Condition_Mana_Below_30"
+msgstr "while below 30% mana"
+
+msgid "Condition_Barrier_Below_50"
+msgstr "while your barrier is below 50%"
+
+msgid "Condition_Health_Full"
+msgstr "while at full health"
+
+msgid "Condition_Health_Wounded"
+msgstr "while wounded"
+
+msgid "Condition_Mana_Empty"
+msgstr "while out of mana"
+
+msgid "Condition_Barrier_Holds"
+msgstr "while your barrier holds"
+
+msgid "Condition_Barrier_Broken"
+msgstr "while your barrier is broken"
+
+msgid "Condition_Under_Control"
+msgstr "while controlled"
+
+msgid "Condition_Stunned_Or_Frozen"
+msgstr "while stunned or frozen"
+
+msgid "Condition_Damaged_Over_Turns"
+msgstr "while damaged over time"
+
+msgid "Condition_Clean_Of_Debuffs"
+msgstr "while free of debuffs"
+
+msgid "Condition_Shielded"
+msgstr "while shielded"
+
+msgid "Condition_Two_Debuffs_Carried"
+msgstr "while carrying two debuffs"
+
+msgid "Condition_Buffed"
+msgstr "while buffed"
+
+msgid "Condition_No_Effects_Carried"
+msgstr "while carrying no effects"
+
+msgid "Condition_Frostbite_Three_Stacks"
+msgstr "while carrying three stacks of frostbite"
+
+msgid "Condition_Stance_Dexterity"
+msgstr "while in the Dexterity stance"
+
+msgid "Condition_Stance_Strength"
+msgstr "while in the Strength stance"
+
+msgid "Condition_Stance_Intelligence"
+msgstr "while in the Intelligence stance"
+
+msgid "Condition_Target_Health_Below_30"
+msgstr "against a target below 30% health"
+
+msgid "Condition_Target_Health_Below_50"
+msgstr "against a target below 50% health"
+
+msgid "Condition_Target_Wounded"
+msgstr "against a wounded target"
+
+msgid "Condition_Target_Barrier_Below_50"
+msgstr "against a target whose barrier is below 50%"
+
+msgid "Condition_Target_Under_Control"
+msgstr "against a controlled target"
+
+msgid "Condition_Target_Bleeding"
+msgstr "against a bleeding target"
+
+msgid "Condition_Target_Poisoned"
+msgstr "against a poisoned target"
+
+msgid "Condition_Target_Burning"
+msgstr "against a burning target"
+
+msgid "Condition_Target_Damaged_Over_Turns"
+msgstr "against a target damaged over time"
+
+msgid "Condition_Target_Clean_Of_Debuffs"
+msgstr "against a target free of debuffs"
+
+msgid "Condition_Turn_First_Attack"
+msgstr "on your first attack of the turn"
+
+msgid "Condition_Turn_First_Ability"
+msgstr "on your first ability of the turn"
+
+msgid "Condition_Turn_Second_Attack_Onwards"
+msgstr "after your first attack of the turn"
+
+msgid "Condition_Turn_Undamaged"
+msgstr "while unharmed this turn"
+
+msgid "Condition_Turn_Unattacked"
+msgstr "until you are attacked this turn"
+
+msgid "Condition_Battle_Before_Turn_4"
+msgstr "during the first three turns of the fight"
+
+msgid "Condition_Battle_From_Turn_5"
+msgstr "from the fifth turn of the fight on"
+
 # ------------------------------
 # UI
 # ------------------------------

@@ -11,12 +11,14 @@ namespace Core.Localization
     /// target contract (the reroll path removes the whole group by that one id). RevealedText is the
     /// Alt-hold variant with each part's roll spread appended ("+47 Strength (40–60)"); null when no
     /// part of the row carries a range, so the caller can fall back to Text without branching.
-    /// Affix is the row's slot family (composite parts all carry the root's stamp) — the UI groups by it.</summary>
+    /// Affix is the row's slot family (composite parts all carry the root's stamp) — the UI groups by it.
+    /// A row held up by a condition carries the clause naming it in both texts, so a panel that only prints
+    /// what it is given still tells the player when the bonus counts.</summary>
     public sealed record EquipItemLine(string Text, string? RevealedText, string InstanceId, AffixKind Affix);
 
-    /// <summary>Builds tooltip/crafting display rows from an item's modifier lists. Grouping, ordering and
-    /// range decoration live here — in the formatter layer — so no UI ever touches GroupId/RolledRange
-    /// stamps directly and both panels show the same lines in the same order.</summary>
+    /// <summary>Builds tooltip/crafting display rows from an item's modifier lists. Grouping, ordering,
+    /// range decoration and the condition clause live here — in the formatter layer — so no UI ever touches
+    /// GroupId/RolledRange/ConditionId stamps directly and both panels show the same lines in the same order.</summary>
     public static class EquipItemLines
     {
         /// <summary>Implicit rows are the SPECIAL authored lines only — the piece's plain base stats
@@ -45,6 +47,12 @@ namespace Core.Localization
             _ => 2,
         };
 
+        /// <summary>One rendered contribution to a row: an entity modifier or a context entry, already
+        /// reduced to what the row needs — its text, its optional roll spread and the stamps that decide
+        /// which row it belongs to. Condition is the catalog id of the predicate holding the part up; a
+        /// context entry has no such stamp to give, so it comes in ungated.</summary>
+        private sealed record LinePart(string InstanceId, string? GroupId, AffixKind Affix, string? Condition, string Text, string? Range);
+
         private static List<EquipItemLine> Compose(
             IReadOnlyList<IModifierInstance> modifiers,
             IReadOnlyList<ContextModifierEntry> entries,
@@ -54,18 +62,20 @@ namespace Core.Localization
             // A composite may mix entity and context parts, so both channels flatten into one ordered
             // list before grouping; a group's row sits where its first part appears.
             var parts = modifiers
-                .Select(modifier => (
+                .Select(modifier => new LinePart(
                     modifier.InstanceId,
-                    GroupId: (modifier as SimpleModifier)?.GroupId,
-                    Affix: (modifier as SimpleModifier)?.Affix ?? AffixKind.None,
-                    Text: WithPreview(Localization.Format(modifier, format), modifier, previewValueScale, format),
-                    Range: Localization.FormatRolledRange(modifier, format)))
-                .Concat(entries.Select(entry => (
+                    (modifier as SimpleModifier)?.GroupId,
+                    (modifier as SimpleModifier)?.Affix ?? AffixKind.None,
+                    (modifier as SimpleModifier)?.ConditionId,
+                    WithPreview(Localization.Format(modifier, format), modifier, previewValueScale, format),
+                    Localization.FormatRolledRange(modifier, format)))
+                .Concat(entries.Select(entry => new LinePart(
                     entry.InstanceId,
                     entry.GroupId,
                     entry.Affix,
-                    Text: WithPreview(Localization.Format(entry, format), entry, previewValueScale, format),
-                    Range: Localization.FormatRolledRange(entry, format))))
+                    Condition: null,
+                    WithPreview(Localization.Format(entry, format), entry, previewValueScale, format),
+                    Localization.FormatRolledRange(entry, format))))
                 .ToList();
 
             var lines = new List<EquipItemLine>();
@@ -74,12 +84,12 @@ namespace Core.Localization
             {
                 if (part.GroupId == null)
                 {
-                    lines.Add(BuildLine([part]));
+                    lines.Add(BuildLine([part], format));
                     continue;
                 }
 
                 if (!emittedGroups.Add(part.GroupId)) continue;
-                lines.Add(BuildLine(parts.Where(candidate => candidate.GroupId == part.GroupId).ToList()));
+                lines.Add(BuildLine(parts.Where(candidate => candidate.GroupId == part.GroupId).ToList(), format));
             }
 
             return lines;
@@ -92,12 +102,19 @@ namespace Core.Localization
                 ? $"{text} {suffix}"
                 : text;
 
-        private static EquipItemLine BuildLine(List<(string InstanceId, string? GroupId, AffixKind Affix, string Text, string? Range)> parts)
+        /// <summary>The row's gate is read off its first part — the same part its id and family come from.
+        /// Every part of one composite carries the root's condition (the materializer stamps it on each), and
+        /// the entity channel flattens first, so the leading part is the one that can name it.</summary>
+        private static EquipItemLine BuildLine(List<LinePart> parts, TextFormat format)
         {
-            string text = string.Join(", ", parts.Select(part => part.Text));
+            string? condition = parts[0].Condition;
+            string text = Localization.WithCondition(string.Join(", ", parts.Select(part => part.Text)), condition, format);
             string? revealed = parts.All(part => part.Range == null)
                 ? null
-                : string.Join(", ", parts.Select(part => part.Range == null ? part.Text : $"{part.Text} ({part.Range})"));
+                : Localization.WithCondition(
+                    string.Join(", ", parts.Select(part => part.Range == null ? part.Text : $"{part.Text} ({part.Range})")),
+                    condition,
+                    format);
             return new EquipItemLine(text, revealed, parts[0].InstanceId, parts[0].Affix);
         }
     }
