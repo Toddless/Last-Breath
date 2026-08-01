@@ -45,6 +45,14 @@ namespace Core.Modifiers.Conditions
 
         protected abstract void Unsubscribe(IFightable owner);
 
+        /// <summary>Drops the live state a family holds beyond the owner, the cached answer and the
+        /// subscriptions this class already wipes for it. Called at both points the base wipes its own — a
+        /// fighter released, a clone handed out — so a family reading anything other than the owner names
+        /// its state once instead of at every point that has to forget it.</summary>
+        protected virtual void Forget()
+        {
+        }
+
         /// <summary>Re-reads the owner and publishes only real flips — a signal that does not move the
         /// predicate must not refresh the parameter. What is compared is the published answer, not the
         /// raw verdict: a subject appearing or vanishing moves the line without moving the verdict.</summary>
@@ -80,14 +88,15 @@ namespace Core.Modifiers.Conditions
             if (Owner == null) return;
 
             Unsubscribe(Owner);
+            Forget();
             Owner = null;
             _state = false;
             _met = false;
         }
 
         /// <summary>A field-by-field clone with the live part wiped: no owner, no subscribers, no cached
-        /// answer. Every predicate here is described by immutable parameters, so the clone needs no
-        /// per-class copy code.</summary>
+        /// answer and nothing a family added on top (<see cref="Forget"/>). What is left is the record the
+        /// predicate was built from, which is immutable, so the clone needs no per-class copy code.</summary>
         public ICondition Copy()
         {
             var copy = (OwnerCondition)MemberwiseClone();
@@ -95,6 +104,7 @@ namespace Core.Modifiers.Conditions
             copy.Owner = null;
             copy._state = false;
             copy._met = false;
+            copy.Forget();
             return copy;
         }
     }

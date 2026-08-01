@@ -1,7 +1,11 @@
 namespace Core.Modifiers.Conditions
 {
     /// <summary>Discriminators matched against the record's "type" property. A new predicate adds a
-    /// name here and a factory class — no consumer parses the record itself.</summary>
+    /// name here and a factory class — no consumer parses the record itself.
+    /// <para>The names starting with Target are read about the fighter the owner is hitting rather than
+    /// about the owner; everything else about the owner. Which of the two a record builds is the record's
+    /// business alone — a line carries an id and nothing more, so the two families share this list and the
+    /// one catalog behind it.</para></summary>
     public static class ConditionTypes
     {
         public const string ResourceThreshold = "ResourceThreshold";
@@ -9,6 +13,8 @@ namespace Core.Modifiers.Conditions
         public const string Status = "Status";
         public const string Effect = "Effect";
         public const string Stance = "Stance";
+        public const string TargetResourceThreshold = "TargetResourceThreshold";
+        public const string TargetStatus = "TargetStatus";
     }
 
     /// <summary>Property names of a condition record, in one place: the format spec the data follows.</summary>
@@ -32,8 +38,9 @@ namespace Core.Modifiers.Conditions
         /// of them.</summary>
         public const string Resource = "resource";
 
-        /// <summary>Threshold as a fraction of the resource maximum. Required; the top of the range is a
-        /// band below one, because a threshold releases its line a band above itself.</summary>
+        /// <summary>Threshold as a fraction of the resource maximum. Required; how much of the range is
+        /// usable is the type's own answer — the owner-side threshold stops a band below one because it
+        /// releases its line a band above itself, the target-side one takes the whole share.</summary>
         public const string Value = "value";
 
         /// <summary>Full or Empty; required.</summary>

@@ -127,6 +127,61 @@
             "id": "Stance_Intelligence",
             "type": "Stance",
             "stance": "Intelligence"
+        },
+        {
+            "id": "Target_Health_Below_30",
+            "type": "TargetResourceThreshold",
+            "resource": "Health",
+            "value": 0.3
+        },
+        {
+            "id": "Target_Health_Below_50",
+            "type": "TargetResourceThreshold",
+            "resource": "Health",
+            "value": 0.5
+        },
+        {
+            "id": "Target_Wounded",
+            "type": "TargetResourceThreshold",
+            "resource": "Health",
+            "value": 1.0
+        },
+        {
+            "id": "Target_Barrier_Below_50",
+            "type": "TargetResourceThreshold",
+            "resource": "Barrier",
+            "value": 0.5
+        },
+        {
+            "id": "Target_Under_Control",
+            "type": "TargetStatus",
+            "statuses": [ "Control" ]
+        },
+        {
+            "id": "Target_Bleeding",
+            "type": "TargetStatus",
+            "statuses": [ "Bleed" ]
+        },
+        {
+            "id": "Target_Poisoned",
+            "type": "TargetStatus",
+            "statuses": [ "Poison" ]
+        },
+        {
+            "id": "Target_Burning",
+            "type": "TargetStatus",
+            "statuses": [ "Burning" ]
+        },
+        {
+            "id": "Target_Damaged_Over_Turns",
+            "type": "TargetStatus",
+            "statuses": [ "DamageOverTime" ]
+        },
+        {
+            "id": "Target_Clean_Of_Debuffs",
+            "type": "TargetStatus",
+            "statuses": [ "Debuff" ],
+            "negate": true
         }
     ]
 }

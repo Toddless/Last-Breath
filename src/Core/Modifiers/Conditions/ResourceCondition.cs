@@ -50,15 +50,24 @@ namespace Core.Modifiers.Conditions
         /// no such vital. A fighter without a barrier holds no share of one, which is a different answer
         /// from holding none of it: "there is no barrier" is a boundary and belongs to
         /// <see cref="ResourceStateCondition"/>, which answers it as empty on purpose.</summary>
-        protected float? Fraction => Read() switch
-        {
-            (_, <= 0f) => null,
-            var (current, max) => current / max,
-        };
+        protected float? Fraction => Share(Read());
 
         /// <summary>The vitals this family can follow. A predicate takes one signal and reads one pair of
         /// values, so a record names exactly one of these and nothing else.</summary>
         public static IReadOnlyCollection<Costs> Followable => s_vitals.Keys;
+
+        /// <summary>The same reading of the same table, for the predicates whose subject is a fighter other
+        /// than their owner (<see cref="TargetCondition"/>). One table answers both, so "under a third of
+        /// his health" cannot come to mean two different things depending on which side of a hit is being
+        /// asked about. Null where there is no such vital to hold a share of — including for no fighter at
+        /// all, which is what a target-side predicate holds between attacks.</summary>
+        public static float? ShareOf(IFightable? fighter, Costs resource) =>
+            fighter != null && s_vitals.TryGetValue(resource, out var vital) ? Share(vital.Read(fighter)) : null;
+
+        /// <summary>The one rule turning a (current, maximum) pair into a share, so the two readings of the
+        /// table cannot disagree about a vital nobody has.</summary>
+        private static float? Share((float Current, float Max) reading) =>
+            reading.Max <= 0f ? null : reading.Current / reading.Max;
 
         /// <summary>The same gate the factory applies, held by the family itself: a predicate built from
         /// C# on a resource nothing follows would subscribe to nothing and answer from an empty pair

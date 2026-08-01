@@ -677,6 +677,8 @@ namespace LastBreathTest.BattleSystemTests
             yield return new StatusCondition(StatusMasks.Control);
             yield return new EffectCondition(EffectScope.Any, string.Empty, 1);
             yield return new StanceCondition(Stance.Strength);
+            yield return new TargetResourceThresholdCondition(Costs.Health, Threshold);
+            yield return new TargetStatusCondition(StatusMasks.Control);
         }
 
         /// <summary>One record of every shipped type — the format as a consumer writes it.</summary>
@@ -689,6 +691,8 @@ namespace LastBreathTest.BattleSystemTests
             yield return JObject.FromObject(new { type = ConditionTypes.Effect, scope = nameof(EffectScope.Shield) });
             yield return JObject.FromObject(new { type = ConditionTypes.Effect, scope = nameof(EffectScope.Stacks), effectId = EffectId, count = 3 });
             yield return JObject.FromObject(new { type = ConditionTypes.Stance, stance = nameof(Stance.Strength) });
+            yield return JObject.FromObject(new { type = ConditionTypes.TargetResourceThreshold, resource = nameof(Costs.Health), value = Threshold });
+            yield return JObject.FromObject(new { type = ConditionTypes.TargetStatus, statuses = new[] { nameof(StatusMasks.Control) } });
         }
 
         /// <summary>Fires every signal a condition can listen to, so a leaked subscription shows up

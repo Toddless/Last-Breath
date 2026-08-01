@@ -36,6 +36,8 @@ namespace Core.Modifiers.Conditions
             new StatusConditionFactory(),
             new EffectConditionFactory(),
             new StanceConditionFactory(),
+            new TargetResourceThresholdConditionFactory(),
+            new TargetStatusConditionFactory(),
         ];
 
         /// <summary>
