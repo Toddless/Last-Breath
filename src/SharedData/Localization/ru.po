@@ -3350,3 +3350,6 @@ msgstr ""
 
 msgid "UI_Inventory_Missing_Items"
 msgstr ""
+
+msgid "UI_Exhaustion"
+msgstr ""

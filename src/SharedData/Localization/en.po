@@ -3891,3 +3891,6 @@ msgstr "Backpack is full — {Item} is lost"
 
 msgid "UI_Inventory_Missing_Items"
 msgstr "Not enough {Item}"
+
+msgid "UI_Exhaustion"
+msgstr "Exhaustion ×{Stacks} — every ability costs +{Surcharge:%}"

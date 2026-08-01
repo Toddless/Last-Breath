@@ -16,6 +16,7 @@
     public partial class BattleHud : Control, IHud
     {
         private const string UID = "uid://6d0sr4hy4gg2";
+        private const string ExhaustionKey = "UI_Exhaustion";
         private static readonly Color s_queueCurrentColor = new(1f, 1f, 1f);
         private static readonly Color s_queueWaitingColor = new(1f, 1f, 1f, 0.45f);
         private IBattleEventBus? _battleEventBus;
@@ -32,6 +33,7 @@
         private static readonly float[] s_playbackSpeeds = [1f, 2f, 3f];
         private IAbilityBookComponent? _abilityBook;
         private Button? _endTurnButton, _fleeButton, _speedButton;
+        private Label? _exhaustionReadout;
         private int _speedIndex;
         private bool _isPlayerTurn, _isPresenting, _isSelectingTargets;
         [Export] private VBoxContainer? _buttonsContainer;
@@ -67,6 +69,7 @@
                 }
 
                 CreateTurnButtons();
+                CreateExhaustionReadout();
             }
             catch (Exception ex)
             {
@@ -92,6 +95,24 @@
             _speedButton.Pressed += CyclePlaybackSpeed;
             _speedButton.FocusMode = FocusModeEnum.None;
             _buttonsContainer?.AddChild(_speedButton);
+        }
+
+        /// <summary>
+        /// The exhaustion line, built into the turn-buttons container directly above the ability
+        /// row — the row it makes more expensive. It states the stack count and the surcharge those
+        /// stacks put on every cast, and stays hidden while there are none.
+        /// </summary>
+        private void CreateExhaustionReadout()
+        {
+            _exhaustionReadout = new Label
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                ThemeTypeVariation = "DimLabel",
+            };
+            _buttonsContainer?.AddChild(_exhaustionReadout);
+            if (_abilitySlots?.GetParent() == _buttonsContainer)
+                _buttonsContainer?.MoveChild(_exhaustionReadout, _abilitySlots.GetIndex());
+            ShowExhaustion(0, 0f);
         }
 
         private void CyclePlaybackSpeed()
@@ -154,6 +175,8 @@
             _battleEventBus.Subscribe<DamageTakenEvent>(OnDamageTakenReplayed);
             _battleEventBus.Subscribe<EntityHealedEvent>(OnHealedReplayed);
             _battleEventBus.Subscribe<AbilityActivatedEvent>(OnAbilityActivatedReplayed);
+            _battleEventBus.Subscribe<ExhaustionChangedEvent>(OnExhaustionChangedReplayed);
+            ShowExhaustion(0, 0f); // the readout belongs to one battle and starts it at zero
 
             // Max values change rarely (effects/level-ups) and stay live until a restore pipeline exists.
             // TODO:
@@ -188,6 +211,7 @@
             _battleEventBus.Unsubscribe<DamageTakenEvent>(OnDamageTakenReplayed);
             _battleEventBus.Unsubscribe<EntityHealedEvent>(OnHealedReplayed);
             _battleEventBus.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivatedReplayed);
+            _battleEventBus.Unsubscribe<ExhaustionChangedEvent>(OnExhaustionChangedReplayed);
             _battleEventBus.Unsubscribe<PlayerMaxManaChangesEvent>(OnPlayerMaxManaChanges);
             _battleEventBus.Unsubscribe<PlayerMaxHealthChanges>(OnPlayerMaxHealthChanges);
             _battleEventBus.Unsubscribe<EntityMaxHealthChangesEvent>(OnEntityMaxHealthChanges);
@@ -311,6 +335,24 @@
         private void OnHealedReplayed(EntityHealedEvent evnt) => UpdateVitals(evnt.Healed, evnt.Vitals);
 
         private void OnAbilityActivatedReplayed(AbilityActivatedEvent evnt) => UpdateVitals(evnt.Caster, evnt.Vitals);
+
+        /// <summary>Only the player's own count is on screen: the readout sits in his action column.</summary>
+        private void OnExhaustionChangedReplayed(ExhaustionChangedEvent evnt)
+        {
+            if (evnt.Fighter is IPlayer) ShowExhaustion(evnt.Stacks, evnt.Surcharge);
+        }
+
+        /// <summary>Both numbers come from the replayed snapshot: how many stacks are on the player
+        /// and what fraction they add to every ability cost. No stacks — no line.</summary>
+        private void ShowExhaustion(int stacks, float surcharge)
+        {
+            if (_exhaustionReadout == null) return;
+            _exhaustionReadout.Visible = stacks > 0;
+            if (stacks == 0) return;
+
+            _exhaustionReadout.Text = Core.Localization.Localization.Render(ExhaustionKey,
+                new Dictionary<string, object?> { ["Stacks"] = stacks, ["Surcharge"] = surcharge });
+        }
 
         /// <summary>Bars always show the snapshot, never live state — live state is "from the future" during replay.</summary>
         private void UpdateVitals(IFightable entity, VitalsSnapshot vitals)

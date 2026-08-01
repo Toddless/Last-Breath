@@ -105,6 +105,74 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void EveryChangeOfTheCountLeavesTheFighterAsAnEvent()
+        {
+            Combatant fighter = Wired();
+
+            fighter.Activate();
+            fighter.Activate();
+
+            ExhaustionChangedEvent[] reported = fighter.Bus.Published<ExhaustionChangedEvent>();
+            CollectionAssert.AreEqual(new[] { 1, 2 }, reported.Select(report => report.Stacks).ToArray(),
+                "the count changed without leaving the fighter — the interface has nothing to draw");
+            Assert.AreSame(fighter.Owner, reported[^1].Fighter, "the report has to name whose count it is");
+        }
+
+        [TestMethod]
+        public void TheReportedSurchargeIsTheOneTheCastIsCharged()
+        {
+            Combatant fighter = Wired();
+
+            fighter.Activate();
+            fighter.Activate();
+            fighter.Activate();
+
+            float reported = fighter.Bus.Published<ExhaustionChangedEvent>()[^1].Surcharge;
+            Assert.AreEqual(100f * (1f + reported), fighter.CostOf(100f), 0.0001f,
+                "the number on screen has to be the number the caster pays");
+        }
+
+        [TestMethod]
+        public void DecayAndBattleEndReportTheCountTheyLeaveBehind()
+        {
+            Combatant fighter = Wired();
+            for (int i = 0; i < 5; i++) fighter.Activate();
+
+            fighter.EndTurn();
+            fighter.EndBattle();
+
+            int[] reported = fighter.Bus.Published<ExhaustionChangedEvent>().Select(report => report.Stacks).ToArray();
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 5, 2, 0 }, reported,
+                "a count that fades away has to fade away on screen too");
+        }
+
+        [TestMethod]
+        public void ACountThatDidNotMoveIsSilent()
+        {
+            Combatant fighter = Wired();
+
+            fighter.EndTurn();
+            fighter.EndBattle();
+
+            Assert.AreEqual(0, fighter.Bus.Published<ExhaustionChangedEvent>().Length,
+                "an unexhausted fighter reported a change nobody made");
+        }
+
+        [TestMethod]
+        public void ADetachedCombatantStopsReportingItsCount()
+        {
+            Combatant fighter = Wired();
+            fighter.Activate();
+
+            ExhaustionGrant.Detach(fighter.Owner);
+            fighter.Bus.ClearPublished();
+            fighter.Activate();
+
+            Assert.AreEqual(0, fighter.Bus.Published<ExhaustionChangedEvent>().Length,
+                "a fighter taken off the field went on feeding the readout");
+        }
+
+        [TestMethod]
         public void MitigationDemandsAStream_SoNoHitRollsOnAnAnonymousGenerator()
         {
             ParameterInfo[] parameters = typeof(Calculations)
@@ -216,6 +284,10 @@ namespace LastBreathTest.BattleSystemTests
             public void Activate() =>
                 Bus.Publish(new AbilityActivatedEvent(Mock.Of<IAbility>(), Owner, default, "cast"));
 
+            public void EndTurn() => Bus.Publish(new TurnEndEvent());
+
+            public void EndBattle() => Bus.Publish(new BattleEndEvent(BattleResults.PlayerWon));
+
             public float CostOf(float cost)
             {
                 IAbilityActivationContext context = new AbilityActivationContext
@@ -233,17 +305,24 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>Dispatches like the real bus and, unlike it, answers what is still subscribed —
-        /// a lambda subscription is invisible from the outside otherwise.</summary>
+        /// a lambda subscription is invisible from the outside otherwise — and what has been
+        /// published on it, which is what the timeline records and the replay later shows.</summary>
         private sealed class RecordingBus : ICombatEventBus
         {
             private readonly List<(Type Event, object Handler)> _handlers = [];
+            private readonly List<ICombatEvent> _published = [];
 
             public int HandlerCount => _handlers.Count;
 
             public Type[] SubscribedEvents => _handlers.Select(entry => entry.Event).ToArray();
 
+            public T[] Published<T>() where T : ICombatEvent => _published.OfType<T>().ToArray();
+
+            public void ClearPublished() => _published.Clear();
+
             public void Publish<T>(T evnt) where T : ICombatEvent
             {
+                _published.Add(evnt);
                 foreach ((Type type, object handler) in _handlers.ToArray())
                     if (type == typeof(T)) ((Action<T>)handler).Invoke(evnt);
             }

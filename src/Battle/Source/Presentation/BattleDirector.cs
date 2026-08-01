@@ -557,6 +557,9 @@ namespace Battle.Source.Presentation
                 case AbilityStageActivatedEvent stage when !IsShownDead(stage.Caster):
                     Republish(stage);
                     break;
+                case ExhaustionChangedEvent exhaustion when !IsShownDead(exhaustion.Fighter):
+                    Republish(exhaustion);
+                    break;
             }
         }
 
@@ -654,6 +657,7 @@ namespace Battle.Source.Presentation
             AttackBlockedEvent blocked => IsShownDead(blocked.Context.Attacker),
             EffectAppliedEvent applied => IsShownDead(applied.Target),
             AbilityStageActivatedEvent stage => IsShownDead(stage.Caster),
+            ExhaustionChangedEvent exhaustion => IsShownDead(exhaustion.Fighter),
             _ => false,
         };
 
@@ -668,6 +672,7 @@ namespace Battle.Source.Presentation
             [typeof(AttackBlockedEvent)] = evnt => RepublishBeat((AttackBlockedEvent)evnt),
             [typeof(EffectAppliedEvent)] = evnt => RepublishBeat((EffectAppliedEvent)evnt),
             [typeof(AbilityStageActivatedEvent)] = evnt => RepublishBeat((AbilityStageActivatedEvent)evnt),
+            [typeof(ExhaustionChangedEvent)] = evnt => RepublishBeat((ExhaustionChangedEvent)evnt),
             // Deaths outside a damage beat (Incineration's Kill): the corpse must still fall on screen.
             // No republish — the battle bus received the event at resolve time.
             [typeof(EntityDiedEvent)] = evnt => PlayEntityDied((EntityDiedEvent)evnt),
