@@ -33,7 +33,11 @@ namespace Core.Save
             services.TryAddSingleton<LoadScope>();
             services.TryAddSingleton<ILoadScope>(sp => sp.GetRequiredService<LoadScope>());
             services.AddSingleton<ISaveStorage>(_ => new SaveStorage(ProjectSettings.GlobalizePath("user://saves")));
-            services.AddSingleton(sp => new EquipItemSaveConverter(sp.GetRequiredService<IGrantFactory>()));
+            // The condition catalog is optional the way it is everywhere a line is built: a project that
+            // loads no data able to name conditions holds none, and a stored line naming one says so.
+            services.AddSingleton(sp => new EquipItemSaveConverter(
+                sp.GetRequiredService<IGrantFactory>(),
+                sp.GetService<Modifiers.Conditions.IConditionProvider>()));
             services.AddSingleton<ISaveManager>(sp =>
             {
                 // The reset service is passed as a factory, not resolved here: it holds the save

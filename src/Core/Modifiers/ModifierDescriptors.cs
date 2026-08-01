@@ -19,6 +19,16 @@ namespace Core.Modifiers
         /// the same ore gives armor to a cuirass and damage to a blade). Null = serves any category.
         /// Enforced at pool assembly (<c>ForCategory</c>), not at parse.</summary>
         EquipmentCategory? OnlyFor { get; }
+
+        /// <summary>Catalog id of the predicate the line is held up by, or null when it always counts.
+        /// The id alone travels in data: a predicate holds the state of ONE owner, so it is built when the
+        /// entry is materialized into a line and never shared by the pool. It is also part of what makes
+        /// two entries the same line (see <see cref="LineIdentity"/>) — "+10% armor" and "+10% armor while
+        /// wounded" compete for different slots.
+        /// <para>Every kind carries it, including the kinds that cannot honour it (a grant, an operation, a
+        /// pipeline knob): the id is what the one gate — <c>LineConditions.WhyCannotBeHeldUp</c> — reads to
+        /// refuse such an entry out loud instead of letting it through with its gate quietly removed.</para></summary>
+        string? Condition { get; }
     }
 
     public sealed record ParameterDescriptor(EntityParameter Parameter, ModifierValueType ValueType, ValueRange Value, ModifierScope Scope) : IModifierDescriptor
@@ -27,6 +37,7 @@ namespace Core.Modifiers
         public AffixKind Affix { get; init; }
         public string? NameKey { get; init; }
         public EquipmentCategory? OnlyFor { get; init; }
+        public string? Condition { get; init; }
     }
 
     public sealed record ContextDescriptor(ContextParameter Parameter, ModifierValueType ValueType, ValueRange Value) : IModifierDescriptor
@@ -35,6 +46,7 @@ namespace Core.Modifiers
         public AffixKind Affix { get; init; }
         public string? NameKey { get; init; }
         public EquipmentCategory? OnlyFor { get; init; }
+        public string? Condition { get; init; }
     }
 
     // TODO:
@@ -48,6 +60,7 @@ namespace Core.Modifiers
         public AffixKind Affix { get; init; }
         public string? NameKey { get; init; }
         public EquipmentCategory? OnlyFor { get; init; }
+        public string? Condition { get; init; }
     }
 
     /// <summary>Rollable grant: behaviour no stat line can express ("ignores the first damage taken each turn")
@@ -60,6 +73,7 @@ namespace Core.Modifiers
         public AffixKind Affix { get; init; }
         public string? NameKey { get; init; }
         public EquipmentCategory? OnlyFor { get; init; }
+        public string? Condition { get; init; }
     }
 
     /// <summary>A weighted bundle rolled as one unit at creation; flattened to its atomic parts for reroll (1-for-1).
@@ -70,5 +84,6 @@ namespace Core.Modifiers
         public AffixKind Affix { get; init; }
         public string? NameKey { get; init; }
         public EquipmentCategory? OnlyFor { get; init; }
+        public string? Condition { get; init; }
     }
 }

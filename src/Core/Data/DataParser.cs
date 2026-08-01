@@ -214,7 +214,7 @@ namespace Core.Data
             foreach (var grantData in itemData.Grants)
             {
                 var kind = EnumParser.ParseEnum<GrantKind>(grantData.Kind);
-                grants.Add(new GrantBlueprint(kind, grantData.Id, LoadModifiers(grantData.Modifiers), grantData.Properties));
+                grants.Add(new GrantBlueprint(kind, grantData.Id, LoadModifiers(grantData.Modifiers, grantData.Id), grantData.Properties));
             }
 
             return grants;
@@ -312,16 +312,35 @@ namespace Core.Data
             return result;
         }
 
+        /// <summary>One entry of an item/pool list, gated by the single rule about conditions: whatever the
+        /// entry turns out to be, a predicate can only hold up a stat line, and a composite answers for its
+        /// WHOLE content. An entry that cannot honour the condition written on it is dropped entirely —
+        /// taking the condition and ignoring it would hand out ungated exactly what the data wrote a gate
+        /// for, and keeping only the parts that fit would put half an authored line on the item.</summary>
         private IModifierDescriptor? ToDescriptor(ItemModifier modifier, string context, AffixPolicy policy, EquipmentCategory? onlyFor = null)
         {
+            var descriptor = BuildDescriptor(modifier, context, policy, onlyFor);
+            if (descriptor?.Condition == null) return descriptor;
+            if (LineConditions.WhyCannotBeHeldUp(descriptor) is not { } refusal) return descriptor;
+
+            Tracker.TrackError($"Skipping modifier of '{context}' held up by condition '{descriptor.Condition}': {refusal}");
+            return null;
+        }
+
+        private IModifierDescriptor? BuildDescriptor(ItemModifier modifier, string context, AffixPolicy policy, EquipmentCategory? onlyFor)
+        {
             if (!TryParseAffix(modifier, context, policy, out var affix)) return null;
+
+            // Carried as written; whether the catalog holds it is answered where the line is built, so a
+            // catalog read after the pools cannot turn a conditional entry into an unconditional line.
+            string? condition = string.IsNullOrWhiteSpace(modifier.Condition) ? null : modifier.Condition.Trim();
 
             // "+Min..Max sharpening levels" — an item operation only the ascension gift applies.
             if (modifier.ExtraUpgradeLevels is { } levels)
             {
                 if (levels is { IsMalformed: false, Min: >= 1 } && levels.Max >= levels.Min)
                 {
-                    return new UpgradeLevelsDescriptor(levels.Min, levels.Max) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor };
+                    return new UpgradeLevelsDescriptor(levels.Min, levels.Max) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor, Condition = condition };
                 }
 
                 Tracker.TrackError($"Skipping modifier of '{context}': invalid extraUpgradeLevels range");
@@ -345,7 +364,7 @@ namespace Core.Data
                     return null;
                 }
 
-                return new GrantDescriptor(grantKind, grantData.Id, grantData.Properties) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor };
+                return new GrantDescriptor(grantKind, grantData.Id, grantData.Properties) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor, Condition = condition };
             }
 
             if (modifier.Parts.Count > 0)
@@ -353,13 +372,20 @@ namespace Core.Data
                 var parts = new List<IModifierDescriptor>();
                 foreach (var part in modifier.Parts)
                 {
-                    // The affix lives on the composite root only — a part carrying its own is a data error.
+                    // The affix and the condition live on the composite root only — a bundle is one line to
+                    // the player, and a part gated apart from its siblings is half a line nobody authored.
+                    if (!string.IsNullOrWhiteSpace(part.Condition))
+                    {
+                        Tracker.TrackError($"Skipping modifier of '{context}': condition '{part.Condition}' belongs on the composite, not on a part");
+                        return null;
+                    }
+
                     var partDescriptor = ToDescriptor(part, context, AffixPolicy.Forbidden);
                     if (partDescriptor == null) return null; // a bad part drops the whole composite
                     parts.Add(partDescriptor);
                 }
 
-                return new CompositeDescriptor(parts) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor };
+                return new CompositeDescriptor(parts) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor, Condition = condition };
             }
 
             ModifierValueType type;
@@ -386,7 +412,8 @@ namespace Core.Data
                     return null;
                 }
 
-                return new ParameterDescriptor(entityParameter, type, range, EnumParser.ParseEnumOrDefault<ModifierScope>(modifier.Scope)) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor };
+                return new ParameterDescriptor(entityParameter, type, range, EnumParser.ParseEnumOrDefault<ModifierScope>(modifier.Scope))
+                    { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor, Condition = condition };
             }
 
             if (EnumParser.TryParseEnum<ContextParameter>(modifier.Parameter, out var contextParameter))
@@ -402,7 +429,11 @@ namespace Core.Data
                     return null;
                 }
 
-                return new ContextDescriptor(contextParameter, type, range) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor };
+                // A pipeline line reaches a fighter as the entry itself and is handed on as the entry alone
+                // (item copy, reroll, save), with no room for a predicate to travel beside it — so a
+                // condition written on it is refused by the gate above, never dropped: the line would
+                // otherwise come back applying always.
+                return new ContextDescriptor(contextParameter, type, range) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor, Condition = condition };
             }
 
             Tracker.TrackError($"Skipping modifier of '{context}': '{modifier.Parameter}' is neither an EntityParameter nor a ContextParameter");
@@ -472,20 +503,25 @@ namespace Core.Data
             return true;
         }
 
-        private List<IModifier> LoadModifiers(List<ItemModifier> modifiers)
+        /// <summary>The lines an authored grant is built from. They face the same rule about conditions a
+        /// pool entry does — asked of the grant that owns them, since that is what they are content of — so
+        /// a gate written here costs the entry instead of being dropped in silence.</summary>
+        private List<IModifier> LoadModifiers(List<ItemModifier> modifiers, string grantId)
         {
             var result = new List<IModifier>();
             foreach (var m in modifiers)
             {
+                if (IsHeldUpByCondition(m, grantId)) continue;
+
                 if (m.Parts.Count > 0)
                 {
-                    var composite = LoadCompositeModifier("item", m);
+                    var composite = LoadCompositeModifier(grantId, m);
                     if (composite != null) result.Add(composite);
                     continue;
                 }
 
-                if (!TryParseModifier("item", m.Parameter, m.ModifierType, out var parameter, out var type)) continue;
-                if (!TryGetFixedValue(m, "item", out float value)) continue;
+                if (!TryParseModifier(grantId, m.Parameter, m.ModifierType, out var parameter, out var type)) continue;
+                if (!TryGetFixedValue(m, grantId, out float value)) continue;
 
                 result.Add(new Modifier(type, parameter, value)
                 {
@@ -498,20 +534,33 @@ namespace Core.Data
 
         /// <summary>One weighted entry granting all its parts at once. A bad part drops the whole entry
         /// (a half-granted composite would be misleading), reported per the usual tolerance rules.</summary>
-        private CompositeModifier? LoadCompositeModifier(string context, ItemModifier data)
+        private CompositeModifier? LoadCompositeModifier(string grantId, ItemModifier data)
         {
             var parts = new List<IModifierInstance>();
             foreach (var part in data.Parts)
             {
-                if (!TryParseModifier(context, part.Parameter, part.ModifierType, out var parameter, out var type)) return null;
-                if (!TryGetFixedValue(part, context, out float value)) return null;
+                if (IsHeldUpByCondition(part, grantId)) return null;
+                if (!TryParseModifier(grantId, part.Parameter, part.ModifierType, out var parameter, out var type)) return null;
+                if (!TryGetFixedValue(part, grantId, out float value)) return null;
 
-                var instance = ModifiersCreator.CreateModifierInstance(parameter, type, value, context);
+                var instance = ModifiersCreator.CreateModifierInstance(parameter, type, value, grantId);
                 instance.Scope = EnumParser.ParseEnumOrDefault<ModifierScope>(part.Scope);
                 parts.Add(instance);
             }
 
-            return parts.Count > 0 ? new CompositeModifier(data.Weight, parts, context) : null;
+            return parts.Count > 0 ? new CompositeModifier(data.Weight, parts, grantId) : null;
+        }
+
+        /// <summary>The gate for a line written inside a grant: the same rule the descriptor path asks of a
+        /// grant ENTRY, one level down. A gate this parse path cannot honour costs the entry — taking the
+        /// condition and ignoring it would put on the wearer for good exactly what the data wrote a gate
+        /// for, and nothing further down would ever say so.</summary>
+        private static bool IsHeldUpByCondition(ItemModifier modifier, string grantId)
+        {
+            if (string.IsNullOrWhiteSpace(modifier.Condition)) return false;
+
+            Tracker.TrackError($"Skipping a modifier held up by condition '{modifier.Condition}': {LineConditions.WhyGrantCannotBeHeldUp(grantId)}");
+            return true;
         }
 
         private List<IUpgradingResource> LoadUpgradeResources(List<UpgradeResourceData> upgradeResourceData) =>

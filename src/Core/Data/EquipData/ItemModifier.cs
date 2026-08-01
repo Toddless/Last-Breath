@@ -15,6 +15,14 @@ namespace Core.Data.EquipData
         /// and on composite parts (only the composite root carries it). Absent = None.</summary>
         [JsonProperty("affix")] public string Affix { get; init; } = string.Empty;
 
+        /// <summary>Catalog id of the condition the line only counts under ("while wounded").
+        /// Absent = the line always counts. Illegal in two places, both refused at parse with a report
+        /// rather than taken and quietly ignored: on a composite part (one bundle is one player-facing line
+        /// and carries one condition, on its root) and anywhere inside <see cref="GrantData.Modifiers"/> —
+        /// a grant's own lines are minted with it and reach the wearer through it, with no channel of their
+        /// own for a predicate.</summary>
+        [JsonProperty("condition")] public string? Condition { get; init; }
+
         /// <summary>Composite entry: one roll grants all parts ("armor AND evade +25%").
         /// When set, the entry's own parameter/type/value are ignored — only weight matters.</summary>
         [JsonProperty("parts")] public List<ItemModifier> Parts { get; init; } = [];

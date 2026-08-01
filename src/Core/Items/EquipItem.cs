@@ -7,6 +7,7 @@ namespace Core.Items
     using Entity;
     using Enums;
     using Godot;
+    using Interfaces;
     using Modifiers;
 
     public class EquipItem : IEquipItem, IAscendable
@@ -27,6 +28,9 @@ namespace Core.Items
         private readonly Dictionary<string, int> _usedRequiredResources = [];
         private readonly Dictionary<string, int> _usedOptionalResources = [];
         private readonly List<IItemGrant> _grants = [];
+        // The predicates of the worn conditional lines, each with the handler that answers its flips —
+        // the only thing an equipped item has to hand back, and the reason it is kept at all.
+        private readonly List<(ICondition Condition, Action<bool> OnFlip)> _watchedConditions = [];
         private Dictionary<EntityParameter, List<IModifierInstance>>? _resolvedModifiers;
         private IFightable? _owner;
 
@@ -285,11 +289,13 @@ namespace Core.Items
             _owner = owner;
             foreach (var grant in _grants) grant.Attach(owner);
             foreach (var entry in AllContextModifiers) entry.Attach(owner);
+            WatchConditions(owner);
         }
 
         public void OnUnequip()
         {
             if (_owner == null) return;
+            ReleaseConditions();
             foreach (var grant in _grants) grant.Detach(_owner);
             foreach (var entry in AllContextModifiers) entry.Detach(_owner);
             _owner = null;
@@ -330,6 +336,9 @@ namespace Core.Items
             foreach (var modifier in AllModifiers)
             {
                 if (modifier.Scope != ModifierScope.Local || modifier.EntityParameter != parameter) continue;
+                // A local line is folded into ONE number before it leaves the item, so a line held up by a
+                // condition has to be weighed here — nothing downstream can tell it apart afterwards.
+                if (modifier is IConditionalModifier { IsActive: false }) continue;
                 switch (modifier.ModifierValueType)
                 {
                     case ModifierValueType.Flat: flat += modifier.Value; break;
@@ -418,6 +427,47 @@ namespace Core.Items
                 SimpleModifier.TransferStamps(part, copy);
                 return copy;
             });
+
+        /// <summary>Points the predicates of the item's conditional lines at the wearer. The lines are never
+        /// written onto him — he pulls them off the item while resolving a value — so a flip has nothing to
+        /// add or remove: it drops what was resolved and asks for the parameter again.
+        /// <para>Whatever was watched before is let go first: an item put on twice without coming off in
+        /// between (a slot refreshed, a fighter rebuilt for a new scene) must watch its predicates once.</para></summary>
+        private void WatchConditions(IFightable owner)
+        {
+            ReleaseConditions();
+            foreach (var modifier in AllModifiers)
+            {
+                if (modifier is not SimpleModifier { Condition: { } condition } line) continue;
+
+                var parameter = line.EntityParameter;
+                Action<bool> onFlip = _ => RefreshParameter(parameter);
+                condition.StateChanged += onFlip;
+                condition.Attach(owner);
+                _watchedConditions.Add((condition, onFlip));
+            }
+        }
+
+        /// <summary>Lets every watched predicate go. An item taken off leaves nothing listening to the
+        /// fighter who wore it, whichever line the predicate belonged to.</summary>
+        private void ReleaseConditions()
+        {
+            foreach ((var condition, var onFlip) in _watchedConditions)
+            {
+                condition.StateChanged -= onFlip;
+                condition.Detach();
+            }
+
+            _watchedConditions.Clear();
+        }
+
+        /// <summary>What a condition flip costs: the resolved view is thrown away and the wearer is asked
+        /// to work the parameter out again.</summary>
+        private void RefreshParameter(EntityParameter parameter)
+        {
+            _resolvedModifiers = null;
+            _owner?.ParameterModifiers.RefreshParameter(parameter);
+        }
 
         private void UpdateModifiersValue()
         {

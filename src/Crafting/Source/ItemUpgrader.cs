@@ -83,6 +83,15 @@ namespace Crafting.Source
             int entitySlot = SlotOf(item.Modifiers.Select(modifier => modifier.InstanceId), groupMemberIds);
             int contextSlot = SlotOf(item.ContextModifiers.Select(entry => entry.InstanceId), groupMemberIds);
 
+            // The replacement is minted BEFORE the old line leaves: a candidate that materializes into
+            // nothing (its predicate is named by an id this host cannot build) would otherwise take the
+            // line away and put none back — a reroll that destroys a line is not one the player asked for,
+            // and an impossible reroll costs nothing by the same rule as every refusal above.
+            var picked = WeightedRandomPicker.PickRandom(weightedObjects, totalWeight, rnd);
+            var sink = new CollectingSink();
+            materializer.Materialize(picked, sink, item.InstanceId); // candidates are already power-scaled
+            if (sink.Entities.Count == 0 && sink.Contexts.Count == 0) return null;
+
             // A grouped line (parts of one composite roll, presented to the player as a SINGLE line)
             // rerolls as one unit: every part leaves the item and exactly one fresh candidate replaces
             // the whole group — an atom, or another composite (the materializer stamps its parts with
@@ -91,9 +100,6 @@ namespace Crafting.Source
             foreach (string memberId in groupMemberIds)
                 item.RemoveAdditionalModifier(memberId);
 
-            var picked = WeightedRandomPicker.PickRandom(weightedObjects, totalWeight, rnd);
-            var sink = new CollectingSink();
-            materializer.Materialize(picked, sink, item.InstanceId); // candidates are already power-scaled
             foreach (var entity in sink.Entities) item.InsertAdditionalModifier(entitySlot++, entity);
             foreach (var context in sink.Contexts) item.InsertAdditionalContextModifier(contextSlot++, context);
 

@@ -5,16 +5,21 @@ namespace Core.Save
     using System.Linq;
     using Data.SaveData;
     using Enums;
+    using Interfaces;
     using Items;
     using Items.Grants;
     using Modifiers;
+    using Modifiers.Conditions;
 
     /// <summary>
     /// Round-trips a procedurally rolled item through its save DTO. Restore rebuilds the item
     /// through the normal mutation API (Set*/Upgrade/TryAscend) so every invariant — value
     /// recomputation from the update multiplier, seal rules — is enforced by the item itself.
+    /// <para>A line held up by a condition stores the catalog id and rebuilds its predicate on restore.
+    /// An id the catalog no longer holds costs the line, exactly as it does when the line is rolled: a
+    /// gated bonus must never come back off a save as an unconditional one.</para>
     /// </summary>
-    public class EquipItemSaveConverter(IGrantFactory grantFactory)
+    public class EquipItemSaveConverter(IGrantFactory grantFactory, IConditionProvider? conditions = null)
     {
         public EquipItemSaveData ToData(IEquipItem item) => new()
         {
@@ -69,8 +74,8 @@ namespace Core.Save
             // Legacy saves carry no base channel: their base stats keep living as local implicit
             // lines (restored below) and resolve through the old fold — no migration needed.
             if (data.BaseStats is { Count: > 0 } baseStats) item.SetBaseStats(baseStats);
-            item.SetImplicits(data.Implicits.Select(modifier => ToModifier(modifier, item.InstanceId)));
-            item.SetModifiers(data.Modifiers.Select(modifier => ToModifier(modifier, item.InstanceId)));
+            item.SetImplicits(ToModifiers(data.Implicits, item.InstanceId));
+            item.SetModifiers(ToModifiers(data.Modifiers, item.InstanceId));
             item.SetContextImplicits(data.ContextImplicits.Select(ToContextEntry));
             item.SetContextModifiers(data.ContextModifiers.Select(ToContextEntry));
             item.SaveUsedResources(data.UsedResources.Required, data.UsedResources.Optional);
@@ -106,16 +111,28 @@ namespace Core.Save
                 Affix = (modifier as SimpleModifier)?.Affix is { } affix and not AffixKind.None ? affix : null,
                 GroupId = (modifier as SimpleModifier)?.GroupId,
                 RangeMin = (modifier as SimpleModifier)?.RolledRange?.Min,
-                RangeMax = (modifier as SimpleModifier)?.RolledRange?.Max
+                RangeMax = (modifier as SimpleModifier)?.RolledRange?.Max,
+                Condition = (modifier as SimpleModifier)?.ConditionId
             }).ToList();
 
-        private static IModifierInstance ToModifier(ModifierSaveData data, string source) =>
+        /// <summary>The stored lines that could be rebuilt whole. A line whose predicate the catalog no
+        /// longer answers for is left behind rather than restored without it.</summary>
+        private IEnumerable<IModifierInstance> ToModifiers(IEnumerable<ModifierSaveData> lines, string source)
+        {
+            foreach (var data in lines)
+                if (LineConditions.TryBuild(conditions, data.Condition, out var condition))
+                    yield return ToModifier(data, source, condition);
+        }
+
+        private static IModifierInstance ToModifier(ModifierSaveData data, string source, ICondition? condition = null) =>
             new SimpleModifier(data.Parameter, data.ValueType, data.BaseValue, source, data.Weight)
             {
                 Scope = data.Scope,
                 Affix = data.Affix ?? AffixKind.None,
                 GroupId = data.GroupId,
-                RolledRange = ToRolledRange(data.RangeMin, data.RangeMax)
+                RolledRange = ToRolledRange(data.RangeMin, data.RangeMax),
+                ConditionId = data.Condition,
+                Condition = condition
             };
 
         private static List<ContextModifierSaveData> ToContextData(IReadOnlyList<ContextModifierEntry> entries) =>
@@ -172,7 +189,7 @@ namespace Core.Save
         {
             GrantSaveData.PassiveSkillKind => grantFactory.CreatePassiveGrant(data.Id, data.SkillId ?? data.Id, data.Properties),
             GrantSaveData.EffectKind => grantFactory.CreateEffectGrant(data.Id, data.EffectId ?? data.Id, data.Properties),
-            _ => grantFactory.CreateModifierGrant(data.Id, data.Modifiers.Select(modifier => ToModifier(modifier, source)).ToList())
+            _ => grantFactory.CreateModifierGrant(data.Id, ToModifiers(data.Modifiers, source).ToList())
         };
     }
 }
