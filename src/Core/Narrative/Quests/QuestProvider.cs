@@ -66,6 +66,7 @@ namespace Core.Narrative.Quests
                     entry.TurnInNpcIds,
                     EnumParser.ParseEnum<DeclinePolicy>(entry.DeclinePolicy),
                     entry.DeclineCooldownHours,
+                    entry.CanFail,
                     entry.TimeLimitHours,
                     ParseConditions(entry.AcceptConditions),
                     stages,

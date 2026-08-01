@@ -337,7 +337,7 @@ namespace LastBreath.Helpers
                 "turnin" => log.TurnIn(id, NarrativeContext.Empty),
                 "decline" => Run(() => log.Decline(id, NarrativeContext.Empty)),
                 "abandon" => Run(() => log.Abandon(id)),
-                "fail" => Run(() => log.Fail(id, "DebugConsole")),
+                "fail" => log.Fail(id, "DebugConsole"),
                 _ => false,
             };
             Print(done ? $"{sub} {id}: ok → {log.GetStatus(id)?.ToString() ?? "NotTaken"}" : $"{sub} {id}: rejected");

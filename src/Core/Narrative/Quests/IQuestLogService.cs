@@ -21,13 +21,17 @@ namespace Core.Narrative.Quests
         bool Accept(string questId, NarrativeContext context);
 
         /// <summary>Turning an OFFER down. Policy decides: Fail buries the quest, CanReturn/Cooldown
-        /// leave it offerable again.</summary>
+        /// leave it offerable again — as does a Fail policy on a quest that cannot fail.</summary>
         void Decline(string questId, NarrativeContext context);
 
-        /// <summary>Dropping an ACCEPTED quest; a Fail-policy quest fails for good.</summary>
+        /// <summary>Dropping an ACCEPTED quest; a Fail-policy quest fails for good unless it
+        /// declares itself unloseable, in which case it becomes offerable again.</summary>
         void Abandon(string questId);
 
-        void Fail(string questId, string reason);
+        /// <summary>The single gate of failure: every path to a Failed quest goes through here.
+        /// False = nothing was buried — the quest declares it cannot fail, is already finished,
+        /// or was never taken.</summary>
+        bool Fail(string questId, string reason);
 
         /// <summary>False while rewards don't fit the inventory — the turn-in option shows disabled.</summary>
         bool CanTurnIn(string questId);

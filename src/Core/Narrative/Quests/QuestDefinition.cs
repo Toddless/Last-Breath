@@ -7,6 +7,8 @@ namespace Core.Narrative.Quests
 
     /// <summary>Immutable, fully parsed quest. Display name/description come from the .po by
     /// convention: Quest_&lt;Id&gt;, Quest_&lt;Id&gt;_Description, stage text Quest_&lt;Id&gt;_Stage_&lt;StageId&gt;.</summary>
+    /// <param name="CanFail">False makes the quest unloseable: every failure path refuses, so the
+    /// journal entry survives a deadline, a lost turn-in NPC and a decline under a Fail policy.</param>
     public record QuestDefinition(
         string Id,
         string GiverNpcId,
@@ -16,6 +18,7 @@ namespace Core.Narrative.Quests
         IReadOnlyList<string> TurnInNpcIds,
         DeclinePolicy DeclinePolicy,
         int DeclineCooldownHours,
+        bool CanFail,
         int TimeLimitHours,
         IReadOnlyList<INarrativeCondition> AcceptConditions,
         IReadOnlyList<QuestStageDefinition> Stages,

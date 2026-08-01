@@ -8,6 +8,7 @@
       "turnInNpcIds": [ "Npc_Bandit_Veteran" ],
       "declinePolicy": "Cooldown",
       "declineCooldownHours": 24,
+      "canFail": false,
       "timeLimitHours": 0,
       "acceptConditions": [],
       "stages": [

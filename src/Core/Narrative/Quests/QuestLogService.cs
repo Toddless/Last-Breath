@@ -19,6 +19,10 @@ namespace Core.Narrative.Quests
         private const int MinutesPerHour = 60;
         private const int MinutesPerDay = 1440;
         private const string GhostHintNotificationId = "UI_Quest_Ghost_Hint";
+        private const string DeclinedReason = "Declined";
+        private const string AbandonedReason = "Abandoned";
+        private const string TimeOutReason = "TimeOut";
+        private const string TurnInPoolGoneReason = "LastTurnInNpcGone";
 
         private readonly Dictionary<string, QuestState> _states = [];
         private readonly IQuestProvider _quests;
@@ -104,11 +108,8 @@ namespace Core.Narrative.Quests
             var state = new QuestState(questId);
             _states[questId] = state;
 
-            if (quest.DeclinePolicy == DeclinePolicy.Fail)
-            {
-                Fail(questId, "Declined");
-                return;
-            }
+            // A refused failure leaves the offer returnable instead of the half-written state.
+            if (quest.DeclinePolicy == DeclinePolicy.Fail && Fail(questId, DeclinedReason)) return;
 
             state.Status = QuestStatus.Declined;
             state.NextOfferAtMinutes = NowMinutes() + CooldownMinutes(quest);
@@ -120,26 +121,29 @@ namespace Core.Narrative.Quests
             var quest = _quests.Get(questId);
             if (quest == null || GetState(questId) is not { Status: QuestStatus.Active or QuestStatus.ReadyToTurnIn } state) return;
 
-            if (quest.DeclinePolicy == DeclinePolicy.Fail)
-            {
-                Fail(questId, "Abandoned");
-                return;
-            }
+            if (quest.DeclinePolicy == DeclinePolicy.Fail && Fail(questId, AbandonedReason)) return;
 
             state.Status = QuestStatus.Declined;
             state.NextOfferAtMinutes = NowMinutes() + CooldownMinutes(quest);
             Publish(state);
         }
 
-        public void Fail(string questId, string reason)
+        public bool Fail(string questId, string reason)
         {
             var quest = _quests.Get(questId);
-            if (quest == null || GetState(questId) is not { } state || state.Status is QuestStatus.Completed or QuestStatus.Failed) return;
+            if (quest == null || GetState(questId) is not { } state || state.Status is QuestStatus.Completed or QuestStatus.Failed) return false;
+
+            if (!quest.CanFail)
+            {
+                Tracker.TrackInfo($"Quest '{questId}' refused to fail ({reason}): the quest is declared unloseable");
+                return false;
+            }
 
             Tracker.TrackInfo($"Quest '{questId}' failed: {reason}");
             Execute(quest.OnFail, NarrativeContext.Empty);
             state.Status = QuestStatus.Failed;
             Publish(state);
+            return true;
         }
 
         public bool CanTurnIn(string questId) =>
@@ -220,11 +224,8 @@ namespace Core.Narrative.Quests
             var quest = _quests.Get(state.QuestId);
             if (quest == null) return;
 
-            if (DeadlinePassed(quest, state))
-            {
-                Fail(quest.Id, "TimeOut");
-                return;
-            }
+            // A quest that refused to fail keeps advancing past its deadline.
+            if (DeadlinePassed(quest, state) && Fail(quest.Id, TimeOutReason)) return;
 
             while (state.Status == QuestStatus.Active && StageCompleted(quest, state))
             {
@@ -268,7 +269,8 @@ namespace Core.Narrative.Quests
         private static string BaselineKey(QuestState state, QuestCounter counter) => $"{state.StageIndex}:{counter.FactKey}";
 
         /// <summary>The A+B policy: one turn-in candidate left alive → a ghostly hint to hurry;
-        /// the pool gone entirely (burned or risen with another face) → the quest fails.</summary>
+        /// the pool gone entirely (burned or risen with another face) → the quest fails unless it
+        /// declares itself unloseable.</summary>
         private void ReevaluateTurnInCandidates()
         {
             if (_loadScope.IsLoading) return;
@@ -286,7 +288,9 @@ namespace Core.Narrative.Quests
 
                 if (pool.Count == 0)
                 {
-                    Fail(quest.Id, "LastTurnInNpcGone");
+                    // The one call that drops the answer: the hint below needs a survivor, so an empty
+                    // pool has nothing left to do whether the quest was buried or refused to fail.
+                    Fail(quest.Id, TurnInPoolGoneReason);
                     continue;
                 }
 

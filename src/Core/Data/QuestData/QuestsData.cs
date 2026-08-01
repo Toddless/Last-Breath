@@ -26,6 +26,10 @@ namespace Core.Data.QuestData
         [JsonProperty("declinePolicy")] public string DeclinePolicy { get; init; } = "CanReturn";
         [JsonProperty("declineCooldownHours")] public int DeclineCooldownHours { get; init; }
 
+        /// <summary>False makes the quest unloseable — deadline, a lost turn-in NPC or a decline
+        /// under a Fail policy cannot bury it. Omitted = true: quests fail as before.</summary>
+        [JsonProperty("canFail")] public bool CanFail { get; init; } = true;
+
         /// <summary>Game hours to finish after accepting; 0 = no deadline.</summary>
         [JsonProperty("timeLimitHours")] public int TimeLimitHours { get; init; }
 
