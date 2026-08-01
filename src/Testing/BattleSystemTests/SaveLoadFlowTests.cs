@@ -27,22 +27,23 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void RestoringAnEarlierSaveForgetsExtraAbilities()
+        public void RestoringAnEarlierSaveTakesTheLaterLayoutApart()
         {
-            // Save with only Ability_A learned, then the player learns Ability_B in the same session.
-            var provider = new Mock<IAbilityProvider>();
+            // The file was written with the ability on the first slot; the player has since moved it.
+            // The restore lays the bar out as the file left it, so the slot it does not name empties.
             var sourceBook = new AbilityBookComponent(new Mock<IFightable>().Object);
             sourceBook.Learn(Stance.Dexterity, FakeAbility("Ability_A"));
-            var captured = new AbilityBookSaveParticipant(AccessorFor(sourceBook), provider.Object).Capture();
+            var captured = new AbilityBookSaveParticipant(AccessorFor(sourceBook)).Capture();
 
             var targetBook = new AbilityBookComponent(new Mock<IFightable>().Object);
-            targetBook.Learn(Stance.Dexterity, FakeAbility("Ability_A"));
-            targetBook.Learn(Stance.Dexterity, FakeAbility("Ability_B")); // learned after the save
-            provider.SetupGet(p => p.KnownAbilityIds).Returns(["Ability_A", "Ability_B"]);
+            var moved = FakeAbility("Ability_A");
+            targetBook.Learn(Stance.Dexterity, moved);
+            targetBook.Equip(Stance.Dexterity, moved.InstanceId, 3);
 
-            new AbilityBookSaveParticipant(AccessorFor(targetBook), provider.Object).Restore(captured, 1);
+            new AbilityBookSaveParticipant(AccessorFor(targetBook)).Restore(captured, 1);
 
-            Assert.AreEqual("Ability_A", targetBook.GetAbilities(Stance.Dexterity).Single().Id);
+            Assert.AreEqual("Ability_A", targetBook.GetSlotLayout(Stance.Dexterity)[0]?.Id);
+            Assert.IsNull(targetBook.GetSlotLayout(Stance.Dexterity)[3]);
         }
 
         private static IPlayerAccessor AccessorFor(AbilityBookComponent book)

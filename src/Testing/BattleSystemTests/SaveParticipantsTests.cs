@@ -69,22 +69,16 @@ namespace LastBreathTest.BattleSystemTests
             sourceBook.Equip(Stance.Dexterity, abilityA.Object.InstanceId, 2);
             sourceBook.SetStance(Stance.Strength);
 
-            var provider = new Mock<IAbilityProvider>();
-            var captured = new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(sourceBook)), provider.Object).Capture();
+            var captured = new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(sourceBook))).Capture();
 
-            // Target: empty book, provider recreates fresh instances.
+            // Target: the abilities are already in the book — the passive tree hands them over on its
+            // own section, which restores first. This one only arranges what is there.
             var targetBook = NewBook();
             var restoredAbilities = new Dictionary<string, Mock<IAbility>>();
-            provider.SetupGet(p => p.KnownAbilityIds).Returns(["Ability_A", "Ability_B", "Ability_C"]);
-            provider.Setup(p => p.CreateAbility(It.IsAny<string>()))
-                .Returns((string id) => (restoredAbilities[id] = FakeAbility(id)).Object);
+            foreach ((string id, Stance stance) in new[] { ("Ability_A", Stance.Dexterity), ("Ability_B", Stance.Dexterity), ("Ability_C", Stance.Strength) })
+                targetBook.Learn(stance, (restoredAbilities[id] = FakeAbility(id)).Object);
 
-            new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(targetBook)), provider.Object).Restore(captured, 1);
-
-            CollectionAssert.AreEquivalent(
-                new[] { "Ability_A", "Ability_B" },
-                targetBook.GetAbilities(Stance.Dexterity).Select(a => a.Id).ToArray());
-            Assert.AreEqual("Ability_C", targetBook.GetAbilities(Stance.Strength).Single().Id);
+            new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(targetBook))).Restore(captured, 1);
 
             var layout = targetBook.GetSlotLayout(Stance.Dexterity);
             Assert.IsNull(layout[0]);
@@ -96,19 +90,20 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void AbilityBookSkipsIdsRemovedFromTheData()
+        public void AbilityBookLeavesASlotEmptyWhenTheBookDoesNotHoldItsAbility()
         {
+            // The file names an ability on the bar that no taken node grants any more: the layout
+            // cannot conjure it back, it can only leave the slot empty.
             var sourceBook = NewBook();
             sourceBook.Learn(Stance.Dexterity, FakeAbility("Ability_Removed").Object);
-            var provider = new Mock<IAbilityProvider>();
-            var captured = new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(sourceBook)), provider.Object).Capture();
+            var captured = new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(sourceBook))).Capture();
 
             var targetBook = NewBook();
-            provider.SetupGet(p => p.KnownAbilityIds).Returns([]);
 
-            new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(targetBook)), provider.Object).Restore(captured, 1);
+            new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(targetBook))).Restore(captured, 1);
 
             Assert.AreEqual(0, targetBook.GetAbilities(Stance.Dexterity).Count);
+            Assert.IsNull(targetBook.GetSlotLayout(Stance.Dexterity)[0]);
         }
 
         private static AbilityBookComponent NewBook() => new(new Mock<IFightable>().Object);

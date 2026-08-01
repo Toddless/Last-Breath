@@ -3,7 +3,6 @@ namespace Core.Save.Participants
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Battle.Abilities;
     using Data.SaveData;
     using Entity.Components;
     using Enums;
@@ -11,15 +10,23 @@ namespace Core.Save.Participants
     using Services;
 
     /// <summary>
-    /// The learned set is mostly derived (AbilityUnlockService learns every non-hidden ability the
-    /// book does not hold), but it is persisted anyway: future sources of abilities (items, seals)
-    /// won't be derivable. What only this section knows: slot layout per stance, chosen upgrades
-    /// (by stable Id) and the active stance.
+    /// What only this section knows: the slot layout per stance, the chosen upgrades (by stable Id)
+    /// and the active stance. The learned set itself is not stored — it follows from the passive-tree
+    /// allocation, which is restored first (<see cref="RestoreOrder.PassiveTree"/> before
+    /// <see cref="RestoreOrder.Abilities"/>). Storing it would give the book a second authority, and
+    /// the two only agree until the tree's content moves: a node repointed at another ability would
+    /// leave the file insisting on the ability the character no longer owns a node for.
+    ///
+    /// The saved layout wins over the auto-equip that learning performs, so an ability whose node was
+    /// taken but which the file never placed stays out of the slots — the player's arrangement is his
+    /// own, and a load must not rearrange it.
+    ///
+    /// Version 2 dropped the learned list; a version 1 file still restores, its list simply unread.
     /// </summary>
-    public class AbilityBookSaveParticipant(IPlayerAccessor playerAccessor, IAbilityProvider abilityProvider) : ISaveParticipant
+    public class AbilityBookSaveParticipant(IPlayerAccessor playerAccessor) : ISaveParticipant
     {
         public string SectionId => "abilityBook";
-        public int Version => 1;
+        public int Version => 2;
         public int RestoreOrder => Save.RestoreOrder.Abilities;
 
         public JToken Capture()
@@ -31,7 +38,6 @@ namespace Core.Save.Participants
             foreach (Stance stance in Enum.GetValues<Stance>())
                 data.Stances[stance.ToString()] = new StanceBookSaveData
                 {
-                    Learned = [.. book.GetAbilities(stance).Select(ability => ability.Id)],
                     Slots = [.. book.GetSlotLayout(stance).Select(ability => ability?.Id)]
                 };
 
@@ -50,7 +56,6 @@ namespace Core.Save.Participants
             foreach ((string stanceName, StanceBookSaveData stanceData) in saved.Stances)
             {
                 if (!Enum.TryParse(stanceName, out Stance stance)) continue; // stance removed from the game
-                RestoreLearned(book, stance, stanceData.Learned);
                 RestoreSlots(book, stance, stanceData.Slots);
             }
 
@@ -58,21 +63,9 @@ namespace Core.Save.Participants
             book.SetStance(saved.CurrentStance);
         }
 
-        private void RestoreLearned(IAbilityBookComponent book, Stance stance, List<string> learnedIds)
-        {
-            // Loading an earlier save in the same session: extra abilities must be forgotten
-            var savedIds = learnedIds.ToHashSet();
-            foreach (var extra in book.GetAbilities(stance).Where(a => !savedIds.Contains(a.Id)).ToList())
-                book.Forget(extra.InstanceId);
-
-            var alreadyLearned = book.GetAbilities(stance).Select(ability => ability.Id).ToHashSet();
-            foreach (string abilityId in learnedIds.Where(id => !alreadyLearned.Contains(id)))
-            {
-                if (!abilityProvider.KnownAbilityIds.Contains(abilityId)) continue; // ability removed from the data
-                book.Learn(stance, abilityProvider.CreateAbility(abilityId));
-            }
-        }
-
+        /// <summary>Lays the slots out as the file left them. A slot naming an ability the book does
+        /// not hold stays empty: the abilities are the allocation's to give, and the file's memory of
+        /// one it no longer grants cannot conjure it.</summary>
         private static void RestoreSlots(IAbilityBookComponent book, Stance stance, List<string?> savedSlots)
         {
             var learned = book.GetAbilities(stance);
