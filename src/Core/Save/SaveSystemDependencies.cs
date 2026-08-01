@@ -66,7 +66,9 @@ namespace Core.Save
                 // a sandbox without them simply doesn't write the section.
                 if (sp.GetService<IInventory>() is { } inventory && sp.GetService<IItemDataProvider>() is { } itemData)
                     manager.Register(new InventorySaveParticipant(inventory, itemData, sp.GetRequiredService<EquipItemSaveConverter>()));
-                manager.Register(new AbilityBookSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
+                manager.Register(new AbilityBookSaveParticipant(
+                    sp.GetRequiredService<IPlayerAccessor>(),
+                    sp.GetService<Battle.Abilities.IAbilitySocketBoard>()));
                 manager.Register(new PlayerVitalsSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
                 manager.Register(new PlayerPlacementSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
 

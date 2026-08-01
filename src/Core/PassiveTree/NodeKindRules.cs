@@ -9,14 +9,17 @@ namespace Core.PassiveTree
     /// </summary>
     public static class NodeKindRules
     {
+        /// <summary>A node class that opens no augment slot.</summary>
+        public const int NoSocket = 0;
+
         private static readonly Dictionary<PassiveNodeKind, NodeKindRule> s_rules = new()
         {
             [PassiveNodeKind.Small] = new NodeKindRule(1, 1, false, false),
             [PassiveNodeKind.Notable] = new NodeKindRule(1, 3, false, false),
             [PassiveNodeKind.Keystone] = new NodeKindRule(0, 3, false, true),
-            [PassiveNodeKind.AbilityUnlock] = new NodeKindRule(0, 0, true, false),
-            [PassiveNodeKind.SocketTier2] = new NodeKindRule(0, 0, true, false),
-            [PassiveNodeKind.SocketTier3] = new NodeKindRule(0, 0, true, false),
+            [PassiveNodeKind.AbilityUnlock] = new NodeKindRule(0, 0, true, false, SocketTier: 1),
+            [PassiveNodeKind.SocketTier2] = new NodeKindRule(0, 0, true, false, SocketTier: 2),
+            [PassiveNodeKind.SocketTier3] = new NodeKindRule(0, 0, true, false, SocketTier: 3),
             [PassiveNodeKind.Start] = new NodeKindRule(0, 0, true, false)
         };
 
@@ -47,15 +50,27 @@ namespace Core.PassiveTree
 
         /// <summary>Seeds are granted with the character, so they never come out of the point budget.</summary>
         public static bool CostsPoint(PassiveNodeKind kind) => kind != PassiveNodeKind.Start;
+
+        /// <summary>
+        /// Which tier of augment slot taking the node opens, or <see cref="NoSocket"/> for the classes
+        /// that open none. A total answer from the table rather than a switch with an unreachable arm:
+        /// the tier is a number the socket carries, so a class opening a tier the game has not used
+        /// yet is a table entry and nothing else.
+        /// </summary>
+        public static int SocketTier(PassiveNodeKind kind) => For(kind).SocketTier;
     }
 
     /// <param name="MinModifiers">Fewer lines than this is a content error, reported but not blocked.</param>
     /// <param name="MaxModifiers">The editor stops offering "add line" past this count.</param>
     /// <param name="RequiresAbility">The node points at an ability from the game's ability catalog.</param>
     /// <param name="UsesRuleText">The node's payload is prose the summator cannot evaluate.</param>
+    /// <param name="SocketTier">The augment slot the node opens on the ability it references;
+    /// <see cref="NodeKindRules.NoSocket"/> when it opens none. The unlock node opens the tier-1 slot
+    /// itself — that slot comes bundled with the ability and is not a node of its own.</param>
     public readonly record struct NodeKindRule(
         int MinModifiers,
         int MaxModifiers,
         bool RequiresAbility,
-        bool UsesRuleText);
+        bool UsesRuleText,
+        int SocketTier = NodeKindRules.NoSocket);
 }

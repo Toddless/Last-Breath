@@ -53,6 +53,9 @@
             services.AddSingleton<IMartialArtMastery>(sp => sp.GetRequiredService<MartialArtMastery>());
             services.AddSingleton<IGameDataParticipant>(sp => sp.GetRequiredService<MartialArtMastery>());
             services.AddGameDataParticipant<IAbilityProvider, AbilityProvider>();
+            // The socket board is filled by the same service that fills the book, and read by the
+            // ability-book save section — hence a singleton next to the one that syncs it.
+            services.AddSingleton<IAbilitySocketBoard, AbilitySocketBoard>();
             services.AddSingleton<IAbilityUnlockService, AbilityUnlockService>();
             // Shared on purpose: control resistance and arena rules must exist in every project
             // that fights (Main included) — a bootstrap-local registration left Main without them.

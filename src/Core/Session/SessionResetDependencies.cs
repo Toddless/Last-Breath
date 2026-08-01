@@ -4,6 +4,7 @@ namespace Core.Session
     using Ai.World.Skirmish;
     using Ai.World.Time;
     using Battle;
+    using Battle.Abilities;
     using Crafting;
     using Entity;
     using Inventory;
@@ -37,6 +38,7 @@ namespace Core.Session
                 Add<IInfluenceMastery>();
                 Add<IMartialArtMastery>();
                 Add<IPassiveTreeService>(); // after the mastery that grants the points its allocation spends
+                Add<IAbilitySocketBoard>(); // a tree that never loaded syncs nothing, so the board clears itself
                 Add<ICraftingMastery>();
                 Add<IRecipeKnowledge>(); // scroll-learned recipes are per-playthrough
                 Add<IInventory>();

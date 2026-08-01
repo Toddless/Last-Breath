@@ -3,6 +3,7 @@ namespace Core.Save.Participants
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Battle.Abilities;
     using Data.SaveData;
     using Entity.Components;
     using Enums;
@@ -10,23 +11,31 @@ namespace Core.Save.Participants
     using Services;
 
     /// <summary>
-    /// What only this section knows: the slot layout per stance, the chosen upgrades (by stable Id)
-    /// and the active stance. The learned set itself is not stored — it follows from the passive-tree
-    /// allocation, which is restored first (<see cref="RestoreOrder.PassiveTree"/> before
-    /// <see cref="RestoreOrder.Abilities"/>). Storing it would give the book a second authority, and
-    /// the two only agree until the tree's content moves: a node repointed at another ability would
-    /// leave the file insisting on the ability the character no longer owns a node for.
+    /// What only this section knows: the slot layout per stance, the chosen upgrades (by stable Id),
+    /// the augments sitting in the ability sockets and the active stance. Neither the learned set nor
+    /// the sockets themselves are stored — both follow from the passive-tree allocation, which is
+    /// restored first (<see cref="RestoreOrder.PassiveTree"/> before <see cref="RestoreOrder.Abilities"/>).
+    /// Storing them would give the book a second authority, and the two only agree until the tree's
+    /// content moves: a node repointed at another ability would leave the file insisting on the
+    /// ability the character no longer owns a node for. What each augment does carry is the slot it
+    /// was chosen for — not to bring that slot back, but to recognise it: a socket Id whose ability or
+    /// tier has moved names a different slot, and the augment does not follow the node into it.
     ///
     /// The saved layout wins over the auto-equip that learning performs, so an ability whose node was
     /// taken but which the file never placed stays out of the slots — the player's arrangement is his
     /// own, and a load must not rearrange it.
     ///
-    /// Version 2 dropped the learned list; a version 1 file still restores, its list simply unread.
+    /// Version 2 dropped the learned list; version 3 added the sockets. An older file still restores:
+    /// its learned list is unread and its missing sockets read as none, which empties every slot the
+    /// allocation opened.
     /// </summary>
-    public class AbilityBookSaveParticipant(IPlayerAccessor playerAccessor) : ISaveParticipant
+    /// <param name="sockets">Optional: a project composed without the battle module has no board,
+    /// and the section is then written without its socket entries.</param>
+    public class AbilityBookSaveParticipant(IPlayerAccessor playerAccessor, IAbilitySocketBoard? sockets = null)
+        : ISaveParticipant
     {
         public string SectionId => "abilityBook";
-        public int Version => 2;
+        public int Version => 3;
         public int RestoreOrder => Save.RestoreOrder.Abilities;
 
         public JToken Capture()
@@ -44,6 +53,7 @@ namespace Core.Save.Participants
             foreach (var ability in book.AllAbilities.Where(a => a.CurrentUpgrades.Count > 0))
                 data.Upgrades[ability.Id] = ability.CurrentUpgrades.ToDictionary(pair => pair.Key, pair => pair.Value.Id);
 
+            CaptureSockets(data);
             return JToken.FromObject(data);
         }
 
@@ -51,7 +61,10 @@ namespace Core.Save.Participants
         {
             var book = playerAccessor.Player?.AbilityBook;
             var saved = data.ToObject<AbilityBookSaveData>();
-            if (book == null || saved == null) return;
+            if (saved == null) return;
+
+            sockets?.Restore(SavedOccupants(saved));
+            if (book == null) return;
 
             foreach ((string stanceName, StanceBookSaveData stanceData) in saved.Stances)
             {
@@ -62,6 +75,36 @@ namespace Core.Save.Participants
             RestoreUpgrades(book, saved.Upgrades);
             book.SetStance(saved.CurrentStance);
         }
+
+        /// <summary>
+        /// The board is a singleton and outlives the scene, so a file that carries nothing for this
+        /// section has to say so out loud: left alone, the slots would still hold the augments of the
+        /// playthrough before. The layout does not need the same treatment — a book belongs to the
+        /// player node, and the scene the load lands in builds a fresh one.
+        /// </summary>
+        public void RestoreWithoutSection() => sockets?.Restore([]);
+
+        /// <summary>Writes the occupied slots only. An empty one carries nothing to remember, and the
+        /// slot itself comes back with the node that opened it. Each augment goes down with the slot
+        /// it was chosen for, so the load can tell that slot from another one wearing the same id.</summary>
+        private void CaptureSockets(AbilityBookSaveData data)
+        {
+            foreach (AbilitySocketOccupant occupant in sockets?.Occupants ?? [])
+                data.Sockets[occupant.Slot.SocketId] = new SocketSaveData
+                {
+                    Augment = occupant.Augment,
+                    Ability = occupant.Slot.AbilityId,
+                    Tier = occupant.Slot.Tier
+                };
+        }
+
+        /// <summary>The file's occupied slots in the board's own terms.</summary>
+        private static IReadOnlyCollection<AbilitySocketOccupant> SavedOccupants(AbilityBookSaveData saved) =>
+        [
+            .. saved.Sockets.Select(entry => new AbilitySocketOccupant(
+                new AbilitySocketPlacement(entry.Key, entry.Value.Ability, entry.Value.Tier),
+                entry.Value.Augment))
+        ];
 
         /// <summary>Lays the slots out as the file left them. A slot naming an ability the book does
         /// not hold stays empty: the abilities are the allocation's to give, and the file's memory of

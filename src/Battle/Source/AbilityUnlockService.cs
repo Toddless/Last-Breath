@@ -18,6 +18,11 @@ namespace Battle.Source
     /// nothing knows nothing. Every pass brings the book all the way back to the allocation, so an
     /// ability put there by any other hand does not survive the next one.
     ///
+    /// The augment sockets travel the same road and in the same pass: a node whose class opens a
+    /// slot (<see cref="NodeKindRules.SocketTier"/>) puts that slot on the board while it is taken,
+    /// and the slot goes when the node does. One reading of the taken set answers for both, so the
+    /// book and the board can never be looking at different allocations.
+    ///
     /// Two things move under the book, so both are listened to: the allocation (a purchase, a refund,
     /// a respec, a session reset, a restored save) and the player himself — a new game or a scene
     /// change builds a second player with an empty book in the same process. The constructor runs the
@@ -31,22 +36,27 @@ namespace Battle.Source
         private readonly IPlayerAccessor _playerAccessor;
         private readonly IAbilityProvider _abilityProvider;
         private readonly IPassiveTreeService? _passiveTree;
+        private readonly IAbilitySocketBoard? _sockets;
 
-        /// <summary>Node ability ids the catalog does not know, already reported. Reconcile runs on
-        /// every allocation change and defensively from the read handlers, so a content gap has to be
-        /// said once instead of once per pass.</summary>
+        /// <summary>Ability ids named by a node and missing from the catalog, already reported.
+        /// Reconcile runs on every allocation change and defensively from the read handlers, so a
+        /// content gap has to be said once instead of once per pass.</summary>
         private readonly HashSet<string> _reportedGaps = new(StringComparer.Ordinal);
 
         /// <param name="passiveTree">Optional: the tree service belongs to the game project, and a
         /// project composed without it (the battle sandbox) resolves the default.</param>
+        /// <param name="sockets">Optional: a project without a socket board simply has no augment
+        /// slots, the same way one without a tree has no abilities.</param>
         public AbilityUnlockService(
             IPlayerAccessor playerAccessor,
             IAbilityProvider abilityProvider,
-            IPassiveTreeService? passiveTree = null)
+            IPassiveTreeService? passiveTree = null,
+            IAbilitySocketBoard? sockets = null)
         {
             _playerAccessor = playerAccessor;
             _abilityProvider = abilityProvider;
             _passiveTree = passiveTree;
+            _sockets = sockets;
 
             _playerAccessor.PlayerChanged += OnPlayerChanged;
             if (_passiveTree != null) _passiveTree.AllocationChanged += OnAllocationChanged;
@@ -61,52 +71,85 @@ namespace Battle.Source
         }
 
         /// <summary>
-        /// Brings the book to exactly what the taken nodes hand out: what no node backs any more is
-        /// forgotten first, so the slots it held are free before the new abilities take theirs.
-        /// Idempotent — a pass that finds the book already matching changes nothing, which is what
-        /// lets the read handlers call it defensively.
+        /// Brings the book and the socket board to exactly what the taken nodes hand out: what no
+        /// node backs any more is forgotten first, so the slots it held are free before the new
+        /// abilities take theirs. Idempotent — a pass that finds both already matching changes
+        /// nothing, which is what lets the read handlers call it defensively.
+        /// The sockets are synced whether or not there is a player: they hang off the allocation, and
+        /// a scene without a fighter in it yet must not leave the board holding an older one.
+        /// A pass that could not read an allocation at all changes nothing, in either channel: an
+        /// unread tree is not an empty one, and treating it as empty would let a launch whose document
+        /// failed to parse take the board's contents down with it.
         /// </summary>
         /// <param name="notify">Not read. An ability arrives because the player spent a point on the
         /// node carrying it, and the node lighting up says so already; there is nothing left for a
         /// toast to announce.</param>
         public void Reconcile(bool notify)
         {
+            TreeGrants granted = ReadGrants();
+            if (!granted.AllocationRead) return;
+
+            _sockets?.Sync(granted.Sockets);
+
             IAbilityBookComponent? book = _playerAccessor.Player?.AbilityBook;
             if (book == null) return;
 
-            HashSet<string> granted = GrantedAbilityIds();
-            ForgetRevoked(book, granted);
-            LearnGranted(book, granted);
+            ForgetRevoked(book, granted.Abilities);
+            LearnGranted(book, granted.Abilities);
         }
 
-        /// <summary>The ability ids the taken nodes hand out right now.</summary>
-        private HashSet<string> GrantedAbilityIds()
+        /// <summary>Everything the taken nodes hand out right now, read in one pass so the abilities
+        /// and the slots can never come from two different readings of the allocation. A project
+        /// composed without a tree reads an allocation that is empty by construction; a tree whose
+        /// document has no content reads none at all.</summary>
+        private TreeGrants ReadGrants()
         {
-            HashSet<string> granted = new(StringComparer.Ordinal);
+            var granted = new TreeGrants(new HashSet<string>(StringComparer.Ordinal), [], AllocationRead: true);
             if (_passiveTree == null) return granted;
 
             PassiveTreeDocument tree = _passiveTree.Tree;
+            if (tree.IsEmpty) return granted with { AllocationRead = false };
+
             foreach (string nodeId in _passiveTree.TakenNodes)
             {
                 PassiveNode? node = tree.Find(nodeId);
-                if (node is not { Kind: PassiveNodeKind.AbilityUnlock }) continue;
-                if (IsLearnable(node)) granted.Add(node.AbilityId);
+                if (node != null && PointsAtAnAbility(node) && ReferencesAPlayerAbility(node)) Collect(node, granted);
             }
 
             return granted;
         }
 
-        /// <summary>Whether the node's ability may enter a player's book. An id the catalog does not
-        /// know is a content gap — the node gives nothing and says so once, rather than throwing on
-        /// the first attempt to build the ability. A hidden ability is skipped without a word: boss
-        /// reactions are cast internally, and the tree must not become a road into the book for one.</summary>
-        private bool IsLearnable(PassiveNode node)
+        /// <summary>Whether the node says anything about an ability at all. The rest carry lines and
+        /// an empty ability field, and putting that field to the catalog would turn every content node
+        /// into a reported gap.</summary>
+        private static bool PointsAtAnAbility(PassiveNode node) =>
+            node.Kind == PassiveNodeKind.AbilityUnlock || NodeKindRules.SocketTier(node.Kind) != NodeKindRules.NoSocket;
+
+        /// <summary>An unlock node hands the ability over; any node with a tier opens that slot on it.
+        /// The unlock node does both — the tier-1 slot comes with the ability rather than with a node
+        /// of its own.</summary>
+        private static void Collect(PassiveNode node, TreeGrants granted)
+        {
+            if (node.Kind == PassiveNodeKind.AbilityUnlock) granted.Abilities.Add(node.AbilityId);
+
+            int tier = NodeKindRules.SocketTier(node.Kind);
+            if (tier != NodeKindRules.NoSocket)
+                granted.Sockets.Add(new AbilitySocketPlacement(node.Id, node.AbilityId, tier));
+        }
+
+        /// <summary>Whether the ability the node names is one a player may hold — the same question for
+        /// an unlock and for a socket, since a slot on an ability nobody can own is worth as little as
+        /// the ability. An id the catalog does not know is a content gap: the node gives nothing and
+        /// says so once, rather than throwing on the first attempt to build the ability. A hidden
+        /// ability is skipped without a word — boss reactions are cast internally, and the tree must
+        /// not become a road into the book for one.</summary>
+        private bool ReferencesAPlayerAbility(PassiveNode node)
         {
             if (_abilityProvider.KnownAbilityIds.Contains(node.AbilityId))
                 return !_abilityProvider.IsHidden(node.AbilityId);
 
             if (_reportedGaps.Add(node.AbilityId))
-                Tracker.TrackNotFound($"Ability '{node.AbilityId}' unlocked by passive node '{node.Id}'");
+                Tracker.TrackNotFound($"Ability '{node.AbilityId}' referenced by passive node '{node.Id}'");
 
             return false;
         }
@@ -130,5 +173,15 @@ namespace Battle.Source
         private void OnAllocationChanged() => Reconcile(notify: false);
 
         private void OnPlayerChanged(IPlayer _) => Reconcile(notify: false);
+
+        /// <summary>What one reading of the taken set produced.</summary>
+        /// <param name="AllocationRead">Whether there was an allocation to read. False only for a tree
+        /// service holding a document with no content: the taken ids have nothing to be measured
+        /// against, so the pass reports no grants and no revocations either — the difference between
+        /// "this character has nothing" and "nobody could be asked".</param>
+        private readonly record struct TreeGrants(
+            HashSet<string> Abilities,
+            List<AbilitySocketPlacement> Sockets,
+            bool AllocationRead);
     }
 }
