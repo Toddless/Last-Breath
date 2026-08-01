@@ -31,6 +31,23 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void ADamagedSectionFillsEveryPointInsteadOfEmptyingTheWorld()
+        {
+            var point = new FakeSpawnPoint("camp_1");
+            var manager = new SaveManager(new LoadScope());
+            var failures = new List<string>();
+            manager.Register(new SpawnPointsSaveParticipant(RegistryOf(point)));
+            manager.SectionRestoreFailed += (section, _) => failures.Add(section);
+
+            var file = new SaveFile();
+            file.Sections["spawnPoints"] = new SaveSection { Version = 1, Data = new JObject { ["Points"] = "corrupt" } };
+            manager.Restore(file);
+
+            Assert.AreEqual(1, point.FreshFills, "the load landed in a world holding no spawn-point NPC at all");
+            CollectionAssert.AreEqual(new[] { "spawnPoints" }, failures, "the damage has to reach the log even so");
+        }
+
+        [TestMethod]
         public void ASavedPointResumesItsCountWhileANewOneFills()
         {
             var saved = new FakeSpawnPoint("camp_1") { Alive = 2 };

@@ -55,44 +55,60 @@ namespace Core.Save
 
             using var _ = loadScope.Begin();
             foreach (var participant in _participants.OrderBy(p => p.RestoreOrder))
-            {
-                if (!file.Sections.TryGetValue(participant.SectionId, out var section))
-                {
-                    RestoreMissingSection(participant);
-                    continue;
-                }
-
-                if (section.Version > participant.Version)
-                {
-                    SectionRestoreFailed?.Invoke(participant.SectionId, new InvalidOperationException(
-                        $"Section version {section.Version} is newer than the supported {participant.Version}."));
-                    continue;
-                }
-
-                try
-                {
-                    participant.Restore(section.Data, section.Version);
-                }
-                catch (Exception e)
-                {
-                    SectionRestoreFailed?.Invoke(participant.SectionId, e);
-                }
-            }
+                RestoreSection(participant, file);
         }
 
-        /// <summary>Tells the participant the file has no section of it, reported the same way a
-        /// failed restore is. Skipping it silently is what leaves the previous file's state standing
-        /// in a system that outlives the scene.</summary>
-        private void RestoreMissingSection(ISaveParticipant participant)
+        /// <summary>
+        /// Hands the participant its section, or — when the file carries nothing this build can apply
+        /// for it — the fresh-game state. An absent section, one whose data throws while being read and
+        /// one written by a newer build all end in the same place: the difference between them is what
+        /// gets reported, not what the participant is left holding. Leaving the participant untouched
+        /// instead is only harmless while a session reset can hand back the fresh value; a section
+        /// owning scene state has nothing behind it, and skipping it lands the load in a world the
+        /// restore never populated.
+        /// </summary>
+        private void RestoreSection(ISaveParticipant participant, SaveFile file)
         {
+            if (!file.Sections.TryGetValue(participant.SectionId, out var section))
+            {
+                RestoreWithoutSection(participant);
+                return;
+            }
+
+            if (section.Version > participant.Version)
+            {
+                Report(participant, new InvalidOperationException(
+                    $"Section version {section.Version} is newer than the supported {participant.Version}."));
+                RestoreWithoutSection(participant);
+                return;
+            }
+
             try
             {
-                participant.RestoreMissingSection();
+                participant.Restore(section.Data, section.Version);
             }
             catch (Exception e)
             {
-                SectionRestoreFailed?.Invoke(participant.SectionId, e);
+                Report(participant, e);
+                RestoreWithoutSection(participant);
             }
         }
+
+        /// <summary>Tells the participant this file gives it nothing to restore. Its own failure is
+        /// reported the same way a failed section is — there is no third fallback behind it.</summary>
+        private void RestoreWithoutSection(ISaveParticipant participant)
+        {
+            try
+            {
+                participant.RestoreWithoutSection();
+            }
+            catch (Exception e)
+            {
+                Report(participant, e);
+            }
+        }
+
+        private void Report(ISaveParticipant participant, Exception e) =>
+            SectionRestoreFailed?.Invoke(participant.SectionId, e);
     }
 }

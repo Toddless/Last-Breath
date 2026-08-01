@@ -27,11 +27,11 @@ namespace Core.Save.Participants
             tree.RestoreState(KnownNodes(saved.Allocated));
         }
 
-        /// <summary>A file with no section of ours describes a character with no allocation. The
+        /// <summary>A file that hands us nothing describes a character with no allocation. The
         /// service is a singleton that outlives the scene, so without this the nodes of the file
         /// loaded before it stay on a character who never bought them — and the next save writes
         /// them into a file that never had them.</summary>
-        public void RestoreMissingSection() => tree.RestoreState([]);
+        public void RestoreWithoutSection() => tree.RestoreState([]);
 
         /// <summary>Keeps the ids the tree catalog still contains and reports the rest. The spend is
         /// recounted from the set that survives, so the point a dropped node cost comes back to the

@@ -26,17 +26,18 @@ namespace Core.Save
         void Restore(JToken data, int savedVersion);
 
         /// <summary>
-        /// Applies "the file carries no section of mine" — a file written before the section existed,
-        /// or by a build that did not have it. Does nothing by default, and for most participants that
-        /// is the whole answer: the restore starts by resetting the session (see
-        /// <see cref="ISaveManager.Restore"/>), so a service registered as
-        /// <see cref="Session.ISessionResettable"/> is already back at its fresh-game value when the
-        /// section turns out to be missing.
+        /// Applies "the file hands me nothing to restore": the section is absent (written before it
+        /// existed, or by a build that did not have it), its data could not be read, or it was written
+        /// by a newer build. Does nothing by default, and for most participants that is the whole
+        /// answer: the restore starts by resetting the session (see <see cref="ISaveManager.Restore"/>),
+        /// so a service registered as <see cref="Session.ISessionResettable"/> is already back at its
+        /// fresh-game value by the time the section turns out to be unusable.
         /// Override it where the fresh-game state is NOT the session reset's to give — state owned by
         /// the scene, which is built before the file is applied and cannot be rebuilt by resetting a
-        /// singleton.
+        /// singleton. An override has to land on the fresh-game state outright rather than add to what
+        /// is already there: it also runs after a <see cref="Restore"/> that threw partway through.
         /// </summary>
-        void RestoreMissingSection()
+        void RestoreWithoutSection()
         {
         }
     }

@@ -25,12 +25,13 @@ namespace Core.Save.Participants
         public void Restore(JToken data, int savedVersion) =>
             Apply(data.ToObject<SpawnPointsSaveData>() ?? new SpawnPointsSaveData());
 
-        /// <summary>A file with no section of ours describes a world where no point was ever touched:
-        /// every one of them fills as it does in a fresh game. The points themselves skip their
-        /// on-ready fill while a load is pending, and a session reset cannot fill them — they are scene
-        /// nodes, not a singleton's state — so without this the load lands in a world holding not a
-        /// single spawn-point NPC.</summary>
-        public void RestoreMissingSection() => Apply(new SpawnPointsSaveData());
+        /// <summary>A file that hands us nothing describes a world where no point was ever touched:
+        /// every one of them fills to capacity as it does in a fresh game, whatever a failed restore
+        /// managed to spawn first. The points themselves skip their on-ready fill while a load is
+        /// pending, and a session reset cannot fill them — they are scene nodes, not a singleton's
+        /// state — so without this the load lands in a world holding not a single spawn-point
+        /// NPC.</summary>
+        public void RestoreWithoutSection() => Apply(new SpawnPointsSaveData());
 
         private void Apply(SpawnPointsSaveData saved)
         {

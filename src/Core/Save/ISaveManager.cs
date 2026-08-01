@@ -5,7 +5,8 @@ namespace Core.Save
     public interface ISaveManager
     {
         /// <summary>A section failed to restore (corrupt data, participant threw, or the section
-        /// was written by a newer game version). The load continues with the other sections.</summary>
+        /// was written by a newer game version). The participant is then given the fresh-game state
+        /// and the load continues with the other sections.</summary>
         event Action<string, Exception>? SectionRestoreFailed;
 
         void Register(ISaveParticipant participant);
@@ -22,7 +23,8 @@ namespace Core.Save
         /// <summary>Resets the session to its fresh-game state, then applies the file inside a load
         /// scope, participants ordered by RestoreOrder. The reset is the baseline the sections are
         /// deltas on: a section the file does not carry leaves the fresh value standing, not the state
-        /// of the file loaded before it. Failing sections are reported and skipped.</summary>
+        /// of the file loaded before it. A section this build cannot apply is reported and then treated
+        /// as one the file never carried, so damaged data costs its own section and nothing else.</summary>
         void Restore(SaveFile file);
     }
 }

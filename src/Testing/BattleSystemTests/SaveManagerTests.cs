@@ -83,17 +83,65 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void RestoreSkipsMissingSections()
+        public void AMissingSectionRestoresFreshWithoutBeingReported()
         {
             bool restored = false;
             bool failed = false;
-            _manager.Register(new FakeParticipant("inventory") { OnRestore = _ => restored = true });
+            var participant = new FakeParticipant("inventory") { OnRestore = _ => restored = true };
+            _manager.Register(participant);
             _manager.SectionRestoreFailed += (_, _) => failed = true;
 
             _manager.Restore(new SaveFile()); // old save without the new section: not an error
 
             Assert.IsFalse(restored);
+            Assert.AreEqual(1, participant.FreshRestores);
             Assert.IsFalse(failed);
+        }
+
+        [TestMethod]
+        public void ASectionThatFailsToReadStillLeavesTheParticipantOnTheFreshState()
+        {
+            // "The section is damaged" must not land where "the section is absent" was already fixed
+            // not to land: a participant nobody called at all. For a section owning scene state that
+            // is a world the restore never populated.
+            var failures = new List<string>();
+            var broken = new FakeParticipant("spawnPoints") { OnRestore = _ => throw new InvalidOperationException("corrupt") };
+            _manager.Register(broken);
+            _manager.SectionRestoreFailed += (section, _) => failures.Add(section);
+
+            _manager.Restore(FileWithSections("spawnPoints"));
+
+            Assert.AreEqual(1, broken.FreshRestores, "the damaged section left the participant holding nothing");
+            CollectionAssert.AreEqual(new[] { "spawnPoints" }, failures, "damage the player cannot see has to reach the log");
+        }
+
+        [TestMethod]
+        public void ASectionThatReadsCleanlyIsNotAlsoGivenTheFreshState()
+        {
+            var participant = new FakeParticipant("mastery");
+            _manager.Register(participant);
+
+            _manager.Restore(FileWithSections("mastery"));
+
+            Assert.AreEqual(0, participant.FreshRestores, "a healthy section is the participant's whole state");
+        }
+
+        [TestMethod]
+        public void AFailingFreshRestoreIsReportedInsteadOfStoppingTheLoad()
+        {
+            var failures = new List<string>();
+            bool secondRestored = false;
+            _manager.Register(new FakeParticipant("broken", restoreOrder: 0)
+            {
+                OnRestoreWithoutSection = () => throw new InvalidOperationException("nothing to fall back on")
+            });
+            _manager.Register(new FakeParticipant("healthy", restoreOrder: 10) { OnRestore = _ => secondRestored = true });
+            _manager.SectionRestoreFailed += (section, _) => failures.Add(section);
+
+            _manager.Restore(FileWithSections("healthy"));
+
+            Assert.IsTrue(secondRestored);
+            CollectionAssert.AreEqual(new[] { "broken" }, failures);
         }
 
         [TestMethod]
@@ -112,18 +160,20 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void SectionNewerThanParticipantIsSkippedAndReported()
+        public void SectionNewerThanParticipantIsReportedAndRestoredFresh()
         {
             bool restored = false;
             var failures = new List<string>();
-            _manager.Register(new FakeParticipant("mastery", version: 1) { OnRestore = _ => restored = true });
+            var participant = new FakeParticipant("mastery", version: 1) { OnRestore = _ => restored = true };
+            _manager.Register(participant);
             _manager.SectionRestoreFailed += (section, _) => failures.Add(section);
 
             var file = new SaveFile();
             file.Sections["mastery"] = new SaveSection { Version = 2, Data = new JObject() };
             _manager.Restore(file);
 
-            Assert.IsFalse(restored);
+            Assert.IsFalse(restored, "data this build cannot read must not be handed to the participant");
+            Assert.AreEqual(1, participant.FreshRestores);
             CollectionAssert.AreEqual(new[] { "mastery" }, failures);
         }
 
@@ -274,6 +324,10 @@ namespace LastBreathTest.BattleSystemTests
             public Func<JToken> OnCapture { get; set; } = () => new JObject();
             public Action<JToken>? OnRestore { get; set; }
             public Action<JToken, int>? OnRestoreWithVersion { get; set; }
+            public Action? OnRestoreWithoutSection { get; set; }
+
+            /// <summary>How many times the manager decided this file gives the participant nothing.</summary>
+            public int FreshRestores { get; private set; }
 
             public string SectionId => sectionId;
             public int Version => version;
@@ -285,6 +339,12 @@ namespace LastBreathTest.BattleSystemTests
             {
                 OnRestore?.Invoke(data);
                 OnRestoreWithVersion?.Invoke(data, savedVersion);
+            }
+
+            public void RestoreWithoutSection()
+            {
+                FreshRestores++;
+                OnRestoreWithoutSection?.Invoke();
             }
         }
     }
