@@ -155,11 +155,25 @@
             StartCooldown(context.Cooldown);
             ConsumeResource(context);
 
-            Owner.CombatEvents.Publish<AbilityActivatedEvent>(new(this, Owner, VitalsSnapshot.From(Owner), CastId));
-            await ExecuteInternal(targets, Owner, field);
-            foreach (var rider in ActivationRiders.Values.ToList())
-                await rider.Apply(context);
-            Owner.CombatEvents.Publish<AbilityExecutedEvent>(new(this, Owner, CastId));
+            try
+            {
+                // The announcement that OPENS the cast window is guarded too: it is delivered to one
+                // subscriber after another, and a charge that armed itself on it has already attached a
+                // modifier to the caster by the time a later subscriber throws.
+                Owner.CombatEvents.Publish<AbilityActivatedEvent>(new(this, Owner, VitalsSnapshot.From(Owner), CastId));
+                await ExecuteInternal(targets, Owner, field);
+                foreach (var rider in ActivationRiders.Values.ToList())
+                    await rider.Apply(context);
+            }
+            finally
+            {
+                // Single end-of-cast channel: charges, chord playback and the tally of actions the owner
+                // spent this turn all close on this event, so the cast is announced finished however it
+                // ends — including a throw inside the opening announcement itself. A cast that ends
+                // without it leaves the charge attached to the caster for good, the turn short of the
+                // action it spent, and every line written for the first action of a turn on for the rest.
+                Owner.CombatEvents.Publish<AbilityExecutedEvent>(new(this, Owner, CastId));
+            }
         }
 
         private static RandomNumberGenerator CastRnd

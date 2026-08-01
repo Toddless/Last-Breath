@@ -4,8 +4,10 @@ namespace Battle.Source
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Threading;
+    using System.Threading.Tasks;
     using Core;
     using Core.Battle;
+    using Core.Events;
 
     // The fuse reporter is injectable because Tracker touches Godot natives in its static ctor —
     // pure-C# tests would crash the test host the moment a fuse trips.
@@ -46,8 +48,7 @@ namespace Battle.Source
 
                     var context = _attackQueue.Dequeue();
                     if (!context.IsValid) continue;
-                    await context.Attacker.Attack(context);
-                    await context.Target.ReceiveAttack(context);
+                    await Resolve(context);
                     yield return context;
                 }
             }
@@ -57,6 +58,28 @@ namespace Battle.Source
                 // (the arena reuses one scheduler across turns).
                 _attackQueue.Clear();
             }
+        }
+
+        /// <summary>
+        /// The two halves of one hit: the attacker joins it, whoever is hit resolves it and announces it
+        /// spent. Joining opens the window in which a predicate about the target has somebody to read, and
+        /// the announcement of the resolution closes it — so a join that throws before the resolution is
+        /// reached closes the window itself instead of leaving the target named until the attacker's next
+        /// swing, with every line written about a target counting on whatever he does in between.
+        /// </summary>
+        private static async Task Resolve(IAttackContext context)
+        {
+            try
+            {
+                await context.Attacker.Attack(context);
+            }
+            catch
+            {
+                context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
+                throw;
+            }
+
+            await context.Target.ReceiveAttack(context);
         }
     }
 }

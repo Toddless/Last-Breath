@@ -114,14 +114,58 @@ namespace LastBreathTest.BattleSystemTests
 
         public bool IsSame(string otherId) => InstanceId == otherId;
         public float GetDamage() => 0f;
-        public void ConsumeResource(Costs type, float amount) => throw new NotSupportedException();
-        public bool TryApplyStatusEffect(StatusEffects statusEffect) => throw new NotSupportedException();
-        public bool TryRemoveStatusEffect(StatusEffects statusEffect) => throw new NotSupportedException();
+
+        /// <summary>What a cast pays before it announces itself: the debit signals like the real one, so
+        /// everything listening for a resource of his recomputes.</summary>
+        public void ConsumeResource(Costs type, float amount)
+        {
+            switch (type)
+            {
+                case Costs.Mana: CurrentMana -= amount; break;
+                case Costs.Health: CurrentHealth -= amount; break;
+                case Costs.Barrier: CurrentBarrier -= amount; break;
+            }
+        }
+
+        /// <summary>A status the fighter does not carry yet takes hold and is announced; anything else is refused.</summary>
+        public bool TryApplyStatusEffect(StatusEffects statusEffect)
+        {
+            if (statusEffect == StatusEffects.None || StatusEffects.HasFlag(statusEffect)) return false;
+
+            ApplyStatus(statusEffect);
+            return true;
+        }
+
+        /// <summary>The counterpart: only a status he actually carries can leave him.</summary>
+        public bool TryRemoveStatusEffect(StatusEffects statusEffect)
+        {
+            if (statusEffect == StatusEffects.None || !StatusEffects.HasFlag(statusEffect)) return false;
+
+            RemoveStatus(statusEffect);
+            return true;
+        }
+
         public IFightable ChoseTarget(List<IFightable> targets) => throw new NotSupportedException();
         public void Kill(bool isDebug = false) => throw new NotSupportedException();
         public void SetupBattleEventBus(IBattleEventBus bus) => throw new NotSupportedException();
-        public Task ReceiveAttack(IAttackContext context) => Task.CompletedTask;
-        public Task Attack(IAttackContext context) => Task.CompletedTask;
+        /// <summary>The resolving half of a hit as the fighters publish it: the attack is announced spent
+        /// on the ATTACKER's bus, whoever resolves it.</summary>
+        public Task ReceiveAttack(IAttackContext context)
+        {
+            context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>The joining half of a hit as the fighters publish it: the attack is announced on the
+        /// attacker's own bus before anybody resolves it.</summary>
+        public Task Attack(IAttackContext context)
+        {
+            CombatEvents.Publish(new BeforeAttackEvent(context));
+
+            return Task.CompletedTask;
+        }
+
         public Task TakeDamage(IDamageContext context) => Task.CompletedTask;
         public void Heal(IHealContext context) => throw new NotSupportedException();
         public void OnTurnStart() => throw new NotSupportedException();
