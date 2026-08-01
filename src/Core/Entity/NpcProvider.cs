@@ -1,23 +1,23 @@
-namespace LastBreath.Npc
+namespace Core.Entity
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Ai;
-    using Core.Ai.World;
-    using Core.Battle.Abilities;
-    using Core.Data;
-    using Core.Data.GameData;
-    using Core.Data.NpcData;
-    using Core.Entity;
-    using Core.Entity.Components;
-    using Core.Enums;
+    using Ai;
+    using Ai.World;
+    using Battle.Abilities;
+    using Components;
+    using Data;
+    using Data.GameData;
+    using Data.NpcData;
+    using Enums;
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Loads Npc.json + NpcBehavior.json and rolls ready-to-apply <see cref="NpcDefinition"/>s:
-    /// stance from the allowed set (the behavior archetype follows it), level within the
-    /// EntityType cap, rarity by weight, a weighted ability pick from the archetype pool.
+    /// Shared NPC provider: loads the Npc and NpcBehaviors catalogs and rolls ready-to-apply
+    /// <see cref="NpcDefinition"/>s — stance from the allowed set (the behavior archetype follows
+    /// it), level within the EntityType cap, rarity by weight, a weighted ability pick from the
+    /// archetype pool. Every project spawning NPCs binds <see cref="INpcProvider"/> to this class.
     /// </summary>
     public class NpcProvider(IAbilityProvider abilityProvider, INpcModifierProvider modifierProvider) : INpcProvider, IGameDataParticipant
     {
@@ -210,7 +210,7 @@ namespace LastBreath.Npc
             {
                 if (!abilityProvider.KnownAbilityIds.Contains(abilityId))
                 {
-                    Core.Tracker.TrackNotFound($"Authored ability '{abilityId}' of npc '{data.Id}'", this);
+                    Tracker.TrackNotFound($"Authored ability '{abilityId}' of npc '{data.Id}'", this);
                     continue;
                 }
 
