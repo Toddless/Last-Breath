@@ -446,7 +446,7 @@
                     "parameter": "Evade",
                     "valueType": "Flat",
                     "value": 500.0,
-                    "condition": "Health_Full"
+                    "condition": "Turn_Unattacked"
                 },
                 {
                     "parameter": "Evade",

@@ -16,21 +16,8 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class PassiveTreeDataTests
     {
-        private static string SharedDataRoot()
-        {
-            var directory = new DirectoryInfo(AppContext.BaseDirectory);
-            while (directory != null)
-            {
-                string candidate = Path.Combine(directory.FullName, "Data", "Shared");
-                if (Directory.Exists(candidate)) return candidate;
-                directory = directory.Parent;
-            }
-
-            throw new InvalidOperationException($"Data/Shared symlink not found above {AppContext.BaseDirectory}");
-        }
-
         private static string ShippedTreePath() =>
-            Path.Combine(SharedDataRoot(), DataCatalog.PassiveTree, PassiveTreeFormat.DefaultFileName);
+            Path.Combine(SharedData.Catalog(DataCatalog.PassiveTree), PassiveTreeFormat.DefaultFileName);
 
         private static int FirstDifference(byte[] left, byte[] right)
         {
@@ -61,7 +48,7 @@ namespace LastBreathTest.BattleSystemTests
         public void ShippedTreeLoadsThroughTheDataPipelineWithoutIssues()
         {
             var provider = new PassiveTreeProvider();
-            var service = new GameDataService(new FileSystemDataSource(SharedDataRoot()), [provider]);
+            var service = new GameDataService(new FileSystemDataSource(SharedData.Root()), [provider]);
             List<string> failures = [];
             service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
 
@@ -84,7 +71,7 @@ namespace LastBreathTest.BattleSystemTests
             // and the draft this tree grew out of wrote its conditions as English sentences.
             var tree = new PassiveTreeProvider();
             var catalog = new ConditionProvider(ConditionParser.Default());
-            new GameDataService(new FileSystemDataSource(SharedDataRoot()), [tree, catalog]).LoadAll();
+            new GameDataService(new FileSystemDataSource(SharedData.Root()), [tree, catalog]).LoadAll();
 
             string[] named = [.. tree.Tree.Nodes
                 .SelectMany(node => node.Modifiers.Select(line => line.Condition)

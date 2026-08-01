@@ -182,6 +182,46 @@
             "type": "TargetStatus",
             "statuses": [ "Debuff" ],
             "negate": true
+        },
+        {
+            "id": "Turn_First_Attack",
+            "type": "TurnAction",
+            "action": "Attack",
+            "negate": true
+        },
+        {
+            "id": "Turn_First_Ability",
+            "type": "TurnAction",
+            "action": "Ability",
+            "negate": true
+        },
+        {
+            "id": "Turn_Undamaged",
+            "type": "TurnAction",
+            "action": "DamageTaken",
+            "negate": true
+        },
+        {
+            "id": "Turn_Unattacked",
+            "type": "TurnAction",
+            "action": "AttackReceived",
+            "negate": true
+        },
+        {
+            "id": "Turn_Second_Attack_Onwards",
+            "type": "TurnAction",
+            "action": "Attack"
+        },
+        {
+            "id": "Battle_Before_Turn_4",
+            "type": "BattleTurn",
+            "turn": 4
+        },
+        {
+            "id": "Battle_From_Turn_5",
+            "type": "BattleTurn",
+            "turn": 5,
+            "negate": true
         }
     ]
 }

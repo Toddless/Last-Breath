@@ -27,7 +27,7 @@ namespace LastBreathTest.BattleSystemTests
         public void TheShippedCatalogLoadsThroughTheDataPipelineAndEveryEntryResolves()
         {
             var provider = new ConditionProvider(ConditionParser.Default());
-            var service = new GameDataService(new FileSystemDataSource(SharedDataRoot()), [provider]);
+            var service = new GameDataService(new FileSystemDataSource(SharedData.Root()), [provider]);
             List<string> failures = [];
             service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
 
@@ -254,22 +254,9 @@ namespace LastBreathTest.BattleSystemTests
         /// the provider: the coverage checks have to see what the data says, including entries the
         /// provider would refuse.</summary>
         private static IReadOnlyList<JObject> ShippedEntries() =>
-            Directory.EnumerateFiles(Path.Combine(SharedDataRoot(), DataCatalog.Conditions), "*.json", SearchOption.AllDirectories)
+            Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Conditions), "*.json", SearchOption.AllDirectories)
                 .SelectMany(path => JObject.Parse(File.ReadAllText(path))[ConditionFields.Entries]?.OfType<JObject>() ?? [])
                 .ToList();
-
-        private static string SharedDataRoot()
-        {
-            var directory = new DirectoryInfo(AppContext.BaseDirectory);
-            while (directory != null)
-            {
-                string candidate = Path.Combine(directory.FullName, "Data", "Shared");
-                if (Directory.Exists(candidate)) return candidate;
-                directory = directory.Parent;
-            }
-
-            throw new InvalidOperationException($"Data/Shared symlink not found above {AppContext.BaseDirectory}");
-        }
 
         /// <summary>A catalog handed to the load orchestrator file by file — the same shape the game
         /// sources have, without a folder on disk.</summary>

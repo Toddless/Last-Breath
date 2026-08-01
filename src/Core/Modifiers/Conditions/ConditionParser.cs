@@ -38,6 +38,8 @@ namespace Core.Modifiers.Conditions
             new StanceConditionFactory(),
             new TargetResourceThresholdConditionFactory(),
             new TargetStatusConditionFactory(),
+            new TurnActionConditionFactory(),
+            new BattleTurnConditionFactory(),
         ];
 
         /// <summary>
