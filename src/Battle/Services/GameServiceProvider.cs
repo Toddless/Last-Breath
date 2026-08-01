@@ -5,14 +5,12 @@ namespace Battle.Services
     using Core.Data.GameData;
     using Core.Entity;
     using Core.Reputation;
-    using Core.Save;
     using Core.Services;
     using Core.Session;
     using Internal.Npc;
     using Internal.World;
     using Microsoft.Extensions.DependencyInjection;
     using Source;
-    using SaveGameService = Internal.Save.SaveGameService;
 
     /// <summary>Project bootstrap: the shared Core provider + Battle registrations. The only place touching the static root.</summary>
     internal static class GameServiceProvider
@@ -43,10 +41,9 @@ namespace Battle.Services
                 // World facts: the boss-gate reads them ("the twin is finally dead"); the tracker writes them.
                 .AddSingleton<Core.Narrative.Facts.IWorldFactsService, Core.Narrative.Facts.WorldFactsService>()
                 .AddSingleton<Core.Narrative.Facts.NpcFinalDeathFactTracker>()
-                .AddSingleton<ISaveGameService, SaveGameService>()
-                // Project infrastructure (module discipline): the sandbox composes its own save
-                // stack and session reset — they no longer ride in the battle module.
-                .AddSaveSystem()
+                // Project infrastructure (module discipline): the sandbox composes its own session
+                // reset — it no longer rides in the battle module. No save system here on purpose:
+                // saving belongs to the game project alone, the sandbox is for isolated tests.
                 .AddSessionReset());
             provider.AddBattleUiElementsFactory();
 

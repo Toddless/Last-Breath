@@ -10,7 +10,6 @@ namespace Battle.Internal.Npc
     using Core.Entity;
     using Core.Events;
     using Source;
-    using Core.Save;
     using Core.Services;
     using Godot;
     using GameServiceProvider = Services.GameServiceProvider;
@@ -20,8 +19,9 @@ namespace Battle.Internal.Npc
     /// <see cref="_maxCount"/>, spawning from its Npc.json id list at free spots in the radius.
     /// A burned body (final death) or a body risen into another faction frees the slot and
     /// schedules a replacement; the global cap is enforced by <see cref="INpcPopulationService"/>.
-    /// Population state persists (see <see cref="IPersistentSpawnPoint"/>): respawns are due at
-    /// absolute GAME minutes, so reloading a save resumes the timers instead of refilling the camp.
+    /// Population state is capturable (see <see cref="IPersistentSpawnPoint"/>): respawns are due
+    /// at absolute GAME minutes, so a restored state resumes the timers instead of refilling the
+    /// camp. The sandbox has no save system — here the point always fills itself on ready.
     /// </summary>
     [GlobalClass]
     internal partial class NpcSpawnPoint : Node2D, IPersistentSpawnPoint
@@ -95,11 +95,9 @@ namespace Battle.Internal.Npc
             _gameEventBus?.Subscribe<NpcFinalDeathEvent>(OnFinalDeath);
             _gameEventBus?.Subscribe<NpcFactionChangedEvent>(OnFactionChanged);
 
-            // A pending load owns the initial population: the restore recreates the saved counts.
-            // Filling here regardless was the save-scum exploit (save -> load = full camp again).
-            bool loadPending = _gameServiceProvider.GetService<ISaveGameService>()?.HasPendingLoad == true;
             // Deferred so the providers finish loading their JSON before the first spawn.
-            if (_spawnOnReady && !loadPending) CallDeferred(nameof(FillToCapacity));
+            // The sandbox never restores a saved world, so nothing competes for the initial fill.
+            if (_spawnOnReady) CallDeferred(nameof(FillToCapacity));
         }
 
         public override void _ExitTree()
@@ -137,8 +135,8 @@ namespace Battle.Internal.Npc
             PendingDueMinutes = [.. _pendingDueMinutes],
         };
 
-        /// <summary>Load path: exactly the saved alive count returns (identities re-roll — same
-        /// policy as the npcWorld bodies) and the respawn timers resume in game time.</summary>
+        /// <summary>Restore path: exactly the captured alive count returns (identities re-roll)
+        /// and the respawn timers resume in game time.</summary>
         public void RestoreState(SpawnPointSaveData data)
         {
             for (int i = 0; i < data.Alive && _ownedInstanceIds.Count < _maxCount; i++)
