@@ -374,26 +374,36 @@ namespace LastBreath.Player
         {
             try
             {
-                Calculations.CalculateSucceeded(context);
-                switch (context.Result)
+                try
                 {
-                    case AttackResults.Succeed:
-                        Calculations.CalculateInitialAttackDamage(context);
-                        var damageContext = Calculations.ComposeAttackDamage(context);
-                        await TakeDamage(damageContext);
-                        context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
-                        break;
-                    case AttackResults.Blocked:
-                        CombatEvents.Publish<AttackBlockedEvent>(new(context));
-                        break;
-                    case AttackResults.Evaded:
-                        CombatEvents.Publish<AttackEvadedEvent>(new(context));
-                        break;
-                }
+                    Calculations.CalculateSucceeded(context);
+                    switch (context.Result)
+                    {
+                        case AttackResults.Succeed:
+                            Calculations.CalculateInitialAttackDamage(context);
+                            var damageContext = Calculations.ComposeAttackDamage(context);
+                            await TakeDamage(damageContext);
+                            context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
+                            break;
+                        case AttackResults.Blocked:
+                            CombatEvents.Publish<AttackBlockedEvent>(new(context));
+                            break;
+                        case AttackResults.Evaded:
+                            CombatEvents.Publish<AttackEvadedEvent>(new(context));
+                            break;
+                    }
 
-                // Single post-attack channel: all reactions (effects, passives, upgrades) subscribe to this event
-                context.Attacker.ModifierHandler.Apply(context);
-                context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
+                    context.Attacker.ModifierHandler.Apply(context);
+                }
+                finally
+                {
+                    // Single post-attack channel: all reactions (effects, passives, upgrades) subscribe to this
+                    // event, and it is also what ends the window in which the attacker's target can be read —
+                    // so it is announced however the hit ends. A hit that throws without it leaves the target
+                    // named until the attacker's next swing, and lines written about him count on everything
+                    // he does in between.
+                    context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
+                }
             }
             catch (Exception e)
             {
