@@ -4,8 +4,10 @@ namespace Core.Save
     using Newtonsoft.Json;
 
     /// <summary>
-    /// One save slot payload: versioned envelope of independent sections. Battle/Crafting/Main
-    /// write the SAME file, each owning its sections — unknown sections must survive a rewrite.
+    /// One save slot payload: versioned envelope of independent sections, rewritten whole on every
+    /// save. The file belongs to a single project — storage is rooted at the running project's own
+    /// <c>user://saves</c> — so it holds exactly the sections that project's registered participants
+    /// captured, and a section nobody captures any more is gone with the next save.
     /// </summary>
     public class SaveFile
     {

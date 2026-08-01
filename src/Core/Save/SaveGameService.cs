@@ -63,8 +63,7 @@ namespace Core.Save
                 MasteryLevel = _mastery.CurrentLevel
             };
 
-            // Capture over the previous file: sections owned by other modules survive the rewrite.
-            _storage.Write(slot, _manager.Capture(metadata, _storage.Load(slot)));
+            _storage.Write(slot, _manager.Capture(metadata));
             _messageBus.PublishMessageAsync(new SendNotificationMessageMessage(SavedNotificationId));
         }
 

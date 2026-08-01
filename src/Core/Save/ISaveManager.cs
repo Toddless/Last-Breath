@@ -13,12 +13,12 @@ namespace Core.Save
         void Unregister(string sectionId);
 
         /// <summary>
-        /// Snapshots all registered participants into a save file. Sections of <paramref name="previous"/>
-        /// not owned by any registered participant are carried over untouched (other app modules'
-        /// data must survive a rewrite). A capture failure throws — combined with the atomic write
+        /// Snapshots the registered participants into a save file: it holds their sections and nothing
+        /// else, so a section whose participant is no longer registered is gone with the next save
+        /// instead of being copied forward. A capture failure throws — combined with the atomic write
         /// in storage the previous file stays intact.
         /// </summary>
-        SaveFile Capture(SaveMetadata metadata, SaveFile? previous = null);
+        SaveFile Capture(SaveMetadata metadata);
 
         /// <summary>Resets the session to its fresh-game state, then applies the file inside a load
         /// scope, participants ordered by RestoreOrder. The reset is the baseline the sections are

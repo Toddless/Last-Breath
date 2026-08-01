@@ -23,13 +23,9 @@ namespace Core.Save
 
         public void Unregister(string sectionId) => _participants.RemoveAll(p => p.SectionId == sectionId);
 
-        public SaveFile Capture(SaveMetadata metadata, SaveFile? previous = null)
+        public SaveFile Capture(SaveMetadata metadata)
         {
             var file = new SaveFile { Metadata = metadata };
-            if (previous != null)
-                foreach ((string id, SaveSection section) in previous.Sections)
-                    file.Sections[id] = section;
-
             foreach (var participant in _participants)
                 file.Sections[participant.SectionId] = new SaveSection
                 {

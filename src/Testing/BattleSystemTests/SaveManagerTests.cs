@@ -18,14 +18,24 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class SaveManagerTests
     {
+        private const int Slot = 1;
+
+        private string _saveRoot = null!;
         private LoadScope _loadScope = null!;
         private SaveManager _manager = null!;
 
         [TestInitialize]
         public void Setup()
         {
+            _saveRoot = Path.Combine(Path.GetTempPath(), $"lastbreath_savemanager_{Guid.NewGuid():N}");
             _loadScope = new LoadScope();
             _manager = new SaveManager(_loadScope);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            if (Directory.Exists(_saveRoot)) Directory.Delete(_saveRoot, recursive: true);
         }
 
         [TestMethod]
@@ -41,31 +51,46 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void CapturePreservesForeignSectionsFromPrevious()
+        public void ASectionOfAnUnregisteredParticipantDoesNotSurviveTheNextSave()
         {
-            // Battle rewrites the shared file: crafting's section must survive untouched.
-            var previous = new SaveFile();
-            previous.Sections["crafting"] = new SaveSection { Version = 3, Data = new JObject { ["recipes"] = 5 } };
+            // A slot belongs to one project, so nothing in the file is "somebody else's" — a section
+            // whose owner the build stopped composing has to leave with the save that dropped it,
+            // instead of being copied out of the old file into every file that follows it.
             _manager.Register(new FakeParticipant("mastery"));
+            _manager.Register(new FakeParticipant("raids"));
+            Assert.IsTrue(_manager.Capture(new SaveMetadata()).Sections.ContainsKey("raids"), "the setup must actually write the section");
 
-            var file = _manager.Capture(new SaveMetadata(), previous);
+            _manager.Unregister("raids");
+            var file = _manager.Capture(new SaveMetadata());
 
-            Assert.AreEqual(3, file.Sections["crafting"].Version);
-            Assert.AreEqual(5, (int)file.Sections["crafting"].Data["recipes"]!);
+            Assert.IsFalse(file.Sections.ContainsKey("raids"), "the section outlived the participant that owned it");
             Assert.IsTrue(file.Sections.ContainsKey("mastery"));
         }
 
         [TestMethod]
-        public void CaptureOverwritesOwnSectionFromPrevious()
+        public void ARewrittenSlotLosesTheFieldsItsNewShapeDoesNotWrite()
         {
-            var previous = new SaveFile();
-            previous.Sections["mastery"] = new SaveSection { Version = 1, Data = new JObject { ["level"] = 1 } };
-            _manager.Register(new FakeParticipant("mastery", version: 2) { OnCapture = () => new JObject { ["level"] = 9 } });
+            // The save actually goes to disk and is read back, because the property belongs to the
+            // file and not to one capture: a section is written whole, never patched field by field.
+            // Bumping a section's format has to be able to retire a field for good — a save that
+            // reached into the previous generation, at either seam, would leave the retired field in
+            // the slot until the player deletes it, and hand it back on the next load.
+            var storage = new SaveStorage(_saveRoot);
+            _manager.Register(new FakeParticipant("abilityBook", version: 2)
+            {
+                OnCapture = () => new JObject { ["upgrades"] = new JObject { ["Ability_A"] = 1 }, ["retired"] = 7 }
+            });
+            storage.Write(Slot, _manager.Capture(new SaveMetadata())); // the slot as the older build left it
+            Assert.IsNotNull(storage.Load(Slot)!.Sections["abilityBook"].Data["retired"], "the setup must actually write the old shape");
 
-            var file = _manager.Capture(new SaveMetadata(), previous);
+            _manager.Unregister("abilityBook");
+            _manager.Register(new FakeParticipant("abilityBook", version: 3) { OnCapture = () => new JObject { ["sockets"] = new JObject() } });
+            storage.Write(Slot, _manager.Capture(new SaveMetadata()));
 
-            Assert.AreEqual(9, (int)file.Sections["mastery"].Data["level"]!);
-            Assert.AreEqual(2, file.Sections["mastery"].Version);
+            var section = storage.Load(Slot)!.Sections["abilityBook"];
+            Assert.IsNull(section.Data["retired"], "the old shape's field survived the rewrite");
+            Assert.IsNotNull(section.Data["sockets"]);
+            Assert.AreEqual(3, section.Version);
         }
 
         [TestMethod]
