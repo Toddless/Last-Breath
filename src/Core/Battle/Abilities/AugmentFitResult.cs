@@ -20,6 +20,12 @@ namespace Core.Battle.Abilities
         NoSharedTag,
 
         /// <summary>The ability already wears an augment of the same exclusion group.</summary>
-        ExclusionGroupTaken
+        ExclusionGroupTaken,
+
+        /// <summary>The record answers the binding question twice and differently: it claims every
+        /// ability and names one. Neither half can be picked without discarding the other, so the
+        /// record is refused by every slot and the author hears about it from the first install
+        /// instead of from the one ability that happens to seat it.</summary>
+        ContradictoryDeclaration
     }
 }

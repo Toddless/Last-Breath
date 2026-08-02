@@ -28,6 +28,17 @@ namespace Core.Data.AbilityData
         /// handed to a whole family. Set, it decides alone; empty, the augment is bound to nothing.</summary>
         [JsonProperty("abilityId")] public string AbilityId { get; init; } = string.Empty;
 
+        /// <summary>Declares the augment at home on every ability there is — what a record does when it
+        /// works through the base contract every ability already honours, cost and cooldown being the
+        /// pair that turns up most. It is a word of its own because no tag is carried by the whole
+        /// book, and because universality has to be claimed: a record that simply names no tag is an
+        /// augment whose author forgot to say what it is about, and it stays refused. Only the binding
+        /// question is answered here — a universal augment is measured for tier and for the exclusion
+        /// group its ability already wears exactly like any other. Claiming this and naming an
+        /// <see cref="AbilityId"/> answers the same question twice, which no reading resolves; the
+        /// fitting rule refuses such a record outright (<see cref="Battle.Abilities.AugmentFitResult.ContradictoryDeclaration"/>).</summary>
+        [JsonProperty("fitsAnyAbility")] public bool FitsAnyAbility { get; init; }
+
         /// <summary>Id of the pool the augment drops from. Empty means it never drops.</summary>
         [JsonProperty("dropPool")] public string DropPool { get; init; } = string.Empty;
 

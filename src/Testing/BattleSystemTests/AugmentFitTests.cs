@@ -8,9 +8,10 @@ namespace LastBreathTest.BattleSystemTests
 
     /// <summary>
     /// An augment declares what it is — its tier, what it is about, the one ability it was written
-    /// for — and a slot is measured against that declaration. A slot takes its own tier and every
-    /// tier under it, a named ability is the whole answer where it is given and the tags answer
-    /// where it is not, and one ability wears at most one augment of an exclusion group. What does
+    /// for, or every ability there is — and a slot is measured against that declaration. A slot takes
+    /// its own tier and every tier under it, a claim on the whole book settles the binding question
+    /// where it is made, a named ability is the whole answer where it is given and the tags answer
+    /// where neither is, and one ability wears at most one augment of an exclusion group. What does
     /// not fit does not go in quietly: the install refuses and nothing moves.
     /// </summary>
     [TestClass]
@@ -32,6 +33,9 @@ namespace LastBreathTest.BattleSystemTests
         private const string SameGroupAugment = "Augment_Poison_Duration_Greater";
         private const string OtherGroupAugment = "Augment_Poison_Spread";
         private const string UnknownAugment = "Augment_No_Catalog_Holds";
+        private const string UniversalAugment = "Augment_Reduced_Cooldown";
+        private const string SilentAugment = "Augment_Declaring_Nothing";
+        private const string ContradictoryAugment = "Augment_Every_Ability_And_One";
 
         private const string DurationGroup = "Group_Poison_Duration";
         private const string SpreadGroup = "Group_Poison_Spread";
@@ -142,6 +146,88 @@ namespace LastBreathTest.BattleSystemTests
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
             Assert.IsFalse(board.Install(PoisonSlotOne, BoundAugment));
+            Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
+        }
+
+        [TestMethod]
+        public void AnAugmentClaimingEveryAbilityGoesOnOneItSharesNoTagWith()
+        {
+            // Cost and cooldown are worked through the contract every ability honours, so an augment
+            // over them belongs everywhere — and no tag says everywhere: the commonest one is carried
+            // by seven abilities of twenty-five. The record carries a tag of another family here, so
+            // the seating is the claim being honoured and not the tags quietly agreeing.
+            var board = BoardOver(
+                PoisonCatalog().With(Augment(UniversalAugment, tier: 2, [AbilityTags.Cold], fitsAnyAbility: true)),
+                Slot(PoisonSlotOne, PoisonAbility, tier: 2));
+
+            Assert.IsTrue(board.Install(PoisonSlotOne, UniversalAugment));
+            Assert.AreEqual(UniversalAugment, board.Find(PoisonSlotOne)?.Augment);
+        }
+
+        [TestMethod]
+        public void AnAugmentClaimingEveryAbilityIsStillHeldToTheSocketTier()
+        {
+            // The claim is about which ability, not about how strong: a tier-three augment stays out
+            // of a tier-one slot however many abilities it belongs on.
+            var board = BoardOver(
+                PoisonCatalog().With(Augment(UniversalAugment, tier: 3, [], fitsAnyAbility: true)),
+                Slot(PoisonSlotOne, PoisonAbility, tier: 1));
+
+            Assert.IsFalse(board.Install(PoisonSlotOne, UniversalAugment));
+            Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty, "the claim carried the augment past its tier");
+        }
+
+        [TestMethod]
+        public void AnAugmentClaimingEveryAbilityStillWaitsForTheExclusionGroup()
+        {
+            // The other half of the same boundary: one of these at a time on one ability holds for a
+            // universal augment too, or the group would be escapable by writing the augment wider.
+            var board = BoardOver(
+                PoisonCatalog()
+                    .With(Augment(GroupedAugment, tier: 2, [AbilityTags.Poison], exclusionGroup: DurationGroup))
+                    .With(Augment(UniversalAugment, tier: 2, [], exclusionGroup: DurationGroup, fitsAnyAbility: true)),
+                Slot(PoisonSlotOne, PoisonAbility, tier: 2),
+                Slot(PoisonSlotTwo, PoisonAbility, tier: 2));
+            Assert.IsTrue(board.Install(PoisonSlotOne, GroupedAugment), "the first of the group would not go in at all");
+
+            Assert.IsFalse(board.Install(PoisonSlotTwo, UniversalAugment));
+
+            Assert.IsTrue(board.Find(PoisonSlotTwo)?.IsEmpty);
+            Assert.AreEqual(GroupedAugment, board.Find(PoisonSlotOne)?.Augment, "the refusal took the seated one with it");
+        }
+
+        [TestMethod]
+        public void AnAugmentThatNamesNothingAtAllIsRefusedRatherThanReadAsUniversal()
+        {
+            // The control on the whole claim: universality is said, never inferred. A record with no
+            // tags and no binding is an augment whose author has not said what it is about, and
+            // reading that silence as "every ability" would hand the widest reach in the system to
+            // the one record that declared the least.
+            var board = BoardOver(
+                PoisonCatalog().With(Augment(SilentAugment, tier: 1, [])),
+                Slot(PoisonSlotOne, PoisonAbility, tier: 3));
+
+            Assert.IsFalse(board.Install(PoisonSlotOne, SilentAugment));
+            Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
+            Assert.AreEqual(AugmentFitResult.NoSharedTag,
+                AugmentFit.Check(Slot(PoisonSlotOne, PoisonAbility, tier: 3), [AbilityTags.Poison], Augment(SilentAugment, tier: 1, []), []));
+        }
+
+        [TestMethod]
+        public void ARecordClaimingEveryAbilityAndNamingOneIsRefusedByTheSlotItNames()
+        {
+            // The record answers the binding question twice: every ability, and this one. The slot
+            // under test is the ability it names and shares its tag, so both readings would seat it
+            // — which is precisely why the refusal has to come from the contradiction itself. Letting
+            // one half win would make the other a comment, and nobody would learn which.
+            AbilityUpgradeData contradictory = Augment(
+                ContradictoryAugment, tier: 1, [AbilityTags.Poison], abilityId: PoisonAbility, fitsAnyAbility: true);
+
+            Assert.AreEqual(AugmentFitResult.ContradictoryDeclaration,
+                AugmentFit.Check(Slot(PoisonSlotOne, PoisonAbility, tier: 2), [AbilityTags.Poison], contradictory, []));
+
+            var board = BoardOver(PoisonCatalog().With(contradictory), Slot(PoisonSlotOne, PoisonAbility, tier: 2));
+            Assert.IsFalse(board.Install(PoisonSlotOne, ContradictoryAugment));
             Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
         }
 
@@ -271,6 +357,15 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(string.Empty, declared.ExclusionGroup, "an augment conflicts with a group it never named");
         }
 
+        [TestMethod]
+        public void ARecordBelongsOnEveryAbilityOnlyWhereItSaysSo()
+        {
+            // Universality is the widest thing a record can claim, and the default has to be the
+            // narrow one: an author who says nothing wrote an ordinary augment, not one that reaches
+            // across the whole book by omission.
+            Assert.IsFalse(new AbilityUpgradeData().FitsAnyAbility);
+        }
+
         /// <summary>
         /// The rule is one predicate or it is not a rule. A second tier comparison — in the board, in
         /// a socket window, in whatever judges a conversion — is a second answer to the same
@@ -325,14 +420,16 @@ namespace LastBreathTest.BattleSystemTests
             int tier,
             string[] tags,
             string abilityId = "",
-            string exclusionGroup = "") =>
+            string exclusionGroup = "",
+            bool fitsAnyAbility = false) =>
             new()
             {
                 Id = id,
                 Tier = tier,
                 Tags = tags,
                 AbilityId = abilityId,
-                ExclusionGroup = exclusionGroup
+                ExclusionGroup = exclusionGroup,
+                FitsAnyAbility = fitsAnyAbility
             };
 
         /// <summary>A catalog holding one poison ability and nothing else yet.</summary>
