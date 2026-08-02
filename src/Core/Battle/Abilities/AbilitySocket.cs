@@ -32,7 +32,11 @@ namespace Core.Battle.Abilities
         public bool IsEmpty => Augment is null;
 
         /// <summary>Fills a free socket. An occupied one refuses rather than swapping: extraction is
-        /// the only way out, so an install can never make the previous occupant disappear.</summary>
+        /// the only way out, so an install can never make the previous occupant disappear.
+        /// The slot holds, it does not judge: whether the augment belongs here is decided once, by
+        /// <see cref="AugmentFit"/>, and the board is what puts the question — everything the rule
+        /// needs (the augment's record, the ability's tags, what its other slots wear) lives above a
+        /// single socket.</summary>
         public bool Install(string augmentId)
         {
             if (!IsEmpty || string.IsNullOrWhiteSpace(augmentId)) return false;

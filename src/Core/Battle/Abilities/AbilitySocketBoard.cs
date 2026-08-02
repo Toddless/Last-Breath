@@ -3,10 +3,16 @@ namespace Core.Battle.Abilities
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Data.AbilityData;
     using Session;
 
     /// <inheritdoc cref="IAbilitySocketBoard"/>
-    public sealed class AbilitySocketBoard : IAbilitySocketBoard, ISessionResettable
+    /// <param name="augments">Optional: what the augment ids mean. Without it the board holds slots
+    /// and nothing else — a composition that mints no augments (the battle sandbox) has no records
+    /// for the fitting rule to be right about, and the board seats what it is handed, as it did
+    /// before there was a rule. With it, every seating goes through <see cref="AugmentFit"/>.</param>
+    public sealed class AbilitySocketBoard(IAbilityAugmentCatalog? augments = null)
+        : IAbilitySocketBoard, ISessionResettable
     {
         private readonly Dictionary<string, AbilitySocket> _sockets = new(StringComparer.Ordinal);
 
@@ -32,7 +38,8 @@ namespace Core.Battle.Abilities
 
         public AbilitySocket? Find(string socketId) => _sockets.GetValueOrDefault(socketId);
 
-        public bool Install(string socketId, string augmentId) => Find(socketId)?.Install(augmentId) == true;
+        public bool Install(string socketId, string augmentId) =>
+            Find(socketId) is { } socket && Accepts(socket, augmentId) && socket.Install(augmentId);
 
         public string? Extract(string socketId) => Find(socketId)?.Extract();
 
@@ -87,6 +94,42 @@ namespace Core.Battle.Abilities
             _waiting.Clear();
         }
 
+        /// <summary>Whether the slot takes that augment. The rule is not written here — the board only
+        /// turns the two ids into what <see cref="AugmentFit"/> judges: the augment's record and the
+        /// tags of the slot's ability. An id the catalog does not hold is refused; there is no record
+        /// to measure, and seating one on the strength of its spelling is how an augment ends up in a
+        /// slot nothing ever agreed to.</summary>
+        private bool Accepts(AbilitySocket socket, string augmentId)
+        {
+            if (augments is null) return true;
+
+            AbilityUpgradeData? augment = augments.Find(augmentId);
+            return augment is not null
+                   && AugmentFit.Check(
+                       socket.Placement,
+                       augments.TagsOf(socket.AbilityId),
+                       augment,
+                       WornGroups(socket.AbilityId)) == AugmentFitResult.Fits;
+        }
+
+        /// <summary>The exclusion groups already standing in one ability's slots. Only that ability's
+        /// own sockets are counted: the group says one of these at a time on one ability, not one of
+        /// these in the whole build.</summary>
+        private IReadOnlyCollection<string> WornGroups(string abilityId)
+        {
+            HashSet<string> worn = new(StringComparer.Ordinal);
+
+            foreach (AbilitySocket socket in SocketsOf(abilityId))
+            {
+                if (socket.Augment is not { } installed) continue;
+
+                string? group = augments?.Find(installed)?.ExclusionGroup;
+                if (!string.IsNullOrWhiteSpace(group)) worn.Add(group);
+            }
+
+            return worn;
+        }
+
         /// <summary>The augments sitting in the open slots, each paired with the slot it sits in.</summary>
         private IEnumerable<AbilitySocketOccupant> Installed()
         {
@@ -97,13 +140,18 @@ namespace Core.Battle.Abilities
 
         /// <summary>Puts one saved augment back where the file says it was. Refused when no slot of
         /// that id is open, or when the slot standing there is not the one the augment was chosen for
-        /// — the id is all a file can name, and a build is free to have moved the node behind it.</summary>
+        /// — the id is all a file can name, and a build is free to have moved the node behind it — or
+        /// when the augment no longer fits that slot. A file records what was seated, not permission
+        /// to seat it again: the records themselves move between builds, and a load puts the same
+        /// question to the same rule as a player's own install.</summary>
         private bool Seat(AbilitySocketOccupant occupant) =>
             Matches(Find(occupant.Slot.SocketId), occupant.Slot) && Install(occupant.Slot.SocketId, occupant.Augment);
 
         /// <summary>Whether the slot standing at that id is still the slot described. A mismatch means
         /// the node was repointed, and the occupant belongs to what the node used to be — the socket is
-        /// rebuilt rather than quietly re-labelled around its contents.</summary>
+        /// rebuilt rather than quietly re-labelled around its contents. This is the signature of a
+        /// placement, not the fitting rule: it asks whether the node moved, and says nothing about
+        /// which augments the slot takes (<see cref="AugmentFit"/>).</summary>
         private static bool Matches(AbilitySocket? socket, AbilitySocketPlacement placement) =>
             socket?.Placement == placement;
     }

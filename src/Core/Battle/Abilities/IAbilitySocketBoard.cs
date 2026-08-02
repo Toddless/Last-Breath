@@ -29,8 +29,11 @@ namespace Core.Battle.Abilities
 
         AbilitySocket? Find(string socketId);
 
-        /// <summary>Puts an augment into a free socket. False when the socket does not exist or is
-        /// already occupied — the caller learns nothing happened instead of losing what was in.</summary>
+        /// <summary>Puts an augment into a free socket. False when the socket does not exist, is
+        /// already occupied, or does not take that augment (<see cref="AugmentFit"/>) — the caller
+        /// learns nothing happened instead of losing what was in. A refusal changes nothing at all:
+        /// an augment that does not belong in a slot must come back to whoever offered it, not
+        /// disappear into one where it would sit inert.</summary>
         bool Install(string socketId, string augmentId);
 
         /// <summary>Takes the augment out and hands it back; null when the socket is unknown or free.</summary>
