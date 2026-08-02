@@ -73,7 +73,8 @@ namespace LastBreathTest.BattleSystemTests
             ("Recipes", CatalogIds("Recipes", "craftingRecipes"), false),
             ("Resources", [.. CatalogIds("Resources", "upgradeResources"), .. CatalogIds("Resources", "craftingResources")], false),
             ("Abilities", CatalogIds("Abilities", "abilities"), true),
-            ("AbilityUpgrades", NestedIds("Abilities", "abilities", "upgrades"), true),
+            // Augments are records of their own in the same catalog, not a nested list under an ability
+            ("Augments", CatalogIds("Abilities", "augments"), true),
             ("Npc", CatalogIds("Npc", "npcs"), false),
             ("NpcModifiers", NestedIds("NpcModifiers", "mods", "modifiers"), true),
             // A condition is worded under a key derived from its id, not under the id itself

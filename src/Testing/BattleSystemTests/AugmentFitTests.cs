@@ -348,12 +348,11 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void ARecordCarriesNoBindingNoPoolAndNoGroupUntilItSaysSo()
+        public void ARecordCarriesNoBindingAndNoGroupUntilItSaysSo()
         {
             var declared = new AbilityUpgradeData();
 
             Assert.AreEqual(string.Empty, declared.AbilityId, "an augment is bound to an ability it never named");
-            Assert.AreEqual(string.Empty, declared.DropPool, "an augment drops from a pool it never named");
             Assert.AreEqual(string.Empty, declared.ExclusionGroup, "an augment conflicts with a group it never named");
         }
 

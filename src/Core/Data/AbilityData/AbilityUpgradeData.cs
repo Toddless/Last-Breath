@@ -39,9 +39,6 @@ namespace Core.Data.AbilityData
         /// fitting rule refuses such a record outright (<see cref="Battle.Abilities.AugmentFitResult.ContradictoryDeclaration"/>).</summary>
         [JsonProperty("fitsAnyAbility")] public bool FitsAnyAbility { get; init; }
 
-        /// <summary>Id of the pool the augment drops from. Empty means it never drops.</summary>
-        [JsonProperty("dropPool")] public string DropPool { get; init; } = string.Empty;
-
         /// <summary>Id of the mutual-exclusion group: an ability wears at most one augment of a group.
         /// Empty conflicts with nothing.</summary>
         [JsonProperty("exclusionGroup")] public string ExclusionGroup { get; init; } = string.Empty;
