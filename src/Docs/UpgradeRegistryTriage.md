@@ -4,15 +4,17 @@
 
 | Корзина | Записей | Доля | Что значит |
 |---|---|---|---|
-| Числовая | 103 | 54% | Декоратор по строковому ключу `AbilityParameterSet`; уезжает в json, кода не требует |
+| Числовая | 104 | 55% | Декоратор по строковому ключу `AbilityParameterSet`; уезжает в json, кода не требует |
 | Обобщаемая | 27 | 14% | Поведение над общим контрактом (райдер, стратегия, эффект); код пишется один раз на семейство |
 | Именная | 58 | 31% | Обращается к членам конкретного класса способности; остаётся с явным `abilityId` |
 
-Скрытых привязок (F-35): **30** — записи, которые выглядят общими, но на чужой способности инертны или падают.
+Скрытых привязок (F-35): **30** — записи, которые выглядят общими, но на чужой способности инертны, падают или срабатывают не по адресу.
+
+> Колонка «Привязка» называет класс, от которого запись зависит. У части записей это **семейный базовый класс** (`DamagingAbility`, `MulticastAbility`), а не конкретная способность: такая запись работает на всём семействе, и вопрос «чья она» решается не этой колонкой, а тем, под какой способностью она объявлена в `BaseAbilityData.json`.
 
 ---
 
-## Числовая — 103
+## Числовая — 104
 
 | Id | Стр. | Создаёт | Привязка | Почему | Скрытая |
 |---|---|---|---|---|---|
@@ -116,6 +118,7 @@
 | `Ability_Sa_Upgrade_Reduce_Cost` | 1255 | `AbilityUpgradeReduceCost` | — | декоратор по универсальному CostValue |  |
 | `Ability_Sa_Upgrade_Reduce_Cooldown` | 1261 | `AbilityUpgradeReduceCooldown` | — | декоратор по универсальному Cooldown |  |
 | `Ability_Sa_Upgrade_Detonation_Scales` | 1267 | `AbilityUpgradeParameterSet` | — | обёртка типизирована Ability, но бампит StaticArmor.Parameters.DetonationWeaponScale/DetonationSpellScale — вне StaticArmor оба декоратора инертны (тот самый ParameterSet из F-35) | да |
+| `Ability_Sa_Upgrade_Buff_Duration` | 1276 | `SimpleUpgrade<Ability>` | — | декоратор по StaticArmor.Parameters.Duration. Ключ Duration — литерал nameof, его регистрируют минимум ШЕСТЬ способностей: на чужой способности запись не инертна, а молча продлевает её собственный баф (W-91) | да |
 | `Ability_Sa_Upgrade_More_Splash` | 1284 | `SimpleUpgrade<Ability>` | — | декоратор по StaticArmor.Parameters.StageThreeSplashDamage — ключ только у StaticArmor | да |
 | `Ability_Sa_Upgrade_Less_Stacks` | 1292 | `SimpleUpgrade<Ability>` | — | декоратор Subtract по StaticArmor.Parameters.RequiredStacks — ключ только у StaticArmor, вне неё инертен | да |
 | `Ability_Sa_Upgrade_Cost_Barrier` | 1314 | `AbilityUpgradeCostTypeOverride` | — | AbilityUpgrade<Ability>: Override-декоратор по универсальному AbilityParameter.CostType (enum хранится числом), членов способности не касается |  |
@@ -219,7 +222,7 @@
 
 ## Скрытые привязки — 30
 
-Записи, у которых механизм отказа тихий: на способности, для которой они не писались, аугмент применится и ничего не сделает либо сработает не по адресу. Каждой нужен явный `abilityId` — тегом не закрывается.
+Записи, у которых механизм отказа тихий. Механизма два: **ключа нет** — декоратор молча ничего не делает; **ключ есть у соседней способности** — срабатывает не по адресу. Каждой нужен явный `abilityId`, тегом не закрывается.
 
 | Id | Корзина | Привязка | Почему тихо |
 |---|---|---|---|
@@ -250,6 +253,6 @@
 | `Ability_Dis_Upgrade_More_Restore` | Числовая | — | декоратор по Discharge.Parameters.StageThreeBarrierRestore — ключ только у Discharge |
 | `Ability_Dis_Upgrade_Spell_Scale` | Числовая | — | декоратор по общему AbilityParameter.SpellDamageScale, но ключ ставит только RegisterDamageParameters (5 классов) — на не-уронной способности инертен |
 | `Ability_Sa_Upgrade_Detonation_Scales` | Числовая | — | обёртка типизирована Ability, но бампит StaticArmor.Parameters.DetonationWeaponScale/DetonationSpellScale — вне StaticArmor оба декоратора инертны (тот самый ParameterSet из F-35) |
-| `Ability_Sa_Upgrade_Buff_Duration` | undefined | — | декоратор по StaticArmor.Parameters.Duration — ключ регистрирует только StaticArmor |
+| `Ability_Sa_Upgrade_Buff_Duration` | Числовая | — | декоратор по StaticArmor.Parameters.Duration. Ключ Duration — литерал nameof, его регистрируют минимум ШЕСТЬ способностей: на чужой способности запись не инертна, а молча продлевает её собственный баф (W-91) |
 | `Ability_Sa_Upgrade_More_Splash` | Числовая | — | декоратор по StaticArmor.Parameters.StageThreeSplashDamage — ключ только у StaticArmor |
 | `Ability_Sa_Upgrade_Less_Stacks` | Числовая | — | декоратор Subtract по StaticArmor.Parameters.RequiredStacks — ключ только у StaticArmor, вне неё инертен |
