@@ -7,10 +7,12 @@ namespace Core.Battle.Abilities
     using Session;
 
     /// <inheritdoc cref="IAbilitySocketBoard"/>
-    /// <param name="augments">Optional: what the augment ids mean. Without it the board holds slots
-    /// and nothing else — a composition that mints no augments (the battle sandbox) has no records
-    /// for the fitting rule to be right about, and the board seats what it is handed, as it did
-    /// before there was a rule. With it, every seating goes through <see cref="AugmentFit"/>.</param>
+    /// <param name="augments">Optional: what the augment ids mean. The catalog is the records the
+    /// fitting rule reads, so a composition that supplies none leaves the board a plain slot-holder:
+    /// it seats what it is handed, as it did before there was a rule. That is the contract, not a
+    /// hole waiting for a guard — with no records there is nothing for the rule to be right about,
+    /// and refusing every id instead would take the sockets of that composition down with it. Where
+    /// a catalog is supplied, every seating goes through <see cref="AugmentFit"/>.</param>
     public sealed class AbilitySocketBoard(IAbilityAugmentCatalog? augments = null)
         : IAbilitySocketBoard, ISessionResettable
     {

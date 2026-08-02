@@ -173,7 +173,8 @@ namespace LastBreathTest.BattleSystemTests
                     .With(Augment(OtherGroupAugment, tier: 2, [AbilityTags.Poison], exclusionGroup: SpreadGroup)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(PoisonSlotTwo, PoisonAbility, tier: 2));
-            board.Install(PoisonSlotOne, GroupedAugment);
+            Assert.IsTrue(board.Install(PoisonSlotOne, GroupedAugment),
+                "the first group never went on — the second augment is being measured against a bare ability");
 
             Assert.IsTrue(board.Install(PoisonSlotTwo, OtherGroupAugment));
         }
@@ -190,7 +191,8 @@ namespace LastBreathTest.BattleSystemTests
                     .With(Augment(SameGroupAugment, tier: 2, [AbilityTags.Cold], exclusionGroup: DurationGroup)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(ColdSlot, ColdAbility, tier: 2));
-            board.Install(PoisonSlotOne, GroupedAugment);
+            Assert.IsTrue(board.Install(PoisonSlotOne, GroupedAugment),
+                "the poison ability never wore the group — the cold slot is crossing nothing");
 
             Assert.IsTrue(board.Install(ColdSlot, SameGroupAugment));
         }
@@ -209,9 +211,9 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void ABoardWithoutACatalogHoldsSlotsAndJudgesNothing()
         {
-            // The seam stated out loud: the rule reads records, and a composition that mints no
-            // augments (the battle sandbox) has none. Such a board is the plain slot-holder it was
-            // before there was a rule — this augment is three tiers above the slot.
+            // The seam stated out loud: the rule reads records, so a board composed without a
+            // catalog has nothing to read and stays the plain slot-holder it was before there was
+            // a rule — this augment is three tiers above the slot and still goes in.
             var board = new AbilitySocketBoard();
             board.Sync([Slot(PoisonSlotOne, PoisonAbility, tier: 1)]);
 

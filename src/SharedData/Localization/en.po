@@ -3619,7 +3619,7 @@ msgid "Passive_Skill_Resonance_Description"
 msgstr "Every ability used this turn grants {SpellDamagePerStack:%} spell damage and {MulticastPerStack:%} multicast chance until the end of the turn."
 
 msgid "Passive_Skill_Mana_Resonance"
-msgstr "Mana Resonance"ы
+msgstr "Mana Resonance"
 
 msgid "Passive_Skill_Mana_Resonance_Description"
 msgstr "Abilities deal extra damage equal to a {Rate:%} of the mana spent this turn."
