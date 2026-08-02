@@ -28,6 +28,10 @@ namespace PassiveTreeEditor.Source.View
         private const float FineSnap = 1f;
         private const float CoarseSnap = 25f;
 
+        /// <summary>Zoom a jump to a node lands at when the view was further out than this: node radii
+        /// are authored in world units against this scale, so at 1 a small node is its drawn size.</summary>
+        private const float FocusZoom = 1f;
+
         private readonly List<PassiveNode> _drawCandidates = [];
         private readonly List<PassiveNode> _pickCandidates = [];
         private readonly HashSet<string> _selected = new(StringComparer.Ordinal);
@@ -141,6 +145,24 @@ namespace PassiveTreeEditor.Source.View
             if (_document.Contains(id)) _selected.Add(id);
             SelectionChanged?.Invoke();
             QueueRedraw();
+        }
+
+        /// <summary>
+        /// Puts one node in the middle of the view and selects it — where a search hit and a check
+        /// finding both land. The zoom is only ever raised, never lowered: arriving from the whole-tree
+        /// view onto a small node two pixels across is not arriving anywhere, while a jump that pulls
+        /// the view further out would throw away a close-up the author was working in.
+        /// </summary>
+        public bool FocusNode(string id)
+        {
+            PassiveNode? node = _document.Find(id);
+            if (node is null) return false;
+
+            if (_zoom < FocusZoom) _zoom = FocusZoom;
+            _panOffset = Size / 2f - new Vector2(node.X, node.Y) * _zoom;
+
+            SelectOnly(id);
+            return true;
         }
 
         /// <summary>Fits the whole tree on screen. Also the recovery hatch when panning has taken the
@@ -676,7 +698,9 @@ namespace PassiveTreeEditor.Source.View
                     SelectionChanged?.Invoke();
                     QueueRedraw();
                     break;
-                case Key.F:
+                // Bare F frames the tree; with Ctrl it is the search shortcut, which belongs to the
+                // whole tool and is answered above the canvas.
+                case Key.F when !key.CtrlPressed:
                     FrameAll();
                     break;
             }

@@ -6,6 +6,7 @@ namespace PassiveTreeEditor.Source.View
     using Core.Modifiers.Conditions;
     using Core.Modifiers.Context;
     using Core.PassiveTree;
+    using Editing;
     using Godot;
     using Io;
 
@@ -24,6 +25,10 @@ namespace PassiveTreeEditor.Source.View
             ModifierValueType.Increase,
             ModifierValueType.Multiplicative
         ];
+
+        /// <summary>Survives the rebuilds, because the rows do not: a row is thrown away the moment its
+        /// knob changes, and what the author typed has to outlive the control that took it.</summary>
+        private readonly ContextLineValues _contextValues = new();
 
         private AbilityCatalog? _abilities;
         private ConditionProvider? _conditions;
@@ -329,15 +334,12 @@ namespace PassiveTreeEditor.Source.View
             // file is loaded, so the tool must not be able to author one in the first place.
             top.AddChild(EditorControls.Picker(ContextKnobs.Bound, line.Parameter, parameter =>
             {
-                line.Parameter = parameter;
-
-                // The knob owns which kind of line it takes, so swapping it re-picks a type the new knob
-                // accepts. The authored number is left untouched: it means nothing while the knob is a
-                // switch, and it is still there when a knob that reads a value comes back. The type is not
-                // carried the same way — a line written as Flat or Multiplicative returns as Increase.
-                // Saving while the knob is a switch is what ends the number's life; see the value box.
-                if (ContextKnobs.WhyRefused(parameter, line.ValueType) is not null)
-                    line.ValueType = ContextKnobs.IsFlag(parameter) ? ModifierValueType.Flag : ModifierValueType.Increase;
+                // Which kind of line the new knob makes of this one is the plain class's rule, not the
+                // control's: pointing a line at a switch turns it into one, and coming back to a knob
+                // that reads a value hands the authored number and its bucket back, so a detour through
+                // a switch costs the author nothing. Saving while the knob is a switch is still what
+                // ends the number's life — the file writes a flag line with no value at all.
+                _contextValues.Retarget(line, parameter);
 
                 ChangedTotals();
                 Rebuild();
@@ -363,14 +365,16 @@ namespace PassiveTreeEditor.Source.View
             bottom.AddChild(hint);
 
             // A switch carries no number: the box shows the pinned value and neither takes input nor
-            // writes back, so the number a numeric knob left behind survives a detour through a switch
-            // and back — in this row, for as long as it lives. It does not survive the file: a flag line
-            // is written with no value at all, so a save while the knob is a switch loses the number and
-            // a reload brings the row back at zero.
-            value.Editable = !line.IsFlag;
+            // writes back. The gate is decided once, when the row is built, and never re-read off the
+            // line: a row outlives its own knob for as long as the rebuild that replaces it takes, and
+            // a box standing in for a switch must not be able to author the pinned one as a quantity
+            // whatever the line has turned into by the time the box is torn down.
+            bool takesNumber = !line.IsFlag;
+
+            value.Editable = takesNumber;
             value.ValueChanged += amount =>
             {
-                if (line.IsFlag) return;
+                if (!takesNumber) return;
 
                 line.Value = (float)amount;
                 hint.Text = ValueHint(line.ValueType, line.Value);

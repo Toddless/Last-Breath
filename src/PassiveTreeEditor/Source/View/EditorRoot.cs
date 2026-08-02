@@ -2,6 +2,7 @@ namespace PassiveTreeEditor.Source.View
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Data.GameData;
     using Core.Entity;
     using Core.Enums;
@@ -11,6 +12,7 @@ namespace PassiveTreeEditor.Source.View
     using Godot;
     using Io;
     using Simulation;
+    using Validation;
     using EditorSettings = Io.EditorSettings;
 
     /// <summary>
@@ -44,6 +46,9 @@ namespace PassiveTreeEditor.Source.View
         private InspectorPanel _inspector = null!;
         private SummaryPanel _summary = null!;
         private BaseStatsPanel _baseStats = null!;
+        private FindPanel _find = null!;
+        private ValidationPanel _check = null!;
+        private TabContainer _tabs = null!;
         private LineEdit _pathEdit = null!;
         private Label _status = null!;
         private SpinBox _budget = null!;
@@ -65,6 +70,17 @@ namespace PassiveTreeEditor.Source.View
         {
             CaptureSettings();
             EditorSettings.Save(_settings);
+        }
+
+        /// <summary>Ctrl+F opens the search from wherever the hands already are. Shortcut input rather
+        /// than unhandled input: it runs while a text field holds the keyboard, which is exactly when
+        /// the author wants to search for the next node.</summary>
+        public override void _ShortcutInput(InputEvent @event)
+        {
+            if (@event is not InputEventKey { Pressed: true, Keycode: Key.F, CtrlPressed: true }) return;
+
+            OpenFind();
+            GetViewport().SetInputAsHandled();
         }
 
         // ── layout ─────────────────────────────────────────────────────────────────────────────
@@ -165,6 +181,7 @@ namespace PassiveTreeEditor.Source.View
             };
             bar.AddChild(guides);
 
+            bar.AddChild(ToolbarButton("Find", OpenFind));
             bar.AddChild(ToolbarButton("Check", RunValidation));
 
             return bar;
@@ -214,36 +231,37 @@ namespace PassiveTreeEditor.Source.View
             simulation.AddChild(reset);
             side.AddChild(simulation);
 
-            var tabs = new TabContainer
+            _tabs = new TabContainer
             {
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
                 SizeFlagsVertical = SizeFlags.ExpandFill
             };
-            side.AddChild(tabs);
+            side.AddChild(_tabs);
 
             _inspector = new InspectorPanel();
             _summary = new SummaryPanel();
             _baseStats = new BaseStatsPanel();
+            _find = new FindPanel();
+            _check = new ValidationPanel();
+            _find.Initialize();
+            _check.Initialize();
 
-            tabs.AddChild(Scrolled("Node", _inspector));
-            tabs.AddChild(Scrolled("Totals", _summary));
-            tabs.AddChild(Scrolled("Base", _baseStats));
+            _tabs.AddChild(Scrolled("Node", _inspector));
+            _tabs.AddChild(Scrolled("Totals", _summary));
+            _tabs.AddChild(Scrolled("Base", _baseStats));
+
+            // The two result panels scroll their own list and go in whole rather than wrapped: the
+            // query field and the count stay put while the results move under them.
+            _tabs.AddChild(_find);
+            _tabs.AddChild(_check);
 
             return side;
         }
 
         private static ScrollContainer Scrolled(string name, Control content)
         {
-            var scroll = new ScrollContainer
-            {
-                Name = name,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                SizeFlagsVertical = SizeFlags.ExpandFill,
-                HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
-            };
-
-            content.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            scroll.AddChild(content);
+            ScrollContainer scroll = EditorControls.Scrolled(content);
+            scroll.Name = name;
             return scroll;
         }
 
@@ -259,6 +277,17 @@ namespace PassiveTreeEditor.Source.View
             _inspector.NodeEdited += MarkDirty;
             _inspector.TotalsChanged += OnDocumentChanged;
             _baseStats.ProfileChanged += RefreshSummary;
+            _find.NodePicked += JumpTo;
+            _check.NodePicked += JumpTo;
+            _check.RecheckRequested += RunValidation;
+        }
+
+        /// <summary>Both result lists lead to the same place: the node in the middle of the canvas,
+        /// selected, with the inspector already showing it.</summary>
+        private void JumpTo(string id)
+        {
+            if (_canvas.FocusNode(id)) SetStatus($"jumped to {id}");
+            else SetStatus($"{id} is no longer in the tree");
         }
 
         // ── data ───────────────────────────────────────────────────────────────────────────────
@@ -316,6 +345,10 @@ namespace PassiveTreeEditor.Source.View
             _budget.Value = document.Budget;
             _dirty = false;
             _inspector.Rebuild();
+            _find.SetDocument(document);
+
+            // Findings belong to the tree they were made on, so a different tree starts unchecked.
+            _check.Clear();
             RefreshSummary();
         }
 
@@ -370,12 +403,32 @@ namespace PassiveTreeEditor.Source.View
             _settings.BaseStats = _baseStats.Overrides();
         }
 
+        /// <summary>
+        /// Runs the integrity rules and shows what they found. The report is a panel rather than a
+        /// dialog because a finding is a place to go: the author reads a line, clicks it, fixes the node
+        /// and reads the next one, and a modal list would be dismissed before the first fix.
+        /// </summary>
         private void RunValidation()
         {
-            List<string> issues = _canvas.Document.Validate();
-            if (issues.Count == 0) issues.Add("No problems found.");
-            ShowMessage("Check", issues);
+            List<TreeIssue> issues = TreeValidator.Validate(_canvas.Document, AbilityView());
+
+            _check.Report(issues);
+            ShowTab(_check);
+            SetStatus(issues.Count == 0 ? "check: no problems found" : $"check: {issues.Count} problem(s)");
         }
+
+        /// <summary>What the tree may name, and what it may name without being wrong: the ability rules
+        /// tell an id nobody has heard of apart from one that exists but never belongs in a tree.</summary>
+        private AbilityCatalogView AbilityView() =>
+            new(_abilities.Abilities.Select(entry => entry.Id), _abilities.Selectable().Select(entry => entry.Id));
+
+        private void OpenFind()
+        {
+            ShowTab(_find);
+            _find.FocusQuery();
+        }
+
+        private void ShowTab(Control panel) => _tabs.CurrentTab = _tabs.GetTabIdxFromControl(panel);
 
         // ── glue ───────────────────────────────────────────────────────────────────────────────
 
@@ -403,6 +456,9 @@ namespace PassiveTreeEditor.Source.View
         private void MarkDirty()
         {
             _dirty = true;
+
+            // The title is one of the three fields a search matches on, and it is edited from here.
+            _find.Invalidate();
             SetStatus("editing");
         }
 
@@ -411,6 +467,10 @@ namespace PassiveTreeEditor.Source.View
             _dirty = true;
             _allocation.Resync(_canvas.Document);
             _canvas.RefreshFrontier();
+
+            // A hit that no longer exists jumps nowhere, and a node just created is the one most likely
+            // to be searched for next.
+            _find.Invalidate();
             RefreshSummary();
         }
 

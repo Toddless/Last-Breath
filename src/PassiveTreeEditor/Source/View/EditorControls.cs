@@ -71,6 +71,42 @@ namespace PassiveTreeEditor.Source.View
             SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
         };
 
+        /// <summary>
+        /// A vertically scrolling frame around content that grows. Horizontal scrolling is off on
+        /// purpose: it is what fixes the width of the content, and wrapped text needs a width before it
+        /// can report how tall it is.
+        /// </summary>
+        public static ScrollContainer Scrolled(Control content)
+        {
+            var scroll = new ScrollContainer
+            {
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+                SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+                HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
+            };
+
+            content.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            scroll.AddChild(content);
+            return scroll;
+        }
+
+        /// <summary>A row of a list that leads somewhere: full width, text left and wrapped, so a whole
+        /// sentence stays readable in a narrow panel instead of being cut off mid-word.</summary>
+        public static Button RowButton(string text, Action activate)
+        {
+            var button = new Button
+            {
+                Text = text,
+                Alignment = HorizontalAlignment.Left,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+                TooltipText = text
+            };
+
+            button.Pressed += activate;
+            return button;
+        }
+
         public static SpinBox Number(double value, double step) => new()
         {
             MinValue = -InputLimit,
