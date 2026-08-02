@@ -33,6 +33,20 @@
     {
         private readonly Dictionary<string, Func<AbilityUpgradeData, IAbilityUpgrade>> _abilityUpgrades = new()
         {
+            // Augments of the base contract every ability honours. They belong to no ability, so
+            // they are written once and state their reduction as a share of the number they cut.
+            ["Ability_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("costShare", 0.3f)),
+            ["Ability_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cooldownShare", 0.25f)),
             ["Ability_SoA_Upgrade_Poison_On_Hit"] = data =>
                 new SoAsUpgradePoisonOnHit(
                     data.Id,
@@ -80,18 +94,6 @@
                     data.Tags,
                     data.Tier,
                     (int)data.UpgradeProperties.GetValueOrDefault("amountAttacks", 1)),
-            ["Ability_SoA_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 50)),
-            ["Ability_SoA_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
             ["Ability_Ip_Upgrade_Single_Empowered_Attack"] = data =>
                 new IpUpgradeSingleEmpoweredAttack(
                     data.Id,
@@ -139,12 +141,6 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("damageMultiplier", 0.05f)),
-            ["Ability_Ip_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
             ["Ability_JoP_Upgrade_Bouncing"] = data =>
                 new JoPUpgradeBouncing(
                     data.Id,
@@ -202,18 +198,6 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("poisonDuration", 1)),
-            ["Ability_JoP_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
-            ["Ability_Ov_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
             ["Ability_Ov_Upgrade_Burn_Add_Cost"] = data =>
                 new OvUpgradeBurnAddCost(
                     data.Id,
@@ -221,12 +205,6 @@
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("burnPercent", 0.30f),
                     data.UpgradeProperties.GetValueOrDefault("additionalCost", 50)),
-            ["Ability_Ov_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 50)),
             ["Ability_Ov_Upgrade_Mana_Step"] = data =>
                 new SimpleUpgrade<Ability>(
                     data.Id,
@@ -273,12 +251,6 @@
                     data.Tier,
                     ability => ability.ResetCooldownOnFinalStage = true,
                     ability => ability.ResetCooldownOnFinalStage = false),
-            ["Ability_Cl_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 3)),
             ["Ability_Cl_Upgrade_Scales_Add_Cost"] = data =>
                 new ClUpgradeScalesAddCost(
                     data.Id,
@@ -287,12 +259,6 @@
                     data.UpgradeProperties.GetValueOrDefault("weaponDamageScale", 0.15f),
                     data.UpgradeProperties.GetValueOrDefault("spellDamageScale", 0.35f),
                     data.UpgradeProperties.GetValueOrDefault("additionalCost", 50)),
-            ["Ability_Cl_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 80)),
             ["Ability_Cl_Upgrade_Additional_Jump"] = data =>
                 new ClUpgradeParameter(
                     data.Id,
@@ -314,18 +280,6 @@
                     data.Tier,
                     ability => ability.IgnoreResistances = true,
                     ability => ability.IgnoreResistances = false),
-            ["Ability_Ia_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
-            ["Ability_Ia_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
             ["Ability_Ia_Upgrade_Additional_Barrier"] = data =>
                 new IaUpgradeParameter(
                     data.Id,
@@ -347,18 +301,6 @@
                     data.Tier,
                     IceAegis.IceAegis.Parameters.Duration,
                     data.UpgradeProperties.GetValueOrDefault("amount", 1f)),
-            ["Ability_Arm_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
-            ["Ability_Arm_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
             ["Ability_Arm_Upgrade_Extend_Stun"] = data =>
                 new ArmUpgradeParameter(
                     data.Id,
@@ -483,18 +425,6 @@
                     data.Tier,
                     Sacrifice.Sacrifice.Parameters.Charges,
                     data.UpgradeProperties.GetValueOrDefault("amount", 1)),
-            ["Ability_Sac_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
-            ["Ability_Sac_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 25)),
             ["Ability_Sac_Upgrade_Additional_Rate"] = data =>
                 new SacUpgradeParameter(
                     data.Id,
@@ -537,18 +467,6 @@
                     data.Tags,
                     data.Tier,
                     ability => new FreeCastEffect(ability.Id)),
-            ["Ability_Bf_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
-            ["Ability_Bf_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 120)),
             ["Ability_Bf_Upgrade_Fury_Duration"] = data =>
                 new BfUpgradeFuryDuration(
                     data.Id,
@@ -608,18 +526,6 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("duration", 1)),
-            ["Ability_Ar_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
-            ["Ability_Ar_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 40)),
             ["Ability_Ar_Upgrade_Recovery_Bonus"] = data =>
                 new ArUpgradeBlessingBonus(
                     data.Id,
@@ -662,18 +568,6 @@
                     data.Tier,
                     ability => new DamageBuffEffect(ability.Duration, maxStacks: 1,
                         data.UpgradeProperties.GetValueOrDefault("amount", 0.55f))),
-            ["Ability_Dst_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 50)),
-            ["Ability_Dst_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
             ["Ability_Dst_Upgrade_Accuracy"] = data =>
                 new DstUpgradeAccuracy(
                     data.Id,
@@ -700,18 +594,6 @@
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("healthRestore", 0.07f),
                     data.UpgradeProperties.GetValueOrDefault("manaRestore", 0.07f)),
-            ["Ability_Hb_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 50)),
-            ["Ability_Hb_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
             ["Ability_Hb_Upgrade_Additional_Scales"] = data =>
                 new AbilityUpgradeAdditionalScales(
                     data.Id,
@@ -789,18 +671,6 @@
                     data.Tier,
                     (int)data.UpgradeProperties.GetValueOrDefault("stacks", 1),
                     data.UpgradeProperties.GetValueOrDefault("cost", 50)),
-            ["Ability_Cc_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
-            ["Ability_Cc_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 30)),
             ["Ability_Ds_Upgrade_Additional_Attack_Chance"] = data =>
                 new DsUpgradeAdditionalAttackChance(
                     data.Id,
@@ -846,18 +716,6 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("duration", 1)),
-            ["Ability_Ds_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
-            ["Ability_Ds_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 25)),
             ["Ability_Pe_Upgrade_Apply_Seal_Of_Oblivion"] = data =>
                 new PeUpgradeApplySealOfOblivion(
                     data.Id,
@@ -892,12 +750,6 @@
                     data.Id,
                     data.Tags,
                     data.Tier),
-            ["Ability_Pe_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 30)),
             ["Ability_Pe_Upgrade_Reduce_Cooldown"] = data =>
                 new AbilityUpgradeReduceCooldownAddCost(
                     data.Id,
@@ -958,18 +810,6 @@
                     data.Tags,
                     data.Tier,
                     (int)data.UpgradeProperties.GetValueOrDefault("duration", 1)),
-            ["Ability_Pc_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
-            ["Ability_Pc_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 30)),
             ["Ability_Is_Upgrade_Reduce_Cooldown_Add_Cost"] = data =>
                 new AbilityUpgradeReduceCooldownAddCost(
                     data.Id,
@@ -984,12 +824,6 @@
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("weaponDamageScale", 0.05f),
                     data.UpgradeProperties.GetValueOrDefault("spellDamageScale", 0.15f)),
-            ["Ability_Is_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 70)),
             ["Ability_Is_Upgrade_Additional_Crit_Damage"] = data =>
                 new AbilityUpgradeAdditionalCritDamage(
                     data.Id,
@@ -1066,18 +900,6 @@
                     new SimpleAbilityParameterDecorator(
                         IceBlocks.Parameters.WitheringValue, Priority.Weak, OperationType.Add,
                         data.UpgradeProperties.GetValueOrDefault("amount", 0.05f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
-            ["Ability_Ib_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
-            ["Ability_Ib_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
             ["Ability_Ib_Upgrade_Withering_Stacks"] = data =>
                 new SimpleUpgrade<Ability>(
                     data.Id,
@@ -1125,18 +947,6 @@
                     data.Tier,
                     ability => ability.ConsumeStunForDoubleDamage = true,
                     ability => ability.ConsumeStunForDoubleDamage = false),
-            ["Ability_Df_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
-            ["Ability_Df_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
             ["Ability_Df_Upgrade_Frostbite_Duration"] = data =>
                 new SimpleUpgrade<Ability>(
                     data.Id,
@@ -1187,18 +997,6 @@
                     data.Tags,
                     data.Tier,
                     new ExecuteImpactRider(data.Id, data.UpgradeProperties.GetValueOrDefault("threshold", 0.30f))),
-            ["Ability_Dis_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
-            ["Ability_Dis_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
             ["Ability_Dis_Upgrade_Multiplier"] = data =>
                 new SimpleUpgrade<Ability>(
                     data.Id,
@@ -1252,18 +1050,6 @@
                     data.Tier,
                     ability => ability.ConsumeManaInstead = true,
                     ability => ability.ConsumeManaInstead = false),
-            ["Ability_Sa_Upgrade_Reduce_Cost"] = data =>
-                new AbilityUpgradeReduceCost(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
-            ["Ability_Sa_Upgrade_Reduce_Cooldown"] = data =>
-                new AbilityUpgradeReduceCooldown(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
             ["Ability_Sa_Upgrade_Detonation_Scales"] = data =>
                 new AbilityUpgradeParameterSet(
                     data.Id,

@@ -2561,6 +2561,22 @@ msgstr "Grants a barrier equal to {BarrierBase} + {PerIntelligenceScale} per poi
 
 
 # ------------------------------
+# Ability upgrades — every ability
+# ------------------------------
+
+msgid "Ability_Upgrade_Reduce_Cost"
+msgstr "Reduce Cost"
+
+msgid "Ability_Upgrade_Reduce_Cost_Description"
+msgstr "-{costShare:%} cost."
+
+msgid "Ability_Upgrade_Reduce_Cooldown"
+msgstr "Reduce Cooldown"
+
+msgid "Ability_Upgrade_Reduce_Cooldown_Description"
+msgstr "-{cooldownShare:%} cooldown."
+
+# ------------------------------
 # Ability upgrades — Intelligence stance
 # ------------------------------
 
@@ -2575,12 +2591,6 @@ msgstr "Additional Scales"
 
 msgid "Ability_Is_Upgrade_Additional_Scales_Description"
 msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} damage scaling."
-
-msgid "Ability_Is_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Is_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
 
 msgid "Ability_Is_Upgrade_Additional_Crit_Damage"
 msgstr "Additional Crit Damage"
@@ -2606,23 +2616,11 @@ msgstr "Apply Fragility"
 msgid "Ability_Is_Upgrade_Apply_Fragility_Description"
 msgstr "Applies {@Effect_Fragility} ({duration|turn|turns}, up to {maxStacks|stack|stacks}, +{critDamageAmp:%} critical damage taken)."
 
-msgid "Ability_Ov_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Ov_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
 msgid "Ability_Ov_Upgrade_Burn_Add_Cost"
 msgstr "Burn Add Cost"
 
 msgid "Ability_Ov_Upgrade_Burn_Add_Cost_Description"
 msgstr "Absorbs {burnPercent:%} of mana, +{additionalCost} cost."
-
-msgid "Ability_Ov_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Ov_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
 
 msgid "Ability_Ov_Upgrade_Mana_Step"
 msgstr "Mana Step"
@@ -2660,23 +2658,11 @@ msgstr "Next Cast Pure"
 msgid "Ability_Ov_Upgrade_Next_Cast_Pure_Description"
 msgstr "The next activated ability deals {fraction:%} of its damage as pure."
 
-msgid "Ability_Cl_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Cl_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
 msgid "Ability_Cl_Upgrade_Scales_Add_Cost"
 msgstr "Scales Add Cost"
 
 msgid "Ability_Cl_Upgrade_Scales_Add_Cost_Description"
 msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} damage scaling, +{additionalCost} cost."
-
-msgid "Ability_Cl_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Cl_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
 
 msgid "Ability_Cl_Upgrade_Additional_Jump"
 msgstr "Additional Jump"
@@ -2695,18 +2681,6 @@ msgstr "Ignore Resistances"
 
 msgid "Ability_Cl_Upgrade_Ignore_Resistances_Description"
 msgstr "Lightning ignores resistances."
-
-msgid "Ability_Ia_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Ia_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
-msgid "Ability_Ia_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Ia_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
 
 msgid "Ability_Ia_Upgrade_Additional_Barrier"
 msgstr "Additional Barrier"
@@ -2854,18 +2828,6 @@ msgstr "Additional Attacks"
 msgid "Ability_SoA_Upgrade_Additional_Attacks_Description"
 msgstr "+{amountAttacks} attack."
 
-msgid "Ability_SoA_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_SoA_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
-msgid "Ability_SoA_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_SoA_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
 msgid "Ability_Ip_Upgrade_Single_Empowered_Attack"
 msgstr "Single Empowered Attack"
 
@@ -2913,12 +2875,6 @@ msgstr "Additional Damage Multiplier"
 
 msgid "Ability_Ip_Upgrade_Additional_Damage_Multiplier_Description"
 msgstr "+{damageMultiplier:%} empowerment per successful hit."
-
-msgid "Ability_Ip_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Ip_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
 
 msgid "Ability_JoP_Upgrade_Bouncing"
 msgstr "Bouncing"
@@ -2968,12 +2924,6 @@ msgstr "Poison Duration"
 msgid "Ability_JoP_Upgrade_Poison_Duration_Description"
 msgstr "+{poisonDuration|turn|turns} poison duration."
 
-msgid "Ability_JoP_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_JoP_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
 msgid "Ability_Ds_Upgrade_Additional_Attack_Chance"
 msgstr "Additional Attack Chance"
 
@@ -3015,18 +2965,6 @@ msgstr "Increased Buff Duration"
 
 msgid "Ability_Ds_Upgrade_Increased_Buff_Duration_Description"
 msgstr "+{duration|turn|turns} buff duration."
-
-msgid "Ability_Ds_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Ds_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
-msgid "Ability_Ds_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Ds_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
 
 msgid "Ability_Cc_Upgrade_Additional_Attack_Chance"
 msgstr "Additional Attack Chance"
@@ -3070,18 +3008,6 @@ msgstr "More Stacks More Cost"
 msgid "Ability_Cc_Upgrade_More_Stacks_More_Cost_Description"
 msgstr "+{stacks|stack|stacks}, +{cost} cost."
 
-msgid "Ability_Cc_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Cc_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
-msgid "Ability_Cc_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Cc_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
 msgid "Ability_Pe_Upgrade_Apply_Seal_Of_Oblivion"
 msgstr "Apply Seal Of Oblivion"
 
@@ -3117,12 +3043,6 @@ msgstr "Transfer Poison On Death"
 
 msgid "Ability_Pe_Upgrade_Transfer_Poison_On_Death_Description"
 msgstr "On the target's death, the poison transfers to another enemy."
-
-msgid "Ability_Pe_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Pe_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
 
 msgid "Ability_Pe_Upgrade_Reduce_Cooldown"
 msgstr "Reduce Cooldown"
@@ -3178,18 +3098,6 @@ msgstr "Increase Duration"
 msgid "Ability_Pc_Upgrade_Increase_Duration_Description"
 msgstr "+{duration|turn|turns} buff duration."
 
-msgid "Ability_Pc_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Pc_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
-msgid "Ability_Pc_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Pc_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
 # ------------------------------
 # Ability upgrades — Strength stance
 # ------------------------------
@@ -3229,18 +3137,6 @@ msgstr "Stage3 Burning"
 
 msgid "Ability_Arm_Upgrade_Stage3_Burning_Description"
 msgstr "Stage 3 applies {stacks} burning {stacks|stack|stacks} (×{damageMultiplier}, {duration|turn|turns})."
-
-msgid "Ability_Arm_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Arm_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
-msgid "Ability_Arm_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Arm_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
 
 msgid "Ability_Arm_Upgrade_Extend_Stun"
 msgstr "Extend Stun"
@@ -3344,18 +3240,6 @@ msgstr "Additional Charge"
 msgid "Ability_Sac_Upgrade_Additional_Charge_Description"
 msgstr "+{amount} charge."
 
-msgid "Ability_Sac_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Sac_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
-msgid "Ability_Sac_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Sac_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
 msgid "Ability_Bf_Upgrade_Burning_Fury"
 msgstr "Burning Fury"
 
@@ -3391,18 +3275,6 @@ msgstr "Less Burn"
 
 msgid "Ability_Bf_Upgrade_Less_Burn_Description"
 msgstr "Attacks burn {amount:%} less health."
-
-msgid "Ability_Bf_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Bf_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
-msgid "Ability_Bf_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Bf_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
 
 msgid "Ability_Bf_Upgrade_Fury_Duration"
 msgstr "Fury Duration"
@@ -3452,18 +3324,6 @@ msgstr "Buff Duration"
 msgid "Ability_Ar_Upgrade_Buff_Duration_Description"
 msgstr "+{duration|turn|turns} buff duration."
 
-msgid "Ability_Ar_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Ar_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
-msgid "Ability_Ar_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Ar_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
 msgid "Ability_Dst_Upgrade_Both_Hits_Buff"
 msgstr "Both Hits Buff"
 
@@ -3488,18 +3348,6 @@ msgstr "Damage Multiplier"
 msgid "Ability_Dst_Upgrade_Damage_Multiplier_Description"
 msgstr "+{amount:%} damage of both attacks."
 
-msgid "Ability_Dst_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Dst_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
-msgid "Ability_Dst_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Dst_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
 msgid "Ability_Hb_Upgrade_Additional_Lunges"
 msgstr "Additional Lunges"
 
@@ -3523,18 +3371,6 @@ msgstr "Armor Debuff"
 
 msgid "Ability_Hb_Upgrade_Armor_Debuff_Description"
 msgstr "Applies -{reduceArmorBy:%} armor ({duration|turn|turns}, up to {maxStacks|stack|stacks})."
-
-msgid "Ability_Hb_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Hb_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
-msgid "Ability_Hb_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Hb_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
 
 # ------------------------------
 # Passive skills
@@ -4152,18 +3988,6 @@ msgstr "Withering Value"
 msgid "Ability_Ib_Upgrade_Withering_Value_Description"
 msgstr "+{amount:%} to the Withering Curse value."
 
-msgid "Ability_Ib_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Ib_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
-msgid "Ability_Ib_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Ib_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
 msgid "Ability_Ib_Upgrade_Withering_Stacks"
 msgstr "Withering Stacks"
 
@@ -4201,18 +4025,6 @@ msgid "Ability_Ib_Upgrade_Consume_Stun_Description"
 msgstr "Consumes the target's stun and deals double damage."
 
 # Deep Freeze upgrades
-
-msgid "Ability_Df_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Df_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
-msgid "Ability_Df_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Df_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
 
 msgid "Ability_Df_Upgrade_Frostbite_Duration"
 msgstr "Frostbite Duration"
@@ -4258,18 +4070,6 @@ msgstr "Executes the target below {threshold:%} health."
 
 # Discharge upgrades
 
-msgid "Ability_Dis_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Dis_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
-msgid "Ability_Dis_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Dis_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
-
 msgid "Ability_Dis_Upgrade_Multiplier"
 msgstr "Multiplier"
 
@@ -4313,18 +4113,6 @@ msgid "Ability_Dis_Upgrade_Consume_Mana_Description"
 msgstr "Consumes mana instead of barrier."
 
 # Static Armor upgrades
-
-msgid "Ability_Sa_Upgrade_Reduce_Cost"
-msgstr "Reduce Cost"
-
-msgid "Ability_Sa_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} cost."
-
-msgid "Ability_Sa_Upgrade_Reduce_Cooldown"
-msgstr "Reduce Cooldown"
-
-msgid "Ability_Sa_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} cooldown."
 
 msgid "Ability_Sa_Upgrade_Detonation_Scales"
 msgstr "Detonation Scales"

@@ -12,10 +12,10 @@ namespace LastBreathTest.BattleSystemTests
     /// Seating an augment names two ids and holds neither, so the fitting rule is only worth as much
     /// as the thing that turns those ids into records. That thing is the ability data itself: the
     /// tags a fit is judged by are the tags the ability is built from, and the augment records are
-    /// declared alongside them. These tests hold the seam end to end — the shipped data reaching the
-    /// catalog through the real loader, the catalog reaching the board through the container each
-    /// project composes, and the board refusing what the rule refuses instead of taking what it is
-    /// handed.
+    /// declared in a section of the same file. These tests hold the seam end to end — the shipped data
+    /// reaching the catalog through the real loader, the catalog reaching the board through the
+    /// container each project composes, and the board refusing what the rule refuses instead of taking
+    /// what it is handed.
     /// </summary>
     [TestClass]
     public class AbilityAugmentCatalogTests
@@ -55,21 +55,20 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void EveryAugmentTheShippedDataDeclaresIsFoundByItsOwnId()
         {
-            // The records are declared inside the abilities and asked for by id alone: a drop, a
-            // conversion or a window listing candidates knows the id it was offered and nothing else.
+            // The records are declared on their own and asked for by id alone: a drop, a conversion
+            // or a window listing candidates knows the id it was offered and nothing else.
             IAbilityAugmentCatalog catalog = ShippedCatalog();
             int declared = 0;
 
-            foreach (JObject ability in DeclaredAbilities())
-                foreach (JObject augment in Declared(ability, "upgrades"))
-                {
-                    string id = augment.Value<string>("id") ?? string.Empty;
-                    AbilityUpgradeData? record = catalog.Find(id);
+            foreach (JObject augment in DeclaredAugments())
+            {
+                string id = augment.Value<string>("id") ?? string.Empty;
+                AbilityUpgradeData? record = catalog.Find(id);
 
-                    Assert.IsNotNull(record, $"the catalog does not hold '{id}', declared by {ability.Value<string>("id")}");
-                    Assert.AreEqual(augment.Value<int>("tier"), record.Tier, $"'{id}' came back carrying another tier");
-                    declared++;
-                }
+                Assert.IsNotNull(record, $"the catalog does not hold '{id}', which the section declares");
+                Assert.AreEqual(augment.Value<int>("tier"), record.Tier, $"'{id}' came back carrying another tier");
+                declared++;
+            }
 
             Assert.IsTrue(declared > 0, "the shipped data declares no augment at all, so the walk proves nothing");
         }
@@ -145,8 +144,8 @@ namespace LastBreathTest.BattleSystemTests
         {
             // Both verdicts on records that travelled the loading road the game uses, because the
             // fitting rule reads fields a hand-built record cannot prove are ever parsed. The content
-            // is written by the test: no shipped record declares a tag or a binding yet, so the
-            // shipped catalog can only produce refusals.
+            // is written by the test: no shipped record carries a tag yet, so a seating decided by
+            // tags has nothing in the shipped catalog to be shown on.
             IAbilityAugmentCatalog catalog = CatalogOver(TwoAbilitiesAndOneAugment());
             var board = new AbilitySocketBoard(catalog);
             board.Sync(
@@ -214,37 +213,36 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
         }
 
-        /// <summary>One poison ability carrying one poison augment, and a cold ability carrying none.</summary>
+        /// <summary>One poison ability, one cold ability, and — beside them rather than inside either
+        /// — one poison augment.</summary>
         private static string TwoAbilitiesAndOneAugment() =>
             $$"""
               {
                   "abilities": [
-                      {
-                          "id": "{{PoisonAbility}}",
-                          "tags": [ "{{AbilityTags.Poison}}" ],
-                          "upgrades": [
-                              { "id": "{{PoisonAugment}}", "tier": 2, "tags": [ "{{AbilityTags.Poison}}" ] }
-                          ]
-                      },
-                      { "id": "{{ColdAbility}}", "tags": [ "{{AbilityTags.Cold}}" ], "upgrades": [] }
+                      { "id": "{{PoisonAbility}}", "tags": [ "{{AbilityTags.Poison}}" ] },
+                      { "id": "{{ColdAbility}}", "tags": [ "{{AbilityTags.Cold}}" ] }
+                  ],
+                  "augments": [
+                      { "id": "{{PoisonAugment}}", "tier": 2, "tags": [ "{{AbilityTags.Poison}}" ] }
                   ]
               }
               """;
 
-        /// <summary>A shipped augment whose tier leaves a lower slot to be refused by, with the
-        /// ability declaring it.</summary>
+        /// <summary>A shipped augment whose tier leaves a lower slot to be refused by, together with
+        /// an ability it belongs on — the record's own, so the refusal under test can only be the
+        /// tier.</summary>
         private static (string Ability, string Augment, int Tier) AnAugmentAboveTierOne(IAbilityAugmentCatalog catalog)
         {
-            foreach (JObject ability in DeclaredAbilities())
-                foreach (JObject augment in Declared(ability, "upgrades"))
-                {
-                    string id = augment.Value<string>("id") ?? string.Empty;
-                    if (catalog.Find(id) is not { Tier: > 1 } record) continue;
+            foreach (JObject augment in DeclaredAugments())
+            {
+                string id = augment.Value<string>("id") ?? string.Empty;
+                if (catalog.Find(id) is not { Tier: > 1 } record) continue;
+                if (string.IsNullOrWhiteSpace(record.AbilityId)) continue;
 
-                    return (ability.Value<string>("id") ?? string.Empty, id, record.Tier);
-                }
+                return (record.AbilityId, id, record.Tier);
+            }
 
-            Assert.Fail("the shipped data declares no augment above tier one, so no slot can be too small for one");
+            Assert.Fail("the shipped data binds no augment above tier one, so no slot can be too small for one");
             return default;
         }
 
@@ -255,6 +253,14 @@ namespace LastBreathTest.BattleSystemTests
             foreach (string path in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Abilities), "*.json", SearchOption.AllDirectories))
                 foreach (JObject ability in Declared(JObject.Parse(File.ReadAllText(path)), "abilities"))
                     yield return ability;
+        }
+
+        /// <summary>Every augment record in the shipped catalog, read the same way.</summary>
+        private static IEnumerable<JObject> DeclaredAugments()
+        {
+            foreach (string path in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Abilities), "*.json", SearchOption.AllDirectories))
+                foreach (JObject augment in Declared(JObject.Parse(File.ReadAllText(path)), "augments"))
+                    yield return augment;
         }
 
         private static IEnumerable<JObject> Declared(JObject owner, string property) =>

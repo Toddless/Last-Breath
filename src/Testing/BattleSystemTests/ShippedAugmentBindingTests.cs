@@ -7,7 +7,7 @@ namespace LastBreathTest.BattleSystemTests
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// What the shipped records now say about where they belong, put to the rule that reads them. The
+    /// What the shipped records say about where they belong, put to the rule that reads them. The
     /// declarations were derived from the registry itself: an augment reaching into the members of one
     /// ability names that ability, an augment working through the contract every ability honours
     /// claims the whole book, and everything else says neither yet. Those three readings are only
@@ -20,6 +20,11 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class ShippedAugmentBindingTests
     {
+        /// <summary>How many records the section declares. Held because the records no longer sit
+        /// inside the abilities: a block that used to go missing took its ability's augments with it
+        /// and left the rest readable, and a section loses them one bulk edit at a time.</summary>
+        private const int ShippedRecordCount = 153;
+
         /// <summary>How many records name an ability. The registry triage
         /// (<c>Docs/UpgradeRegistryTriage.md</c>) counted them: 58 reaching into the members of one
         /// ability class, and 25 more that look general and are inert or throw anywhere else. The
@@ -29,22 +34,39 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>How many records claim every ability there is — cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
-        /// with more at stake: universality is the widest reach in the system.</summary>
-        private const int UniversalRecords = 12;
+        /// with more at stake: universality is the widest reach in the system. Two of them are the
+        /// plain cost and cooldown augments, one record each for the whole book.</summary>
+        private const int UniversalRecords = 14;
+
+        /// <summary>How many records still declare neither. They belong nowhere until they are given
+        /// tags or a claim, and the number is what the work left to do is measured against.</summary>
+        private const int SilentRecords = 56;
 
         [TestMethod]
-        public void EveryBoundRecordNamesTheAbilityItIsDeclaredUnder()
+        public void TheSectionDeclaresTheRecordsTheTriageCounted()
         {
-            // A binding is written next to the ability it belongs to, so the two must be the same
-            // ability. Naming another one would not fail loudly anywhere: the augment would simply
-            // never fit the slots of the ability whose block declares it, and the ability it does
-            // name would be offered an augment written against members it does not have.
             AbilityProvider catalog = ShippedCatalog();
+            var records = ShippedRecords(catalog).ToList();
+
+            Assert.AreEqual(ShippedRecordCount, records.Count, "the section no longer declares the records the registry holds factories for");
+            Assert.AreEqual(BoundRecords, records.Count(Bound), "the shipped data no longer binds the records the registry says are written for one ability");
+            Assert.AreEqual(UniversalRecords, records.Count(Universal), "the shipped data no longer claims the whole book for the records that work through the base contract");
+            Assert.AreEqual(SilentRecords, records.Count(entry => !Bound(entry) && !Universal(entry)), "the records that have declared nothing yet are no longer the ones counted");
+        }
+
+        [TestMethod]
+        public void EveryBoundRecordNamesAnAbilityTheBookDeclares()
+        {
+            // A binding used to be checked against the ability whose block held the record; the
+            // records stand on their own now, so the name is all there is — and a name the book does
+            // not carry fails loudly nowhere: the augment simply never fits any slot in the game.
+            AbilityProvider catalog = ShippedCatalog();
+            var abilities = catalog.KnownAbilityIds.ToHashSet(StringComparer.Ordinal);
             int bound = 0;
 
-            foreach ((string id, string home, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Bound))
+            foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Bound))
             {
-                Assert.AreEqual(home, record.AbilityId, $"'{id}' is declared under '{home}' and binds itself to another ability");
+                Assert.IsTrue(abilities.Contains(record.AbilityId), $"'{id}' binds itself to '{record.AbilityId}', which the book does not declare");
                 bound++;
             }
 
@@ -62,7 +84,7 @@ namespace LastBreathTest.BattleSystemTests
             string[] abilities = [.. catalog.KnownAbilityIds];
             int bound = 0;
 
-            foreach ((string id, _, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Bound))
+            foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Bound))
             {
                 IAbilitySocketBoard board = BoardOver(catalog, abilities, record.Tier);
 
@@ -92,7 +114,7 @@ namespace LastBreathTest.BattleSystemTests
             string[] abilities = [.. catalog.KnownAbilityIds];
             int universal = 0;
 
-            foreach ((string id, _, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Universal))
+            foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Universal))
             {
                 Assert.AreEqual(string.Empty, record.AbilityId,
                     $"'{id}' claims every ability and names one, and the rule refuses a record answering the same question twice");
@@ -121,7 +143,7 @@ namespace LastBreathTest.BattleSystemTests
             string[] abilities = [.. catalog.KnownAbilityIds];
             int silent = 0;
 
-            foreach ((string id, _, AbilityUpgradeData record) in ShippedRecords(catalog).Where(entry => !Bound(entry) && !Universal(entry)))
+            foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(entry => !Bound(entry) && !Universal(entry)))
             {
                 IAbilitySocketBoard board = BoardOver(catalog, abilities, record.Tier);
 
@@ -135,10 +157,10 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(silent > 0, "every shipped record declares a binding or a claim, so the refusal has nothing left to be proved on");
         }
 
-        private static bool Bound((string Id, string Home, AbilityUpgradeData Record) entry) =>
+        private static bool Bound((string Id, AbilityUpgradeData Record) entry) =>
             !string.IsNullOrWhiteSpace(entry.Record.AbilityId);
 
-        private static bool Universal((string Id, string Home, AbilityUpgradeData Record) entry) =>
+        private static bool Universal((string Id, AbilityUpgradeData Record) entry) =>
             entry.Record.FitsAnyAbility;
 
         /// <summary>One slot per ability in the book, all of the same tier, judged by the shipped
@@ -167,24 +189,20 @@ namespace LastBreathTest.BattleSystemTests
             return provider;
         }
 
-        /// <summary>Every shipped augment paired with the ability it is declared under and with the
-        /// record the loader made of it. Where a record is written is read off the files themselves —
-        /// the catalog answers by id alone and has no opinion about it.</summary>
-        private static IEnumerable<(string Id, string Home, AbilityUpgradeData Record)> ShippedRecords(IAbilityAugmentCatalog catalog)
+        /// <summary>Every augment the shipped section writes, paired with the record the loader made
+        /// of it. The ids are read off the files rather than taken from the catalog, so a record the
+        /// loader dropped on the way shows up here as a missing one instead of never being asked
+        /// about.</summary>
+        private static IEnumerable<(string Id, AbilityUpgradeData Record)> ShippedRecords(IAbilityAugmentCatalog catalog)
         {
             foreach (string path in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Abilities), "*.json", SearchOption.AllDirectories))
-                foreach (JObject ability in Children(JObject.Parse(File.ReadAllText(path)), "abilities"))
+                foreach (JObject augment in Children(JObject.Parse(File.ReadAllText(path)), "augments"))
                 {
-                    string home = ability.Value<string>("id") ?? string.Empty;
+                    string id = augment.Value<string>("id") ?? string.Empty;
+                    AbilityUpgradeData? record = catalog.Find(id);
+                    Assert.IsNotNull(record, $"the catalog does not hold '{id}', which the section declares");
 
-                    foreach (JObject augment in Children(ability, "upgrades"))
-                    {
-                        string id = augment.Value<string>("id") ?? string.Empty;
-                        AbilityUpgradeData? record = catalog.Find(id);
-                        Assert.IsNotNull(record, $"the catalog does not hold '{id}', declared by '{home}'");
-
-                        yield return (id, home, record);
-                    }
+                    yield return (id, record);
                 }
         }
 

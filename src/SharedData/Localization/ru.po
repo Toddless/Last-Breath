@@ -1934,6 +1934,22 @@ msgid "Effect_Mana_Flow_Tooltip"
 msgstr "Восстанавливает процент максимальной маны каждый ход."
 
 # ------------------------------
+# Ability upgrades — every ability
+# ------------------------------
+
+msgid "Ability_Upgrade_Reduce_Cost"
+msgstr ""
+
+msgid "Ability_Upgrade_Reduce_Cost_Description"
+msgstr ""
+
+msgid "Ability_Upgrade_Reduce_Cooldown"
+msgstr ""
+
+msgid "Ability_Upgrade_Reduce_Cooldown_Description"
+msgstr ""
+
+# ------------------------------
 # Ability upgrades — Intelligence stance
 # ------------------------------
 
@@ -1948,12 +1964,6 @@ msgstr ""
 
 msgid "Ability_Is_Upgrade_Additional_Scales_Description"
 msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} к скейлам урона."
-
-msgid "Ability_Is_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Is_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
 
 msgid "Ability_Is_Upgrade_Additional_Crit_Damage"
 msgstr ""
@@ -1979,23 +1989,11 @@ msgstr ""
 msgid "Ability_Is_Upgrade_Apply_Fragility_Description"
 msgstr "Накладывает {@Effect_Fragility} ({duration|turn|turns}, до {maxStacks|stack|stacks}, +{critDamageAmp:%} получаемого крит-урона)."
 
-msgid "Ability_Ov_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Ov_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} перезарядки."
-
 msgid "Ability_Ov_Upgrade_Burn_Add_Cost"
 msgstr ""
 
 msgid "Ability_Ov_Upgrade_Burn_Add_Cost_Description"
 msgstr "Поглощает {burnPercent:%} маны, стоимость +{additionalCost}."
-
-msgid "Ability_Ov_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Ov_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
 
 msgid "Ability_Ov_Upgrade_Mana_Step"
 msgstr ""
@@ -2033,23 +2031,11 @@ msgstr ""
 msgid "Ability_Ov_Upgrade_Next_Cast_Pure_Description"
 msgstr "Следующая активированная способность наносит {fraction:%} урона чистым."
 
-msgid "Ability_Cl_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Cl_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} перезарядки."
-
 msgid "Ability_Cl_Upgrade_Scales_Add_Cost"
 msgstr ""
 
 msgid "Ability_Cl_Upgrade_Scales_Add_Cost_Description"
 msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} к скейлам урона, стоимость +{additionalCost}."
-
-msgid "Ability_Cl_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Cl_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
 
 msgid "Ability_Cl_Upgrade_Additional_Jump"
 msgstr ""
@@ -2068,18 +2054,6 @@ msgstr ""
 
 msgid "Ability_Cl_Upgrade_Ignore_Resistances_Description"
 msgstr "Молнии игнорируют сопротивления."
-
-msgid "Ability_Ia_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Ia_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
-msgid "Ability_Ia_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Ia_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
 
 msgid "Ability_Ia_Upgrade_Additional_Barrier"
 msgstr ""
@@ -2179,18 +2153,6 @@ msgstr ""
 msgid "Ability_SoA_Upgrade_Additional_Attacks_Description"
 msgstr "+{amountAttacks} атака."
 
-msgid "Ability_SoA_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_SoA_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
-msgid "Ability_SoA_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_SoA_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
-
 msgid "Ability_Ip_Upgrade_Single_Empowered_Attack"
 msgstr ""
 
@@ -2238,12 +2200,6 @@ msgstr ""
 
 msgid "Ability_Ip_Upgrade_Additional_Damage_Multiplier_Description"
 msgstr "+{damageMultiplier:%} усиления за успешный удар."
-
-msgid "Ability_Ip_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Ip_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
 
 msgid "Ability_JoP_Upgrade_Bouncing"
 msgstr ""
@@ -2293,12 +2249,6 @@ msgstr ""
 msgid "Ability_JoP_Upgrade_Poison_Duration_Description"
 msgstr "+{poisonDuration|turn|turns} длительности яда."
 
-msgid "Ability_JoP_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_JoP_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
-
 msgid "Ability_Ds_Upgrade_Additional_Attack_Chance"
 msgstr ""
 
@@ -2340,18 +2290,6 @@ msgstr ""
 
 msgid "Ability_Ds_Upgrade_Increased_Buff_Duration_Description"
 msgstr "+{duration|turn|turns} длительности бафа."
-
-msgid "Ability_Ds_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Ds_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
-
-msgid "Ability_Ds_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Ds_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
 
 msgid "Ability_Cc_Upgrade_Additional_Attack_Chance"
 msgstr ""
@@ -2395,18 +2333,6 @@ msgstr ""
 msgid "Ability_Cc_Upgrade_More_Stacks_More_Cost_Description"
 msgstr "+{stacks|stack|stacks}, +{cost} к стоимости."
 
-msgid "Ability_Cc_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Cc_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
-
-msgid "Ability_Cc_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Cc_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
 msgid "Ability_Pe_Upgrade_Apply_Seal_Of_Oblivion"
 msgstr ""
 
@@ -2442,12 +2368,6 @@ msgstr ""
 
 msgid "Ability_Pe_Upgrade_Transfer_Poison_On_Death_Description"
 msgstr "При смерти цели яд переносится на другого врага."
-
-msgid "Ability_Pe_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Pe_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
 
 msgid "Ability_Pe_Upgrade_Reduce_Cooldown"
 msgstr ""
@@ -2503,18 +2423,6 @@ msgstr ""
 msgid "Ability_Pc_Upgrade_Increase_Duration_Description"
 msgstr "+{duration|turn|turns} длительности бафа."
 
-msgid "Ability_Pc_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Pc_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
-
-msgid "Ability_Pc_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Pc_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
 # ------------------------------
 # Ability upgrades — Strength stance
 # ------------------------------
@@ -2554,18 +2462,6 @@ msgstr ""
 
 msgid "Ability_Arm_Upgrade_Stage3_Burning_Description"
 msgstr "Стадия 3 накладывает {stacks} {stacks|stack|stacks} горения (×{damageMultiplier}, {duration|turn|turns})."
-
-msgid "Ability_Arm_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Arm_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
-msgid "Ability_Arm_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Arm_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
 
 msgid "Ability_Arm_Upgrade_Extend_Stun"
 msgstr ""
@@ -2669,18 +2565,6 @@ msgstr ""
 msgid "Ability_Sac_Upgrade_Additional_Charge_Description"
 msgstr "+{amount} заряд."
 
-msgid "Ability_Sac_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Sac_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
-
-msgid "Ability_Sac_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Sac_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
 msgid "Ability_Bf_Upgrade_Burning_Fury"
 msgstr ""
 
@@ -2716,18 +2600,6 @@ msgstr ""
 
 msgid "Ability_Bf_Upgrade_Less_Burn_Description"
 msgstr "Атаки сжигают на {amount:%} меньше HP."
-
-msgid "Ability_Bf_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Bf_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
-
-msgid "Ability_Bf_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Bf_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
 
 msgid "Ability_Bf_Upgrade_Fury_Duration"
 msgstr ""
@@ -2777,18 +2649,6 @@ msgstr ""
 msgid "Ability_Ar_Upgrade_Buff_Duration_Description"
 msgstr "+{duration|turn|turns} длительности бафа."
 
-msgid "Ability_Ar_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Ar_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
-
-msgid "Ability_Ar_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Ar_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
 msgid "Ability_Dst_Upgrade_Both_Hits_Buff"
 msgstr ""
 
@@ -2813,18 +2673,6 @@ msgstr ""
 msgid "Ability_Dst_Upgrade_Damage_Multiplier_Description"
 msgstr "+{amount:%} урона обеих атак."
 
-msgid "Ability_Dst_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Dst_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
-msgid "Ability_Dst_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Dst_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
-
 msgid "Ability_Hb_Upgrade_Additional_Lunges"
 msgstr ""
 
@@ -2848,18 +2696,6 @@ msgstr ""
 
 msgid "Ability_Hb_Upgrade_Armor_Debuff_Description"
 msgstr "Накладывает -{reduceArmorBy:%} брони ({duration|turn|turns}, до {maxStacks|stack|stacks})."
-
-msgid "Ability_Hb_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Hb_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
-msgid "Ability_Hb_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Hb_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} к перезарядке."
 
 # ------------------------------
 # Passive skills
@@ -3182,18 +3018,6 @@ msgstr ""
 msgid "Ability_Ib_Upgrade_Withering_Value_Description"
 msgstr "+{amount:%} к значению Проклятья увядания."
 
-msgid "Ability_Ib_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Ib_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} перезарядки."
-
-msgid "Ability_Ib_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Ib_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
 msgid "Ability_Ib_Upgrade_Withering_Stacks"
 msgstr ""
 
@@ -3231,18 +3055,6 @@ msgid "Ability_Ib_Upgrade_Consume_Stun_Description"
 msgstr "Поглощает оглушение с цели и наносит двойной урон."
 
 # Апгрейды Глубокой заморозки
-
-msgid "Ability_Df_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Df_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
-msgid "Ability_Df_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Df_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} перезарядки."
 
 msgid "Ability_Df_Upgrade_Frostbite_Duration"
 msgstr ""
@@ -3288,18 +3100,6 @@ msgstr "Казнит цель со здоровьем ниже {threshold:%}."
 
 # Апгрейды Разряда
 
-msgid "Ability_Dis_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Dis_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
-msgid "Ability_Dis_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Dis_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} перезарядки."
-
 msgid "Ability_Dis_Upgrade_Multiplier"
 msgstr ""
 
@@ -3343,18 +3143,6 @@ msgid "Ability_Dis_Upgrade_Consume_Mana_Description"
 msgstr "Поглощает ману вместо барьера."
 
 # Апгрейды Статического доспеха
-
-msgid "Ability_Sa_Upgrade_Reduce_Cost"
-msgstr ""
-
-msgid "Ability_Sa_Upgrade_Reduce_Cost_Description"
-msgstr "-{cost} к стоимости."
-
-msgid "Ability_Sa_Upgrade_Reduce_Cooldown"
-msgstr ""
-
-msgid "Ability_Sa_Upgrade_Reduce_Cooldown_Description"
-msgstr "-{cooldown} перезарядки."
 
 msgid "Ability_Sa_Upgrade_Detonation_Scales"
 msgstr ""

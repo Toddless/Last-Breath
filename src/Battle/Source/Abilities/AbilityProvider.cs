@@ -19,8 +19,8 @@
     {
         private readonly Dictionary<string, AbilityBaseData> _abilityBaseData = [];
 
-        /// <summary>Every augment record by its own id. The records are declared inside the abilities
-        /// and asked for by id alone: the fit of an augment nobody owns yet is a question about a
+        /// <summary>Every augment record by its own id, out of the section that declares them. They
+        /// are asked for by id alone: the fit of an augment nobody owns yet is a question about a
         /// record, and the asker knows the id it was offered, not where it is written.</summary>
         private readonly Dictionary<string, AbilityUpgradeData> _augments = [];
 
@@ -28,22 +28,28 @@
 
         public IReadOnlyCollection<string> KnownAbilityIds => _abilityBaseData.Keys;
 
+        /// <summary>Every augment the data declares, whatever it ends up fitting.</summary>
+        public IReadOnlyCollection<string> KnownAugmentIds => _augments.Keys;
+
+        /// <summary>Every augment this build knows how to make an upgrade of. A record the data
+        /// declares and this collection does not name is a record that parses, is offered and then
+        /// silently produces nothing.</summary>
+        public IReadOnlyCollection<string> BuildableAugmentIds => _abilityUpgrades.Keys;
+
         public void Apply(string catalog, GameDataFile file)
         {
             var root = JsonConvert.DeserializeObject<AbilityDataRoot>(file.Json)
                        ?? throw new InvalidOperationException("Failed to deserialize ability data");
-            foreach (AbilityBaseData abilityData in root.Abilities)
-            {
-                _abilityBaseData[abilityData.Id] = abilityData;
-                foreach (AbilityUpgradeData augment in abilityData.Upgrades) _augments[augment.Id] = augment;
-            }
+            foreach (AbilityBaseData abilityData in root.Abilities) _abilityBaseData[abilityData.Id] = abilityData;
+
+            foreach (AbilityUpgradeData augment in root.Augments) _augments[augment.Id] = augment;
         }
 
         public IAbility CreateAbility(string abilityId)
         {
             var data = GetBaseData(abilityId);
             var ability = GetFactory(abilityId).Invoke(data);
-            ability.SetAbilityUpgrades(CopyAbilityUpgrades(data.Upgrades));
+            ability.SetAbilityUpgrades(AugmentsOffered(data));
             return ability;
         }
 
@@ -72,9 +78,28 @@
             _abilityFactories.GetValueOrDefault(abilityId)
             ?? throw new KeyNotFoundException($"No factory registered for ability '{abilityId}'");
 
-        private Dictionary<int, List<IAbilityUpgrade>> CopyAbilityUpgrades(List<AbilityUpgradeData> data) =>
-            data.GroupBy(upgrade => upgrade.Tier)
-                .ToDictionary(tier => tier.Key, tier => tier.Select(CreateUpgrade).OfType<IAbilityUpgrade>().ToList());
+        /// <summary>The augments an ability may wear, grouped by the tier each of them is written at.
+        /// The offering is no longer a list the ability declares: every record of the catalog is put
+        /// to the fitting rule against a slot of this ability, so what answers is the augment's own
+        /// declaration. Nothing is passed as already worn — the offering says what may ever go in,
+        /// while an exclusion group speaks about what is sitting there right now.</summary>
+        private Dictionary<int, List<IAbilityUpgrade>> AugmentsOffered(AbilityBaseData ability) =>
+            _augments.Values
+                .Where(augment => BelongsOn(ability, augment))
+                .GroupBy(augment => augment.Tier)
+                .ToDictionary(group => group.Key, group => group.Select(CreateUpgrade).OfType<IAbilityUpgrade>().ToList());
+
+        /// <summary>Whether the augment belongs on that ability at all, asked of the one rule that
+        /// answers it. The slot handed over is the ability's own, opened exactly deep enough for the
+        /// record — the offering is about belonging, and a socket too shallow is a question for the
+        /// board that holds the real slots. It carries no id because no slot is meant: nothing here
+        /// is being seated.</summary>
+        private static bool BelongsOn(AbilityBaseData ability, AbilityUpgradeData augment) =>
+            AugmentFit.Check(
+                new AbilitySocketPlacement(string.Empty, ability.Id, augment.Tier),
+                ability.Tags,
+                augment,
+                []) == AugmentFitResult.Fits;
 
         private IAbilityUpgrade? CreateUpgrade(AbilityUpgradeData data)
         {

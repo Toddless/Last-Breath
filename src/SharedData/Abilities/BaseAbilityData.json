@@ -15,88 +15,7 @@
                 "minAttacks": 2,
                 "maxAttacks": 5,
                 "damageMultiplier": 1
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_SoA_Upgrade_Poison_On_Hit",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "poisonDuration": 3
-                    }
-                },
-                {
-                    "id": "Ability_SoA_Upgrade_Apply_Buff_Critical_Chance",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Series_Of_Attacks",
-                    "upgradeProperties": {
-                        "amountAttacks": 6,
-                        "criticalChance": 0.15,
-                        "duration": 5,
-                        "maxStacks": 3
-                    }
-                },
-                {
-                    "id": "Ability_SoA_Upgrade_Apply_Buff_Critical_Damage",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Series_Of_Attacks",
-                    "upgradeProperties": {
-                        "amountAttacks": 9,
-                        "criticalDamage": 0.25,
-                        "duration": 5,
-                        "maxStacks": 3
-                    }
-                },
-                {
-                    "id": "Ability_SoA_Upgrade_Additional_Max_Attacks",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "maxAdditionalAttacks": 3
-                    }
-                },
-                {
-                    "id": "Ability_SoA_Upgrade_More_Attack_Damage",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "damageMultiplier": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_SoA_Upgrade_Attacks_Cannot_Be_Evaded",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Series_Of_Attacks",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_SoA_Upgrade_Additional_Attacks",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amountAttacks": 1
-                    }
-                },
-                {
-                    "id": "Ability_SoA_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 50
-                    }
-                },
-                {
-                    "id": "Ability_SoA_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 1
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Increasing_Pressure",
@@ -112,79 +31,7 @@
             "abilityProperties": {
                 "attacks": 5,
                 "attackDamageStepMultiplier": 0.15
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Ip_Upgrade_Single_Empowered_Attack",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Increasing_Pressure",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Ip_Upgrade_Attack_Random_Target",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "splashDamage": 0.45
-                    }
-                },
-                {
-                    "id": "Ability_Ip_Upgrade_Last_Attack_Always_Crit",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Increasing_Pressure",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Ip_Upgrade_First_Attack_Crit_Damage",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Increasing_Pressure",
-                    "upgradeProperties": {
-                        "critDamageBonus": 1.3
-                    }
-                },
-                {
-                    "id": "Ability_Ip_Upgrade_Attack_Extend_Poison",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "poisonDuration": 1
-                    }
-                },
-                {
-                    "id": "Ability_Ip_Upgrade_Unevadable",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Increasing_Pressure",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Ip_Upgrade_Additional_Amount_Attacks",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amountAttacks": 2
-                    }
-                },
-                {
-                    "id": "Ability_Ip_Upgrade_Additional_Damage_Multiplier",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "damageMultiplier": 0.05
-                    }
-                },
-                {
-                    "id": "Ability_Ip_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 2
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Jar_Of_Poison",
@@ -197,86 +44,7 @@
             "damage": 50,
             "weaponDamageScale": 0.35,
             "spellDamageScale": 0.5,
-            "abilityProperties": {},
-            "upgrades": [
-                {
-                    "id": "Ability_JoP_Upgrade_Bouncing",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Jar_Of_Poison",
-                    "upgradeProperties": {
-                        "bounces": 5
-                    }
-                },
-                {
-                    "id": "Ability_JoP_Upgrade_Transfer_Poison_On_Death",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_JoP_Upgrade_All_Targets",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Jar_Of_Poison",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_JoP_Upgrade_Clumsiness",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "evadeReduce": 0.15,
-                        "maxStacks": 5,
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_JoP_Upgrade_Apply_Blind",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "accuracyReduce": 0.15,
-                        "maxStacks": 5,
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_JoP_Upgrade_Apply_Weakness",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "damageReduce": 0.15,
-                        "maxStacks": 5,
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_JoP_Upgrade_Increasing_Scales",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "weaponDamageScale": 0.6,
-                        "spellDamageScale": 0.85
-                    }
-                },
-                {
-                    "id": "Ability_JoP_Upgrade_Poison_Duration",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "poisonDuration": 1
-                    }
-                },
-                {
-                    "id": "Ability_JoP_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 1
-                    }
-                }
-            ]
+            "abilityProperties": {}
         },
         {
             "id": "Ability_Dark_Shroud",
@@ -292,86 +60,7 @@
                 "stacks": 4,
                 "healthRegen": 0.05,
                 "lightStepValue": 0.15
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Ds_Upgrade_Additional_Attack_Chance",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Dark_Shroud",
-                    "upgradeProperties": {
-                        "amount": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Ds_Upgrade_Additional_Accuracy",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Dark_Shroud",
-                    "upgradeProperties": {
-                        "amount": 0.2
-                    }
-                },
-                {
-                    "id": "Ability_Ds_Upgrade_Immortality",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "duration": 3,
-                        "stacks": 1
-                    }
-                },
-                {
-                    "id": "Ability_Ds_Upgrade_Mana_Regen",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Dark_Shroud",
-                    "upgradeProperties": {
-                        "regenAmount": 0.05
-                    }
-                },
-                {
-                    "id": "Ability_Ds_Upgrade_Additional_Health_Regen",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "additionalRegen": 0.025
-                    }
-                },
-                {
-                    "id": "Ability_Ds_Upgrade_Add_Effectiveness_Reduce_Stacks",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "additionalEffectiveness": 0.35,
-                        "amountStacks": 2
-                    }
-                },
-                {
-                    "id": "Ability_Ds_Upgrade_Increased_Buff_Duration",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "duration": 1
-                    }
-                },
-                {
-                    "id": "Ability_Ds_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 1
-                    }
-                },
-                {
-                    "id": "Ability_Ds_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 25
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Critical_Calculation",
@@ -385,85 +74,7 @@
                 "stacks": 3,
                 "duration": 3,
                 "additionalDurationAmount": 1
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Cc_Upgrade_Additional_Attack_Chance",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Critical_Calculation",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Cc_Upgrade_Additional_Crit_Chance",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Critical_Calculation",
-                    "upgradeProperties": {
-                        "criticalChance": 0.08
-                    }
-                },
-                {
-                    "id": "Ability_Cc_Upgrade_Lucky_Crit",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_Cc_Upgrade_Additional_Crit_Multiplier",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "multiplier": 0.15,
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_Cc_Upgrade_Leach_On_Crit",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Cc_Upgrade_Apply_Enhanced_Defence",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "duration": 3,
-                        "stacks": 3,
-                        "value": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Cc_Upgrade_More_Stacks_More_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 50,
-                        "stacks": 1
-                    }
-                },
-                {
-                    "id": "Ability_Cc_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 1
-                    }
-                },
-                {
-                    "id": "Ability_Cc_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 30
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Poison_Explosion",
@@ -476,82 +87,7 @@
             "abilityProperties": {
                 "damageMultiplier": 0,
                 "executionThreshold": 15
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Pe_Upgrade_Apply_Seal_Of_Oblivion",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_Pe_Upgrade_Execute_Bosses",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Explosion",
-                    "upgradeProperties": {
-                        "stacksMultiplier": 2
-                    }
-                },
-                {
-                    "id": "Ability_Pe_Upgrade_Spread_Poison",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Explosion",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Pe_Upgrade_Poison_Not_Removed",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Explosion",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Pe_Upgrade_Reduce_Execution_Trahsold",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 5
-                    }
-                },
-                {
-                    "id": "Ability_Pe_Upgrade_Transfer_Poison_On_Death",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Explosion",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Pe_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 30
-                    }
-                },
-                {
-                    "id": "Ability_Pe_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {
-                        "cooldown": 2,
-                        "additionalCost": 50
-                    }
-                },
-                {
-                    "id": "Ability_Pe_Upgrade_Total_Damage_Multiplier",
-                    "tier": 1,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Explosion",
-                    "upgradeProperties": {
-                        "multiplier": 0.15
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Poison_Coating",
@@ -565,90 +101,7 @@
                 "poisonMultiplier": 0.45,
                 "coatingDuration": 3,
                 "poisonDuration": 5
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Pc_Upgrade_Attacks_Reduce_Incoming_Heal",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Coating",
-                    "upgradeProperties": {
-                        "reduceBy": 0.6,
-                        "maxStacks": 1,
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_Pc_Upgrade_Attacks_Reduce_Armor",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Coating",
-                    "upgradeProperties": {
-                        "reduceArmorBy": 0.15,
-                        "maxStacks": 4,
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_Pc_Upgrade_Apply_Stack_For_Each_Enemy",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Coating",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Pc_Upgrade_Increase_Poison_On_Target",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Coating",
-                    "upgradeProperties": {
-                        "poisonDuration": 1
-                    }
-                },
-                {
-                    "id": "Ability_Pc_Upgrade_Additional_Poison_Stack_Duration",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Coating",
-                    "upgradeProperties": {
-                        "additionalDuration": 1
-                    }
-                },
-                {
-                    "id": "Ability_Pc_Upgrade_Additional_Multiplier",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Coating",
-                    "upgradeProperties": {
-                        "multiplier": 0.25
-                    }
-                },
-                {
-                    "id": "Ability_Pc_Upgrade_Increase_Duration",
-                    "tier": 1,
-                    "tags": [],
-                    "abilityId": "Ability_Poison_Coating",
-                    "upgradeProperties": {
-                        "duration": 1
-                    }
-                },
-                {
-                    "id": "Ability_Pc_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 1
-                    }
-                },
-                {
-                    "id": "Ability_Pc_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 30
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Double_Strike",
@@ -669,61 +122,7 @@
                 "evadeReduce": 0.15,
                 "debuffDuration": 3,
                 "debuffMaxStacks": 3
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Dst_Upgrade_Both_Hits_Buff",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Double_Strike",
-                    "upgradeProperties": {
-                        "amount": 0.25,
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_Dst_Upgrade_Restore_On_Hit",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "healthRestore": 0.07,
-                        "manaRestore": 0.07
-                    }
-                },
-                {
-                    "id": "Ability_Dst_Upgrade_Accuracy",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Double_Strike",
-                    "upgradeProperties": {
-                        "amount": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Dst_Upgrade_Damage_Multiplier",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.25
-                    }
-                },
-                {
-                    "id": "Ability_Dst_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 50
-                    }
-                },
-                {
-                    "id": "Ability_Dst_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 1
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Ares_Blessing",
@@ -737,85 +136,7 @@
                 "duration": 3,
                 "healthBonus": 0.3,
                 "recoveryBonus": 0.3
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Ar_Upgrade_Incoming_Reduction",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ares_Blessing",
-                    "upgradeProperties": {
-                        "reduce": 0.25
-                    }
-                },
-                {
-                    "id": "Ability_Ar_Upgrade_Turn_End_Heal",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ares_Blessing",
-                    "upgradeProperties": {
-                        "regenAmount": 0.08
-                    }
-                },
-                {
-                    "id": "Ability_Ar_Upgrade_Damage_Buff",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ares_Blessing",
-                    "upgradeProperties": {
-                        "amount": 0.55
-                    }
-                },
-                {
-                    "id": "Ability_Ar_Upgrade_Recovery_Bonus",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "recoveryBonus": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Ar_Upgrade_Health_Bonus",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "healthBonus": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Ar_Upgrade_Both_Bonuses",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "healthBonus": 0.07,
-                        "recoveryBonus": 0.07
-                    }
-                },
-                {
-                    "id": "Ability_Ar_Upgrade_Buff_Duration",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "duration": 1
-                    }
-                },
-                {
-                    "id": "Ability_Ar_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 1
-                    }
-                },
-                {
-                    "id": "Ability_Ar_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 40
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Porcupine",
@@ -829,88 +150,7 @@
                 "duration": 3,
                 "damageReturn": 0.25,
                 "armorReturn": 0.15
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Porc_Upgrade_Echo",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Porcupine",
-                    "upgradeProperties": {
-                        "delayedPercent": 0.3,
-                        "turns": 2
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Incoming_Reduction",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Porcupine",
-                    "upgradeProperties": {
-                        "reduce": 0.25
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Crit_Mitigation",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Porcupine",
-                    "upgradeProperties": {
-                        "amount": 0.8
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Heal_On_Hit",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.07
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_More_Armor_Return",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_More_Damage_Return",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.20
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Reduce_Cooldown_Add_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {
-                        "cooldown": 2,
-                        "additionalCost": 30
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Cooldown_Chance",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "chance": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Armor_Buff",
-                    "tier": 1,
-                    "tags": [],
-                    "abilityId": "Ability_Porcupine",
-                    "upgradeProperties": {
-                        "amount": 0.25
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Berserk_Fury",
@@ -926,85 +166,7 @@
             "abilityProperties": {
                 "furyDuration": 3,
                 "furyHealthPercent": 0.05
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Bf_Upgrade_Burning_Fury",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Berserk_Fury",
-                    "upgradeProperties": {
-                        "healthAsDamageMultiplier": 1,
-                        "burningDuration": 3,
-                        "burningMaxStacks": 3
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Primal_Fury",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Berserk_Fury",
-                    "upgradeProperties": {
-                        "damageMultiplier": 1.5
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Healing_Fury",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Berserk_Fury",
-                    "upgradeProperties": {
-                        "healAmount": 0.5
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Cost_Type_Health",
-                    "tier": 2,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_More_Burn",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.035
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Less_Burn",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.02
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 2
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 120
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Fury_Duration",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "duration": 1
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Head_Butt",
@@ -1020,63 +182,7 @@
             "abilityProperties": {
                 "stunDuration": 1,
                 "attacks": 1
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Hb_Upgrade_Additional_Lunges",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 1
-                    }
-                },
-                {
-                    "id": "Ability_Hb_Upgrade_Additional_Scales",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Head_Butt",
-                    "upgradeProperties": {
-                        "weaponDamageScale": 0.15,
-                        "spellDamageScale": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Hb_Upgrade_Extend_Stun_Add_Cost",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "stunDuration": 1,
-                        "additionalCost": 50
-                    }
-                },
-                {
-                    "id": "Ability_Hb_Upgrade_Armor_Debuff",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Head_Butt",
-                    "upgradeProperties": {
-                        "reduceArmorBy": 0.25,
-                        "duration": 3,
-                        "maxStacks": 3
-                    }
-                },
-                {
-                    "id": "Ability_Hb_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 50
-                    }
-                },
-                {
-                    "id": "Ability_Hb_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 1
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Sacrifice",
@@ -1090,81 +196,7 @@
                 "sacrificePercent": 0.15,
                 "ratePerHundred": 0.01,
                 "charges": 1
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Sac_Upgrade_Heal_From_Damage",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Incoming_Reduction",
-                    "tier": 3,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {
-                        "reduce": 0.25,
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Free_Cast",
-                    "tier": 3,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Additional_Rate",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.015
-                    }
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_More_Sacrifice",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.10
-                    }
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Cost_Type_Health",
-                    "tier": 2,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Additional_Charge",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 1
-                    }
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 1
-                    }
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 25
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Armageddon",
@@ -1188,88 +220,7 @@
                 "stage2HpCost": 0.15,
                 "stage3HpCost": 0.5,
                 "stunDuration": 2
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Arm_Upgrade_Missing_Hp_Damage",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "rate": 1
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Shatter_Armor",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "reduceBy": 1,
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_All_Targets",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Armageddon",
-                    "upgradeProperties": {
-                        "additionalCooldown": 3
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Reduce_Hp_Cost",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Stage1_Damage",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "damage": 400,
-                        "weaponScale": 1.0,
-                        "spellScale": 1.0
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Stage3_Burning",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Armageddon",
-                    "upgradeProperties": {
-                        "stacks": 3,
-                        "duration": 3,
-                        "damageMultiplier": 0.7
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 100
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 2
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Extend_Stun",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "duration": 1
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Ice_Block",
@@ -1289,86 +240,7 @@
                 "witheringValue": 0.15,
                 "extraBlocks": 3,
                 "extraBlockDamagePercent": 0.5
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Ib_Upgrade_Withering_Value",
-                    "tier": 1,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Block",
-                    "upgradeProperties": {
-                        "amount": 0.05
-                    }
-                },
-                {
-                    "id": "Ability_Ib_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 1
-                    }
-                },
-                {
-                    "id": "Ability_Ib_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 100
-                    }
-                },
-                {
-                    "id": "Ability_Ib_Upgrade_Withering_Stacks",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Block",
-                    "upgradeProperties": {
-                        "amount": 1
-                    }
-                },
-                {
-                    "id": "Ability_Ib_Upgrade_Extra_Block_Damage",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Block",
-                    "upgradeProperties": {
-                        "amount": 0.25
-                    }
-                },
-                {
-                    "id": "Ability_Ib_Upgrade_Heavy_Blocks",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Block",
-                    "upgradeProperties": {
-                        "damage": 150,
-                        "weaponDamageScale": 0.15,
-                        "spellDamageScale": 0.45
-                    }
-                },
-                {
-                    "id": "Ability_Ib_Upgrade_Reset_Chance",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Block",
-                    "upgradeProperties": {
-                        "chance": 0.25
-                    }
-                },
-                {
-                    "id": "Ability_Ib_Upgrade_Random_Extra_Blocks",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Block",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Ib_Upgrade_Consume_Stun",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Block",
-                    "upgradeProperties": {}
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Overload",
@@ -1385,87 +257,7 @@
                 "stageTwoAbsorbBonus": 0.05,
                 "stageThreeManaPerStep": 1,
                 "stageFourManaRestore": 1
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Ov_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 1
-                    }
-                },
-                {
-                    "id": "Ability_Ov_Upgrade_Burn_Add_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "burnPercent": 0.30,
-                        "additionalCost": 50
-                    }
-                },
-                {
-                    "id": "Ability_Ov_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 50
-                    }
-                },
-                {
-                    "id": "Ability_Ov_Upgrade_Mana_Step",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Overload",
-                    "upgradeProperties": {
-                        "amount": 1.5
-                    }
-                },
-                {
-                    "id": "Ability_Ov_Upgrade_Random_Cooldown",
-                    "tier": 2,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {
-                        "amount": 1
-                    }
-                },
-                {
-                    "id": "Ability_Ov_Upgrade_Additional_Multiplier",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Overload",
-                    "upgradeProperties": {
-                        "amount": 0.02
-                    }
-                },
-                {
-                    "id": "Ability_Ov_Upgrade_Stage4_Resets_Cooldown",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Overload",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Ov_Upgrade_Mana_Flow",
-                    "tier": 3,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {
-                        "regenAmount": 0.15,
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_Ov_Upgrade_Next_Cast_Pure",
-                    "tier": 3,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {
-                        "fraction": 0.3
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Chain_Lightning",
@@ -1484,58 +276,7 @@
                 "damageFalloff": 0.25,
                 "stageThreeFalloffReduction": 0.15,
                 "stageFourLastJumpMultiplier": 2
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Cl_Upgrade_Ignore_Resistances",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Chain_Lightning",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Cl_Upgrade_Additional_Jump",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 1
-                    }
-                },
-                {
-                    "id": "Ability_Cl_Upgrade_Reduce_Falloff",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.10
-                    }
-                },
-                {
-                    "id": "Ability_Cl_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 3
-                    }
-                },
-                {
-                    "id": "Ability_Cl_Upgrade_Scales_Add_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "weaponDamageScale": 0.15,
-                        "spellDamageScale": 0.35,
-                        "additionalCost": 50
-                    }
-                },
-                {
-                    "id": "Ability_Cl_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 80
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Ice_Aegis",
@@ -1554,85 +295,7 @@
                 "clumsinessMaxStacks": 5,
                 "clumsinessValue": 0.15,
                 "freezeDuration": 1
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Ia_Upgrade_Additional_Scale",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 5
-                    }
-                },
-                {
-                    "id": "Ability_Ia_Upgrade_Additional_Duration",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 1
-                    }
-                },
-                {
-                    "id": "Ability_Ia_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 100
-                    }
-                },
-                {
-                    "id": "Ability_Ia_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 2
-                    }
-                },
-                {
-                    "id": "Ability_Ia_Upgrade_Additional_Barrier",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 300
-                    }
-                },
-                {
-                    "id": "Ability_Ia_Upgrade_Reflect",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Aegis",
-                    "upgradeProperties": {
-                        "amount": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Ia_Upgrade_Stun_Attackers",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Aegis",
-                    "upgradeProperties": {
-                        "chance": 0.25
-                    }
-                },
-                {
-                    "id": "Ability_Ia_Upgrade_Turn_End_Heal",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Aegis",
-                    "upgradeProperties": {
-                        "amount": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Ia_Upgrade_Crit_Mitigation",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Aegis",
-                    "upgradeProperties": {
-                        "amount": 0.8
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Ice_Shards",
@@ -1653,91 +316,7 @@
                 "secondStageDamage": 120,
                 "secondStageWeaponDamageScale": 0.35,
                 "secondStageSpellDamageScale": 1.2
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Is_Upgrade_Barrier_From_Shrapnel",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Shards",
-                    "upgradeProperties": {
-                        "leachPercent": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Is_Upgrade_Apply_Fragility",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Shards",
-                    "upgradeProperties": {
-                        "duration": 3,
-                        "maxStacks": 3,
-                        "critDamageAmp": 0.35
-                    }
-                },
-                {
-                    "id": "Ability_Is_Upgrade_Additional_Crit_Damage",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Shards",
-                    "upgradeProperties": {
-                        "amount": 0.75
-                    }
-                },
-                {
-                    "id": "Ability_Is_Upgrade_Additional_Crit_Chance",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Shards",
-                    "upgradeProperties": {
-                        "amount": 0.35
-                    }
-                },
-                {
-                    "id": "Ability_Is_Upgrade_Reduce_Cooldown_Add_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {
-                        "cooldown": 2,
-                        "additionalCost": 100
-                    }
-                },
-                {
-                    "id": "Ability_Is_Upgrade_Additional_Scales",
-                    "tier": 1,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Shards",
-                    "upgradeProperties": {
-                        "weaponDamageScale": 0.05,
-                        "spellDamageScale": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Is_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 70
-                    }
-                },
-                {
-                    "id": "Ability_Is_Upgrade_Multicast",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Shards",
-                    "upgradeProperties": {
-                        "amount": 0.25
-                    }
-                },
-                {
-                    "id": "Ability_Is_Upgrade_Crit_Ignores_Cold_Res",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Ice_Shards",
-                    "upgradeProperties": {}
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Deep_Freeze",
@@ -1756,87 +335,7 @@
                 "shredDuration": 3,
                 "healReductionValue": 0.45,
                 "healReductionDuration": 3
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Df_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 100
-                    }
-                },
-                {
-                    "id": "Ability_Df_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 2
-                    }
-                },
-                {
-                    "id": "Ability_Df_Upgrade_Frostbite_Duration",
-                    "tier": 1,
-                    "tags": [],
-                    "abilityId": "Ability_Deep_Freeze",
-                    "upgradeProperties": {
-                        "amount": 1
-                    }
-                },
-                {
-                    "id": "Ability_Df_Upgrade_Spread_Freeze",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Deep_Freeze",
-                    "upgradeProperties": {
-                        "chance": 0.5
-                    }
-                },
-                {
-                    "id": "Ability_Df_Upgrade_Extend_Effects",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Deep_Freeze",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Df_Upgrade_More_Shred",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Deep_Freeze",
-                    "upgradeProperties": {
-                        "amount": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Df_Upgrade_Enemy_Cooldown",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Deep_Freeze",
-                    "upgradeProperties": {
-                        "duration": 3,
-                        "amount": 3
-                    }
-                },
-                {
-                    "id": "Ability_Df_Upgrade_Reduce_All_Cooldowns",
-                    "tier": 3,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {
-                        "amount": 2
-                    }
-                },
-                {
-                    "id": "Ability_Df_Upgrade_Execute",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Deep_Freeze",
-                    "upgradeProperties": {
-                        "threshold": 0.3
-                    }
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Discharge",
@@ -1853,82 +352,7 @@
                 "barrierMultiplier": 1.5,
                 "stageTwoMultiplierBonus": 0.3,
                 "stageThreeBarrierRestore": 0.45
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Dis_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 100
-                    }
-                },
-                {
-                    "id": "Ability_Dis_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 2
-                    }
-                },
-                {
-                    "id": "Ability_Dis_Upgrade_Multiplier",
-                    "tier": 1,
-                    "tags": [],
-                    "abilityId": "Ability_Discharge",
-                    "upgradeProperties": {
-                        "amount": 0.5
-                    }
-                },
-                {
-                    "id": "Ability_Dis_Upgrade_More_Restore",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Discharge",
-                    "upgradeProperties": {
-                        "amount": 0.25
-                    }
-                },
-                {
-                    "id": "Ability_Dis_Upgrade_More_Multiplier",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Discharge",
-                    "upgradeProperties": {
-                        "amount": 1
-                    }
-                },
-                {
-                    "id": "Ability_Dis_Upgrade_Spell_Scale",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Discharge",
-                    "upgradeProperties": {
-                        "amount": 0.35
-                    }
-                },
-                {
-                    "id": "Ability_Dis_Upgrade_Overkill",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Discharge",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Dis_Upgrade_Ignore_Resistances",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Discharge",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Dis_Upgrade_Consume_Mana",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Discharge",
-                    "upgradeProperties": {}
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Static_Armor",
@@ -1947,83 +371,7 @@
                 "chargeDuration": 3,
                 "stageTwoBarrierRestore": 0.25,
                 "stageThreeSplashDamage": 0.5
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Sa_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 100
-                    }
-                },
-                {
-                    "id": "Ability_Sa_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 2
-                    }
-                },
-                {
-                    "id": "Ability_Sa_Upgrade_Detonation_Scales",
-                    "tier": 1,
-                    "tags": [],
-                    "abilityId": "Ability_Static_Armor",
-                    "upgradeProperties": {
-                        "weaponDamageScale": 0.25,
-                        "spellDamageScale": 0.35
-                    }
-                },
-                {
-                    "id": "Ability_Sa_Upgrade_Buff_Duration",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Static_Armor",
-                    "upgradeProperties": {
-                        "amount": 1
-                    }
-                },
-                {
-                    "id": "Ability_Sa_Upgrade_More_Splash",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Static_Armor",
-                    "upgradeProperties": {
-                        "amount": 0.5
-                    }
-                },
-                {
-                    "id": "Ability_Sa_Upgrade_Less_Stacks",
-                    "tier": 2,
-                    "tags": [],
-                    "abilityId": "Ability_Static_Armor",
-                    "upgradeProperties": {
-                        "amount": 1
-                    }
-                },
-                {
-                    "id": "Ability_Sa_Upgrade_Overkill",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Static_Armor",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Sa_Upgrade_Ignore_Resistances",
-                    "tier": 3,
-                    "tags": [],
-                    "abilityId": "Ability_Static_Armor",
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Sa_Upgrade_Cost_Barrier",
-                    "tier": 3,
-                    "tags": [],
-                    "fitsAnyAbility": true,
-                    "upgradeProperties": {}
-                }
-            ]
+            }
         },
         {
             "id": "Ability_Twin_Assist_Attack",
@@ -2067,6 +415,1330 @@
             "abilityProperties": {
                 "wolvesPerCast": 3,
                 "statShare": 0.25
+            }
+        }
+    ],
+    "augments": [
+        {
+            "id": "Ability_SoA_Upgrade_Poison_On_Hit",
+            "tier": 3,
+            "tags": [],
+            "upgradeProperties": {
+                "poisonDuration": 3
+            }
+        },
+        {
+            "id": "Ability_SoA_Upgrade_Apply_Buff_Critical_Chance",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Series_Of_Attacks",
+            "upgradeProperties": {
+                "amountAttacks": 6,
+                "criticalChance": 0.15,
+                "duration": 5,
+                "maxStacks": 3
+            }
+        },
+        {
+            "id": "Ability_SoA_Upgrade_Apply_Buff_Critical_Damage",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Series_Of_Attacks",
+            "upgradeProperties": {
+                "amountAttacks": 9,
+                "criticalDamage": 0.25,
+                "duration": 5,
+                "maxStacks": 3
+            }
+        },
+        {
+            "id": "Ability_SoA_Upgrade_Additional_Max_Attacks",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "maxAdditionalAttacks": 3
+            }
+        },
+        {
+            "id": "Ability_SoA_Upgrade_More_Attack_Damage",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "damageMultiplier": 0.15
+            }
+        },
+        {
+            "id": "Ability_SoA_Upgrade_Attacks_Cannot_Be_Evaded",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Series_Of_Attacks",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_SoA_Upgrade_Additional_Attacks",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "amountAttacks": 1
+            }
+        },
+        {
+            "id": "Ability_Ip_Upgrade_Single_Empowered_Attack",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Increasing_Pressure",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Ip_Upgrade_Attack_Random_Target",
+            "tier": 3,
+            "tags": [],
+            "upgradeProperties": {
+                "splashDamage": 0.45
+            }
+        },
+        {
+            "id": "Ability_Ip_Upgrade_Last_Attack_Always_Crit",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Increasing_Pressure",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Ip_Upgrade_First_Attack_Crit_Damage",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Increasing_Pressure",
+            "upgradeProperties": {
+                "critDamageBonus": 1.3
+            }
+        },
+        {
+            "id": "Ability_Ip_Upgrade_Attack_Extend_Poison",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "poisonDuration": 1
+            }
+        },
+        {
+            "id": "Ability_Ip_Upgrade_Unevadable",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Increasing_Pressure",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Ip_Upgrade_Additional_Amount_Attacks",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "amountAttacks": 2
+            }
+        },
+        {
+            "id": "Ability_Ip_Upgrade_Additional_Damage_Multiplier",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "damageMultiplier": 0.05
+            }
+        },
+        {
+            "id": "Ability_JoP_Upgrade_Bouncing",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Jar_Of_Poison",
+            "upgradeProperties": {
+                "bounces": 5
+            }
+        },
+        {
+            "id": "Ability_JoP_Upgrade_Transfer_Poison_On_Death",
+            "tier": 3,
+            "tags": [],
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_JoP_Upgrade_All_Targets",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Jar_Of_Poison",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_JoP_Upgrade_Clumsiness",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "evadeReduce": 0.15,
+                "maxStacks": 5,
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_JoP_Upgrade_Apply_Blind",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "accuracyReduce": 0.15,
+                "maxStacks": 5,
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_JoP_Upgrade_Apply_Weakness",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "damageReduce": 0.15,
+                "maxStacks": 5,
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_JoP_Upgrade_Increasing_Scales",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "weaponDamageScale": 0.6,
+                "spellDamageScale": 0.85
+            }
+        },
+        {
+            "id": "Ability_JoP_Upgrade_Poison_Duration",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "poisonDuration": 1
+            }
+        },
+        {
+            "id": "Ability_Ds_Upgrade_Additional_Attack_Chance",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Dark_Shroud",
+            "upgradeProperties": {
+                "amount": 0.15
+            }
+        },
+        {
+            "id": "Ability_Ds_Upgrade_Additional_Accuracy",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Dark_Shroud",
+            "upgradeProperties": {
+                "amount": 0.2
+            }
+        },
+        {
+            "id": "Ability_Ds_Upgrade_Immortality",
+            "tier": 3,
+            "tags": [],
+            "upgradeProperties": {
+                "duration": 3,
+                "stacks": 1
+            }
+        },
+        {
+            "id": "Ability_Ds_Upgrade_Mana_Regen",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Dark_Shroud",
+            "upgradeProperties": {
+                "regenAmount": 0.05
+            }
+        },
+        {
+            "id": "Ability_Ds_Upgrade_Additional_Health_Regen",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "additionalRegen": 0.025
+            }
+        },
+        {
+            "id": "Ability_Ds_Upgrade_Add_Effectiveness_Reduce_Stacks",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "additionalEffectiveness": 0.35,
+                "amountStacks": 2
+            }
+        },
+        {
+            "id": "Ability_Ds_Upgrade_Increased_Buff_Duration",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "duration": 1
+            }
+        },
+        {
+            "id": "Ability_Cc_Upgrade_Additional_Attack_Chance",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Critical_Calculation",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Cc_Upgrade_Additional_Crit_Chance",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Critical_Calculation",
+            "upgradeProperties": {
+                "criticalChance": 0.08
+            }
+        },
+        {
+            "id": "Ability_Cc_Upgrade_Lucky_Crit",
+            "tier": 3,
+            "tags": [],
+            "upgradeProperties": {
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_Cc_Upgrade_Additional_Crit_Multiplier",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "multiplier": 0.15,
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_Cc_Upgrade_Leach_On_Crit",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.15
+            }
+        },
+        {
+            "id": "Ability_Cc_Upgrade_Apply_Enhanced_Defence",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "duration": 3,
+                "stacks": 3,
+                "value": 0.15
+            }
+        },
+        {
+            "id": "Ability_Cc_Upgrade_More_Stacks_More_Cost",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "cost": 50,
+                "stacks": 1
+            }
+        },
+        {
+            "id": "Ability_Pe_Upgrade_Apply_Seal_Of_Oblivion",
+            "tier": 3,
+            "tags": [],
+            "upgradeProperties": {
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_Pe_Upgrade_Execute_Bosses",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Poison_Explosion",
+            "upgradeProperties": {
+                "stacksMultiplier": 2
+            }
+        },
+        {
+            "id": "Ability_Pe_Upgrade_Spread_Poison",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Poison_Explosion",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Pe_Upgrade_Poison_Not_Removed",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Poison_Explosion",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Pe_Upgrade_Reduce_Execution_Trahsold",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 5
+            }
+        },
+        {
+            "id": "Ability_Pe_Upgrade_Transfer_Poison_On_Death",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Poison_Explosion",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Pe_Upgrade_Reduce_Cooldown",
+            "tier": 1,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {
+                "cooldown": 2,
+                "additionalCost": 50
+            }
+        },
+        {
+            "id": "Ability_Pe_Upgrade_Total_Damage_Multiplier",
+            "tier": 1,
+            "tags": [],
+            "abilityId": "Ability_Poison_Explosion",
+            "upgradeProperties": {
+                "multiplier": 0.15
+            }
+        },
+        {
+            "id": "Ability_Pc_Upgrade_Attacks_Reduce_Incoming_Heal",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Poison_Coating",
+            "upgradeProperties": {
+                "reduceBy": 0.6,
+                "maxStacks": 1,
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_Pc_Upgrade_Attacks_Reduce_Armor",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Poison_Coating",
+            "upgradeProperties": {
+                "reduceArmorBy": 0.15,
+                "maxStacks": 4,
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_Pc_Upgrade_Apply_Stack_For_Each_Enemy",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Poison_Coating",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Pc_Upgrade_Increase_Poison_On_Target",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Poison_Coating",
+            "upgradeProperties": {
+                "poisonDuration": 1
+            }
+        },
+        {
+            "id": "Ability_Pc_Upgrade_Additional_Poison_Stack_Duration",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Poison_Coating",
+            "upgradeProperties": {
+                "additionalDuration": 1
+            }
+        },
+        {
+            "id": "Ability_Pc_Upgrade_Additional_Multiplier",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Poison_Coating",
+            "upgradeProperties": {
+                "multiplier": 0.25
+            }
+        },
+        {
+            "id": "Ability_Pc_Upgrade_Increase_Duration",
+            "tier": 1,
+            "tags": [],
+            "abilityId": "Ability_Poison_Coating",
+            "upgradeProperties": {
+                "duration": 1
+            }
+        },
+        {
+            "id": "Ability_Dst_Upgrade_Both_Hits_Buff",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Double_Strike",
+            "upgradeProperties": {
+                "amount": 0.25,
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_Dst_Upgrade_Restore_On_Hit",
+            "tier": 3,
+            "tags": [],
+            "upgradeProperties": {
+                "healthRestore": 0.07,
+                "manaRestore": 0.07
+            }
+        },
+        {
+            "id": "Ability_Dst_Upgrade_Accuracy",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Double_Strike",
+            "upgradeProperties": {
+                "amount": 0.15
+            }
+        },
+        {
+            "id": "Ability_Dst_Upgrade_Damage_Multiplier",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.25
+            }
+        },
+        {
+            "id": "Ability_Ar_Upgrade_Incoming_Reduction",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ares_Blessing",
+            "upgradeProperties": {
+                "reduce": 0.25
+            }
+        },
+        {
+            "id": "Ability_Ar_Upgrade_Turn_End_Heal",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ares_Blessing",
+            "upgradeProperties": {
+                "regenAmount": 0.08
+            }
+        },
+        {
+            "id": "Ability_Ar_Upgrade_Damage_Buff",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ares_Blessing",
+            "upgradeProperties": {
+                "amount": 0.55
+            }
+        },
+        {
+            "id": "Ability_Ar_Upgrade_Recovery_Bonus",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "recoveryBonus": 0.15
+            }
+        },
+        {
+            "id": "Ability_Ar_Upgrade_Health_Bonus",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "healthBonus": 0.15
+            }
+        },
+        {
+            "id": "Ability_Ar_Upgrade_Both_Bonuses",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "healthBonus": 0.07,
+                "recoveryBonus": 0.07
+            }
+        },
+        {
+            "id": "Ability_Ar_Upgrade_Buff_Duration",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "duration": 1
+            }
+        },
+        {
+            "id": "Ability_Porc_Upgrade_Echo",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Porcupine",
+            "upgradeProperties": {
+                "delayedPercent": 0.3,
+                "turns": 2
+            }
+        },
+        {
+            "id": "Ability_Porc_Upgrade_Incoming_Reduction",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Porcupine",
+            "upgradeProperties": {
+                "reduce": 0.25
+            }
+        },
+        {
+            "id": "Ability_Porc_Upgrade_Crit_Mitigation",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Porcupine",
+            "upgradeProperties": {
+                "amount": 0.8
+            }
+        },
+        {
+            "id": "Ability_Porc_Upgrade_Heal_On_Hit",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.07
+            }
+        },
+        {
+            "id": "Ability_Porc_Upgrade_More_Armor_Return",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.15
+            }
+        },
+        {
+            "id": "Ability_Porc_Upgrade_More_Damage_Return",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.20
+            }
+        },
+        {
+            "id": "Ability_Porc_Upgrade_Reduce_Cooldown_Add_Cost",
+            "tier": 1,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {
+                "cooldown": 2,
+                "additionalCost": 30
+            }
+        },
+        {
+            "id": "Ability_Porc_Upgrade_Cooldown_Chance",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "chance": 0.15
+            }
+        },
+        {
+            "id": "Ability_Porc_Upgrade_Armor_Buff",
+            "tier": 1,
+            "tags": [],
+            "abilityId": "Ability_Porcupine",
+            "upgradeProperties": {
+                "amount": 0.25
+            }
+        },
+        {
+            "id": "Ability_Bf_Upgrade_Burning_Fury",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Berserk_Fury",
+            "upgradeProperties": {
+                "healthAsDamageMultiplier": 1,
+                "burningDuration": 3,
+                "burningMaxStacks": 3
+            }
+        },
+        {
+            "id": "Ability_Bf_Upgrade_Primal_Fury",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Berserk_Fury",
+            "upgradeProperties": {
+                "damageMultiplier": 1.5
+            }
+        },
+        {
+            "id": "Ability_Bf_Upgrade_Healing_Fury",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Berserk_Fury",
+            "upgradeProperties": {
+                "healAmount": 0.5
+            }
+        },
+        {
+            "id": "Ability_Bf_Upgrade_Cost_Type_Health",
+            "tier": 2,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Bf_Upgrade_More_Burn",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.035
+            }
+        },
+        {
+            "id": "Ability_Bf_Upgrade_Less_Burn",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.02
+            }
+        },
+        {
+            "id": "Ability_Bf_Upgrade_Fury_Duration",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "duration": 1
+            }
+        },
+        {
+            "id": "Ability_Hb_Upgrade_Additional_Lunges",
+            "tier": 3,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 1
+            }
+        },
+        {
+            "id": "Ability_Hb_Upgrade_Additional_Scales",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Head_Butt",
+            "upgradeProperties": {
+                "weaponDamageScale": 0.15,
+                "spellDamageScale": 0.15
+            }
+        },
+        {
+            "id": "Ability_Hb_Upgrade_Extend_Stun_Add_Cost",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "stunDuration": 1,
+                "additionalCost": 50
+            }
+        },
+        {
+            "id": "Ability_Hb_Upgrade_Armor_Debuff",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Head_Butt",
+            "upgradeProperties": {
+                "reduceArmorBy": 0.25,
+                "duration": 3,
+                "maxStacks": 3
+            }
+        },
+        {
+            "id": "Ability_Sac_Upgrade_Heal_From_Damage",
+            "tier": 3,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.15
+            }
+        },
+        {
+            "id": "Ability_Sac_Upgrade_Incoming_Reduction",
+            "tier": 3,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {
+                "reduce": 0.25,
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_Sac_Upgrade_Free_Cast",
+            "tier": 3,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Sac_Upgrade_Additional_Rate",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.015
+            }
+        },
+        {
+            "id": "Ability_Sac_Upgrade_More_Sacrifice",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.10
+            }
+        },
+        {
+            "id": "Ability_Sac_Upgrade_Cost_Type_Health",
+            "tier": 2,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Sac_Upgrade_Additional_Charge",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 1
+            }
+        },
+        {
+            "id": "Ability_Arm_Upgrade_Missing_Hp_Damage",
+            "tier": 3,
+            "tags": [],
+            "upgradeProperties": {
+                "rate": 1
+            }
+        },
+        {
+            "id": "Ability_Arm_Upgrade_Shatter_Armor",
+            "tier": 3,
+            "tags": [],
+            "upgradeProperties": {
+                "reduceBy": 1,
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_Arm_Upgrade_All_Targets",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Armageddon",
+            "upgradeProperties": {
+                "additionalCooldown": 3
+            }
+        },
+        {
+            "id": "Ability_Arm_Upgrade_Reduce_Hp_Cost",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.15
+            }
+        },
+        {
+            "id": "Ability_Arm_Upgrade_Stage1_Damage",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "damage": 400,
+                "weaponScale": 1.0,
+                "spellScale": 1.0
+            }
+        },
+        {
+            "id": "Ability_Arm_Upgrade_Stage3_Burning",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Armageddon",
+            "upgradeProperties": {
+                "stacks": 3,
+                "duration": 3,
+                "damageMultiplier": 0.7
+            }
+        },
+        {
+            "id": "Ability_Arm_Upgrade_Extend_Stun",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "duration": 1
+            }
+        },
+        {
+            "id": "Ability_Ib_Upgrade_Withering_Value",
+            "tier": 1,
+            "tags": [],
+            "abilityId": "Ability_Ice_Block",
+            "upgradeProperties": {
+                "amount": 0.05
+            }
+        },
+        {
+            "id": "Ability_Ib_Upgrade_Withering_Stacks",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Ice_Block",
+            "upgradeProperties": {
+                "amount": 1
+            }
+        },
+        {
+            "id": "Ability_Ib_Upgrade_Extra_Block_Damage",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Ice_Block",
+            "upgradeProperties": {
+                "amount": 0.25
+            }
+        },
+        {
+            "id": "Ability_Ib_Upgrade_Heavy_Blocks",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Ice_Block",
+            "upgradeProperties": {
+                "damage": 150,
+                "weaponDamageScale": 0.15,
+                "spellDamageScale": 0.45
+            }
+        },
+        {
+            "id": "Ability_Ib_Upgrade_Reset_Chance",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ice_Block",
+            "upgradeProperties": {
+                "chance": 0.25
+            }
+        },
+        {
+            "id": "Ability_Ib_Upgrade_Random_Extra_Blocks",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ice_Block",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Ib_Upgrade_Consume_Stun",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ice_Block",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Ov_Upgrade_Burn_Add_Cost",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "burnPercent": 0.30,
+                "additionalCost": 50
+            }
+        },
+        {
+            "id": "Ability_Ov_Upgrade_Mana_Step",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Overload",
+            "upgradeProperties": {
+                "amount": 1.5
+            }
+        },
+        {
+            "id": "Ability_Ov_Upgrade_Random_Cooldown",
+            "tier": 2,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {
+                "amount": 1
+            }
+        },
+        {
+            "id": "Ability_Ov_Upgrade_Additional_Multiplier",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Overload",
+            "upgradeProperties": {
+                "amount": 0.02
+            }
+        },
+        {
+            "id": "Ability_Ov_Upgrade_Stage4_Resets_Cooldown",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Overload",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Ov_Upgrade_Mana_Flow",
+            "tier": 3,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {
+                "regenAmount": 0.15,
+                "duration": 3
+            }
+        },
+        {
+            "id": "Ability_Ov_Upgrade_Next_Cast_Pure",
+            "tier": 3,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {
+                "fraction": 0.3
+            }
+        },
+        {
+            "id": "Ability_Cl_Upgrade_Ignore_Resistances",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Chain_Lightning",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Cl_Upgrade_Additional_Jump",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 1
+            }
+        },
+        {
+            "id": "Ability_Cl_Upgrade_Reduce_Falloff",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 0.10
+            }
+        },
+        {
+            "id": "Ability_Cl_Upgrade_Scales_Add_Cost",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "weaponDamageScale": 0.15,
+                "spellDamageScale": 0.35,
+                "additionalCost": 50
+            }
+        },
+        {
+            "id": "Ability_Ia_Upgrade_Additional_Scale",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 5
+            }
+        },
+        {
+            "id": "Ability_Ia_Upgrade_Additional_Duration",
+            "tier": 2,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 1
+            }
+        },
+        {
+            "id": "Ability_Ia_Upgrade_Additional_Barrier",
+            "tier": 1,
+            "tags": [],
+            "upgradeProperties": {
+                "amount": 300
+            }
+        },
+        {
+            "id": "Ability_Ia_Upgrade_Reflect",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Ice_Aegis",
+            "upgradeProperties": {
+                "amount": 0.15
+            }
+        },
+        {
+            "id": "Ability_Ia_Upgrade_Stun_Attackers",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ice_Aegis",
+            "upgradeProperties": {
+                "chance": 0.25
+            }
+        },
+        {
+            "id": "Ability_Ia_Upgrade_Turn_End_Heal",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ice_Aegis",
+            "upgradeProperties": {
+                "amount": 0.15
+            }
+        },
+        {
+            "id": "Ability_Ia_Upgrade_Crit_Mitigation",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ice_Aegis",
+            "upgradeProperties": {
+                "amount": 0.8
+            }
+        },
+        {
+            "id": "Ability_Is_Upgrade_Barrier_From_Shrapnel",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ice_Shards",
+            "upgradeProperties": {
+                "leachPercent": 0.15
+            }
+        },
+        {
+            "id": "Ability_Is_Upgrade_Apply_Fragility",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ice_Shards",
+            "upgradeProperties": {
+                "duration": 3,
+                "maxStacks": 3,
+                "critDamageAmp": 0.35
+            }
+        },
+        {
+            "id": "Ability_Is_Upgrade_Additional_Crit_Damage",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Ice_Shards",
+            "upgradeProperties": {
+                "amount": 0.75
+            }
+        },
+        {
+            "id": "Ability_Is_Upgrade_Additional_Crit_Chance",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Ice_Shards",
+            "upgradeProperties": {
+                "amount": 0.35
+            }
+        },
+        {
+            "id": "Ability_Is_Upgrade_Reduce_Cooldown_Add_Cost",
+            "tier": 1,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {
+                "cooldown": 2,
+                "additionalCost": 100
+            }
+        },
+        {
+            "id": "Ability_Is_Upgrade_Additional_Scales",
+            "tier": 1,
+            "tags": [],
+            "abilityId": "Ability_Ice_Shards",
+            "upgradeProperties": {
+                "weaponDamageScale": 0.05,
+                "spellDamageScale": 0.15
+            }
+        },
+        {
+            "id": "Ability_Is_Upgrade_Multicast",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Ice_Shards",
+            "upgradeProperties": {
+                "amount": 0.25
+            }
+        },
+        {
+            "id": "Ability_Is_Upgrade_Crit_Ignores_Cold_Res",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Ice_Shards",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Df_Upgrade_Frostbite_Duration",
+            "tier": 1,
+            "tags": [],
+            "abilityId": "Ability_Deep_Freeze",
+            "upgradeProperties": {
+                "amount": 1
+            }
+        },
+        {
+            "id": "Ability_Df_Upgrade_Spread_Freeze",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Deep_Freeze",
+            "upgradeProperties": {
+                "chance": 0.5
+            }
+        },
+        {
+            "id": "Ability_Df_Upgrade_Extend_Effects",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Deep_Freeze",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Df_Upgrade_More_Shred",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Deep_Freeze",
+            "upgradeProperties": {
+                "amount": 0.15
+            }
+        },
+        {
+            "id": "Ability_Df_Upgrade_Enemy_Cooldown",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Deep_Freeze",
+            "upgradeProperties": {
+                "duration": 3,
+                "amount": 3
+            }
+        },
+        {
+            "id": "Ability_Df_Upgrade_Reduce_All_Cooldowns",
+            "tier": 3,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {
+                "amount": 2
+            }
+        },
+        {
+            "id": "Ability_Df_Upgrade_Execute",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Deep_Freeze",
+            "upgradeProperties": {
+                "threshold": 0.3
+            }
+        },
+        {
+            "id": "Ability_Dis_Upgrade_Multiplier",
+            "tier": 1,
+            "tags": [],
+            "abilityId": "Ability_Discharge",
+            "upgradeProperties": {
+                "amount": 0.5
+            }
+        },
+        {
+            "id": "Ability_Dis_Upgrade_More_Restore",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Discharge",
+            "upgradeProperties": {
+                "amount": 0.25
+            }
+        },
+        {
+            "id": "Ability_Dis_Upgrade_More_Multiplier",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Discharge",
+            "upgradeProperties": {
+                "amount": 1
+            }
+        },
+        {
+            "id": "Ability_Dis_Upgrade_Spell_Scale",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Discharge",
+            "upgradeProperties": {
+                "amount": 0.35
+            }
+        },
+        {
+            "id": "Ability_Dis_Upgrade_Overkill",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Discharge",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Dis_Upgrade_Ignore_Resistances",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Discharge",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Dis_Upgrade_Consume_Mana",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Discharge",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Sa_Upgrade_Detonation_Scales",
+            "tier": 1,
+            "tags": [],
+            "abilityId": "Ability_Static_Armor",
+            "upgradeProperties": {
+                "weaponDamageScale": 0.25,
+                "spellDamageScale": 0.35
+            }
+        },
+        {
+            "id": "Ability_Sa_Upgrade_Buff_Duration",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Static_Armor",
+            "upgradeProperties": {
+                "amount": 1
+            }
+        },
+        {
+            "id": "Ability_Sa_Upgrade_More_Splash",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Static_Armor",
+            "upgradeProperties": {
+                "amount": 0.5
+            }
+        },
+        {
+            "id": "Ability_Sa_Upgrade_Less_Stacks",
+            "tier": 2,
+            "tags": [],
+            "abilityId": "Ability_Static_Armor",
+            "upgradeProperties": {
+                "amount": 1
+            }
+        },
+        {
+            "id": "Ability_Sa_Upgrade_Overkill",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Static_Armor",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Sa_Upgrade_Ignore_Resistances",
+            "tier": 3,
+            "tags": [],
+            "abilityId": "Ability_Static_Armor",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Sa_Upgrade_Cost_Barrier",
+            "tier": 3,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Ability_Upgrade_Reduce_Cost",
+            "tier": 1,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {
+                "costShare": 0.30
+            }
+        },
+        {
+            "id": "Ability_Upgrade_Reduce_Cooldown",
+            "tier": 1,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {
+                "cooldownShare": 0.25
             }
         }
     ]

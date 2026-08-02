@@ -17,25 +17,29 @@ namespace LastBreathTest.BattleSystemTests
     public class AbilityActivationHygieneTests
     {
         [TestMethod]
-        public void CostReductionUpgrades_FromDifferentUpgrades_BothApply()
+        public void CostDecorators_FromDifferentUpgrades_BothApply()
         {
+            // Decorator ids are derived from the upgrade that writes them, so two upgrades touching the
+            // same parameter must leave two decorators and not one overwriting the other. The two are
+            // flat here on purpose: what a share does to a parameter another augment already touched is
+            // its own question, answered in AugmentShareReductionTests.
             var ability = CreateAbility(cost: 100);
 
-            new AbilityUpgradeReduceCost("Upgrade_A", [], 1, 20f).Apply(ability);
-            new AbilityUpgradeReduceCost("Upgrade_B", [], 1, 30f).Apply(ability);
+            new AbilityUpgradeReduceCooldownAddCost("Upgrade_A", [], 1, 1f, 20f).Apply(ability);
+            new AbilityUpgradeReduceCooldownAddCost("Upgrade_B", [], 2, 1f, 30f).Apply(ability);
 
-            Assert.AreEqual(50, ability.CostValue, "decorators of two different upgrades must stack, not collide by id");
+            Assert.AreEqual(150, ability.CostValue, "decorators of two different upgrades must stack, not collide by id");
         }
 
         [TestMethod]
-        public void CooldownReductionUpgrades_FromDifferentUpgrades_BothApply()
+        public void CooldownDecorators_FromDifferentUpgrades_BothApply()
         {
             var ability = CreateAbility(cooldown: 10);
 
-            new AbilityUpgradeReduceCooldown("Upgrade_A", [], 1, 2f).Apply(ability);
-            new AbilityUpgradeReduceCooldown("Upgrade_B", [], 1, 3f).Apply(ability);
+            new AbilityUpgradeReduceCooldownAddCost("Upgrade_A", [], 1, 2f, 0f).Apply(ability);
+            new AbilityUpgradeReduceCooldownAddCost("Upgrade_B", [], 2, 3f, 0f).Apply(ability);
 
-            Assert.AreEqual(5f, ability.Cooldown);
+            Assert.AreEqual(5f, ability.Cooldown, "decorators of two different upgrades must stack, not collide by id");
         }
 
         [TestMethod]
@@ -110,7 +114,7 @@ namespace LastBreathTest.BattleSystemTests
         public void Copy_DoesNotShareUpgradeInstances()
         {
             var ability = CreateAbility(cost: 100);
-            var upgrade = new AbilityUpgradeReduceCost("Upgrade_A", [], 1, 20f);
+            var upgrade = new AbilityUpgradeReduceCost("Upgrade_A", [], 1, 0.2f);
             ability.SetAbilityUpgrades(new() { [1] = [upgrade] });
 
             var copy = (Ability)ability.Copy();
