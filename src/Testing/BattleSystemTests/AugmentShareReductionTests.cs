@@ -9,11 +9,12 @@ namespace LastBreathTest.BattleSystemTests
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// The two augments that took the place of thirty-eight. Both work through the base contract every
-    /// ability honours, so both are written once and state what they take as a share of the number
-    /// they cut rather than as a number of their own: they go on every ability there is — prices
-    /// running from nothing at all to five hundred, waits from no turns to nine — and one flat figure
-    /// would be a near-free cast at the cheap end and nothing worth choosing at the expensive one.
+    /// The four augments that took the place of forty-three. All of them work through the base contract
+    /// every ability honours, so all of them are written once — and the three that move a number state
+    /// what they move as a share of it rather than as a number of their own: they go on every ability
+    /// there is — prices running from nothing at all to five hundred, waits from no turns to nine — and
+    /// one flat figure would be a near-free cast at the cheap end and nothing worth choosing at the
+    /// expensive one.
     ///
     /// Two things a share has to answer for, and both are walked below. A share of a small base is a
     /// fraction of a turn, and turns are whole: a cut that rounds down to zero would leave an augment
@@ -25,30 +26,60 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class AugmentShareReductionTests
     {
-        private const string CostAugment = "Ability_Upgrade_Reduce_Cost";
-        private const string CooldownAugment = "Ability_Upgrade_Reduce_Cooldown";
+        private const string CostAugment = "Augment_Reduce_Cost";
+        private const string CooldownAugment = "Augment_Reduce_Cooldown";
+
+        /// <summary>The record that took the place of three: a shorter wait bought with a higher
+        /// price, both stated as shares of the ability's own numbers.</summary>
+        private const string SurchargeAugment = "Augment_Reduce_Cooldown_Add_Cost";
+
+        /// <summary>The record that took the place of two: the price paid in health. It moves no
+        /// number at all — the cost type is categorical — so it appears here only where the collapse
+        /// is what is being walked.</summary>
+        private const string HealthCostAugment = "Augment_Cost_Type_Health";
+
+        private const float CostShare = 0.3f;
+        private const float CooldownShare = 0.25f;
+        private const float SurchargeShare = 0.4f;
 
         /// <summary>The augment of another tier the cost share has to share a parameter with: Head
         /// Butt's longer stun, bought with fifty more mana. The shipped record and the shipped
         /// class.</summary>
-        private const string CostSurcharge = "Ability_Hb_Upgrade_Extend_Stun_Add_Cost";
+        private const string CostSurcharge = "Augment_Extend_Stun_Add_Cost";
 
         /// <summary>The same on the other parameter — Armageddon reaching every target and waiting three
         /// turns longer for it. Stood in for by an upgrade of the same shape (a flat addition to the
         /// wait), because Armageddon itself has nothing to do with the question.</summary>
-        private const string CooldownSurcharge = "Ability_Arm_Upgrade_All_Targets";
+        private const string CooldownSurcharge = "Ability_Arm_Augment_All_Targets";
 
         /// <summary>How many augments the game holds after the collapse — the same number in the data
         /// and in the registry, because one half without the other is either an offer nothing builds
         /// or code nothing can reach.</summary>
-        private const int ShippedAugmentCount = 153;
+        private const int ShippedAugmentCount = 150;
 
-        /// <summary>Every cooldown the shipped abilities are written with, and what a quarter of it
-        /// comes to once it is rounded to whole turns. Held as a table rather than recomputed, so a
-        /// change of the rounding rule shows up as the numbers it moves.</summary>
-        private static readonly (int Base, int Cut)[] s_cooldownTable =
+        /// <summary>Every record the collapse of the base-contract families left behind, with the tier
+        /// it was written at. All four claim the whole book, which is the widest reach in the system
+        /// and the thing a lost marker would take away in silence.</summary>
+        private static readonly (string Id, int Tier)[] s_collapsedRecords =
         [
-            (3, 1), (4, 1), (5, 1), (6, 2), (7, 2), (9, 2)
+            (CostAugment, 1), (CooldownAugment, 1), (SurchargeAugment, 1), (HealthCostAugment, 2)
+        ];
+
+        /// <summary>Every cooldown the shipped abilities are written with, and what each share comes to
+        /// on it once it is rounded to whole turns. Held as a table rather than recomputed, so a change
+        /// of the rounding rule shows up as the numbers it moves.</summary>
+        private static readonly (int Base, int QuarterCut, int SurchargeCut)[] s_cooldownTable =
+        [
+            (3, 1, 1), (4, 1, 2), (5, 1, 2), (6, 2, 2), (7, 2, 3), (9, 2, 4)
+        ];
+
+        /// <summary>The three abilities whose own cooldown augments the surcharge record absorbed, and
+        /// what the shares come to on the numbers those abilities are written with. The bases are read
+        /// off the files, so an ability repriced after the collapse fails here instead of quietly
+        /// getting another augment than the one that was agreed.</summary>
+        private static readonly (string AbilityId, int CooldownCut, int CostSurchargeValue)[] s_absorbedAbilities =
+        [
+            ("Ability_Porcupine", 2, 40), ("Ability_Ice_Shards", 2, 80), ("Ability_Poison_Explosion", 3, 40)
         ];
 
         [TestMethod]
@@ -59,8 +90,8 @@ namespace LastBreathTest.BattleSystemTests
             var cheap = AbilityWith(cost: 100);
             var dear = AbilityWith(cost: 500);
 
-            new AbilityUpgradeReduceCost(CostAugment, [], 1, 0.3f).Apply(cheap);
-            new AbilityUpgradeReduceCost(CostAugment, [], 1, 0.3f).Apply(dear);
+            new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare).Apply(cheap);
+            new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare).Apply(dear);
 
             Assert.AreEqual(70, cheap.CostValue, "the share was not measured against the cheap ability's own price");
             Assert.AreEqual(350, dear.CostValue, "the share was not measured against the dear ability's own price");
@@ -72,11 +103,30 @@ namespace LastBreathTest.BattleSystemTests
             var quick = AbilityWith(cooldown: 4);
             var slow = AbilityWith(cooldown: 9);
 
-            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, 0.25f).Apply(quick);
-            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, 0.25f).Apply(slow);
+            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(quick);
+            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(slow);
 
             Assert.AreEqual(3f, quick.Cooldown, "the share was not measured against the quick ability's own wait");
             Assert.AreEqual(7f, slow.Cooldown, "the share was not measured against the slow ability's own wait");
+        }
+
+        [TestMethod]
+        public void TheSurchargeAugmentCutsTheWaitAndRaisesThePriceOfTheAbilityItGoesOn()
+        {
+            // The three records the surcharge augment replaced, each on the ability it used to belong
+            // to: one record now, and what it does to each of them is the ability's own numbers read
+            // twice. Both shares are measured on the same base, so a mistake in either shows up as one
+            // of these two figures and not as a build that merely feels off.
+            foreach ((string abilityId, int cut, int surcharge) in s_absorbedAbilities)
+            {
+                (int wait, int price) = ShippedBaseOf(abilityId);
+                var ability = AbilityWith(cost: price, cooldown: wait);
+
+                new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(ability);
+
+                Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"the share no longer takes {cut} turns off the {wait} '{abilityId}' waits");
+                Assert.AreEqual(price + surcharge, ability.CostValue, $"the share no longer adds {surcharge} to the {price} '{abilityId}' charges");
+            }
         }
 
         [TestMethod]
@@ -103,6 +153,17 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void TheSurchargeAugmentMovesBothNumbersTheSameWhicheverWayTheBuildWasAssembled()
+        {
+            // One record moving two parameters at once, with an augment of another tier standing on
+            // each of them: fifty more mana for a longer stun, three more turns of waiting. Both
+            // shares are the ability's own, so what the surcharge augment does is settled before
+            // either of the others is read — and stays settled when the slots are filled backwards.
+            Assert.AreEqual((260, 8f), BothOf(surchargesFirst: true), "a share was measured against a number another augment had already moved");
+            Assert.AreEqual((260, 8f), BothOf(surchargesFirst: false), "the same three augments came to another build in the other order");
+        }
+
+        [TestMethod]
         public void TakingTheAugmentOffAndPuttingItBackOnLeavesTheBuildWhereItWas()
         {
             // The tier slot holds one augment, and swapping it is a click away in the augment window.
@@ -120,11 +181,11 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void EveryShippedCooldownLosesAWholeTurnAndTheOneTheTableNames()
         {
-            foreach ((int wait, int cut) in s_cooldownTable)
+            foreach ((int wait, int cut, _) in s_cooldownTable)
             {
                 var ability = AbilityWith(cooldown: wait);
 
-                new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, 0.25f).Apply(ability);
+                new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(ability);
 
                 Assert.IsTrue(ability.Cooldown < wait, $"a quarter of {wait} turns rounded down to nothing, and the augment does nothing at all");
                 Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"a quarter of {wait} turns no longer comes to {cut}");
@@ -132,9 +193,26 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void EveryShippedCooldownLosesAWholeTurnToTheSurchargeAndTheOneTheTableNames()
+        {
+            // The same walk for the second share on the same parameter. The surcharge augment is paid
+            // for in mana whatever it gives back, so a wait it rounds down to nothing is worse than
+            // inert — the player is charged more for a cast that comes round no sooner.
+            foreach ((int wait, _, int cut) in s_cooldownTable)
+            {
+                var ability = AbilityWith(cooldown: wait);
+
+                new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(ability);
+
+                Assert.IsTrue(ability.Cooldown < wait, $"the share of {wait} turns rounded down to nothing, and the augment is paid for and does nothing");
+                Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"the share of {wait} turns no longer comes to {cut}");
+            }
+        }
+
+        [TestMethod]
         public void TheTableCoversEveryCooldownTheShippedAbilitiesAreWrittenWith()
         {
-            // The control the walk above needs: its table is only worth something while it is the
+            // The control the walks above need: their table is only worth something while it is the
             // waits the game actually ships. A new ability with a base of its own has to be answered
             // for here rather than quietly left out.
             var written = ShippedCooldowns();
@@ -148,43 +226,52 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void AWaitTooShortForTheShareToReachATurnStillLosesOne()
         {
-            // The floor, on the only base small enough to need it. Nothing the game ships waits a
-            // single turn today, so this is the rule stated for the data that will: a quarter of one
-            // turn is a quarter of a turn, and rounding it honestly leaves the augment inert.
-            var ability = AbilityWith(cooldown: 1);
+            // The floor, on the only base small enough to need it, for both augments that cut a wait.
+            // Nothing the game ships waits a single turn today, so this is the rule stated for the data
+            // that will: a fraction of one turn is a fraction of a turn, and rounding it honestly leaves
+            // the augment inert.
+            var cut = AbilityWith(cooldown: 1);
+            var surcharged = AbilityWith(cooldown: 1);
 
-            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, 0.25f).Apply(ability);
+            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(cut);
+            new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
 
-            Assert.AreEqual(0f, ability.Cooldown, "a share too small to reach a whole turn took nothing at all");
+            Assert.AreEqual(0f, cut.Cooldown, "a share too small to reach a whole turn took nothing at all");
+            Assert.AreEqual(0f, surcharged.Cooldown, "the surcharge augment charged for a wait it was too small to shorten");
         }
 
         [TestMethod]
         public void AnAbilityThatCostsNothingAndWaitsForNothingIsLeftAlone()
         {
-            // Both augments now go onto every ability there is, and the book holds casts that are free
-            // and instant. A floor of one unit applied blindly would hand the caster a negative price.
-            var free = AbilityWith(cost: 0, cooldown: 0);
+            // The augments now go onto every ability there is, and the book holds casts that are free
+            // and instant. A floor of one unit applied blindly would hand the caster a negative price
+            // on one side and a bill for a free cast on the other.
+            var discounted = AbilityWith(cost: 0, cooldown: 0);
+            var surcharged = AbilityWith(cost: 0, cooldown: 0);
 
-            new AbilityUpgradeReduceCost(CostAugment, [], 1, 0.3f).Apply(free);
-            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, 0.25f).Apply(free);
+            new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare).Apply(discounted);
+            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(discounted);
+            new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
 
-            Assert.AreEqual(0, free.CostValue, "an ability that costs nothing was given a negative price");
-            Assert.AreEqual(0f, free.Cooldown, "an ability that waits for nothing was given a negative wait");
+            Assert.AreEqual(0, discounted.CostValue, "an ability that costs nothing was given a negative price");
+            Assert.AreEqual(0f, discounted.Cooldown, "an ability that waits for nothing was given a negative wait");
+            Assert.AreEqual(0, surcharged.CostValue, "a free cast was charged for a wait it does not have");
+            Assert.AreEqual(0f, surcharged.Cooldown, "an ability that waits for nothing was given a negative wait");
         }
 
         [TestMethod]
-        public void BothRecordsGoOntoAbilitiesTheyShareNoTagWith()
+        public void EveryCollapsedRecordGoesOntoAbilitiesItSharesNoTagWith()
         {
-            // The claim on the whole book, honoured where no tag could have carried the augment. Both
-            // records name no tag at all, so every ability in the game is a stranger to them.
+            // The claim on the whole book, honoured where no tag could have carried the augment. All
+            // four records name no tag at all, so every ability in the game is a stranger to them.
             AbilityProvider catalog = ShippedCatalog();
             string[] abilities = [.. catalog.KnownAbilityIds];
 
-            foreach (string id in new[] { CostAugment, CooldownAugment })
+            foreach ((string id, int tier) in s_collapsedRecords)
             {
                 AbilityUpgradeData? record = catalog.Find(id);
                 Assert.IsNotNull(record, $"the shipped data declares no '{id}'");
-                Assert.AreEqual(1, record.Tier, $"'{id}' is no longer the plainest augment there is");
+                Assert.AreEqual(tier, record.Tier, $"'{id}' is no longer written at the tier the collapse gave it");
 
                 var board = new AbilitySocketBoard(catalog);
                 board.Sync([.. abilities.Select(ability => new AbilitySocketPlacement(Socket(ability), ability, record.Tier))]);
@@ -219,7 +306,7 @@ namespace LastBreathTest.BattleSystemTests
             var ability = AbilityWith(cooldown: 9);
             ability.SetAbilityUpgrades(new()
             {
-                [1] = [new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, 0.25f)],
+                [1] = [new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare)],
                 [3] = [new AbilityUpgradeParameterSet(CooldownSurcharge, [], 3, [(AbilityParameter.Cooldown, 3f)])]
             });
 
@@ -230,6 +317,26 @@ namespace LastBreathTest.BattleSystemTests
             return ability.Cooldown;
         }
 
+        /// <summary>What the ability charges and how long it waits with the surcharge augment in its
+        /// tier-one slot and a flat addition to each of its two parameters above it.</summary>
+        private static (int Cost, float Cooldown) BothOf(bool surchargesFirst)
+        {
+            var ability = AbilityWith(cost: 150, cooldown: 9);
+            ability.SetAbilityUpgrades(new()
+            {
+                [1] = [new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare)],
+                [2] = [new HbUpgradeExtendStunAddCost(CostSurcharge, [], 2, 1f, 50f)],
+                [3] = [new AbilityUpgradeParameterSet(CooldownSurcharge, [], 3, [(AbilityParameter.Cooldown, 3f)])]
+            });
+
+            string[] chosen = [SurchargeAugment, CostSurcharge, CooldownSurcharge];
+            int[] order = surchargesFirst ? [3, 2, 1] : [1, 2, 3];
+            foreach (int tier in order)
+                ability.SelectUpgrade(tier, chosen[tier - 1]);
+
+            return (ability.CostValue, ability.Cooldown);
+        }
+
         /// <summary>Head Butt wearing the cost share in its tier-one slot and the stun surcharge in its
         /// tier-two one, chosen in the order asked for — the two are seated through the ability's own
         /// selection, because that is where a slot is emptied and refilled.</summary>
@@ -238,7 +345,7 @@ namespace LastBreathTest.BattleSystemTests
             var ability = AbilityWith(cost: 150);
             ability.SetAbilityUpgrades(new()
             {
-                [1] = [new AbilityUpgradeReduceCost(CostAugment, [], 1, 0.3f)],
+                [1] = [new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare)],
                 [2] = [new HbUpgradeExtendStunAddCost(CostSurcharge, [], 2, 1f, 50f)]
             });
 
@@ -250,7 +357,7 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>A stand-in ability carrying the base numbers under test. Any ability would do —
-        /// both augments decorate keys every ability registers as part of the base contract.</summary>
+        /// the augments decorate keys every ability registers as part of the base contract.</summary>
         private static HeadButt AbilityWith(int cost = 100, int cooldown = 5) => new(new AbilityBaseData
         {
             Id = "Ability_Head_Butt",
@@ -266,11 +373,29 @@ namespace LastBreathTest.BattleSystemTests
         {
             List<int> waits = [];
 
-            foreach (string path in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Abilities), "*.json", SearchOption.AllDirectories))
-                foreach (JObject ability in JObject.Parse(File.ReadAllText(path))["abilities"] as JArray ?? [])
-                    waits.Add(ability.Value<int>("cooldown"));
+            foreach (JObject ability in ShippedAbilities())
+                waits.Add(ability.Value<int>("cooldown"));
 
             return [.. waits.Where(wait => wait > 0).Distinct().OrderBy(wait => wait)];
+        }
+
+        /// <summary>The wait and the price one shipped ability is written with.</summary>
+        private static (int Cooldown, int CostValue) ShippedBaseOf(string abilityId)
+        {
+            foreach (JObject ability in ShippedAbilities())
+                if (string.Equals(ability.Value<string>("id"), abilityId, StringComparison.Ordinal))
+                    return (ability.Value<int>("cooldown"), ability.Value<int>("costValue"));
+
+            Assert.Fail($"the shipped data declares no '{abilityId}'");
+            return default;
+        }
+
+        /// <summary>Every ability record the shipped catalog writes, read straight from the files.</summary>
+        private static IEnumerable<JObject> ShippedAbilities()
+        {
+            foreach (string path in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Abilities), "*.json", SearchOption.AllDirectories))
+                foreach (JObject ability in JObject.Parse(File.ReadAllText(path))["abilities"] as JArray ?? [])
+                    yield return ability;
         }
 
         /// <summary>The shipped ability data as the game reads it: the real source, the real loader,

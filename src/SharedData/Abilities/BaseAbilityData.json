@@ -420,7 +420,7 @@
     ],
     "augments": [
         {
-            "id": "Ability_SoA_Upgrade_Poison_On_Hit",
+            "id": "Augment_Poison_On_Hit",
             "tier": 3,
             "tags": [],
             "upgradeProperties": {
@@ -428,7 +428,7 @@
             }
         },
         {
-            "id": "Ability_SoA_Upgrade_Apply_Buff_Critical_Chance",
+            "id": "Ability_SoA_Augment_Apply_Buff_Critical_Chance",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Series_Of_Attacks",
@@ -440,7 +440,7 @@
             }
         },
         {
-            "id": "Ability_SoA_Upgrade_Apply_Buff_Critical_Damage",
+            "id": "Ability_SoA_Augment_Apply_Buff_Critical_Damage",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Series_Of_Attacks",
@@ -452,7 +452,7 @@
             }
         },
         {
-            "id": "Ability_SoA_Upgrade_Additional_Max_Attacks",
+            "id": "Augment_Additional_Max_Attacks",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -460,7 +460,7 @@
             }
         },
         {
-            "id": "Ability_SoA_Upgrade_More_Attack_Damage",
+            "id": "Augment_More_Attack_Damage",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -468,14 +468,14 @@
             }
         },
         {
-            "id": "Ability_SoA_Upgrade_Attacks_Cannot_Be_Evaded",
+            "id": "Ability_SoA_Augment_Attacks_Cannot_Be_Evaded",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Series_Of_Attacks",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_SoA_Upgrade_Additional_Attacks",
+            "id": "Augment_Additional_Attacks",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -483,14 +483,14 @@
             }
         },
         {
-            "id": "Ability_Ip_Upgrade_Single_Empowered_Attack",
+            "id": "Ability_Ip_Augment_Single_Empowered_Attack",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Increasing_Pressure",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Ip_Upgrade_Attack_Random_Target",
+            "id": "Augment_Attack_Random_Target",
             "tier": 3,
             "tags": [],
             "upgradeProperties": {
@@ -498,14 +498,14 @@
             }
         },
         {
-            "id": "Ability_Ip_Upgrade_Last_Attack_Always_Crit",
+            "id": "Ability_Ip_Augment_Last_Attack_Always_Crit",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Increasing_Pressure",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Ip_Upgrade_First_Attack_Crit_Damage",
+            "id": "Ability_Ip_Augment_First_Attack_Crit_Damage",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Increasing_Pressure",
@@ -514,7 +514,7 @@
             }
         },
         {
-            "id": "Ability_Ip_Upgrade_Attack_Extend_Poison",
+            "id": "Augment_Attack_Extend_Poison",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -522,14 +522,14 @@
             }
         },
         {
-            "id": "Ability_Ip_Upgrade_Unevadable",
+            "id": "Ability_Ip_Augment_Unevadable",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Increasing_Pressure",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Ip_Upgrade_Additional_Amount_Attacks",
+            "id": "Augment_Additional_Amount_Attacks",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -537,7 +537,7 @@
             }
         },
         {
-            "id": "Ability_Ip_Upgrade_Additional_Damage_Multiplier",
+            "id": "Augment_Additional_Damage_Multiplier",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -545,7 +545,7 @@
             }
         },
         {
-            "id": "Ability_JoP_Upgrade_Bouncing",
+            "id": "Ability_JoP_Augment_Bouncing",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Jar_Of_Poison",
@@ -554,20 +554,20 @@
             }
         },
         {
-            "id": "Ability_JoP_Upgrade_Transfer_Poison_On_Death",
+            "id": "Augment_Transfer_Poison_On_Death",
             "tier": 3,
             "tags": [],
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_JoP_Upgrade_All_Targets",
+            "id": "Ability_JoP_Augment_All_Targets",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Jar_Of_Poison",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_JoP_Upgrade_Clumsiness",
+            "id": "Augment_Clumsiness",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -577,7 +577,7 @@
             }
         },
         {
-            "id": "Ability_JoP_Upgrade_Apply_Blind",
+            "id": "Augment_Apply_Blind",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -587,7 +587,7 @@
             }
         },
         {
-            "id": "Ability_JoP_Upgrade_Apply_Weakness",
+            "id": "Augment_Apply_Weakness",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -597,7 +597,7 @@
             }
         },
         {
-            "id": "Ability_JoP_Upgrade_Increasing_Scales",
+            "id": "Augment_Increasing_Scales",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -606,7 +606,7 @@
             }
         },
         {
-            "id": "Ability_JoP_Upgrade_Poison_Duration",
+            "id": "Augment_Poison_Duration",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -614,7 +614,7 @@
             }
         },
         {
-            "id": "Ability_Ds_Upgrade_Additional_Attack_Chance",
+            "id": "Ability_Ds_Augment_Additional_Attack_Chance",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Dark_Shroud",
@@ -623,7 +623,7 @@
             }
         },
         {
-            "id": "Ability_Ds_Upgrade_Additional_Accuracy",
+            "id": "Ability_Ds_Augment_Additional_Accuracy",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Dark_Shroud",
@@ -632,7 +632,7 @@
             }
         },
         {
-            "id": "Ability_Ds_Upgrade_Immortality",
+            "id": "Augment_Immortality",
             "tier": 3,
             "tags": [],
             "upgradeProperties": {
@@ -641,7 +641,7 @@
             }
         },
         {
-            "id": "Ability_Ds_Upgrade_Mana_Regen",
+            "id": "Ability_Ds_Augment_Mana_Regen",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Dark_Shroud",
@@ -650,7 +650,7 @@
             }
         },
         {
-            "id": "Ability_Ds_Upgrade_Additional_Health_Regen",
+            "id": "Augment_Additional_Health_Regen",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -658,7 +658,7 @@
             }
         },
         {
-            "id": "Ability_Ds_Upgrade_Add_Effectiveness_Reduce_Stacks",
+            "id": "Augment_Add_Effectiveness_Reduce_Stacks",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -667,7 +667,7 @@
             }
         },
         {
-            "id": "Ability_Ds_Upgrade_Increased_Buff_Duration",
+            "id": "Augment_Increased_Buff_Duration",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -675,14 +675,14 @@
             }
         },
         {
-            "id": "Ability_Cc_Upgrade_Additional_Attack_Chance",
+            "id": "Ability_Cc_Augment_Additional_Attack_Chance",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Critical_Calculation",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Cc_Upgrade_Additional_Crit_Chance",
+            "id": "Ability_Cc_Augment_Additional_Crit_Chance",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Critical_Calculation",
@@ -691,7 +691,7 @@
             }
         },
         {
-            "id": "Ability_Cc_Upgrade_Lucky_Crit",
+            "id": "Augment_Lucky_Crit",
             "tier": 3,
             "tags": [],
             "upgradeProperties": {
@@ -699,7 +699,7 @@
             }
         },
         {
-            "id": "Ability_Cc_Upgrade_Additional_Crit_Multiplier",
+            "id": "Augment_Additional_Crit_Multiplier",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -708,7 +708,7 @@
             }
         },
         {
-            "id": "Ability_Cc_Upgrade_Leach_On_Crit",
+            "id": "Augment_Leach_On_Crit",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -716,7 +716,7 @@
             }
         },
         {
-            "id": "Ability_Cc_Upgrade_Apply_Enhanced_Defence",
+            "id": "Augment_Apply_Enhanced_Defence",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -726,7 +726,7 @@
             }
         },
         {
-            "id": "Ability_Cc_Upgrade_More_Stacks_More_Cost",
+            "id": "Augment_More_Stacks_More_Cost",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -735,7 +735,7 @@
             }
         },
         {
-            "id": "Ability_Pe_Upgrade_Apply_Seal_Of_Oblivion",
+            "id": "Augment_Apply_Seal_Of_Oblivion",
             "tier": 3,
             "tags": [],
             "upgradeProperties": {
@@ -743,7 +743,7 @@
             }
         },
         {
-            "id": "Ability_Pe_Upgrade_Execute_Bosses",
+            "id": "Ability_Pe_Augment_Execute_Bosses",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
@@ -752,21 +752,21 @@
             }
         },
         {
-            "id": "Ability_Pe_Upgrade_Spread_Poison",
+            "id": "Ability_Pe_Augment_Spread_Poison",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Pe_Upgrade_Poison_Not_Removed",
+            "id": "Ability_Pe_Augment_Poison_Not_Removed",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Pe_Upgrade_Reduce_Execution_Trahsold",
+            "id": "Augment_Reduce_Execution_Trahsold",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -774,24 +774,14 @@
             }
         },
         {
-            "id": "Ability_Pe_Upgrade_Transfer_Poison_On_Death",
+            "id": "Ability_Pe_Augment_Transfer_Poison_On_Death",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Pe_Upgrade_Reduce_Cooldown",
-            "tier": 1,
-            "tags": [],
-            "fitsAnyAbility": true,
-            "upgradeProperties": {
-                "cooldown": 2,
-                "additionalCost": 50
-            }
-        },
-        {
-            "id": "Ability_Pe_Upgrade_Total_Damage_Multiplier",
+            "id": "Ability_Pe_Augment_Total_Damage_Multiplier",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
@@ -800,7 +790,7 @@
             }
         },
         {
-            "id": "Ability_Pc_Upgrade_Attacks_Reduce_Incoming_Heal",
+            "id": "Ability_Pc_Augment_Attacks_Reduce_Incoming_Heal",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -811,7 +801,7 @@
             }
         },
         {
-            "id": "Ability_Pc_Upgrade_Attacks_Reduce_Armor",
+            "id": "Ability_Pc_Augment_Attacks_Reduce_Armor",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -822,14 +812,14 @@
             }
         },
         {
-            "id": "Ability_Pc_Upgrade_Apply_Stack_For_Each_Enemy",
+            "id": "Ability_Pc_Augment_Apply_Stack_For_Each_Enemy",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Pc_Upgrade_Increase_Poison_On_Target",
+            "id": "Ability_Pc_Augment_Increase_Poison_On_Target",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -838,7 +828,7 @@
             }
         },
         {
-            "id": "Ability_Pc_Upgrade_Additional_Poison_Stack_Duration",
+            "id": "Ability_Pc_Augment_Additional_Poison_Stack_Duration",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -847,7 +837,7 @@
             }
         },
         {
-            "id": "Ability_Pc_Upgrade_Additional_Multiplier",
+            "id": "Ability_Pc_Augment_Additional_Multiplier",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -856,7 +846,7 @@
             }
         },
         {
-            "id": "Ability_Pc_Upgrade_Increase_Duration",
+            "id": "Ability_Pc_Augment_Increase_Duration",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -865,7 +855,7 @@
             }
         },
         {
-            "id": "Ability_Dst_Upgrade_Both_Hits_Buff",
+            "id": "Ability_Dst_Augment_Both_Hits_Buff",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Double_Strike",
@@ -875,7 +865,7 @@
             }
         },
         {
-            "id": "Ability_Dst_Upgrade_Restore_On_Hit",
+            "id": "Augment_Restore_On_Hit",
             "tier": 3,
             "tags": [],
             "upgradeProperties": {
@@ -884,7 +874,7 @@
             }
         },
         {
-            "id": "Ability_Dst_Upgrade_Accuracy",
+            "id": "Ability_Dst_Augment_Accuracy",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Double_Strike",
@@ -893,7 +883,7 @@
             }
         },
         {
-            "id": "Ability_Dst_Upgrade_Damage_Multiplier",
+            "id": "Augment_Damage_Multiplier",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -901,7 +891,7 @@
             }
         },
         {
-            "id": "Ability_Ar_Upgrade_Incoming_Reduction",
+            "id": "Ability_Ar_Augment_Incoming_Reduction",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ares_Blessing",
@@ -910,7 +900,7 @@
             }
         },
         {
-            "id": "Ability_Ar_Upgrade_Turn_End_Heal",
+            "id": "Ability_Ar_Augment_Turn_End_Heal",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ares_Blessing",
@@ -919,7 +909,7 @@
             }
         },
         {
-            "id": "Ability_Ar_Upgrade_Damage_Buff",
+            "id": "Ability_Ar_Augment_Damage_Buff",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ares_Blessing",
@@ -928,7 +918,7 @@
             }
         },
         {
-            "id": "Ability_Ar_Upgrade_Recovery_Bonus",
+            "id": "Augment_Recovery_Bonus",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -936,7 +926,7 @@
             }
         },
         {
-            "id": "Ability_Ar_Upgrade_Health_Bonus",
+            "id": "Augment_Health_Bonus",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -944,7 +934,7 @@
             }
         },
         {
-            "id": "Ability_Ar_Upgrade_Both_Bonuses",
+            "id": "Augment_Both_Bonuses",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -953,7 +943,7 @@
             }
         },
         {
-            "id": "Ability_Ar_Upgrade_Buff_Duration",
+            "id": "Augment_Buff_Duration",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -961,7 +951,7 @@
             }
         },
         {
-            "id": "Ability_Porc_Upgrade_Echo",
+            "id": "Ability_Porc_Augment_Echo",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Porcupine",
@@ -971,7 +961,7 @@
             }
         },
         {
-            "id": "Ability_Porc_Upgrade_Incoming_Reduction",
+            "id": "Ability_Porc_Augment_Incoming_Reduction",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Porcupine",
@@ -980,7 +970,7 @@
             }
         },
         {
-            "id": "Ability_Porc_Upgrade_Crit_Mitigation",
+            "id": "Ability_Porc_Augment_Crit_Mitigation",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Porcupine",
@@ -989,7 +979,7 @@
             }
         },
         {
-            "id": "Ability_Porc_Upgrade_Heal_On_Hit",
+            "id": "Augment_Heal_On_Hit",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -997,7 +987,7 @@
             }
         },
         {
-            "id": "Ability_Porc_Upgrade_More_Armor_Return",
+            "id": "Augment_More_Armor_Return",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1005,7 +995,7 @@
             }
         },
         {
-            "id": "Ability_Porc_Upgrade_More_Damage_Return",
+            "id": "Augment_More_Damage_Return",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1013,17 +1003,7 @@
             }
         },
         {
-            "id": "Ability_Porc_Upgrade_Reduce_Cooldown_Add_Cost",
-            "tier": 1,
-            "tags": [],
-            "fitsAnyAbility": true,
-            "upgradeProperties": {
-                "cooldown": 2,
-                "additionalCost": 30
-            }
-        },
-        {
-            "id": "Ability_Porc_Upgrade_Cooldown_Chance",
+            "id": "Augment_Cooldown_Chance",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -1031,7 +1011,7 @@
             }
         },
         {
-            "id": "Ability_Porc_Upgrade_Armor_Buff",
+            "id": "Ability_Porc_Augment_Armor_Buff",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Porcupine",
@@ -1040,7 +1020,7 @@
             }
         },
         {
-            "id": "Ability_Bf_Upgrade_Burning_Fury",
+            "id": "Ability_Bf_Augment_Burning_Fury",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Berserk_Fury",
@@ -1051,7 +1031,7 @@
             }
         },
         {
-            "id": "Ability_Bf_Upgrade_Primal_Fury",
+            "id": "Ability_Bf_Augment_Primal_Fury",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Berserk_Fury",
@@ -1060,7 +1040,7 @@
             }
         },
         {
-            "id": "Ability_Bf_Upgrade_Healing_Fury",
+            "id": "Ability_Bf_Augment_Healing_Fury",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Berserk_Fury",
@@ -1069,14 +1049,7 @@
             }
         },
         {
-            "id": "Ability_Bf_Upgrade_Cost_Type_Health",
-            "tier": 2,
-            "tags": [],
-            "fitsAnyAbility": true,
-            "upgradeProperties": {}
-        },
-        {
-            "id": "Ability_Bf_Upgrade_More_Burn",
+            "id": "Augment_More_Burn",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1084,7 +1057,7 @@
             }
         },
         {
-            "id": "Ability_Bf_Upgrade_Less_Burn",
+            "id": "Augment_Less_Burn",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1092,7 +1065,7 @@
             }
         },
         {
-            "id": "Ability_Bf_Upgrade_Fury_Duration",
+            "id": "Augment_Fury_Duration",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -1100,7 +1073,7 @@
             }
         },
         {
-            "id": "Ability_Hb_Upgrade_Additional_Lunges",
+            "id": "Augment_Additional_Lunges",
             "tier": 3,
             "tags": [],
             "upgradeProperties": {
@@ -1108,7 +1081,7 @@
             }
         },
         {
-            "id": "Ability_Hb_Upgrade_Additional_Scales",
+            "id": "Ability_Hb_Augment_Additional_Scales",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Head_Butt",
@@ -1118,7 +1091,7 @@
             }
         },
         {
-            "id": "Ability_Hb_Upgrade_Extend_Stun_Add_Cost",
+            "id": "Augment_Extend_Stun_Add_Cost",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1127,7 +1100,7 @@
             }
         },
         {
-            "id": "Ability_Hb_Upgrade_Armor_Debuff",
+            "id": "Ability_Hb_Augment_Armor_Debuff",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Head_Butt",
@@ -1138,7 +1111,7 @@
             }
         },
         {
-            "id": "Ability_Sac_Upgrade_Heal_From_Damage",
+            "id": "Augment_Heal_From_Damage",
             "tier": 3,
             "tags": [],
             "upgradeProperties": {
@@ -1146,7 +1119,7 @@
             }
         },
         {
-            "id": "Ability_Sac_Upgrade_Incoming_Reduction",
+            "id": "Augment_Incoming_Reduction",
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1156,14 +1129,14 @@
             }
         },
         {
-            "id": "Ability_Sac_Upgrade_Free_Cast",
+            "id": "Augment_Free_Cast",
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Sac_Upgrade_Additional_Rate",
+            "id": "Augment_Additional_Rate",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1171,7 +1144,7 @@
             }
         },
         {
-            "id": "Ability_Sac_Upgrade_More_Sacrifice",
+            "id": "Augment_More_Sacrifice",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1179,14 +1152,7 @@
             }
         },
         {
-            "id": "Ability_Sac_Upgrade_Cost_Type_Health",
-            "tier": 2,
-            "tags": [],
-            "fitsAnyAbility": true,
-            "upgradeProperties": {}
-        },
-        {
-            "id": "Ability_Sac_Upgrade_Additional_Charge",
+            "id": "Augment_Additional_Charge",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -1194,7 +1160,7 @@
             }
         },
         {
-            "id": "Ability_Arm_Upgrade_Missing_Hp_Damage",
+            "id": "Augment_Missing_Hp_Damage",
             "tier": 3,
             "tags": [],
             "upgradeProperties": {
@@ -1202,7 +1168,7 @@
             }
         },
         {
-            "id": "Ability_Arm_Upgrade_Shatter_Armor",
+            "id": "Augment_Shatter_Armor",
             "tier": 3,
             "tags": [],
             "upgradeProperties": {
@@ -1211,7 +1177,7 @@
             }
         },
         {
-            "id": "Ability_Arm_Upgrade_All_Targets",
+            "id": "Ability_Arm_Augment_All_Targets",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Armageddon",
@@ -1220,7 +1186,7 @@
             }
         },
         {
-            "id": "Ability_Arm_Upgrade_Reduce_Hp_Cost",
+            "id": "Augment_Reduce_Hp_Cost",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1228,7 +1194,7 @@
             }
         },
         {
-            "id": "Ability_Arm_Upgrade_Stage1_Damage",
+            "id": "Augment_Stage1_Damage",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1238,7 +1204,7 @@
             }
         },
         {
-            "id": "Ability_Arm_Upgrade_Stage3_Burning",
+            "id": "Ability_Arm_Augment_Stage3_Burning",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Armageddon",
@@ -1249,7 +1215,7 @@
             }
         },
         {
-            "id": "Ability_Arm_Upgrade_Extend_Stun",
+            "id": "Augment_Extend_Stun",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -1257,7 +1223,7 @@
             }
         },
         {
-            "id": "Ability_Ib_Upgrade_Withering_Value",
+            "id": "Ability_Ib_Augment_Withering_Value",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1266,7 +1232,7 @@
             }
         },
         {
-            "id": "Ability_Ib_Upgrade_Withering_Stacks",
+            "id": "Ability_Ib_Augment_Withering_Stacks",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1275,7 +1241,7 @@
             }
         },
         {
-            "id": "Ability_Ib_Upgrade_Extra_Block_Damage",
+            "id": "Ability_Ib_Augment_Extra_Block_Damage",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1284,7 +1250,7 @@
             }
         },
         {
-            "id": "Ability_Ib_Upgrade_Heavy_Blocks",
+            "id": "Ability_Ib_Augment_Heavy_Blocks",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1295,7 +1261,7 @@
             }
         },
         {
-            "id": "Ability_Ib_Upgrade_Reset_Chance",
+            "id": "Ability_Ib_Augment_Reset_Chance",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1304,21 +1270,21 @@
             }
         },
         {
-            "id": "Ability_Ib_Upgrade_Random_Extra_Blocks",
+            "id": "Ability_Ib_Augment_Random_Extra_Blocks",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Ib_Upgrade_Consume_Stun",
+            "id": "Ability_Ib_Augment_Consume_Stun",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Ov_Upgrade_Burn_Add_Cost",
+            "id": "Augment_Burn_Add_Cost",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -1327,7 +1293,7 @@
             }
         },
         {
-            "id": "Ability_Ov_Upgrade_Mana_Step",
+            "id": "Ability_Ov_Augment_Mana_Step",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Overload",
@@ -1336,7 +1302,7 @@
             }
         },
         {
-            "id": "Ability_Ov_Upgrade_Random_Cooldown",
+            "id": "Augment_Random_Cooldown",
             "tier": 2,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1345,7 +1311,7 @@
             }
         },
         {
-            "id": "Ability_Ov_Upgrade_Additional_Multiplier",
+            "id": "Ability_Ov_Augment_Additional_Multiplier",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Overload",
@@ -1354,14 +1320,14 @@
             }
         },
         {
-            "id": "Ability_Ov_Upgrade_Stage4_Resets_Cooldown",
+            "id": "Ability_Ov_Augment_Stage4_Resets_Cooldown",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Overload",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Ov_Upgrade_Mana_Flow",
+            "id": "Augment_Mana_Flow",
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1371,7 +1337,7 @@
             }
         },
         {
-            "id": "Ability_Ov_Upgrade_Next_Cast_Pure",
+            "id": "Augment_Next_Cast_Pure",
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1380,14 +1346,14 @@
             }
         },
         {
-            "id": "Ability_Cl_Upgrade_Ignore_Resistances",
+            "id": "Ability_Cl_Augment_Ignore_Resistances",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Chain_Lightning",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Cl_Upgrade_Additional_Jump",
+            "id": "Augment_Additional_Jump",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1395,7 +1361,7 @@
             }
         },
         {
-            "id": "Ability_Cl_Upgrade_Reduce_Falloff",
+            "id": "Augment_Reduce_Falloff",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1403,7 +1369,7 @@
             }
         },
         {
-            "id": "Ability_Cl_Upgrade_Scales_Add_Cost",
+            "id": "Augment_Scales_Add_Cost",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -1413,7 +1379,7 @@
             }
         },
         {
-            "id": "Ability_Ia_Upgrade_Additional_Scale",
+            "id": "Augment_Additional_Scale",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1421,7 +1387,7 @@
             }
         },
         {
-            "id": "Ability_Ia_Upgrade_Additional_Duration",
+            "id": "Augment_Additional_Duration",
             "tier": 2,
             "tags": [],
             "upgradeProperties": {
@@ -1429,7 +1395,7 @@
             }
         },
         {
-            "id": "Ability_Ia_Upgrade_Additional_Barrier",
+            "id": "Augment_Additional_Barrier",
             "tier": 1,
             "tags": [],
             "upgradeProperties": {
@@ -1437,7 +1403,7 @@
             }
         },
         {
-            "id": "Ability_Ia_Upgrade_Reflect",
+            "id": "Ability_Ia_Augment_Reflect",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Aegis",
@@ -1446,7 +1412,7 @@
             }
         },
         {
-            "id": "Ability_Ia_Upgrade_Stun_Attackers",
+            "id": "Ability_Ia_Augment_Stun_Attackers",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Aegis",
@@ -1455,7 +1421,7 @@
             }
         },
         {
-            "id": "Ability_Ia_Upgrade_Turn_End_Heal",
+            "id": "Ability_Ia_Augment_Turn_End_Heal",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Aegis",
@@ -1464,7 +1430,7 @@
             }
         },
         {
-            "id": "Ability_Ia_Upgrade_Crit_Mitigation",
+            "id": "Ability_Ia_Augment_Crit_Mitigation",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Aegis",
@@ -1473,7 +1439,7 @@
             }
         },
         {
-            "id": "Ability_Is_Upgrade_Barrier_From_Shrapnel",
+            "id": "Ability_Is_Augment_Barrier_From_Shrapnel",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1482,7 +1448,7 @@
             }
         },
         {
-            "id": "Ability_Is_Upgrade_Apply_Fragility",
+            "id": "Ability_Is_Augment_Apply_Fragility",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1493,7 +1459,7 @@
             }
         },
         {
-            "id": "Ability_Is_Upgrade_Additional_Crit_Damage",
+            "id": "Ability_Is_Augment_Additional_Crit_Damage",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1502,7 +1468,7 @@
             }
         },
         {
-            "id": "Ability_Is_Upgrade_Additional_Crit_Chance",
+            "id": "Ability_Is_Augment_Additional_Crit_Chance",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1511,17 +1477,7 @@
             }
         },
         {
-            "id": "Ability_Is_Upgrade_Reduce_Cooldown_Add_Cost",
-            "tier": 1,
-            "tags": [],
-            "fitsAnyAbility": true,
-            "upgradeProperties": {
-                "cooldown": 2,
-                "additionalCost": 100
-            }
-        },
-        {
-            "id": "Ability_Is_Upgrade_Additional_Scales",
+            "id": "Ability_Is_Augment_Additional_Scales",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1531,7 +1487,7 @@
             }
         },
         {
-            "id": "Ability_Is_Upgrade_Multicast",
+            "id": "Ability_Is_Augment_Multicast",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1540,14 +1496,14 @@
             }
         },
         {
-            "id": "Ability_Is_Upgrade_Crit_Ignores_Cold_Res",
+            "id": "Ability_Is_Augment_Crit_Ignores_Cold_Res",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Df_Upgrade_Frostbite_Duration",
+            "id": "Ability_Df_Augment_Frostbite_Duration",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
@@ -1556,7 +1512,7 @@
             }
         },
         {
-            "id": "Ability_Df_Upgrade_Spread_Freeze",
+            "id": "Ability_Df_Augment_Spread_Freeze",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
@@ -1565,14 +1521,14 @@
             }
         },
         {
-            "id": "Ability_Df_Upgrade_Extend_Effects",
+            "id": "Ability_Df_Augment_Extend_Effects",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Df_Upgrade_More_Shred",
+            "id": "Ability_Df_Augment_More_Shred",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
@@ -1581,7 +1537,7 @@
             }
         },
         {
-            "id": "Ability_Df_Upgrade_Enemy_Cooldown",
+            "id": "Ability_Df_Augment_Enemy_Cooldown",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
@@ -1591,7 +1547,7 @@
             }
         },
         {
-            "id": "Ability_Df_Upgrade_Reduce_All_Cooldowns",
+            "id": "Augment_Reduce_All_Cooldowns",
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1600,7 +1556,7 @@
             }
         },
         {
-            "id": "Ability_Df_Upgrade_Execute",
+            "id": "Ability_Df_Augment_Execute",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
@@ -1609,7 +1565,7 @@
             }
         },
         {
-            "id": "Ability_Dis_Upgrade_Multiplier",
+            "id": "Ability_Dis_Augment_Multiplier",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Discharge",
@@ -1618,7 +1574,7 @@
             }
         },
         {
-            "id": "Ability_Dis_Upgrade_More_Restore",
+            "id": "Ability_Dis_Augment_More_Restore",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Discharge",
@@ -1627,7 +1583,7 @@
             }
         },
         {
-            "id": "Ability_Dis_Upgrade_More_Multiplier",
+            "id": "Ability_Dis_Augment_More_Multiplier",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Discharge",
@@ -1636,7 +1592,7 @@
             }
         },
         {
-            "id": "Ability_Dis_Upgrade_Spell_Scale",
+            "id": "Ability_Dis_Augment_Spell_Scale",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Discharge",
@@ -1645,28 +1601,28 @@
             }
         },
         {
-            "id": "Ability_Dis_Upgrade_Overkill",
+            "id": "Ability_Dis_Augment_Overkill",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Discharge",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Dis_Upgrade_Ignore_Resistances",
+            "id": "Ability_Dis_Augment_Ignore_Resistances",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Discharge",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Dis_Upgrade_Consume_Mana",
+            "id": "Ability_Dis_Augment_Consume_Mana",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Discharge",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Sa_Upgrade_Detonation_Scales",
+            "id": "Ability_Sa_Augment_Detonation_Scales",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
@@ -1676,7 +1632,7 @@
             }
         },
         {
-            "id": "Ability_Sa_Upgrade_Buff_Duration",
+            "id": "Ability_Sa_Augment_Buff_Duration",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
@@ -1685,7 +1641,7 @@
             }
         },
         {
-            "id": "Ability_Sa_Upgrade_More_Splash",
+            "id": "Ability_Sa_Augment_More_Splash",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
@@ -1694,7 +1650,7 @@
             }
         },
         {
-            "id": "Ability_Sa_Upgrade_Less_Stacks",
+            "id": "Ability_Sa_Augment_Less_Stacks",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
@@ -1703,28 +1659,28 @@
             }
         },
         {
-            "id": "Ability_Sa_Upgrade_Overkill",
+            "id": "Ability_Sa_Augment_Overkill",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Sa_Upgrade_Ignore_Resistances",
+            "id": "Ability_Sa_Augment_Ignore_Resistances",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Sa_Upgrade_Cost_Barrier",
+            "id": "Augment_Cost_Barrier",
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Upgrade_Reduce_Cost",
+            "id": "Augment_Reduce_Cost",
             "tier": 1,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1733,13 +1689,30 @@
             }
         },
         {
-            "id": "Ability_Upgrade_Reduce_Cooldown",
+            "id": "Augment_Reduce_Cooldown",
             "tier": 1,
             "tags": [],
             "fitsAnyAbility": true,
             "upgradeProperties": {
                 "cooldownShare": 0.25
             }
+        },
+        {
+            "id": "Augment_Reduce_Cooldown_Add_Cost",
+            "tier": 1,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {
+                "cooldownShare": 0.40,
+                "costShare": 0.40
+            }
+        },
+        {
+            "id": "Augment_Cost_Type_Health",
+            "tier": 2,
+            "tags": [],
+            "fitsAnyAbility": true,
+            "upgradeProperties": {}
         }
     ]
 }

@@ -25,8 +25,8 @@ namespace LastBreathTest.BattleSystemTests
             // its own question, answered in AugmentShareReductionTests.
             var ability = CreateAbility(cost: 100);
 
-            new AbilityUpgradeReduceCooldownAddCost("Upgrade_A", [], 1, 1f, 20f).Apply(ability);
-            new AbilityUpgradeReduceCooldownAddCost("Upgrade_B", [], 2, 1f, 30f).Apply(ability);
+            new AbilityUpgradeParameterSet("Upgrade_A", [], 1, [(AbilityParameter.CostValue, 20f)]).Apply(ability);
+            new AbilityUpgradeParameterSet("Upgrade_B", [], 2, [(AbilityParameter.CostValue, 30f)]).Apply(ability);
 
             Assert.AreEqual(150, ability.CostValue, "decorators of two different upgrades must stack, not collide by id");
         }
@@ -36,10 +36,10 @@ namespace LastBreathTest.BattleSystemTests
         {
             var ability = CreateAbility(cooldown: 10);
 
-            new AbilityUpgradeReduceCooldownAddCost("Upgrade_A", [], 1, 2f, 0f).Apply(ability);
-            new AbilityUpgradeReduceCooldownAddCost("Upgrade_B", [], 2, 3f, 0f).Apply(ability);
+            new AbilityUpgradeParameterSet("Upgrade_A", [], 1, [(AbilityParameter.Cooldown, 2f)]).Apply(ability);
+            new AbilityUpgradeParameterSet("Upgrade_B", [], 2, [(AbilityParameter.Cooldown, 3f)]).Apply(ability);
 
-            Assert.AreEqual(5f, ability.Cooldown, "decorators of two different upgrades must stack, not collide by id");
+            Assert.AreEqual(15f, ability.Cooldown, "decorators of two different upgrades must stack, not collide by id");
         }
 
         [TestMethod]

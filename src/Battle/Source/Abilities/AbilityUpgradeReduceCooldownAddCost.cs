@@ -3,8 +3,16 @@ namespace Battle.Source.Abilities
     using Core.Battle.Abilities;
     using Core.Enums;
 
-    /// <summary>Reduces the ability's cooldown at the price of an increased resource cost.</summary>
-    public class AbilityUpgradeReduceCooldownAddCost(string id, string[] tags, int tier, float cooldown, float additionalCost)
+    /// <summary>
+    /// Shortens the ability's wait and charges more for the cast, both stated as a share of what the
+    /// ability is written with. Shares and not numbers of their own, because one record serves the
+    /// whole book: the waits it goes on run from no turns at all to nine and the prices from nothing to
+    /// five hundred, and a flat pair of figures would be a rewritten ability at one end and a change
+    /// nobody notices at the other. Both shares are measured against the ability's own base numbers and
+    /// rounded there — see <see cref="AbilityParameterShare"/> — so the turns taken off and the points
+    /// added on are the same whatever else is worn beside this augment.
+    /// </summary>
+    public class AbilityUpgradeReduceCooldownAddCost(string id, string[] tags, int tier, float cooldownShare, float costShare)
         : AbilityUpgrade<Ability>(id, tags, tier)
     {
         private string CooldownDecoratorId => $"Ability_Parameter_Decorator_{Id}_Cooldown";
@@ -12,10 +20,10 @@ namespace Battle.Source.Abilities
 
         public override void ApplyUpgrade(Ability ability)
         {
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
-                AbilityParameter.Cooldown, Priority.Weak, OperationType.Subtract, cooldown, CooldownDecoratorId, Id));
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
-                AbilityParameter.CostValue, Priority.Weak, OperationType.Add, additionalCost, CostDecoratorId, Id));
+            ability.AddParameterDecorator(new AbilityParameterShare(
+                AbilityParameter.Cooldown, OperationType.Subtract, cooldownShare, CooldownDecoratorId, Id));
+            ability.AddParameterDecorator(new AbilityParameterShare(
+                AbilityParameter.CostValue, OperationType.Add, costShare, CostDecoratorId, Id));
         }
 
         public override void RemoveUpgrade(Ability ability)
@@ -24,6 +32,6 @@ namespace Battle.Source.Abilities
             ability.RemoveParameterDecorator(CostDecoratorId, AbilityParameter.CostValue);
         }
 
-        public override IAbilityUpgrade Copy() => new AbilityUpgradeReduceCooldownAddCost(Id, Tags, Tier, cooldown, additionalCost);
+        public override IAbilityUpgrade Copy() => new AbilityUpgradeReduceCooldownAddCost(Id, Tags, Tier, cooldownShare, costShare);
     }
 }

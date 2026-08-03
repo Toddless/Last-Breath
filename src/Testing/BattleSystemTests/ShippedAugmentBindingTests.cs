@@ -23,7 +23,7 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>How many records the section declares. Held because the records no longer sit
         /// inside the abilities: a block that used to go missing took its ability's augments with it
         /// and left the rest readable, and a section loses them one bulk edit at a time.</summary>
-        private const int ShippedRecordCount = 153;
+        private const int ShippedRecordCount = 150;
 
         /// <summary>How many records name an ability. The registry triage
         /// (<c>Docs/UpgradeRegistryTriage.md</c>) counted them: 58 reaching into the members of one
@@ -34,9 +34,11 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>How many records claim every ability there is — cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
-        /// with more at stake: universality is the widest reach in the system. Two of them are the
-        /// plain cost and cooldown augments, one record each for the whole book.</summary>
-        private const int UniversalRecords = 14;
+        /// with more at stake: universality is the widest reach in the system. Four of them came out
+        /// of the collapse of the base-contract families — the plain cost cut, the plain cooldown cut,
+        /// the cooldown bought with a higher price and the price paid in health — one record each for
+        /// the whole book.</summary>
+        private const int UniversalRecords = 11;
 
         /// <summary>How many records still declare neither. They belong nowhere until they are given
         /// tags or a claim, and the number is what the work left to do is measured against.</summary>
