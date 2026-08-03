@@ -9,6 +9,8 @@ namespace PassiveTreeEditor.Source.View
     using Core.Localization;
     using Core.Modifiers.Conditions;
     using Core.PassiveTree;
+    using Editing;
+    using Editing.History;
     using Godot;
     using Io;
     using Simulation;
@@ -26,6 +28,10 @@ namespace PassiveTreeEditor.Source.View
         private readonly AbilityCatalog _abilities = new();
         private readonly PassiveTreeProvider _treeProvider = new();
         private readonly AllocationState _allocation = new();
+
+        /// <summary>The document and the stack of what has been done to it. Owned here because both the
+        /// canvas and the inspector edit the same tree and both have to be undone from one place.</summary>
+        private readonly TreeEditor _editor = new();
 
         // The game's own condition catalog, read through the same participant contract as everything
         // else here: the ids a line may name are the ids the game will resolve, with no list of them
@@ -55,7 +61,13 @@ namespace PassiveTreeEditor.Source.View
         private AcceptDialog _messageDialog = null!;
         private FileDialog _fileDialog = null!;
         private NodeTooltip _tooltip = null!;
-        private bool _dirty;
+        private Button _undoButton = null!;
+        private Button _redoButton = null!;
+
+        /// <summary>Whether the tree on screen differs from the file. Asked of the history rather than
+        /// kept as a flag: stepping back to exactly what was saved makes the tree saved again, and a
+        /// flag that only ever turns on would keep reporting changes that no longer exist.</summary>
+        private bool Dirty => !_editor.History.IsClean;
 
         public override void _Ready()
         {
@@ -72,14 +84,38 @@ namespace PassiveTreeEditor.Source.View
             EditorSettings.Save(_settings);
         }
 
-        /// <summary>Ctrl+F opens the search from wherever the hands already are. Shortcut input rather
-        /// than unhandled input: it runs while a text field holds the keyboard, which is exactly when
-        /// the author wants to search for the next node.</summary>
-        public override void _ShortcutInput(InputEvent @event)
+        /// <summary>
+        /// The tool-wide shortcuts, answered ahead of every panel and every text field.
+        /// <para>Plain input rather than shortcut input, which is where the search key used to live: a
+        /// focused text field swallows Ctrl+Z for its own character-level undo long before shortcut
+        /// input is reached, and a tool whose undo means "one letter" while the caret is in a title and
+        /// "one edit" everywhere else is a tool whose undo nobody can predict. The tool has one history
+        /// and one key for it; a title typed into a node is a step in that history like any other.</para>
+        /// <para>Ctrl+Z steps back, Ctrl+Y and Ctrl+Shift+Z both step forward — both are muscle memory
+        /// and neither has anything else to mean here. Held keys repeat and history steps deliberately
+        /// do not follow the repeat: one press is one step, so leaning on the key cannot unwind a
+        /// session faster than it can be read.</para>
+        /// </summary>
+        public override void _Input(InputEvent @event)
         {
-            if (@event is not InputEventKey { Pressed: true, Keycode: Key.F, CtrlPressed: true }) return;
+            if (@event is not InputEventKey { Pressed: true, Echo: false, CtrlPressed: true } key) return;
 
-            OpenFind();
+            switch (key.Keycode)
+            {
+                case Key.F:
+                    OpenFind();
+                    break;
+                case Key.Z when key.ShiftPressed:
+                case Key.Y:
+                    StepForward();
+                    break;
+                case Key.Z:
+                    StepBack();
+                    break;
+                default:
+                    return;
+            }
+
             GetViewport().SetInputAsHandled();
         }
 
@@ -170,6 +206,15 @@ namespace PassiveTreeEditor.Source.View
             bar.AddChild(ToolbarButton("Load", LoadTree));
             bar.AddChild(ToolbarButton("Save", SaveTree));
             bar.AddChild(new VSeparator());
+
+            // The shortcuts do the work; the buttons are how the author sees that there is anything to
+            // go back to, and what the next step back would be.
+            _undoButton = ToolbarButton("Undo", StepBack);
+            _redoButton = ToolbarButton("Redo", StepForward);
+            bar.AddChild(_undoButton);
+            bar.AddChild(_redoButton);
+            bar.AddChild(new VSeparator());
+
             bar.AddChild(ToolbarButton("New", NewTree));
             bar.AddChild(ToolbarButton("Frame", () => _canvas.FrameAll()));
 
@@ -214,10 +259,15 @@ namespace PassiveTreeEditor.Source.View
             };
             _budget.ValueChanged += value =>
             {
-                _canvas.Document.Budget = (int)value;
+                _editor.SetBudget((int)value);
                 _canvas.RefreshFrontier();
                 RefreshSummary();
             };
+
+            // Leaving the box ends the run of keystrokes it was taking, the same way leaving a text
+            // field does — the spin box keeps its number in a line edit of its own, and that is the
+            // control the focus actually belongs to.
+            _budget.GetLineEdit().FocusExited += _editor.Seal;
             simulation.AddChild(_budget);
 
             var reset = new Button { Text = "Reset allocation" };
@@ -267,19 +317,25 @@ namespace PassiveTreeEditor.Source.View
 
         private void WireEvents()
         {
-            _inspector.Initialize(_canvas, _abilities, _conditions);
+            _canvas.Initialize(_editor);
+            _inspector.Initialize(_canvas, _editor, _abilities, _conditions);
 
-            _canvas.SelectionChanged += () => _inspector.Rebuild();
+            _editor.Restored += OnHistoryStep;
+            _editor.History.Changed += RefreshHistoryButtons;
+
+            _canvas.SelectionChanged += OnSelectionChanged;
             _canvas.DocumentChanged += OnDocumentChanged;
             _canvas.AllocationChanged += RefreshSummary;
             _canvas.StatusChanged += SetStatus;
             _canvas.HoveredChanged += OnHovered;
-            _inspector.NodeEdited += MarkDirty;
+            _inspector.NodeEdited += OnNodeEdited;
             _inspector.TotalsChanged += OnDocumentChanged;
             _baseStats.ProfileChanged += RefreshSummary;
             _find.NodePicked += JumpTo;
             _check.NodePicked += JumpTo;
             _check.RecheckRequested += RunValidation;
+
+            RefreshHistoryButtons();
         }
 
         /// <summary>Both result lists lead to the same place: the node in the middle of the canvas,
@@ -338,12 +394,18 @@ namespace PassiveTreeEditor.Source.View
             _baseStats.Initialize(profile, baseline);
         }
 
+        /// <summary>
+        /// Another tree becomes the one being edited. The history is dropped with it (the editor does
+        /// that when it takes the document): its steps hold nodes of the tree just closed, and a step
+        /// back into a file that is no longer open is exactly the wrong restore this layer exists to
+        /// prevent. Loading and starting a new tree are therefore not undoable, on purpose.
+        /// </summary>
         private void AdoptDocument(PassiveTreeDocument document)
         {
             _allocation.Reset(document);
-            _canvas.SetDocument(document, _allocation);
+            _editor.SetDocument(document);
+            _canvas.DocumentReplaced(_allocation);
             _budget.Value = document.Budget;
-            _dirty = false;
             _inspector.Rebuild();
             _find.SetDocument(document);
 
@@ -389,7 +451,9 @@ namespace PassiveTreeEditor.Source.View
                 return;
             }
 
-            _dirty = false;
+            // The state now on disk. Steps taken from here are what "unsaved changes" means, and
+            // stepping back onto this one means there is nothing left to save.
+            _editor.History.MarkSaved();
             EditorSettings.Save(_settings);
             SetStatus($"saved {_canvas.Document.Nodes.Count} node(s) to {path}");
         }
@@ -453,18 +517,64 @@ namespace PassiveTreeEditor.Source.View
             else _tooltip.ShowFor(node, GetGlobalMousePosition());
         }
 
-        private void MarkDirty()
+        private void OnNodeEdited()
         {
-            _dirty = true;
-
             // The title is one of the three fields a search matches on, and it is edited from here.
             _find.Invalidate();
             SetStatus("editing");
         }
 
+        /// <summary>Moving to another node ends whatever run of keystrokes the last one was taking, so
+        /// the title of one node and the title of the next are two steps and not one.</summary>
+        private void OnSelectionChanged()
+        {
+            _editor.Seal();
+            _inspector.Rebuild();
+        }
+
+        private void StepBack() => Report("undo", _editor.Undo());
+
+        private void StepForward() => Report("redo", _editor.Redo());
+
+        private void Report(string direction, string? step) =>
+            SetStatus(step is null ? $"nothing to {direction}" : $"{direction}: {step}");
+
+        /// <summary>
+        /// What the tool shows is rebuilt from the document after every step through the history. Every
+        /// panel holds values copied out of the tree, and a control still showing what was typed a
+        /// moment ago is the exact confusion undo exists to prevent — the author would be looking at
+        /// one number and saving another. The rebuild costs the focus, so the caret leaves the field it
+        /// was in: a step is a step of the tool, not of the field.
+        /// <para>The selection goes first and takes the step with it: a step that renamed a node has to
+        /// leave that node selected under the id it now has, or the panel answers "nothing selected" to
+        /// an undo whose whole subject is the id.</para>
+        /// </summary>
+        private void OnHistoryStep(HistoryStep step)
+        {
+            _canvas.SyncSelection(step.Rename);
+            _allocation.Resync(_canvas.Document);
+            _canvas.RefreshFrontier();
+            _budget.Value = _canvas.Document.Budget;
+            _inspector.Rebuild();
+            _find.Invalidate();
+            RefreshSummary();
+            _canvas.QueueRedraw();
+        }
+
+        /// <summary>The buttons say what the stack holds. A disabled Undo is the honest answer to
+        /// "can I take that back" at the point where the answer is no.</summary>
+        private void RefreshHistoryButtons()
+        {
+            EditHistory history = _editor.History;
+
+            _undoButton.Disabled = !history.CanUndo;
+            _redoButton.Disabled = !history.CanRedo;
+            _undoButton.TooltipText = history.NextUndo ?? "nothing to undo";
+            _redoButton.TooltipText = history.NextRedo ?? "nothing to redo";
+        }
+
         private void OnDocumentChanged()
         {
-            _dirty = true;
             _allocation.Resync(_canvas.Document);
             _canvas.RefreshFrontier();
 
@@ -481,7 +591,7 @@ namespace PassiveTreeEditor.Source.View
         }
 
         private void SetStatus(string message) =>
-            _status.Text = _dirty ? message + "   •  unsaved changes" : message;
+            _status.Text = Dirty ? message + "   •  unsaved changes" : message;
 
         private void ShowMessage(string title, IReadOnlyList<string> lines)
         {

@@ -3,6 +3,8 @@ namespace PassiveTreeEditor.Source.View
     using System;
     using System.Collections.Generic;
     using Core.PassiveTree;
+    using Editing;
+    using Editing.History;
     using Godot;
     using Simulation;
 
@@ -35,13 +37,19 @@ namespace PassiveTreeEditor.Source.View
         private readonly List<PassiveNode> _drawCandidates = [];
         private readonly List<PassiveNode> _pickCandidates = [];
         private readonly HashSet<string> _selected = new(StringComparer.Ordinal);
-        private readonly Dictionary<string, Vector2> _dragOrigins = new(StringComparer.Ordinal);
+
+        /// <summary>Where each dragged node sat when the gesture started — what the undo step is made
+        /// of, so it is kept in plain numbers the rule that reads it can be written against.</summary>
+        private readonly Dictionary<string, NodePoint> _dragOrigins = new(StringComparer.Ordinal);
 
         /// <summary>Last node created of each class — the pattern a new node of that class copies
         /// when nothing is selected to continue from.</summary>
         private readonly Dictionary<PassiveNodeKind, PassiveNode> _lastCreated = new();
 
-        private PassiveTreeDocument _document = new();
+        /// <summary>Every change the canvas makes goes through here rather than into the document, so
+        /// that laying out a tree is a thing that can be taken back.</summary>
+        private TreeEditor _editor = null!;
+
         private AllocationState _allocation = new();
         private HashSet<string> _frontier = new(StringComparer.Ordinal);
         private List<string> _path = [];
@@ -88,14 +96,14 @@ namespace PassiveTreeEditor.Source.View
         /// guides. They are geometry to aim at, never something nodes snap to.</summary>
         public bool ShowGuides { get; set; } = true;
 
-        public PassiveTreeDocument Document => _document;
+        public PassiveTreeDocument Document => _editor.Document;
 
         public AllocationState Allocation => _allocation;
 
         public IReadOnlyCollection<string> Selection => _selected;
 
         public PassiveNode? SingleSelection =>
-            _selected.Count == 1 ? _document.Find(FirstSelected()) : null;
+            _selected.Count == 1 ? Document.Find(FirstSelected()) : null;
 
         public override void _Ready()
         {
@@ -120,9 +128,14 @@ namespace PassiveTreeEditor.Source.View
             QueueRedraw();
         }
 
-        public void SetDocument(PassiveTreeDocument document, AllocationState allocation)
+        /// <summary>The one wiring step: the canvas edits through the editor and reads the document off
+        /// it, so the two can never be looking at different trees.</summary>
+        public void Initialize(TreeEditor editor) => _editor = editor;
+
+        /// <summary>Another tree became the one on screen. Everything pointing into the previous
+        /// document — selection, hover, the half-drawn link — is dropped rather than re-matched.</summary>
+        public void DocumentReplaced(AllocationState allocation)
         {
-            _document = document;
             _allocation = allocation;
             _selected.Clear();
             _linkFrom = null;
@@ -133,16 +146,28 @@ namespace PassiveTreeEditor.Source.View
             QueueRedraw();
         }
 
+        /// <summary>Brings the selection back in line with the tree after a step through the history:
+        /// a node the step took away stops being selected, and a node the step gave another id stays
+        /// selected under it. The rule itself is <see cref="SelectionSync"/>; what happens here is the
+        /// redraw and telling the panels.</summary>
+        public void SyncSelection(IdSwap? rename)
+        {
+            SelectionSync.Follow(_selected, Document, rename);
+            ClearHover();
+            SelectionChanged?.Invoke();
+            QueueRedraw();
+        }
+
         public void RefreshFrontier()
         {
-            _frontier = _allocation.Frontier(_document, _document.Budget);
+            _frontier = _allocation.Frontier(Document, Document.Budget);
             QueueRedraw();
         }
 
         public void SelectOnly(string id)
         {
             _selected.Clear();
-            if (_document.Contains(id)) _selected.Add(id);
+            if (Document.Contains(id)) _selected.Add(id);
             SelectionChanged?.Invoke();
             QueueRedraw();
         }
@@ -155,7 +180,7 @@ namespace PassiveTreeEditor.Source.View
         /// </summary>
         public bool FocusNode(string id)
         {
-            PassiveNode? node = _document.Find(id);
+            PassiveNode? node = Document.Find(id);
             if (node is null) return false;
 
             if (_zoom < FocusZoom) _zoom = FocusZoom;
@@ -169,7 +194,7 @@ namespace PassiveTreeEditor.Source.View
         /// view somewhere far away from the content.</summary>
         public void FrameAll()
         {
-            if (_document.Nodes.Count == 0)
+            if (Document.Nodes.Count == 0)
             {
                 _panOffset = Size / 2f;
                 _zoom = 1f;
@@ -178,7 +203,7 @@ namespace PassiveTreeEditor.Source.View
             }
 
             float minX = float.MaxValue, minY = float.MaxValue, maxX = float.MinValue, maxY = float.MinValue;
-            foreach (PassiveNode node in _document.Nodes)
+            foreach (PassiveNode node in Document.Nodes)
             {
                 minX = MathF.Min(minX, node.X);
                 minY = MathF.Min(minY, node.Y);
@@ -321,10 +346,10 @@ namespace PassiveTreeEditor.Source.View
             float idleWidth = MathF.Max(1f, 1.6f * _zoom);
             float liveWidth = MathF.Max(1.5f, 3f * _zoom);
 
-            foreach (NodeLink link in _document.Links)
+            foreach (NodeLink link in Document.Links)
             {
-                PassiveNode? first = _document.Find(link.A);
-                PassiveNode? second = _document.Find(link.B);
+                PassiveNode? first = Document.Find(link.A);
+                PassiveNode? second = Document.Find(link.B);
                 if (first is null || second is null) continue;
 
                 // Segment bounding box against the visible box — enough to skip everything off-screen
@@ -360,7 +385,7 @@ namespace PassiveTreeEditor.Source.View
         {
             if (_linkFrom is null) return;
 
-            PassiveNode? from = _document.Find(_linkFrom);
+            PassiveNode? from = Document.Find(_linkFrom);
             if (from is null) return;
 
             DrawDashedLine(ToScreen(from.X, from.Y), GetLocalMousePosition(), CanvasStyle.Gold1,
@@ -370,7 +395,7 @@ namespace PassiveTreeEditor.Source.View
         private void DrawNodes(float minX, float minY, float maxX, float maxY)
         {
             _drawCandidates.Clear();
-            _document.Index.Query(minX, minY, maxX, maxY, _drawCandidates);
+            Document.Index.Query(minX, minY, maxX, maxY, _drawCandidates);
 
             bool showLabels = _zoom >= CanvasStyle.LabelZoomThreshold;
             Font font = GetThemeDefaultFont();
@@ -591,8 +616,8 @@ namespace PassiveTreeEditor.Source.View
             _dragOrigins.Clear();
             foreach (string id in _selected)
             {
-                PassiveNode? selected = _document.Find(id);
-                if (selected is not null) _dragOrigins[id] = new Vector2(selected.X, selected.Y);
+                PassiveNode? selected = Document.Find(id);
+                if (selected is not null) _dragOrigins[id] = new NodePoint(selected.X, selected.Y);
             }
 
             SelectionChanged?.Invoke();
@@ -611,14 +636,24 @@ namespace PassiveTreeEditor.Source.View
             if (_draggingNodes)
             {
                 _draggingNodes = false;
-                if (_dragMoved)
-                {
-                    _document.Reindex();
-                    DocumentChanged?.Invoke();
-                }
+                if (_dragMoved) CommitDrag();
             }
 
             QueueRedraw();
+        }
+
+        /// <summary>Files the drag that just ended as one step. Which nodes it actually moved is
+        /// <see cref="NodeMoves"/>' answer, not this node's — the drag itself belongs to the canvas,
+        /// the step that takes it back belongs to the stack.</summary>
+        private void CommitDrag()
+        {
+            List<NodeMove> moves = NodeMoves.Since(Document, _dragOrigins);
+
+            Document.Reindex();
+            if (moves.Count == 0) return;
+
+            _editor.MoveNodes(moves);
+            DocumentChanged?.Invoke();
         }
 
         private void HandleMouseMotion(InputEventMouseMotion motion)
@@ -665,7 +700,7 @@ namespace PassiveTreeEditor.Source.View
         private void UpdatePathPreview()
         {
             List<string> path = Mode == EditorMode.Simulate && _hovered is not null
-                ? _allocation.PathTo(_document, _hovered)
+                ? _allocation.PathTo(Document, _hovered)
                 : [];
 
             if (path.Count == _path.Count && path.Count == 0) return;
@@ -719,9 +754,9 @@ namespace PassiveTreeEditor.Source.View
             Vector2 delta = world - _dragStartWorld;
             float snap = coarse ? CoarseSnap : FineSnap;
 
-            foreach (KeyValuePair<string, Vector2> origin in _dragOrigins)
+            foreach (KeyValuePair<string, NodePoint> origin in _dragOrigins)
             {
-                PassiveNode? node = _document.Find(origin.Key);
+                PassiveNode? node = Document.Find(origin.Key);
                 if (node is null) continue;
 
                 node.X = MathF.Round((origin.Value.X + delta.X) / snap) * snap;
@@ -740,7 +775,7 @@ namespace PassiveTreeEditor.Source.View
             float maxY = MathF.Max(_boxStartWorld.Y, _boxEndWorld.Y);
 
             _pickCandidates.Clear();
-            _document.Index.Query(minX, minY, maxX, maxY, _pickCandidates);
+            Document.Index.Query(minX, minY, maxX, maxY, _pickCandidates);
 
             foreach (PassiveNode node in _pickCandidates)
                 if (node.X >= minX && node.X <= maxX && node.Y >= minY && node.Y <= maxY)
@@ -755,7 +790,7 @@ namespace PassiveTreeEditor.Source.View
             float reach = CanvasStyle.MaxRadius + slack;
 
             _pickCandidates.Clear();
-            _document.Index.Query(world.X - reach, world.Y - reach, world.X + reach, world.Y + reach, _pickCandidates);
+            Document.Index.Query(world.X - reach, world.Y - reach, world.X + reach, world.Y + reach, _pickCandidates);
 
             PassiveNode? best = null;
             float bestDistance = float.MaxValue;
@@ -788,8 +823,8 @@ namespace PassiveTreeEditor.Source.View
             {
                 PassiveNode? template = TemplateFor(kind);
                 string label = template is null
-                    ? $"{kind}   {_document.NextId(kind)}"
-                    : $"{kind}   {_document.NextIdFrom(template.Id)}";
+                    ? $"{kind}   {Document.NextId(kind)}"
+                    : $"{kind}   {Document.NextIdFrom(template.Id)}";
 
                 _kindMenu.AddItem(label, (int)kind);
             }
@@ -807,16 +842,16 @@ namespace PassiveTreeEditor.Source.View
         {
             if (_selected.Count == 1)
             {
-                PassiveNode? selected = _document.Find(FirstSelected());
+                PassiveNode? selected = Document.Find(FirstSelected());
                 if (selected is not null && selected.Kind == kind) return selected;
             }
 
-            if (_lastCreated.TryGetValue(kind, out PassiveNode? last) && _document.Contains(last.Id)) return last;
+            if (_lastCreated.TryGetValue(kind, out PassiveNode? last) && Document.Contains(last.Id)) return last;
 
             // Nothing created this session — a freshly loaded tree. Fall back to the last node of the
             // class in the document so naming series survive a reload instead of restarting at _1.
             PassiveNode? fallback = null;
-            foreach (PassiveNode node in _document.Nodes)
+            foreach (PassiveNode node in Document.Nodes)
                 if (node.Kind == kind)
                     fallback = node;
 
@@ -825,7 +860,7 @@ namespace PassiveTreeEditor.Source.View
 
         private void CreateNode(PassiveNodeKind kind, Vector2 world)
         {
-            PassiveNode? selected = _selected.Count == 1 ? _document.Find(FirstSelected()) : null;
+            PassiveNode? selected = _selected.Count == 1 ? Document.Find(FirstSelected()) : null;
             PassiveNode? template = TemplateFor(kind);
 
             var node = new PassiveNode
@@ -839,7 +874,7 @@ namespace PassiveTreeEditor.Source.View
             {
                 // A cluster is a run of near-identical nodes, so the payload rides along and the id
                 // continues the series. Editing the template first is what makes the run cheap.
-                node.Id = _document.NextIdFrom(template.Id);
+                node.Id = Document.NextIdFrom(template.Id);
                 node.Stance = template.Stance;
                 node.HybridStance = template.HybridStance;
 
@@ -857,7 +892,7 @@ namespace PassiveTreeEditor.Source.View
             }
             else
             {
-                node.Id = _document.NextId(kind);
+                node.Id = Document.NextId(kind);
                 // No pattern for this class yet — still inherit the ray being worked on.
                 node.Stance = selected?.Stance;
                 node.HybridStance = selected?.HybridStance;
@@ -866,11 +901,10 @@ namespace PassiveTreeEditor.Source.View
                     node.Modifiers.Add(new ModifierLine());
             }
 
-            if (!_document.AddNode(node)) return;
-
             // Chaining: with exactly one node selected the fresh node links to it, so a run of nodes
-            // is laid out by repeated clicks instead of switching to Link mode after every one.
-            if (selected is not null) _document.Link(selected.Id, node.Id);
+            // is laid out by repeated clicks instead of switching to Link mode after every one. The
+            // node and that edge are one step: one click made them, one step back unmakes them.
+            if (!_editor.CreateNode(node, selected)) return;
 
             _lastCreated[kind] = node;
             _lastKind = kind;
@@ -903,17 +937,13 @@ namespace PassiveTreeEditor.Source.View
             string from = _linkFrom;
             _linkFrom = null;
 
-            if (_document.AreLinked(from, node.Id))
-            {
-                _document.Unlink(from, node.Id);
-                StatusChanged?.Invoke($"unlinked {from} — {node.Id}");
-            }
-            else
-            {
-                _document.Link(from, node.Id);
-                StatusChanged?.Invoke($"linked {from} — {node.Id}");
-            }
+            PassiveNode? first = Document.Find(from);
+            if (first is null) return;
 
+            bool link = !Document.AreLinked(from, node.Id);
+            if (!_editor.SetLink(first, node, link)) return;
+
+            StatusChanged?.Invoke(link ? $"linked {from} — {node.Id}" : $"unlinked {from} — {node.Id}");
             DocumentChanged?.Invoke();
             QueueRedraw();
         }
@@ -922,23 +952,23 @@ namespace PassiveTreeEditor.Source.View
         {
             if (_allocation.IsTaken(node.Id))
             {
-                if (_allocation.Refund(_document, node.Id)) StatusChanged?.Invoke($"refunded {node.Id}");
+                if (_allocation.Refund(Document, node.Id)) StatusChanged?.Invoke($"refunded {node.Id}");
                 else StatusChanged?.Invoke($"{node.Id} cannot be refunded — something further out depends on it");
             }
             else if (takeWholePath && _path.Count > 0)
             {
-                if (_allocation.TakePath(_document, _path, _document.Budget))
+                if (_allocation.TakePath(Document, _path, Document.Budget))
                     StatusChanged?.Invoke($"took {_path.Count} node(s) up to {node.Id}");
                 else
-                    StatusChanged?.Invoke($"the path to {node.Id} needs {_path.Count} point(s), {_document.Budget - _allocation.Spent} left");
+                    StatusChanged?.Invoke($"the path to {node.Id} needs {_path.Count} point(s), {Document.Budget - _allocation.Spent} left");
             }
-            else if (_allocation.Take(_document, node.Id, _document.Budget))
+            else if (_allocation.Take(Document, node.Id, Document.Budget))
             {
                 StatusChanged?.Invoke($"took {node.Id}");
             }
-            else if (_allocation.Spent >= _document.Budget)
+            else if (_allocation.Spent >= Document.Budget)
             {
-                StatusChanged?.Invoke($"out of points ({_allocation.Spent}/{_document.Budget})");
+                StatusChanged?.Invoke($"out of points ({_allocation.Spent}/{Document.Budget})");
             }
             else
             {
@@ -955,14 +985,11 @@ namespace PassiveTreeEditor.Source.View
         {
             if (_selected.Count == 0) return;
 
-            int removed = 0;
-            foreach (string id in new List<string>(_selected))
-                if (_document.RemoveNode(id))
-                    removed++;
+            int removed = _editor.DeleteNodes([.. _selected]);
 
             _selected.Clear();
             ClearHover();
-            _allocation.Resync(_document);
+            _allocation.Resync(Document);
             RefreshFrontier();
             SelectionChanged?.Invoke();
             DocumentChanged?.Invoke();

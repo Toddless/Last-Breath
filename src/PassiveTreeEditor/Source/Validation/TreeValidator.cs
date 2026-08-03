@@ -2,6 +2,7 @@ namespace PassiveTreeEditor.Source.Validation
 {
     using System;
     using System.Collections.Generic;
+    using Core.Enums;
     using Core.PassiveTree;
 
     /// <summary>
@@ -32,7 +33,6 @@ namespace PassiveTreeEditor.Source.Validation
                 CheckAbilityReference(node, abilities, issues);
                 CheckLineCount(node, issues);
                 CheckRuleText(node, issues);
-                CheckStance(node, issues);
             }
 
             issues.Sort(Order);
@@ -47,25 +47,96 @@ namespace PassiveTreeEditor.Source.Validation
             return byNode != 0 ? byNode : first.Kind.CompareTo(second.Kind);
         }
 
+        /// <summary>
+        /// The seeds a character is granted. The design has one at the core of the wheel, belonging to
+        /// no stance and opening nothing, and one on each stance, and a stance seed is where that
+        /// stance's first ability comes from — so the roster is checked place by place rather than by
+        /// counting: three seeds on one stance and none on another add up to the right total and are
+        /// not a tree anyone can play.
+        /// </summary>
         private static void CheckStartPoints(PassiveTreeDocument document, List<TreeIssue> issues)
         {
             if (document.IsEmpty) return;
 
-            int starts = 0;
+            List<PassiveNode> starts = [];
             foreach (PassiveNode node in document.Nodes)
                 if (node.Kind == PassiveNodeKind.Start)
-                    starts++;
+                    starts.Add(node);
 
-            if (starts == 0)
+            if (starts.Count == 0)
             {
                 issues.Add(new TreeIssue(TreeIssueKind.NoStartPoint, string.Empty,
                     "the tree has no start point: nothing in it can be taken, and nothing is checked for reachability"));
                 return;
             }
 
-            if (starts != PassiveTreeDocument.StartPointCount)
-                issues.Add(new TreeIssue(TreeIssueKind.StartPointCount, string.Empty,
-                    $"the tree has {starts} start point(s), the design calls for {PassiveTreeDocument.StartPointCount}"));
+            CheckCoreStart(starts, issues);
+
+            foreach (Stance stance in Enum.GetValues<Stance>())
+                CheckStanceStart(starts, stance, issues);
+        }
+
+        /// <summary>The neutral seed in the middle of the wheel: it is the one point of the tree that
+        /// belongs to no ray, and it opens nothing — an ability on it would be an ability granted
+        /// outside every stance.</summary>
+        private static void CheckCoreStart(List<PassiveNode> starts, List<TreeIssue> issues)
+        {
+            List<PassiveNode> core = starts.FindAll(node => node.Stance is null);
+
+            if (core.Count == 0)
+            {
+                issues.Add(new TreeIssue(TreeIssueKind.StartPointMissing, string.Empty,
+                    "no start point at the core: the design has one seed outside every stance, and the rays are reached through it"));
+                return;
+            }
+
+            ReportExtras(core, "a second start point outside every stance — the core is one seed", issues);
+
+            foreach (PassiveNode node in core) CheckCarriesNoAbility(node, issues);
+        }
+
+        /// <summary>One seed per stance, and each of them is what puts that stance's first ability in
+        /// the book — a stance seed without one leaves the stance unplayable from its own start.</summary>
+        private static void CheckStanceStart(List<PassiveNode> starts, Stance stance, List<TreeIssue> issues)
+        {
+            List<PassiveNode> seeds = starts.FindAll(node => node.Stance == stance);
+
+            if (seeds.Count == 0)
+            {
+                issues.Add(new TreeIssue(TreeIssueKind.StartPointMissing, string.Empty,
+                    $"no start point for {stance}: the design has one seed per stance, and it is what opens that stance's first ability"));
+                return;
+            }
+
+            ReportExtras(seeds, $"a second start point for {stance} — a stance begins at one seed", issues);
+
+            foreach (PassiveNode node in seeds) CheckCarriesAbility(node, issues);
+        }
+
+        /// <summary>Every seed past the first one of its place. The first is left alone on purpose:
+        /// one of them is the seed the design asks for, and which one that is belongs to the author.
+        /// </summary>
+        private static void ReportExtras(List<PassiveNode> seeds, string message, List<TreeIssue> issues)
+        {
+            for (int index = 1; index < seeds.Count; index++)
+                issues.Add(new TreeIssue(TreeIssueKind.StartPointExtra, seeds[index].Id, message));
+        }
+
+        private static void CheckCarriesAbility(PassiveNode node, List<TreeIssue> issues)
+        {
+            if (node.AbilityId.Trim().Length > 0) return;
+
+            issues.Add(new TreeIssue(TreeIssueKind.AbilityMissing, node.Id,
+                "a stance start point must reference the ability it opens"));
+        }
+
+        private static void CheckCarriesNoAbility(PassiveNode node, List<TreeIssue> issues)
+        {
+            string abilityId = node.AbilityId.Trim();
+            if (abilityId.Length == 0) return;
+
+            issues.Add(new TreeIssue(TreeIssueKind.AbilityStray, node.Id,
+                $"the core start point opens no ability, yet carries '{abilityId}'"));
         }
 
         /// <summary>
@@ -100,7 +171,7 @@ namespace PassiveTreeEditor.Source.Validation
                 if (abilityId.Length == 0 || unlocked.Contains(abilityId)) continue;
 
                 issues.Add(new TreeIssue(TreeIssueKind.SocketWithoutUnlock, node.Id,
-                    $"sockets '{abilityId}', which no unlock node of the tree grants — the slot cannot be reached"));
+                    $"sockets '{abilityId}', which nothing in the tree opens — the slot cannot be reached"));
             }
         }
 
@@ -109,11 +180,17 @@ namespace PassiveTreeEditor.Source.Validation
             var unlocked = new HashSet<string>(StringComparer.Ordinal);
 
             foreach (PassiveNode node in document.Nodes)
-                if (NodeKindRules.SocketTier(node.Kind) == UnlockSocketTier && node.AbilityId.Trim().Length > 0)
+                if (Unlocks(node) && node.AbilityId.Trim().Length > 0)
                     unlocked.Add(node.AbilityId.Trim());
 
             return unlocked;
         }
+
+        /// <summary>Which nodes put an ability in the book. The unlock class is one way in; the stance
+        /// seeds are the other, because a stance is granted its first ability at its start point — a
+        /// socket for that ability is reachable even though no unlock node of the tree names it.</summary>
+        private static bool Unlocks(PassiveNode node) =>
+            NodeKindRules.SocketTier(node.Kind) == UnlockSocketTier || node.Kind == PassiveNodeKind.Start;
 
         /// <summary>
         /// Two different failures, told apart on purpose. A node with no edges is a cluster that was
@@ -168,6 +245,14 @@ namespace PassiveTreeEditor.Source.Validation
         {
             string abilityId = node.AbilityId.Trim();
 
+            // Whether a seed carries an ability depends on which seed it is — the core carries none and
+            // a stance seed must — so the start rules answer that, and only the name is checked here.
+            if (node.Kind == PassiveNodeKind.Start)
+            {
+                CheckAbilityName(node, abilityId, abilities, issues);
+                return;
+            }
+
             if (!NodeKindRules.For(node.Kind).RequiresAbility)
             {
                 if (abilityId.Length > 0)
@@ -184,9 +269,16 @@ namespace PassiveTreeEditor.Source.Validation
                 return;
             }
 
+            CheckAbilityName(node, abilityId, abilities, issues);
+        }
+
+        /// <summary>The name a node does carry, whether or not it had to. An empty field says nothing
+        /// here — the rule that knows whether this node needed one has already spoken.</summary>
+        private static void CheckAbilityName(PassiveNode node, string abilityId, AbilityCatalogView abilities, List<TreeIssue> issues)
+        {
             // No catalog was read at all: reporting every reference as unknown would say something
             // about the tool's own data and nothing about the tree.
-            if (abilities.IsEmpty) return;
+            if (abilityId.Length == 0 || abilities.IsEmpty) return;
 
             if (!abilities.Knows(abilityId))
             {
@@ -224,14 +316,6 @@ namespace PassiveTreeEditor.Source.Validation
 
             issues.Add(new TreeIssue(TreeIssueKind.KeystoneWithoutRule, node.Id,
                 $"{node.Kind} carries no rule text — its rule is the whole of what it gives"));
-        }
-
-        private static void CheckStance(PassiveNode node, List<TreeIssue> issues)
-        {
-            if (node.Kind != PassiveNodeKind.Start || node.Stance is not null) return;
-
-            issues.Add(new TreeIssue(TreeIssueKind.StartWithoutStance, node.Id,
-                "a start point must belong to a stance"));
         }
     }
 }

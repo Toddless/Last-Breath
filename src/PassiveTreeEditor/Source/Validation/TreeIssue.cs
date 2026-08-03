@@ -6,8 +6,13 @@ namespace PassiveTreeEditor.Source.Validation
     /// </summary>
     public enum TreeIssueKind
     {
-        /// <summary>The tree carries a number of start points the design does not call for.</summary>
-        StartPointCount,
+        /// <summary>A seed the design calls for is not in the tree: the core, or the one belonging to
+        /// a stance. It has no node to point at — the finding is about the seed that is missing.</summary>
+        StartPointMissing,
+
+        /// <summary>A second start point where the design has one — a second core, or a second seed on
+        /// the same stance.</summary>
+        StartPointExtra,
 
         /// <summary>No start point at all — nothing in the tree can be reached, so reachability is
         /// reported once here instead of once per node.</summary>
@@ -29,7 +34,8 @@ namespace PassiveTreeEditor.Source.Validation
         /// leaves behind.</summary>
         AbilityStray,
 
-        /// <summary>A socket opens a slot on an ability no node of the tree unlocks.</summary>
+        /// <summary>A socket opens a slot on an ability nothing in the tree unlocks — neither an
+        /// unlock node nor a stance seed.</summary>
         SocketWithoutUnlock,
 
         /// <summary>The node has no edges at all.</summary>
@@ -45,10 +51,7 @@ namespace PassiveTreeEditor.Source.Validation
         TooManyLines,
 
         /// <summary>A keystone with no rule text — the whole of what a keystone is.</summary>
-        KeystoneWithoutRule,
-
-        /// <summary>A start point outside any stance.</summary>
-        StartWithoutStance
+        KeystoneWithoutRule
     }
 
     /// <param name="Kind">Which rule produced the finding.</param>

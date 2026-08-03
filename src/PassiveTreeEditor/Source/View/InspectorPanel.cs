@@ -34,6 +34,10 @@ namespace PassiveTreeEditor.Source.View
         private ConditionProvider? _conditions;
         private TreeCanvas? _canvas;
 
+        /// <summary>Every field on this panel changes the tree through here. A control that wrote into
+        /// a node directly would be a change the undo stack never heard of.</summary>
+        private TreeEditor _editor = null!;
+
         /// <summary>A cosmetic edit: the canvas needs a redraw, the totals do not.</summary>
         public event Action? NodeEdited;
 
@@ -41,9 +45,10 @@ namespace PassiveTreeEditor.Source.View
         /// which id. Kept separate so that typing a title does not rebuild the totals per keystroke.</summary>
         public event Action? TotalsChanged;
 
-        public void Initialize(TreeCanvas canvas, AbilityCatalog abilities, ConditionProvider conditions)
+        public void Initialize(TreeCanvas canvas, TreeEditor editor, AbilityCatalog abilities, ConditionProvider conditions)
         {
             _canvas = canvas;
+            _editor = editor;
             _abilities = abilities;
             _conditions = conditions;
             SizeFlagsHorizontal = SizeFlags.ExpandFill;
@@ -82,6 +87,26 @@ namespace PassiveTreeEditor.Source.View
             NodeEdited?.Invoke();
         }
 
+        /// <summary>
+        /// Ends the run of edits a control was taking when the author leaves it, so that coming back to
+        /// the same box later is a second step and one undo takes back one of them. Every control that
+        /// can be edited more than once in a row passes through here — the run is what merges edits into
+        /// one step, and a control left out would merge two separate visits to it into one.
+        /// <para>A spin box keeps its number in a line edit of its own, and that is where the focus
+        /// goes; asking the box itself would be asking a control that never had it.</para>
+        /// </summary>
+        private SpinBox Sealing(SpinBox box)
+        {
+            box.GetLineEdit().FocusExited += _editor.Seal;
+            return box;
+        }
+
+        private OptionButton Sealing(OptionButton picker)
+        {
+            picker.FocusExited += _editor.Seal;
+            return picker;
+        }
+
         private void ChangedTotals()
         {
             Changed();
@@ -98,18 +123,28 @@ namespace PassiveTreeEditor.Source.View
             grid.AddChild(new Label { Text = "Id" });
             var idEdit = new LineEdit { Text = node.Id, SizeFlagsHorizontal = SizeFlags.ExpandFill };
 
+            // The id this field was built to describe. It is not always the node's id any more by the
+            // time the field writes back — see the staleness guard below.
+            string shown = node.Id;
+
             // Committed on Enter *and* on leaving the field. Enter-only loses the edit when the mouse
             // moves on, and a rename that silently did not happen is invisible — the id keeps looking
             // renamed in a field that no longer owns it.
             void CommitId(string text)
             {
-                if (_canvas is null) return;
+                // A field can outlive the state it was built for. A step back through the history
+                // renames the node and rebuilds this panel, and a control being torn down reports the
+                // focus it is losing — so this runs one last time, holding the text from before the
+                // undo. Writing it would put the undone rename straight back, which is the one way an
+                // undo can leave the author with a tree they did not ask for and did not notice.
+                if (_canvas is null || !string.Equals(node.Id, shown, StringComparison.Ordinal)) return;
 
                 string wanted = text.Trim();
                 if (wanted.Length == 0 || wanted == node.Id) return;
 
-                if (_canvas.Document.Rename(node.Id, wanted))
+                if (_editor.Rename(node, wanted))
                 {
+                    shown = wanted;
                     _canvas.SelectOnly(wanted);
                     ChangedTotals();
                 }
@@ -124,31 +159,31 @@ namespace PassiveTreeEditor.Source.View
             grid.AddChild(idEdit);
 
             grid.AddChild(new Label { Text = "Kind" });
-            grid.AddChild(EditorControls.Picker(node.Kind, kind =>
+            grid.AddChild(Sealing(EditorControls.Picker(node.Kind, kind =>
             {
-                node.Kind = kind;
+                _editor.SetNodeValue(node, EditFields.Kind, node.Kind, kind, value => node.Kind = value);
                 ChangedTotals();
                 Rebuild();
-            }));
+            })));
 
             grid.AddChild(new Label { Text = "Stance" });
-            grid.AddChild(EditorControls.OptionalPicker<Stance>(node.Stance, value =>
+            grid.AddChild(Sealing(EditorControls.OptionalPicker<Stance>(node.Stance, value =>
             {
-                node.Stance = value;
+                _editor.SetNodeValue(node, EditFields.Stance, node.Stance, value, stance => node.Stance = stance);
                 Changed();
                 Rebuild();
-            }));
+            })));
 
             // The second ray only means something once there is a first one to bridge from.
             if (node.Stance is not null)
             {
                 grid.AddChild(new Label { Text = "Hybrid" });
-                grid.AddChild(EditorControls.OptionalPicker<Stance>(node.HybridStance, value =>
+                grid.AddChild(Sealing(EditorControls.OptionalPicker<Stance>(node.HybridStance, value =>
                 {
-                    node.HybridStance = value;
+                    _editor.SetNodeValue(node, EditFields.Hybrid, node.HybridStance, value, stance => node.HybridStance = stance);
                     Changed();
                     Rebuild();
-                }));
+                })));
             }
 
             grid.AddChild(new Label { Text = "X" });
@@ -160,9 +195,13 @@ namespace PassiveTreeEditor.Source.View
             var titleEdit = new LineEdit { Text = node.Title, SizeFlagsHorizontal = SizeFlags.ExpandFill };
             titleEdit.TextChanged += text =>
             {
-                node.Title = text;
+                _editor.SetNodeValue(node, EditFields.Title, node.Title, text, value => node.Title = value);
                 Changed();
             };
+
+            // Leaving the field ends the run of keystrokes: coming back to it later is a second edit,
+            // and one undo has to take back one of them rather than both.
+            titleEdit.FocusExited += _editor.Seal;
             grid.AddChild(titleEdit);
 
             if (!NodeKindRules.For(node.Kind).RequiresAbility) return;
@@ -177,22 +216,37 @@ namespace PassiveTreeEditor.Source.View
 
             box.ValueChanged += value =>
             {
-                if (horizontal) node.X = (float)value;
-                else node.Y = (float)value;
+                // Moving a node is moving it, whether the hand did it with a drag or with this box —
+                // both put back the coordinate the node had, not an offset applied in reverse.
+                _editor.SetNodeValue(node,
+                    horizontal ? EditFields.X : EditFields.Y,
+                    horizontal ? node.X : node.Y,
+                    (float)value,
+                    Place(node, horizontal));
 
-                _canvas?.Document.Reindex();
                 Changed();
             };
 
-            return box;
+            return Sealing(box);
         }
 
+        /// <summary>Writing a coordinate moves geometry the graph itself knows nothing about, so the
+        /// spatial grid has to be told. It sits inside the action rather than at the call site because
+        /// the history replays this same action on the way back.</summary>
+        private Action<float> Place(PassiveNode node, bool horizontal) => value =>
+        {
+            if (horizontal) node.X = value;
+            else node.Y = value;
+
+            _editor.Document.Reindex();
+        };
+
         private OptionButton AbilityPicker(PassiveNode node) =>
-            EditorControls.IdPicker(AbilityIds(), node.AbilityId, id =>
+            Sealing(EditorControls.IdPicker(AbilityIds(), node.AbilityId, id =>
             {
-                node.AbilityId = id;
+                _editor.SetNodeValue(node, EditFields.Ability, node.AbilityId, id, value => node.AbilityId = value);
                 ChangedTotals();
-            });
+            }));
 
         private List<string> AbilityIds()
         {
@@ -218,10 +272,13 @@ namespace PassiveTreeEditor.Source.View
 
             text.TextChanged += () =>
             {
-                node.Description = text.Text;
+                _editor.SetNodeValue(node, EditFields.Description, node.Description, text.Text,
+                    value => node.Description = value);
+
                 Changed();
             };
 
+            text.FocusExited += _editor.Seal;
             AddChild(text);
         }
 
@@ -243,8 +300,8 @@ namespace PassiveTreeEditor.Source.View
             for (int index = 0; index < node.ContextModifiers.Count; index++) AddChild(ContextRow(node, index));
 
             var buttons = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-            buttons.AddChild(AddButton("+ line", node, rule, () => node.Modifiers.Add(new ModifierLine())));
-            buttons.AddChild(AddButton("+ context", node, rule, () => node.ContextModifiers.Add(new ContextModifierLine())));
+            buttons.AddChild(AddButton("+ line", node, rule, () => _editor.AddModifierLine(node)));
+            buttons.AddChild(AddButton("+ context", node, rule, () => _editor.AddContextLine(node)));
             AddChild(buttons);
         }
 
@@ -276,12 +333,12 @@ namespace PassiveTreeEditor.Source.View
             var top = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             box.AddChild(top);
 
-            top.AddChild(EditorControls.Picker(line.Parameter, parameter =>
+            top.AddChild(Sealing(EditorControls.Picker(line.Parameter, parameter =>
             {
-                line.Parameter = parameter;
+                _editor.EditLine(node, line, EditFields.Parameter, () => line.Parameter = parameter);
                 ChangedTotals();
-            }));
-            top.AddChild(RemoveButton(() => node.Modifiers.RemoveAt(index)));
+            })));
+            top.AddChild(RemoveButton(() => _editor.RemoveModifierLine(node, index)));
 
             var bottom = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             box.AddChild(bottom);
@@ -290,31 +347,32 @@ namespace PassiveTreeEditor.Source.View
             // before the picker that captures it is built.
             var hint = new Label { CustomMinimumSize = new Vector2(64, 0) };
 
-            OptionButton typePicker = EditorControls.Picker(s_numericValueTypes, line.ValueType, type =>
+            OptionButton typePicker = Sealing(EditorControls.Picker(s_numericValueTypes, line.ValueType, type =>
             {
-                line.ValueType = type;
+                _editor.EditLine(node, line, EditFields.ValueType, () => line.ValueType = type);
                 hint.Text = ValueHint(line.ValueType, line.Value);
                 ChangedTotals();
-            });
+            }));
 
             // The value box owns the free width of the row: the number is what gets typed, the type
             // is picked once.
             typePicker.SizeFlagsHorizontal = SizeFlags.Fill;
             bottom.AddChild(typePicker);
 
-            SpinBox value = EditorControls.Number(line.Value, 0.001);
+            SpinBox value = Sealing(EditorControls.Number(line.Value, 0.001));
             bottom.AddChild(value);
             bottom.AddChild(hint);
 
             value.ValueChanged += amount =>
             {
-                line.Value = (float)amount;
+                _editor.EditLine(node, line, EditFields.Value, () => line.Value = (float)amount);
                 hint.Text = ValueHint(line.ValueType, line.Value);
                 ChangedTotals();
             };
 
             hint.Text = ValueHint(line.ValueType, line.Value);
-            box.AddChild(ConditionPicker(line.Condition, id => line.Condition = id));
+            box.AddChild(ConditionPicker(line.Condition,
+                id => _editor.EditLine(node, line, EditFields.Condition, () => line.Condition = id)));
 
             return box;
         }
@@ -332,32 +390,34 @@ namespace PassiveTreeEditor.Source.View
 
             // Only wired knobs are offered. A line naming a knob no pipeline reads is refused when the
             // file is loaded, so the tool must not be able to author one in the first place.
-            top.AddChild(EditorControls.Picker(ContextKnobs.Bound, line.Parameter, parameter =>
+            top.AddChild(Sealing(EditorControls.Picker(ContextKnobs.Bound, line.Parameter, parameter =>
             {
                 // Which kind of line the new knob makes of this one is the plain class's rule, not the
                 // control's: pointing a line at a switch turns it into one, and coming back to a knob
                 // that reads a value hands the authored number and its bucket back, so a detour through
                 // a switch costs the author nothing. Saving while the knob is a switch is still what
                 // ends the number's life — the file writes a flag line with no value at all.
-                _contextValues.Retarget(line, parameter);
+                // One gesture, three fields: the history snapshots the whole line either side of it
+                // rather than the knob alone.
+                _editor.EditLine(node, line, EditFields.Knob, () => _contextValues.Retarget(line, parameter));
 
                 ChangedTotals();
                 Rebuild();
-            }));
-            top.AddChild(RemoveButton(() => node.ContextModifiers.RemoveAt(index)));
+            })));
+            top.AddChild(RemoveButton(() => _editor.RemoveContextLine(node, index)));
 
             var bottom = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             box.AddChild(bottom);
 
             var hint = new Label { CustomMinimumSize = new Vector2(64, 0) };
-            SpinBox value = EditorControls.Number(line.Value, 0.001);
+            SpinBox value = Sealing(EditorControls.Number(line.Value, 0.001));
 
-            OptionButton typePicker = EditorControls.Picker(ContextValueTypes(line.Parameter), line.ValueType, type =>
+            OptionButton typePicker = Sealing(EditorControls.Picker(ContextValueTypes(line.Parameter), line.ValueType, type =>
             {
-                line.ValueType = type;
+                _editor.EditLine(node, line, EditFields.ValueType, () => line.ValueType = type);
                 hint.Text = ValueHint(line.ValueType, line.Value);
                 ChangedTotals();
-            });
+            }));
 
             typePicker.SizeFlagsHorizontal = SizeFlags.Fill;
             bottom.AddChild(typePicker);
@@ -376,13 +436,14 @@ namespace PassiveTreeEditor.Source.View
             {
                 if (!takesNumber) return;
 
-                line.Value = (float)amount;
+                _editor.EditLine(node, line, EditFields.Value, () => line.Value = (float)amount);
                 hint.Text = ValueHint(line.ValueType, line.Value);
                 ChangedTotals();
             };
 
             hint.Text = ValueHint(line.ValueType, line.Value);
-            box.AddChild(ConditionPicker(line.Condition, id => line.Condition = id));
+            box.AddChild(ConditionPicker(line.Condition,
+                id => _editor.EditLine(node, line, EditFields.Condition, () => line.Condition = id)));
 
             return box;
         }
@@ -406,11 +467,11 @@ namespace PassiveTreeEditor.Source.View
         /// the whole line when the catalog has no such entry, so an id that could be typed would be a way
         /// to author a line that quietly never applies.</summary>
         private OptionButton ConditionPicker(string current, Action<string> apply) =>
-            EditorControls.IdPicker(_conditions?.Ids ?? [], current, id =>
+            Sealing(EditorControls.IdPicker(_conditions?.Ids ?? [], current, id =>
             {
                 apply(id);
                 ChangedTotals();
-            }, emptyLabel: "— always");
+            }, emptyLabel: "— always"));
 
         /// <summary>What a context line on this knob may be. A switch takes nothing but Flag, and a knob
         /// that reads a value never takes it — both readers refuse the other half, so the tool must not
