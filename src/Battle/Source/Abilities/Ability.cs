@@ -19,18 +19,20 @@
     public abstract class Ability(AbilityBaseData data) : IAbility
     {
         // Rolls for cast mutators that fire by chance (item lines like "X% chance the cast is free").
-        // One shared, time-seeded generator instead of a fresh one per activation. LAZY on the first
-        // real cast: the engine generator is a native object — sandboxes without Godot (tests) fatally
-        // crash on its construction (0xC0000005), and previews must never materialize it.
+        // One shared, time-seeded generator instead of a fresh one per activation, built lazily on the
+        // first real cast — a preview never materializes it.
         private static IRandomNumberGenerator? s_castRnd;
 
         protected IFightable? Owner;
 
         /// <summary>
-        /// Builds the generator every cast rolls on. The running game keeps <see cref="EngineCastRandom"/>
-        /// here, so a cast rolls on the engine RNG like the rest of combat; sandboxes without Godot put a
-        /// pure-C# source here instead. A new source also drops the stream currently in use, so the swap
-        /// holds however much has already been cast.
+        /// Builds the generator every cast rolls on. The seat starts on <see cref="DefaultCastRandom"/>,
+        /// which touches nothing native: the engine generator is a native object, and constructing one
+        /// where Godot is not running kills the whole process (0xC0000005) past the reach of any catch.
+        /// Which implementation the running game rolls on is a composition decision — the bootstrap puts
+        /// <see cref="EngineCastRandom"/> here, so a cast rolls on the engine RNG like the rest of combat.
+        /// A new source also drops the stream currently in use, so the swap holds however much has
+        /// already been cast.
         /// </summary>
         public static Func<IRandomNumberGenerator> CastRandomSource
         {
@@ -40,7 +42,7 @@
                 field = value;
                 s_castRnd = null;
             }
-        } = EngineCastRandom;
+        } = DefaultCastRandom;
 
         /// <summary>The data record the ability was built from — the single source of base values;
         /// <see cref="Copy"/> rebuilds fresh instances from it.</summary>
@@ -202,6 +204,11 @@
             rnd.Randomize();
             return new GodotRandomNumberGenerator(rnd);
         }
+
+        /// <summary>The generator a cast rolls on until a composition says otherwise: pure C#, time-seeded
+        /// and free of the engine, so a host that never boots Godot survives a cast instead of dying on
+        /// the first one.</summary>
+        public static DefaultRandomNumberGenerator DefaultCastRandom() => new();
 
         private static IRandomNumberGenerator CastRnd => s_castRnd ??= CastRandomSource();
 

@@ -107,6 +107,15 @@
             return services;
         }
 
+        /// <summary>
+        /// Points the stream a cast rolls on at the engine generator. Deliberately outside
+        /// <see cref="AddBattleSystemModuleDependencies"/>: the module is composed by hosts without a
+        /// Godot runtime too, and there the engine generator is a native object whose construction takes
+        /// the process down. Only a project that boots inside the engine calls this — the assignment
+        /// itself builds nothing, the generator is created on the first real cast.
+        /// </summary>
+        public static void UseEngineCastRandom() => Ability.CastRandomSource = Ability.EngineCastRandom;
+
         public static void AddBattleUiElementsFactory(this IGameServiceProvider provider)
         {
             var uiElementManager = provider.GetService<IUiElementsManager>();

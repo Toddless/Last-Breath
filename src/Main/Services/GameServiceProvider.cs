@@ -46,6 +46,10 @@ namespace LastBreath.Services
 
         private static IGameServiceProvider CreateProvider()
         {
+            // The stream a cast rolls on is chosen here, next to the container that already binds the
+            // engine RNG for everything else: the game rolls its casts on Godot's generator, and the
+            // domain default stays free of the engine so hosts without one survive a cast.
+            BattleSystemModuleDependencies.UseEngineCastRandom();
             var provider = Core.Services.GameServiceProvider.Initialize(RegisterProjectServices);
             provider.GetService<IGameDataService>().LoadAll();
             provider.GetService<ReputationBroadcaster>(); // eager: nobody injects it, it lives on bus subscriptions

@@ -19,6 +19,10 @@ namespace Battle.Services
 
         private static IGameServiceProvider CreateProvider()
         {
+            // The stream a cast rolls on is chosen here, next to the container that already binds the
+            // engine RNG for everything else: the sandbox runs inside Godot, so its casts roll on the
+            // engine generator too — the domain default stays free of the engine for hosts without one.
+            BattleSystemModuleDependencies.UseEngineCastRandom();
             var provider = Core.Services.GameServiceProvider.Initialize(services => services
                 .AddBattleSystemModuleDependencies()
                 .AddGameData("res://Data/", "res://Data/Shared/")
