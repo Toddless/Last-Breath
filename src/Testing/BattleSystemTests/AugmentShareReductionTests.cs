@@ -264,8 +264,8 @@ namespace LastBreathTest.BattleSystemTests
         {
             // The claim on the whole book, honoured where no tag could have carried the augment. All
             // four records name no tag at all, so every ability in the game is a stranger to them.
-            AbilityProvider catalog = ShippedCatalog();
-            string[] abilities = [.. catalog.KnownAbilityIds];
+            (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            string[] abilities = [.. book.KnownAbilityIds];
 
             foreach ((string id, int tier) in s_collapsedRecords)
             {
@@ -287,10 +287,10 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void TheDataAndTheRegistryDeclareTheSameNumberOfAugments()
         {
-            AbilityProvider catalog = ShippedCatalog();
+            (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
 
-            Assert.AreEqual(ShippedAugmentCount, catalog.KnownAugmentIds.Count, "the section no longer declares the augments the collapse left it with");
-            Assert.AreEqual(ShippedAugmentCount, catalog.BuildableAugmentIds.Count, "the registry no longer holds factories for the augments the collapse left it with");
+            Assert.AreEqual(ShippedAugmentCount, catalog.All.Count, "the section no longer declares the augments the collapse left it with");
+            Assert.AreEqual(ShippedAugmentCount, book.BuildableAugmentIds.Count, "the registry no longer holds factories for the augments the collapse left it with");
         }
 
         private static string Socket(string abilityId) => $"socket_{abilityId}";
@@ -396,21 +396,6 @@ namespace LastBreathTest.BattleSystemTests
             foreach (string path in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Abilities), "*.json", SearchOption.AllDirectories))
                 foreach (JObject ability in JObject.Parse(File.ReadAllText(path))["abilities"] as JArray ?? [])
                     yield return ability;
-        }
-
-        /// <summary>The shipped ability data as the game reads it: the real source, the real loader,
-        /// the real parser.</summary>
-        private static AbilityProvider ShippedCatalog()
-        {
-            var provider = new AbilityProvider();
-            var service = new GameDataService(new FileSystemDataSource(SharedData.Root()), [provider]);
-            List<string> failures = [];
-            service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
-
-            service.LoadAll();
-
-            Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
-            return provider;
         }
     }
 }

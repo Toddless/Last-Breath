@@ -48,7 +48,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void TheSectionDeclaresTheRecordsTheTriageCounted()
         {
-            AbilityProvider catalog = ShippedCatalog();
+            AbilityAugmentCatalog catalog = ShippedAbilityData.Augments();
             var records = ShippedRecords(catalog).ToList();
 
             Assert.AreEqual(ShippedRecordCount, records.Count, "the section no longer declares the records the registry holds factories for");
@@ -63,8 +63,8 @@ namespace LastBreathTest.BattleSystemTests
             // A binding used to be checked against the ability whose block held the record; the
             // records stand on their own now, so the name is all there is — and a name the book does
             // not carry fails loudly nowhere: the augment simply never fits any slot in the game.
-            AbilityProvider catalog = ShippedCatalog();
-            var abilities = catalog.KnownAbilityIds.ToHashSet(StringComparer.Ordinal);
+            (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            var abilities = book.KnownAbilityIds.ToHashSet(StringComparer.Ordinal);
             int bound = 0;
 
             foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Bound))
@@ -83,8 +83,8 @@ namespace LastBreathTest.BattleSystemTests
             // for takes it, and the twenty-four abilities it was not written for refuse it. The slots
             // are opened at the record's own tier, so a refusal is the binding talking and not the
             // socket being too small.
-            AbilityProvider catalog = ShippedCatalog();
-            string[] abilities = [.. catalog.KnownAbilityIds];
+            (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            string[] abilities = [.. book.KnownAbilityIds];
             int bound = 0;
 
             foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Bound))
@@ -113,8 +113,8 @@ namespace LastBreathTest.BattleSystemTests
             // The claim is honoured where no tag could have carried the augment: the abilities under
             // test share nothing with the record, so a seating here is the claim being read and not
             // the tags quietly agreeing.
-            AbilityProvider catalog = ShippedCatalog();
-            string[] abilities = [.. catalog.KnownAbilityIds];
+            (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            string[] abilities = [.. book.KnownAbilityIds];
             int universal = 0;
 
             foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Universal))
@@ -142,8 +142,8 @@ namespace LastBreathTest.BattleSystemTests
             // the filling had made those records fit as well, the walks would be passing on a rule
             // that seats everything. A record that names no ability and claims no book is judged by
             // its tags alone, so every ability sharing none of them refuses it.
-            AbilityProvider catalog = ShippedCatalog();
-            string[] abilities = [.. catalog.KnownAbilityIds];
+            (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            string[] abilities = [.. book.KnownAbilityIds];
             int silent = 0;
 
             foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(entry => !Bound(entry) && !Universal(entry)))
@@ -176,21 +176,6 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         private static string SocketOf(string abilityId) => $"socket_{abilityId}";
-
-        /// <summary>The shipped ability data as the game reads it: the real source, the real loader,
-        /// the real parser. A record the loader did not produce is a record the rule never sees.</summary>
-        private static AbilityProvider ShippedCatalog()
-        {
-            var provider = new AbilityProvider();
-            var service = new GameDataService(new FileSystemDataSource(SharedData.Root()), [provider]);
-            List<string> failures = [];
-            service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
-
-            service.LoadAll();
-
-            Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
-            return provider;
-        }
 
         /// <summary>Every augment the shipped section writes, paired with the record the loader made
         /// of it. The ids are read off the files rather than taken from the catalog, so a record the

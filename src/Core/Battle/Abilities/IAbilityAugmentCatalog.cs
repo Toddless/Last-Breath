@@ -12,6 +12,12 @@ namespace Core.Battle.Abilities
     /// </summary>
     public interface IAbilityAugmentCatalog
     {
+        /// <summary>Every augment record the data declares. Asked by whoever offers augments instead
+        /// of judging one already named — an augment says which sockets take it and no index is kept
+        /// the other way round, so "what may go into this slot" is answered by putting the whole
+        /// section to the rule.</summary>
+        IReadOnlyCollection<AbilityUpgradeData> All { get; }
+
         /// <summary>The augment's own record; null when the catalog holds no augment of that id.</summary>
         AbilityUpgradeData? Find(string augmentId);
 

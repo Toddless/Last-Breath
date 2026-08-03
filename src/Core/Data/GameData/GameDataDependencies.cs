@@ -1,11 +1,28 @@
 namespace Core.Data.GameData
 {
     using System;
+    using Battle.Abilities;
+    using Localization;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
 
     public static class GameDataDependencies
     {
+        /// <summary>
+        /// The data participants a composition holds whatever modules it builds — catalogs read by
+        /// Core itself, so no project can end up without them and no module can end up owning them.
+        /// Called by the shared composition root, which is the one thing every project bootstraps.
+        /// A participant belongs here when the answers it gives are asked outside the module that
+        /// happens to use them most: the augment records are asked wherever an augment is offered,
+        /// judged or handled, and that is every project rather than the two that fight.
+        /// </summary>
+        public static IServiceCollection AddSharedGameDataParticipants(this IServiceCollection services)
+        {
+            services.AddGameDataParticipant<IParameterFormatProvider, ParameterFormatProvider>();
+            services.AddGameDataParticipant<IAbilityAugmentCatalog, AbilityAugmentCatalog>();
+            return services;
+        }
+
         /// <summary>
         /// Registers the data source(s) rooted at the project's data folders plus the load
         /// orchestrator. Called by the project BOOTSTRAP (modules only register participants),

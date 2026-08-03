@@ -5,7 +5,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
-    using Core.Data.GameData;
     using Core.Entity;
     using Core.Enums;
 
@@ -119,11 +118,11 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void EveryTranslatedRecordMovesTheParametersItsOwnClassUsedTo()
         {
-            AbilityProvider catalog = ShippedCatalog();
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
 
             foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augment in Translated())
             {
-                IAbilityUpgrade upgrade = Built(catalog, augment.Key, properties => properties);
+                IAbilityUpgrade upgrade = Built(registry, catalog, augment.Key, properties => properties);
 
                 foreach (float start in s_bases)
                 {
@@ -145,11 +144,11 @@ namespace LastBreathTest.BattleSystemTests
             // in a data pass reads as zero: the augment is still offered, still chosen, still paid for,
             // and moves nothing. The fallbacks moved into the table with the parameters, and this is
             // what holds them there — the walk builds every record stripped of its numbers.
-            AbilityProvider catalog = ShippedCatalog();
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
 
             foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augment in Translated())
             {
-                IAbilityUpgrade upgrade = Built(catalog, augment.Key, _ => []);
+                IAbilityUpgrade upgrade = Built(registry, catalog, augment.Key, _ => []);
                 ParameterProbe probe = ProbeAt(0f);
                 upgrade.Apply(probe);
 
@@ -166,11 +165,11 @@ namespace LastBreathTest.BattleSystemTests
             // nobody reads any more. Doubling every number the record carries has to double every number
             // the augment moves — a move reaching for a property the record does not have would sit on
             // its fallback and show up here as the figure that did not budge.
-            AbilityProvider catalog = ShippedCatalog();
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
 
             foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augment in Translated())
             {
-                IAbilityUpgrade upgrade = Built(catalog, augment.Key,
+                IAbilityUpgrade upgrade = Built(registry, catalog, augment.Key,
                     properties => properties.ToDictionary(entry => entry.Key, entry => entry.Value * 2f));
                 ParameterProbe probe = ProbeAt(0f);
                 upgrade.Apply(probe);
@@ -184,11 +183,11 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void TakingATranslatedRecordOffLeavesTheAbilityWhereItWas()
         {
-            AbilityProvider catalog = ShippedCatalog();
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
 
             foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augment in Translated())
             {
-                IAbilityUpgrade upgrade = Built(catalog, augment.Key, properties => properties);
+                IAbilityUpgrade upgrade = Built(registry, catalog, augment.Key, properties => properties);
                 ParameterProbe probe = ProbeAt(8f);
 
                 upgrade.Apply(probe);
@@ -220,8 +219,8 @@ namespace LastBreathTest.BattleSystemTests
         {
             // The registry is two halves now, and an id written into both would be built by whichever
             // half is asked first while the other quietly never runs.
-            AbilityProvider catalog = ShippedCatalog();
-            var buildable = catalog.BuildableAugmentIds.ToList();
+            AbilityProvider registry = ShippedAbilityData.Abilities();
+            var buildable = registry.BuildableAugmentIds.ToList();
 
             Assert.AreEqual(buildable.Count, buildable.Distinct(StringComparer.Ordinal).Count(),
                 "an augment id is answered by a factory and by the parameter table at once");
@@ -242,14 +241,15 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>The upgrade the registry builds for an augment, out of its shipped record with the
         /// numbers put through the given change.</summary>
         private static IAbilityUpgrade Built(
-            AbilityProvider catalog,
+            AbilityProvider registry,
+            AbilityAugmentCatalog catalog,
             string augmentId,
             Func<Dictionary<string, float>, Dictionary<string, float>> numbers)
         {
             AbilityUpgradeData? record = catalog.Find(augmentId);
             Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
 
-            IAbilityUpgrade? upgrade = catalog.CreateUpgrade(record with { UpgradeProperties = numbers(record.UpgradeProperties) });
+            IAbilityUpgrade? upgrade = registry.CreateUpgrade(record with { UpgradeProperties = numbers(record.UpgradeProperties) });
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{augmentId}'");
 
             return upgrade;
@@ -266,19 +266,6 @@ namespace LastBreathTest.BattleSystemTests
                 .Where(parameter => !string.Equals(parameter, AbilityParameter.CostValue, StringComparison.Ordinal))
                 .ToDictionary(parameter => parameter, _ => start, StringComparer.Ordinal)
         });
-
-        private static AbilityProvider ShippedCatalog()
-        {
-            var provider = new AbilityProvider();
-            var service = new GameDataService(new FileSystemDataSource(SharedData.Root()), [provider]);
-            List<string> failures = [];
-            service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
-
-            service.LoadAll();
-
-            Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
-            return provider;
-        }
 
         /// <summary>An ability that is nothing but its parameters — it never casts, and the walks read
         /// the numbers straight off it.</summary>

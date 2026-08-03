@@ -1,7 +1,6 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
-    using Battle.Source.Abilities;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Data.GameData;
@@ -10,11 +9,11 @@ namespace LastBreathTest.BattleSystemTests
 
     /// <summary>
     /// Seating an augment names two ids and holds neither, so the fitting rule is only worth as much
-    /// as the thing that turns those ids into records. That thing is the ability data itself: the
-    /// tags a fit is judged by are the tags the ability is built from, and the augment records are
-    /// declared in a section of the same file. These tests hold the seam end to end — the shipped data
+    /// as the thing that turns those ids into records. That thing is the augment catalog: a data
+    /// participant of Core's own, reading the section that declares the records and the tags of the
+    /// abilities a fit is judged against. These tests hold the seam end to end — the shipped data
     /// reaching the catalog through the real loader, the catalog reaching the board through the
-    /// container each project composes, and the board refusing what the rule refuses instead of taking
+    /// container a project composes, and the board refusing what the rule refuses instead of taking
     /// what it is handed.
     /// </summary>
     [TestClass]
@@ -29,28 +28,6 @@ namespace LastBreathTest.BattleSystemTests
         private const string PoisonAbility = "Ability_Test_Poison";
         private const string ColdAbility = "Ability_Test_Cold";
         private const string PoisonAugment = "Augment_Test_Poison_Tier_Two";
-
-        /// <summary>The bootstraps that must end up with a board able to judge. The game project is
-        /// not on the test assembly's references (it is the Godot game), so the fact that it composes
-        /// the module carrying the registration is read off its source.</summary>
-        private static readonly string[] s_bootstraps =
-        [
-            Path.Combine("Main", "Services", "GameServiceProvider.cs"),
-            Path.Combine("Battle", "Services", "GameServiceProvider.cs"),
-        ];
-
-        /// <summary>The sources the game ships, found by walking up from the test binaries.</summary>
-        private static string SrcRoot
-        {
-            get
-            {
-                var directory = new DirectoryInfo(AppContext.BaseDirectory);
-                while (directory != null && !Directory.Exists(Path.Combine(directory.FullName, "SharedData")))
-                    directory = directory.Parent;
-                Assert.IsNotNull(directory, "SharedData not found above the test bin directory");
-                return directory.FullName;
-            }
-        }
 
         [TestMethod]
         public void EveryAugmentTheShippedDataDeclaresIsFoundByItsOwnId()
@@ -105,14 +82,20 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void TheCatalogIsTheProviderItselfAndNotASecondHolderOfTheSameData()
+        public void TheCatalogIsOneSingletonAndNotASecondHolderOfTheSameSection()
         {
-            // Two holders of the ability records are two answers about the same augment, kept in step
-            // only until one of them is loaded and the other is not.
-            ServiceProvider container = BattleComposition();
+            // Two holders of the augment records are two answers about the same augment, kept in step
+            // only until one of them is loaded and the other is not. The battle module used to
+            // register the catalog itself and consumes one now, so a registration of its own would put
+            // a fresh, unloaded instance in front of the one the loader feeds.
+            IServiceCollection services = Composition();
 
+            Assert.AreEqual(1, services.Count(descriptor => descriptor.ServiceType == typeof(IAbilityAugmentCatalog)),
+                "the augment catalog is registered more than once, so what answers depends on which registration ran last");
+
+            ServiceProvider container = services.BuildServiceProvider();
             Assert.AreSame<object>(
-                container.GetRequiredService<IAbilityProvider>(),
+                container.GetRequiredService<AbilityAugmentCatalog>(),
                 container.GetRequiredService<IAbilityAugmentCatalog>());
         }
 
@@ -122,8 +105,8 @@ namespace LastBreathTest.BattleSystemTests
             // The point of the wiring, on shipped ids: the board a project builds refuses a record the
             // rule refuses. The plain board is the control — the same id, the same slot, and it goes
             // in — so the refusal is the catalog reaching the board and not the slot being closed.
-            ServiceProvider container = BattleComposition();
-            Load(container.GetRequiredService<AbilityProvider>());
+            ServiceProvider container = ProjectComposition();
+            LoadInto(container);
             var catalog = container.GetRequiredService<IAbilityAugmentCatalog>();
             (string ability, string augment, int tier) = AnAugmentAboveTierOne(catalog);
             IAbilitySocketBoard composed = container.GetRequiredService<IAbilitySocketBoard>();
@@ -158,35 +141,31 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsFalse(board.Install(ColdSlot, PoisonAugment), "the augment went onto an ability sharing none of its tags");
         }
 
-        [TestMethod]
-        public void EveryProjectBootstrapComposesTheModuleThatRegistersTheCatalog()
-        {
-            // The other half of the chain: the tests above resolve the catalog out of the module's own
-            // composition, and this one says which projects compose that module. A project skipping it
-            // builds the board that holds slots and judges nothing, and nothing else in the bootstrap
-            // would show it — the catalog is resolved by type, so its absence is silent.
-            foreach (string relative in s_bootstraps)
-            {
-                string bootstrap = Path.Combine(SrcRoot, relative);
-                Assert.IsTrue(File.Exists(bootstrap), $"the bootstrap is not where it lived: {bootstrap}");
-                Assert.IsTrue(File.ReadAllText(bootstrap).Contains("AddBattleSystemModuleDependencies", StringComparison.Ordinal),
-                    $"{relative} composes the battle module no more, and its board is left without a catalog");
-            }
-        }
+        /// <summary>What a project registers: the participants Core holds for every composition, and
+        /// the battle module on top of them.</summary>
+        private static IServiceCollection Composition() =>
+            new ServiceCollection()
+                .AddSharedGameDataParticipants()
+                .AddBattleSystemModuleDependencies();
 
-        /// <summary>The container a project builds around the battle module.</summary>
-        private static ServiceProvider BattleComposition() =>
-            new ServiceCollection().AddBattleSystemModuleDependencies().BuildServiceProvider();
+        private static ServiceProvider ProjectComposition() => Composition().BuildServiceProvider();
+
+        /// <summary>The shipped data into a composed container, through the loader the game runs.</summary>
+        private static void LoadInto(ServiceProvider container)
+        {
+            var service = new GameDataService(
+                new FileSystemDataSource(SharedData.Root()),
+                [container.GetRequiredService<AbilityAugmentCatalog>()]);
+            List<string> failures = [];
+            service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
+
+            service.LoadAll();
+
+            Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
+        }
 
         /// <summary>The shipped ability data as the game reads it: the real loader, the real parser.</summary>
-        private static AbilityProvider ShippedCatalog()
-        {
-            var provider = new AbilityProvider();
-            Load(provider);
-            return provider;
-        }
-
-        private static void Load(AbilityProvider provider) => LoadFrom(SharedData.Root(), provider);
+        private static IAbilityAugmentCatalog ShippedCatalog() => ShippedAbilityData.Augments();
 
         /// <summary>The same loader over data the test wrote, for records the shipped file does not
         /// declare yet.</summary>
@@ -196,21 +175,9 @@ namespace LastBreathTest.BattleSystemTests
             Directory.CreateDirectory(Path.Combine(root, DataCatalog.Abilities));
             File.WriteAllText(Path.Combine(root, DataCatalog.Abilities, "Abilities.json"), json);
 
-            var provider = new AbilityProvider();
-            LoadFrom(root, provider);
+            AbilityAugmentCatalog catalog = ShippedAbilityData.LoadFrom(root).Augments;
             Directory.Delete(root, recursive: true);
-            return provider;
-        }
-
-        private static void LoadFrom(string root, AbilityProvider provider)
-        {
-            var service = new GameDataService(new FileSystemDataSource(root), [provider]);
-            List<string> failures = [];
-            service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
-
-            service.LoadAll();
-
-            Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
+            return catalog;
         }
 
         /// <summary>One poison ability, one cold ability, and — beside them rather than inside either

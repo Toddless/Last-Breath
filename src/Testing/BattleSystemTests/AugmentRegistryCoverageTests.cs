@@ -1,6 +1,7 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source.Abilities;
+    using Core.Battle.Abilities;
     using Core.Data.GameData;
     using Newtonsoft.Json.Linq;
 
@@ -19,27 +20,27 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void EveryDeclaredAugmentHasAFactoryToBuildIt()
         {
-            AbilityProvider catalog = ShippedCatalog();
-            var registry = catalog.BuildableAugmentIds.ToHashSet(StringComparer.Ordinal);
+            (AbilityProvider registryHolder, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            var registry = registryHolder.BuildableAugmentIds.ToHashSet(StringComparer.Ordinal);
 
-            var unbuildable = catalog.KnownAugmentIds.Where(id => !registry.Contains(id)).OrderBy(id => id).ToList();
+            var unbuildable = DeclaredIds(catalog).Where(id => !registry.Contains(id)).OrderBy(id => id).ToList();
 
             Assert.AreEqual(0, unbuildable.Count,
                 $"declared and unbuildable — the data offers what no factory makes:\n  {string.Join("\n  ", unbuildable)}");
-            Assert.IsTrue(catalog.KnownAugmentIds.Count > 0, "the shipped data declares no augment, so the walk proves nothing");
+            Assert.IsTrue(catalog.All.Count > 0, "the shipped data declares no augment, so the walk proves nothing");
         }
 
         [TestMethod]
         public void EveryFactoryHasARecordThatDeclaresIt()
         {
-            AbilityProvider catalog = ShippedCatalog();
-            var declared = catalog.KnownAugmentIds.ToHashSet(StringComparer.Ordinal);
+            (AbilityProvider registryHolder, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            var declared = DeclaredIds(catalog).ToHashSet(StringComparer.Ordinal);
 
-            var unreachable = catalog.BuildableAugmentIds.Where(id => !declared.Contains(id)).OrderBy(id => id).ToList();
+            var unreachable = registryHolder.BuildableAugmentIds.Where(id => !declared.Contains(id)).OrderBy(id => id).ToList();
 
             Assert.AreEqual(0, unreachable.Count,
                 $"registered and undeclared — the code builds what no record names:\n  {string.Join("\n  ", unreachable)}");
-            Assert.IsTrue(catalog.BuildableAugmentIds.Count > 0, "the registry is empty, so the walk proves nothing");
+            Assert.IsTrue(registryHolder.BuildableAugmentIds.Count > 0, "the registry is empty, so the walk proves nothing");
         }
 
         [TestMethod]
@@ -56,9 +57,13 @@ namespace LastBreathTest.BattleSystemTests
                 .ToList();
 
             Assert.AreEqual(0, duplicates.Count, $"declared more than once: {string.Join(", ", duplicates)}");
-            Assert.AreEqual(written.Count, ShippedCatalog().KnownAugmentIds.Count,
+            Assert.AreEqual(written.Count, ShippedAbilityData.Augments().All.Count,
                 "the catalog holds fewer records than the section writes");
         }
+
+        /// <summary>Every augment id the catalog holds.</summary>
+        private static IEnumerable<string> DeclaredIds(AbilityAugmentCatalog catalog) =>
+            catalog.All.Select(record => record.Id);
 
         /// <summary>Every augment id the shipped section writes, read off the files themselves —
         /// repetitions included, which is the point.</summary>
@@ -75,20 +80,5 @@ namespace LastBreathTest.BattleSystemTests
 
         private static IEnumerable<JObject> Augments(JObject root) =>
             root["augments"] is { } section ? section.OfType<JObject>() : [];
-
-        /// <summary>The shipped ability data as the game reads it: the real source, the real loader,
-        /// the real parser.</summary>
-        private static AbilityProvider ShippedCatalog()
-        {
-            var provider = new AbilityProvider();
-            var service = new GameDataService(new FileSystemDataSource(SharedData.Root()), [provider]);
-            List<string> failures = [];
-            service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
-
-            service.LoadAll();
-
-            Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
-            return provider;
-        }
     }
 }

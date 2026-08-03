@@ -53,11 +53,9 @@
             services.AddSingleton<IMartialArtMastery>(sp => sp.GetRequiredService<MartialArtMastery>());
             services.AddSingleton<IGameDataParticipant>(sp => sp.GetRequiredService<MartialArtMastery>());
             services.AddGameDataParticipant<IAbilityProvider, AbilityProvider>();
-            // The same singleton once more, as the records an install names: the ability data holds
-            // both the tags a fit is judged by and the augment records themselves, so a second holder
-            // would be a second place for them to drift. Registered here rather than per project —
-            // without it every board in the game holds slots and judges nothing.
-            services.AddSingleton<IAbilityAugmentCatalog>(sp => sp.GetRequiredService<AbilityProvider>());
+            // The records an install names are NOT registered here: a composition without this module
+            // still has augments to offer, judge and handle, so the catalog is a shared data
+            // participant (AddSharedGameDataParticipants) and this module only consumes it.
             // The socket board is filled by the same service that fills the book, and read by the
             // ability-book save section — hence a singleton next to the one that syncs it.
             services.AddSingleton<IAbilitySocketBoard, AbilitySocketBoard>();

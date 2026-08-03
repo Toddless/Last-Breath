@@ -1,7 +1,10 @@
 ﻿namespace LastBreathTest.LootSimulation
 {
+    using Core.Battle.Abilities;
+    using Core.Data.AbilityData;
     using Core.Enums;
     using Core.Modifiers;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>Fast, seeded invariants of the drop pipeline â€” the economy's regression net.
     /// Run only these with: dotnet test --filter "TestCategory!=Simulation"</summary>
@@ -17,6 +20,22 @@
         {
             s_pipeline = LootPipeline.Create(Seed);
             s_simulator = new LootSimulator(s_pipeline);
+        }
+
+        [TestMethod]
+        public void TheStandHoldsTheAugmentRecordsThoughItBuildsNoBattleModule()
+        {
+            // The stand is the drop pipeline of a composition without a battle module — which is
+            // exactly where an augment that becomes an item would be minted, dropped and priced. So
+            // the records have to be readable here, and through the registration the game uses rather
+            // than a list this file writes by hand: unregister the catalog and this goes red.
+            var catalog = s_pipeline.Shared.GetService<IAbilityAugmentCatalog>();
+
+            Assert.IsNotNull(catalog, "the stand composes no augment catalog, so no drop pipeline of its kind could ever see one.");
+            Assert.IsTrue(catalog.All.Count > 0, "The augment records reached the stand empty.");
+
+            AbilityUpgradeData first = catalog.All.First();
+            Assert.IsNotNull(catalog.Find(first.Id), $"'{first.Id}' is held by the stand and not found by its own id.");
         }
 
         [TestMethod]

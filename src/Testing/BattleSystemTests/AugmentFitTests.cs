@@ -448,6 +448,8 @@ namespace LastBreathTest.BattleSystemTests
             private readonly Dictionary<string, AbilityUpgradeData> _augments = new(StringComparer.Ordinal);
             private readonly Dictionary<string, string[]> _abilityTags = new(StringComparer.Ordinal);
 
+            public IReadOnlyCollection<AbilityUpgradeData> All => _augments.Values;
+
             public AugmentCatalogStub WithAbility(string abilityId, params string[] tags)
             {
                 _abilityTags[abilityId] = tags;

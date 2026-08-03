@@ -8,6 +8,7 @@ namespace LastBreathTest.LootSimulation
     using LootGeneration.Internal;
     using LootGeneration.Services;
     using LootGeneration.Source;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>The REAL drop pipeline assembled without Godot: FileSystemDataSource reads the same
     /// SharedData catalogs the game loads, and DefaultRandomNumberGenerator(seed) makes runs reproducible.
@@ -23,6 +24,12 @@ namespace LastBreathTest.LootSimulation
         public required IRandomNumberGenerator Rnd { get; init; }
         public required Core.Items.IItemMinter Minter { get; init; }
 
+        /// <summary>The data participants Core registers for every composition, resolved the way a
+        /// project resolves them. The stand builds no battle module, so whatever the game keeps
+        /// outside its modules has to arrive here through that same registration — otherwise the sim
+        /// describes a game with less in it than the one that ships.</summary>
+        public required ServiceProvider Shared { get; init; }
+
         public static LootPipeline Create(int seed)
         {
             string dataRoot = FindSharedDataRoot();
@@ -35,10 +42,14 @@ namespace LastBreathTest.LootSimulation
             var tableProvider = new LootTableProvider(parser);
             var configurationProvider = new LootConfigurationProvider(parser);
             var effectCatalog = new Core.Crafting.CraftingEffectProvider();
+            ServiceProvider shared = new ServiceCollection().AddSharedGameDataParticipants().BuildServiceProvider();
 
             var dataService = new GameDataService(
                 new FileSystemDataSource(dataRoot),
-                [itemProvider, modifierProvider, tableProvider, configurationProvider, effectCatalog]);
+                [
+                    itemProvider, modifierProvider, tableProvider, configurationProvider, effectCatalog,
+                    .. shared.GetServices<IGameDataParticipant>()
+                ]);
             var loadFailures = new List<string>();
             dataService.LoadFailed += (context, exception) => loadFailures.Add($"{context}: {exception.Message}");
             dataService.LoadAll();
@@ -68,6 +79,7 @@ namespace LastBreathTest.LootSimulation
                 Messages = messages,
                 Rnd = rnd,
                 Minter = itemMinter,
+                Shared = shared,
             };
         }
 

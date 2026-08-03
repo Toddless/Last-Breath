@@ -60,7 +60,7 @@ namespace Core.Services
             services.AddSingleton<IGameEventBus, GameEventBus>();
             services.AddSingleton<IGameMessageBus, GameMessageBus>();
             services.AddSingleton<ILocalizationProvider, GodotLocalizationProvider>();
-            services.AddGameDataParticipant<IParameterFormatProvider, ParameterFormatProvider>();
+            services.AddSharedGameDataParticipants();
             services.AddSingleton<ModifierFormatter>();
             services.AddSingleton<ITextFormatter, ModifierTextFormatter>();
             services.AddSingleton<ContextModifierFormatter>();

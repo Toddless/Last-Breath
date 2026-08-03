@@ -3,7 +3,6 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source.Abilities;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
-    using Core.Data.GameData;
 
     /// <summary>
     /// The tags an ability carries are not decoration: an augment that names no ability and claims no
@@ -116,7 +115,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void EveryTagTheMarkupLeansOnIsStillDeclaredAndStillCarriesItsAugments()
         {
-            AbilityProvider catalog = ShippedCatalog();
+            AbilityAugmentCatalog catalog = ShippedAbilityData.Augments();
 
             foreach ((string abilityId, string tag) in s_loadBearing)
             {
@@ -136,11 +135,11 @@ namespace LastBreathTest.BattleSystemTests
             // The other direction. A pair the table does not name is a tag holding augments nobody
             // wrote down, which is the same silence one edit later — the walk above would keep passing
             // while the markup it was written for is no longer the markup that ships.
-            AbilityProvider catalog = ShippedCatalog();
+            (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             var written = s_loadBearing.Select(pair => $"{pair.AbilityId} / {pair.Tag}").ToHashSet(StringComparer.Ordinal);
             var carrying = new HashSet<string>(StringComparer.Ordinal);
 
-            foreach (string abilityId in catalog.KnownAbilityIds)
+            foreach (string abilityId in book.KnownAbilityIds)
             {
                 List<string> tags = [.. catalog.TagsOf(abilityId)];
                 foreach (string tag in tags)
@@ -157,7 +156,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>The augments an ability would stop being offered if it dropped that one tag — the
         /// whole meaning of a tag being load-bearing, asked of the rule that actually seats them.</summary>
-        private static List<string> Lost(AbilityProvider catalog, string abilityId, IReadOnlyCollection<string> tags, string dropped)
+        private static List<string> Lost(AbilityAugmentCatalog catalog, string abilityId, IReadOnlyCollection<string> tags, string dropped)
         {
             string[] without = [.. tags.Where(tag => !string.Equals(tag, dropped, StringComparison.OrdinalIgnoreCase))];
             return [.. Offered(catalog, abilityId, tags).Except(Offered(catalog, abilityId, without), StringComparer.Ordinal)];
@@ -166,30 +165,14 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>Every tag-judged augment the fitting rule lets onto an ability carrying those tags.
         /// Records naming an ability or claiming the whole book are left out: neither of them ever asks
         /// about a tag, so neither can be lost by dropping one.</summary>
-        private static IEnumerable<string> Offered(AbilityProvider catalog, string abilityId, IReadOnlyCollection<string> tags) =>
-            catalog.KnownAugmentIds
-                .Select(id => (Id: id, Record: catalog.Find(id)!))
-                .Where(entry => TagJudged(entry.Record))
-                .Where(entry => AugmentFit.Check(
-                    new AbilitySocketPlacement(string.Empty, abilityId, DeepestSocket), tags, entry.Record, []) == AugmentFitResult.Fits)
-                .Select(entry => entry.Id);
+        private static IEnumerable<string> Offered(AbilityAugmentCatalog catalog, string abilityId, IReadOnlyCollection<string> tags) =>
+            catalog.All
+                .Where(TagJudged)
+                .Where(record => AugmentFit.Check(
+                    new AbilitySocketPlacement(string.Empty, abilityId, DeepestSocket), tags, record, []) == AugmentFitResult.Fits)
+                .Select(record => record.Id);
 
         private static bool TagJudged(AbilityUpgradeData record) =>
             !record.FitsAnyAbility && string.IsNullOrWhiteSpace(record.AbilityId);
-
-        /// <summary>The shipped ability data as the game reads it: the real source, the real loader,
-        /// the real parser.</summary>
-        private static AbilityProvider ShippedCatalog()
-        {
-            var provider = new AbilityProvider();
-            var service = new GameDataService(new FileSystemDataSource(SharedData.Root()), [provider]);
-            List<string> failures = [];
-            service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
-
-            service.LoadAll();
-
-            Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
-            return provider;
-        }
     }
 }
