@@ -599,7 +599,7 @@
         {
             "id": "Augment_Increasing_Scales",
             "tier": 1,
-            "tags": [],
+            "tags": [ "damage" ],
             "upgradeProperties": {
                 "weaponDamageScale": 0.6,
                 "spellDamageScale": 0.85
@@ -634,7 +634,7 @@
         {
             "id": "Augment_Immortality",
             "tier": 3,
-            "tags": [],
+            "tags": [ "buff" ],
             "upgradeProperties": {
                 "duration": 3,
                 "stacks": 1
@@ -693,7 +693,7 @@
         {
             "id": "Augment_Lucky_Crit",
             "tier": 3,
-            "tags": [],
+            "tags": [ "crit" ],
             "upgradeProperties": {
                 "duration": 3
             }
@@ -701,7 +701,7 @@
         {
             "id": "Augment_Additional_Crit_Multiplier",
             "tier": 2,
-            "tags": [ "damage" ],
+            "tags": [ "crit", "damage" ],
             "upgradeProperties": {
                 "multiplier": 0.15,
                 "duration": 3
@@ -718,7 +718,7 @@
         {
             "id": "Augment_Apply_Enhanced_Defence",
             "tier": 2,
-            "tags": [ "buff" ],
+            "tags": [ "buff", "duration" ],
             "upgradeProperties": {
                 "duration": 3,
                 "stacks": 3,
