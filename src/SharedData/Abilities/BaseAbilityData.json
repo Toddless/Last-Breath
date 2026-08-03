@@ -2,7 +2,7 @@
     "abilities": [
         {
             "id": "Ability_Series_Of_Attacks",
-            "tags": [ "attack", "series" ],
+            "tags": [ "attack", "series", "damage", "scale", "evadable" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 5,
@@ -19,7 +19,7 @@
         },
         {
             "id": "Ability_Increasing_Pressure",
-            "tags": [ "attack", "series" ],
+            "tags": [ "attack", "series", "damage", "scale", "evadable" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 7,
@@ -35,7 +35,7 @@
         },
         {
             "id": "Ability_Jar_Of_Poison",
-            "tags": [ "poison" ],
+            "tags": [ "poison", "stacks", "duration", "scale" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 3,
@@ -48,7 +48,7 @@
         },
         {
             "id": "Ability_Dark_Shroud",
-            "tags": [ "buff", "evasion", "health" ],
+            "tags": [ "buff", "evasion", "health", "stacks", "recovery", "duration" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 5,
@@ -64,7 +64,7 @@
         },
         {
             "id": "Ability_Critical_Calculation",
-            "tags": [ "buff", "crit" ],
+            "tags": [ "buff", "crit", "stacks", "duration" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 5,
@@ -78,7 +78,7 @@
         },
         {
             "id": "Ability_Poison_Explosion",
-            "tags": [ "poison", "execute" ],
+            "tags": [ "poison", "execute", "scale" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 7,
@@ -91,7 +91,7 @@
         },
         {
             "id": "Ability_Poison_Coating",
-            "tags": [ "poison", "buff" ],
+            "tags": [ "poison", "buff", "stacks", "duration", "scale" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 7,
@@ -105,7 +105,7 @@
         },
         {
             "id": "Ability_Double_Strike",
-            "tags": [ "attack" ],
+            "tags": [ "attack", "damage", "scale", "evadable", "stacks", "duration" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 4,
@@ -126,7 +126,7 @@
         },
         {
             "id": "Ability_Ares_Blessing",
-            "tags": [ "buff", "health" ],
+            "tags": [ "buff", "health", "stacks", "duration", "recovery" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -140,7 +140,7 @@
         },
         {
             "id": "Ability_Porcupine",
-            "tags": [ "buff", "retaliation" ],
+            "tags": [ "buff", "retaliation", "armor", "stacks", "duration" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -154,7 +154,7 @@
         },
         {
             "id": "Ability_Berserk_Fury",
-            "tags": [ "attack", "series", "health" ],
+            "tags": [ "attack", "series", "health", "damage", "scale", "evadable", "stacks", "duration" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 7,
@@ -170,7 +170,7 @@
         },
         {
             "id": "Ability_Head_Butt",
-            "tags": [ "attack", "stun" ],
+            "tags": [ "attack", "stun", "control", "damage", "scale", "evadable" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 4,
@@ -186,7 +186,7 @@
         },
         {
             "id": "Ability_Sacrifice",
-            "tags": [ "health", "empower" ],
+            "tags": [ "health", "empower", "buff", "duration" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -200,7 +200,7 @@
         },
         {
             "id": "Ability_Armageddon",
-            "tags": [ "spell", "fire", "health" ],
+            "tags": [ "spell", "fire", "health", "damage", "scale", "charged" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 9,
@@ -224,7 +224,7 @@
         },
         {
             "id": "Ability_Ice_Block",
-            "tags": [ "spell", "cold", "stun" ],
+            "tags": [ "spell", "cold", "stun", "control", "scale", "damage", "hit" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 5,
@@ -280,7 +280,7 @@
         },
         {
             "id": "Ability_Ice_Aegis",
-            "tags": [ "buff", "cold", "barrier" ],
+            "tags": [ "buff", "cold", "barrier", "stacks", "duration", "scale" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 9,
@@ -299,7 +299,7 @@
         },
         {
             "id": "Ability_Ice_Shards",
-            "tags": [ "spell", "cold" ],
+            "tags": [ "spell", "cold", "scale", "damage", "hit" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 4,
@@ -320,7 +320,7 @@
         },
         {
             "id": "Ability_Deep_Freeze",
-            "tags": [ "spell", "cold", "freeze" ],
+            "tags": [ "spell", "cold", "freeze", "control", "stacks", "duration" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 6,
@@ -339,7 +339,7 @@
         },
         {
             "id": "Ability_Discharge",
-            "tags": [ "spell", "lightning", "barrier" ],
+            "tags": [ "spell", "lightning", "barrier", "damage", "scale", "hit" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 6,
@@ -356,7 +356,7 @@
         },
         {
             "id": "Ability_Static_Armor",
-            "tags": [ "buff", "lightning" ],
+            "tags": [ "buff", "lightning", "stacks", "duration", "damage", "scale", "hit" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 6,
@@ -422,7 +422,7 @@
         {
             "id": "Augment_Poison_On_Hit",
             "tier": 3,
-            "tags": [],
+            "tags": [ "poison" ],
             "upgradeProperties": {
                 "poisonDuration": 3
             }
@@ -454,7 +454,7 @@
         {
             "id": "Augment_Additional_Max_Attacks",
             "tier": 2,
-            "tags": [],
+            "tags": [ "attack" ],
             "upgradeProperties": {
                 "maxAdditionalAttacks": 3
             }
@@ -462,7 +462,7 @@
         {
             "id": "Augment_More_Attack_Damage",
             "tier": 2,
-            "tags": [],
+            "tags": [ "damage", "attack" ],
             "upgradeProperties": {
                 "damageMultiplier": 0.15
             }
@@ -477,7 +477,7 @@
         {
             "id": "Augment_Additional_Attacks",
             "tier": 1,
-            "tags": [],
+            "tags": [ "attack" ],
             "upgradeProperties": {
                 "amountAttacks": 1
             }
@@ -516,7 +516,7 @@
         {
             "id": "Augment_Attack_Extend_Poison",
             "tier": 2,
-            "tags": [],
+            "tags": [ "poison", "duration" ],
             "upgradeProperties": {
                 "poisonDuration": 1
             }
@@ -531,7 +531,7 @@
         {
             "id": "Augment_Additional_Amount_Attacks",
             "tier": 1,
-            "tags": [],
+            "tags": [ "attack" ],
             "upgradeProperties": {
                 "amountAttacks": 2
             }
@@ -539,7 +539,7 @@
         {
             "id": "Augment_Additional_Damage_Multiplier",
             "tier": 1,
-            "tags": [],
+            "tags": [ "damage", "attack" ],
             "upgradeProperties": {
                 "damageMultiplier": 0.05
             }
@@ -556,7 +556,7 @@
         {
             "id": "Augment_Transfer_Poison_On_Death",
             "tier": 3,
-            "tags": [],
+            "tags": [ "poison" ],
             "upgradeProperties": {}
         },
         {
@@ -569,7 +569,7 @@
         {
             "id": "Augment_Clumsiness",
             "tier": 2,
-            "tags": [],
+            "tags": [ "evasion" ],
             "upgradeProperties": {
                 "evadeReduce": 0.15,
                 "maxStacks": 5,
@@ -589,7 +589,7 @@
         {
             "id": "Augment_Apply_Weakness",
             "tier": 2,
-            "tags": [],
+            "tags": [ "damage" ],
             "upgradeProperties": {
                 "damageReduce": 0.15,
                 "maxStacks": 5,
@@ -608,7 +608,7 @@
         {
             "id": "Augment_Poison_Duration",
             "tier": 1,
-            "tags": [],
+            "tags": [ "poison", "duration" ],
             "upgradeProperties": {
                 "poisonDuration": 1
             }
@@ -652,7 +652,7 @@
         {
             "id": "Augment_Additional_Health_Regen",
             "tier": 2,
-            "tags": [],
+            "tags": [ "recovery", "health" ],
             "upgradeProperties": {
                 "additionalRegen": 0.025
             }
@@ -660,7 +660,7 @@
         {
             "id": "Augment_Add_Effectiveness_Reduce_Stacks",
             "tier": 2,
-            "tags": [],
+            "tags": [ "stacks" ],
             "upgradeProperties": {
                 "additionalEffectiveness": 0.35,
                 "amountStacks": 2
@@ -669,7 +669,7 @@
         {
             "id": "Augment_Increased_Buff_Duration",
             "tier": 1,
-            "tags": [],
+            "tags": [ "buff", "duration" ],
             "upgradeProperties": {
                 "duration": 1
             }
@@ -701,7 +701,7 @@
         {
             "id": "Augment_Additional_Crit_Multiplier",
             "tier": 2,
-            "tags": [],
+            "tags": [ "damage" ],
             "upgradeProperties": {
                 "multiplier": 0.15,
                 "duration": 3
@@ -710,7 +710,7 @@
         {
             "id": "Augment_Leach_On_Crit",
             "tier": 2,
-            "tags": [],
+            "tags": [ "crit", "health" ],
             "upgradeProperties": {
                 "amount": 0.15
             }
@@ -718,7 +718,7 @@
         {
             "id": "Augment_Apply_Enhanced_Defence",
             "tier": 2,
-            "tags": [],
+            "tags": [ "buff" ],
             "upgradeProperties": {
                 "duration": 3,
                 "stacks": 3,
@@ -728,7 +728,7 @@
         {
             "id": "Augment_More_Stacks_More_Cost",
             "tier": 1,
-            "tags": [],
+            "tags": [ "stacks" ],
             "upgradeProperties": {
                 "cost": 50,
                 "stacks": 1
@@ -768,7 +768,7 @@
         {
             "id": "Augment_Reduce_Execution_Trahsold",
             "tier": 2,
-            "tags": [],
+            "tags": [ "execute" ],
             "upgradeProperties": {
                 "amount": 5
             }
@@ -867,7 +867,7 @@
         {
             "id": "Augment_Restore_On_Hit",
             "tier": 3,
-            "tags": [],
+            "tags": [ "hit" ],
             "upgradeProperties": {
                 "healthRestore": 0.07,
                 "manaRestore": 0.07
@@ -885,7 +885,7 @@
         {
             "id": "Augment_Damage_Multiplier",
             "tier": 2,
-            "tags": [],
+            "tags": [ "damage" ],
             "upgradeProperties": {
                 "amount": 0.25
             }
@@ -920,7 +920,7 @@
         {
             "id": "Augment_Recovery_Bonus",
             "tier": 2,
-            "tags": [],
+            "tags": [ "recovery", "health" ],
             "upgradeProperties": {
                 "recoveryBonus": 0.15
             }
@@ -928,24 +928,15 @@
         {
             "id": "Augment_Health_Bonus",
             "tier": 2,
-            "tags": [],
+            "tags": [ "health" ],
             "upgradeProperties": {
                 "healthBonus": 0.15
             }
         },
         {
-            "id": "Augment_Both_Bonuses",
-            "tier": 2,
-            "tags": [],
-            "upgradeProperties": {
-                "healthBonus": 0.07,
-                "recoveryBonus": 0.07
-            }
-        },
-        {
             "id": "Augment_Buff_Duration",
             "tier": 1,
-            "tags": [],
+            "tags": [ "buff", "duration" ],
             "upgradeProperties": {
                 "duration": 1
             }
@@ -981,7 +972,7 @@
         {
             "id": "Augment_Heal_On_Hit",
             "tier": 2,
-            "tags": [],
+            "tags": [ "hit" ],
             "upgradeProperties": {
                 "amount": 0.07
             }
@@ -989,7 +980,7 @@
         {
             "id": "Augment_More_Armor_Return",
             "tier": 2,
-            "tags": [],
+            "tags": [ "armor" ],
             "upgradeProperties": {
                 "amount": 0.15
             }
@@ -997,7 +988,7 @@
         {
             "id": "Augment_More_Damage_Return",
             "tier": 2,
-            "tags": [],
+            "tags": [ "damage" ],
             "upgradeProperties": {
                 "amount": 0.20
             }
@@ -1051,7 +1042,7 @@
         {
             "id": "Augment_More_Burn",
             "tier": 2,
-            "tags": [],
+            "tags": [ "damage" ],
             "upgradeProperties": {
                 "amount": 0.035
             }
@@ -1067,7 +1058,7 @@
         {
             "id": "Augment_Fury_Duration",
             "tier": 1,
-            "tags": [],
+            "tags": [ "duration" ],
             "upgradeProperties": {
                 "duration": 1
             }
@@ -1075,7 +1066,7 @@
         {
             "id": "Augment_Additional_Lunges",
             "tier": 3,
-            "tags": [],
+            "tags": [ "attack" ],
             "upgradeProperties": {
                 "amount": 1
             }
@@ -1093,7 +1084,7 @@
         {
             "id": "Augment_Extend_Stun_Add_Cost",
             "tier": 2,
-            "tags": [],
+            "tags": [ "control", "duration" ],
             "upgradeProperties": {
                 "stunDuration": 1,
                 "additionalCost": 50
@@ -1113,7 +1104,7 @@
         {
             "id": "Augment_Heal_From_Damage",
             "tier": 3,
-            "tags": [],
+            "tags": [ "health", "damage", "recovery" ],
             "upgradeProperties": {
                 "amount": 0.15
             }
@@ -1136,71 +1127,12 @@
             "upgradeProperties": {}
         },
         {
-            "id": "Augment_Additional_Rate",
-            "tier": 2,
-            "tags": [],
-            "upgradeProperties": {
-                "amount": 0.015
-            }
-        },
-        {
-            "id": "Augment_More_Sacrifice",
-            "tier": 2,
-            "tags": [],
-            "upgradeProperties": {
-                "amount": 0.10
-            }
-        },
-        {
-            "id": "Augment_Additional_Charge",
-            "tier": 1,
-            "tags": [],
-            "upgradeProperties": {
-                "amount": 1
-            }
-        },
-        {
-            "id": "Augment_Missing_Hp_Damage",
-            "tier": 3,
-            "tags": [],
-            "upgradeProperties": {
-                "rate": 1
-            }
-        },
-        {
-            "id": "Augment_Shatter_Armor",
-            "tier": 3,
-            "tags": [],
-            "upgradeProperties": {
-                "reduceBy": 1,
-                "duration": 3
-            }
-        },
-        {
             "id": "Ability_Arm_Augment_All_Targets",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Armageddon",
             "upgradeProperties": {
                 "additionalCooldown": 3
-            }
-        },
-        {
-            "id": "Augment_Reduce_Hp_Cost",
-            "tier": 2,
-            "tags": [],
-            "upgradeProperties": {
-                "amount": 0.15
-            }
-        },
-        {
-            "id": "Augment_Stage1_Damage",
-            "tier": 2,
-            "tags": [],
-            "upgradeProperties": {
-                "damage": 400,
-                "weaponScale": 1.0,
-                "spellScale": 1.0
             }
         },
         {
@@ -1212,14 +1144,6 @@
                 "stacks": 3,
                 "duration": 3,
                 "damageMultiplier": 0.7
-            }
-        },
-        {
-            "id": "Augment_Extend_Stun",
-            "tier": 1,
-            "tags": [],
-            "upgradeProperties": {
-                "duration": 1
             }
         },
         {
@@ -1284,15 +1208,6 @@
             "upgradeProperties": {}
         },
         {
-            "id": "Augment_Burn_Add_Cost",
-            "tier": 1,
-            "tags": [],
-            "upgradeProperties": {
-                "burnPercent": 0.30,
-                "additionalCost": 50
-            }
-        },
-        {
             "id": "Ability_Ov_Augment_Mana_Step",
             "tier": 2,
             "tags": [],
@@ -1351,56 +1266,6 @@
             "tags": [],
             "abilityId": "Ability_Chain_Lightning",
             "upgradeProperties": {}
-        },
-        {
-            "id": "Augment_Additional_Jump",
-            "tier": 2,
-            "tags": [],
-            "upgradeProperties": {
-                "amount": 1
-            }
-        },
-        {
-            "id": "Augment_Reduce_Falloff",
-            "tier": 2,
-            "tags": [],
-            "upgradeProperties": {
-                "amount": 0.10
-            }
-        },
-        {
-            "id": "Augment_Scales_Add_Cost",
-            "tier": 1,
-            "tags": [],
-            "upgradeProperties": {
-                "weaponDamageScale": 0.15,
-                "spellDamageScale": 0.35,
-                "additionalCost": 50
-            }
-        },
-        {
-            "id": "Augment_Additional_Scale",
-            "tier": 2,
-            "tags": [],
-            "upgradeProperties": {
-                "amount": 5
-            }
-        },
-        {
-            "id": "Augment_Additional_Duration",
-            "tier": 2,
-            "tags": [],
-            "upgradeProperties": {
-                "amount": 1
-            }
-        },
-        {
-            "id": "Augment_Additional_Barrier",
-            "tier": 1,
-            "tags": [],
-            "upgradeProperties": {
-                "amount": 300
-            }
         },
         {
             "id": "Ability_Ia_Augment_Reflect",

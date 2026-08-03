@@ -65,11 +65,6 @@ namespace Battle.Source.Abilities
             ],
 
             // Overload
-            ["Augment_Burn_Add_Cost"] =
-            [
-                new(Overload.Overload.Parameters.ManaBurnPercent, OperationType.Override, "burnPercent", 0.30f),
-                new(AbilityParameter.CostValue, OperationType.Add, "additionalCost", 50f)
-            ],
             ["Ability_Ov_Augment_Mana_Step"] =
             [
                 new(Overload.Overload.Parameters.ManaPerStep, OperationType.Subtract, "amount", 1.5f)
@@ -77,56 +72,6 @@ namespace Battle.Source.Abilities
             ["Ability_Ov_Augment_Additional_Multiplier"] =
             [
                 new(Overload.Overload.Parameters.DamagePerStep, OperationType.Add, "amount", 0.02f)
-            ],
-
-            // Chain Lightning
-            ["Augment_Scales_Add_Cost"] =
-            [
-                new(AbilityParameter.WeaponDamageScale, OperationType.Add, "weaponDamageScale", 0.15f),
-                new(AbilityParameter.SpellDamageScale, OperationType.Add, "spellDamageScale", 0.35f),
-                new(AbilityParameter.CostValue, OperationType.Add, "additionalCost", 50f)
-            ],
-            ["Augment_Additional_Jump"] =
-            [
-                new(ChainLightning.ChainLightning.Parameters.Jumps, OperationType.Add, "amount", 1f)
-            ],
-            ["Augment_Reduce_Falloff"] =
-            [
-                new(ChainLightning.ChainLightning.Parameters.DamageFalloff, OperationType.Subtract, "amount", 0.10f)
-            ],
-
-            // Ice Aegis
-            ["Augment_Additional_Barrier"] =
-            [
-                new(IceAegis.IceAegis.Parameters.BarrierBase, OperationType.Add, "amount", 300f)
-            ],
-            ["Augment_Additional_Scale"] =
-            [
-                new(IceAegis.IceAegis.Parameters.PerIntelligenceScale, OperationType.Add, "amount", 5f)
-            ],
-            ["Augment_Additional_Duration"] =
-            [
-                new(IceAegis.IceAegis.Parameters.Duration, OperationType.Add, "amount", 1f)
-            ],
-
-            // Armageddon
-            ["Augment_Extend_Stun"] =
-            [
-                new(Armageddon.Armageddon.Parameters.StunDuration, OperationType.Add, "duration", 1f)
-            ],
-            ["Augment_Reduce_Hp_Cost"] =
-            [
-                new(Armageddon.Armageddon.Parameters.HpCostMultiplier, OperationType.Subtract, "amount", 0.15f)
-            ],
-            ["Augment_Stage1_Damage"] =
-            [
-                new(AbilityParameter.Damage, OperationType.Override, "damage", 400f),
-                new(AbilityParameter.WeaponDamageScale, OperationType.Override, "weaponScale", 1f),
-                new(AbilityParameter.SpellDamageScale, OperationType.Override, "spellScale", 1f)
-            ],
-            ["Augment_Missing_Hp_Damage"] =
-            [
-                new(Armageddon.Armageddon.Parameters.MissingHpRate, OperationType.Add, "rate", 1f)
             ],
 
             // Porcupine
@@ -148,18 +93,6 @@ namespace Battle.Source.Abilities
             ],
 
             // Sacrifice
-            ["Augment_Additional_Charge"] =
-            [
-                new(Sacrifice.Sacrifice.Parameters.Charges, OperationType.Add, "amount", 1f)
-            ],
-            ["Augment_Additional_Rate"] =
-            [
-                new(Sacrifice.Sacrifice.Parameters.RatePerHundred, OperationType.Add, "amount", 0.015f)
-            ],
-            ["Augment_More_Sacrifice"] =
-            [
-                new(Sacrifice.Sacrifice.Parameters.SacrificePercent, OperationType.Add, "amount", 0.10f)
-            ],
             ["Augment_Heal_From_Damage"] =
             [
                 new(Sacrifice.Sacrifice.Parameters.HealPercent, OperationType.Add, "amount", 0.15f)
@@ -191,11 +124,6 @@ namespace Battle.Source.Abilities
             ["Augment_Health_Bonus"] =
             [
                 new(AresBlessing.AresBlessing.Parameters.HealthBonus, OperationType.Add, "healthBonus", 0.15f)
-            ],
-            ["Augment_Both_Bonuses"] =
-            [
-                new(AresBlessing.AresBlessing.Parameters.HealthBonus, OperationType.Add, "healthBonus", 0.07f),
-                new(AresBlessing.AresBlessing.Parameters.RecoveryBonus, OperationType.Add, "recoveryBonus", 0.07f)
             ],
 
             // Double Strike

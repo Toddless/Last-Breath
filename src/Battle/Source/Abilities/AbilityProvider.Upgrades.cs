@@ -216,15 +216,6 @@
                     (int)data.UpgradeProperties.GetValueOrDefault("stacks", 3),
                     (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
                     data.UpgradeProperties.GetValueOrDefault("damageMultiplier", 0.7f)),
-            ["Augment_Shatter_Armor"] = data =>
-                new AbilityUpgradeImpactRider(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    new ApplyEffectImpactRider(new ArmorReductionEffect(
-                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                        maxStacks: 1,
-                        data.UpgradeProperties.GetValueOrDefault("reduceBy", 1f)))),
             ["Ability_Arm_Augment_All_Targets"] = data =>
                 new ArmUpgradeAllTargets(
                     data.Id,

@@ -23,7 +23,7 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>How many records the section declares. Held because the records no longer sit
         /// inside the abilities: a block that used to go missing took its ability's augments with it
         /// and left the rest readable, and a section loses them one bulk edit at a time.</summary>
-        private const int ShippedRecordCount = 150;
+        private const int ShippedRecordCount = 134;
 
         /// <summary>How many records name an ability. The registry triage
         /// (<c>Docs/UpgradeRegistryTriage.md</c>) counted them: 58 reaching into the members of one
@@ -40,9 +40,10 @@ namespace LastBreathTest.BattleSystemTests
         /// the whole book.</summary>
         private const int UniversalRecords = 11;
 
-        /// <summary>How many records still declare neither. They belong nowhere until they are given
-        /// tags or a claim, and the number is what the work left to do is measured against.</summary>
-        private const int SilentRecords = 56;
+        /// <summary>How many records name neither an ability nor the whole book, and are judged by
+        /// their tags alone. Most of them carry tags now; the number is held because a record losing
+        /// its last tag belongs nowhere and says so nowhere.</summary>
+        private const int SilentRecords = 40;
 
         [TestMethod]
         public void TheSectionDeclaresTheRecordsTheTriageCounted()

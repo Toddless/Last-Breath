@@ -2622,12 +2622,6 @@ msgstr "Apply Fragility"
 msgid "Ability_Is_Augment_Apply_Fragility_Description"
 msgstr "Applies {@Effect_Fragility} ({duration|turn|turns}, up to {maxStacks|stack|stacks}, +{critDamageAmp:%} critical damage taken)."
 
-msgid "Augment_Burn_Add_Cost"
-msgstr "Burn Add Cost"
-
-msgid "Augment_Burn_Add_Cost_Description"
-msgstr "Absorbs {burnPercent:%} of mana, +{additionalCost} cost."
-
 msgid "Ability_Ov_Augment_Mana_Step"
 msgstr "Mana Step"
 
@@ -2664,47 +2658,11 @@ msgstr "Next Cast Pure"
 msgid "Augment_Next_Cast_Pure_Description"
 msgstr "The next activated ability deals {fraction:%} of its damage as pure."
 
-msgid "Augment_Scales_Add_Cost"
-msgstr "Scales Add Cost"
-
-msgid "Augment_Scales_Add_Cost_Description"
-msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} damage scaling, +{additionalCost} cost."
-
-msgid "Augment_Additional_Jump"
-msgstr "Additional Jump"
-
-msgid "Augment_Additional_Jump_Description"
-msgstr "Adds {amount} extra jump."
-
-msgid "Augment_Reduce_Falloff"
-msgstr "Reduce Falloff"
-
-msgid "Augment_Reduce_Falloff_Description"
-msgstr "-{amount:%} damage falloff per jump."
-
 msgid "Ability_Cl_Augment_Ignore_Resistances"
 msgstr "Ignore Resistances"
 
 msgid "Ability_Cl_Augment_Ignore_Resistances_Description"
 msgstr "Lightning ignores resistances."
-
-msgid "Augment_Additional_Barrier"
-msgstr "Additional Barrier"
-
-msgid "Augment_Additional_Barrier_Description"
-msgstr "+{amount} base barrier."
-
-msgid "Augment_Additional_Scale"
-msgstr "Additional Scale"
-
-msgid "Augment_Additional_Scale_Description"
-msgstr "+{amount} barrier per point of Intelligence."
-
-msgid "Augment_Additional_Duration"
-msgstr "Additional Duration"
-
-msgid "Augment_Additional_Duration_Description"
-msgstr "+{amount|turn|turns} duration."
 
 # ------------------------------
 # Keyword reference cards  (<Id>_Tooltip = static text, no placeholders)
@@ -3102,47 +3060,17 @@ msgstr "+{duration|turn|turns} buff duration."
 # Ability upgrades — Strength stance
 # ------------------------------
 
-msgid "Augment_Missing_Hp_Damage"
-msgstr "Missing Hp Damage"
-
-msgid "Augment_Missing_Hp_Damage_Description"
-msgstr "+{rate} damage for each point of missing health."
-
-msgid "Augment_Shatter_Armor"
-msgstr "Shatter Armor"
-
-msgid "Augment_Shatter_Armor_Description"
-msgstr "Destroys the target's armor for {duration|turn|turns}."
-
 msgid "Ability_Arm_Augment_All_Targets"
 msgstr "All Targets"
 
 msgid "Ability_Arm_Augment_All_Targets_Description"
 msgstr "Strikes every enemy, but +{additionalCooldown} cooldown."
 
-msgid "Augment_Reduce_Hp_Cost"
-msgstr "Reduce Hp Cost"
-
-msgid "Augment_Reduce_Hp_Cost_Description"
-msgstr "-{amount:%} health cost of every stage."
-
-msgid "Augment_Stage1_Damage"
-msgstr "Stage1 Damage"
-
-msgid "Augment_Stage1_Damage_Description"
-msgstr "Stage 1 becomes {damage} + ({weaponScale:%} + {spellScale:%})."
-
 msgid "Ability_Arm_Augment_Stage3_Burning"
 msgstr "Stage3 Burning"
 
 msgid "Ability_Arm_Augment_Stage3_Burning_Description"
 msgstr "Stage 3 applies {stacks} burning {stacks|stack|stacks} (×{damageMultiplier}, {duration|turn|turns})."
-
-msgid "Augment_Extend_Stun"
-msgstr "Extend Stun"
-
-msgid "Augment_Extend_Stun_Description"
-msgstr "+{duration|turn|turns} stun."
 
 msgid "Ability_Porc_Augment_Echo"
 msgstr "Echo"
@@ -3210,24 +3138,6 @@ msgstr "Free Cast"
 msgid "Augment_Free_Cast_Description"
 msgstr "The next ability is cast without a cooldown."
 
-msgid "Augment_Additional_Rate"
-msgstr "Additional Rate"
-
-msgid "Augment_Additional_Rate_Description"
-msgstr "+{amount:%} bonus per 100 sacrificed health."
-
-msgid "Augment_More_Sacrifice"
-msgstr "More Sacrifice"
-
-msgid "Augment_More_Sacrifice_Description"
-msgstr "+{amount:%} sacrificed health."
-
-msgid "Augment_Additional_Charge"
-msgstr "Additional Charge"
-
-msgid "Augment_Additional_Charge_Description"
-msgstr "+{amount} charge."
-
 msgid "Ability_Bf_Augment_Burning_Fury"
 msgstr "Burning Fury"
 
@@ -3293,12 +3203,6 @@ msgstr "Health Bonus"
 
 msgid "Augment_Health_Bonus_Description"
 msgstr "+{healthBonus:%} maximum health."
-
-msgid "Augment_Both_Bonuses"
-msgstr "Both Bonuses"
-
-msgid "Augment_Both_Bonuses_Description"
-msgstr "+{healthBonus:%} maximum health and +{recoveryBonus:%} health recovery."
 
 msgid "Augment_Buff_Duration"
 msgstr "Buff Duration"

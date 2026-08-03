@@ -144,8 +144,8 @@ namespace LastBreathTest.BattleSystemTests
         {
             // Both verdicts on records that travelled the loading road the game uses, because the
             // fitting rule reads fields a hand-built record cannot prove are ever parsed. The content
-            // is written by the test: no shipped record carries a tag yet, so a seating decided by
-            // tags has nothing in the shipped catalog to be shown on.
+            // is written by the test rather than taken from the shipped catalog, so the pair under
+            // test stays a pair whatever the shipped markup is repointed at.
             IAbilityAugmentCatalog catalog = CatalogOver(TwoAbilitiesAndOneAugment());
             var board = new AbilitySocketBoard(catalog);
             board.Sync(

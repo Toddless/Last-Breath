@@ -1995,12 +1995,6 @@ msgstr ""
 msgid "Ability_Is_Augment_Apply_Fragility_Description"
 msgstr "Накладывает {@Effect_Fragility} ({duration|turn|turns}, до {maxStacks|stack|stacks}, +{critDamageAmp:%} получаемого крит-урона)."
 
-msgid "Augment_Burn_Add_Cost"
-msgstr ""
-
-msgid "Augment_Burn_Add_Cost_Description"
-msgstr "Поглощает {burnPercent:%} маны, стоимость +{additionalCost}."
-
 msgid "Ability_Ov_Augment_Mana_Step"
 msgstr ""
 
@@ -2037,47 +2031,11 @@ msgstr ""
 msgid "Augment_Next_Cast_Pure_Description"
 msgstr "Следующая активированная способность наносит {fraction:%} урона чистым."
 
-msgid "Augment_Scales_Add_Cost"
-msgstr ""
-
-msgid "Augment_Scales_Add_Cost_Description"
-msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} к скейлам урона, стоимость +{additionalCost}."
-
-msgid "Augment_Additional_Jump"
-msgstr ""
-
-msgid "Augment_Additional_Jump_Description"
-msgstr "Добавляет {amount} дополнительный прыжок."
-
-msgid "Augment_Reduce_Falloff"
-msgstr ""
-
-msgid "Augment_Reduce_Falloff_Description"
-msgstr "-{amount:%} потери урона за прыжок."
-
 msgid "Ability_Cl_Augment_Ignore_Resistances"
 msgstr ""
 
 msgid "Ability_Cl_Augment_Ignore_Resistances_Description"
 msgstr "Молнии игнорируют сопротивления."
-
-msgid "Augment_Additional_Barrier"
-msgstr ""
-
-msgid "Augment_Additional_Barrier_Description"
-msgstr "+{amount} базового барьера."
-
-msgid "Augment_Additional_Scale"
-msgstr ""
-
-msgid "Augment_Additional_Scale_Description"
-msgstr "+{amount} барьера за единицу интеллекта."
-
-msgid "Augment_Additional_Duration"
-msgstr ""
-
-msgid "Augment_Additional_Duration_Description"
-msgstr "+{amount|turn|turns} к длительности."
 
 # ------------------------------
 # Keyword reference cards (dexterity effects)
@@ -2427,47 +2385,17 @@ msgstr "+{duration|turn|turns} длительности бафа."
 # Ability upgrades — Strength stance
 # ------------------------------
 
-msgid "Augment_Missing_Hp_Damage"
-msgstr ""
-
-msgid "Augment_Missing_Hp_Damage_Description"
-msgstr "+{rate} урона за каждую единицу отсутствующего здоровья."
-
-msgid "Augment_Shatter_Armor"
-msgstr ""
-
-msgid "Augment_Shatter_Armor_Description"
-msgstr "Уничтожает броню цели на {duration|turn|turns}."
-
 msgid "Ability_Arm_Augment_All_Targets"
 msgstr ""
 
 msgid "Ability_Arm_Augment_All_Targets_Description"
 msgstr "Бьёт по всем врагам, но +{additionalCooldown} к перезарядке."
 
-msgid "Augment_Reduce_Hp_Cost"
-msgstr ""
-
-msgid "Augment_Reduce_Hp_Cost_Description"
-msgstr "-{amount:%} HP-стоимости всех стадий."
-
-msgid "Augment_Stage1_Damage"
-msgstr ""
-
-msgid "Augment_Stage1_Damage_Description"
-msgstr "Стадия 1 → {damage} + ({weaponScale:%} + {spellScale:%})."
-
 msgid "Ability_Arm_Augment_Stage3_Burning"
 msgstr ""
 
 msgid "Ability_Arm_Augment_Stage3_Burning_Description"
 msgstr "Стадия 3 накладывает {stacks} {stacks|stack|stacks} горения (×{damageMultiplier}, {duration|turn|turns})."
-
-msgid "Augment_Extend_Stun"
-msgstr ""
-
-msgid "Augment_Extend_Stun_Description"
-msgstr "+{duration|turn|turns} оглушения."
 
 msgid "Ability_Porc_Augment_Echo"
 msgstr ""
@@ -2535,24 +2463,6 @@ msgstr ""
 msgid "Augment_Free_Cast_Description"
 msgstr "Следующая способность без перезарядки."
 
-msgid "Augment_Additional_Rate"
-msgstr ""
-
-msgid "Augment_Additional_Rate_Description"
-msgstr "+{amount:%} бонуса за 100 пожертвованного HP."
-
-msgid "Augment_More_Sacrifice"
-msgstr ""
-
-msgid "Augment_More_Sacrifice_Description"
-msgstr "+{amount:%} жертвуемого HP."
-
-msgid "Augment_Additional_Charge"
-msgstr ""
-
-msgid "Augment_Additional_Charge_Description"
-msgstr "+{amount} заряд."
-
 msgid "Ability_Bf_Augment_Burning_Fury"
 msgstr ""
 
@@ -2618,12 +2528,6 @@ msgstr ""
 
 msgid "Augment_Health_Bonus_Description"
 msgstr "+{healthBonus:%} максимального здоровья."
-
-msgid "Augment_Both_Bonuses"
-msgstr ""
-
-msgid "Augment_Both_Bonuses_Description"
-msgstr "+{healthBonus:%} максимального здоровья и +{recoveryBonus:%} восстановления."
 
 msgid "Augment_Buff_Duration"
 msgstr ""

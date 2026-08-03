@@ -27,7 +27,7 @@ namespace LastBreathTest.BattleSystemTests
     public class AugmentParameterTableTests
     {
         /// <summary>How many records the table took over from a class of their own.</summary>
-        private const int TranslatedRecords = 62;
+        private const int TranslatedRecords = 47;
 
         /// <summary>Two bases every move is measured on. One of them has to be something other than
         /// nothing: an override and an addition are the same number on a base of zero, and a walk that
@@ -51,36 +51,14 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Increasing_Scales", "SpellDamageScale", OperationType.Add, 0.85f),
             ("Augment_Poison_Duration", "PoisonDuration", OperationType.Add, 1f),
 
-            ("Augment_Burn_Add_Cost", "ManaBurnPercent", OperationType.Override, 0.30f),
-            ("Augment_Burn_Add_Cost", "CostValue", OperationType.Add, 50f),
             ("Ability_Ov_Augment_Mana_Step", "ManaPerStep", OperationType.Subtract, 1.5f),
             ("Ability_Ov_Augment_Additional_Multiplier", "DamagePerStep", OperationType.Add, 0.02f),
-
-            ("Augment_Scales_Add_Cost", "WeaponDamageScale", OperationType.Add, 0.15f),
-            ("Augment_Scales_Add_Cost", "SpellDamageScale", OperationType.Add, 0.35f),
-            ("Augment_Scales_Add_Cost", "CostValue", OperationType.Add, 50f),
-            ("Augment_Additional_Jump", "Jumps", OperationType.Add, 1f),
-            ("Augment_Reduce_Falloff", "DamageFalloff", OperationType.Subtract, 0.10f),
-
-            ("Augment_Additional_Barrier", "BarrierBase", OperationType.Add, 300f),
-            ("Augment_Additional_Scale", "PerIntelligenceScale", OperationType.Add, 5f),
-            ("Augment_Additional_Duration", "Duration", OperationType.Add, 1f),
-
-            ("Augment_Extend_Stun", "StunDuration", OperationType.Add, 1f),
-            ("Augment_Reduce_Hp_Cost", "HpCostMultiplier", OperationType.Subtract, 0.15f),
-            ("Augment_Stage1_Damage", "Damage", OperationType.Override, 400f),
-            ("Augment_Stage1_Damage", "WeaponDamageScale", OperationType.Override, 1f),
-            ("Augment_Stage1_Damage", "SpellDamageScale", OperationType.Override, 1f),
-            ("Augment_Missing_Hp_Damage", "MissingHpRate", OperationType.Add, 1f),
 
             ("Augment_Cooldown_Chance", "CooldownReduceChance", OperationType.Add, 0.15f),
             ("Augment_Heal_On_Hit", "HealOnHit", OperationType.Add, 0.07f),
             ("Augment_More_Armor_Return", "ArmorReturn", OperationType.Add, 0.15f),
             ("Augment_More_Damage_Return", "DamageReturn", OperationType.Add, 0.20f),
 
-            ("Augment_Additional_Charge", "Charges", OperationType.Add, 1f),
-            ("Augment_Additional_Rate", "RatePerHundred", OperationType.Add, 0.015f),
-            ("Augment_More_Sacrifice", "SacrificePercent", OperationType.Add, 0.10f),
             ("Augment_Heal_From_Damage", "HealPercent", OperationType.Add, 0.15f),
 
             ("Augment_Fury_Duration", "FuryDuration", OperationType.Subtract, 1f),
@@ -90,8 +68,6 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Buff_Duration", "Duration", OperationType.Add, 1f),
             ("Augment_Recovery_Bonus", "RecoveryBonus", OperationType.Add, 0.15f),
             ("Augment_Health_Bonus", "HealthBonus", OperationType.Add, 0.15f),
-            ("Augment_Both_Bonuses", "HealthBonus", OperationType.Add, 0.07f),
-            ("Augment_Both_Bonuses", "RecoveryBonus", OperationType.Add, 0.07f),
 
             ("Augment_Damage_Multiplier", "DamageMultiplier", OperationType.Add, 0.25f),
             ("Augment_Restore_On_Hit", "HealthRestore", OperationType.Add, 0.07f),
