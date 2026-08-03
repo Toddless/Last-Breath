@@ -3,14 +3,14 @@ namespace Core.Battle.Abilities
     using System.Collections.Generic;
     using Enums;
     using Entity;
-    using Godot;
+    using Entity.Components;
 
     public record AbilityActivationContext : IAbilityActivationContext
     {
         public required IAbility Ability { get; init; }
         public required IFightable Caster { get; init; }
         public required IBattleField Field { get; init; }
-        public required RandomNumberGenerator Rnd { get; init; }
+        public required IRandomNumberGenerator Rnd { get; init; }
         public List<IFightable> Targets { get; init; } = [];
         public bool IsPreview { get; init; }
 

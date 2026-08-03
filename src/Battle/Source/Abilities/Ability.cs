@@ -9,6 +9,7 @@
     using Core.Data;
     using Core.Data.AbilityData;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
     using Core.Localization;
@@ -19,11 +20,27 @@
     {
         // Rolls for cast mutators that fire by chance (item lines like "X% chance the cast is free").
         // One shared, time-seeded generator instead of a fresh one per activation. LAZY on the first
-        // real cast: the Godot RNG is a native object — sandboxes without the engine (tests) fatally
+        // real cast: the engine generator is a native object — sandboxes without Godot (tests) fatally
         // crash on its construction (0xC0000005), and previews must never materialize it.
-        private static RandomNumberGenerator? s_castRnd;
+        private static IRandomNumberGenerator? s_castRnd;
 
         protected IFightable? Owner;
+
+        /// <summary>
+        /// Builds the generator every cast rolls on. The running game keeps <see cref="EngineCastRandom"/>
+        /// here, so a cast rolls on the engine RNG like the rest of combat; sandboxes without Godot put a
+        /// pure-C# source here instead. A new source also drops the stream currently in use, so the swap
+        /// holds however much has already been cast.
+        /// </summary>
+        public static Func<IRandomNumberGenerator> CastRandomSource
+        {
+            get;
+            set
+            {
+                field = value;
+                s_castRnd = null;
+            }
+        } = EngineCastRandom;
 
         /// <summary>The data record the ability was built from — the single source of base values;
         /// <see cref="Copy"/> rebuilds fresh instances from it.</summary>
@@ -176,16 +193,17 @@
             }
         }
 
-        private static RandomNumberGenerator CastRnd
+        /// <summary>The generator the running game rolls its casts on: the engine RNG, time-seeded.
+        /// The return type names the implementation on purpose — the production choice stays readable
+        /// (and assertable) without constructing the native object.</summary>
+        public static GodotRandomNumberGenerator EngineCastRandom()
         {
-            get
-            {
-                if (s_castRnd != null) return s_castRnd;
-                s_castRnd = new RandomNumberGenerator();
-                s_castRnd.Randomize();
-                return s_castRnd;
-            }
+            var rnd = new RandomNumberGenerator();
+            rnd.Randomize();
+            return new GodotRandomNumberGenerator(rnd);
         }
+
+        private static IRandomNumberGenerator CastRnd => s_castRnd ??= CastRandomSource();
 
         /// <summary>Delivery implementations (internal loops and execution strategies) call this on every
         /// impact so per-impact riders fire for each touched target.</summary>
@@ -308,7 +326,7 @@
             Ability = this,
             Caster = Owner!,
             Field = field,
-            // Preview never rolls (IsPreview contract), so the native generator stays untouched.
+            // Preview never rolls (IsPreview contract), so the generator is never even built for it.
             Rnd = isPreview ? null! : CastRnd,
             Targets = targets,
             IsPreview = isPreview,

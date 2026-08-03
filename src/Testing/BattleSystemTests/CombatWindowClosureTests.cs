@@ -1,7 +1,5 @@
 namespace LastBreathTest.BattleSystemTests
 {
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using Battle.Source;
     using Battle.Source.Abilities;
@@ -39,8 +37,6 @@ namespace LastBreathTest.BattleSystemTests
         private const float WoundedShare = 0.5f;
         private const float MaxHealth = 100f;
 
-        /// <summary>The lazy slot holding the generator a real cast rolls on.</summary>
-        private const string CastGeneratorField = "s_castRnd";
         private const string ChargeSource = "Ability_Overload";
 
         /// <summary>Anything but <see cref="ChargeSource"/>: recasting the ability a charge came from
@@ -88,7 +84,10 @@ namespace LastBreathTest.BattleSystemTests
             // charge arms itself on it: by the time a later subscriber throws, the caster already carries
             // the boost that only the end of the cast takes off him. The end is also what spends the cast
             // for a predicate counting the owner's actions this turn.
-            NeutralizeCastGenerator();
+            // A cast rolls on whatever the ability's source hands out, and the game's own source builds the
+            // engine generator — a native object no sandbox can construct. Nothing here rolls, but the cast
+            // builds the stream anyway, so the source is a pure-C# one for the length of the test.
+            using var cast = CastRandomScope.Seeded();
             var caster = new ConditionOwner();
             await Charge().Apply(new EffectApplyingContext { Caster = caster, Target = caster, Source = nameof(CombatWindowClosureTests) });
             float armedInside = 0f;
@@ -232,21 +231,6 @@ namespace LastBreathTest.BattleSystemTests
             caster.ModifierHandler.Apply(damage);
 
             return damage.TotalDamage;
-        }
-
-        /// <summary>
-        /// A real cast rolls on Godot's generator, and constructing one outside the engine is a fatal
-        /// access violation — which is why the ability keeps it in a lazy static, untouched until the
-        /// first activation. The sandbox fills that slot before the first cast with an instance that is
-        /// never constructed and never rolled: nothing here has a chance to roll on it.
-        /// </summary>
-        private static void NeutralizeCastGenerator()
-        {
-            var slot = typeof(Ability).GetField(CastGeneratorField, BindingFlags.Static | BindingFlags.NonPublic);
-            Assert.IsNotNull(slot, $"{nameof(Ability)} no longer keeps its cast generator in '{CastGeneratorField}' — "
-                + "a cast can no longer be driven without the engine, and this fixture would take the test host down with it");
-
-            slot.SetValue(null, RuntimeHelpers.GetUninitializedObject(slot.FieldType));
         }
 
         /// <summary>A cast with no delivery of its own: what it announces about itself is the whole of it.</summary>
