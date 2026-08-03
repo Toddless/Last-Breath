@@ -43,8 +43,8 @@ namespace LastBreathTest.BattleSystemTests
         private const float SurchargeShare = 0.4f;
 
         /// <summary>The augment of another tier the cost share has to share a parameter with: Head
-        /// Butt's longer stun, bought with fifty more mana. The shipped record and the shipped
-        /// class.</summary>
+        /// Butt's longer stun, bought with fifty more mana. The shipped record, built the way the
+        /// registry builds it — two flat moves on two parameters.</summary>
         private const string CostSurcharge = "Augment_Extend_Stun_Add_Cost";
 
         /// <summary>The same on the other parameter — Armageddon reaching every target and waiting three
@@ -307,7 +307,7 @@ namespace LastBreathTest.BattleSystemTests
             ability.SetAbilityUpgrades(new()
             {
                 [1] = [new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare)],
-                [3] = [new AbilityUpgradeParameterSet(CooldownSurcharge, [], 3, [(AbilityParameter.Cooldown, 3f)])]
+                [3] = [new AbilityUpgradeParameterSet(CooldownSurcharge, [], 3, [(AbilityParameter.Cooldown, OperationType.Add, 3f)])]
             });
 
             int[] order = surchargeFirst ? [3, 1] : [1, 3];
@@ -325,8 +325,8 @@ namespace LastBreathTest.BattleSystemTests
             ability.SetAbilityUpgrades(new()
             {
                 [1] = [new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare)],
-                [2] = [new HbUpgradeExtendStunAddCost(CostSurcharge, [], 2, 1f, 50f)],
-                [3] = [new AbilityUpgradeParameterSet(CooldownSurcharge, [], 3, [(AbilityParameter.Cooldown, 3f)])]
+                [2] = [new AbilityUpgradeParameterSet(CostSurcharge, [], 2, [(HeadButt.Parameters.StunDuration, OperationType.Add, 1f), (AbilityParameter.CostValue, OperationType.Add, 50f)])],
+                [3] = [new AbilityUpgradeParameterSet(CooldownSurcharge, [], 3, [(AbilityParameter.Cooldown, OperationType.Add, 3f)])]
             });
 
             string[] chosen = [SurchargeAugment, CostSurcharge, CooldownSurcharge];
@@ -346,7 +346,7 @@ namespace LastBreathTest.BattleSystemTests
             ability.SetAbilityUpgrades(new()
             {
                 [1] = [new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare)],
-                [2] = [new HbUpgradeExtendStunAddCost(CostSurcharge, [], 2, 1f, 50f)]
+                [2] = [new AbilityUpgradeParameterSet(CostSurcharge, [], 2, [(HeadButt.Parameters.StunDuration, OperationType.Add, 1f), (AbilityParameter.CostValue, OperationType.Add, 50f)])]
             });
 
             int[] order = surchargeFirst ? [2, 1] : [1, 2];

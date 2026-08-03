@@ -31,10 +31,11 @@
         /// <summary>Every augment the data declares, whatever it ends up fitting.</summary>
         public IReadOnlyCollection<string> KnownAugmentIds => _augments.Keys;
 
-        /// <summary>Every augment this build knows how to make an upgrade of. A record the data
-        /// declares and this collection does not name is a record that parses, is offered and then
-        /// silently produces nothing.</summary>
-        public IReadOnlyCollection<string> BuildableAugmentIds => _abilityUpgrades.Keys;
+        /// <summary>Every augment this build knows how to make an upgrade of — the augments a factory
+        /// is written for and the augments the parameter table describes, which are two halves of one
+        /// registry and never name the same id twice. A record the data declares and this collection
+        /// does not name is a record that parses, is offered and then silently produces nothing.</summary>
+        public IReadOnlyCollection<string> BuildableAugmentIds => [.. _abilityUpgrades.Keys, .. _parameterAugments.Keys];
 
         public void Apply(string catalog, GameDataFile file)
         {
@@ -101,18 +102,34 @@
                 augment,
                 []) == AugmentFitResult.Fits;
 
-        private IAbilityUpgrade? CreateUpgrade(AbilityUpgradeData data)
+        /// <summary>The upgrade an augment record installs, built from that record alone. Null for an
+        /// id neither half of the registry answers — the record parses and is offered, and this is
+        /// where that silence is reported.</summary>
+        public IAbilityUpgrade? CreateUpgrade(AbilityUpgradeData data)
         {
-            if (_abilityUpgrades.TryGetValue(data.Id, out var factory))
+            IAbilityUpgrade? upgrade = Build(data);
+            if (upgrade == null)
             {
-                var upgrade = factory(data);
-                // Placeholder = json property name; live upgrade descriptions come for free
-                upgrade.DescriptionValues = data.UpgradeProperties.ToDictionary(entry => entry.Key, object? (entry) => entry.Value);
-                return upgrade;
+                Tracker.TrackNotFound($"Upgrade factory '{data.Id}'", this);
+                return null;
             }
 
-            Tracker.TrackNotFound($"Upgrade factory '{data.Id}'", this);
-            return null;
+            // Placeholder = json property name; live upgrade descriptions come for free
+            upgrade.DescriptionValues = data.UpgradeProperties.ToDictionary(entry => entry.Key, object? (entry) => entry.Value);
+            return upgrade;
+        }
+
+        /// <summary>The two halves of the registry, asked in order: an augment reaching into the members
+        /// of an ability has a factory written for it, one that only moves numbers is a row of the
+        /// parameter table and needs no code of its own.</summary>
+        private IAbilityUpgrade? Build(AbilityUpgradeData data)
+        {
+            if (_abilityUpgrades.TryGetValue(data.Id, out var factory)) return factory(data);
+
+            return _parameterAugments.TryGetValue(data.Id, out AugmentParameterMove[]? moves)
+                ? new AbilityUpgradeParameterSet(data.Id, data.Tags, data.Tier,
+                    [.. moves.Select(move => (move.Parameter, move.Operation, move.AmountIn(data.UpgradeProperties)))])
+                : null;
         }
     }
 }
