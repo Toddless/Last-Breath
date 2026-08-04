@@ -1,4 +1,4 @@
-namespace LastBreathTest.BattleSystemTests
+﻿namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
     using Core.Battle.Abilities;
@@ -6,12 +6,13 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Data.GameData;
     using Microsoft.Extensions.DependencyInjection;
     using Newtonsoft.Json.Linq;
+    using static AugmentCopies;
 
     /// <summary>
     /// Seating an augment names two ids and holds neither, so the fitting rule is only worth as much
     /// as the thing that turns those ids into records. That thing is the augment catalog: a data
     /// participant of Core's own, reading the section that declares the records and the tags of the
-    /// abilities a fit is judged against. These tests hold the seam end to end — the shipped data
+    /// abilities a fit is judged against. These tests hold the seam end to end â€” the shipped data
     /// reaching the catalog through the real loader, the catalog reaching the board through the
     /// container a project composes, and the board refusing what the rule refuses instead of taking
     /// what it is handed.
@@ -73,7 +74,7 @@ namespace LastBreathTest.BattleSystemTests
         public void AnIdNoFileDeclaresIsNotFoundAndCarriesNoTags()
         {
             // Both halves are asked about ids arriving from a save file or a drop, so neither may
-            // throw — but an augment nothing declares must not come back as a blank record either:
+            // throw â€” but an augment nothing declares must not come back as a blank record either:
             // a record declaring nothing is still a record, and the rule would judge it.
             IAbilityAugmentCatalog catalog = ShippedCatalog();
 
@@ -103,8 +104,8 @@ namespace LastBreathTest.BattleSystemTests
         public void TheBoardTheCompositionBuildsJudgesTheAugmentsItIsHanded()
         {
             // The point of the wiring, on shipped ids: the board a project builds refuses a record the
-            // rule refuses. The plain board is the control — the same id, the same slot, and it goes
-            // in — so the refusal is the catalog reaching the board and not the slot being closed.
+            // rule refuses. The plain board is the control â€” the same id, the same slot, and it goes
+            // in â€” so the refusal is the catalog reaching the board and not the slot being closed.
             ServiceProvider container = ProjectComposition();
             LoadInto(container);
             var catalog = container.GetRequiredService<IAbilityAugmentCatalog>();
@@ -112,13 +113,13 @@ namespace LastBreathTest.BattleSystemTests
             IAbilitySocketBoard composed = container.GetRequiredService<IAbilitySocketBoard>();
             composed.Sync([new AbilitySocketPlacement(Slot, ability, tier - 1)]);
 
-            Assert.IsFalse(composed.Install(Slot, augment), $"'{augment}' of tier {tier} went into a tier {tier - 1} slot");
-            Assert.IsFalse(composed.Install(Slot, UnwrittenAugment), "an id nothing declares went in on the strength of its spelling");
+            Assert.IsFalse(composed.Install(Slot, Copy(augment)), $"'{augment}' of tier {tier} went into a tier {tier - 1} slot");
+            Assert.IsFalse(composed.Install(Slot, Copy(UnwrittenAugment)), "an id nothing declares went in on the strength of its spelling");
             Assert.IsTrue(composed.Find(Slot)?.IsEmpty, "the refused augments are sitting in the slot anyway");
 
             var plain = new AbilitySocketBoard();
             plain.Sync([new AbilitySocketPlacement(Slot, ability, tier - 1)]);
-            Assert.IsTrue(plain.Install(Slot, augment),
+            Assert.IsTrue(plain.Install(Slot, Copy(augment)),
                 "a board without a catalog stopped holding what it is handed, so the refusal above says nothing about the wiring");
         }
 
@@ -137,8 +138,8 @@ namespace LastBreathTest.BattleSystemTests
                 new AbilitySocketPlacement(ColdSlot, ColdAbility, 2),
             ]);
 
-            Assert.IsTrue(board.Install(Slot, PoisonAugment), "the augment did not go onto the ability it shares a tag with");
-            Assert.IsFalse(board.Install(ColdSlot, PoisonAugment), "the augment went onto an ability sharing none of its tags");
+            Assert.IsTrue(board.Install(Slot, Copy(PoisonAugment)), "the augment did not go onto the ability it shares a tag with");
+            Assert.IsFalse(board.Install(ColdSlot, Copy(PoisonAugment)), "the augment went onto an ability sharing none of its tags");
         }
 
         /// <summary>What a project registers: the participants Core holds for every composition, and
@@ -180,8 +181,8 @@ namespace LastBreathTest.BattleSystemTests
             return catalog;
         }
 
-        /// <summary>One poison ability, one cold ability, and — beside them rather than inside either
-        /// — one poison augment.</summary>
+        /// <summary>One poison ability, one cold ability, and â€” beside them rather than inside either
+        /// â€” one poison augment.</summary>
         private static string TwoAbilitiesAndOneAugment() =>
             $$"""
               {
@@ -196,7 +197,7 @@ namespace LastBreathTest.BattleSystemTests
               """;
 
         /// <summary>A shipped augment whose tier leaves a lower slot to be refused by, together with
-        /// an ability it belongs on — the record's own, so the refusal under test can only be the
+        /// an ability it belongs on â€” the record's own, so the refusal under test can only be the
         /// tier.</summary>
         private static (string Ability, string Augment, int Tier) AnAugmentAboveTierOne(IAbilityAugmentCatalog catalog)
         {

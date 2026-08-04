@@ -1,4 +1,4 @@
-namespace LastBreathTest.BattleSystemTests
+﻿namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
     using Core.Battle.Abilities;
@@ -15,11 +15,12 @@ namespace LastBreathTest.BattleSystemTests
     using Microsoft.Extensions.DependencyInjection;
     using Moq;
     using Newtonsoft.Json.Linq;
+    using static AugmentCopies;
 
     /// <summary>
     /// An augment slot exists exactly while the node that opened it is taken, and what sits in it is
     /// the only part of the arrangement the save file remembers. The slot is addressed by its own id
-    /// rather than by its tier, so an ability can carry two slots of the same tier — and each saved
+    /// rather than by its tier, so an ability can carry two slots of the same tier â€” and each saved
     /// augment carries the slot it was chosen for, so an id the next build points elsewhere is not
     /// mistaken for the slot it came out of.
     /// </summary>
@@ -40,15 +41,23 @@ namespace LastBreathTest.BattleSystemTests
         private const string Augment = "Augment_Sharpened";
         private const string OtherAugment = "Augment_Ornament";
 
+        /// <summary>Two properties an augment copy carries its own number for. Any names will do —
+        /// the slot and the file keep whatever the copy was minted with, and neither reads them.</summary>
+        private const string Duration = "duration";
+        private const string Chance = "chance";
+
+        /// <summary>The section under test, as the file keys it.</summary>
+        private const string BookSection = "abilityBook";
+
         [TestMethod]
         public void AnEmptySlotTakesAnAugmentAndGivesTheSameOneBack()
         {
             var socket = new AbilitySocket(SocketTwo, DexAbility, tier: 2);
 
             Assert.IsTrue(socket.IsEmpty);
-            Assert.IsTrue(socket.Install(Augment));
+            Assert.IsTrue(socket.Install(Copy(Augment)));
             Assert.IsFalse(socket.IsEmpty);
-            Assert.AreEqual(Augment, socket.Extract());
+            Assert.AreEqual(Augment, socket.Extract()?.AugmentId);
             Assert.IsTrue(socket.IsEmpty, "extraction did not undo the install");
             Assert.IsNull(socket.Extract(), "a free slot handed something out");
         }
@@ -57,10 +66,10 @@ namespace LastBreathTest.BattleSystemTests
         public void AnOccupiedSlotRefusesASecondAugmentInsteadOfSwallowingTheFirst()
         {
             var socket = new AbilitySocket(SocketTwo, DexAbility, tier: 2);
-            socket.Install(Augment);
+            socket.Install(Copy(Augment));
 
-            Assert.IsFalse(socket.Install(OtherAugment));
-            Assert.AreEqual(Augment, socket.Augment, "the occupant was replaced and the old one is gone");
+            Assert.IsFalse(socket.Install(Copy(OtherAugment)));
+            Assert.AreEqual(Augment, socket.Augment?.AugmentId, "the occupant was replaced and the old one is gone");
         }
 
         [TestMethod]
@@ -71,9 +80,9 @@ namespace LastBreathTest.BattleSystemTests
             var board = new AbilitySocketBoard();
             board.Sync([new AbilitySocketPlacement("socket_fourth", DexAbility, Tier: 4)]);
 
-            Assert.IsTrue(board.Install("socket_fourth", Augment));
+            Assert.IsTrue(board.Install("socket_fourth", Copy(Augment)));
             Assert.AreEqual(4, board.SocketsOf(DexAbility).Single().Tier);
-            Assert.AreEqual(Augment, board.Extract("socket_fourth"));
+            Assert.AreEqual(Augment, board.Extract("socket_fourth")?.AugmentId);
         }
 
         [TestMethod]
@@ -111,7 +120,7 @@ namespace LastBreathTest.BattleSystemTests
             IPassiveTreeService tree = NewTree();
             CreateService(tree, board);
             tree.Take(SocketTwo);
-            Assert.IsTrue(board.Install(SocketTwo, Augment), "the node opened no slot, so there is nothing to close");
+            Assert.IsTrue(board.Install(SocketTwo, Copy(Augment)), "the node opened no slot, so there is nothing to close");
 
             Assert.AreEqual(AllocationResult.Success, tree.Refund(SocketTwo));
 
@@ -130,12 +139,12 @@ namespace LastBreathTest.BattleSystemTests
 
             tree.Take(SocketTwo);
             tree.Take(SocketTwoOrnament);
-            Assert.IsTrue(board.Install(SocketTwo, Augment));
-            Assert.IsTrue(board.Install(SocketTwoOrnament, OtherAugment));
+            Assert.IsTrue(board.Install(SocketTwo, Copy(Augment)));
+            Assert.IsTrue(board.Install(SocketTwoOrnament, Copy(OtherAugment)));
 
             CollectionAssert.AreEquivalent(
                 new[] { Augment, OtherAugment },
-                board.SocketsOf(DexAbility).Select(socket => socket.Augment).ToArray(),
+                board.SocketsOf(DexAbility).Select(socket => socket.Augment?.AugmentId).ToArray(),
                 "the second tier-2 augment displaced the first");
         }
 
@@ -164,7 +173,7 @@ namespace LastBreathTest.BattleSystemTests
             CreateService(tree, board);
             tree.Take(DexNode);
             tree.Take(SocketTwo);
-            Assert.IsTrue(board.Install(SocketTwo, Augment), "the respec is handed a board that was already empty");
+            Assert.IsTrue(board.Install(SocketTwo, Copy(Augment)), "the respec is handed a board that was already empty");
             Assert.AreEqual(2, board.Sockets.Count, "the unlock node and the socket node opened a slot each");
 
             tree.Respec();
@@ -179,7 +188,7 @@ namespace LastBreathTest.BattleSystemTests
             var tree = NewTree();
             CreateService(tree, board);
             tree.Take(SocketTwo);
-            Assert.IsTrue(board.Install(SocketTwo, Augment), "the playthrough being left behind never had a slot");
+            Assert.IsTrue(board.Install(SocketTwo, Copy(Augment)), "the playthrough being left behind never had a slot");
 
             tree.ResetSession();
 
@@ -194,7 +203,7 @@ namespace LastBreathTest.BattleSystemTests
             // used to carry, so the slot is rebuilt empty rather than re-labelled around it.
             var board = new AbilitySocketBoard();
             board.Sync([new AbilitySocketPlacement(SocketTwo, DexAbility, Tier: 2)]);
-            board.Install(SocketTwo, Augment);
+            board.Install(SocketTwo, Copy(Augment));
 
             board.Sync([new AbilitySocketPlacement(SocketTwo, DexAbilityTwo, Tier: 2)]);
 
@@ -208,7 +217,7 @@ namespace LastBreathTest.BattleSystemTests
             // The same drift a build apart, on the road it actually travels: the file names the slot by
             // id, and in the build reading it that id belongs to another ability. The entry carries the
             // slot it was chosen for, so the load drops it instead of putting it into the rebuilt slot.
-            SaveFile file = Save([SocketTwo], (SocketTwo, Augment));
+            SaveFile file = Save([SocketTwo], (SocketTwo, Copy(Augment)));
 
             var board = new AbilitySocketBoard();
             IPassiveTreeService tree = NewTree(socketTwoAbility: DexAbilityTwo);
@@ -224,9 +233,9 @@ namespace LastBreathTest.BattleSystemTests
         {
             // A document with no content is what the reader hands out for a file that failed to parse:
             // no node can be found, so no slot opens and nothing can be installed. The file's augments
-            // are held rather than spent — one bad launch costs the player the tree's content, not what
+            // are held rather than spent â€” one bad launch costs the player the tree's content, not what
             // he put into it.
-            SaveFile file = Save([SocketTwo], (SocketTwo, Augment));
+            SaveFile file = Save([SocketTwo], (SocketTwo, Copy(Augment)));
 
             var board = new AbilitySocketBoard();
             IPassiveTreeService unreadable = NewService(new PassiveTreeDocument());
@@ -243,7 +252,7 @@ namespace LastBreathTest.BattleSystemTests
         public void TheFirstAllocationThatOpensNoSlotDropsWhatWasHeldForIt()
         {
             // The holding is a postponement, not a promise. The first allocation the board can read
-            // says the character owns no slot at all — that is the answer the entry was waiting for,
+            // says the character owns no slot at all â€” that is the answer the entry was waiting for,
             // and it is dropped rather than carried into every save that follows.
             var board = new AbilitySocketBoard();
             board.Restore([Occupant(SocketTwo, DexAbility, tier: 2)]);
@@ -258,14 +267,14 @@ namespace LastBreathTest.BattleSystemTests
         public void TheFirstAllocationSeatsWhatWasHeldForTheSlotItOpens()
         {
             // The tree came back: the slot the file named is open again and still the one the augment
-            // was chosen for. What was held goes into it — a load that survived a broken launch must
+            // was chosen for. What was held goes into it â€” a load that survived a broken launch must
             // end with the augment working, not merely with it remembered.
             var board = new AbilitySocketBoard();
             board.Restore([Occupant(SocketTwo, DexAbility, tier: 2)]);
 
             board.Sync([new AbilitySocketPlacement(SocketTwo, DexAbility, Tier: 2)]);
 
-            Assert.AreEqual(Augment, board.Find(SocketTwo)?.Augment,
+            Assert.AreEqual(Augment, board.Find(SocketTwo)?.Augment?.AugmentId,
                 "the slot opened empty and the held augment stayed outside it");
             Assert.AreEqual(1, board.Occupants.Count, "the augment is counted both in the slot and outside it");
         }
@@ -280,7 +289,7 @@ namespace LastBreathTest.BattleSystemTests
             board.Restore([Occupant(SocketTwo, DexAbility, tier: 2)]);
             board.Sync([new AbilitySocketPlacement(SocketTwo, DexAbilityTwo, Tier: 2)]);
 
-            Assert.IsTrue(board.Install(SocketTwo, OtherAugment), "the rebuilt slot would not take an augment at all");
+            Assert.IsTrue(board.Install(SocketTwo, Copy(OtherAugment)), "the rebuilt slot would not take an augment at all");
 
             JToken written = new AbilityBookSaveParticipant(AccessorFor(NewBook()), board).Capture();
             Assert.AreEqual(OtherAugment, written["sockets"]?[SocketTwo]?["augment"]?.Value<string>(),
@@ -291,11 +300,11 @@ namespace LastBreathTest.BattleSystemTests
         public void ANewPlaythroughDoesNotInheritAugmentsHeldForATreeThatNeverLoaded()
         {
             // The one road the fix above cannot cover: the document never parsed, so no allocation is
-            // ever read and nothing judges the held entries. Starting a new game is the answer — the
+            // ever read and nothing judges the held entries. Starting a new game is the answer â€” the
             // board is a singleton, and the previous playthrough's augment would otherwise be written
             // into the first save of the next one. No stand-in for the wiring: the reset has to reach
             // the board through the container the game builds.
-            SaveFile file = Save([SocketTwo], (SocketTwo, Augment));
+            SaveFile file = Save([SocketTwo], (SocketTwo, Copy(Augment)));
 
             var board = new AbilitySocketBoard();
             IPassiveTreeService unreadable = NewService(new PassiveTreeDocument());
@@ -311,15 +320,15 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void TwoAugmentsOfOneTierSurviveASaveAndLoad()
         {
-            SaveFile file = Save([DexNode, SocketTwo, SocketTwoOrnament], (SocketTwo, Augment), (SocketTwoOrnament, OtherAugment));
+            SaveFile file = Save([DexNode, SocketTwo, SocketTwoOrnament], (SocketTwo, Copy(Augment)), (SocketTwoOrnament, Copy(OtherAugment)));
 
             var targetBoard = new AbilitySocketBoard();
             IPassiveTreeService targetTree = NewTree();
             CreateService(targetTree, targetBoard);
             ManagerFor(targetTree, targetBoard).Restore(file);
 
-            Assert.AreEqual(Augment, targetBoard.Find(SocketTwo)?.Augment);
-            Assert.AreEqual(OtherAugment, targetBoard.Find(SocketTwoOrnament)?.Augment);
+            Assert.AreEqual(Augment, targetBoard.Find(SocketTwo)?.Augment?.AugmentId);
+            Assert.AreEqual(OtherAugment, targetBoard.Find(SocketTwoOrnament)?.Augment?.AugmentId);
         }
 
         [TestMethod]
@@ -332,8 +341,9 @@ namespace LastBreathTest.BattleSystemTests
             CreateService(tree, board);
             var data = new AbilityBookSaveData { CurrentStance = Stance.Dexterity };
             data.Sockets[SocketTwo] = new SocketSaveData { Augment = Augment, Ability = DexAbility, Tier = 2 };
+            var participant = new AbilityBookSaveParticipant(AccessorFor(NewBook()), board);
 
-            new AbilityBookSaveParticipant(AccessorFor(NewBook()), board).Restore(JToken.FromObject(data), savedVersion: 3);
+            participant.Restore(JToken.FromObject(data), participant.Version);
 
             Assert.AreEqual(0, board.Sockets.Count);
             Assert.IsNull(board.Find(SocketTwo));
@@ -346,7 +356,7 @@ namespace LastBreathTest.BattleSystemTests
             // not leave the augments of the playthrough before sitting in the slots.
             var board = new AbilitySocketBoard();
             board.Sync([new AbilitySocketPlacement(SocketTwo, DexAbility, Tier: 2)]);
-            board.Install(SocketTwo, Augment);
+            board.Install(SocketTwo, Copy(Augment));
 
             new AbilityBookSaveParticipant(AccessorFor(NewBook()), board).RestoreWithoutSection();
 
@@ -354,34 +364,62 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void AVersionTwoSectionRestoresWithEmptySlots()
+        public void ACopyKeepsTheNumbersItRolledAcrossASaveAndLoad()
         {
-            // Every file written before this build names no socket at all; reading one must leave the
-            // slots empty rather than fail the section.
+            // The whole point of the section moving version: an augment is a copy with numbers of its
+            // own, and nothing in the game can roll the same ones twice. A load that brought the id
+            // back and left the numbers behind would hand the player a different augment than the one
+            // he put in the slot — and one he cannot tell apart from it until he reads the tooltip.
+            AugmentInstance rolled = Copy(Augment, (Duration, 4f), (Chance, 0.185f));
+            SaveFile file = Save([DexNode, SocketTwo], (SocketTwo, rolled));
+
             var board = new AbilitySocketBoard();
-            board.Sync([new AbilitySocketPlacement(SocketTwo, DexAbility, Tier: 2)]);
-            board.Install(SocketTwo, Augment);
-            var section = JToken.FromObject(new AbilityBookSaveData { CurrentStance = Stance.Dexterity });
+            IPassiveTreeService tree = NewTree();
+            CreateService(tree, board);
+            ManagerFor(tree, board).Restore(file);
 
-            new AbilityBookSaveParticipant(AccessorFor(NewBook()), board).Restore(section, savedVersion: 2);
-
-            Assert.IsTrue(board.Find(SocketTwo)?.IsEmpty == true);
+            AugmentInstance? restored = board.Find(SocketTwo)?.Augment;
+            Assert.AreEqual(Augment, restored?.AugmentId, "the slot came back empty");
+            Assert.AreEqual(4f, restored?.Values[Duration], "the copy came back at another number");
+            Assert.AreEqual(0.185f, restored?.Values[Chance], "the copy came back at another number");
         }
 
         [TestMethod]
-        public void TheSectionDeclaresTheVersionThatCarriesSockets()
+        public void AFileWrittenBeforeTheCopiesIsRefusedWholeAndLeavesTheOtherSectionsAlone()
         {
-            Assert.AreEqual(3, new AbilityBookSaveParticipant(AccessorFor(NewBook())).Version);
+            // A version 3 entry names a record and no copy of it. Finishing the read would mean either
+            // inventing numbers the player never rolled or quietly handing him the record's bases, so
+            // the section is refused instead — and refused by itself, without an exception: the rest of
+            // the file is a playthrough this build reads perfectly well, and the allocation beside the
+            // book is what proves it landed.
+            SaveFile file = Save([DexNode, SocketTwo], (SocketTwo, Copy(Augment)));
+            file.Sections[BookSection] = new SaveSection { Version = 3, Data = file.Sections[BookSection].Data };
+
+            var board = new AbilitySocketBoard();
+            IPassiveTreeService tree = NewTree();
+            CreateService(tree, board);
+            ManagerFor(tree, board).Restore(file);
+
+            Assert.IsTrue(board.Find(SocketTwo)?.IsEmpty == true, "a slot came back filled out of a file that carries no copies");
+            Assert.AreEqual(0, board.Occupants.Count, "the refused entry is being held outside the slots");
+            CollectionAssert.Contains(tree.TakenNodes.ToArray(), SocketTwo,
+                "the refused book took the allocation down with it");
+        }
+
+        [TestMethod]
+        public void TheSectionDeclaresTheVersionThatCarriesTheRolledNumbers()
+        {
+            Assert.AreEqual(4, new AbilityBookSaveParticipant(AccessorFor(NewBook())).Version);
         }
 
         /// <summary>A file holding an allocation and the augments installed into the slots it opened.</summary>
-        private static SaveFile Save(string[] taken, params (string Socket, string Augment)[] installed)
+        private static SaveFile Save(string[] taken, params (string Socket, AugmentInstance Augment)[] installed)
         {
             var board = new AbilitySocketBoard();
             IPassiveTreeService tree = NewTree();
             CreateService(tree, board);
             foreach (string nodeId in taken) tree.Take(nodeId);
-            foreach ((string socket, string augment) in installed)
+            foreach ((string socket, AugmentInstance augment) in installed)
                 Assert.IsTrue(board.Install(socket, augment), $"the fixture could not fill {socket}");
 
             return ManagerFor(tree, board).Capture(new SaveMetadata());
@@ -389,7 +427,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>One saved augment together with the slot it was written under.</summary>
         private static AbilitySocketOccupant Occupant(string socketId, string abilityId, int tier) =>
-            new(new AbilitySocketPlacement(socketId, abilityId, tier), Augment);
+            new(new AbilitySocketPlacement(socketId, abilityId, tier), Copy(Augment));
 
         /// <summary>The reset stack the game builds, holding nothing but the board.</summary>
         private static ISessionResetService NewSessionOver(IAbilitySocketBoard board)

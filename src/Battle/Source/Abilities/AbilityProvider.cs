@@ -82,9 +82,26 @@
                 augment,
                 []) == AugmentFitResult.Fits;
 
-        /// <summary>The upgrade an augment record installs, built from that record alone. Null for an
-        /// id neither half of the registry answers — the record parses and is offered, and this is
-        /// where that silence is reported.</summary>
+        /// <summary>
+        /// The upgrade one COPY of an augment installs. The copy's numbers go in ahead of the record's
+        /// own, so the behaviour installed and the description printed are built from the same
+        /// dictionary: a player reading a tooltip of the augment in his slot reads what that copy
+        /// rolled, and not the average the record declares.
+        /// Null for a copy of a record the catalog does not hold — nothing says what to build.
+        /// </summary>
+        public IAbilityUpgrade? CreateUpgrade(AugmentInstance instance)
+        {
+            AbilityUpgradeData? record = augments.Find(instance.AugmentId);
+            if (record != null) return CreateUpgrade(instance.Applied(record));
+
+            Tracker.TrackNotFound($"Augment record '{instance.AugmentId}'", this);
+            return null;
+        }
+
+        /// <summary>The upgrade an augment record installs, built from that record alone — the augment
+        /// as it is offered, before any copy of it is minted. Null for an id neither half of the
+        /// registry answers: the record parses and is offered, and this is where that silence is
+        /// reported.</summary>
         public IAbilityUpgrade? CreateUpgrade(AbilityUpgradeData data)
         {
             IAbilityUpgrade? upgrade = Build(data);

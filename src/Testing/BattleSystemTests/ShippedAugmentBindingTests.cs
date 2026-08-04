@@ -1,10 +1,11 @@
-namespace LastBreathTest.BattleSystemTests
+﻿namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source.Abilities;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Data.GameData;
     using Newtonsoft.Json.Linq;
+    using static AugmentCopies;
 
     /// <summary>
     /// What the shipped records say about where they belong, put to the rule that reads them. The
@@ -12,7 +13,7 @@ namespace LastBreathTest.BattleSystemTests
     /// ability names that ability, an augment working through the contract every ability honours
     /// claims the whole book, and everything else says neither yet. Those three readings are only
     /// worth what the seating does with them, so the walks below take the shipped file down the loader
-    /// the game uses and ask the real board — every binding seats where it was written and nowhere
+    /// the game uses and ask the real board â€” every binding seats where it was written and nowhere
     /// else, every claim on the book seats where no tag would have carried it, and a record that has
     /// said nothing so far is still refused, which is what keeps the filling from having quietly made
     /// the whole registry fit everywhere.
@@ -29,14 +30,14 @@ namespace LastBreathTest.BattleSystemTests
         /// (<c>Docs/UpgradeRegistryTriage.md</c>) counted them: 58 reaching into the members of one
         /// ability class, and 25 more that look general and are inert or throw anywhere else. The
         /// number is held so that bindings cannot go missing in a bulk edit the way they were missing
-        /// before — the failure of a lost binding is an augment silently offered to the whole family.</summary>
+        /// before â€” the failure of a lost binding is an augment silently offered to the whole family.</summary>
         private const int BoundRecords = 83;
 
-        /// <summary>How many records claim every ability there is — cost, cooldown and the other
+        /// <summary>How many records claim every ability there is â€” cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
         /// with more at stake: universality is the widest reach in the system. Four of them came out
-        /// of the collapse of the base-contract families — the plain cost cut, the plain cooldown cut,
-        /// the cooldown bought with a higher price and the price paid in health — one record each for
+        /// of the collapse of the base-contract families â€” the plain cost cut, the plain cooldown cut,
+        /// the cooldown bought with a higher price and the price paid in health â€” one record each for
         /// the whole book.</summary>
         private const int UniversalRecords = 11;
 
@@ -61,7 +62,7 @@ namespace LastBreathTest.BattleSystemTests
         public void EveryBoundRecordNamesAnAbilityTheBookDeclares()
         {
             // A binding used to be checked against the ability whose block held the record; the
-            // records stand on their own now, so the name is all there is — and a name the book does
+            // records stand on their own now, so the name is all there is â€” and a name the book does
             // not carry fails loudly nowhere: the augment simply never fits any slot in the game.
             (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             var abilities = book.KnownAbilityIds.ToHashSet(StringComparer.Ordinal);
@@ -93,7 +94,7 @@ namespace LastBreathTest.BattleSystemTests
 
                 foreach (string ability in abilities)
                 {
-                    bool seated = board.Install(SocketOf(ability), id);
+                    bool seated = board.Install(SocketOf(ability), Copy(id));
 
                     if (string.Equals(ability, record.AbilityId, StringComparison.Ordinal))
                         Assert.IsTrue(seated, $"'{id}' stayed out of a tier {record.Tier} slot of '{ability}', the ability its own record names");
@@ -126,7 +127,7 @@ namespace LastBreathTest.BattleSystemTests
 
                 IAbilitySocketBoard board = BoardOver(catalog, abilities, record.Tier);
                 foreach (string stranger in strangers)
-                    Assert.IsTrue(board.Install(SocketOf(stranger), id),
+                    Assert.IsTrue(board.Install(SocketOf(stranger), Copy(id)),
                         $"'{id}' claims every ability and stayed out of a tier {record.Tier} slot of '{stranger}'");
 
                 universal++;
@@ -151,7 +152,7 @@ namespace LastBreathTest.BattleSystemTests
                 IAbilitySocketBoard board = BoardOver(catalog, abilities, record.Tier);
 
                 foreach (string stranger in abilities.Where(ability => !AbilityTags.SharesAny(record.Tags, catalog.TagsOf(ability))))
-                    Assert.IsFalse(board.Install(SocketOf(stranger), id),
+                    Assert.IsFalse(board.Install(SocketOf(stranger), Copy(id)),
                         $"'{id}' names no ability, claims no book and shares no tag with '{stranger}', and went in anyway");
 
                 silent++;

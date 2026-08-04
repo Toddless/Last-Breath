@@ -39,8 +39,9 @@ namespace LastBreathTest.BattleSystemTests
             var moved = FakeAbility("Ability_A");
             targetBook.Learn(Stance.Dexterity, moved);
             targetBook.Equip(Stance.Dexterity, moved.InstanceId, 3);
+            var participant = new AbilityBookSaveParticipant(AccessorFor(targetBook));
 
-            new AbilityBookSaveParticipant(AccessorFor(targetBook)).Restore(captured, 1);
+            participant.Restore(captured, participant.Version);
 
             Assert.AreEqual("Ability_A", targetBook.GetSlotLayout(Stance.Dexterity)[0]?.Id);
             Assert.IsNull(targetBook.GetSlotLayout(Stance.Dexterity)[3]);

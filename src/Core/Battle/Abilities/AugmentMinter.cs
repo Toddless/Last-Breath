@@ -1,0 +1,49 @@
+namespace Core.Battle.Abilities
+{
+    using System.Collections.Generic;
+    using Data.AbilityData;
+    using Entity.Components;
+
+    /// <summary>
+    /// Where an augment copy is born. The record says what the augment is and what its numbers are
+    /// worth on average; the copy is one draw around those numbers, taken here and kept for good.
+    ///
+    /// The draw goes through the project's own generator interface. Never Godot's class directly: an
+    /// engine generator is a native object, and a composition built outside the runtime takes the
+    /// process down the moment one is constructed.
+    /// </summary>
+    /// <param name="augments">What an id means — the records the numbers are rolled around.</param>
+    /// <param name="rules">Where the spread comes from. Read at every mint rather than once, so a
+    /// reloaded rules file is worth something without rebuilding the minter.</param>
+    public sealed class AugmentMinter(
+        IAbilityAugmentCatalog augments,
+        ICombatRulesProvider rules,
+        IRandomNumberGenerator rnd)
+    {
+        /// <summary>A copy of the augment named. Null for an id no record declares — there is nothing
+        /// to roll around, and a copy with no numbers would be an augment that does nothing.</summary>
+        public AugmentInstance? Mint(string augmentId)
+        {
+            AbilityUpgradeData? record = augments.Find(augmentId);
+            if (record != null) return Mint(record);
+
+            Tracker.TrackNotFound($"Augment record '{augmentId}'", this);
+            return null;
+        }
+
+        /// <summary>A copy of a record already in hand.</summary>
+        public AugmentInstance Mint(AbilityUpgradeData record) => new(record.Id, Rolled(record));
+
+        /// <summary>Every number the record declares, drawn once each.</summary>
+        private Dictionary<string, float> Rolled(AbilityUpgradeData record)
+        {
+            AugmentValueRules values = rules.AugmentValues;
+            Dictionary<string, float> rolled = new(record.UpgradeProperties.Count);
+
+            foreach ((string property, float declared) in record.UpgradeProperties)
+                rolled[property] = values.Roll(declared, rnd);
+
+            return rolled;
+        }
+    }
+}

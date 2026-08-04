@@ -11,5 +11,8 @@
     "exhaustion": {
         "costIncreasePerStack": 0.25,
         "decayPerTurn": 3
+    },
+    "abilityAugments": {
+        "valueSpread": 0.25
     }
 }

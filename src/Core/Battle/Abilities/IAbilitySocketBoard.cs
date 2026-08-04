@@ -34,10 +34,11 @@ namespace Core.Battle.Abilities
         /// learns nothing happened instead of losing what was in. A refusal changes nothing at all:
         /// an augment that does not belong in a slot must come back to whoever offered it, not
         /// disappear into one where it would sit inert.</summary>
-        bool Install(string socketId, string augmentId);
+        bool Install(string socketId, AugmentInstance augment);
 
-        /// <summary>Takes the augment out and hands it back; null when the socket is unknown or free.</summary>
-        string? Extract(string socketId);
+        /// <summary>Takes the augment out and hands it back — the copy that went in, with the numbers
+        /// it was minted with. Null when the socket is unknown or free.</summary>
+        AugmentInstance? Extract(string socketId);
 
         /// <summary>
         /// Makes the board hold exactly these sockets. A placement that was already open keeps its

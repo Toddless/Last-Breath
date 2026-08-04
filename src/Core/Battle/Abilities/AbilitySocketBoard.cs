@@ -40,10 +40,10 @@ namespace Core.Battle.Abilities
 
         public AbilitySocket? Find(string socketId) => _sockets.GetValueOrDefault(socketId);
 
-        public bool Install(string socketId, string augmentId) =>
-            Find(socketId) is { } socket && Accepts(socket, augmentId) && socket.Install(augmentId);
+        public bool Install(string socketId, AugmentInstance augment) =>
+            Find(socketId) is { } socket && Accepts(socket, augment) && socket.Install(augment);
 
-        public string? Extract(string socketId) => Find(socketId)?.Extract();
+        public AugmentInstance? Extract(string socketId) => Find(socketId)?.Extract();
 
         public void Sync(IReadOnlyCollection<AbilitySocketPlacement> open)
         {
@@ -97,15 +97,17 @@ namespace Core.Battle.Abilities
         }
 
         /// <summary>Whether the slot takes that augment. The rule is not written here — the board only
-        /// turns the two ids into what <see cref="AugmentFit"/> judges: the augment's record and the
-        /// tags of the slot's ability. An id the catalog does not hold is refused; there is no record
-        /// to measure, and seating one on the strength of its spelling is how an augment ends up in a
-        /// slot nothing ever agreed to.</summary>
-        private bool Accepts(AbilitySocket socket, string augmentId)
+        /// turns what it holds into what <see cref="AugmentFit"/> judges: the augment's record and the
+        /// tags of the slot's ability. The RECORD is what is measured and never the copy's own numbers:
+        /// where an augment belongs is a property of the augment, and a lucky roll does not open a slot
+        /// an unlucky one is refused. An id the catalog does not hold is refused; there is no record to
+        /// measure, and seating one on the strength of its spelling is how an augment ends up in a slot
+        /// nothing ever agreed to.</summary>
+        private bool Accepts(AbilitySocket socket, AugmentInstance occupant)
         {
             if (augments is null) return true;
 
-            AbilityUpgradeData? augment = augments.Find(augmentId);
+            AbilityUpgradeData? augment = augments.Find(occupant.AugmentId);
             return augment is not null
                    && AugmentFit.Check(
                        socket.Placement,
@@ -125,7 +127,7 @@ namespace Core.Battle.Abilities
             {
                 if (socket.Augment is not { } installed) continue;
 
-                string? group = augments?.Find(installed)?.ExclusionGroup;
+                string? group = augments?.Find(installed.AugmentId)?.ExclusionGroup;
                 if (!string.IsNullOrWhiteSpace(group)) worn.Add(group);
             }
 

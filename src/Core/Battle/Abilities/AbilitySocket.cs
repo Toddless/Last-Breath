@@ -5,9 +5,11 @@ namespace Core.Battle.Abilities
     /// that opened it — and not the tier, so two nodes of the same tier pointing at the same ability
     /// are two sockets rather than one that overwrites itself.
     ///
-    /// The socket owns the fact that something is in it, not the augment's own data: it holds the
-    /// stable id of the occupant and nothing else. What an augment is made of belongs to whoever
-    /// mints augments.
+    /// The socket owns the fact that something is in it, not the rules the occupant was made under:
+    /// it holds the copy that went in, numbers and all. Which copy that is matters — two copies of one
+    /// record are worth different amounts — so the slot keeps the one it was given rather than an id
+    /// standing for any of them. What an augment is made of belongs to whoever mints augments
+    /// (<see cref="AugmentMinter"/>).
     /// </summary>
     /// <param name="socketId">Identity, unique across the tree (the node's own id).</param>
     /// <param name="abilityId">The ability the slot belongs to.</param>
@@ -26,8 +28,8 @@ namespace Core.Battle.Abilities
         /// what was in the old one was not chosen for this one.</summary>
         public AbilitySocketPlacement Placement => new(SocketId, AbilityId, Tier);
 
-        /// <summary>Stable id of the augment occupying the socket; null while it is free.</summary>
-        public string? Augment { get; private set; }
+        /// <summary>The augment copy occupying the socket; null while it is free.</summary>
+        public AugmentInstance? Augment { get; private set; }
 
         public bool IsEmpty => Augment is null;
 
@@ -37,19 +39,20 @@ namespace Core.Battle.Abilities
         /// <see cref="AugmentFit"/>, and the board is what puts the question — everything the rule
         /// needs (the augment's record, the ability's tags, what its other slots wear) lives above a
         /// single socket.</summary>
-        public bool Install(string augmentId)
+        public bool Install(AugmentInstance augment)
         {
-            if (!IsEmpty || string.IsNullOrWhiteSpace(augmentId)) return false;
+            if (!IsEmpty || string.IsNullOrWhiteSpace(augment?.AugmentId)) return false;
 
-            Augment = augmentId;
+            Augment = augment;
             return true;
         }
 
         /// <summary>Empties the socket and hands back what came out — null when it was already free.
-        /// The mirror of <see cref="Install"/>: what went in is what comes out.</summary>
-        public string? Extract()
+        /// The mirror of <see cref="Install"/>: the copy that went in is the copy that comes out, with
+        /// the numbers it was minted with.</summary>
+        public AugmentInstance? Extract()
         {
-            string? augment = Augment;
+            AugmentInstance? augment = Augment;
             Augment = null;
             return augment;
         }

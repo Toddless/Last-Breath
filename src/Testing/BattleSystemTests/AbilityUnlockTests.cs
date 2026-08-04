@@ -307,10 +307,12 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void AVersionOneSectionLearnsNothingOnItsOwn()
+        public void ALearnedListInTheSectionLearnsNothingOnItsOwn()
         {
-            // Every save written before this build carries a learned list. Restoring it would put an
-            // ability into the book of a character who owns no node granting it.
+            // The learned list is what saves written before this build carried, and it is unread: an
+            // ability is the allocation's to give, and a file cannot put one into the book of a
+            // character who owns no node granting it. Written at the version the build reads, so the
+            // claim is the list being ignored rather than the file being refused for its age.
             var book = NewBook();
             var accessor = new PlayerAccessor();
             accessor.Set(NewPlayer(book));
@@ -318,8 +320,9 @@ namespace LastBreathTest.BattleSystemTests
             {
                 Stances = { [Stance.Dexterity.ToString()] = new StanceBookSaveData { Learned = [DexAbility] } }
             });
+            var participant = new AbilityBookSaveParticipant(accessor);
 
-            new AbilityBookSaveParticipant(accessor).Restore(section, savedVersion: 1);
+            participant.Restore(section, participant.Version);
 
             Assert.AreEqual(0, book.AllAbilities.Count);
         }

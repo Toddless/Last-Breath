@@ -1,4 +1,4 @@
-namespace LastBreathTest.BattleSystemTests
+﻿namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source.Abilities;
     using Battle.Source.Abilities.HeadButt;
@@ -7,18 +7,19 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Data.GameData;
     using Core.Enums;
     using Newtonsoft.Json.Linq;
+    using static AugmentCopies;
 
     /// <summary>
     /// The four augments that took the place of forty-three. All of them work through the base contract
-    /// every ability honours, so all of them are written once — and the three that move a number state
+    /// every ability honours, so all of them are written once â€” and the three that move a number state
     /// what they move as a share of it rather than as a number of their own: they go on every ability
-    /// there is — prices running from nothing at all to five hundred, waits from no turns to nine — and
+    /// there is â€” prices running from nothing at all to five hundred, waits from no turns to nine â€” and
     /// one flat figure would be a near-free cast at the cheap end and nothing worth choosing at the
     /// expensive one.
     ///
     /// Two things a share has to answer for, and both are walked below. A share of a small base is a
     /// fraction of a turn, and turns are whole: a cut that rounds down to zero would leave an augment
-    /// chosen, worn, paid for and doing nothing at all — the silent refusal this system has already
+    /// chosen, worn, paid for and doing nothing at all â€” the silent refusal this system has already
     /// been bitten by once on effect durations. And a share is a share OF something: measured against
     /// whatever the parameter happens to carry when the augment goes in, the same build would be worth
     /// one price assembled in one order and another price in the other.
@@ -34,7 +35,7 @@ namespace LastBreathTest.BattleSystemTests
         private const string SurchargeAugment = "Augment_Reduce_Cooldown_Add_Cost";
 
         /// <summary>The record that took the place of two: the price paid in health. It moves no
-        /// number at all — the cost type is categorical — so it appears here only where the collapse
+        /// number at all â€” the cost type is categorical â€” so it appears here only where the collapse
         /// is what is being walked.</summary>
         private const string HealthCostAugment = "Augment_Cost_Type_Health";
 
@@ -44,15 +45,15 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>The augment of another tier the cost share has to share a parameter with: Head
         /// Butt's longer stun, bought with fifty more mana. The shipped record, built the way the
-        /// registry builds it — two flat moves on two parameters.</summary>
+        /// registry builds it â€” two flat moves on two parameters.</summary>
         private const string CostSurcharge = "Augment_Extend_Stun_Add_Cost";
 
-        /// <summary>The same on the other parameter — Armageddon reaching every target and waiting three
+        /// <summary>The same on the other parameter â€” Armageddon reaching every target and waiting three
         /// turns longer for it. Stood in for by an upgrade of the same shape (a flat addition to the
         /// wait), because Armageddon itself has nothing to do with the question.</summary>
         private const string CooldownSurcharge = "Ability_Arm_Augment_All_Targets";
 
-        /// <summary>How many augments the game holds after the collapse — the same number in the data
+        /// <summary>How many augments the game holds after the collapse â€” the same number in the data
         /// and in the registry, because one half without the other is either an offer nothing builds
         /// or code nothing can reach.</summary>
         private const int ShippedAugmentCount = 134;
@@ -135,7 +136,7 @@ namespace LastBreathTest.BattleSystemTests
             // The share is a share of the ability's price, and an augment of another tier charging fifty
             // more mana for a longer stun does not change what the ability costs to begin with. Read off
             // the number the parameter happens to carry instead, the same two augments would be worth
-            // one price picked in one order and another price picked in the other — and the build would
+            // one price picked in one order and another price picked in the other â€” and the build would
             // change again the next time the tier-one slot was emptied and refilled.
             Assert.AreEqual(155, PriceOf(surchargeFirst: true), "the share was measured against a price the surcharge had already raised");
             Assert.AreEqual(155, PriceOf(surchargeFirst: false), "the same two augments came to another price in the other order");
@@ -158,7 +159,7 @@ namespace LastBreathTest.BattleSystemTests
             // One record moving two parameters at once, with an augment of another tier standing on
             // each of them: fifty more mana for a longer stun, three more turns of waiting. Both
             // shares are the ability's own, so what the surcharge augment does is settled before
-            // either of the others is read — and stays settled when the slots are filled backwards.
+            // either of the others is read â€” and stays settled when the slots are filled backwards.
             Assert.AreEqual((260, 8f), BothOf(surchargesFirst: true), "a share was measured against a number another augment had already moved");
             Assert.AreEqual((260, 8f), BothOf(surchargesFirst: false), "the same three augments came to another build in the other order");
         }
@@ -168,7 +169,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             // The tier slot holds one augment, and swapping it is a click away in the augment window.
             // A cut fixed from the number found at the moment of wearing deepens every time the slot is
-            // refilled over another augment — and says nothing while it does.
+            // refilled over another augment â€” and says nothing while it does.
             var ability = BuildWithSurcharge(surchargeFirst: false);
             int assembled = ability.CostValue;
 
@@ -197,7 +198,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             // The same walk for the second share on the same parameter. The surcharge augment is paid
             // for in mana whatever it gives back, so a wait it rounds down to nothing is worse than
-            // inert — the player is charged more for a cast that comes round no sooner.
+            // inert â€” the player is charged more for a cast that comes round no sooner.
             foreach ((int wait, _, int cut) in s_cooldownTable)
             {
                 var ability = AbilityWith(cooldown: wait);
@@ -280,7 +281,7 @@ namespace LastBreathTest.BattleSystemTests
                 Assert.IsTrue(strangers.Length > 0, $"'{id}' shares a tag with every shipped ability, so the claim on strangers has nothing to be proved on");
 
                 foreach (string stranger in strangers)
-                    Assert.IsTrue(board.Install(Socket(stranger), id), $"'{id}' claims every ability and stayed out of a slot of '{stranger}'");
+                    Assert.IsTrue(board.Install(Socket(stranger), Copy(id)), $"'{id}' claims every ability and stayed out of a slot of '{stranger}'");
             }
         }
 
@@ -338,7 +339,7 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>Head Butt wearing the cost share in its tier-one slot and the stun surcharge in its
-        /// tier-two one, chosen in the order asked for — the two are seated through the ability's own
+        /// tier-two one, chosen in the order asked for â€” the two are seated through the ability's own
         /// selection, because that is where a slot is emptied and refilled.</summary>
         private static HeadButt BuildWithSurcharge(bool surchargeFirst)
         {
@@ -356,7 +357,7 @@ namespace LastBreathTest.BattleSystemTests
             return ability;
         }
 
-        /// <summary>A stand-in ability carrying the base numbers under test. Any ability would do —
+        /// <summary>A stand-in ability carrying the base numbers under test. Any ability would do â€”
         /// the augments decorate keys every ability registers as part of the base contract.</summary>
         private static HeadButt AbilityWith(int cost = 100, int cooldown = 5) => new(new AbilityBaseData
         {
@@ -368,7 +369,7 @@ namespace LastBreathTest.BattleSystemTests
         });
 
         /// <summary>The distinct cooldowns the shipped abilities declare, read off the files. Casts
-        /// that wait for nothing are left out — they are answered by their own walk.</summary>
+        /// that wait for nothing are left out â€” they are answered by their own walk.</summary>
         private static List<int> ShippedCooldowns()
         {
             List<int> waits = [];

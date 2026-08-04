@@ -1,4 +1,4 @@
-namespace LastBreathTest.BattleSystemTests
+﻿namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
     using Core.Battle.Abilities;
@@ -71,14 +71,15 @@ namespace LastBreathTest.BattleSystemTests
 
             var captured = new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(sourceBook))).Capture();
 
-            // Target: the abilities are already in the book — the passive tree hands them over on its
+            // Target: the abilities are already in the book â€” the passive tree hands them over on its
             // own section, which restores first. This one only arranges what is there.
             var targetBook = NewBook();
             var restoredAbilities = new Dictionary<string, Mock<IAbility>>();
             foreach ((string id, Stance stance) in new[] { ("Ability_A", Stance.Dexterity), ("Ability_B", Stance.Dexterity), ("Ability_C", Stance.Strength) })
                 targetBook.Learn(stance, (restoredAbilities[id] = FakeAbility(id)).Object);
 
-            new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(targetBook))).Restore(captured, 1);
+            var participant = new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(targetBook)));
+            participant.Restore(captured, participant.Version);
 
             var layout = targetBook.GetSlotLayout(Stance.Dexterity);
             Assert.IsNull(layout[0]);
@@ -100,7 +101,8 @@ namespace LastBreathTest.BattleSystemTests
 
             var targetBook = NewBook();
 
-            new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(targetBook))).Restore(captured, 1);
+            var participant = new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(targetBook)));
+            participant.Restore(captured, participant.Version);
 
             Assert.AreEqual(0, targetBook.GetAbilities(Stance.Dexterity).Count);
             Assert.IsNull(targetBook.GetSlotLayout(Stance.Dexterity)[0]);

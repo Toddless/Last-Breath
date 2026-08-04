@@ -25,9 +25,13 @@ namespace Core.Save.Participants
     /// taken but which the file never placed stays out of the slots — the player's arrangement is his
     /// own, and a load must not rearrange it.
     ///
-    /// Version 2 dropped the learned list; version 3 added the sockets. An older file still restores:
-    /// its learned list is unread and its missing sockets read as none, which empties every slot the
-    /// allocation opened.
+    /// Version 2 dropped the learned list, version 3 added the sockets, and version 4 made each of them
+    /// carry the numbers its augment rolled. Nothing older is read: a version 3 entry names a record and
+    /// no copy of it, and the only ways to finish reading one are to invent numbers the player never
+    /// rolled or to hand him the record's bases — one is a different augment, the other is the tooltip
+    /// lying about what is in the slot. An older file is reported and the section is refused whole
+    /// (<see cref="RestoreWithoutSection"/>), which is the one outcome that leaves the rest of the save
+    /// alone: the file is a playthrough this build cannot dress, not a load that failed.
     /// </summary>
     /// <param name="sockets">Optional: a project composed without the battle module has no board,
     /// and the section is then written without its socket entries.</param>
@@ -35,7 +39,7 @@ namespace Core.Save.Participants
         : ISaveParticipant
     {
         public string SectionId => "abilityBook";
-        public int Version => 3;
+        public int Version => 4;
         public int RestoreOrder => Save.RestoreOrder.Abilities;
 
         public JToken Capture()
@@ -59,6 +63,12 @@ namespace Core.Save.Participants
 
         public void Restore(JToken data, int savedVersion)
         {
+            if (savedVersion < Version)
+            {
+                Refuse(savedVersion);
+                return;
+            }
+
             var book = playerAccessor.Player?.AbilityBook;
             var saved = data.ToObject<AbilityBookSaveData>();
             if (saved == null) return;
@@ -84,15 +94,35 @@ namespace Core.Save.Participants
         /// </summary>
         public void RestoreWithoutSection() => sockets?.Restore([]);
 
+        /// <summary>
+        /// Says out loud that the file carries a book this build cannot read, and lands on the state a
+        /// file without the section leaves — the fresh-game one. Said rather than thrown: an exception
+        /// would reach the same place through the manager's guard, but a version this build simply
+        /// stopped supporting is a decision and not a failure, and reporting it here keeps the reason
+        /// readable instead of turning it into a stack trace. The refusal is the whole section and
+        /// nothing besides it: every other participant reads its own section untouched.
+        /// </summary>
+        private void Refuse(int savedVersion)
+        {
+            Tracker.TrackError(
+                $"Save section '{SectionId}' was written at version {savedVersion}, which carries augment ids without " +
+                $"the numbers each copy rolled. Version {Version} is the oldest that can be read; the section is dropped.",
+                this);
+
+            RestoreWithoutSection();
+        }
+
         /// <summary>Writes the occupied slots only. An empty one carries nothing to remember, and the
         /// slot itself comes back with the node that opened it. Each augment goes down with the slot
-        /// it was chosen for, so the load can tell that slot from another one wearing the same id.</summary>
+        /// it was chosen for, so the load can tell that slot from another one wearing the same id —
+        /// and with the numbers this copy rolled, which nothing else in the game can say again.</summary>
         private void CaptureSockets(AbilityBookSaveData data)
         {
             foreach (AbilitySocketOccupant occupant in sockets?.Occupants ?? [])
                 data.Sockets[occupant.Slot.SocketId] = new SocketSaveData
                 {
-                    Augment = occupant.Augment,
+                    Augment = occupant.Augment.AugmentId,
+                    Values = new Dictionary<string, float>(occupant.Augment.Values),
                     Ability = occupant.Slot.AbilityId,
                     Tier = occupant.Slot.Tier
                 };
@@ -103,7 +133,7 @@ namespace Core.Save.Participants
         [
             .. saved.Sockets.Select(entry => new AbilitySocketOccupant(
                 new AbilitySocketPlacement(entry.Key, entry.Value.Ability, entry.Value.Tier),
-                entry.Value.Augment))
+                new AugmentInstance(entry.Value.Augment, entry.Value.Values)))
         ];
 
         /// <summary>Lays the slots out as the file left them. A slot naming an ability the book does

@@ -1,14 +1,15 @@
-namespace LastBreathTest.BattleSystemTests
+﻿namespace LastBreathTest.BattleSystemTests
 {
     using System.Text.RegularExpressions;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Enums;
     using Microsoft.Extensions.DependencyInjection;
+    using static AugmentCopies;
 
     /// <summary>
-    /// An augment declares what it is — its tier, what it is about, the one ability it was written
-    /// for, or every ability there is — and a slot is measured against that declaration. A slot takes
+    /// An augment declares what it is â€” its tier, what it is about, the one ability it was written
+    /// for, or every ability there is â€” and a slot is measured against that declaration. A slot takes
     /// its own tier and every tier under it, a claim on the whole book settles the binding question
     /// where it is made, a named ability is the whole answer where it is given and the tags answer
     /// where neither is, and one ability wears at most one augment of an exclusion group. What does
@@ -74,8 +75,8 @@ namespace LastBreathTest.BattleSystemTests
                 PoisonCatalog().With(Augment(LowAugment, tier: 1, [AbilityTags.Poison])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 3));
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, LowAugment));
-            Assert.AreEqual(LowAugment, board.Find(PoisonSlotOne)?.Augment);
+            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(LowAugment)));
+            Assert.AreEqual(LowAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId);
         }
 
         [TestMethod]
@@ -85,8 +86,8 @@ namespace LastBreathTest.BattleSystemTests
                 PoisonCatalog().With(Augment(EqualAugment, tier: 2, [AbilityTags.Poison])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, EqualAugment));
-            Assert.AreEqual(EqualAugment, board.Find(PoisonSlotOne)?.Augment);
+            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(EqualAugment)));
+            Assert.AreEqual(EqualAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId);
         }
 
         [TestMethod]
@@ -96,7 +97,7 @@ namespace LastBreathTest.BattleSystemTests
                 PoisonCatalog().With(Augment(HighAugment, tier: 3, [AbilityTags.Poison])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, HighAugment));
+            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(HighAugment)));
 
             Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty, "the augment went in against the rule");
             Assert.AreEqual(0, board.Occupants.Count, "the refused augment is still written into the save");
@@ -109,7 +110,7 @@ namespace LastBreathTest.BattleSystemTests
                 PoisonCatalog().With(Augment(EqualAugment, tier: 2, [AbilityTags.Poison, AbilityTags.Spell])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, EqualAugment));
+            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(EqualAugment)));
         }
 
         [TestMethod]
@@ -119,7 +120,7 @@ namespace LastBreathTest.BattleSystemTests
                 PoisonCatalog().With(Augment(ColdAugment, tier: 1, [AbilityTags.Cold])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, ColdAugment));
+            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(ColdAugment)));
             Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
         }
 
@@ -132,8 +133,8 @@ namespace LastBreathTest.BattleSystemTests
                 PoisonCatalog().With(Augment(BoundAugment, tier: 1, [AbilityTags.Cold], abilityId: PoisonAbility)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, BoundAugment));
-            Assert.AreEqual(BoundAugment, board.Find(PoisonSlotOne)?.Augment);
+            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(BoundAugment)));
+            Assert.AreEqual(BoundAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId);
         }
 
         [TestMethod]
@@ -145,7 +146,7 @@ namespace LastBreathTest.BattleSystemTests
                 PoisonCatalog().With(Augment(BoundAugment, tier: 1, [AbilityTags.Poison], abilityId: ColdAbility)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, BoundAugment));
+            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(BoundAugment)));
             Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
         }
 
@@ -153,15 +154,15 @@ namespace LastBreathTest.BattleSystemTests
         public void AnAugmentClaimingEveryAbilityGoesOnOneItSharesNoTagWith()
         {
             // Cost and cooldown are worked through the contract every ability honours, so an augment
-            // over them belongs everywhere — and no tag says everywhere: the commonest one is carried
+            // over them belongs everywhere â€” and no tag says everywhere: the commonest one is carried
             // by seven abilities of twenty-five. The record carries a tag of another family here, so
             // the seating is the claim being honoured and not the tags quietly agreeing.
             var board = BoardOver(
                 PoisonCatalog().With(Augment(UniversalAugment, tier: 2, [AbilityTags.Cold], fitsAnyAbility: true)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, UniversalAugment));
-            Assert.AreEqual(UniversalAugment, board.Find(PoisonSlotOne)?.Augment);
+            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(UniversalAugment)));
+            Assert.AreEqual(UniversalAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId);
         }
 
         [TestMethod]
@@ -173,7 +174,7 @@ namespace LastBreathTest.BattleSystemTests
                 PoisonCatalog().With(Augment(UniversalAugment, tier: 3, [], fitsAnyAbility: true)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 1));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, UniversalAugment));
+            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(UniversalAugment)));
             Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty, "the claim carried the augment past its tier");
         }
 
@@ -188,12 +189,12 @@ namespace LastBreathTest.BattleSystemTests
                     .With(Augment(UniversalAugment, tier: 2, [], exclusionGroup: DurationGroup, fitsAnyAbility: true)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(PoisonSlotTwo, PoisonAbility, tier: 2));
-            Assert.IsTrue(board.Install(PoisonSlotOne, GroupedAugment), "the first of the group would not go in at all");
+            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(GroupedAugment)), "the first of the group would not go in at all");
 
-            Assert.IsFalse(board.Install(PoisonSlotTwo, UniversalAugment));
+            Assert.IsFalse(board.Install(PoisonSlotTwo, Copy(UniversalAugment)));
 
             Assert.IsTrue(board.Find(PoisonSlotTwo)?.IsEmpty);
-            Assert.AreEqual(GroupedAugment, board.Find(PoisonSlotOne)?.Augment, "the refusal took the seated one with it");
+            Assert.AreEqual(GroupedAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId, "the refusal took the seated one with it");
         }
 
         [TestMethod]
@@ -207,7 +208,7 @@ namespace LastBreathTest.BattleSystemTests
                 PoisonCatalog().With(Augment(SilentAugment, tier: 1, [])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 3));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, SilentAugment));
+            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(SilentAugment)));
             Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
             Assert.AreEqual(AugmentFitResult.NoSharedTag,
                 AugmentFit.Check(Slot(PoisonSlotOne, PoisonAbility, tier: 3), [AbilityTags.Poison], Augment(SilentAugment, tier: 1, []), []));
@@ -218,7 +219,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             // The record answers the binding question twice: every ability, and this one. The slot
             // under test is the ability it names and shares its tag, so both readings would seat it
-            // — which is precisely why the refusal has to come from the contradiction itself. Letting
+            // â€” which is precisely why the refusal has to come from the contradiction itself. Letting
             // one half win would make the other a comment, and nobody would learn which.
             AbilityUpgradeData contradictory = Augment(
                 ContradictoryAugment, tier: 1, [AbilityTags.Poison], abilityId: PoisonAbility, fitsAnyAbility: true);
@@ -227,7 +228,7 @@ namespace LastBreathTest.BattleSystemTests
                 AugmentFit.Check(Slot(PoisonSlotOne, PoisonAbility, tier: 2), [AbilityTags.Poison], contradictory, []));
 
             var board = BoardOver(PoisonCatalog().With(contradictory), Slot(PoisonSlotOne, PoisonAbility, tier: 2));
-            Assert.IsFalse(board.Install(PoisonSlotOne, ContradictoryAugment));
+            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(ContradictoryAugment)));
             Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
         }
 
@@ -240,12 +241,12 @@ namespace LastBreathTest.BattleSystemTests
                     .With(Augment(SameGroupAugment, tier: 2, [AbilityTags.Poison], exclusionGroup: DurationGroup)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(PoisonSlotTwo, PoisonAbility, tier: 2));
-            Assert.IsTrue(board.Install(PoisonSlotOne, GroupedAugment), "the first of the group would not go in at all");
+            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(GroupedAugment)), "the first of the group would not go in at all");
 
-            Assert.IsFalse(board.Install(PoisonSlotTwo, SameGroupAugment));
+            Assert.IsFalse(board.Install(PoisonSlotTwo, Copy(SameGroupAugment)));
 
             Assert.IsTrue(board.Find(PoisonSlotTwo)?.IsEmpty);
-            Assert.AreEqual(GroupedAugment, board.Find(PoisonSlotOne)?.Augment, "the refusal took the seated one with it");
+            Assert.AreEqual(GroupedAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId, "the refusal took the seated one with it");
         }
 
         [TestMethod]
@@ -259,10 +260,10 @@ namespace LastBreathTest.BattleSystemTests
                     .With(Augment(OtherGroupAugment, tier: 2, [AbilityTags.Poison], exclusionGroup: SpreadGroup)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(PoisonSlotTwo, PoisonAbility, tier: 2));
-            Assert.IsTrue(board.Install(PoisonSlotOne, GroupedAugment),
-                "the first group never went on — the second augment is being measured against a bare ability");
+            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(GroupedAugment)),
+                "the first group never went on â€” the second augment is being measured against a bare ability");
 
-            Assert.IsTrue(board.Install(PoisonSlotTwo, OtherGroupAugment));
+            Assert.IsTrue(board.Install(PoisonSlotTwo, Copy(OtherGroupAugment)));
         }
 
         [TestMethod]
@@ -277,10 +278,10 @@ namespace LastBreathTest.BattleSystemTests
                     .With(Augment(SameGroupAugment, tier: 2, [AbilityTags.Cold], exclusionGroup: DurationGroup)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(ColdSlot, ColdAbility, tier: 2));
-            Assert.IsTrue(board.Install(PoisonSlotOne, GroupedAugment),
-                "the poison ability never wore the group — the cold slot is crossing nothing");
+            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(GroupedAugment)),
+                "the poison ability never wore the group â€” the cold slot is crossing nothing");
 
-            Assert.IsTrue(board.Install(ColdSlot, SameGroupAugment));
+            Assert.IsTrue(board.Install(ColdSlot, Copy(SameGroupAugment)));
         }
 
         [TestMethod]
@@ -290,7 +291,7 @@ namespace LastBreathTest.BattleSystemTests
             // its spelling is how an augment ends up in a slot nobody agreed to.
             var board = BoardOver(PoisonCatalog(), Slot(PoisonSlotOne, PoisonAbility, tier: 3));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, UnknownAugment));
+            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(UnknownAugment)));
             Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
         }
 
@@ -299,11 +300,11 @@ namespace LastBreathTest.BattleSystemTests
         {
             // The seam stated out loud: the rule reads records, so a board composed without a
             // catalog has nothing to read and stays the plain slot-holder it was before there was
-            // a rule — this augment is three tiers above the slot and still goes in.
+            // a rule â€” this augment is three tiers above the slot and still goes in.
             var board = new AbilitySocketBoard();
             board.Sync([Slot(PoisonSlotOne, PoisonAbility, tier: 1)]);
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, HighAugment));
+            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(HighAugment)));
         }
 
         [TestMethod]
@@ -366,8 +367,8 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>
-        /// The rule is one predicate or it is not a rule. A second tier comparison — in the board, in
-        /// a socket window, in whatever judges a conversion — is a second answer to the same
+        /// The rule is one predicate or it is not a rule. A second tier comparison â€” in the board, in
+        /// a socket window, in whatever judges a conversion â€” is a second answer to the same
         /// question, and two answers agree only until one of them is edited: an augment the window
         /// offers and the board refuses. The audit walks the shipped sources: no file that speaks
         /// about the slots or about the records may hold tiers against each other or intersect tags
@@ -381,9 +382,9 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(File.Exists(predicate), $"the predicate is not where the rule lives: {predicate}");
 
             string[] rule = File.ReadAllLines(predicate);
-            Assert.IsTrue(rule.Any(s_tierComparison.IsMatch), "the predicate holds no tier against another — the tier rule is gone");
+            Assert.IsTrue(rule.Any(s_tierComparison.IsMatch), "the predicate holds no tier against another â€” the tier rule is gone");
             Assert.IsTrue(rule.Any(line => s_tagComparisons.Any(comparison => line.Contains(comparison, StringComparison.Ordinal))),
-                "the predicate compares no tags — the tag rule is gone");
+                "the predicate compares no tags â€” the tag rule is gone");
 
             foreach (string source in ShippedSources().Where(path => !string.Equals(path, predicate, StringComparison.OrdinalIgnoreCase)))
             {
@@ -393,9 +394,9 @@ namespace LastBreathTest.BattleSystemTests
                 foreach (string line in lines)
                 {
                     Assert.IsFalse(s_tierComparison.IsMatch(line),
-                        $"{Path.GetRelativePath(SrcRoot, source)}: holds tier against tier itself — '{line.Trim()}'");
+                        $"{Path.GetRelativePath(SrcRoot, source)}: holds tier against tier itself â€” '{line.Trim()}'");
                     Assert.IsFalse(s_tagComparisons.Any(comparison => line.Contains(comparison, StringComparison.Ordinal)),
-                        $"{Path.GetRelativePath(SrcRoot, source)}: compares tags itself — '{line.Trim()}'");
+                        $"{Path.GetRelativePath(SrcRoot, source)}: compares tags itself â€” '{line.Trim()}'");
                 }
             }
         }
