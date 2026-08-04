@@ -186,7 +186,8 @@ namespace PassiveTreeEditor.Source.View
         Diamond
     }
 
-    /// <param name="Radius">World units, the mockup's own sizes.</param>
+    /// <param name="Radius">The mockup's own sizes, in pixels at zoom 1. A size, so it follows the
+    /// zoom alone — the layout spread moves nodes apart without making any of them bigger.</param>
     /// <param name="Labelled">Small nodes and sockets stay mute — captions on them turn the wheel into noise.</param>
     public readonly record struct NodeVisual(NodeShape Shape, float Radius, bool Labelled);
 

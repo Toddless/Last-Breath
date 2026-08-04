@@ -6,13 +6,14 @@ namespace PassiveTreeEditor.Source.Io
     using System.Text;
     using Core.Data;
     using Core.Enums;
+    using Navigation;
     using Newtonsoft.Json;
     using Simulation;
 
     /// <summary>
-    /// Tool-only preferences: which file was open and what character the totals are measured on.
-    /// Deliberately separate from the tree file — the tree is game data and must not carry editor
-    /// state into the repository.
+    /// Tool-only preferences: which file was open, what character the totals are measured on, and how
+    /// far apart the layout is being read. Deliberately separate from the tree file — the tree is game
+    /// data and must not carry editor state into the repository.
     /// </summary>
     public static class EditorSettings
     {
@@ -28,6 +29,10 @@ namespace PassiveTreeEditor.Source.Io
                 if (dto is null) return state;
 
                 if (!string.IsNullOrWhiteSpace(dto.TreePath)) state.TreePath = dto.TreePath;
+
+                // A file written before the handle existed, or one edited by hand into nonsense, reads
+                // as the authored layout; the bounds themselves are the transform's to enforce.
+                if (dto.LayoutSpread is > 0f) state.LayoutSpread = dto.LayoutSpread.Value;
 
                 foreach (KeyValuePair<string, float> pair in dto.BaseStats ?? new Dictionary<string, float>())
                     if (EnumParser.TryParseEnum(pair.Key, out EntityParameter parameter))
@@ -47,6 +52,7 @@ namespace PassiveTreeEditor.Source.Io
             var dto = new EditorSettingsDto
             {
                 TreePath = state.TreePath,
+                LayoutSpread = state.LayoutSpread,
                 BaseStats = new Dictionary<string, float>()
             };
 
@@ -69,6 +75,10 @@ namespace PassiveTreeEditor.Source.Io
     {
         public string TreePath { get; set; } = string.Empty;
 
+        /// <summary>How far apart the layout was being read. A view setting, so it lives here and never
+        /// in the tree file — the same 178 coordinates are on disk whatever this says.</summary>
+        public float LayoutSpread { get; set; } = CanvasTransform.DefaultSpread;
+
         /// <summary>Saved overrides only, empty when nothing was saved. The baseline lives in the
         /// PlayerStats catalog, which is not loaded yet when settings are read.</summary>
         public BaseStatProfile BaseStats { get; set; } = new();
@@ -77,6 +87,8 @@ namespace PassiveTreeEditor.Source.Io
     public sealed class EditorSettingsDto
     {
         [JsonProperty("treePath")] public string? TreePath { get; set; }
+
+        [JsonProperty("layoutSpread")] public float? LayoutSpread { get; set; }
 
         [JsonProperty("baseStats")] public Dictionary<string, float>? BaseStats { get; set; }
     }

@@ -2,26 +2,34 @@ namespace PassiveTreeEditor.Source.View
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using Core.PassiveTree;
     using Editing;
     using Editing.History;
     using Godot;
+    using Navigation;
     using Simulation;
 
     /// <summary>
     /// The tree surface: draws the graph in immediate mode and owns navigation, picking and editing
     /// gestures. Both drawing and hit-testing go through the document's spatial grid, so their cost
     /// follows what is on screen rather than how big the tree is.
+    /// <para>Every coordinate on the way in or out passes through <see cref="CanvasTransform"/>: what is
+    /// drawn, what is clicked and what is written back into a node all read the same pair of
+    /// multipliers, so the picture and the pick can never drift apart.</para>
     /// </summary>
     public partial class TreeCanvas : Control
     {
-        private const float MinZoom = 0.08f;
-        private const float MaxZoom = 4f;
-        private const float ZoomStep = 1.15f;
-
-        /// <summary>World-space slack added to the visible box: covers the largest node radius plus a
+        /// <summary>Document-space slack added to the visible box: covers the largest node radius plus a
         /// grid cell, so a node being dragged never blinks out at the edge.</summary>
         private const float CullMargin = 220f;
+
+        /// <summary>Total margin left around the tree when the whole of it is framed.</summary>
+        private const float FramePadding = 160f;
+
+        /// <summary>Where the origin sits before a tree is loaded — the first frame replaces it.</summary>
+        private const float InitialPanX = 700f;
+        private const float InitialPanY = 450f;
 
         /// <summary>Turns a square's half-extent into the circumradius its polygon vertices sit on.</summary>
         private const float SquareCircumradius = 1.41421356f;
@@ -31,8 +39,13 @@ namespace PassiveTreeEditor.Source.View
         private const float CoarseSnap = 25f;
 
         /// <summary>Zoom a jump to a node lands at when the view was further out than this: node radii
-        /// are authored in world units against this scale, so at 1 a small node is its drawn size.</summary>
+        /// are authored against this scale, so at 1 a small node is its drawn size. Unaffected by the
+        /// layout spread, which changes what is between nodes and not how big they are.</summary>
         private const float FocusZoom = 1f;
+
+        /// <summary>Zoom, pan and layout spread in one place, and the only arithmetic that turns a
+        /// document coordinate into a pixel.</summary>
+        private readonly CanvasTransform _view = new();
 
         private readonly List<PassiveNode> _drawCandidates = [];
         private readonly List<PassiveNode> _pickCandidates = [];
@@ -57,19 +70,17 @@ namespace PassiveTreeEditor.Source.View
 
         private PopupMenu _kindMenu = null!;
         private PassiveNodeKind? _lastKind;
-        private Vector2 _pendingCreateWorld;
+        private Vector2 _pendingCreateDocument;
         private EditorMode _mode = EditorMode.Select;
-        private Vector2 _panOffset = new(700f, 450f);
-        private float _zoom = 1f;
         private string? _hovered;
         private string? _linkFrom;
         private bool _panning;
         private bool _draggingNodes;
         private bool _boxSelecting;
         private bool _dragMoved;
-        private Vector2 _dragStartWorld;
-        private Vector2 _boxStartWorld;
-        private Vector2 _boxEndWorld;
+        private Vector2 _dragStartDocument;
+        private Vector2 _boxStartDocument;
+        private Vector2 _boxEndDocument;
 
         public event Action? SelectionChanged;
 
@@ -81,6 +92,10 @@ namespace PassiveTreeEditor.Source.View
 
         /// <summary>The node under the cursor, or null when the cursor left every node.</summary>
         public event Action<PassiveNode?>? HoveredChanged;
+
+        /// <summary>The layout spread settled on a new value — raised for the keys, so the control in
+        /// the toolbar shows what the keys did.</summary>
+        public event Action<float>? SpreadChanged;
 
         public EditorMode Mode
         {
@@ -95,6 +110,26 @@ namespace PassiveTreeEditor.Source.View
         /// <summary>The wheel's rings and sectors from the draft, drawn behind the tree as layout
         /// guides. They are geometry to aim at, never something nodes snap to.</summary>
         public bool ShowGuides { get; set; } = true;
+
+        /// <summary>
+        /// How far apart the layout is pulled. It multiplies distances only — a node keeps the size it
+        /// was authored at — so raising it opens the gaps a dense wheel hides its edges in, which no
+        /// amount of zooming can do. The tree file never sees it: this is a property of the view, and
+        /// the coordinates in the document stay exactly as their author typed them.
+        /// <para>The middle of the view is the fixed point, so the tree opens up around what is being
+        /// looked at instead of sliding off screen.</para>
+        /// </summary>
+        public float LayoutSpread
+        {
+            get => _view.Spread;
+            set
+            {
+                if (!_view.SetSpread(value, Size.X * 0.5f, Size.Y * 0.5f)) return;
+
+                SpreadChanged?.Invoke(_view.Spread);
+                QueueRedraw();
+            }
+        }
 
         public PassiveTreeDocument Document => _editor.Document;
 
@@ -111,8 +146,10 @@ namespace PassiveTreeEditor.Source.View
             MouseFilter = MouseFilterEnum.Stop;
             ClipContents = true;
 
+            _view.SetPan(InitialPanX, InitialPanY);
+
             _kindMenu = new PopupMenu();
-            _kindMenu.IdPressed += id => CreateNode((PassiveNodeKind)id, _pendingCreateWorld);
+            _kindMenu.IdPressed += id => CreateNode((PassiveNodeKind)id, _pendingCreateDocument);
             AddChild(_kindMenu);
 
             MouseExited += ClearHover;
@@ -183,21 +220,21 @@ namespace PassiveTreeEditor.Source.View
             PassiveNode? node = Document.Find(id);
             if (node is null) return false;
 
-            if (_zoom < FocusZoom) _zoom = FocusZoom;
-            _panOffset = Size / 2f - new Vector2(node.X, node.Y) * _zoom;
+            _view.RaiseZoomTo(FocusZoom);
+            _view.CenterOn(node.X, node.Y, Size.X, Size.Y);
 
             SelectOnly(id);
             return true;
         }
 
-        /// <summary>Fits the whole tree on screen. Also the recovery hatch when panning has taken the
-        /// view somewhere far away from the content.</summary>
+        /// <summary>Fits the whole tree on screen at the spread it is being read at — the spread is not
+        /// touched, so framing shows the layout the author opened up rather than silently closing it
+        /// again. Also the recovery hatch when panning has taken the view far from the content.</summary>
         public void FrameAll()
         {
             if (Document.Nodes.Count == 0)
             {
-                _panOffset = Size / 2f;
-                _zoom = 1f;
+                _view.ResetZoom(Size.X, Size.Y);
                 QueueRedraw();
                 return;
             }
@@ -211,18 +248,15 @@ namespace PassiveTreeEditor.Source.View
                 maxY = MathF.Max(maxY, node.Y);
             }
 
-            var extent = new Vector2(MathF.Max(maxX - minX, 1f), MathF.Max(maxY - minY, 1f));
-            Vector2 available = Size - new Vector2(160f, 160f);
-            _zoom = Mathf.Clamp(MathF.Min(available.X / extent.X, available.Y / extent.Y), MinZoom, MaxZoom);
-
-            var center = new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f);
-            _panOffset = Size / 2f - center * _zoom;
+            _view.Fit(minX, minY, maxX, maxY, Size.X, Size.Y, FramePadding);
             QueueRedraw();
         }
 
-        private Vector2 ToScreen(float worldX, float worldY) => new(worldX * _zoom + _panOffset.X, worldY * _zoom + _panOffset.Y);
+        private Vector2 ToScreen(float documentX, float documentY) =>
+            new(_view.ScreenX(documentX), _view.ScreenY(documentY));
 
-        private Vector2 ToWorld(Vector2 screen) => (screen - _panOffset) / _zoom;
+        private Vector2 ToDocument(Vector2 screen) =>
+            new(_view.DocumentX(screen.X), _view.DocumentY(screen.Y));
 
         private string FirstSelected()
         {
@@ -237,8 +271,8 @@ namespace PassiveTreeEditor.Source.View
             DrawRect(new Rect2(Vector2.Zero, Size), CanvasStyle.Void);
             if (ShowGuides) DrawGuides();
 
-            Vector2 topLeft = ToWorld(Vector2.Zero);
-            Vector2 bottomRight = ToWorld(Size);
+            Vector2 topLeft = ToDocument(Vector2.Zero);
+            Vector2 bottomRight = ToDocument(Size);
             float minX = topLeft.X - CullMargin;
             float minY = topLeft.Y - CullMargin;
             float maxX = bottomRight.X + CullMargin;
@@ -251,24 +285,27 @@ namespace PassiveTreeEditor.Source.View
         }
 
         /// <summary>The wheel behind the tree: six 60° sectors, the four ring radii and the core glow.
-        /// Pure decoration for the eye and a target for the hand — it never touches node data.</summary>
+        /// Pure decoration for the eye and a target for the hand — it never touches node data.
+        /// <para>Its radii are distances between the core and the nodes, so they follow the layout
+        /// spread exactly as the nodes do. A ring that kept its size while the tree opened up would
+        /// leave every node it names off it.</para></summary>
         private void DrawGuides()
         {
             Vector2 origin = ToScreen(0f, 0f);
 
             DrawSectors(origin);
 
-            foreach (float ring in CanvasStyle.RingRadii) DrawDashedRing(origin, ring * _zoom);
+            foreach (float ring in CanvasStyle.RingRadii) DrawDashedRing(origin, ring * _view.PositionScale);
 
             DrawCoreGlow(origin);
 
-            if (_zoom >= CanvasStyle.LabelZoomThreshold) DrawGuideLabels(origin);
+            if (_view.Zoom >= CanvasStyle.LabelZoomThreshold) DrawGuideLabels(origin);
         }
 
         private void DrawSectors(Vector2 origin)
         {
             const int segments = 14;
-            float radius = CanvasStyle.SectorRadius * _zoom;
+            float radius = CanvasStyle.SectorRadius * _view.PositionScale;
             if (radius < 8f) return;
 
             foreach ((float angle, Color color, string _) in CanvasStyle.Sectors)
@@ -307,7 +344,7 @@ namespace PassiveTreeEditor.Source.View
         private void DrawCoreGlow(Vector2 origin)
         {
             const int layers = 7;
-            float radius = CanvasStyle.CoreGlowRadius * _zoom;
+            float radius = CanvasStyle.CoreGlowRadius * _view.PositionScale;
             if (radius < 4f) return;
 
             for (int layer = layers; layer > 0; layer--)
@@ -324,12 +361,12 @@ namespace PassiveTreeEditor.Source.View
 
             for (int ring = 0; ring < CanvasStyle.RingRadii.Length; ring++)
             {
-                float radius = CanvasStyle.RingRadii[ring] * _zoom;
+                float radius = CanvasStyle.RingRadii[ring] * _view.PositionScale;
                 DrawString(font, new Vector2(origin.X + 6f, origin.Y - radius + fontSize * 0.4f), $"R{ring}",
                     HorizontalAlignment.Left, -1f, fontSize, CanvasStyle.RingLabel);
             }
 
-            float labelRadius = (CanvasStyle.SectorRadius + 28f) * _zoom;
+            float labelRadius = (CanvasStyle.SectorRadius + 28f) * _view.PositionScale;
             foreach ((float angle, Color color, string label) in CanvasStyle.Sectors)
             {
                 float radians = Mathf.DegToRad(angle);
@@ -339,12 +376,12 @@ namespace PassiveTreeEditor.Source.View
             }
         }
 
-        private int LabelSize() => (int)Mathf.Clamp(13f * _zoom, 9f, 20f);
+        private int LabelSize() => (int)Mathf.Clamp(13f * _view.Zoom, 9f, 20f);
 
         private void DrawEdges(float minX, float minY, float maxX, float maxY)
         {
-            float idleWidth = MathF.Max(1f, 1.6f * _zoom);
-            float liveWidth = MathF.Max(1.5f, 3f * _zoom);
+            float idleWidth = MathF.Max(1f, 1.6f * _view.Zoom);
+            float liveWidth = MathF.Max(1.5f, 3f * _view.Zoom);
 
             foreach (NodeLink link in Document.Links)
             {
@@ -367,7 +404,7 @@ namespace PassiveTreeEditor.Source.View
                 if (_pathSet.Contains(first.Id) && (_pathSet.Contains(second.Id) || secondTaken)
                     || _pathSet.Contains(second.Id) && firstTaken)
                 {
-                    DrawDashedLine(from, to, CanvasStyle.EdgePath, liveWidth, MathF.Max(3f, 7f * _zoom));
+                    DrawDashedLine(from, to, CanvasStyle.EdgePath, liveWidth, MathF.Max(3f, 7f * _view.Zoom));
                     continue;
                 }
 
@@ -389,7 +426,7 @@ namespace PassiveTreeEditor.Source.View
             if (from is null) return;
 
             DrawDashedLine(ToScreen(from.X, from.Y), GetLocalMousePosition(), CanvasStyle.Gold1,
-                MathF.Max(1.5f, 2f * _zoom), 8f);
+                MathF.Max(1.5f, 2f * _view.Zoom), 8f);
         }
 
         private void DrawNodes(float minX, float minY, float maxX, float maxY)
@@ -397,7 +434,7 @@ namespace PassiveTreeEditor.Source.View
             _drawCandidates.Clear();
             Document.Index.Query(minX, minY, maxX, maxY, _drawCandidates);
 
-            bool showLabels = _zoom >= CanvasStyle.LabelZoomThreshold;
+            bool showLabels = _view.Zoom >= CanvasStyle.LabelZoomThreshold;
             Font font = GetThemeDefaultFont();
             int fontSize = LabelSize();
 
@@ -405,7 +442,10 @@ namespace PassiveTreeEditor.Source.View
             {
                 NodeVisual visual = CanvasStyle.Visual(node.Kind);
                 Vector2 center = ToScreen(node.X, node.Y);
-                float radius = visual.Radius * _zoom;
+
+                // Size follows the zoom alone: spreading the layout moves nodes apart, it does not
+                // grow them, and that is the whole difference between this handle and zooming out.
+                float radius = visual.Radius * _view.Zoom;
                 if (radius < 1.5f) radius = 1.5f;
 
                 bool taken = _allocation.IsTaken(node.Id);
@@ -419,16 +459,16 @@ namespace PassiveTreeEditor.Source.View
                 bool hovered = _hovered == node.Id;
                 Color outline = hovered ? CanvasStyle.Gold1 : look.Outline;
 
-                DrawNodeShape(visual.Shape, center, radius, look.Fill, outline, look.OutlineWidth * MathF.Max(0.6f, _zoom));
+                DrawNodeShape(visual.Shape, center, radius, look.Fill, outline, look.OutlineWidth * MathF.Max(0.6f, _view.Zoom));
 
                 // The frontier ring is editor-only feedback: it says "this one is legal next".
                 if (Mode == EditorMode.Simulate && !taken && state == NodeState.Idle && _frontier.Contains(node.Id))
-                    DrawArc(center, radius + 3f * _zoom, 0f, Mathf.Tau, 24, new Color(CanvasStyle.Gold2, 0.7f),
-                        MathF.Max(1f, 1.2f * _zoom), true);
+                    DrawArc(center, radius + 3f * _view.Zoom, 0f, Mathf.Tau, 24, new Color(CanvasStyle.Gold2, 0.7f),
+                        MathF.Max(1f, 1.2f * _view.Zoom), true);
 
                 if (_selected.Contains(node.Id))
-                    DrawArc(center, radius + 5f * _zoom, 0f, Mathf.Tau, 28, CanvasStyle.SelectionStroke,
-                        MathF.Max(1.5f, 2f * _zoom), true);
+                    DrawArc(center, radius + 5f * _view.Zoom, 0f, Mathf.Tau, 28, CanvasStyle.SelectionStroke,
+                        MathF.Max(1.5f, 2f * _view.Zoom), true);
 
                 if (!showLabels || !visual.Labelled) continue;
 
@@ -494,8 +534,8 @@ namespace PassiveTreeEditor.Source.View
         {
             if (!_boxSelecting) return;
 
-            Vector2 first = ToScreen(_boxStartWorld.X, _boxStartWorld.Y);
-            Vector2 second = ToScreen(_boxEndWorld.X, _boxEndWorld.Y);
+            Vector2 first = ToScreen(_boxStartDocument.X, _boxStartDocument.Y);
+            Vector2 second = ToScreen(_boxEndDocument.X, _boxEndDocument.Y);
             var box = new Rect2(
                 MathF.Min(first.X, second.X),
                 MathF.Min(first.Y, second.Y),
@@ -528,7 +568,10 @@ namespace PassiveTreeEditor.Source.View
         {
             if (button.Pressed && button.ButtonIndex is MouseButton.WheelUp or MouseButton.WheelDown)
             {
-                Zoom(button.ButtonIndex == MouseButton.WheelUp ? ZoomStep : 1f / ZoomStep, button.Position);
+                Zoom(button.ButtonIndex == MouseButton.WheelUp
+                    ? CanvasTransform.ZoomStep
+                    : 1f / CanvasTransform.ZoomStep, button.Position);
+
                 AcceptEvent();
                 return;
             }
@@ -558,16 +601,16 @@ namespace PassiveTreeEditor.Source.View
 
         private void OnLeftPressed(InputEventMouseButton button)
         {
-            Vector2 world = ToWorld(button.Position);
-            PassiveNode? node = NodeAt(world);
+            Vector2 document = ToDocument(button.Position);
+            PassiveNode? node = NodeAt(button.Position);
 
             switch (Mode)
             {
                 case EditorMode.Add:
                     // Shift skips the picker and repeats the last class: laying a run of small nodes
                     // is one click each again, while the picker stays the way a class is chosen.
-                    if (button.ShiftPressed && _lastKind is not null) CreateNode(_lastKind.Value, world);
-                    else ShowKindMenu(world);
+                    if (button.ShiftPressed && _lastKind is not null) CreateNode(_lastKind.Value, document);
+                    else ShowKindMenu(document);
                     return;
 
                 case EditorMode.Link:
@@ -580,12 +623,12 @@ namespace PassiveTreeEditor.Source.View
 
                 case EditorMode.Select:
                 default:
-                    BeginSelectGesture(node, world, button);
+                    BeginSelectGesture(node, document, button);
                     return;
             }
         }
 
-        private void BeginSelectGesture(PassiveNode? node, Vector2 world, InputEventMouseButton button)
+        private void BeginSelectGesture(PassiveNode? node, Vector2 document, InputEventMouseButton button)
         {
             bool additive = button.ShiftPressed || button.CtrlPressed;
 
@@ -593,8 +636,8 @@ namespace PassiveTreeEditor.Source.View
             {
                 if (!additive) _selected.Clear();
                 _boxSelecting = true;
-                _boxStartWorld = world;
-                _boxEndWorld = world;
+                _boxStartDocument = document;
+                _boxEndDocument = document;
                 SelectionChanged?.Invoke();
                 QueueRedraw();
                 return;
@@ -612,7 +655,7 @@ namespace PassiveTreeEditor.Source.View
 
             _draggingNodes = true;
             _dragMoved = false;
-            _dragStartWorld = world;
+            _dragStartDocument = document;
             _dragOrigins.Clear();
             foreach (string id in _selected)
             {
@@ -660,25 +703,25 @@ namespace PassiveTreeEditor.Source.View
         {
             if (_panning)
             {
-                _panOffset += motion.Relative;
+                _view.MovePan(motion.Relative.X, motion.Relative.Y);
                 QueueRedraw();
                 return;
             }
 
             if (_draggingNodes)
             {
-                DragSelection(ToWorld(motion.Position), motion.CtrlPressed);
+                DragSelection(ToDocument(motion.Position), motion.CtrlPressed);
                 return;
             }
 
             if (_boxSelecting)
             {
-                _boxEndWorld = ToWorld(motion.Position);
+                _boxEndDocument = ToDocument(motion.Position);
                 QueueRedraw();
                 return;
             }
 
-            PassiveNode? under = NodeAt(ToWorld(motion.Position));
+            PassiveNode? under = NodeAt(motion.Position);
             if (under?.Id != _hovered)
             {
                 _hovered = under?.Id;
@@ -738,20 +781,40 @@ namespace PassiveTreeEditor.Source.View
                 case Key.F when !key.CtrlPressed:
                     FrameAll();
                     break;
+                // The brackets sit next to each other and mean "wider" and "tighter" — and being plain
+                // keys of the canvas they cannot fire while a title is being typed in the inspector.
+                case Key.Bracketright:
+                    NudgeSpread(1);
+                    break;
+                case Key.Bracketleft:
+                    NudgeSpread(-1);
+                    break;
             }
+        }
+
+        /// <summary>One step of the layout spread, reported in the status line: the handle moves nothing
+        /// the eye can measure against, so the number is how its owner knows where it stands.</summary>
+        private void NudgeSpread(int steps)
+        {
+            LayoutSpread = _view.Spread + steps * CanvasTransform.SpreadStep;
+            StatusChanged?.Invoke($"layout spread ×{_view.Spread.ToString("0.##", CultureInfo.InvariantCulture)}");
         }
 
         private void Zoom(float factor, Vector2 pivotScreen)
         {
-            Vector2 pivotWorld = ToWorld(pivotScreen);
-            _zoom = Mathf.Clamp(_zoom * factor, MinZoom, MaxZoom);
-            _panOffset = pivotScreen - pivotWorld * _zoom;
+            _view.ZoomBy(factor, pivotScreen.X, pivotScreen.Y);
             QueueRedraw();
         }
 
-        private void DragSelection(Vector2 world, bool coarse)
+        /// <summary>
+        /// Moves the captured nodes to where the cursor is, in the document's own coordinates. The
+        /// delta arrives already divided by the spread — both ends of it came through
+        /// <see cref="ToDocument"/> — so a node dropped at a spread of four lands under the cursor and
+        /// not four times further out, and the snap grid keeps meaning 25 units of the file.
+        /// </summary>
+        private void DragSelection(Vector2 document, bool coarse)
         {
-            Vector2 delta = world - _dragStartWorld;
+            Vector2 delta = document - _dragStartDocument;
             float snap = coarse ? CoarseSnap : FineSnap;
 
             foreach (KeyValuePair<string, NodePoint> origin in _dragOrigins)
@@ -769,10 +832,10 @@ namespace PassiveTreeEditor.Source.View
 
         private void ApplyBoxSelection()
         {
-            float minX = MathF.Min(_boxStartWorld.X, _boxEndWorld.X);
-            float maxX = MathF.Max(_boxStartWorld.X, _boxEndWorld.X);
-            float minY = MathF.Min(_boxStartWorld.Y, _boxEndWorld.Y);
-            float maxY = MathF.Max(_boxStartWorld.Y, _boxEndWorld.Y);
+            float minX = MathF.Min(_boxStartDocument.X, _boxEndDocument.X);
+            float maxX = MathF.Max(_boxStartDocument.X, _boxEndDocument.X);
+            float minY = MathF.Min(_boxStartDocument.Y, _boxEndDocument.Y);
+            float maxY = MathF.Max(_boxStartDocument.Y, _boxEndDocument.Y);
 
             _pickCandidates.Clear();
             Document.Index.Query(minX, minY, maxX, maxY, _pickCandidates);
@@ -782,24 +845,32 @@ namespace PassiveTreeEditor.Source.View
                     _selected.Add(node.Id);
         }
 
-        private PassiveNode? NodeAt(Vector2 world)
+        /// <summary>
+        /// The node under a point on screen, decided in screen pixels against the same radius the
+        /// drawing used. Measuring where the eye is looking is the whole point: at any layout spread a
+        /// node covers exactly the pixels it is painted on, so the click lands where it was aimed.
+        /// <para>Small nodes shrink to a couple of pixels when the whole tree is on screen; the slack
+        /// keeps them clickable without making overlapping picks ambiguous when zoomed in.</para>
+        /// </summary>
+        private PassiveNode? NodeAt(Vector2 screen)
         {
-            // Small nodes shrink to a couple of pixels when the whole tree is on screen; the slack
-            // keeps them clickable without making overlapping picks ambiguous when zoomed in.
-            float slack = PickScreenSlack / _zoom;
-            float reach = CanvasStyle.MaxRadius + slack;
+            Vector2 document = ToDocument(screen);
+
+            // The grid is indexed in document coordinates, so the widest node on screen has to be
+            // asked for in those — pixels of reach are worth less of the document the wider it is spread.
+            float reach = _view.DocumentLength(CanvasStyle.MaxRadius * _view.Zoom + PickScreenSlack);
 
             _pickCandidates.Clear();
-            Document.Index.Query(world.X - reach, world.Y - reach, world.X + reach, world.Y + reach, _pickCandidates);
+            Document.Index.Query(document.X - reach, document.Y - reach, document.X + reach, document.Y + reach, _pickCandidates);
 
             PassiveNode? best = null;
             float bestDistance = float.MaxValue;
 
             foreach (PassiveNode node in _pickCandidates)
             {
-                float radius = CanvasStyle.Visual(node.Kind).Radius + slack;
-                float deltaX = node.X - world.X;
-                float deltaY = node.Y - world.Y;
+                float radius = CanvasStyle.Visual(node.Kind).Radius * _view.Zoom + PickScreenSlack;
+                float deltaX = _view.ScreenX(node.X) - screen.X;
+                float deltaY = _view.ScreenY(node.Y) - screen.Y;
                 float distance = deltaX * deltaX + deltaY * deltaY;
 
                 if (distance <= radius * radius && distance < bestDistance)
@@ -814,9 +885,9 @@ namespace PassiveTreeEditor.Source.View
 
         /// <summary>The class picker, opened at the cursor by a click in Add mode. Each entry shows
         /// the id the node would get, so the naming series is visible before committing to it.</summary>
-        private void ShowKindMenu(Vector2 world)
+        private void ShowKindMenu(Vector2 document)
         {
-            _pendingCreateWorld = world;
+            _pendingCreateDocument = document;
             _kindMenu.Clear();
 
             foreach (PassiveNodeKind kind in Enum.GetValues<PassiveNodeKind>())
@@ -858,7 +929,7 @@ namespace PassiveTreeEditor.Source.View
             return fallback;
         }
 
-        private void CreateNode(PassiveNodeKind kind, Vector2 world)
+        private void CreateNode(PassiveNodeKind kind, Vector2 document)
         {
             PassiveNode? selected = _selected.Count == 1 ? Document.Find(FirstSelected()) : null;
             PassiveNode? template = TemplateFor(kind);
@@ -866,8 +937,8 @@ namespace PassiveTreeEditor.Source.View
             var node = new PassiveNode
             {
                 Kind = kind,
-                X = MathF.Round(world.X),
-                Y = MathF.Round(world.Y)
+                X = MathF.Round(document.X),
+                Y = MathF.Round(document.Y)
             };
 
             if (template is not null)

@@ -13,6 +13,7 @@ namespace PassiveTreeEditor.Source.View
     using Editing.History;
     using Godot;
     using Io;
+    using Navigation;
     using Simulation;
     using Validation;
     using EditorSettings = Io.EditorSettings;
@@ -58,6 +59,7 @@ namespace PassiveTreeEditor.Source.View
         private LineEdit _pathEdit = null!;
         private Label _status = null!;
         private SpinBox _budget = null!;
+        private SpinBox _spread = null!;
         private AcceptDialog _messageDialog = null!;
         private FileDialog _fileDialog = null!;
         private NodeTooltip _tooltip = null!;
@@ -75,6 +77,12 @@ namespace PassiveTreeEditor.Source.View
 
             BuildUi();
             WireEvents();
+
+            // Through the control rather than the canvas, so the box and the view start out agreeing.
+            // Before the tree is read: the first frame has to fit the tree at the spread it will be
+            // read at, not at the one it happened to start with.
+            _spread.Value = _settings.LayoutSpread;
+
             LoadGameData();
         }
 
@@ -217,6 +225,7 @@ namespace PassiveTreeEditor.Source.View
 
             bar.AddChild(ToolbarButton("New", NewTree));
             bar.AddChild(ToolbarButton("Frame", () => _canvas.FrameAll()));
+            bar.AddChild(SpreadBox());
 
             var guides = new Button { Text = "Guides", ToggleMode = true, ButtonPressed = true };
             guides.Toggled += pressed =>
@@ -237,6 +246,33 @@ namespace PassiveTreeEditor.Source.View
             var button = new Button { Text = text };
             button.Pressed += action;
             return button;
+        }
+
+        /// <summary>
+        /// The layout spread, in the header next to Frame because it is the same kind of handle: both
+        /// change how the tree is looked at, neither changes what is in it. It reads as a number rather
+        /// than a slider — being back at exactly 1 is the one position that has to be recognisable, and
+        /// "somewhere near the left end" is not recognising it.
+        /// </summary>
+        private Control SpreadBox()
+        {
+            var row = new HBoxContainer();
+            row.AddChild(new Label { Text = "spread" });
+
+            _spread = new SpinBox
+            {
+                MinValue = CanvasTransform.MinSpread,
+                MaxValue = CanvasTransform.MaxSpread,
+                Step = CanvasTransform.SpreadStep,
+                Value = CanvasTransform.DefaultSpread,
+                TooltipText = "distance between nodes — [ and ] step it on the canvas. "
+                              + "Nodes keep their size; 1 is the layout as it is written in the file"
+            };
+
+            _spread.ValueChanged += value => _canvas.LayoutSpread = (float)value;
+            row.AddChild(_spread);
+
+            return row;
         }
 
         private Control BuildSidePanel()
@@ -328,6 +364,10 @@ namespace PassiveTreeEditor.Source.View
             _canvas.AllocationChanged += RefreshSummary;
             _canvas.StatusChanged += SetStatus;
             _canvas.HoveredChanged += OnHovered;
+
+            // The keys are the other way to move the same handle, so the box follows them. Without the
+            // signal, because the box is not being told anything it did not already know.
+            _canvas.SpreadChanged += spread => _spread.SetValueNoSignal(spread);
             _inspector.NodeEdited += OnNodeEdited;
             _inspector.TotalsChanged += OnDocumentChanged;
             _baseStats.ProfileChanged += RefreshSummary;
@@ -465,6 +505,9 @@ namespace PassiveTreeEditor.Source.View
         {
             _settings.TreePath = _pathEdit.Text.Trim();
             _settings.BaseStats = _baseStats.Overrides();
+
+            // Read off the canvas, not off the box: the keys move the canvas first and the box after.
+            _settings.LayoutSpread = _canvas.LayoutSpread;
         }
 
         /// <summary>
