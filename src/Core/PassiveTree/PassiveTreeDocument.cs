@@ -180,7 +180,7 @@ namespace Core.PassiveTree
 
             foreach (PassiveNode node in _nodes)
             {
-                NodeKindRule rule = NodeKindRules.For(node);
+                NodeKindRule rule = NodeKindRules.For(node.Kind);
 
                 // Both channels count against one limit: a line is content whichever road it takes to
                 // the fighter, and counting only the parametric ones would let a node carry a second

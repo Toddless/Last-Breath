@@ -284,7 +284,7 @@ namespace PassiveTreeEditor.Source.View
 
         private void BuildModifiers(PassiveNode node)
         {
-            NodeKindRule rule = NodeKindRules.For(node);
+            NodeKindRule rule = NodeKindRules.For(node.Kind);
             AddChild(EditorControls.Caption($"MODIFIERS  {node.LineCount}/{rule.MaxModifiers}"
                                            + (node.IsHybrid ? "   hybrid" : string.Empty)));
 

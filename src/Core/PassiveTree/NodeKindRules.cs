@@ -14,7 +14,7 @@ namespace Core.PassiveTree
 
         private static readonly Dictionary<PassiveNodeKind, NodeKindRule> s_rules = new()
         {
-            [PassiveNodeKind.Small] = new NodeKindRule(1, 1, false, false),
+            [PassiveNodeKind.Small] = new NodeKindRule(1, 2, false, false),
             [PassiveNodeKind.Notable] = new NodeKindRule(1, 3, false, false),
             [PassiveNodeKind.Keystone] = new NodeKindRule(0, 3, false, true),
             [PassiveNodeKind.AbilityUnlock] = new NodeKindRule(0, 0, true, false, SocketTier: 1),
@@ -33,20 +33,6 @@ namespace Core.PassiveTree
         }
 
         public static NodeKindRule For(PassiveNodeKind kind) => s_rules[kind];
-
-        /// <summary>
-        /// Rules for a concrete node. A hybrid small node may carry a second line, because a wedge
-        /// transition is written either as one aggregate line ("+2 to all attributes") or as one line
-        /// per stance ("+2 Strength and +2 Dexterity") — both shapes are in the draft.
-        /// </summary>
-        public static NodeKindRule For(PassiveNode node)
-        {
-            NodeKindRule rule = For(node.Kind);
-
-            return node.Kind == PassiveNodeKind.Small && node.IsHybrid
-                ? rule with { MaxModifiers = 2 }
-                : rule;
-        }
 
         /// <summary>Seeds are granted with the character, so they never come out of the point budget.</summary>
         public static bool CostsPoint(PassiveNodeKind kind) => kind != PassiveNodeKind.Start;

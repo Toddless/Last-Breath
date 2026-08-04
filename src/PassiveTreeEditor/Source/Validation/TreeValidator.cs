@@ -296,7 +296,7 @@ namespace PassiveTreeEditor.Source.Validation
         /// takes to the fighter.</summary>
         private static void CheckLineCount(PassiveNode node, List<TreeIssue> issues)
         {
-            NodeKindRule rule = NodeKindRules.For(node);
+            NodeKindRule rule = NodeKindRules.For(node.Kind);
 
             if (node.LineCount < rule.MinModifiers)
                 issues.Add(new TreeIssue(TreeIssueKind.TooFewLines, node.Id,

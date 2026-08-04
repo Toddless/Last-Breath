@@ -6,7 +6,7 @@ namespace Core.PassiveTree
     /// </summary>
     public enum PassiveNodeKind
     {
-        /// <summary>Exactly one modifier line.</summary>
+        /// <summary>One or two modifier lines.</summary>
         Small,
 
         /// <summary>Cluster finisher: one to three modifier lines.</summary>

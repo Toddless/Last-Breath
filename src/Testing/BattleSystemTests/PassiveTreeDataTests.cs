@@ -428,13 +428,29 @@ namespace LastBreathTest.BattleSystemTests
             var document = new PassiveTreeDocument();
             var node = new PassiveNode { Id = "small_1", Kind = PassiveNodeKind.Small, Stance = Stance.Strength };
             node.Modifiers.Add(new ModifierLine { Parameter = EntityParameter.Armor, ValueType = ModifierValueType.Increase, Value = 0.06f });
+            node.Modifiers.Add(new ModifierLine { Parameter = EntityParameter.Evade, ValueType = ModifierValueType.Increase, Value = 0.06f });
             node.ContextModifiers.Add(new ContextModifierLine { Parameter = ContextParameter.BleedDamage, Value = 0.1f });
             document.AddNode(node);
 
             List<string> issues = document.Validate();
 
-            Assert.IsTrue(issues.Any(issue => issue.Contains("small_1") && issue.Contains("at most 1")),
-                "a second payload slipped past the per-class line limit: " + string.Join("; ", issues));
+            Assert.IsTrue(issues.Any(issue => issue.Contains("small_1") && issue.Contains("at most 2")),
+                "a payload past the limit slipped through on the context channel: " + string.Join("; ", issues));
+        }
+
+        [TestMethod]
+        public void ASmallNodeCarriesTwoLinesWithoutBeingCalledOverfull()
+        {
+            var document = new PassiveTreeDocument();
+            var node = new PassiveNode { Id = "small_1", Kind = PassiveNodeKind.Small, Stance = Stance.Strength };
+            node.Modifiers.Add(new ModifierLine { Parameter = EntityParameter.Armor, ValueType = ModifierValueType.Increase, Value = 0.06f });
+            node.Modifiers.Add(new ModifierLine { Parameter = EntityParameter.Evade, ValueType = ModifierValueType.Increase, Value = 0.06f });
+            document.AddNode(node);
+
+            List<string> issues = document.Validate();
+
+            Assert.IsFalse(issues.Any(issue => issue.Contains("small_1") && issue.Contains("at most")),
+                "a small node was refused its second line: " + string.Join("; ", issues));
         }
 
         [TestMethod]
