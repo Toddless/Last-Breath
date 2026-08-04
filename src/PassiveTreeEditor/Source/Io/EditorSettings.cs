@@ -23,10 +23,13 @@ namespace PassiveTreeEditor.Source.Io
 
             try
             {
-                if (!File.Exists(ToolPaths.SettingsPath)) return state;
+                string path = File.Exists(ToolPaths.SettingsPath) ? ToolPaths.SettingsPath : ToolPaths.LegacySettingsPath;
+                if (!File.Exists(path)) return state;
 
-                EditorSettingsDto? dto = JsonConvert.DeserializeObject<EditorSettingsDto>(File.ReadAllText(ToolPaths.SettingsPath));
+                EditorSettingsDto? dto = JsonConvert.DeserializeObject<EditorSettingsDto>(File.ReadAllText(path));
                 if (dto is null) return state;
+
+                if (!string.IsNullOrWhiteSpace(dto.DataRoot)) state.DataRoot = dto.DataRoot;
 
                 if (!string.IsNullOrWhiteSpace(dto.TreePath)) state.TreePath = dto.TreePath;
 
@@ -51,6 +54,7 @@ namespace PassiveTreeEditor.Source.Io
         {
             var dto = new EditorSettingsDto
             {
+                DataRoot = state.DataRoot,
                 TreePath = state.TreePath,
                 LayoutSpread = state.LayoutSpread,
                 BaseStats = new Dictionary<string, float>()
@@ -62,6 +66,12 @@ namespace PassiveTreeEditor.Source.Io
             try
             {
                 string json = JsonConvert.SerializeObject(dto, Formatting.Indented).Replace("\r\n", "\n");
+
+                // The user directory exists in a normal run, but a first run that cannot create it must
+                // fail on the write rather than on a missing folder nobody reported.
+                string? folder = Path.GetDirectoryName(ToolPaths.SettingsPath);
+                if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+
                 File.WriteAllText(ToolPaths.SettingsPath, json + "\n", new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
             }
             catch (Exception)
@@ -73,6 +83,10 @@ namespace PassiveTreeEditor.Source.Io
 
     public sealed class EditorSettingsState
     {
+        /// <summary>The SharedData folder every catalog is read from. Empty means the default for this
+        /// run — the project's symlink in the editor, the folder beside the executable in a build.</summary>
+        public string DataRoot { get; set; } = string.Empty;
+
         public string TreePath { get; set; } = string.Empty;
 
         /// <summary>How far apart the layout was being read. A view setting, so it lives here and never
@@ -86,6 +100,8 @@ namespace PassiveTreeEditor.Source.Io
 
     public sealed class EditorSettingsDto
     {
+        [JsonProperty("dataRoot")] public string? DataRoot { get; set; }
+
         [JsonProperty("treePath")] public string? TreePath { get; set; }
 
         [JsonProperty("layoutSpread")] public float? LayoutSpread { get; set; }

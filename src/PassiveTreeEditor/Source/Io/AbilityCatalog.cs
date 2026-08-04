@@ -32,6 +32,16 @@ namespace PassiveTreeEditor.Source.Io
             }
         }
 
+        /// <summary>Empties the catalog so the next read starts from nothing. Entries accumulate across
+        /// <see cref="Apply"/> calls — a catalog is a folder of files — so re-reading a data root without
+        /// this would list every ability once per read.</summary>
+        public void Reset()
+        {
+            _abilities.Clear();
+            _selectable = null;
+            _sorted = false;
+        }
+
         /// <summary>Sorting is deferred to the first read because <see cref="Apply"/> runs once per
         /// file: sorting there would re-sort the whole catalog for every file it grows by.</summary>
         private void Sort()

@@ -1,0 +1,36 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PassiveTreeEditor", "PassiveTreeEditor.csproj", "{448E8A82-EABA-484A-AB0B-6FC9E3E82366}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "..\Core\Core.csproj", "{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		ExportDebug|Any CPU = ExportDebug|Any CPU
+		ExportRelease|Any CPU = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{448E8A82-EABA-484A-AB0B-6FC9E3E82366}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{448E8A82-EABA-484A-AB0B-6FC9E3E82366}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{448E8A82-EABA-484A-AB0B-6FC9E3E82366}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{448E8A82-EABA-484A-AB0B-6FC9E3E82366}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{448E8A82-EABA-484A-AB0B-6FC9E3E82366}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{448E8A82-EABA-484A-AB0B-6FC9E3E82366}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6C0D7A5F-24B8-4F1E-9A2D-7E3F5B8C41D2}
+	EndGlobalSection
+EndGlobal

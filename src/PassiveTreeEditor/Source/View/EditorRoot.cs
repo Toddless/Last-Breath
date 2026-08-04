@@ -56,6 +56,7 @@ namespace PassiveTreeEditor.Source.View
         private FindPanel _find = null!;
         private ValidationPanel _check = null!;
         private TabContainer _tabs = null!;
+        private LineEdit _dataRootEdit = null!;
         private LineEdit _pathEdit = null!;
         private Label _status = null!;
         private SpinBox _budget = null!;
@@ -202,9 +203,21 @@ namespace PassiveTreeEditor.Source.View
 
             bar.AddChild(new VSeparator());
 
+            _dataRootEdit = new LineEdit
+            {
+                Text = DataRoot(),
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                CustomMinimumSize = new Vector2(220, 0),
+                TooltipText = "SharedData folder every catalog is read from — Reload re-reads them all"
+            };
+            bar.AddChild(new Label { Text = "data" });
+            bar.AddChild(_dataRootEdit);
+            bar.AddChild(ToolbarButton("Reload", ReloadGameData));
+            bar.AddChild(new VSeparator());
+
             _pathEdit = new LineEdit
             {
-                Text = string.IsNullOrWhiteSpace(_settings.TreePath) ? ToolPaths.DefaultTreePath : _settings.TreePath,
+                Text = string.IsNullOrWhiteSpace(_settings.TreePath) ? ToolPaths.DefaultTreePath(DataRoot()) : _settings.TreePath,
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
                 CustomMinimumSize = new Vector2(320, 0)
             };
@@ -388,12 +401,38 @@ namespace PassiveTreeEditor.Source.View
 
         // ── data ───────────────────────────────────────────────────────────────────────────────
 
+        /// <summary>The folder the catalogs are read from: what the header says, or the default for this
+        /// run while the field is empty.</summary>
+        private string DataRoot() =>
+            string.IsNullOrWhiteSpace(_settings.DataRoot) ? ToolPaths.DefaultSharedDataRoot : _settings.DataRoot;
+
+        /// <summary>
+        /// Reads every catalog from the root now in the header. The tree path follows the root while it
+        /// is still that root's own default — a path typed by hand is left where the author put it.
+        /// </summary>
+        private void ReloadGameData()
+        {
+            string previousDefaultTree = ToolPaths.DefaultTreePath(DataRoot());
+            CaptureDataRoot();
+
+            if (string.Equals(_pathEdit.Text.Trim(), previousDefaultTree, StringComparison.OrdinalIgnoreCase))
+                _pathEdit.Text = ToolPaths.DefaultTreePath(DataRoot());
+
+            CaptureSettings();
+            LoadGameData();
+        }
+
         private void LoadGameData()
         {
+            string root = DataRoot();
             var failures = new List<string>();
-            var source = new FileSystemDataSource(ToolPaths.SharedDataRoot);
+            var source = new FileSystemDataSource(root);
             var participants = new IGameDataParticipant[] { _abilities, _treeProvider, _playerStats, _parameterFormats, _conditions };
             var service = new GameDataService(source, participants);
+
+            // The catalogs of the previous root are not this root's: everything that grows by file has
+            // to start empty, or a second read shows every ability twice.
+            _abilities.Reset();
 
             service.LoadFailed += (catalog, exception) => failures.Add($"{catalog}: {exception.Message}");
             service.LoadAll();
@@ -418,7 +457,11 @@ namespace PassiveTreeEditor.Source.View
                       + (failures.Count > 0 ? $", {failures.Count} catalog(s) unavailable" : string.Empty)
                       + (issues.Count > 0 ? $", {issues.Count} data issue(s)" : string.Empty));
 
-            if (issues.Count > 0) ShowMessage("Data issues", issues);
+            // A root that is not there at all is said on its own: every catalog under it is missing for
+            // that one reason, and a list of them names the symptom instead of the cause.
+            if (!System.IO.Directory.Exists(root))
+                ShowMessage("Data root not found", [root, "Point the tool at a SharedData folder in the header and press Reload."]);
+            else if (issues.Count > 0) ShowMessage("Data issues", issues);
         }
 
         /// <summary>Settings are read before any catalog exists, so the profile can only be assembled
@@ -503,11 +546,24 @@ namespace PassiveTreeEditor.Source.View
         /// a word — both save paths have to re-read the live values instead of trusting an alias.</summary>
         private void CaptureSettings()
         {
+            CaptureDataRoot();
             _settings.TreePath = _pathEdit.Text.Trim();
             _settings.BaseStats = _baseStats.Overrides();
 
             // Read off the canvas, not off the box: the keys move the canvas first and the box after.
             _settings.LayoutSpread = _canvas.LayoutSpread;
+        }
+
+        /// <summary>Only a root the author chose is written down. The default is a different folder in a
+        /// run from the editor and in an exported one, and both runs read the same settings file — a
+        /// default recorded as a path would hand one run the other one's folder.</summary>
+        private void CaptureDataRoot()
+        {
+            string root = _dataRootEdit.Text.Trim();
+
+            _settings.DataRoot = string.Equals(root, ToolPaths.DefaultSharedDataRoot, StringComparison.OrdinalIgnoreCase)
+                ? string.Empty
+                : root;
         }
 
         /// <summary>
