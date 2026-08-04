@@ -67,7 +67,8 @@ namespace LastBreathTest.LootSimulation
             var itemMinter = new Core.Items.ItemMinter(itemProvider, equipMinter, itemProvider);
             var itemCreation = new ItemCreationService(itemProvider, rnd, itemMinter, materializer, effectCatalog,
                 new Core.Items.Grants.GrantFactory(() => null, () => null, () => null));
-            var lootService = new LootGenerationService(rnd, events, messages, itemCreation, configurationProvider);
+            var draw = new TableRecordDraw(shared.GetRequiredService<Core.Battle.Abilities.IAbilityAugmentCatalog>(), rnd);
+            var lootService = new LootGenerationService(rnd, events, messages, itemCreation, configurationProvider, draw);
 
             return new LootPipeline
             {

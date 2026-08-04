@@ -2,17 +2,24 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Newtonsoft.Json.Linq;
 
-    /// <summary>Every id referenced by the loot tables must resolve to a shipped catalog entry —
-    /// an unknown id is a hard failure (the drop pipeline would burn budget on an uncreatable item).</summary>
+    /// <summary>Every position of the shipped loot tables must resolve to something the game can
+    /// actually mint — a position naming an id needs a catalog entry, a position naming a set of
+    /// augments needs at least one augment answering its filter. Either way an unresolvable position
+    /// is a hard failure: the drop pipeline would burn budget on a seat that produces nothing.</summary>
     [TestClass]
     public class LootTablesAuditTests
     {
+        /// <summary>The key a loot table position writes its augment filter under.</summary>
+        private const string GroupProperty = "augments";
+
+        /// <summary>The section of the ability catalog the augment records live in.</summary>
+        private const string AugmentSection = "augments";
+
         [TestMethod]
         public void EveryLootTableIdExistsInTheCatalogs()
         {
-            var lootIds = CatalogRoots("LootTables")
-                .SelectMany(root => root.SelectTokens("$..items[*].id"))
-                .Select(token => (string?)token)
+            var lootIds = Positions()
+                .Select(position => (string?)position["id"])
                 .Where(id => !string.IsNullOrEmpty(id))
                 .Select(id => id!)
                 .ToHashSet();
@@ -28,6 +35,52 @@ namespace LastBreathTest.BattleSystemTests
             var orphans = lootIds.Where(id => !knownIds.Contains(id)).OrderBy(id => id).ToList();
             Assert.AreEqual(0, orphans.Count, $"Loot table ids without a catalog entry: {string.Join(", ", orphans)}");
         }
+
+        /// <summary>A position names exactly one of the two kinds of drop. Naming both leaves what
+        /// drops undecided, naming neither prices a seat that describes nothing — the parser refuses
+        /// either, so a shipped table written that way would lose the line silently.</summary>
+        [TestMethod]
+        public void EveryLootTablePositionNamesOneKindOfDrop()
+        {
+            var confused = Positions()
+                .Where(position => !string.IsNullOrEmpty((string?)position["id"]) == (position[GroupProperty] != null))
+                .Select(position => position.ToString(Newtonsoft.Json.Formatting.None))
+                .ToList();
+
+            Assert.AreEqual(0, confused.Count, $"Loot table positions naming both an id and a group, or neither: {string.Join(", ", confused)}");
+        }
+
+        /// <summary>A group is expanded at mint time, so a filter no augment answers is not a load
+        /// error at all — it is a kill that quietly drops one item fewer, forever.</summary>
+        [TestMethod]
+        public void EveryLootTableGroupIsAnsweredByAShippedAugment()
+        {
+            var augments = Augments();
+            var unanswered = Positions()
+                .Select(position => position[GroupProperty])
+                .OfType<JObject>()
+                .Select(group => ((int?)group["tier"], (string?)group["rarity"] ?? DefaultRarity))
+                .Where(filter => !augments.Contains(filter!))
+                .Select(filter => $"tier {filter.Item1?.ToString() ?? "(none)"} / {filter.Item2}")
+                .Distinct()
+                .ToList();
+
+            Assert.AreEqual(0, unanswered.Count, $"Loot table groups no shipped augment answers: {string.Join(", ", unanswered)}");
+        }
+
+        /// <summary>An augment record leaving its rarity unstated is the plainest augment there is —
+        /// the same reading <see cref="Core.Data.AbilityData.AbilityUpgradeData"/> gives it.</summary>
+        private const string DefaultRarity = nameof(Core.Enums.Rarity.Common);
+
+        /// <summary>The tier/rarity pairs the shipped augment records cover.</summary>
+        private static HashSet<(int? Tier, string Rarity)> Augments() =>
+            CatalogRoots("Abilities")
+                .SelectMany(root => root[AugmentSection] as JArray ?? [])
+                .Select(augment => ((int?)augment["tier"], (string?)augment["rarity"] ?? DefaultRarity))
+                .ToHashSet();
+
+        private static IEnumerable<JObject> Positions() =>
+            CatalogRoots("LootTables").SelectMany(root => root.SelectTokens("$..items[*]")).OfType<JObject>();
 
         private static IEnumerable<string> CatalogIds(string catalog, string arrayProperty) =>
             CatalogRoots(catalog)

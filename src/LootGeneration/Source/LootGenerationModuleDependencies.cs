@@ -12,6 +12,7 @@ namespace LootGeneration.Source
         {
             services.AddGameDataParticipant<ILootTableProvider, LootTableProvider>();
             services.AddGameDataParticipant<ILootConfiguration, LootConfigurationProvider>();
+            services.AddSingleton<TableRecordDraw>();
             services.AddSingleton<ILootGenerationService, LootGenerationService>();
             services.AddSingleton<ILootOrchestrator, LootOrchestrator>();
             services.AddTransient<IRequestHandler<GetLootTableRequest, Dictionary<int, List<TableRecord>>>, GetLootTableRequestHandler>();

@@ -6,6 +6,11 @@ namespace Core.Data.LootTable
     public record LootTableTierData
     {
         [JsonProperty("tier")] public int Tier { get; init; }
-        [JsonProperty("items")] public List<TableRecord> Items { get; init; } = [];
+
+        /// <summary>The seats of this tier. Read through <see cref="TableRecordsConverter"/>: a
+        /// position must say what it drops and what it costs before it is allowed to take budget.</summary>
+        [JsonProperty("items")]
+        [JsonConverter(typeof(TableRecordsConverter))]
+        public List<TableRecord> Items { get; init; } = [];
     };
 }

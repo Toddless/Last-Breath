@@ -2,6 +2,7 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
     using Core.Battle;
+    using Core.Battle.Abilities;
     using Core.Data;
     using Core.Data.LootTable;
     using Core.Entity;
@@ -102,7 +103,8 @@ namespace LastBreathTest.BattleSystemTests
                 Mock.Of<IGameEventBus>(),
                 messageBus.Object,
                 Mock.Of<IItemCreationService>(),
-                configuration.Object);
+                configuration.Object,
+                new TableRecordDraw(Mock.Of<IAbilityAugmentCatalog>(), Mock.Of<IRandomNumberGenerator>()));
         }
 
         private static Mock<IFightableNpc> CreateNpc(bool isSummon)

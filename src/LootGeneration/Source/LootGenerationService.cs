@@ -26,6 +26,7 @@ namespace LootGeneration.Source
         private readonly IGameMessageBus _gameMessageBus;
         private readonly IGameEventBus _gameEventBus;
         private readonly IItemCreationService _itemCreationService;
+        private readonly TableRecordDraw _draw;
         private readonly List<string> _diedEntities = [];
         private ILootConfiguration _configuration;
 
@@ -34,13 +35,15 @@ namespace LootGeneration.Source
             IGameEventBus eventBus,
             IGameMessageBus messageBus,
             IItemCreationService itemCreationService,
-            ILootConfiguration configuration)
+            ILootConfiguration configuration,
+            TableRecordDraw draw)
         {
             _rnd = rnd;
             _configuration = configuration;
             _gameEventBus = eventBus;
             _gameMessageBus = messageBus;
             _itemCreationService = itemCreationService;
+            _draw = draw;
             _gameEventBus.Subscribe<BattleEndEvent>(OnBattleEnds);
         }
 
@@ -67,13 +70,21 @@ namespace LootGeneration.Source
             float[] actualTierChances = Calculations.CalculateChances<ITierMultiplierModifier>(npcModifiers, CopyBaseChances(_configuration.BaseTierChances));
             float[] actualRarityChances = Calculations.CalculateChances<IRarityUpgradeModifier>(npcModifiers, CopyBaseChances(_configuration.BaseRarityChances));
 
-            var chosenItemsIds = SpendBudget(budget, _configuration.TierPrices, actualTierChances, context.TryUpgradeTier, finalLootTable, out float leftoverBudget);
+            var chosenRecords = SpendBudget(budget, _configuration.TierPrices, actualTierChances, context.TryUpgradeTier, finalLootTable, out float leftoverBudget);
+            var chosenItemsIds = NameTheDrops(chosenRecords);
             chosenItemsIds.AddRange(context.GuaranteedItems);
             _diedEntities.Add(diedEntity.InstanceId);
             var items = GenerateChosenItems(actualRarityChances, context, chosenItemsIds);
             AppendGoldPile(items, leftoverBudget);
             return items;
         }
+
+        /// <summary>The bought positions as the ids the minter is asked for. A position naming a set
+        /// is resolved to one of its members HERE, a step before the item is made: what the table
+        /// bought is the seat, what the world sees is a thing. A seat that names nothing left in the
+        /// game is reported by the draw and simply produces no id.</summary>
+        private List<string> NameTheDrops(List<TableRecord> chosen) =>
+            chosen.Select(record => _draw.Draw(record)).OfType<string>().ToList();
 
         private Dictionary<int, List<TableRecord>> CreateFinalLootTable(Dictionary<int, List<TableRecord>> baseTable, Dictionary<int, List<TableRecord>> additionalItems)
         {
@@ -101,7 +112,10 @@ namespace LootGeneration.Source
             items.Add(new ItemStack(new GoldItem()) { Stack = gold });
         }
 
-        private List<string> SpendBudget(
+        /// <summary>Buys positions out of the table until the budget cannot afford the cheapest one.
+        /// Returns the positions rather than ids: a position naming a set is still a set here, and
+        /// which member of it drops belongs to the mint (<see cref="NameTheDrops"/>).</summary>
+        private List<TableRecord> SpendBudget(
             float budget,
             int[] tierPrices,
             float[] actualTierChances,
@@ -146,7 +160,7 @@ namespace LootGeneration.Source
 
                 var tableRecords = modifiedTable[chosenTier];
                 var randomItem = tableRecords[_rnd.RandIntRange(0, tableRecords.Count - 1)];
-                if (randomItem.Price > budget || string.IsNullOrWhiteSpace(randomItem.Id)) randomItem = PickRandomAffordableItem(tableRecords, budget);
+                if (randomItem.Price > budget || !randomItem.NamesADrop) randomItem = PickRandomAffordableItem(tableRecords, budget);
                 if (randomItem == null)
                 {
                     wastedRolls++;
@@ -177,7 +191,7 @@ namespace LootGeneration.Source
 
             _gameEventBus.Publish<ItemTierChosenEvent>(new(tiersAmount));
 
-            return chosen.Select(entry => entry.Record.Id).ToList();
+            return chosen.Select(entry => entry.Record).ToList();
         }
 
         /// <summary>The item cap must not flatten the reward curve: when the cap stopped the spending,
@@ -207,7 +221,7 @@ namespace LootGeneration.Source
                 {
                     if (!modifiedTable.TryGetValue(betterTier, out var records)) continue;
                     candidates.AddRange(records
-                        .Where(record => !string.IsNullOrWhiteSpace(record.Id) && record.Price > cheapest.Price && record.Price - cheapest.Price <= budget)
+                        .Where(record => record.NamesADrop && record.Price > cheapest.Price && record.Price - cheapest.Price <= budget)
                         .Select(record => (record, betterTier)));
                 }
 
@@ -278,10 +292,10 @@ namespace LootGeneration.Source
         }
 
         private static Dictionary<int, float> BuildMinPriceByTier(Dictionary<int, List<TableRecord>> table) =>
-            table.Where(kvp => kvp.Value.Any(record => !string.IsNullOrWhiteSpace(record.Id)))
+            table.Where(kvp => kvp.Value.Any(record => record.NamesADrop))
                 .ToDictionary(
                     kvp => kvp.Key,
-                    kvp => kvp.Value.Where(record => !string.IsNullOrWhiteSpace(record.Id)).Min(record => record.Price));
+                    kvp => kvp.Value.Where(record => record.NamesADrop).Min(record => record.Price));
 
         /// <summary>Falls to the nearest WORSE tier the budget can still afford; -1 when none can.</summary>
         private static int FindClosestAffordableTier(int fromTier, float budget, Dictionary<int, float> minPriceByTier, int tierCount)
@@ -297,7 +311,7 @@ namespace LootGeneration.Source
         // funnel most small-budget kills into the single most expensive item of the tier.
         private TableRecord? PickRandomAffordableItem(List<TableRecord> tableRecords, float budget)
         {
-            var affordable = tableRecords.Where(record => !string.IsNullOrWhiteSpace(record.Id) && record.Price <= budget).ToList();
+            var affordable = tableRecords.Where(record => record.NamesADrop && record.Price <= budget).ToList();
             return affordable.Count == 0 ? null : affordable[_rnd.RandIntRange(0, affordable.Count - 1)];
         }
 
