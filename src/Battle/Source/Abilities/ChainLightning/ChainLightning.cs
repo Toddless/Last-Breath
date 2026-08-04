@@ -32,8 +32,6 @@ namespace Battle.Source.Abilities.ChainLightning
     /// </summary>
     public class ChainLightning(AbilityBaseData data) : MulticastAbility<ChainPlan>(data)
     {
-        private readonly RandomNumberGenerator _rnd = CreateRandom();
-
         public float Damage => this[AbilityParameter.Damage];
         public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
         public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
@@ -131,14 +129,7 @@ namespace Battle.Source.Abilities.ChainLightning
         {
             var alive = field.GetEnemies(owner).Where(e => e.IsAlive).ToList();
             var pool = alive.Count > 1 && previous != null ? alive.Where(e => !e.IsSame(previous.InstanceId)).ToList() : alive;
-            return pool.Count == 0 ? null : pool[_rnd.RandiRange(0, pool.Count - 1)];
-        }
-
-        private static RandomNumberGenerator CreateRandom()
-        {
-            var rnd = new RandomNumberGenerator();
-            rnd.Randomize();
-            return rnd;
+            return pool.Count == 0 ? null : pool[CombatRandom.Rolls.RandIntRange(0, pool.Count - 1)];
         }
     }
 }

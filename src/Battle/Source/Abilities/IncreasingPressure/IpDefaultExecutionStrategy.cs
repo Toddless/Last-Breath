@@ -6,15 +6,11 @@
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Godot;
 
     public class IpDefaultExecutionStrategy : IIpExecutionStrategy
     {
         public virtual async Task Execute(IncreasingPressure ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
-            var rnd = new RandomNumberGenerator();
-            rnd.Randomize();
-
             foreach (IFightable target in targets)
             {
                 var window = new AttackSeriesWindow(ability, owner, field);
@@ -24,7 +20,7 @@
                     if (!target.IsAlive) break;
                     float additionalDamage = ability.BonusDamage(owner) * increase;
                     float damage = owner.Parameters.Damage * increase;
-                    var context = new AttackContext(owner, target, damage, rnd, window.Scheduler)
+                    var context = new AttackContext(owner, target, damage, CombatRandom.Attacks!, window.Scheduler)
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,

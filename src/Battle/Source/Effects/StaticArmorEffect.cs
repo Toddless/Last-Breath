@@ -8,7 +8,6 @@ namespace Battle.Source.Effects
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
-    using Godot;
 
     /// <summary>Everything a Charge detonation needs, frozen at cast time from the ability's
     /// (post-upgrade) parameters.</summary>
@@ -34,8 +33,6 @@ namespace Battle.Source.Effects
     public class StaticArmorEffect(int duration, ChargeDetonation settings, IBattleField field)
         : Effect(id: "Effect_Static_Armor", duration, maxStacks: 1)
     {
-        private readonly RandomNumberGenerator _rnd = new();
-
         public override async Task Apply(EffectApplyingContext context)
         {
             await base.Apply(context);
@@ -116,7 +113,7 @@ namespace Battle.Source.Effects
         private IFightable? RandomEnemy(IFightable owner, IFightable except)
         {
             var enemies = field.GetEnemies(owner).Where(enemy => enemy.IsAlive && !enemy.IsSame(except.InstanceId)).ToList();
-            return enemies.Count == 0 ? null : enemies[_rnd.RandiRange(0, enemies.Count - 1)];
+            return enemies.Count == 0 ? null : enemies[CombatRandom.Rolls.RandIntRange(0, enemies.Count - 1)];
         }
     }
 }

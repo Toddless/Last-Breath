@@ -114,6 +114,16 @@
         /// </summary>
         public static void UseEngineCastRandom() => Ability.CastRandomSource = Ability.EngineCastRandom;
 
+        /// <summary>
+        /// Points the stream ability delivery rolls on at the engine generator — series lengths, stage
+        /// rolls, bounce and jump targets, splash victims, and the generator every attack context of a
+        /// cast carries. Outside <see cref="AddBattleSystemModuleDependencies"/> for the same reason as
+        /// <see cref="UseEngineCastRandom"/>: hosts without a Godot runtime compose this module too, and
+        /// there the engine generator is a native object whose construction takes the process down. The
+        /// assignment itself builds nothing — the generator is created on the first real delivery.
+        /// </summary>
+        public static void UseEngineCombatRandom() => CombatRandom.Source = CombatRandom.EngineCombatRandom;
+
         public static void AddBattleUiElementsFactory(this IGameServiceProvider provider)
         {
             var uiElementManager = provider.GetService<IUiElementsManager>();

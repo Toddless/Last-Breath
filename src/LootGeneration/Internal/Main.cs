@@ -2,6 +2,7 @@ namespace LootGeneration.Internal
 {
     using System;
     using Core.Data;
+    using Core.Entity.Components;
     using Core.Events;
     using Godot;
     using Services;
@@ -30,6 +31,11 @@ namespace LootGeneration.Internal
             {
                 var npcModifierProvider = _gameServiceProvider.GetService<INpcModifierProvider>();
                 var gameEventBus = _gameServiceProvider.GetService<IGameEventBus>();
+                // The stream the spawner rolls on is chosen here, from the container that already binds the
+                // engine RNG for everything else: this scene runs inside Godot, so its spawns roll on the
+                // engine generator too — the spawner's own default stays free of the engine for hosts
+                // without one, where merely building a native generator kills the process.
+                _spawner.SetRandomNumberGenerator(_gameServiceProvider.GetService<IRandomNumberGenerator>());
                 _spawner.SetNpcModifierProvider(npcModifierProvider);
                 _lootGenerationHud?.SetEventBus(gameEventBus);
                 _lootGenerationHud?.SetNpcModifiers(npcModifierProvider.GetAllModifierIds());

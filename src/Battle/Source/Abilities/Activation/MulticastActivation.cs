@@ -21,8 +21,6 @@ namespace Battle.Source.Abilities.Activation
         /// <summary>Stance-wide caps for the final stage chance: stage 2 may become guaranteed, higher stages may not.</summary>
         private readonly Dictionary<int, float> _stageChanceCaps = new() { [2] = 1f, [3] = 0.65f, [4] = 0.4f };
 
-        private readonly RandomNumberGenerator _rnd = new();
-
         /// <summary>Per-ability multicast bonus on top of the owner's MulticastChance (upgrades set it).</summary>
         public float BonusChance { get; set; }
 
@@ -33,7 +31,7 @@ namespace Battle.Source.Abilities.Activation
             {
                 float cap = _stageChanceCaps.GetValueOrDefault(stage, 1f);
                 float chance = Mathf.Clamp(_baseStageChances[stage] * (1 + multicast), 0f, cap);
-                if (_rnd.Randf() <= chance) return stage;
+                if (CombatRandom.Rolls.RandFloat() <= chance) return stage;
             }
 
             return BaseStage;

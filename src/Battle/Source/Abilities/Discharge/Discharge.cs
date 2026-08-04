@@ -10,7 +10,6 @@ namespace Battle.Source.Abilities.Discharge
     using Core.Data.AbilityData;
     using Core.Entity;
     using Core.Enums;
-    using Godot;
 
     /// <summary>Cast plan of the Discharge: the barrier-conversion knobs.</summary>
     public class DischargePlan : DamagingCastPlan
@@ -26,8 +25,6 @@ namespace Battle.Source.Abilities.Discharge
     /// </summary>
     public class Discharge(AbilityBaseData data) : MulticastAbility<DischargePlan>(data)
     {
-        private readonly RandomNumberGenerator _rnd = new();
-
         /// <summary>L3 upgrade point: the strike ignores elemental resistances.</summary>
         public bool AlwaysIgnoreResistances { get; set; }
 
@@ -139,7 +136,7 @@ namespace Battle.Source.Abilities.Discharge
                 IgnoreResistances = plan.IgnoreResistances
             };
             context.Add(plan.DamageType, overkill);
-            _ = others[_rnd.RandiRange(0, others.Count - 1)].TakeDamage(context);
+            _ = others[CombatRandom.Rolls.RandIntRange(0, others.Count - 1)].TakeDamage(context);
         }
     }
 }

@@ -6,15 +6,12 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Godot;
 
     public class SoAsDefaultExecutionStrategy : ISoAExecutionStrategy
     {
         public virtual async Task Execute(SeriesOfAttacks ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
-            var rnd = new RandomNumberGenerator();
-            rnd.Randomize();
-            int attacks = rnd.RandiRange(ability.MinAttacks, ability.MaxAttacks);
+            int attacks = CombatRandom.Rolls.RandIntRange(ability.MinAttacks, ability.MaxAttacks);
 
             foreach (IFightable target in targets)
                 await ExecuteOnTarget(target);
@@ -29,7 +26,7 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
                 for (int i = 0; i < attacks; i++)
                 {
                     float additionalDamage = ability.Damage + ((owner.Parameters.Damage * ability.WeaponDamageScale) + (owner.Parameters.SpellDamage * ability.SpellDamageScale));
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, window.Scheduler)
+                    var context = new AttackContext(owner, target, owner.Parameters.Damage, CombatRandom.Attacks!, window.Scheduler)
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         Index = i,

@@ -48,9 +48,7 @@ namespace Battle.Source.Abilities.Riders
             var enemies = field.GetEnemies(owner).Where(e => e.IsAlive).ToList();
             if (enemies.Count == 0) return;
 
-            var rnd = new Godot.RandomNumberGenerator();
-            rnd.Randomize();
-            var newTarget = enemies[rnd.RandiRange(0, enemies.Count - 1)];
+            var newTarget = enemies[CombatRandom.Rolls.RandIntRange(0, enemies.Count - 1)];
 
             foreach (var stack in poisonStacks)
             {

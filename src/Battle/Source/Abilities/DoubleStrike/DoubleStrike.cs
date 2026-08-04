@@ -68,9 +68,6 @@ namespace Battle.Source.Abilities.DoubleStrike
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
-            var rnd = new Godot.RandomNumberGenerator();
-            rnd.Randomize();
-
             foreach (IFightable target in targets)
             {
                 var window = new AttackSeriesWindow(this, owner, field);
@@ -78,7 +75,7 @@ namespace Battle.Source.Abilities.DoubleStrike
                 for (int strike = 0; strike < 2; strike++)
                 {
                     if (!target.IsAlive) break;
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, window.Scheduler)
+                    var context = new AttackContext(owner, target, owner.Parameters.Damage, CombatRandom.Attacks!, window.Scheduler)
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,

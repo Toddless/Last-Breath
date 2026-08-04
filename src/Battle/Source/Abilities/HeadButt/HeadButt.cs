@@ -37,9 +37,6 @@ namespace Battle.Source.Abilities.HeadButt
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
-            var rnd = new Godot.RandomNumberGenerator();
-            rnd.Randomize();
-
             foreach (IFightable target in targets)
             {
                 var window = new AttackSeriesWindow(this, owner, field);
@@ -47,7 +44,7 @@ namespace Battle.Source.Abilities.HeadButt
                 {
                     if (!target.IsAlive) break;
                     float additionalDamage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, window.Scheduler)
+                    var context = new AttackContext(owner, target, owner.Parameters.Damage, CombatRandom.Attacks!, window.Scheduler)
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,

@@ -10,7 +10,6 @@ namespace Battle.Source.Abilities.IceAegis
     using Core.Entity;
     using Core.Enums;
     using Effects;
-    using Godot;
 
     /// <summary>Cast plan of the Ice Aegis: barrier numbers and the optional stage payloads.</summary>
     public class AegisPlan
@@ -32,8 +31,6 @@ namespace Battle.Source.Abilities.IceAegis
     /// </summary>
     public class IceAegis(AbilityBaseData data) : MulticastAbility<AegisPlan>(data)
     {
-        private readonly RandomNumberGenerator _rnd = new();
-
         public float BarrierBase => this[Parameters.BarrierBase];
         public float PerIntelligenceScale => this[Parameters.PerIntelligenceScale];
         public int Duration => (int)this[Parameters.Duration];
@@ -113,7 +110,7 @@ namespace Battle.Source.Abilities.IceAegis
         private IEffect CreateAttackerEffect()
         {
             float stunChance = this[Parameters.StunAttackersChance];
-            if (stunChance > 0 && _rnd.Randf() <= stunChance)
+            if (stunChance > 0 && CombatRandom.Rolls.RandFloat() <= stunChance)
                 return new StunEffect((int)this[Parameters.StunDuration]);
 
             return new Clumsiness(

@@ -9,7 +9,6 @@ namespace Battle.Source.Abilities.DeepFreeze
     using Core.Data.AbilityData;
     using Core.Entity;
     using Effects;
-    using Godot;
 
     /// <summary>Cast plan of the Deep Freeze: durations plus the optional stage payloads.</summary>
     public class DeepFreezePlan
@@ -28,8 +27,6 @@ namespace Battle.Source.Abilities.DeepFreeze
     /// </summary>
     public class DeepFreeze(AbilityBaseData data) : MulticastAbility<DeepFreezePlan>(data)
     {
-        private readonly RandomNumberGenerator _rnd = new();
-
         /// <summary>L2 upgrade point: chance to also freeze one random other enemy.</summary>
         public float SpreadFreezeChance { get; set; }
 
@@ -126,14 +123,14 @@ namespace Battle.Source.Abilities.DeepFreeze
         /// <summary>L2 upgrade: a coin flip freezes one random enemy the cast did not touch.</summary>
         private void TrySpreadFreeze(DeepFreezePlan plan, IFightable owner, IBattleField field)
         {
-            if (SpreadFreezeChance <= 0 || _rnd.Randf() > SpreadFreezeChance) return;
+            if (SpreadFreezeChance <= 0 || CombatRandom.Rolls.RandFloat() > SpreadFreezeChance) return;
 
             var untouched = field.GetEnemies(owner)
                 .Where(enemy => enemy.IsAlive && plan.Targets.All(t => !t.IsSame(enemy.InstanceId)))
                 .ToList();
             if (untouched.Count == 0) return;
 
-            IFightable lucky = untouched[_rnd.RandiRange(0, untouched.Count - 1)];
+            IFightable lucky = untouched[CombatRandom.Rolls.RandIntRange(0, untouched.Count - 1)];
             _ = new FreezeEffect(plan.FreezeDuration)
                 .Apply(new EffectApplyingContext { Caster = owner, Target = lucky, Source = InstanceId });
         }

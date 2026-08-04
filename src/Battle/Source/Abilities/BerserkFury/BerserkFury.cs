@@ -54,9 +54,6 @@ namespace Battle.Source.Abilities.BerserkFury
             await FuryFactory(FuryDuration, FuryHealthPercent)
                 .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
 
-            var rnd = new RandomNumberGenerator();
-            rnd.Randomize();
-
             foreach (IFightable target in targets)
             {
                 var window = new AttackSeriesWindow(this, owner, field);
@@ -64,7 +61,7 @@ namespace Battle.Source.Abilities.BerserkFury
                 while (owner.CurrentHealth > 1 && target.IsAlive)
                 {
                     float additionalDamage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, window.Scheduler)
+                    var context = new AttackContext(owner, target, owner.Parameters.Damage, CombatRandom.Attacks!, window.Scheduler)
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
@@ -78,7 +75,7 @@ namespace Battle.Source.Abilities.BerserkFury
 
                     // Lower health — lower chance to keep swinging (fury burns health, so the series ends itself).
                     float chance = Mathf.Clamp(owner.CurrentHealth / owner.Parameters.MaxHealth, MinContinueChance, MaxContinueChance);
-                    if (rnd.Randf() > chance) break;
+                    if (CombatRandom.Rolls.RandFloat() > chance) break;
                 }
             }
         }

@@ -10,7 +10,6 @@ namespace Battle.Source.Abilities
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
-    using Godot;
 
     /// <summary>
     /// Base of the Intelligence stance abilities: every cast rolls an activation stage.
@@ -24,8 +23,6 @@ namespace Battle.Source.Abilities
         where TPlan : class
     {
         private const int BaseStage = 1;
-
-        private readonly RandomNumberGenerator _rnd = new();
 
         /// <summary>The stance activation roll; the knobs live inside (upgrades/boss phases tune it).</summary>
         public MulticastActivation Activation { get; } = new();
@@ -91,7 +88,7 @@ namespace Battle.Source.Abilities
 
         /// <summary>Ability bonus is a fractional increase over the owner's crit chance (0.35 = +35%).</summary>
         protected bool RollCritical(IFightable owner) =>
-            _rnd.Randf() <= owner.Parameters.CriticalChance * (1 + CriticalChanceBonus);
+            CombatRandom.Rolls.RandFloat() <= owner.Parameters.CriticalChance * (1 + CriticalChanceBonus);
 
         protected float CalculateHitDamage(DamagingCastPlan plan, IFightable owner) =>
             plan.Damage

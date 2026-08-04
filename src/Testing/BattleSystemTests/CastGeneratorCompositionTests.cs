@@ -1,6 +1,5 @@
 namespace LastBreathTest.BattleSystemTests
 {
-    using System;
     using System.Collections.Generic;
     using System.Reflection;
     using System.Threading.Tasks;
@@ -32,28 +31,6 @@ namespace LastBreathTest.BattleSystemTests
         private const float Mana = 100f;
         private const float Cost = 50f;
         private const float Tolerance = 0.001f;
-
-        /// <summary>The bootstraps that boot inside Godot and therefore owe their casts the engine
-        /// generator. They are the Godot projects, off the test assembly's references, so the fact that
-        /// they still install it is read off their source.</summary>
-        private static readonly string[] s_bootstraps =
-        [
-            Path.Combine("Main", "Services", "GameServiceProvider.cs"),
-            Path.Combine("Battle", "Services", "GameServiceProvider.cs"),
-        ];
-
-        /// <summary>The sources the game ships, found by walking up from the test binaries.</summary>
-        private static string SrcRoot
-        {
-            get
-            {
-                var directory = new DirectoryInfo(AppContext.BaseDirectory);
-                while (directory != null && !Directory.Exists(Path.Combine(directory.FullName, "SharedData")))
-                    directory = directory.Parent;
-                Assert.IsNotNull(directory, "SharedData not found above the test bin directory");
-                return directory.FullName;
-            }
-        }
 
         [TestMethod]
         public async Task ACastNobodyPinnedAGeneratorForRollsWithoutTouchingTheEngine()
@@ -99,16 +76,8 @@ namespace LastBreathTest.BattleSystemTests
         public void EveryProjectThatBootsInsideGodotInstallsTheEngineCastStream()
         {
             // The other half of the chain: the hook above is worth exactly as much as the bootstraps
-            // that call it. A project dropping the call leaves its casts on the engine-free default,
-            // and nothing in the running game would ever say so out loud.
-            foreach (string relative in s_bootstraps)
-            {
-                string bootstrap = Path.Combine(SrcRoot, relative);
-                Assert.IsTrue(File.Exists(bootstrap), $"the bootstrap is not where it lived: {bootstrap}");
-                Assert.IsTrue(
-                    File.ReadAllText(bootstrap).Contains(nameof(BattleSystemModuleDependencies.UseEngineCastRandom), StringComparison.Ordinal),
-                    $"{relative} stopped pointing its cast stream at the engine generator — the game would roll casts on the sandbox default");
-            }
+            // that call it.
+            GodotBootstraps.AssertEachInstalls(nameof(BattleSystemModuleDependencies.UseEngineCastRandom));
         }
 
         [TestMethod]
@@ -145,59 +114,6 @@ namespace LastBreathTest.BattleSystemTests
             caster.CurrentMana = Mana;
 
             return caster;
-        }
-
-        /// <summary>Counts what was asked of it: which generator a cast actually rolled on is invisible
-        /// from the outside otherwise.</summary>
-        private sealed class CountingRandom : IRandomNumberGenerator
-        {
-            private readonly IRandomNumberGenerator _rolls = new DefaultRandomNumberGenerator(seed: 1);
-
-            public int Count { get; private set; }
-
-            public float RandFloat()
-            {
-                Count++;
-                return _rolls.RandFloat();
-            }
-
-            public float RandFloatRange(float min, float max)
-            {
-                Count++;
-                return _rolls.RandFloatRange(min, max);
-            }
-
-            public int RandIntRange(int min, int max)
-            {
-                Count++;
-                return _rolls.RandIntRange(min, max);
-            }
-
-            public float RandFloatN(float mean, float deviation)
-            {
-                Count++;
-                return _rolls.RandFloatN(mean, deviation);
-            }
-
-            public uint RandInt()
-            {
-                Count++;
-                return _rolls.RandInt();
-            }
-
-            public long RandWeighted(float[] weights)
-            {
-                Count++;
-                return _rolls.RandWeighted(weights);
-            }
-
-            public long RandWeighted(ReadOnlySpan<float> weights)
-            {
-                Count++;
-                return _rolls.RandWeighted(weights);
-            }
-
-            public void Randomize() => _rolls.Randomize();
         }
 
         /// <summary>A cast with no delivery of its own: what it pays for itself is the whole of it.</summary>

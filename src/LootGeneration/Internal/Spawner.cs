@@ -7,14 +7,31 @@ namespace LootGeneration.Internal
     using Core.Data;
     using Core.Enums;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Entity.NpcModifiers;
     using Core.Events;
     using Godot;
 
+    /// <summary>
+    /// Fills the sandbox world with example NPCs and rolls what each of them is — rarity, faction, level,
+    /// type, how many modifiers it carries and which, and where it lands.
+    /// </summary>
     public class Spawner
     {
         private const int AmountNpc = 5;
-        private readonly RandomNumberGenerator _rnd = new();
+
+        /// <summary>The rectangle a spawn lands in, in world units.</summary>
+        private const int WorldWidth = 1500;
+        private const int WorldHeight = 800;
+
+        /// <summary>
+        /// The stream every spawn decision rolls on. It starts on <see cref="DefaultRandomNumberGenerator"/>,
+        /// which touches nothing native: the engine generator is a native object, and constructing one where
+        /// Godot is not running kills the whole process (0xC0000005) past the reach of any catch — a spawner
+        /// that built its own took every host that merely CREATED it down with it. Which implementation the
+        /// running sandbox rolls on is a composition decision, made by the scene that wires this spawner.
+        /// </summary>
+        private IRandomNumberGenerator _rnd = new DefaultRandomNumberGenerator();
 
         private readonly Dictionary<Rarity, float> _rarityChances = new()
         {
@@ -85,6 +102,10 @@ namespace LootGeneration.Internal
             _npcModifierProvider = npcModifierProvider;
         }
 
+        /// <summary>Seats the stream spawn decisions roll on. The scene that boots inside Godot hands over
+        /// the engine-backed generator here; a host without the engine keeps the pure-C# default.</summary>
+        public void SetRandomNumberGenerator(IRandomNumberGenerator rnd) => _rnd = rnd;
+
         public void SetGameEventBus(IGameEventBus gameEventBus) => _gameEventBus = gameEventBus;
         public void SetWorld(Node2D world) => _mainWorld = world;
 
@@ -128,14 +149,14 @@ namespace LootGeneration.Internal
 
         private Vector2 GetRandomPosition()
         {
-            float x = GD.RandRange(0, 1500);
-            float y = GD.RandRange(0, 800);
+            float x = _rnd.RandIntRange(0, WorldWidth);
+            float y = _rnd.RandIntRange(0, WorldHeight);
             return new Vector2(x, y);
         }
 
         private Rarity GetRandomRarity()
         {
-            float roll = _rnd.Randf();
+            float roll = _rnd.RandFloat();
             float cumulative = 0f;
 
             foreach (KeyValuePair<Rarity, float> rarityChance in _rarityChances)
@@ -148,25 +169,25 @@ namespace LootGeneration.Internal
             return Rarity.Uncommon;
         }
 
-        private Fractions GetRandomFraction() => (Fractions)_rnd.RandiRange(0, 6);
+        private Fractions GetRandomFraction() => (Fractions)_rnd.RandIntRange(0, 6);
 
         private int GetRandomLevel(Rarity rarity) => rarity switch
         {
-            Rarity.Uncommon => _rnd.RandiRange(1, 15),
-            Rarity.Rare => _rnd.RandiRange(1, 25),
-            Rarity.Epic => _rnd.RandiRange(1, 35),
-            Rarity.Legendary => _rnd.RandiRange(1, 55),
-            Rarity.Unique => _rnd.RandiRange(1, 85),
-            Rarity.Mythic => _rnd.RandiRange(1, 150),
-            _ => _rnd.RandiRange(0, 10)
+            Rarity.Uncommon => _rnd.RandIntRange(1, 15),
+            Rarity.Rare => _rnd.RandIntRange(1, 25),
+            Rarity.Epic => _rnd.RandIntRange(1, 35),
+            Rarity.Legendary => _rnd.RandIntRange(1, 55),
+            Rarity.Unique => _rnd.RandIntRange(1, 85),
+            Rarity.Mythic => _rnd.RandIntRange(1, 150),
+            _ => _rnd.RandIntRange(0, 10)
         };
 
-        private EntityType GetRandomEntityType() => (EntityType)_rnd.RandiRange(0, 5);
+        private EntityType GetRandomEntityType() => (EntityType)_rnd.RandIntRange(0, 5);
 
         private int GetAmountNpcModifiers(EntityType type, Rarity rarity)
         {
             int min = MinAmountNpcModifiers(type);
-            return _rnd.RandiRange(min, AmountNpcModifiersForRarity(rarity));
+            return _rnd.RandIntRange(min, AmountNpcModifiersForRarity(rarity));
         }
 
         private int MinAmountNpcModifiers(EntityType type) => type switch

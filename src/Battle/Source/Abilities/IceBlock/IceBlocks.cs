@@ -12,7 +12,6 @@ namespace Battle.Source.Abilities.IceBlock
     using Core.Entity;
     using Core.Enums;
     using Effects;
-    using Godot;
 
     /// <summary>Cast plan of the Ice Block: the volley fields plus the stage-mutable stun length.</summary>
     public class IceBlockPlan : DamagingCastPlan
@@ -27,8 +26,6 @@ namespace Battle.Source.Abilities.IceBlock
     /// </summary>
     public class IceBlocks(AbilityBaseData data) : MulticastAbility<IceBlockPlan>(data)
     {
-        private readonly RandomNumberGenerator _rnd = new();
-
         public float Damage => this[AbilityParameter.Damage];
         public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
         public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
@@ -86,7 +83,7 @@ namespace Battle.Source.Abilities.IceBlock
                 await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage));
             }
 
-            if (ResetCooldownChance > 0 && _rnd.Randf() <= ResetCooldownChance) CooldownLeft = 0;
+            if (ResetCooldownChance > 0 && CombatRandom.Rolls.RandFloat() <= ResetCooldownChance) CooldownLeft = 0;
         }
 
         protected override IceBlockPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field)
@@ -169,7 +166,7 @@ namespace Battle.Source.Abilities.IceBlock
         private IFightable? RandomEnemy(IFightable owner, IBattleField field)
         {
             var enemies = field.GetEnemies(owner).Where(enemy => enemy.IsAlive).ToList();
-            return enemies.Count == 0 ? null : enemies[_rnd.RandiRange(0, enemies.Count - 1)];
+            return enemies.Count == 0 ? null : enemies[CombatRandom.Rolls.RandIntRange(0, enemies.Count - 1)];
         }
     }
 }

@@ -5,7 +5,6 @@ namespace Battle.Source.Effects
     using Core.Context;
     using Core.Enums;
     using Core.Events;
-    using Godot;
 
     /// <summary>
     /// The Porcupine buff: every real enemy hit is answered with pure damage — a share of the damage
@@ -21,8 +20,6 @@ namespace Battle.Source.Effects
         float cooldownReduceChance)
         : Effect(id: "Effect_Porcupine", duration, maxStacks: 1)
     {
-        private readonly RandomNumberGenerator _rnd = CreateRandom();
-
         public float DamageReturn => damageReturn;
 
         public override async Task Apply(EffectApplyingContext context)
@@ -49,7 +46,7 @@ namespace Battle.Source.Effects
 
             if (healOnHitPercent > 0)
                 Target.Heal(new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * healOnHitPercent });
-            if (cooldownReduceChance > 0 && sourceAbility.CooldownLeft > 0 && _rnd.Randf() <= cooldownReduceChance)
+            if (cooldownReduceChance > 0 && sourceAbility.CooldownLeft > 0 && CombatRandom.Rolls.RandFloat() <= cooldownReduceChance)
                 sourceAbility.CooldownLeft--;
 
             float returned = (context.TotalDamage * damageReturn) + (Target.Parameters.Armor * armorReturn);
@@ -57,13 +54,6 @@ namespace Battle.Source.Effects
             var retaliation = new DamageContext { Source = Target, Cause = DamageCause.Effect };
             retaliation.Add(DamageType.Pure, returned);
             attacker.TakeDamage(retaliation);
-        }
-
-        private static RandomNumberGenerator CreateRandom()
-        {
-            var rnd = new RandomNumberGenerator();
-            rnd.Randomize();
-            return rnd;
         }
     }
 }

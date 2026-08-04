@@ -8,7 +8,6 @@ namespace Battle.Source.Abilities.IncreasingPressure
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
-    using Godot;
 
     /// <summary>
     /// L3 upgrade strategy: each successful attack also deals a percentage of the damage
@@ -17,13 +16,11 @@ namespace Battle.Source.Abilities.IncreasingPressure
     public class IpDamageRandomTargetStrategy(float splashDamagePercent) : IpDefaultExecutionStrategy
     {
         private IFightable? _owner;
-        private readonly RandomNumberGenerator _splashRnd = new();
         private IBattleField? _field;
 
         public override async Task Execute(IncreasingPressure ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             _owner = owner;
-            _splashRnd.Randomize();
             Subscribe(owner);
             _field = field;
             await base.Execute(ability, owner, targets, field);
@@ -51,7 +48,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
             var enemies = _field.GetEnemies(_owner).Where(e => e.IsAlive && e != context.Target).ToList();
             if (enemies.Count == 0) return;
 
-            int idx = _splashRnd.RandiRange(0, enemies.Count - 1);
+            int idx = CombatRandom.Rolls.RandIntRange(0, enemies.Count - 1);
             var randomTarget = enemies[idx];
 
             var damageContext = new DamageContext { Source = _owner, Cause = DamageCause.Ability };

@@ -5,20 +5,16 @@
     using Core.Battle;
     using Core.Context;
     using Core.Entity;
-    using Godot;
 
     public class IpSingleAttackExecutionStrategy : IIpExecutionStrategy
     {
         public async Task Execute(IncreasingPressure ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
-            var rnd = new RandomNumberGenerator();
-            rnd.Randomize();
-
             foreach (IFightable target in targets)
             {
                 float totalDamage = CalculateTotalDamage(ability, owner);
                 var window = new AttackSeriesWindow(ability, owner, field);
-                var context = new AttackContext(owner, target, totalDamage, rnd, window.Scheduler)
+                var context = new AttackContext(owner, target, totalDamage, CombatRandom.Attacks!, window.Scheduler)
                 {
                     RawCriticalDamage = owner.Parameters.CriticalDamage, RawCriticalChance = owner.Parameters.CriticalChance,
                     SourceAbilityId = ability.Id
