@@ -28,22 +28,32 @@ namespace Crafting.Internal.Inventory
         public int GetTotalItemAmount(string itemId) =>
             _items.Values.Where(i => i.Item.Id == itemId).Sum(i => i.Quantity);
 
+        /// <summary>
+        /// Tops up an existing stack of the item, all of the amount or none of it: a stack with room
+        /// for only part of it is left alone, so the caller opens a fresh one instead of the remainder
+        /// being trimmed away in silence. <see langword="false"/> when no held stack can take it whole.
+        /// </summary>
         public bool TryAddItemStacks(string itemId, int amount = 1)
         {
-            // Find the first existing stack of this item that still has room.
-            // Returns false when no such stack exists or every stack is already full.
-            var itemStack = _items.FirstOrDefault(x => x.Value.Item.Id == itemId && x.Value.Quantity < x.Value.Item.MaxStackSize);
+            var itemStack = _items.FirstOrDefault(x =>
+                x.Value.Item.Id == itemId && x.Value.Quantity + amount <= x.Value.Item.MaxStackSize);
 
             if (itemStack.Key == null) return false;
 
             var item = itemStack.Value.Item;
-            int quantity = itemStack.Value.Quantity;
-            int newQuantity = Math.Min(quantity + amount, item.MaxStackSize);
+            int newQuantity = itemStack.Value.Quantity + amount;
             _items[item.InstanceId] = (item, newQuantity);
             ItemAmountChanges?.Invoke(item.InstanceId, newQuantity);
             return true;
         }
 
+        /// <summary>
+        /// Takes the item, all of the amount or none of it. The sandbox keeps one entry per instance
+        /// instead of a grid of slots, so it refuses three ways: a non-positive amount, a bag at
+        /// capacity (announced through <see cref="InventoryFull"/>), and an instance already held —
+        /// the same instance cannot lie in the bag twice, and that refusal comes with room to spare.
+        /// Every one of them leaves the bag exactly as it was, the caller still holding the item.
+        /// </summary>
         public bool TryAddItem(IItem item, int amount = 1)
         {
             if (amount <= 0) return false;

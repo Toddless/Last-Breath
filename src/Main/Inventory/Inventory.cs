@@ -17,6 +17,8 @@
     public class Inventory(IUiElementsManager uiElements, IGameMessageBus messageBus) : IInventory, ISessionResettable
     {
         private const int BagSlots = 220;
+        private const string BagIsFullKey = "UI_Inventory_Full";
+        private const string MissingItemsKey = "UI_Inventory_Missing_Items";
 
         private readonly Dictionary<string, IItem> _itemInstances = [];
         protected List<IInventorySlot> Slots { get; } = [];
@@ -91,23 +93,43 @@
             where T : IItem => (T?)_itemInstances.GetValueOrDefault(instanceId);
         public int GetTotalItemAmount(string itemId) => Slots.Where(x => x.CurrentItem != null && x.CurrentItem.ItemId == itemId).Sum(x => x.Quantity);
         /// <summary>
-        /// Add the stack of the item to the existing instance. <see langword="true"/> if the stack was added, <see langword="false"/> if the instance was not found.
+        /// Adds the stack of the item to the existing instance. <see langword="true"/> only when the
+        /// whole amount was added; <see langword="false"/> when no instance of the id is held or the
+        /// bag has no room for all of it, and a refusal leaves the bag exactly as it was.
         /// </summary>
         /// <param name="itemId">Meaningful Id. For example "Crafting_Resource_Diamond"</param>
-        /// <param name="amount"></param>
-        /// <returns></returns>
+        /// <param name="amount">How many units of the item are being added.</param>
         public bool TryAddItemStacks(string itemId, int amount = 1)
         {
             var itemInstance = _itemInstances.Values.FirstOrDefault(x => x.Id == itemId);
             if (itemInstance == null) return false;
+
+            if (!HasRoomFor(itemId, amount, itemInstance.MaxStackSize))
+            {
+                NotifyToast(BagIsFullKey, itemInstance.DisplayName);
+                return false;
+            }
+
             FitItemsInSlots(itemInstance.Id, itemInstance.InstanceId, amount, itemInstance.MaxStackSize);
             return true;
         }
 
+        /// <summary>
+        /// Takes the item into the bag, all of it or none of it. An amount that does not fit whole is
+        /// not placed at all and leaves neither the slots nor the instance register touched, so a
+        /// caller answered <see langword="false"/> still owns what it tried to hand over.
+        /// </summary>
         public bool TryAddItem(IItem item, int amount = 1)
         {
             if (amount <= 0) return false;
 
+            if (!HasRoomFor(item.Id, amount, item.MaxStackSize))
+            {
+                NotifyToast(BagIsFullKey, item.DisplayName);
+                return false;
+            }
+
+            // The register is filled before the slots: a slot draws the item it was given through it.
             _itemInstances.TryAdd(item.InstanceId, item);
 
             FitItemsInSlots(item.Id, item.InstanceId, amount, item.MaxStackSize);
@@ -115,6 +137,29 @@
             ItemAmountChanges?.Invoke(item.Id, GetTotalItemAmount(item.Id));
 
             return true;
+        }
+
+        /// <summary>Whether the whole amount fits: what the stacks already held can still take, plus
+        /// the empty slots.</summary>
+        private bool HasRoomFor(string itemId, int amount, int maxStackSize)
+        {
+            EnsureSlots(); // items arrive (loot, quests) long before any window shows the bag
+            int room = 0;
+            foreach (var slot in Slots)
+            {
+                room += RoomInSlot(slot, itemId, maxStackSize);
+                if (room >= amount) return true;
+            }
+
+            return room >= amount;
+        }
+
+        /// <summary>How much of the item a single slot can take: an empty slot a whole stack, a slot
+        /// already holding the same item whatever is left of its own, any other slot nothing.</summary>
+        private static int RoomInSlot(IInventorySlot slot, string itemId, int maxStackSize)
+        {
+            if (slot.CurrentItem == null) return maxStackSize;
+            return slot.CurrentItem.ItemId == itemId ? slot.CurrentItem.MaxStackSize - slot.Quantity : 0;
         }
 
         public int GetAvailableCapacity()
@@ -198,7 +243,7 @@
                 else
                     Tracker.TrackError($"Failed to remove {canRemove} x '{itemId}' from an inventory slot");
             }
-            if (remainToDelete > 0) NotifyToast("UI_Inventory_Missing_Items", itemId);
+            if (remainToDelete > 0) NotifyToast(MissingItemsKey, DisplayNameOf(itemId));
 
             ItemAmountChanges?.Invoke(itemId, GetTotalItemAmount(itemId));
         }
@@ -239,13 +284,16 @@
 
         private Texture2D? GetItemIcon(string instanceId) => _itemInstances[instanceId].Icon;
 
-        private void NotifyToast(string key, string itemId)
-        {
-            string name = _itemInstances.Values.FirstOrDefault(x => x.Id == itemId)?.DisplayName ?? itemId;
-            _ = messageBus.PublishMessageAsync(new SendNotificationMessageMessage(key, NotificationCategory.System,
-                new Dictionary<string, object?> { ["Item"] = name }));
-        }
+        /// <summary>The name a held instance carries; an id nothing is held under speaks for itself.</summary>
+        private string DisplayNameOf(string itemId) =>
+            _itemInstances.Values.FirstOrDefault(x => x.Id == itemId)?.DisplayName ?? itemId;
 
+        private void NotifyToast(string key, string itemName) =>
+            _ = messageBus.PublishMessageAsync(new SendNotificationMessageMessage(key, NotificationCategory.System,
+                new Dictionary<string, object?> { ["Item"] = itemName }));
+
+        /// <summary>Lays the amount out over the slots. Runs behind a room check — the placement
+        /// itself never decides to drop anything.</summary>
         private void FitItemsInSlots(string itemId, string instanceId, int amount, int maxStackSize)
         {
             EnsureSlots(); // items arrive (loot, quests) long before any window shows the bag
@@ -267,8 +315,8 @@
                 var emptySlot = Slots.FirstOrDefault(x => x.CurrentItem == null);
                 if (emptySlot == null)
                 {
-                    // The overflow is dropped; without the toast the loss would be silent.
-                    NotifyToast("UI_Inventory_Full", itemId);
+                    // Unreachable while every entry point checks the room first: the bag lost count of itself.
+                    Tracker.TrackError($"No slot left for {remaining} x '{itemId}' the bag reported room for");
                     return;
                 }
 

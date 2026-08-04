@@ -11,8 +11,8 @@ namespace LastBreathTest.BattleSystemTests
     /// a second register of the instances themselves — the slot remembers an id and a count, the
     /// register remembers the thing.
     /// <para>
-    /// Mirrored faithfully includes the part that is wrong: a stack that found no empty slot is
-    /// dropped and the caller is still told it was taken.
+    /// The answer is worth what it says: an arrival is taken whole or not at all, and a bag that
+    /// cannot hold all of it takes none of it, leaving neither a slot nor a register entry behind.
     /// </para>
     /// </summary>
     internal sealed class SlottedBag(int slots) : IInventory
@@ -41,6 +41,7 @@ namespace LastBreathTest.BattleSystemTests
         public bool TryAddItem(IItem item, int amount = 1)
         {
             if (amount <= 0) return false;
+            if (!HasRoomFor(item.Id, amount, item.MaxStackSize)) return false;
 
             _instances.TryAdd(item.InstanceId, item);
             Fit(item, amount);
@@ -52,6 +53,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             var held = _instances.Values.FirstOrDefault(item => item.Id == itemId);
             if (held == null) return false;
+            if (!HasRoomFor(itemId, amount, held.MaxStackSize)) return false;
 
             Fit(held, amount);
             return true;
@@ -89,6 +91,26 @@ namespace LastBreathTest.BattleSystemTests
         {
             Array.Clear(_slots);
             _instances.Clear();
+        }
+
+        /// <summary>Whether the whole amount fits: what the stacks already held can still take, plus
+        /// the empty slots.</summary>
+        private bool HasRoomFor(string itemId, int amount, int maxStackSize)
+        {
+            int room = 0;
+            foreach (Slot? slot in _slots)
+            {
+                room += RoomInSlot(slot, itemId, maxStackSize);
+                if (room >= amount) return true;
+            }
+
+            return room >= amount;
+        }
+
+        private static int RoomInSlot(Slot? slot, string itemId, int maxStackSize)
+        {
+            if (slot == null) return maxStackSize;
+            return slot.Item.Id == itemId ? slot.Item.MaxStackSize - slot.Quantity : 0;
         }
 
         private void Fit(IItem item, int amount)
