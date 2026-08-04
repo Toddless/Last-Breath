@@ -31,26 +31,14 @@ namespace Core.Data.SaveData
     }
 
     /// <summary>
-    /// One occupied augment slot. The augment is written together with the slot it was chosen for,
-    /// because a socket Id outlives the slot it names: the build reading the file is free to point
-    /// that node at another ability or another tier. An entry whose signature no longer matches the
-    /// slot standing at that id is dropped, instead of dressing another ability in an augment picked
-    /// for the one the node used to carry.
+    /// One occupied augment slot: the augment as any file writes one (<see cref="AugmentSaveData"/>),
+    /// plus the slot it was chosen for. The slot travels with it because a socket Id outlives the slot
+    /// it names: the build reading the file is free to point that node at another ability or another
+    /// tier. An entry whose signature no longer matches the slot standing at that id is dropped,
+    /// instead of dressing another ability in an augment picked for the one the node used to carry.
     /// </summary>
-    public class SocketSaveData
+    public class SocketSaveData : AugmentSaveData
     {
-        /// <summary>Stable Id of the augment record in the slot.</summary>
-        [JsonProperty("augment")] public string Augment { get; init; } = string.Empty;
-
-        /// <summary>
-        /// What THIS copy of the augment rolled, property by property. The id names the record and
-        /// every copy of the augment shares it; the numbers are the copy, and re-rolling them on load
-        /// would hand the player a different augment than the one he put in the slot.
-        /// Written as the copy carries it: a property the record has gained since falls back to its
-        /// declared base when the instance is applied, so a file is never the reason a number is lost.
-        /// </summary>
-        [JsonProperty("values")] public Dictionary<string, float> Values { get; init; } = [];
-
         /// <summary>The ability the slot belonged to when the augment went in.</summary>
         [JsonProperty("ability")] public string Ability { get; init; } = string.Empty;
 

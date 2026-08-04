@@ -17,6 +17,7 @@
     using Core.Entity;
     using Core.Events;
     using Core.Inventory;
+    using Core.Items;
     using Core.Items.Grants;
     using Core.MessageBus;
     using Core.MessageBus.Requests;
@@ -63,6 +64,12 @@
             // Shared on purpose: control resistance and arena rules must exist in every project
             // that fights (Main included) — a bootstrap-local registration left Main without them.
             services.AddGameDataParticipant<ICombatRulesProvider, CombatRulesProvider>();
+            // Minting an augment — as a copy for a socket or as a thing for the bag — draws its
+            // numbers around the band those rules declare, so the two are registered together. A
+            // composition without them holds no augment minter, and the item minter treats augment
+            // ids as ids it cannot make sense of.
+            services.AddSingleton<AugmentMinter>();
+            services.AddSingleton<IAugmentItemMinter, AugmentItemMinter>();
 
             services.AddSingleton<ISkillProvider, PassiveSkillProvider>();
             services.AddSingleton<IGrantEffectProvider, GrantEffectProvider>();

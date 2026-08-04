@@ -311,7 +311,7 @@ namespace LastBreathTest.BattleSystemTests
         private static AugmentMinter MinterOver(float spread, IRandomNumberGenerator rnd) =>
             new(ShippedAbilityData.Augments(), RulesOf(new AugmentValueRules(spread)), rnd);
 
-        private static ICombatRulesProvider RulesOf(AugmentValueRules values) => new StubRules(values);
+        private static ICombatRulesProvider RulesOf(AugmentValueRules values) => new StubCombatRules(values);
 
         /// <summary>One shipped record, read through the loader the game uses.</summary>
         private static AbilityUpgradeData ShippedRecord(string augmentId)
@@ -343,18 +343,6 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
             return provider;
-        }
-
-        /// <summary>The rules a minter reads, with everything but the augment band left at nothing.</summary>
-        private sealed class StubRules(AugmentValueRules values) : ICombatRulesProvider
-        {
-            public ControlResistanceRules ControlResistance => ControlResistanceRules.Disabled;
-
-            public ArenaRules Arena => ArenaRules.Default;
-
-            public ExhaustionRules Exhaustion => ExhaustionRules.Disabled;
-
-            public AugmentValueRules AugmentValues { get; } = values;
         }
 
         /// <summary>A generator pinned to one edge of every range it is asked for — what the extremes

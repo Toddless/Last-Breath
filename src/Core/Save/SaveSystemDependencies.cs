@@ -65,7 +65,11 @@ namespace Core.Save
                 // The bag lives only in projects that have both an inventory and item data (Main);
                 // a sandbox without them simply doesn't write the section.
                 if (sp.GetService<IInventory>() is { } inventory && sp.GetService<IItemDataProvider>() is { } itemData)
-                    manager.Register(new InventorySaveParticipant(inventory, itemData, sp.GetRequiredService<EquipItemSaveConverter>()));
+                    manager.Register(new InventorySaveParticipant(inventory, itemData,
+                        sp.GetRequiredService<EquipItemSaveConverter>(),
+                        // Optional like every seam here: a project that mints no augments holds none
+                        // in its bag, and the section is then written without them.
+                        sp.GetService<Items.IAugmentItemMinter>()));
                 manager.Register(new AbilityBookSaveParticipant(
                     sp.GetRequiredService<IPlayerAccessor>(),
                     sp.GetService<Battle.Abilities.IAbilitySocketBoard>()));
