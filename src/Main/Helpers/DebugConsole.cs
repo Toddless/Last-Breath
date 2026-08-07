@@ -9,10 +9,15 @@ namespace LastBreath.Helpers
     using Core.Ai.World.Time;
     using Core.Battle.Abilities;
     using Core.Crafting;
+    using Core.Data.AbilityData;
     using Core.Data.NpcData;
     using Core.Entity;
     using Core.Enums;
+    using Core.Inventory;
+    using Core.Items;
     using Core.Localization;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
     using Core.Modifiers;
     using Core.Narrative;
     using Core.Narrative.Facts;
@@ -39,9 +44,20 @@ namespace LastBreath.Helpers
         private const string PassiveTreeUsage =
             "passive tree | passive frontier | passive node <nodeId> | passive take <nodeId> | passive refund <nodeId> | passive dump | passive respec";
 
+        private const string AugmentUsage =
+            "aug catalog [filter] | aug bag | aug sockets | aug install <socketId> <copy> | aug extract <socketId>";
+
         /// <summary>How many frontier rows one answer prints: the whole frontier of a wide allocation
         /// would scroll the useful lines out of the console.</summary>
         private const int FrontierLimit = 25;
+
+        /// <summary>How many catalog rows one answer prints. The augment section is over a hundred
+        /// records long; a filter is how the rest of it is reached.</summary>
+        private const int CatalogLimit = 25;
+
+        /// <summary>How much of a copy id the listings print. A copy id is a guid, and the head of one
+        /// is what a player can retype — the install command takes any head naming exactly one copy.</summary>
+        private const int CopyIdHeadLength = 8;
 
         private readonly List<string> _history = [];
         private int _historyIndex;
@@ -73,6 +89,7 @@ namespace LastBreath.Helpers
             _root = new PanelContainer { Visible = false, AnchorRight = 1, AnchorBottom = 0.45f, };
             var layout = new VBoxContainer();
             _output = new RichTextLabel { ScrollFollowing = true, SizeFlagsVertical = Control.SizeFlags.ExpandFill, FocusMode = Control.FocusModeEnum.None };
+            UseFixedWidthFont(_output);
             _input = new LineEdit { PlaceholderText = "help" };
             _input.TextSubmitted += OnSubmitted;
             _input.GuiInput += OnInputKey;
@@ -81,6 +98,13 @@ namespace LastBreath.Helpers
             _root.AddChild(layout);
             AddChild(_root);
         }
+
+        /// <summary>Puts the transcript in a fixed-width face. The listings here are columns padded with
+        /// spaces, and columns only line up while every character is the same width. The face is asked
+        /// for by name, so a machine without it falls back to the theme's own rather than failing; the
+        /// bold face is left alone, which keeps the help headings apart from the lines under them.</summary>
+        private static void UseFixedWidthFont(RichTextLabel output) =>
+            output.AddThemeFontOverride("normal_font", new SystemFont { FontNames = ["Consolas", "Courier New", "monospace"] });
 
         // ↑/↓ recall previous commands; one step past the newest entry restores an empty line.
         private void OnInputKey(InputEvent @event)
@@ -128,6 +152,7 @@ namespace LastBreath.Helpers
                 case "craft": ExecuteCraft(args); break;
                 case "rep": ExecuteReputation(args); break;
                 case "item": ExecuteItem(args); break;
+                case "aug": ExecuteAugment(args); break;
                 case "stats": ExecutePlayerStats(args); break;
                 case "heal": ExecuteHeal(args); break;
                 case "trade": ExecuteTrade(args); break;
@@ -152,7 +177,7 @@ namespace LastBreath.Helpers
         private void ExecuteTrade(string[] args)
         {
             string traderId = args.Length > 1 ? args[1] : "Trader_Human_Merchant";
-            Service<Core.MessageBus.IGameMessageBus>().PublishMessageAsync(new Core.MessageBus.Messages.OpenTradeWindowMessage(traderId));
+            Service<IGameMessageBus>().PublishMessageAsync(new Core.MessageBus.Messages.OpenTradeWindowMessage(traderId));
             Print($"trade window requested: {traderId}");
         }
 
@@ -426,8 +451,9 @@ namespace LastBreath.Helpers
         }
 
         /// <summary>
-        /// What can be bought right now, so a node can be picked without opening the 155-node catalog.
-        /// Adjacency is not recomputed here: a node is listed when <see cref="IPassiveTreeService.CheckTake"/>
+        /// What can be bought right now, so a node can be picked without reading the tree file — whose
+        /// node count and ids move under an authoring pass, which is exactly why the pick is made here.
+        /// Adjacency is not recomputed: a node is listed when <see cref="IPassiveTreeService.CheckTake"/>
         /// says it would succeed, so the list can never disagree with what <c>passive take</c> does.
         /// </summary>
         private void PrintFrontier(IPassiveTreeService tree)
@@ -613,7 +639,8 @@ namespace LastBreath.Helpers
         }
 
         // item add <id> [amount] [rarity]: with a rarity the equip goes through the loot pipeline
-        // (rarity gives the affix slot split), without one it is a plain blueprint mint.
+        // (rarity gives the affix slot split), without one it is a plain mint — which is also the door
+        // an augment id comes through, the minter offering every id to every kind it knows.
         private void ExecuteItem(string[] args)
         {
             if (args.Length < 3 || args[1].ToLowerInvariant() != "add")
@@ -648,12 +675,42 @@ namespace LastBreath.Helpers
                 rarity = parsedRarity;
             }
 
-            var inventory = Service<Core.Inventory.IInventory>();
-            var item = rarity is { } requested
-                ? Service<IItemCreationService>().CreateItem(args[2], [], requested, equipEffectChance: 0, modifierMultiplier: 1)
-                : Service<Core.Items.IItemMinter>().MintItem(args[2]);
-            inventory.TryAddItem(item, amount);
+            var inventory = Service<IInventory>();
+            AddItems(inventory, args[2], amount, rarity);
             Print($"{args[2]}{(rarity != null ? $" ({rarity})" : string.Empty)}: now {inventory.GetTotalItemAmount(args[2])}");
+        }
+
+        /// <summary>
+        /// Puts the amount into the bag. A stackable id is minted once and laid out as a stack; one that
+        /// rolls — an equip, an augment — is minted once PER COPY, because a single instance laid into
+        /// several slots is one draw shown many times over: every slot shows the same numbers, and
+        /// whatever takes the instance out of the bag empties all of them at once.
+        /// </summary>
+        private void AddItems(IInventory inventory, string itemId, int amount, Rarity? rarity)
+        {
+            IItem first = Minted(itemId, rarity);
+            if (first.MaxStackSize > 1)
+            {
+                Placed(inventory, first, amount);
+                return;
+            }
+
+            for (int copy = 0; copy < amount; copy++)
+                if (!Placed(inventory, copy == 0 ? first : Minted(itemId, rarity), 1))
+                    return;
+        }
+
+        private IItem Minted(string itemId, Rarity? rarity) =>
+            rarity is { } requested
+                ? Service<IItemCreationService>().CreateItem(itemId, [], requested, equipEffectChance: 0, modifierMultiplier: 1)
+                : Service<IItemMinter>().MintItem(itemId);
+
+        private bool Placed(IInventory inventory, IItem item, int amount)
+        {
+            if (inventory.TryAddItem(item, amount)) return true;
+
+            Print($"[color=red]The bag would not take {amount} x {item.Id}[/color]");
+            return false;
         }
 
         private void ExecuteInventory(string[] args)
@@ -664,9 +721,339 @@ namespace LastBreath.Helpers
                 return;
             }
 
-            Service<Core.Inventory.IInventory>().Clear();
+            Service<IInventory>().Clear();
             Print("Inventory cleared");
         }
+
+        /// <summary>
+        /// Drives one augment from the bag into a slot and back out. There is no socket window yet, so
+        /// this is the only hand on that road; the two operations travel the bus gates the window will
+        /// use, because a console reaching for the board itself would answer for a road the game does
+        /// not take. Everything else here reads: the records, the copies carried, the slots open.
+        /// </summary>
+        private void ExecuteAugment(string[] args)
+        {
+            switch (args.Length > 1 ? args[1].ToLowerInvariant() : "sockets")
+            {
+                case "catalog": PrintAugmentCatalog(args.Length > 2 ? args[2] : string.Empty); break;
+                case "bag": PrintCarriedAugments(); break;
+                case "sockets": PrintSockets(); break;
+                case "install" when args.Length > 3: InstallAugment(args[2], args[3]); break;
+                case "extract" when args.Length > 2: ExtractAugment(args[2]); break;
+                default: Print(AugmentUsage); break;
+            }
+        }
+
+        /// <summary>
+        /// Every augment the data declares, so a copy can be asked for by id without opening the ability
+        /// file. What is shown is the RECORD — the tier, where it may go, the figures its numbers are
+        /// drawn around — which is what a slot measures. What a copy came out at is the copy's own and
+        /// is shown beside the copy.
+        /// </summary>
+        private void PrintAugmentCatalog(string filter)
+        {
+            var catalog = Service<IAbilityAugmentCatalog>();
+            List<AbilityUpgradeData> matching =
+            [
+                .. catalog.All
+                    .Where(augment => augment.Id.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(augment => augment.Id, StringComparer.Ordinal)
+            ];
+
+            Print(filter.Length == 0
+                ? $"Augments: {matching.Count} declared, {Math.Min(matching.Count, CatalogLimit)} shown"
+                : $"Augments: {matching.Count} of {catalog.All.Count} match \"{filter}\", {Math.Min(matching.Count, CatalogLimit)} shown");
+
+            PrintTable(
+                ["id", "tier", "rarity", "goes on", "group", "declared"],
+                [
+                    .. matching.Take(CatalogLimit).Select(augment => new[]
+                    {
+                        augment.Id,
+                        Text(augment.Tier),
+                        augment.Rarity.ToString(),
+                        BindingOf(augment),
+                        augment.ExclusionGroup.Length == 0 ? "none" : augment.ExclusionGroup,
+                        Numbers(augment.UpgradeProperties),
+                    })
+                ]);
+        }
+
+        /// <summary>
+        /// The augments in the bag as copies rather than as names: two copies of one record differ in
+        /// nothing but what they rolled, so an id alone cannot say which one is about to be seated. The
+        /// head of the copy id printed here is what the install command takes.
+        /// </summary>
+        private void PrintCarriedAugments()
+        {
+            var inventory = Service<IInventory>();
+            var catalog = Service<IAbilityAugmentCatalog>();
+            IReadOnlyList<IAugmentItem> carried = CarriedAugments(inventory);
+
+            Print($"Bag: {carried.Count} augment(s) carried, {inventory.GetAvailableCapacity()} of {inventory.InventoryCapacity} slot(s) free");
+            if (carried.Count == 0)
+            {
+                Print("Nothing to seat: item add <augmentId> mints one (aug catalog lists the ids)");
+                return;
+            }
+
+            PrintTable(
+                ["copy", "id", "tier", "rarity", "rolled"],
+                [
+                    .. carried.Select(item => new[]
+                    {
+                        Head(item.InstanceId),
+                        item.Id,
+                        catalog.Find(item.Id) is { } record ? Text(record.Tier) : "?",
+                        item.Rarity.ToString(),
+                        RolledNumbers(item.Augment),
+                    })
+                ]);
+        }
+
+        /// <summary>The augments the bag actually holds, read off its slots — the same list a save
+        /// writes down. Ordered by record so two copies of one augment stand next to each other, which
+        /// is where two rolls of it are compared.</summary>
+        private static IReadOnlyList<IAugmentItem> CarriedAugments(IInventory inventory) =>
+        [
+            .. inventory.GetContents()
+                .Select(entry => entry.Item)
+                .OfType<IAugmentItem>()
+                .OrderBy(item => item.Id, StringComparer.Ordinal)
+        ];
+
+        /// <summary>Every slot the allocation opens and what stands in it. A slot's id IS the passive
+        /// node that opened it, so a row names the node to give back as well as the ability it serves
+        /// and the tier it takes.</summary>
+        private void PrintSockets()
+        {
+            var board = Service<IAbilitySocketBoard>();
+            IReadOnlyList<AbilitySocket> sockets =
+            [
+                .. board.Sockets
+                    .OrderBy(socket => socket.AbilityId, StringComparer.Ordinal)
+                    .ThenBy(socket => socket.Tier)
+                    .ThenBy(socket => socket.SocketId, StringComparer.Ordinal)
+            ];
+
+            Print($"Sockets: {sockets.Count} open, {sockets.Count(socket => !socket.IsEmpty)} filled");
+            if (sockets.Count == 0)
+                Print("No node opens one yet: an ability node opens the tier-1 slot of its ability, a socket node the higher ones (passive frontier)");
+            else
+                PrintTable(
+                    ["socket (node)", "ability", "tier", "holds"],
+                    [.. sockets.Select(socket => new[] { socket.SocketId, socket.AbilityId, Text(socket.Tier), HoldingOf(socket) })]);
+
+            PrintAugmentsHeldOutsideSockets(board, sockets);
+        }
+
+        /// <summary>The augments a save left the board holding with no slot to put them in — what a
+        /// launch whose tree failed to parse carries until an allocation can answer for them. Printed
+        /// because they are otherwise invisible and are written back into the next save: they are in no
+        /// socket, and they are not in the bag either.</summary>
+        private void PrintAugmentsHeldOutsideSockets(IAbilitySocketBoard board, IReadOnlyList<AbilitySocket> sockets)
+        {
+            HashSet<string> seated = [.. sockets.Where(socket => !socket.IsEmpty).Select(socket => socket.SocketId)];
+            List<AbilitySocketOccupant> waiting = [.. board.Occupants.Where(occupant => !seated.Contains(occupant.Slot.SocketId))];
+            if (waiting.Count == 0) return;
+
+            Print($"{waiting.Count} augment(s) held outside the slots, waiting for an allocation that can judge them:");
+            foreach (AbilitySocketOccupant occupant in waiting)
+                Print($"  {occupant.Slot.SocketId} ({occupant.Slot.AbilityId}, tier {occupant.Slot.Tier}): {occupant.Augment.AugmentId}");
+        }
+
+        /// <summary>Hands one carried copy to a slot through the gate the socket window will use. A
+        /// refusal is named in words: the gate says which of them answered and carries the fitting
+        /// rule's own verdict with it, so nothing here works the rule out a second time.</summary>
+        private void InstallAugment(string socketId, string copy)
+        {
+            if (!TryResolveCopy(copy, out string instanceId)) return;
+
+            SendAndReport<InstallAugmentRequest, AugmentInstallResult>(
+                new InstallAugmentRequest(socketId, instanceId),
+                result => ReportInstall(socketId, result));
+        }
+
+        /// <summary>Takes the augment out of a slot and back into the bag through the mirror gate.</summary>
+        private void ExtractAugment(string socketId) =>
+            SendAndReport<ExtractAugmentRequest, AugmentExtractResult>(
+                new ExtractAugmentRequest(socketId),
+                result => ReportExtract(socketId, result));
+
+        private void ReportInstall(string socketId, AugmentInstallResult result)
+        {
+            if (!result.Installed)
+            {
+                Print($"[color=red]install {socketId}: refused — {RefusalOf(result)}[/color]");
+                return;
+            }
+
+            Print($"install {socketId}: ok");
+            PrintSocket(socketId);
+        }
+
+        private void ReportExtract(string socketId, AugmentExtractResult result)
+        {
+            if (result != AugmentExtractResult.Extracted)
+            {
+                Print($"[color=red]extract {socketId}: refused — {ExtractRefusalOf(result)}[/color]");
+                return;
+            }
+
+            Print($"extract {socketId}: ok");
+            PrintSocket(socketId);
+            PrintCarriedAugments();
+        }
+
+        /// <summary>The one slot an operation just touched, so its new state is on screen without
+        /// listing the whole board again.</summary>
+        private void PrintSocket(string socketId)
+        {
+            if (Service<IAbilitySocketBoard>().Find(socketId) is not { } socket) return;
+
+            Print($"  {socket.SocketId} ({socket.AbilityId}, tier {socket.Tier}): {HoldingOf(socket)}");
+        }
+
+        /// <summary>Sends one socket command and prints the answer when it comes. Void-returning because
+        /// the console has nothing to hand a task to and the printed line IS the answer; the wait is
+        /// kept rather than skipped, so a gate that stops answering at once still reports.</summary>
+        private async void SendAndReport<TRequest, TResponse>(TRequest request, Action<TResponse> report)
+            where TRequest : IRequest<TResponse>
+        {
+            try
+            {
+                report(await Service<IGameMessageBus>().SendRequest<TRequest, TResponse>(request));
+            }
+            catch (Exception exception)
+            {
+                Print($"[color=red]{exception.Message}[/color]");
+            }
+        }
+
+        /// <summary>
+        /// Turns what was typed into the instance id of a carried copy. A copy id is a guid, so the
+        /// listings print its head and this accepts one: a head naming exactly one carried augment
+        /// resolves to it. Anything else is passed on untouched — an id the bag does not know is the
+        /// gate's answer to give and not the console's — and the single refusal made here is a head
+        /// naming several copies, which the console has no ground to choose between.
+        /// </summary>
+        private bool TryResolveCopy(string typed, out string instanceId)
+        {
+            instanceId = typed;
+            List<IAugmentItem> matching =
+            [
+                .. CarriedAugments(Service<IInventory>())
+                    .Where(item => item.InstanceId.StartsWith(typed, StringComparison.OrdinalIgnoreCase))
+            ];
+
+            if (matching.Count > 1)
+            {
+                Print($"[color=red]{matching.Count} carried copies start with \"{typed}\" — type more of the id (aug bag)[/color]");
+                return false;
+            }
+
+            if (matching.Count == 1) instanceId = matching[0].InstanceId;
+            return true;
+        }
+
+        /// <summary>Which gate turned the augment back, in words. The fitting rule's own reasons are
+        /// not repeated in this list — they travel beside the outcome and are spelled out where they
+        /// are read.</summary>
+        private static string RefusalOf(AugmentInstallResult result) => result.Outcome switch
+        {
+            AugmentInstallOutcome.AugmentNotHeld => "the bag holds no augment under that copy id (aug bag)",
+            AugmentInstallOutcome.NoSuchSocket => "no socket of that id is open (aug sockets)",
+            AugmentInstallOutcome.SocketOccupied => "the socket already holds an augment — take it out first (aug extract <socketId>)",
+            AugmentInstallOutcome.DoesNotFit => FitRefusalOf(result.Fit),
+            _ => result.Outcome.ToString(),
+        };
+
+        /// <summary>Why the slot does not take that augment, in the fitting rule's own terms. A verdict
+        /// that never came is a record the catalog no longer declares: there was nothing to measure.</summary>
+        private static string FitRefusalOf(AugmentFitResult? fit) => fit switch
+        {
+            AugmentFitResult.TierAboveSocket => "the augment stands above the tier the socket takes",
+            AugmentFitResult.BoundToAnotherAbility => "the augment is written for another ability (aug catalog names it)",
+            AugmentFitResult.NoSharedTag => "the augment shares no tag with the socket's ability",
+            AugmentFitResult.ExclusionGroupTaken => "the ability already wears an augment of the same exclusion group",
+            AugmentFitResult.ContradictoryDeclaration => "the record answers twice and differently: it claims every ability and names one",
+            null => "no record declares that augment any more, so nothing can judge it",
+            _ => fit.ToString()!,
+        };
+
+        private static string ExtractRefusalOf(AugmentExtractResult result) => result switch
+        {
+            AugmentExtractResult.NothingToExtract => "no socket of that id is open, or it stands empty (aug sockets)",
+            AugmentExtractResult.NoBagRoom => "the bag has no room — the augment stays in the socket rather than being lost on the way",
+            AugmentExtractResult.CannotBeHeld => "no record declares that augment any more — it stays in the socket",
+            _ => result.ToString(),
+        };
+
+        /// <summary>Where the record says the augment may go, in the words the fitting rule reads it by.
+        /// A record answering the binding question twice is shown as it stands: every slot refuses it,
+        /// and the author sees why here instead of at the first install.</summary>
+        private static string BindingOf(AbilityUpgradeData augment)
+        {
+            if (augment.FitsAnyAbility)
+                return augment.AbilityId.Length == 0 ? "any ability" : $"any ability AND {augment.AbilityId} — contradiction";
+
+            if (augment.AbilityId.Length > 0) return augment.AbilityId;
+
+            return augment.Tags.Length == 0 ? "nothing: no tag and no ability" : $"tag {string.Join("/", augment.Tags)}";
+        }
+
+        private string HoldingOf(AbilitySocket socket) =>
+            socket.Augment is { } augment ? $"{augment.AugmentId}: {RolledNumbers(augment)}" : "empty";
+
+        /// <summary>What one copy came out at, every number beside the figure it was drawn around — a
+        /// roll cannot be read against nothing. A property the record has dropped since the copy was
+        /// minted is shown alone: the copy keeps what it rolled either way.</summary>
+        private string RolledNumbers(AugmentInstance augment)
+        {
+            if (augment.Values.Count == 0) return "no numbers";
+
+            AbilityUpgradeData? record = Service<IAbilityAugmentCatalog>().Find(augment.AugmentId);
+            return string.Join(", ", augment.Values
+                .OrderBy(rolled => rolled.Key, StringComparer.Ordinal)
+                .Select(rolled => record != null && record.UpgradeProperties.TryGetValue(rolled.Key, out float declared)
+                    ? $"{rolled.Key} {Rounded(rolled.Value)} (base {Rounded(declared)})"
+                    : $"{rolled.Key} {Rounded(rolled.Value)}"));
+        }
+
+        /// <summary>The figures a record declares, in a fixed order so two records read side by side.</summary>
+        private static string Numbers(IReadOnlyDictionary<string, float> values) =>
+            values.Count == 0
+                ? "none"
+                : string.Join(", ", values
+                    .OrderBy(value => value.Key, StringComparer.Ordinal)
+                    .Select(value => $"{value.Key} {Rounded(value.Value)}"));
+
+        /// <summary>Prints the rows under their header with every column as wide as its widest cell. The
+        /// console is read by eye and held against what was expected, so a listing whose columns do not
+        /// line up is one that has to be read twice. Nothing at all is printed for an empty listing —
+        /// the count line above it has already said so, and a header over no rows only reads as one.</summary>
+        private void PrintTable(string[] header, IReadOnlyList<string[]> rows)
+        {
+            if (rows.Count == 0) return;
+
+            int[] widths = new int[header.Length];
+            foreach (string[] row in rows.Append(header))
+                for (int column = 0; column < header.Length; column++)
+                    widths[column] = Math.Max(widths[column], row[column].Length);
+
+            Print(Padded(header, widths));
+            foreach (string[] row in rows) Print(Padded(row, widths));
+        }
+
+        /// <summary>One line of a table. The last cell is left as it stands — padding a tail of numbers
+        /// only drags trailing spaces across the console.</summary>
+        private static string Padded(string[] cells, int[] widths) =>
+            string.Join("  ", cells.Select((cell, column) => column == cells.Length - 1 ? cell : cell.PadRight(widths[column])));
+
+        private static string Head(string instanceId) =>
+            instanceId.Length <= CopyIdHeadLength ? instanceId : instanceId[..CopyIdHeadLength];
+
+        private static string Text(int value) => value.ToString(CultureInfo.InvariantCulture);
 
         private void ExecuteReputation(string[] args)
         {
@@ -831,6 +1218,7 @@ namespace LastBreath.Helpers
             Print("[b]Effects:[/b] effect list | effect <stun|freeze> [duration] | effect clear");
             Print("[b]Abilities:[/b] ability list | ability learn <abilityId>");
             Print("[b]Items:[/b] item add <itemId> [amount] [rarity] | inv clear");
+            Print($"[b]Augments:[/b] {AugmentUsage}");
             Print("[b]Masteries:[/b] influence [exp <n>] | martial [exp <n>] | craft [exp <n>]");
             Print($"[b]Passive tree:[/b] {PassiveTreeUsage}");
             Print("[b]Reputation:[/b] rep add <faction> <delta> | rep set <faction> <level> | raid");
