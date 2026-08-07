@@ -408,9 +408,27 @@
         }
 
         [TestMethod]
-        public void TheSectionDeclaresTheVersionThatCarriesTheRolledNumbers()
+        public void TheSectionDeclaresTheVersionWhereTheSocketsAreTheWholeTruth()
         {
-            Assert.AreEqual(4, new AbilityBookSaveParticipant(AccessorFor(NewBook())).Version);
+            Assert.AreEqual(5, new AbilityBookSaveParticipant(AccessorFor(NewBook())).Version);
+        }
+
+        [TestMethod]
+        public void AFileWrittenWhenUpgradesWereStillChosenIsReadForItsSlots()
+        {
+            // Version 4 carries everything version 5 needs: the copies and the slots they sit in. Only
+            // the free upgrade choices beside them are gone, so the file is read rather than refused —
+            // refusing it would take the player's augments with the choices.
+            SaveFile file = Save([DexNode, SocketTwo], (SocketTwo, Copy(Augment, (Duration, 4f))));
+            file.Sections[BookSection] = new SaveSection { Version = 4, Data = file.Sections[BookSection].Data };
+
+            var board = new AbilitySocketBoard();
+            IPassiveTreeService tree = NewTree();
+            CreateService(tree, board);
+            ManagerFor(tree, board).Restore(file);
+
+            Assert.AreEqual(Augment, board.Find(SocketTwo)?.Augment?.AugmentId, "a readable file lost the augment in its slot");
+            Assert.AreEqual(4f, board.Find(SocketTwo)?.Augment?.Values[Duration], "the copy came back at another number");
         }
 
         /// <summary>A file holding an allocation and the augments installed into the slots it opened.</summary>
@@ -494,10 +512,14 @@
                 var ability = new Mock<IAbility>();
                 ability.SetupGet(a => a.Id).Returns(abilityId);
                 ability.SetupGet(a => a.InstanceId).Returns(instanceId);
-                ability.SetupGet(a => a.CurrentUpgrades).Returns(new Dictionary<int, IAbilityUpgrade>());
+                ability.SetupGet(a => a.InstalledUpgrades).Returns(new Dictionary<string, IAbilityUpgrade>());
                 ability.Setup(a => a.IsSame(It.IsAny<string>())).Returns((string other) => other == instanceId);
                 return ability.Object;
             }
+
+            /// <summary>These walks are about the slots and the file, never about behaviour: nothing
+            /// here asks what an augment does.</summary>
+            public IAbilityUpgrade? CreateUpgrade(AugmentInstance augment) => null;
 
             public Stance GetAbilityStance(string abilityId) => Stance.Dexterity;
 

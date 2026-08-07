@@ -72,7 +72,10 @@ namespace Core.Save
                         sp.GetService<Items.IAugmentItemMinter>()));
                 manager.Register(new AbilityBookSaveParticipant(
                     sp.GetRequiredService<IPlayerAccessor>(),
-                    sp.GetService<Battle.Abilities.IAbilitySocketBoard>()));
+                    sp.GetService<Battle.Abilities.IAbilitySocketBoard>(),
+                    // Optional beside the board: the restored arrangement has to reach the abilities,
+                    // and a composition holding no slots holds nothing to carry over to them.
+                    sp.GetService<Battle.Abilities.IAbilityAugmentBinder>()));
                 manager.Register(new PlayerVitalsSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
                 manager.Register(new PlayerPlacementSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
 

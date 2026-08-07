@@ -60,6 +60,11 @@
             // The socket board is filled by the same service that fills the book, and read by the
             // ability-book save section — hence a singleton next to the one that syncs it.
             services.AddSingleton<IAbilitySocketBoard, AbilitySocketBoard>();
+            // The one road from the board to the abilities. A singleton because a new playthrough
+            // resets through it, and registered before the unlock service, which closes every
+            // allocation pass with it.
+            services.AddSingleton<AbilityAugmentBinder>();
+            services.AddSingleton<IAbilityAugmentBinder>(sp => sp.GetRequiredService<AbilityAugmentBinder>());
             services.AddSingleton<IAbilityUnlockService, AbilityUnlockService>();
             // Shared on purpose: control resistance and arena rules must exist in every project
             // that fights (Main included) — a bootstrap-local registration left Main without them.
@@ -108,7 +113,6 @@
 
             services.AddTransient<IRequestHandler<GetStanceAbilityRequest, IReadOnlyList<AbilitySlotView>>, GetStanceAbilityRequestHandler>();
             services.AddTransient<IRequestHandler<GetAbilityUpgradeViewRequest, AbilityUpgradeView>, GetAbilityUpgradeViewRequestHandler>();
-            services.AddTransient<IRequestHandler<ApplyAbilityUpgradeRequest, AbilityUpgradeView>, ApplyAbilityUpgradeRequestHandler>();
             // The gates an augment travels between the bag and a slot. They need a bag, which is the
             // game project's — a composition without one owns no augment to move and never sends
             // either request, so the seam is left as a plain dependency instead of an optional one

@@ -14,18 +14,15 @@ namespace Core.Data.SaveData
         /// <summary>Keyed by stance name; tolerates stances added/removed between versions.</summary>
         [JsonProperty("stances")] public Dictionary<string, StanceBookSaveData> Stances { get; init; } = [];
 
-        /// <summary>abilityId → (tier → stable upgrade Id). Restored via Ability.SelectUpgrade, which
-        /// holds one choice per tier — a shape that cannot express a second slot of the same tier.
-        /// That is what <see cref="Sockets"/> is for; this one carries the upgrade choices until the
-        /// choice model itself is retired.</summary>
-        [JsonProperty("upgrades")] public Dictionary<string, Dictionary<int, string>> Upgrades { get; init; } = [];
-
         /// <summary>
         /// Occupied augment slots: socket Id → what sits in it. The key is the SOCKET, not the tier,
         /// which is what lets one ability hold two augments of the same tier — the two entries differ
         /// by socket even when tier and ability are identical. Free slots are not written: which slots
         /// exist follows from the passive-tree allocation, and only what is in them is the file's to
         /// remember.
+        /// This is the whole of what an ability wears. There is no second list of chosen upgrades any
+        /// more: an ability is upgraded by exactly the copies in its sockets, so a file naming both
+        /// would be a file able to disagree with itself.
         /// </summary>
         [JsonProperty("sockets")] public Dictionary<string, SocketSaveData> Sockets { get; init; } = [];
     }

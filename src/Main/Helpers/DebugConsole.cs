@@ -325,11 +325,56 @@ namespace LastBreath.Helpers
                     player.AbilityBook.Learn(provider.GetAbilityStance(abilityId), provider.CreateAbility(abilityId));
                     Print($"Learned {abilityId} ({provider.GetAbilityStance(abilityId)})");
                     break;
+                case "show" when args.Length > 2:
+                    PrintLearnedAbility(player, args[2]);
+                    break;
                 default:
-                    Print("ability list | ability learn <abilityId>");
+                    Print("ability list | ability learn <abilityId> | ability show <abilityId>");
                     break;
             }
         }
+
+        /// <summary>
+        /// One learned ability as it actually casts, and what it is wearing. The numbers on the first
+        /// line are the LIVE ones — everything in the ability's sockets is already counted in them — so
+        /// seating an augment and printing this again is where an install stops being an arrangement
+        /// and becomes a build. Each row beneath names the slot, what stands in it and the numbers that
+        /// copy is working at, which are the copy's own and not the record's averages.
+        /// </summary>
+        private void PrintLearnedAbility(IPlayer player, string abilityId)
+        {
+            IAbility? ability = player.AbilityBook.AllAbilities.FirstOrDefault(learned => learned.Id == abilityId);
+            if (ability == null)
+            {
+                Print($"Not learned: {abilityId} | ability list");
+                return;
+            }
+
+            Print($"{ability.Id}: costs {ability.CostValue} {ability.CostType}, waits {Rounded(ability.Cooldown)} turn(s)");
+            if (ability.InstalledUpgrades.Count == 0)
+            {
+                Print("Wears nothing: no augment sits in its sockets | aug sockets");
+                return;
+            }
+
+            PrintTable(
+                ["socket (node)", "augment", "tier", "working at"],
+                [
+                    .. ability.InstalledUpgrades
+                        .OrderBy(worn => worn.Value.Tier)
+                        .ThenBy(worn => worn.Key, StringComparer.Ordinal)
+                        .Select(worn => new[] { worn.Key, worn.Value.Id, Text(worn.Value.Tier), AppliedNumbers(worn.Value) })
+                ]);
+        }
+
+        /// <summary>The numbers the upgrade was built with — the seated copy's own, since the copy's
+        /// dictionary is what both the behaviour and the description are made from.</summary>
+        private static string AppliedNumbers(IAbilityUpgrade upgrade) =>
+            upgrade.DescriptionValues.Count == 0
+                ? "no numbers"
+                : string.Join(", ", upgrade.DescriptionValues
+                    .OrderBy(applied => applied.Key, StringComparer.Ordinal)
+                    .Select(applied => $"{applied.Key} {applied.Value}"));
 
         private void ExecuteQuest(string[] args)
         {
@@ -1216,7 +1261,7 @@ namespace LastBreath.Helpers
             Print("[b]Player:[/b] restore [hp|mana|barrier|all] | heal <amount> | cd [reset] | kill | revive | tp [x y]");
             Print("[b]Stats:[/b] stats list | stats add <param> <amount> <flat|increase|multiplicative> | stats remove <param> | stats clear");
             Print("[b]Effects:[/b] effect list | effect <stun|freeze> [duration] | effect clear");
-            Print("[b]Abilities:[/b] ability list | ability learn <abilityId>");
+            Print("[b]Abilities:[/b] ability list | ability learn <abilityId> | ability show <abilityId>");
             Print("[b]Items:[/b] item add <itemId> [amount] [rarity] | inv clear");
             Print($"[b]Augments:[/b] {AugmentUsage}");
             Print("[b]Masteries:[/b] influence [exp <n>] | martial [exp <n>] | craft [exp <n>]");

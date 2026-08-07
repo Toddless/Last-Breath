@@ -28,23 +28,26 @@
 
         /// <summary>Riders fired on every delivery impact (per hit / bounce / attack of a series).</summary>
         Dictionary<string, IImpactRider> ImpactRiders { get; }
-        Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; }
-
-        /// <summary>The chosen upgrade per tier (one of three); selection is changeable outside battle.</summary>
-        IReadOnlyDictionary<int, IAbilityUpgrade> CurrentUpgrades { get; }
+        /// <summary>
+        /// The augments the ability is wearing, keyed by the socket each of them sits in. A socket and
+        /// not a tier: two nodes of one tier on one ability are two slots (see
+        /// <see cref="IAbilitySocketBoard"/>), and a tier-keyed arrangement could only hold one of them.
+        /// Each entry was built from the COPY that was seated, so its numbers are that copy's own.
+        /// </summary>
+        IReadOnlyDictionary<string, IAbilityUpgrade> InstalledUpgrades { get; }
 
         event Action<string>? OnParameterChanged;
         event Action<IAbility, bool>? AbilityResourceChanges;
         event Action<IAbility, int>? CooldownLeftChanges;
 
-        void SetAbilityUpgrades(Dictionary<int, List<IAbilityUpgrade>> upgrades);
-
-        /// <summary>Applies the tier's upgrade, removing the previously chosen one. Accepts the stable
-        /// data Id (survives restarts — save/load path) or the InstanceId (UI selection).</summary>
-        void SelectUpgrade(int tier, string upgradeId);
-
-        /// <summary>Removes the tier's chosen upgrade without selecting a replacement.</summary>
-        void ClearUpgrade(int tier);
+        /// <summary>
+        /// Makes the ability wear exactly these upgrades and nothing else: everything worn is removed
+        /// first, then every entry of the set is applied. The whole arrangement arrives at once because
+        /// it is not the ability's to decide — the sockets are the truth of what it wears, and an ability
+        /// that could be told about one slot at a time is an ability whose build can drift away from them.
+        /// </summary>
+        /// <param name="bySocket">Socket id → the upgrade the augment in that socket installs.</param>
+        void InstallUpgrades(IReadOnlyDictionary<string, IAbilityUpgrade> bySocket);
         Task Execute(List<IFightable> targets, IBattleField field);
         void AddParameterDecorator(AbilityParameterDecorator decorator);
         void RemoveParameterDecorator(string decoratorId, string parameter);

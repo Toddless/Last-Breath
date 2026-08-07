@@ -53,16 +53,15 @@
         }
 
         [TestMethod]
-        public void AbilityBookRoundTripsLayoutUpgradesAndStance()
+        public void AbilityBookRoundTripsLayoutAndStance()
         {
-            // Source: two dex abilities (B stays in slot 1, A moved to slot 2), one str, upgrade chosen on A.
+            // Source: two dex abilities (B stays in slot 1, A moved to slot 2), one str. What each of
+            // them WEARS is not written here at all — the augments travel with the sockets, and the
+            // section carries the arrangement of the bar and nothing about behaviour.
             var sourceBook = NewBook();
             var abilityA = FakeAbility("Ability_A");
             var abilityB = FakeAbility("Ability_B");
             var abilityC = FakeAbility("Ability_C");
-            var upgrade = new Mock<IAbilityUpgrade>();
-            upgrade.SetupGet(u => u.Id).Returns("A_Upgrade_L2");
-            abilityA.SetupGet(a => a.CurrentUpgrades).Returns(new Dictionary<int, IAbilityUpgrade> { [2] = upgrade.Object });
             sourceBook.Learn(Stance.Dexterity, abilityA.Object);
             sourceBook.Learn(Stance.Dexterity, abilityB.Object);
             sourceBook.Learn(Stance.Strength, abilityC.Object);
@@ -74,9 +73,8 @@
             // Target: the abilities are already in the book â€” the passive tree hands them over on its
             // own section, which restores first. This one only arranges what is there.
             var targetBook = NewBook();
-            var restoredAbilities = new Dictionary<string, Mock<IAbility>>();
             foreach ((string id, Stance stance) in new[] { ("Ability_A", Stance.Dexterity), ("Ability_B", Stance.Dexterity), ("Ability_C", Stance.Strength) })
-                targetBook.Learn(stance, (restoredAbilities[id] = FakeAbility(id)).Object);
+                targetBook.Learn(stance, FakeAbility(id).Object);
 
             var participant = new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(targetBook)));
             participant.Restore(captured, participant.Version);
@@ -86,7 +84,6 @@
             Assert.AreEqual("Ability_B", layout[1]?.Id);
             Assert.AreEqual("Ability_A", layout[2]?.Id);
 
-            restoredAbilities["Ability_A"].Verify(a => a.SelectUpgrade(2, "A_Upgrade_L2"), Times.Once);
             Assert.AreEqual(Stance.Strength, targetBook.CurrentStance);
         }
 
@@ -140,7 +137,7 @@
             ability.SetupGet(a => a.Id).Returns(id);
             ability.SetupGet(a => a.InstanceId).Returns(instanceId);
             ability.Setup(a => a.IsSame(It.IsAny<string>())).Returns((string other) => other == instanceId);
-            ability.SetupGet(a => a.CurrentUpgrades).Returns(new Dictionary<int, IAbilityUpgrade>());
+            ability.SetupGet(a => a.InstalledUpgrades).Returns(new Dictionary<string, IAbilityUpgrade>());
             return ability;
         }
     }

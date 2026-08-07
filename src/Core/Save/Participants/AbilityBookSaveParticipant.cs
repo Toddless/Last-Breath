@@ -11,35 +11,56 @@ namespace Core.Save.Participants
     using Services;
 
     /// <summary>
-    /// What only this section knows: the slot layout per stance, the chosen upgrades (by stable Id),
-    /// the augments sitting in the ability sockets and the active stance. Neither the learned set nor
-    /// the sockets themselves are stored — both follow from the passive-tree allocation, which is
-    /// restored first (<see cref="RestoreOrder.PassiveTree"/> before <see cref="RestoreOrder.Abilities"/>).
+    /// What only this section knows: the slot layout per stance, the augments sitting in the ability
+    /// sockets and the active stance. Neither the learned set nor the sockets themselves are stored —
+    /// both follow from the passive-tree allocation, which is restored first
+    /// (<see cref="RestoreOrder.PassiveTree"/> before <see cref="RestoreOrder.Abilities"/>).
     /// Storing them would give the book a second authority, and the two only agree until the tree's
     /// content moves: a node repointed at another ability would leave the file insisting on the
     /// ability the character no longer owns a node for. What each augment does carry is the slot it
     /// was chosen for — not to bring that slot back, but to recognise it: a socket Id whose ability or
     /// tier has moved names a different slot, and the augment does not follow the node into it.
     ///
+    /// That restore order is also what makes the augments land at all. The tree section hands its
+    /// allocation over first; the abilities are learned off it before this section runs, so by the time
+    /// the saved arrangement is laid out there is a book to lay it onto — and the augments reach the
+    /// abilities through the same binder a player's own install goes through
+    /// (<see cref="IAbilityAugmentBinder"/>), never through a second road of the load's own.
+    ///
     /// The saved layout wins over the auto-equip that learning performs, so an ability whose node was
     /// taken but which the file never placed stays out of the slots — the player's arrangement is his
     /// own, and a load must not rearrange it.
     ///
-    /// Version 2 dropped the learned list, version 3 added the sockets, and version 4 made each of them
-    /// carry the numbers its augment rolled. Nothing older is read: a version 3 entry names a record and
-    /// no copy of it, and the only ways to finish reading one are to invent numbers the player never
-    /// rolled or to hand him the record's bases — one is a different augment, the other is the tooltip
-    /// lying about what is in the slot. An older file is reported and the section is refused whole
-    /// (<see cref="RestoreWithoutSection"/>), which is the one outcome that leaves the rest of the save
-    /// alone: the file is a playthrough this build cannot dress, not a load that failed.
+    /// Version 2 dropped the learned list, version 3 added the sockets, version 4 made each of them
+    /// carry the numbers its augment rolled, and version 5 dropped the chosen upgrades: an ability is
+    /// upgraded by exactly what stands in its sockets, so the second list had nothing left to say. A
+    /// version 4 file is still read — everything version 5 needs is in it — and the choices it carries
+    /// are reported as dropped rather than silently skipped. Nothing older: a version 3 entry names a
+    /// record and no copy of it, and the only ways to finish reading one are to invent numbers the
+    /// player never rolled or to hand him the record's bases — one is a different augment, the other is
+    /// the tooltip lying about what is in the slot. Such a file is reported and the section is refused
+    /// whole (<see cref="RestoreWithoutSection"/>), which is the one outcome that leaves the rest of the
+    /// save alone: the file is a playthrough this build cannot dress, not a load that failed.
     /// </summary>
     /// <param name="sockets">Optional: a project composed without the battle module has no board,
     /// and the section is then written without its socket entries.</param>
-    public class AbilityBookSaveParticipant(IPlayerAccessor playerAccessor, IAbilitySocketBoard? sockets = null)
+    /// <param name="augments">Optional with the board: what carries the restored arrangement onto the
+    /// abilities. A project holding no slots has nothing to carry.</param>
+    public class AbilityBookSaveParticipant(
+        IPlayerAccessor playerAccessor,
+        IAbilitySocketBoard? sockets = null,
+        IAbilityAugmentBinder? augments = null)
         : ISaveParticipant
     {
+        /// <summary>The oldest section this build can still dress a character from. Below it the file
+        /// carries augment ids without the numbers each copy rolled, which is not a book at all.</summary>
+        private const int OldestReadable = 4;
+
+        /// <summary>The property a version 4 file kept its free upgrade choices under.</summary>
+        private const string RetiredChoices = "upgrades";
+
         public string SectionId => "abilityBook";
-        public int Version => 4;
+        public int Version => 5;
         public int RestoreOrder => Save.RestoreOrder.Abilities;
 
         public JToken Capture()
@@ -54,36 +75,39 @@ namespace Core.Save.Participants
                     Slots = [.. book.GetSlotLayout(stance).Select(ability => ability?.Id)]
                 };
 
-            foreach (var ability in book.AllAbilities.Where(a => a.CurrentUpgrades.Count > 0))
-                data.Upgrades[ability.Id] = ability.CurrentUpgrades.ToDictionary(pair => pair.Key, pair => pair.Value.Id);
-
             CaptureSockets(data);
             return JToken.FromObject(data);
         }
 
         public void Restore(JToken data, int savedVersion)
         {
-            if (savedVersion < Version)
+            if (savedVersion < OldestReadable)
             {
                 Refuse(savedVersion);
                 return;
             }
 
+            ReportRetiredChoices(data, savedVersion);
             var book = playerAccessor.Player?.AbilityBook;
             var saved = data.ToObject<AbilityBookSaveData>();
             if (saved == null) return;
 
             sockets?.Restore(SavedOccupants(saved));
-            if (book == null) return;
 
-            foreach ((string stanceName, StanceBookSaveData stanceData) in saved.Stances)
+            if (book != null)
             {
-                if (!Enum.TryParse(stanceName, out Stance stance)) continue; // stance removed from the game
-                RestoreSlots(book, stance, stanceData.Slots);
+                foreach ((string stanceName, StanceBookSaveData stanceData) in saved.Stances)
+                {
+                    if (!Enum.TryParse(stanceName, out Stance stance)) continue; // stance removed from the game
+                    RestoreSlots(book, stance, stanceData.Slots);
+                }
+
+                book.SetStance(saved.CurrentStance);
             }
 
-            RestoreUpgrades(book, saved.Upgrades);
-            book.SetStance(saved.CurrentStance);
+            // After the slots and whether or not there is a book: the binder is what turns the restored
+            // arrangement into upgrades, and it is the same one a player's own install goes through.
+            augments?.Bind();
         }
 
         /// <summary>
@@ -92,7 +116,11 @@ namespace Core.Save.Participants
         /// playthrough before. The layout does not need the same treatment — a book belongs to the
         /// player node, and the scene the load lands in builds a fresh one.
         /// </summary>
-        public void RestoreWithoutSection() => sockets?.Restore([]);
+        public void RestoreWithoutSection()
+        {
+            sockets?.Restore([]);
+            augments?.Bind();
+        }
 
         /// <summary>
         /// Says out loud that the file carries a book this build cannot read, and lands on the state a
@@ -106,10 +134,27 @@ namespace Core.Save.Participants
         {
             Tracker.TrackError(
                 $"Save section '{SectionId}' was written at version {savedVersion}, which carries augment ids without " +
-                $"the numbers each copy rolled. Version {Version} is the oldest that can be read; the section is dropped.",
+                $"the numbers each copy rolled. Version {OldestReadable} is the oldest that can be read; the section is dropped.",
                 this);
 
             RestoreWithoutSection();
+        }
+
+        /// <summary>
+        /// Says out loud that the file's free upgrade choices are not being read. They were a second
+        /// authority over what an ability does, and the sockets are now the only one — so the choices
+        /// go, and the player is told which abilities lost one instead of finding out by casting.
+        /// Silent only where there is nothing to lose: a file that chose nothing says nothing.
+        /// </summary>
+        private void ReportRetiredChoices(JToken data, int savedVersion)
+        {
+            if (savedVersion >= Version || data[RetiredChoices] is not JObject chosen || chosen.Count == 0) return;
+
+            Tracker.TrackError(
+                $"Save section '{SectionId}' was written at version {savedVersion} and carries upgrade choices for " +
+                $"{chosen.Count} ability(ies) ({string.Join(", ", chosen.Properties().Select(entry => entry.Name))}). " +
+                "An ability now wears exactly the augments in its sockets, so the choices are dropped.",
+                this);
         }
 
         /// <summary>Writes the occupied slots only. An empty one carries nothing to remember, and the
@@ -152,17 +197,6 @@ namespace Core.Save.Participants
                 if (abilityId == null) continue;
                 var ability = learned.FirstOrDefault(a => a.Id == abilityId);
                 if (ability != null) book.Equip(stance, ability.InstanceId, slot);
-            }
-        }
-
-        private static void RestoreUpgrades(IAbilityBookComponent book, Dictionary<string, Dictionary<int, string>> savedUpgrades)
-        {
-            foreach ((string abilityId, Dictionary<int, string> tiers) in savedUpgrades)
-            {
-                var ability = book.AllAbilities.FirstOrDefault(a => a.Id == abilityId);
-                if (ability == null) continue;
-                foreach ((int tier, string upgradeId) in tiers)
-                    ability.SelectUpgrade(tier, upgradeId);
             }
         }
     }

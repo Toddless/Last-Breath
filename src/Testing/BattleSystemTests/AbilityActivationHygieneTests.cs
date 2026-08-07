@@ -111,19 +111,25 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void Copy_DoesNotShareUpgradeInstances()
+        public void Copy_WearsTheSameAugmentsThroughUpgradeInstancesOfItsOwn()
         {
+            // A copy is the same ability wearing the same augments. The upgrade OBJECTS have to be its
+            // own: they carry applied state (Learned, the decorators they laid on), and one shared
+            // between the two would come off the original the next time the copy's slots were rebuilt.
             var ability = CreateAbility(cost: 100);
             var upgrade = new AbilityUpgradeReduceCost("Upgrade_A", [], 1, 0.2f);
-            ability.SetAbilityUpgrades(new() { [1] = [upgrade] });
+            ability.InstallUpgrades(new Dictionary<string, IAbilityUpgrade> { ["socket_one"] = upgrade });
 
             var copy = (Ability)ability.Copy();
-            copy.SelectUpgrade(1, "Upgrade_A");
 
-            Assert.IsFalse(ReferenceEquals(upgrade, copy.Upgrades[1][0]));
-            Assert.IsFalse(upgrade.Learned, "selecting on the copy must not mark the original's upgrade as learned");
-            Assert.AreEqual(100, ability.CostValue, "the original's parameters must stay undecoated");
-            Assert.AreEqual(80, copy.CostValue);
+            Assert.AreEqual(80, copy.CostValue, "the copy is not wearing what the original wears");
+            Assert.IsFalse(ReferenceEquals(upgrade, copy.InstalledUpgrades["socket_one"]));
+
+            copy.InstallUpgrades(new Dictionary<string, IAbilityUpgrade>());
+
+            Assert.AreEqual(100, copy.CostValue, "the copy kept the augment it was told to take off");
+            Assert.IsTrue(upgrade.Learned, "emptying the copy's slot took the original's augment off with it");
+            Assert.AreEqual(80, ability.CostValue, "the original lost its own augment when the copy lost one");
         }
 
         [TestMethod]

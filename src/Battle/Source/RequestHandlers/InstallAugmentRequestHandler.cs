@@ -18,8 +18,17 @@ namespace Battle.Source.RequestHandlers
     /// so the window tells the player why the augment stayed out instead of measuring tiers and tags
     /// on its own — two readings of one rule are two answers.
     /// </para>
+    /// <para>
+    /// A seating that took ends by putting the board back onto the abilities. The gate does not work
+    /// out which upgrade that is — the binder reads the whole arrangement, the same way it reads it
+    /// after a load or a refunded node — because a gate that dressed the ability itself would be a
+    /// second opinion about what the sockets hold.
+    /// </para>
     /// </summary>
-    public class InstallAugmentRequestHandler(IAbilitySocketBoard sockets, IInventory inventory)
+    public class InstallAugmentRequestHandler(
+        IAbilitySocketBoard sockets,
+        IInventory inventory,
+        IAbilityAugmentBinder augments)
         : IRequestHandler<InstallAugmentRequest, AugmentInstallResult>
     {
         public Task<AugmentInstallResult> HandleRequest(InstallAugmentRequest request)
@@ -31,6 +40,7 @@ namespace Battle.Source.RequestHandlers
                 return Task.FromResult(Refusal(request.SocketId, item.Augment));
 
             inventory.RemoveItemByInstanceId(item.InstanceId);
+            augments.Bind();
             return Task.FromResult(new AugmentInstallResult(AugmentInstallOutcome.Installed));
         }
 

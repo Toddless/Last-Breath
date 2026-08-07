@@ -39,6 +39,7 @@ namespace Core.Session
                 Add<IMartialArtMastery>();
                 Add<IPassiveTreeService>(); // after the mastery that grants the points its allocation spends
                 Add<IAbilitySocketBoard>(); // a tree that never loaded syncs nothing, so the board clears itself
+                Add<IAbilityAugmentBinder>(); // after the board: the abilities lose what it no longer holds
                 Add<ICraftingMastery>();
                 Add<IRecipeKnowledge>(); // scroll-learned recipes are per-playthrough
                 Add<IInventory>();

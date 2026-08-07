@@ -92,9 +92,8 @@
         public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
         public Dictionary<string, IActivationRider> ActivationRiders { get; } = [];
         public Dictionary<string, IImpactRider> ImpactRiders { get; } = [];
-        public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; private set; } = [];
-        public IReadOnlyDictionary<int, IAbilityUpgrade> CurrentUpgrades => _currentUpgrades;
-        private readonly Dictionary<int, IAbilityUpgrade> _currentUpgrades = [];
+        public IReadOnlyDictionary<string, IAbilityUpgrade> InstalledUpgrades => _installedUpgrades;
+        private readonly Dictionary<string, IAbilityUpgrade> _installedUpgrades = new(StringComparer.Ordinal);
         public ITargetingStrategy Targeting { get; set; } = TargetingStrategyFactory.From(data);
         public int CostValue => (int)this[AbilityParameter.CostValue];
         public string Id { get; } = data.Id;
@@ -131,30 +130,24 @@
         public event Action<IAbility, int>? CooldownLeftChanges;
         public event Action<IAbility, bool>? AbilityResourceChanges;
 
-        public void SetAbilityUpgrades(Dictionary<int, List<IAbilityUpgrade>> upgrades) => Upgrades = upgrades;
-
-        /// <summary>One chosen upgrade per tier: selecting a new one removes the previous choice first.
-        /// Matches by stable data Id (save/load) or InstanceId (UI selection).</summary>
-        public void SelectUpgrade(int tier, string upgradeId)
+        /// <summary>
+        /// The arrangement is taken down and put up whole rather than compared entry by entry: the
+        /// values an upgrade lays on are decorators, so removing and re-applying the same set leaves the
+        /// same numbers standing, and the alternative would be telling one seated copy from another by
+        /// its id — which is precisely what two copies of one record have in common.
+        /// Cheap enough for that: nothing in a fight rebinds, the passes come from a taken node, a
+        /// seated augment, a load or a new playthrough.
+        /// </summary>
+        public void InstallUpgrades(IReadOnlyDictionary<string, IAbilityUpgrade> bySocket)
         {
-            if (!Upgrades.TryGetValue(tier, out var tierUpgrades)) return;
-            var upgrade = tierUpgrades.FirstOrDefault(u => u.IsSame(upgradeId) || u.Id == upgradeId);
-            if (upgrade == null) return;
-            if (_currentUpgrades.TryGetValue(tier, out var current))
+            foreach (IAbilityUpgrade worn in _installedUpgrades.Values) worn.Remove(this);
+            _installedUpgrades.Clear();
+
+            foreach ((string socketId, IAbilityUpgrade upgrade) in bySocket)
             {
-                if (current.IsSame(upgrade.InstanceId)) return;
-                current.Remove(this);
+                upgrade.Apply(this);
+                _installedUpgrades[socketId] = upgrade;
             }
-
-            upgrade.Apply(this);
-            _currentUpgrades[tier] = upgrade;
-        }
-
-        public void ClearUpgrade(int tier)
-        {
-            if (!_currentUpgrades.TryGetValue(tier, out var current)) return;
-            current.Remove(this);
-            _currentUpgrades.Remove(tier);
         }
 
         public virtual async Task Execute(List<IFightable> targets, IBattleField field)
@@ -304,14 +297,16 @@
             parameters.Register(AbilityParameter.SpellDamageScale, Data.SpellDamageScale);
         }
 
-        /// <summary>Shared tail of every Copy(): fresh instance from the same data + the upgrade catalog.
-        /// Upgrades are copied element by element — a shared instance would leak applied state
-        /// (Learned, decorators) between the copy and the original.</summary>
+        /// <summary>Shared tail of every Copy(): a fresh instance from the same data, wearing the same
+        /// augments in the same slots. The upgrades are copied one by one and applied to the copy — a
+        /// shared instance would leak applied state (Learned, decorators) between the two, and the
+        /// original's decorators would come off whenever the copy's arrangement was rebuilt.</summary>
         protected IAbility CopyUpgradesTo(Ability copy)
         {
-            copy.SetAbilityUpgrades(Upgrades.ToDictionary(
-                tier => tier.Key,
-                tier => tier.Value.Select(upgrade => upgrade.Copy()).ToList()));
+            copy.InstallUpgrades(_installedUpgrades.ToDictionary(
+                worn => worn.Key,
+                worn => worn.Value.Copy(),
+                StringComparer.Ordinal));
             return copy;
         }
 

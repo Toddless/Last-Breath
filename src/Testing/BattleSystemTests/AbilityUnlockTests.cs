@@ -562,7 +562,7 @@ namespace LastBreathTest.BattleSystemTests
             var ability = new Mock<IAbility>();
             ability.SetupGet(a => a.Id).Returns(abilityId);
             ability.SetupGet(a => a.InstanceId).Returns(instanceId);
-            ability.SetupGet(a => a.CurrentUpgrades).Returns(new Dictionary<int, IAbilityUpgrade>());
+            ability.SetupGet(a => a.InstalledUpgrades).Returns(new Dictionary<string, IAbilityUpgrade>());
             ability.Setup(a => a.IsSame(It.IsAny<string>())).Returns((string other) => other == instanceId);
             return ability.Object;
         }
@@ -575,6 +575,8 @@ namespace LastBreathTest.BattleSystemTests
             public IReadOnlyCollection<string> KnownAbilityIds => shipped.KnownAbilityIds;
 
             public IAbility CreateAbility(string abilityId) => StubAbility(abilityId);
+
+            public IAbilityUpgrade? CreateUpgrade(AugmentInstance augment) => null; // no walk here asks what an augment does
 
             public Stance GetAbilityStance(string abilityId) => shipped.GetAbilityStance(abilityId);
 
@@ -596,6 +598,8 @@ namespace LastBreathTest.BattleSystemTests
             public IReadOnlyCollection<string> KnownAbilityIds => s_stances.Keys;
 
             public IAbility CreateAbility(string abilityId) => StubAbility(abilityId);
+
+            public IAbilityUpgrade? CreateUpgrade(AugmentInstance augment) => null; // no walk here asks what an augment does
 
             public Stance GetAbilityStance(string abilityId) => s_stances[abilityId];
 

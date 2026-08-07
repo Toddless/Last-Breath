@@ -63,7 +63,7 @@ namespace LastBreathTest.BattleSystemTests
             ability.SetupGet(a => a.Id).Returns(id);
             ability.SetupGet(a => a.InstanceId).Returns(instanceId);
             ability.Setup(a => a.IsSame(It.IsAny<string>())).Returns((string other) => other == instanceId);
-            ability.SetupGet(a => a.CurrentUpgrades).Returns(new Dictionary<int, IAbilityUpgrade>());
+            ability.SetupGet(a => a.InstalledUpgrades).Returns(new Dictionary<string, IAbilityUpgrade>());
             return ability.Object;
         }
     }

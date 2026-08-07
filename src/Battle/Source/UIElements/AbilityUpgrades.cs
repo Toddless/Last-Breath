@@ -1,14 +1,18 @@
 namespace Battle.Source.UIElements
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Core.Views;
     using Godot;
 
     /// <summary>
-    /// The three tiers of upgrade radio-buttons. Fed pure view data (no domain object); reports the
-    /// chosen upgrade up by instance id + tier. One selection per tier is enforced by the ButtonGroups.
+    /// What the ability is wearing, laid out by tier. Fed pure view data (no domain object) and read
+    /// only: an ability is upgraded by exactly the augments in its sockets, so there is no choice to
+    /// offer and nothing to report upwards. Seating and extracting belong to the socket window, which
+    /// drives the install and extract gates.
+    /// The three tier rows and the rows inside them come from the scene, so an ability wearing more
+    /// augments of one tier than the scene has rows for shows the first of them — a limit this
+    /// placeholder inherits and the socket window replaces.
     /// </summary>
     public partial class AbilityUpgrades : Control
     {
@@ -17,66 +21,28 @@ namespace Battle.Source.UIElements
 
         [Export] private BoxContainer? _tierOne, _tierTwo, _tierThree;
 
-        public event Action<string, int>? AbilityUpgradeSelected;
-
-        public override void _Ready()
-        {
-            CreateButtonGroup(_tierOne);
-            CreateButtonGroup(_tierTwo);
-            CreateButtonGroup(_tierThree);
-        }
-
-        public void SetOptions(IReadOnlyList<UpgradeOptionView> options)
+        public void SetWorn(IReadOnlyList<UpgradeOptionView> worn)
         {
             // Every tier renders, even an empty one: the window instance is reused between
             // abilities (OpenWindow returns the open one), so a skipped tier would keep the
-            // previous ability's variants on screen (tracker #64).
+            // previous ability's augments on screen (tracker #64).
             for (int tier = 1; tier <= TierCount; tier++)
-                SetTier(tier, options.Where(option => option.Tier == tier).ToList());
+                SetTier(tier, [.. worn.Where(augment => augment.Tier == tier)]);
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private void SetTier(int tier, List<UpgradeOptionView> options)
+        private void SetTier(int tier, IReadOnlyList<UpgradeOptionView> worn)
         {
-            var buttons = GetButtonsInTier(tier);
-            for (int i = 0; i < buttons.Length; i++)
+            var rows = GetButtonsInTier(tier);
+            for (int row = 0; row < rows.Length; row++)
             {
-                var button = buttons[i];
-                if (i >= options.Count)
-                {
-                    // A button without an option hides: stale text stays invisible and a click
-                    // can't send the previous ability's upgrade instance id.
-                    button.Visible = false;
-                    button.SetUpgradeTaken(false);
-                    button.SetUpgradeInstanceId(string.Empty);
-                    button.SetDescription(string.Empty);
-                    continue;
-                }
-
-                var option = options[i];
-                button.Visible = true;
-                button.SetUpgradeTaken(option.Selected);
-                button.SetUpgradeTier(tier);
-                button.SetUpgradeInstanceId(option.UpgradeInstanceId);
-                button.SetDescription(option.Description);
+                // A row without an augment hides: stale text must not read as something worn.
+                bool filled = row < worn.Count;
+                rows[row].Visible = filled;
+                if (filled) rows[row].ShowWorn(worn[row].DisplayName, worn[row].Description);
             }
         }
-
-        private void CreateButtonGroup(BoxContainer? container)
-        {
-            if (container == null) return;
-
-            var buttonGroup = new ButtonGroup();
-            buttonGroup.AllowUnpress = false;
-            foreach (UpgradeButton button in container.GetChildren().OfType<UpgradeButton>())
-            {
-                button.ButtonGroup = buttonGroup;
-                button.UpgradeSelected += OnUpgradeSelected;
-            }
-        }
-
-        private void OnUpgradeSelected(string upgradeInstanceId, int tier) => AbilityUpgradeSelected?.Invoke(upgradeInstanceId, tier);
 
         private UpgradeButton[] GetButtonsInTier(int tier) => tier switch
         {

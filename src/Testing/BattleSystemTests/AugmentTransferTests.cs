@@ -1,6 +1,7 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
+    using Battle.Source.Abilities;
     using Battle.Source.RequestHandlers;
     using Core.Battle;
     using Core.Battle.Abilities;
@@ -15,6 +16,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.MessageBus.Requests;
     using Core.Save;
     using Core.Save.Participants;
+    using Core.Services;
     using Microsoft.Extensions.DependencyInjection;
     using Moq;
     using Newtonsoft.Json;
@@ -225,6 +227,9 @@ namespace LastBreathTest.BattleSystemTests
                 .AddBattleSystemModuleDependencies();
             services.AddSingleton<IInventory>(new SlottedBag(BagSlots));
             services.AddSingleton<IRandomNumberGenerator>(new DefaultRandomNumberGenerator(Seed));
+            // Whose abilities the seated augment reaches: the accessor is a shared service of every
+            // project, and the module composed without one would build no binder for the gates.
+            services.AddSingleton<IPlayerAccessor>(new PlayerAccessor());
             using ServiceProvider container = services.BuildServiceProvider();
 
             Assert.IsNotNull(container.GetService<IRequestHandler<InstallAugmentRequest, AugmentInstallResult>>(),
@@ -288,6 +293,7 @@ namespace LastBreathTest.BattleSystemTests
                 ]);
                 Augments = new AugmentItemMinter(_catalog, new AugmentMinter(_catalog,
                     new StubCombatRules(new AugmentValueRules(Spread)), new DefaultRandomNumberGenerator(Seed)));
+                Binder = new AbilityAugmentBinder(new PlayerAccessor(), Board, new Mock<IAbilityProvider>().Object);
             }
 
             internal SlottedBag Bag { get; }
@@ -295,6 +301,11 @@ namespace LastBreathTest.BattleSystemTests
             internal AbilitySocketBoard Board { get; }
 
             internal AugmentItemMinter Augments { get; }
+
+            /// <summary>What the gates hand the board over to. This file is about the road between bag
+            /// and slot, so the binder stands over a character with no abilities at all — what a seated
+            /// augment DOES is walked where the abilities are (<see cref="AugmentEffectTests"/>).</summary>
+            internal IAbilityAugmentBinder Binder { get; }
 
             /// <summary>A fresh copy of the record, in the bag and ready to be handed over.</summary>
             internal IAugmentItem Held(string augmentId)
@@ -306,11 +317,11 @@ namespace LastBreathTest.BattleSystemTests
             }
 
             internal Task<AugmentInstallResult> Install(string socketId, string itemInstanceId) =>
-                new InstallAugmentRequestHandler(Board, Bag)
+                new InstallAugmentRequestHandler(Board, Bag, Binder)
                     .HandleRequest(new InstallAugmentRequest(socketId, itemInstanceId));
 
             internal Task<AugmentExtractResult> Extract(string socketId) =>
-                new ExtractAugmentRequestHandler(Board, Augments, Bag)
+                new ExtractAugmentRequestHandler(Board, Augments, Bag, Binder)
                     .HandleRequest(new ExtractAugmentRequest(socketId));
 
             /// <summary>The bag section as the game registers it, minus the item data: an augment must

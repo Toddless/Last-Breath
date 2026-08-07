@@ -11,10 +11,14 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// The abilities as their data declares them: what each one is built from, and which augments it
-    /// is offered. The records of the augments themselves are not read here — they are asked of
-    /// <see cref="IAbilityAugmentCatalog"/>, which every composition holds, while the code that turns
-    /// one into an upgrade is this module's own.
+    /// The abilities as their data declares them: what each one is built from, and how a copy of an
+    /// augment becomes the upgrade it installs. The records of the augments themselves are not read
+    /// here — they are asked of <see cref="IAbilityAugmentCatalog"/>, which every composition holds,
+    /// while the code that turns one into an upgrade is this module's own.
+    ///
+    /// An ability is created bare. What it wears is not a property of the ability but of the sockets
+    /// its owner has filled, so the arrangement is put on by <see cref="IAbilityAugmentBinder"/> and
+    /// never handed over at construction.
     /// </summary>
     public partial class AbilityProvider(IAbilityAugmentCatalog augments) : IAbilityProvider, IGameDataParticipant
     {
@@ -27,7 +31,7 @@
         /// <summary>Every augment this build knows how to make an upgrade of — the augments a factory
         /// is written for and the augments the parameter table describes, which are two halves of one
         /// registry and never name the same id twice. A record the data declares and this collection
-        /// does not name is a record that parses, is offered and then silently produces nothing.</summary>
+        /// does not name is a record that parses, is minted, is seated and then does nothing at all.</summary>
         public IReadOnlyCollection<string> BuildableAugmentIds => [.. _abilityUpgrades.Keys, .. _parameterAugments.Keys];
 
         public void Apply(string catalog, GameDataFile file)
@@ -37,13 +41,7 @@
             foreach (AbilityBaseData abilityData in root.Abilities) _abilityBaseData[abilityData.Id] = abilityData;
         }
 
-        public IAbility CreateAbility(string abilityId)
-        {
-            var data = GetBaseData(abilityId);
-            var ability = GetFactory(abilityId).Invoke(data);
-            ability.SetAbilityUpgrades(AugmentsOffered(data));
-            return ability;
-        }
+        public IAbility CreateAbility(string abilityId) => GetFactory(abilityId).Invoke(GetBaseData(abilityId));
 
         /// <summary>The stance an ability belongs to — the ability book partitions by it on Learn.</summary>
         public Stance GetAbilityStance(string abilityId) => GetBaseData(abilityId).Stance;
@@ -58,29 +56,6 @@
         private Func<AbilityBaseData, IAbility> GetFactory(string abilityId) =>
             _abilityFactories.GetValueOrDefault(abilityId)
             ?? throw new KeyNotFoundException($"No factory registered for ability '{abilityId}'");
-
-        /// <summary>The augments an ability may wear, grouped by the tier each of them is written at.
-        /// The offering is no longer a list the ability declares: every record of the catalog is put
-        /// to the fitting rule against a slot of this ability, so what answers is the augment's own
-        /// declaration. Nothing is passed as already worn — the offering says what may ever go in,
-        /// while an exclusion group speaks about what is sitting there right now.</summary>
-        private Dictionary<int, List<IAbilityUpgrade>> AugmentsOffered(AbilityBaseData ability) =>
-            augments.All
-                .Where(augment => BelongsOn(ability, augment))
-                .GroupBy(augment => augment.Tier)
-                .ToDictionary(group => group.Key, group => group.Select(CreateUpgrade).OfType<IAbilityUpgrade>().ToList());
-
-        /// <summary>Whether the augment belongs on that ability at all, asked of the one rule that
-        /// answers it. The slot handed over is the ability's own, opened exactly deep enough for the
-        /// record — the offering is about belonging, and a socket too shallow is a question for the
-        /// board that holds the real slots. It carries no id because no slot is meant: nothing here
-        /// is being seated.</summary>
-        private static bool BelongsOn(AbilityBaseData ability, AbilityUpgradeData augment) =>
-            AugmentFit.Check(
-                new AbilitySocketPlacement(string.Empty, ability.Id, augment.Tier),
-                ability.Tags,
-                augment,
-                []) == AugmentFitResult.Fits;
 
         /// <summary>
         /// The upgrade one COPY of an augment installs. The copy's numbers go in ahead of the record's
@@ -99,8 +74,8 @@
         }
 
         /// <summary>The upgrade an augment record installs, built from that record alone — the augment
-        /// as it is offered, before any copy of it is minted. Null for an id neither half of the
-        /// registry answers: the record parses and is offered, and this is where that silence is
+        /// as the data declares it, before any copy of it is minted. Null for an id neither half of the
+        /// registry answers: the record parses and is mintable, and this is where that silence is
         /// reported.</summary>
         public IAbilityUpgrade? CreateUpgrade(AbilityUpgradeData data)
         {

@@ -167,14 +167,16 @@
         [TestMethod]
         public void TakingTheAugmentOffAndPuttingItBackOnLeavesTheBuildWhereItWas()
         {
-            // The tier slot holds one augment, and swapping it is a click away in the augment window.
-            // A cut fixed from the number found at the moment of wearing deepens every time the slot is
-            // refilled over another augment â€” and says nothing while it does.
-            var ability = BuildWithSurcharge(surchargeFirst: false);
+            // A slot is emptied and refilled whenever an augment is swapped, and the whole arrangement
+            // is taken down and put back up on every pass of the binder besides. A cut fixed from the
+            // number found at the moment of wearing deepens every time that happens â€” and says nothing
+            // while it does.
+            var ability = AbilityWith(cost: 150);
+            ability.InstallUpgrades(InThisOrder(CostShareUpgrade(), StunSurcharge()));
             int assembled = ability.CostValue;
 
-            ability.ClearUpgrade(1);
-            ability.SelectUpgrade(1, CostAugment);
+            ability.InstallUpgrades(InThisOrder(StunSurcharge()));                    // the tier-one slot is emptied
+            ability.InstallUpgrades(InThisOrder(CostShareUpgrade(), StunSurcharge())); // and filled again
 
             Assert.AreEqual(assembled, ability.CostValue, "the same augment took more off the second time it was worn");
         }
@@ -305,15 +307,10 @@
         private static float WaitOf(bool surchargeFirst)
         {
             var ability = AbilityWith(cooldown: 9);
-            ability.SetAbilityUpgrades(new()
-            {
-                [1] = [new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare)],
-                [3] = [new AbilityUpgradeParameterSet(CooldownSurcharge, [], 3, [(AbilityParameter.Cooldown, OperationType.Add, 3f)])]
-            });
+            IAbilityUpgrade share = new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare);
+            IAbilityUpgrade surcharge = CooldownSurchargeUpgrade();
 
-            int[] order = surchargeFirst ? [3, 1] : [1, 3];
-            foreach (int tier in order)
-                ability.SelectUpgrade(tier, tier == 1 ? CooldownAugment : CooldownSurcharge);
+            ability.InstallUpgrades(surchargeFirst ? InThisOrder(surcharge, share) : InThisOrder(share, surcharge));
 
             return ability.Cooldown;
         }
@@ -323,38 +320,47 @@
         private static (int Cost, float Cooldown) BothOf(bool surchargesFirst)
         {
             var ability = AbilityWith(cost: 150, cooldown: 9);
-            ability.SetAbilityUpgrades(new()
-            {
-                [1] = [new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare)],
-                [2] = [new AbilityUpgradeParameterSet(CostSurcharge, [], 2, [(HeadButt.Parameters.StunDuration, OperationType.Add, 1f), (AbilityParameter.CostValue, OperationType.Add, 50f)])],
-                [3] = [new AbilityUpgradeParameterSet(CooldownSurcharge, [], 3, [(AbilityParameter.Cooldown, OperationType.Add, 3f)])]
-            });
+            IAbilityUpgrade both = new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare);
+            IAbilityUpgrade stun = StunSurcharge();
+            IAbilityUpgrade wait = CooldownSurchargeUpgrade();
 
-            string[] chosen = [SurchargeAugment, CostSurcharge, CooldownSurcharge];
-            int[] order = surchargesFirst ? [3, 2, 1] : [1, 2, 3];
-            foreach (int tier in order)
-                ability.SelectUpgrade(tier, chosen[tier - 1]);
+            ability.InstallUpgrades(surchargesFirst ? InThisOrder(wait, stun, both) : InThisOrder(both, stun, wait));
 
             return (ability.CostValue, ability.Cooldown);
         }
 
-        /// <summary>Head Butt wearing the cost share in its tier-one slot and the stun surcharge in its
-        /// tier-two one, chosen in the order asked for â€” the two are seated through the ability's own
-        /// selection, because that is where a slot is emptied and refilled.</summary>
+        /// <summary>Head Butt wearing the cost share in one slot and the stun surcharge in another,
+        /// seated in the order asked for.</summary>
         private static HeadButt BuildWithSurcharge(bool surchargeFirst)
         {
             var ability = AbilityWith(cost: 150);
-            ability.SetAbilityUpgrades(new()
-            {
-                [1] = [new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare)],
-                [2] = [new AbilityUpgradeParameterSet(CostSurcharge, [], 2, [(HeadButt.Parameters.StunDuration, OperationType.Add, 1f), (AbilityParameter.CostValue, OperationType.Add, 50f)])]
-            });
+            IAbilityUpgrade share = CostShareUpgrade();
+            IAbilityUpgrade surcharge = StunSurcharge();
 
-            int[] order = surchargeFirst ? [2, 1] : [1, 2];
-            foreach (int tier in order)
-                ability.SelectUpgrade(tier, tier == 1 ? CostAugment : CostSurcharge);
+            ability.InstallUpgrades(surchargeFirst ? InThisOrder(surcharge, share) : InThisOrder(share, surcharge));
 
             return ability;
+        }
+
+        /// <summary>Armageddon's shape: three more turns of waiting, flat.</summary>
+        private static IAbilityUpgrade CooldownSurchargeUpgrade() =>
+            new AbilityUpgradeParameterSet(CooldownSurcharge, [], 3, [(AbilityParameter.Cooldown, OperationType.Add, 3f)]);
+
+        /// <summary>Head Butt's own tier-two augment: a longer stun bought with fifty more mana.</summary>
+        private static IAbilityUpgrade StunSurcharge() =>
+            new AbilityUpgradeParameterSet(CostSurcharge, [], 2,
+                [(HeadButt.Parameters.StunDuration, OperationType.Add, 1f), (AbilityParameter.CostValue, OperationType.Add, 50f)]);
+
+        private static IAbilityUpgrade CostShareUpgrade() => new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare);
+
+        /// <summary>An arrangement whose slots are applied in exactly the order written. The socket ids
+        /// are made up and sorted, because what these walks vary is the order the augments go on in and
+        /// nothing about the slots themselves — the claim is that the order changes nothing.</summary>
+        private static IReadOnlyDictionary<string, IAbilityUpgrade> InThisOrder(params IAbilityUpgrade[] upgrades)
+        {
+            SortedDictionary<string, IAbilityUpgrade> seated = new(StringComparer.Ordinal);
+            for (int slot = 0; slot < upgrades.Length; slot++) seated[$"socket_{slot}"] = upgrades[slot];
+            return seated;
         }
 
         /// <summary>A stand-in ability carrying the base numbers under test. Any ability would do â€”

@@ -1,29 +1,26 @@
-﻿namespace Battle.Source.UIElements
+namespace Battle.Source.UIElements
 {
-    using System;
     using Godot;
 
+    /// <summary>
+    /// One row of the ability's augment list: the augment's name and what this copy of it does. It is
+    /// built on a Button because the layout it sits in is, and it is never a control — an ability wears
+    /// exactly what its sockets hold, so there is nothing here to press. Seating and extracting happen
+    /// through the socket window and its request gates.
+    /// </summary>
     [GlobalClass]
     public partial class UpgradeButton : Button
     {
-        private string _upgradeInstanceId = string.Empty;
-        private int _upgradeTier;
         [Export] private RichTextLabel? _description;
-        public event Action<string, int>? UpgradeSelected;
 
-        public override void _Ready()
+        /// <summary>Fills the row and takes the press away: pressed marks it as worn, disabled makes
+        /// sure the mark cannot be moved by a click that would go nowhere.</summary>
+        public void ShowWorn(string displayName, string description)
         {
-            Toggled += OnToggled;
-        }
-
-        public void SetUpgradeTier(int upgradeTier) => _upgradeTier = upgradeTier;
-        public void SetUpgradeInstanceId(string upgradeInstanceId) => _upgradeInstanceId = upgradeInstanceId;
-        public void SetUpgradeTaken(bool isTaken) => SetPressedNoSignal(isTaken);
-        public void SetDescription(string description) => _description?.Text = description;
-
-        private void OnToggled(bool toggledOn)
-        {
-            if (toggledOn) UpgradeSelected?.Invoke(_upgradeInstanceId, _upgradeTier);
+            Text = displayName;
+            _description?.Text = description;
+            SetPressedNoSignal(true);
+            Disabled = true;
         }
     }
 }

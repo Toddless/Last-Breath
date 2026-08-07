@@ -23,7 +23,10 @@ namespace Battle.Source
     /// The augment sockets travel the same road and in the same pass: a node whose class opens a
     /// slot (<see cref="NodeKindRules.SocketTier"/>) puts that slot on the board while it is taken,
     /// and the slot goes when the node does. One reading of the taken set answers for both, so the
-    /// book and the board can never be looking at different allocations.
+    /// book and the board can never be looking at different allocations. The pass closes by putting
+    /// the board back onto the abilities (<see cref="IAbilityAugmentBinder"/>): a node given back drops
+    /// its socket and the augment in it, and the ability has to stop wearing that augment in the same
+    /// breath — otherwise a refunded node leaves a working upgrade behind it.
     ///
     /// Two things move under the book, so both are listened to: the allocation (a purchase, a refund,
     /// a respec, a session reset, a restored save) and the player himself — a new game or a scene
@@ -39,6 +42,7 @@ namespace Battle.Source
         private readonly IAbilityProvider _abilityProvider;
         private readonly IPassiveTreeService? _passiveTree;
         private readonly IAbilitySocketBoard? _sockets;
+        private readonly IAbilityAugmentBinder? _augments;
 
         /// <summary>Ability ids named by a node and missing from the catalog, already reported.
         /// Reconcile runs on every allocation change and defensively from the read handlers, so a
@@ -49,16 +53,20 @@ namespace Battle.Source
         /// project composed without it (the battle sandbox) resolves the default.</param>
         /// <param name="sockets">Optional: a project without a socket board simply has no augment
         /// slots, the same way one without a tree has no abilities.</param>
+        /// <param name="augments">Optional, and optional with the board: a composition holding no slots
+        /// has nothing to put onto its abilities.</param>
         public AbilityUnlockService(
             IPlayerAccessor playerAccessor,
             IAbilityProvider abilityProvider,
             IPassiveTreeService? passiveTree = null,
-            IAbilitySocketBoard? sockets = null)
+            IAbilitySocketBoard? sockets = null,
+            IAbilityAugmentBinder? augments = null)
         {
             _playerAccessor = playerAccessor;
             _abilityProvider = abilityProvider;
             _passiveTree = passiveTree;
             _sockets = sockets;
+            _augments = augments;
 
             _playerAccessor.PlayerChanged += OnPlayerChanged;
             if (_passiveTree != null) _passiveTree.AllocationChanged += OnAllocationChanged;
@@ -98,6 +106,9 @@ namespace Battle.Source
 
             ForgetRevoked(book, granted.Abilities);
             LearnGranted(book, granted.Abilities);
+            // Last, and after the book: an ability learned this very pass has to be dressed in the same
+            // one, and an ability that lost a slot has to be undressed in it.
+            _augments?.Bind();
         }
 
         /// <summary>Everything the taken nodes hand out right now, read in one pass so the abilities

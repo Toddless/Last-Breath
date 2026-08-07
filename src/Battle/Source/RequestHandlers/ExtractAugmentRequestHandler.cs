@@ -16,11 +16,17 @@ namespace Battle.Source.RequestHandlers
     /// one where it never stands outside both: a bag with no room refuses, and the augment is still
     /// worn — which is the state the player can act on — rather than dropped on the way home.
     /// </para>
+    /// <para>
+    /// An extraction that took ends by putting the board back onto the abilities, exactly as a seating
+    /// does: the augment is out of the slot, so the ability must stop doing what it did. A refusal
+    /// binds nothing — the arrangement never moved.
+    /// </para>
     /// </summary>
     public class ExtractAugmentRequestHandler(
         IAbilitySocketBoard sockets,
         IAugmentItemMinter augments,
-        IInventory inventory)
+        IInventory inventory,
+        IAbilityAugmentBinder binder)
         : IRequestHandler<ExtractAugmentRequest, AugmentExtractResult>
     {
         public Task<AugmentExtractResult> HandleRequest(ExtractAugmentRequest request)
@@ -35,6 +41,7 @@ namespace Battle.Source.RequestHandlers
                 return Task.FromResult(AugmentExtractResult.NoBagRoom);
 
             sockets.Extract(request.SocketId);
+            binder.Bind();
             return Task.FromResult(AugmentExtractResult.Extracted);
         }
     }
