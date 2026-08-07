@@ -10,6 +10,8 @@
     },
     "upgradeLevelBonus": 0.1,
     "ascensionMultiplier": 1.5,
+    "augmentBasePrice": 30,
+    "augmentTierMultiplier": 2.5,
     "buybackFactor": 0.4,
     "startingGold": 100
 }

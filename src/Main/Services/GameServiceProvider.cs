@@ -5,6 +5,7 @@ namespace LastBreath.Services
     using Core.Ai.World.Raids;
     using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
+    using Core.Battle.Abilities;
     using Core.Data;
     using Core.Data.GameData;
     using Core.Entity;
@@ -119,7 +120,8 @@ namespace LastBreath.Services
             services.AddSingleton<IWalletService, WalletService>();
             services.AddSingleton<IItemValuation>(sp => new ItemValuation(
                 sp.GetRequiredService<ITradeConfigProvider>(),
-                sp.GetService<IItemDataProvider>()));
+                sp.GetService<IItemDataProvider>(),
+                sp.GetService<IAbilityAugmentCatalog>()));
             services.AddGameDataParticipant<ITraderProvider, TraderProvider>();
             services.AddSingleton<ITraderService>(sp => new TraderService(
                 sp.GetRequiredService<ITraderProvider>(),

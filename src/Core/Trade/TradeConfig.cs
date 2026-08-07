@@ -28,6 +28,16 @@ namespace Core.Trade
         /// <summary>Extra multiplier for ascended (sealed) gear on top of the Mythic rarity step.</summary>
         public float AscensionMultiplier { get; init; } = 1.5f;
 
+        /// <summary>What an augment is worth at tier 0, before its tier and rarity are applied. The
+        /// foot of the curve rather than a price any record has to carry: an augment's gold value is
+        /// computed from what its record already declares, so a hundred and thirty-four authored
+        /// prices cannot drift apart from each other or from the loot they drop beside.</summary>
+        public float AugmentBasePrice { get; init; } = 30f;
+
+        /// <summary>What one tier step multiplies an augment's price by. The steps compound, so every
+        /// tier is answered for — including one nobody has authored an augment at yet.</summary>
+        public float AugmentTierMultiplier { get; init; } = 2.5f;
+
         /// <summary>Share of the valuation a trader pays when the player sells.</summary>
         public float BuybackFactor { get; init; } = 0.4f;
 
