@@ -56,6 +56,10 @@
             services.AddTransient<IRequestHandler<GetEquipItemRecraftModifierCostRequest, IEnumerable<IRequirement>>, GetEquipItemRecraftModifierCostRequestHandler>();
             services.AddTransient<IRequestHandler<RecraftEquipItemModifierRequest, RequestResult<string>>, RecraftEquipItemModifierRequestHandler>();
             services.AddTransient<IRequestHandler<AscendEquipItemRequest, AscensionResult>, AscendEquipItemRequestHandler>();
+            // The augment drain. Its minter belongs to the module that fights, so a sandbox composed
+            // without that module registers the gate and can never reach it — which is the truth about
+            // such a composition: it holds no augments to hand over either.
+            services.AddTransient<IRequestHandler<ConvertAugmentsRequest, AugmentConversionResult>, ConvertAugmentsRequestHandler>();
 
             services.AddTransient<IMessageHandler<DestroyItemMessage>, DestroyItemMessageHandler>();
             // The item-use seam: the shared channel + dispatch live here with the tooltip button;
