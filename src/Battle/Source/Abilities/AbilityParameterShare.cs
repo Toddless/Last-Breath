@@ -12,9 +12,9 @@ namespace Battle.Source.Abilities
     /// share is measured against is the ability's own base value and nothing else. Everything any
     /// other augment does to the parameter is applied on top of the result, which is what makes the
     /// change the same whatever order the player picked their augments in and however many times this
-    /// one is taken off and put back on. Two shares on one parameter would read one another instead of
-    /// the base, so the records carrying them are written at one tier and an ability wears one augment
-    /// per tier.
+    /// one is taken off and put back on. Two shares moving one parameter the same way would read one
+    /// another instead of the base; they never do, because two of them are the same effect and only the
+    /// stronger works (<see cref="AbilityEffectIdentity"/>).
     ///
     /// What the share comes to is rounded to a whole unit, half away from zero, and never down to
     /// nothing while there is anything to measure: costs are paid in whole points and cooldowns counted
@@ -26,6 +26,11 @@ namespace Battle.Source.Abilities
     public class AbilityParameterShare(string parameter, OperationType operation, float share, string id, string source)
         : AbilityParameterDecorator(parameter, Priority.Base, id, source)
     {
+        /// <summary>Which way the share moves the parameter. <see cref="Decorate"/> honours a
+        /// subtraction and treats everything else as an addition, and so does this.</summary>
+        public override AbilityEffectDirection Direction =>
+            operation == OperationType.Subtract ? AbilityEffectDirection.Lower : AbilityEffectDirection.Raise;
+
         public override float Decorate(float baseValue) => operation switch
         {
             OperationType.Add => baseValue + Share(baseValue),

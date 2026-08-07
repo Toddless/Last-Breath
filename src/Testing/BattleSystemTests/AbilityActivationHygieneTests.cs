@@ -19,16 +19,17 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void CostDecorators_FromDifferentUpgrades_BothApply()
         {
-            // Decorator ids are derived from the upgrade that writes them, so two upgrades touching the
-            // same parameter must leave two decorators and not one overwriting the other. The two are
-            // flat here on purpose: what a share does to a parameter another augment already touched is
-            // its own question, answered in AugmentShareReductionTests.
+            // Both upgrades below RAISE what the cast costs, which is a bill and never an offer: each of
+            // them is the price of something its own record does, so both are charged. Two records that
+            // CUT one parameter are the opposite case and do not add up (AugmentRivalryTests). The two
+            // are flat here on purpose: what a share does to a parameter another augment already touched
+            // is its own question, answered in AugmentShareReductionTests.
             var ability = CreateAbility(cost: 100);
 
             new AbilityUpgradeParameterSet("Upgrade_A", [], 1, [(AbilityParameter.CostValue, OperationType.Add, 20f)]).Apply(ability);
             new AbilityUpgradeParameterSet("Upgrade_B", [], 2, [(AbilityParameter.CostValue, OperationType.Add, 30f)]).Apply(ability);
 
-            Assert.AreEqual(150, ability.CostValue, "decorators of two different upgrades must stack, not collide by id");
+            Assert.AreEqual(150, ability.CostValue, "one of the two records had its bill waived by the other");
         }
 
         [TestMethod]
@@ -39,7 +40,7 @@ namespace LastBreathTest.BattleSystemTests
             new AbilityUpgradeParameterSet("Upgrade_A", [], 1, [(AbilityParameter.Cooldown, OperationType.Add, 2f)]).Apply(ability);
             new AbilityUpgradeParameterSet("Upgrade_B", [], 2, [(AbilityParameter.Cooldown, OperationType.Add, 3f)]).Apply(ability);
 
-            Assert.AreEqual(15f, ability.Cooldown, "decorators of two different upgrades must stack, not collide by id");
+            Assert.AreEqual(15f, ability.Cooldown, "one of the two records had its longer wait waived by the other");
         }
 
         [TestMethod]

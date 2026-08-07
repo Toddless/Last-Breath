@@ -7,6 +7,7 @@
     using Core.Data.GameData;
     using Core.Enums;
     using Newtonsoft.Json.Linq;
+    using static AugmentBench;
     using static AugmentCopies;
 
     /// <summary>
@@ -352,27 +353,6 @@
                 [(HeadButt.Parameters.StunDuration, OperationType.Add, 1f), (AbilityParameter.CostValue, OperationType.Add, 50f)]);
 
         private static IAbilityUpgrade CostShareUpgrade() => new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare);
-
-        /// <summary>An arrangement whose slots are applied in exactly the order written. The socket ids
-        /// are made up and sorted, because what these walks vary is the order the augments go on in and
-        /// nothing about the slots themselves — the claim is that the order changes nothing.</summary>
-        private static IReadOnlyDictionary<string, IAbilityUpgrade> InThisOrder(params IAbilityUpgrade[] upgrades)
-        {
-            SortedDictionary<string, IAbilityUpgrade> seated = new(StringComparer.Ordinal);
-            for (int slot = 0; slot < upgrades.Length; slot++) seated[$"socket_{slot}"] = upgrades[slot];
-            return seated;
-        }
-
-        /// <summary>A stand-in ability carrying the base numbers under test. Any ability would do â€”
-        /// the augments decorate keys every ability registers as part of the base contract.</summary>
-        private static HeadButt AbilityWith(int cost = 100, int cooldown = 5) => new(new AbilityBaseData
-        {
-            Id = "Ability_Head_Butt",
-            Cooldown = cooldown,
-            CostValue = cost,
-            CostsType = Costs.Mana,
-            AbilityProperties = new() { ["stunDuration"] = 1, ["attacks"] = 2 }
-        });
 
         /// <summary>The distinct cooldowns the shipped abilities declare, read off the files. Casts
         /// that wait for nothing are left out â€” they are answered by their own walk.</summary>

@@ -10,11 +10,12 @@ namespace Battle.Source.Abilities
     /// one another is the key they stand on, what they do to the value there and by how much — three
     /// things that are data, so they arrive as data and no augment of this kind needs a class of its own.
     ///
-    /// A decorator's id is the augment's id and the parameter it moves, which is the pair that has to be
-    /// unique: two augments worn on the same ability and reaching for the same parameter must leave two
-    /// decorators, because a shared id makes the second one silently lose to the first (see
-    /// <see cref="AbilityParameterSet.AddDecorator"/>) and the player pays for an augment that does
-    /// nothing. One augment never names the same parameter twice, so the pair is unique by construction.
+    /// A decorator's id is the augment's id and the parameter it moves, which is what an upgrade takes
+    /// off again: the pair names one move of one record, so taking this augment off an ability leaves
+    /// everything else it wears exactly where it was. One augment never names the same parameter twice,
+    /// so the pair is unique by construction. Whether the move actually works once it is seated is
+    /// another question and is not settled by the id — two augments reaching for the same parameter the
+    /// same way are one effect, and only the strongest of them is read (<see cref="AbilityEffectIdentity"/>).
     /// </summary>
     public class AbilityUpgradeParameterSet(
         string id,
