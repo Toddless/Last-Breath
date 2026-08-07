@@ -15,6 +15,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using Moq;
     using Newtonsoft.Json.Linq;
+    using static AbilityBookStand;
     using static AugmentCopies;
 
     /// <summary>
@@ -445,17 +446,6 @@
             manager.Register(new PassiveTreeSaveParticipant(tree));
             manager.Register(new AbilityBookSaveParticipant(AccessorFor(NewBook()), board));
             return manager;
-        }
-
-        private static AbilityBookComponent NewBook() => new(new Mock<IFightable>().Object);
-
-        private static IPlayerAccessor AccessorFor(IAbilityBookComponent book)
-        {
-            var player = new Mock<IPlayer>();
-            player.SetupGet(p => p.AbilityBook).Returns(book);
-            var accessor = new PlayerAccessor();
-            accessor.Set(player.Object);
-            return accessor;
         }
 
         /// <summary>One unlock node and three socket nodes hanging off the seed: two of them are

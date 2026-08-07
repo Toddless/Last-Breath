@@ -36,6 +36,14 @@ namespace Core.Battle.Abilities
         /// disappear into one where it would sit inert.</summary>
         bool Install(string socketId, AugmentInstance augment);
 
+        /// <summary>How the slot judges that augment, without seating it. The verdict comes from the
+        /// one place the rule is written (<see cref="AugmentFit"/>), so whoever refuses an install can
+        /// name the reason to the player instead of measuring tiers and tags a second time.
+        /// Null when there is nothing to judge: no slot of that id is open, or no record declares the
+        /// augment — the board refuses such an id outright, and a rule with no record in front of it
+        /// has nothing to be right about.</summary>
+        AugmentFitResult? Judge(string socketId, AugmentInstance augment);
+
         /// <summary>Takes the augment out and hands it back — the copy that went in, with the numbers
         /// it was minted with. Null when the socket is unknown or free.</summary>
         AugmentInstance? Extract(string socketId);

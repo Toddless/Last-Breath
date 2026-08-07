@@ -20,6 +20,20 @@ namespace LastBreathTest.BattleSystemTests
 
         internal static (AbilityProvider Abilities, AbilityAugmentCatalog Augments) Load() => LoadFrom(SharedData.Root());
 
+        /// <summary>The augment records of a catalog a test wrote, read through the same loader the
+        /// game runs — the fitting rule reads fields no hand-built record can prove are ever parsed,
+        /// and a case that writes its own pair keeps that pair whatever the shipped markup becomes.</summary>
+        internal static AbilityAugmentCatalog CatalogOver(string json)
+        {
+            string root = Directory.CreateTempSubdirectory("augments_").FullName;
+            Directory.CreateDirectory(Path.Combine(root, DataCatalog.Abilities));
+            File.WriteAllText(Path.Combine(root, DataCatalog.Abilities, "Abilities.json"), json);
+
+            AbilityAugmentCatalog catalog = LoadFrom(root).Augments;
+            Directory.Delete(root, recursive: true);
+            return catalog;
+        }
+
         /// <summary>The same pair over any data root — for records the shipped files do not declare.</summary>
         internal static (AbilityProvider Abilities, AbilityAugmentCatalog Augments) LoadFrom(string root)
         {

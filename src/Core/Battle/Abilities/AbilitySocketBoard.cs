@@ -41,7 +41,10 @@ namespace Core.Battle.Abilities
         public AbilitySocket? Find(string socketId) => _sockets.GetValueOrDefault(socketId);
 
         public bool Install(string socketId, AugmentInstance augment) =>
-            Find(socketId) is { } socket && Accepts(socket, augment) && socket.Install(augment);
+            Find(socketId) is { } socket && Verdict(socket, augment) == AugmentFitResult.Fits && socket.Install(augment);
+
+        public AugmentFitResult? Judge(string socketId, AugmentInstance augment) =>
+            Find(socketId) is { } socket ? Verdict(socket, augment) : null;
 
         public AugmentInstance? Extract(string socketId) => Find(socketId)?.Extract();
 
@@ -96,24 +99,26 @@ namespace Core.Battle.Abilities
             _waiting.Clear();
         }
 
-        /// <summary>Whether the slot takes that augment. The rule is not written here — the board only
-        /// turns what it holds into what <see cref="AugmentFit"/> judges: the augment's record and the
+        /// <summary>How the slot judges that augment. The rule is not written here — the board only
+        /// turns what it holds into what <see cref="AugmentFit"/> measures: the augment's record and the
         /// tags of the slot's ability. The RECORD is what is measured and never the copy's own numbers:
         /// where an augment belongs is a property of the augment, and a lucky roll does not open a slot
-        /// an unlucky one is refused. An id the catalog does not hold is refused; there is no record to
-        /// measure, and seating one on the strength of its spelling is how an augment ends up in a slot
-        /// nothing ever agreed to.</summary>
-        private bool Accepts(AbilitySocket socket, AugmentInstance occupant)
+        /// an unlucky one is refused. An id the catalog does not hold is refused with no verdict at all;
+        /// there is no record to measure, and seating one on the strength of its spelling is how an
+        /// augment ends up in a slot nothing ever agreed to. A composition supplying no catalog takes
+        /// what it is handed, which is the contract this board is built on.</summary>
+        private AugmentFitResult? Verdict(AbilitySocket socket, AugmentInstance occupant)
         {
-            if (augments is null) return true;
+            if (augments is null) return AugmentFitResult.Fits;
 
             AbilityUpgradeData? augment = augments.Find(occupant.AugmentId);
-            return augment is not null
-                   && AugmentFit.Check(
-                       socket.Placement,
-                       augments.TagsOf(socket.AbilityId),
-                       augment,
-                       WornGroups(socket.AbilityId)) == AugmentFitResult.Fits;
+            return augment is null
+                ? null
+                : AugmentFit.Check(
+                    socket.Placement,
+                    augments.TagsOf(socket.AbilityId),
+                    augment,
+                    WornGroups(socket.AbilityId));
         }
 
         /// <summary>The exclusion groups already standing in one ability's slots. Only that ability's

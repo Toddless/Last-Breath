@@ -130,7 +130,7 @@
             // fitting rule reads fields a hand-built record cannot prove are ever parsed. The content
             // is written by the test rather than taken from the shipped catalog, so the pair under
             // test stays a pair whatever the shipped markup is repointed at.
-            IAbilityAugmentCatalog catalog = CatalogOver(TwoAbilitiesAndOneAugment());
+            IAbilityAugmentCatalog catalog = ShippedAbilityData.CatalogOver(TwoAbilitiesAndOneAugment());
             var board = new AbilitySocketBoard(catalog);
             board.Sync(
             [
@@ -167,19 +167,6 @@
 
         /// <summary>The shipped ability data as the game reads it: the real loader, the real parser.</summary>
         private static IAbilityAugmentCatalog ShippedCatalog() => ShippedAbilityData.Augments();
-
-        /// <summary>The same loader over data the test wrote, for records the shipped file does not
-        /// declare yet.</summary>
-        private static IAbilityAugmentCatalog CatalogOver(string json)
-        {
-            string root = Directory.CreateTempSubdirectory("augments_").FullName;
-            Directory.CreateDirectory(Path.Combine(root, DataCatalog.Abilities));
-            File.WriteAllText(Path.Combine(root, DataCatalog.Abilities, "Abilities.json"), json);
-
-            AbilityAugmentCatalog catalog = ShippedAbilityData.LoadFrom(root).Augments;
-            Directory.Delete(root, recursive: true);
-            return catalog;
-        }
 
         /// <summary>One poison ability, one cold ability, and â€” beside them rather than inside either
         /// â€” one poison augment.</summary>
