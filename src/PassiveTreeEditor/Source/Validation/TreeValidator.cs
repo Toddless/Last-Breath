@@ -14,11 +14,6 @@ namespace PassiveTreeEditor.Source.Validation
     /// </summary>
     public static class TreeValidator
     {
-        /// <summary>The slot that arrives together with the ability rather than through a socket node
-        /// of its own. A class carrying it is what puts an ability into the tree; a class carrying a
-        /// higher tier is a socket that needs the ability to already be there.</summary>
-        private const int UnlockSocketTier = 1;
-
         public static List<TreeIssue> Validate(PassiveTreeDocument document, AbilityCatalogView abilities)
         {
             List<TreeIssue> issues = [];
@@ -165,7 +160,8 @@ namespace PassiveTreeEditor.Source.Validation
 
             foreach (PassiveNode node in document.Nodes)
             {
-                if (NodeKindRules.SocketTier(node.Kind) <= UnlockSocketTier) continue;
+                // The bundled tier-1 slot needs no unlock elsewhere: it is the unlock.
+                if (NodeKindRules.SocketTier(node.Kind) <= NodeKindRules.UnlockSocketTier) continue;
 
                 string abilityId = node.AbilityId.Trim();
                 if (abilityId.Length == 0 || unlocked.Contains(abilityId)) continue;
@@ -179,18 +175,15 @@ namespace PassiveTreeEditor.Source.Validation
         {
             var unlocked = new HashSet<string>(StringComparer.Ordinal);
 
+            // Which classes put an ability in the book is the per-class table's answer, and the game
+            // reads the same one — a rule kept in two places is a rule the tool and the battle can
+            // disagree about.
             foreach (PassiveNode node in document.Nodes)
-                if (Unlocks(node) && node.AbilityId.Trim().Length > 0)
+                if (NodeKindRules.UnlocksAbility(node.Kind) && node.AbilityId.Trim().Length > 0)
                     unlocked.Add(node.AbilityId.Trim());
 
             return unlocked;
         }
-
-        /// <summary>Which nodes put an ability in the book. The unlock class is one way in; the stance
-        /// seeds are the other, because a stance is granted its first ability at its start point — a
-        /// socket for that ability is reachable even though no unlock node of the tree names it.</summary>
-        private static bool Unlocks(PassiveNode node) =>
-            NodeKindRules.SocketTier(node.Kind) == UnlockSocketTier || node.Kind == PassiveNodeKind.Start;
 
         /// <summary>
         /// Two different failures, told apart on purpose. A node with no edges is a cluster that was

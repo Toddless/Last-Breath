@@ -13,10 +13,12 @@ namespace Battle.Source
 
     /// <summary>
     /// The player's ability book is the mirror of his passive-tree allocation: an ability is in the
-    /// book exactly while an <see cref="PassiveNodeKind.AbilityUnlock"/> node carrying it is taken.
-    /// Taking the node learns it, giving the node back forgets it, and a character who has spent
-    /// nothing knows nothing. Every pass brings the book all the way back to the allocation, so an
-    /// ability put there by any other hand does not survive the next one.
+    /// book exactly while a node that unlocks it (<see cref="NodeKindRules.UnlocksAbility"/>) is taken
+    /// — an unlock node bought with a point, or the stance's seed, which is granted with the character
+    /// and is why a fresh fighter starts with one ability per stance. Taking the node learns it,
+    /// giving the node back forgets it, and a character who has taken nothing knows nothing. Every
+    /// pass brings the book all the way back to the allocation, so an ability put there by any other
+    /// hand does not survive the next one.
     ///
     /// The augment sockets travel the same road and in the same pass: a node whose class opens a
     /// slot (<see cref="NodeKindRules.SocketTier"/>) puts that slot on the board while it is taken,
@@ -119,22 +121,27 @@ namespace Battle.Source
             return granted;
         }
 
-        /// <summary>Whether the node says anything about an ability at all. The rest carry lines and
-        /// an empty ability field, and putting that field to the catalog would turn every content node
-        /// into a reported gap.</summary>
+        /// <summary>
+        /// Whether the node says anything about an ability at all: its class opens something on one
+        /// (<see cref="NodeKindRules.SocketTier"/>) and the node names which. Content nodes carry lines
+        /// and an empty ability field, and putting that field to the catalog would turn every one of
+        /// them into a reported gap. The neutral seed at the core of the wheel leaves the field empty
+        /// for the same reason it belongs to no stance — it opens nothing — so it hands out neither an
+        /// ability nor a slot, and says nothing about it: whether a node of an ability-bearing class
+        /// had to name one depends on where the node sits, which is the authoring tool's question.
+        /// </summary>
         private static bool PointsAtAnAbility(PassiveNode node) =>
-            node.Kind == PassiveNodeKind.AbilityUnlock || NodeKindRules.SocketTier(node.Kind) != NodeKindRules.NoSocket;
+            NodeKindRules.SocketTier(node.Kind) != NodeKindRules.NoSocket && !string.IsNullOrWhiteSpace(node.AbilityId);
 
-        /// <summary>An unlock node hands the ability over; any node with a tier opens that slot on it.
-        /// The unlock node does both — the tier-1 slot comes with the ability rather than with a node
-        /// of its own.</summary>
+        /// <summary>A node whose class unlocks hands the ability over; any node with a tier opens that
+        /// slot on it. The unlocking classes do both — the tier-1 slot comes with the ability rather
+        /// than with a node of its own — and which classes those are is the per-class table's answer,
+        /// the same one the authoring tool checks the tree against.</summary>
         private static void Collect(PassiveNode node, TreeGrants granted)
         {
-            if (node.Kind == PassiveNodeKind.AbilityUnlock) granted.Abilities.Add(node.AbilityId);
+            if (NodeKindRules.UnlocksAbility(node.Kind)) granted.Abilities.Add(node.AbilityId);
 
-            int tier = NodeKindRules.SocketTier(node.Kind);
-            if (tier != NodeKindRules.NoSocket)
-                granted.Sockets.Add(new AbilitySocketPlacement(node.Id, node.AbilityId, tier));
+            granted.Sockets.Add(new AbilitySocketPlacement(node.Id, node.AbilityId, NodeKindRules.SocketTier(node.Kind)));
         }
 
         /// <summary>Whether the ability the node names is one a player may hold — the same question for

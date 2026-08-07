@@ -2,6 +2,7 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
     using Core.Battle.Abilities;
+    using Core.Data.GameData;
     using Core.Data.SaveData;
     using Core.Entity;
     using Core.Entity.Components;
@@ -25,6 +26,13 @@ namespace LastBreathTest.BattleSystemTests
     public class AbilityUnlockTests
     {
         private const string Seed = "start_1";
+
+        /// <summary>The neutral seed of the wheel: no stance, no ability.</summary>
+        private const string CoreSeed = "start_core";
+
+        /// <summary>A seed of a stance — the node that stance's first ability comes from.</summary>
+        private const string StanceSeed = "start_dexterity";
+
         private const string DexNode = "abilityunlock_dex";
         private const string DexNodeTwo = "abilityunlock_dex_two";
         private const string StrNode = "abilityunlock_str";
@@ -174,6 +182,90 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(AllocationResult.Success, tree.Take(SocketNode));
 
             Assert.AreEqual(0, book.AllAbilities.Count);
+        }
+
+        [TestMethod]
+        public void TheStanceSeedHandsItsAbilityOverTheWayAnUnlockNodeDoes()
+        {
+            // A stance begins at its seed, and the seed is granted rather than bought: this is the one
+            // ability a character has before he has spent anything, and the reason the battle bar is
+            // not empty on a new game.
+            var book = NewBook();
+            IPassiveTreeService tree = SeededTree(DexAbility);
+
+            CreateService(book, tree);
+
+            CollectionAssert.AreEquivalent(new[] { DexAbility }, LearnedIds(book),
+                "the stance seed named an ability and the book never received it");
+            Assert.AreEqual(0, tree.SpentPoints, "the seed was charged for; a seed comes with the character");
+        }
+
+        [TestMethod]
+        public void TheStanceSeedBringsTheTierOneSlotOfTheAbilityItOpens()
+        {
+            // The tier-1 slot belongs to the ability rather than to a node, so whatever opens the
+            // ability opens the slot — otherwise the three abilities a character starts with would be
+            // the only ones in the game with no augment slot of their own.
+            var board = new AbilitySocketBoard();
+
+            CreateService(NewBook(), SeededTree(DexAbility), board);
+
+            AbilitySocket socket = board.SocketsOf(DexAbility).Single();
+            Assert.AreEqual(NodeKindRules.UnlockSocketTier, socket.Tier);
+            Assert.AreEqual(StanceSeed, socket.SocketId, "the slot was opened by something other than the seed that granted the ability");
+        }
+
+        [TestMethod]
+        public void TheCoreSeedNamesNoAbilityAndThereforeOpensNothing()
+        {
+            // The seed at the middle of the wheel belongs to no stance and carries an empty reference.
+            // An empty reference is not a name the catalog can be asked about: it must produce neither
+            // an ability nor a slot hanging off one nobody owns.
+            var book = NewBook();
+            var board = new AbilitySocketBoard();
+
+            CreateService(book, SeededTree(DexAbility), board);
+
+            CollectionAssert.AreEquivalent(new[] { DexAbility }, LearnedIds(book), "the empty reference reached the book");
+            Assert.IsNull(board.Find(CoreSeed), "the empty reference became a slot on an ability nobody names");
+            Assert.AreEqual(1, board.Sockets.Count, "the core seed put a second slot on the board");
+        }
+
+        [TestMethod]
+        public void TheShippedSeedsOpenOneAbilityPerStanceAndTheSlotEachBringsWithIt()
+        {
+            // The authored tree, not a fixture: the abilities a character actually starts the game with.
+            // Read structurally so that renaming one of them is content and not a broken test — what is
+            // pinned is that every stance is opened by its seed, that the catalog holds what the seed
+            // names, and that the neutral seed opens nothing.
+            var book = NewBook();
+            var board = new AbilitySocketBoard();
+            var accessor = new PlayerAccessor();
+            accessor.Set(NewPlayer(book));
+            PassiveTreeService tree = ShippedTree();
+
+            _ = new AbilityUnlockService(accessor, new ShippedCatalogStand(ShippedAbilityData.Abilities()), tree, board);
+
+            PassiveNode[] seeds = [.. tree.Tree.Nodes.Where(node => node.Kind == PassiveNodeKind.Start)];
+            PassiveNode[] opening = [.. seeds.Where(seed => seed.AbilityId.Length > 0)];
+
+            foreach (Stance stance in Enum.GetValues<Stance>())
+                Assert.AreEqual(1, opening.Count(seed => seed.Stance == stance),
+                    $"{stance} is not opened by exactly one seed carrying an ability");
+
+            CollectionAssert.AreEquivalent(opening.Select(seed => seed.AbilityId).ToArray(), LearnedIds(book),
+                "the abilities the seeds name are not the abilities a new character holds");
+
+            foreach (PassiveNode seed in opening)
+            {
+                AbilitySocket? socket = board.Find(seed.Id);
+                Assert.IsNotNull(socket, $"{seed.Id} opened '{seed.AbilityId}' without the slot that comes with it");
+                Assert.AreEqual(NodeKindRules.UnlockSocketTier, socket.Tier);
+                Assert.AreEqual(seed.AbilityId, socket.AbilityId);
+            }
+
+            foreach (PassiveNode seed in seeds.Except(opening))
+                Assert.IsNull(board.Find(seed.Id), $"{seed.Id} names no ability and still opened a slot");
         }
 
         [TestMethod]
@@ -409,16 +501,85 @@ namespace LastBreathTest.BattleSystemTests
             }
         }
 
-        private static AbilityUnlockService CreateService(IAbilityBookComponent book, IPassiveTreeService tree)
+        /// <summary>
+        /// The shape the shipped tree has around its seeds: the neutral one at the core of the wheel,
+        /// which belongs to no stance and names no ability, and a stance seed naming the ability its
+        /// stance begins with. Neither is bought — a seed is granted with the character.
+        /// </summary>
+        private static PassiveTreeService SeededTree(string seedAbility)
+        {
+            var document = new PassiveTreeDocument();
+            document.AddNode(new PassiveNode { Id = CoreSeed, Kind = PassiveNodeKind.Start });
+            document.AddNode(new PassiveNode
+            {
+                Id = StanceSeed,
+                Kind = PassiveNodeKind.Start,
+                Stance = Stance.Dexterity,
+                AbilityId = seedAbility
+            });
+            document.Link(CoreSeed, StanceSeed);
+
+            var service = new PassiveTreeService(new TreeProviderStub(document), ConditionCatalogs.Empty());
+            service.SetTotalPoints(document.Nodes.Count);
+            return service;
+        }
+
+        /// <summary>The tree the owner authors, read through the same serializer the game runs.</summary>
+        private static PassiveTreeService ShippedTree()
+        {
+            List<string> issues = [];
+            string path = Path.Combine(SharedData.Catalog(DataCatalog.PassiveTree), PassiveTreeFormat.DefaultFileName);
+            PassiveTreeDocument document = PassiveTreeSerializer.Deserialize(File.ReadAllText(path), issues);
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            var service = new PassiveTreeService(new TreeProviderStub(document), ConditionCatalogs.Empty());
+            service.SetTotalPoints(document.Budget);
+            return service;
+        }
+
+        private static AbilityUnlockService CreateService(
+            IAbilityBookComponent book,
+            IPassiveTreeService tree,
+            IAbilitySocketBoard? sockets = null)
         {
             var accessor = new PlayerAccessor();
             accessor.Set(NewPlayer(book));
-            return CreateService(accessor, tree);
+            return CreateService(accessor, tree, sockets);
         }
 
         /// <summary>No mastery argument on purpose: the service must not be able to see a level.</summary>
-        private static AbilityUnlockService CreateService(IPlayerAccessor accessor, IPassiveTreeService tree) =>
-            new(accessor, new FakeAbilityProvider(), tree);
+        private static AbilityUnlockService CreateService(
+            IPlayerAccessor accessor,
+            IPassiveTreeService tree,
+            IAbilitySocketBoard? sockets = null) =>
+            new(accessor, new FakeAbilityProvider(), tree, sockets);
+
+        /// <summary>An ability instance with nothing but an identity: the book only ever asks it what it
+        /// is, and building the real thing is the ability provider's business and not this file's.</summary>
+        private static IAbility StubAbility(string abilityId)
+        {
+            string instanceId = Guid.NewGuid().ToString();
+            var ability = new Mock<IAbility>();
+            ability.SetupGet(a => a.Id).Returns(abilityId);
+            ability.SetupGet(a => a.InstanceId).Returns(instanceId);
+            ability.SetupGet(a => a.CurrentUpgrades).Returns(new Dictionary<int, IAbilityUpgrade>());
+            ability.Setup(a => a.IsSame(It.IsAny<string>())).Returns((string other) => other == instanceId);
+            return ability.Object;
+        }
+
+        /// <summary>The shipped ability catalog with instantiation stubbed out. Which ids the tree hands
+        /// over is the question — whether the catalog holds them, whether one of them is hidden — while
+        /// building a real ability wants the battle module wired into a scene.</summary>
+        private sealed class ShippedCatalogStand(IAbilityProvider shipped) : IAbilityProvider
+        {
+            public IReadOnlyCollection<string> KnownAbilityIds => shipped.KnownAbilityIds;
+
+            public IAbility CreateAbility(string abilityId) => StubAbility(abilityId);
+
+            public Stance GetAbilityStance(string abilityId) => shipped.GetAbilityStance(abilityId);
+
+            public bool IsHidden(string abilityId) => shipped.IsHidden(abilityId);
+        }
 
         /// <summary>Catalog stub: three player abilities across the stances plus one hidden boss reaction.</summary>
         private sealed class FakeAbilityProvider : IAbilityProvider
@@ -434,16 +595,7 @@ namespace LastBreathTest.BattleSystemTests
 
             public IReadOnlyCollection<string> KnownAbilityIds => s_stances.Keys;
 
-            public IAbility CreateAbility(string abilityId)
-            {
-                string instanceId = Guid.NewGuid().ToString();
-                var ability = new Mock<IAbility>();
-                ability.SetupGet(a => a.Id).Returns(abilityId);
-                ability.SetupGet(a => a.InstanceId).Returns(instanceId);
-                ability.SetupGet(a => a.CurrentUpgrades).Returns(new Dictionary<int, IAbilityUpgrade>());
-                ability.Setup(a => a.IsSame(It.IsAny<string>())).Returns((string other) => other == instanceId);
-                return ability.Object;
-            }
+            public IAbility CreateAbility(string abilityId) => StubAbility(abilityId);
 
             public Stance GetAbilityStance(string abilityId) => s_stances[abilityId];
 
