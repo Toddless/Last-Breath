@@ -324,8 +324,9 @@ namespace Battle.Internal.Npc
 
             AttachWorldBrain(definition.World);
 
-            _lifecycle = new NpcLifecycle(definition.Lifecycle, new DefaultRandomNumberGenerator());
+            _lifecycle = NpcLifecycleFactory.Create(definition, new DefaultRandomNumberGenerator());
             if (_lifecycle is IUndeadRiseLifecycle undead) undead.ResurrectionReady += OnResurrectionReady;
+            if (_lifecycle is IAliveRiseLifecycle alive) alive.ReviveReady += OnReviveReady;
         }
 
         /// <summary>Per-NPC art from the shared visual library; no entry — the scene's placeholder frames stay.</summary>
@@ -875,6 +876,20 @@ namespace Battle.Internal.Npc
             var previousFraction = Fraction;
             BecomeRisenUndead(parameterBonus);
             _gameEventBus?.Publish(new NpcFactionChangedEvent(InstanceId, Id, previousFraction, Fractions.Undead, GlobalPosition));
+        }
+
+        /// <summary>
+        /// The recovery timer of a peaceful resident ran out: the same creature gets back on its feet
+        /// with its vitals full, exactly as a rising does — minus the transformation. Same faction, no
+        /// rising bonus, no undead tint, and no event: the spawn point that owns this NPC never learns
+        /// of the fall, so its slot stays taken and the settlement keeps its people.
+        /// </summary>
+        private void OnReviveReady()
+        {
+            CurrentHealth = Parameters.MaxHealth;
+            CurrentMana = Parameters.MaxMana;
+            CurrentBarrier = Parameters.MaxBarrier; // starts full like the other vitals
+            ClearActivityPose(); // out of the Dead pose, and the movement clip cache forgets the direction it fell in
         }
 
         /// <summary>Save-load path: rebuilds a lying body. Health drops through the normal property —
