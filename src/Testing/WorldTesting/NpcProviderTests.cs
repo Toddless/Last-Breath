@@ -33,6 +33,23 @@ namespace LastBreathTest.WorldTesting
         /// <summary>Spawns drawn when a test judges whether a fact still rolls.</summary>
         private const int RollSamples = 30;
 
+        /// <summary>The type and rarity the modifier-count tests spawn at: together they send the
+        /// type × rarity formula to a number that is neither zero nor the count those tests author,
+        /// so every result below names the rule that produced it.</summary>
+        private const EntityType ModifierRollingType = EntityType.Elit;
+
+        private const Rarity ModifierRollingRarity = Rarity.Mythic;
+
+        /// <summary>The modifier count an authored record names.</summary>
+        private const int AuthoredModifiers = 3;
+
+        /// <summary>A count that is not a count — what the file does with nonsense is a decision.</summary>
+        private const int NegativeModifiers = -1;
+
+        /// <summary>Modifiers offered to the roll: more than any count named here, so a short result
+        /// means the count decided it and never that the pool ran dry.</summary>
+        private const int ModifierPoolSize = 8;
+
         [TestMethod]
         public void ShippedCatalogs_LoadAndSpawnEveryAuthoredNpc()
         {
@@ -299,6 +316,59 @@ namespace LastBreathTest.WorldTesting
             Assert.ThrowsException<FormatException>(() => provider.CreateDefinition(TestNpcId));
         }
 
+        /// <summary>The reason the field exists: an authored villager is allowed to be a person and
+        /// not a rolled encounter. Zero must exclude the pick itself and not merely trim its result —
+        /// and since every weighted pick this provider makes appends a modifier, an empty list is
+        /// exactly the claim that no pick ran. The first assert is the precondition: the very same
+        /// record, asked without the field, does come out wearing modifiers.</summary>
+        [TestMethod]
+        public void AuthoredModifierCountOfZero_LeavesTheNpcBare_WhereTheSameRecordRollsModifiers()
+        {
+            var rolling = ModifierRollingProvider(authored: null);
+            var bare = ModifierRollingProvider(new NpcAuthoredData { ModifierCount = 0 });
+
+            Assert.IsTrue(rolling.CreateDefinition(TestNpcId).Modifiers.Count > 0, "precondition: this record rolls modifiers while the section names no count");
+            Assert.AreEqual(0, bare.CreateDefinition(TestNpcId).Modifiers.Count, "an authored count of zero must exclude the roll entirely");
+        }
+
+        /// <summary>A named count is the whole answer: the type × rarity table does not get to add
+        /// to it, subtract from it or be consulted at all.</summary>
+        [TestMethod]
+        public void AuthoredModifierCount_ReplacesTheTypeAndRarityFormula()
+        {
+            var provider = ModifierRollingProvider(new NpcAuthoredData { ModifierCount = AuthoredModifiers });
+
+            Assert.AreNotEqual(
+                AuthoredModifiers,
+                NpcTypeDefaults.ModifierCount(ModifierRollingType, ModifierRollingRarity),
+                "this test proves nothing while the formula happens to answer the authored number");
+            Assert.AreEqual(AuthoredModifiers, provider.CreateDefinition(TestNpcId).Modifiers.Count);
+        }
+
+        /// <summary>The regression every shipped record rides on: with no count named, the number of
+        /// modifiers is still the agreed type × rarity table and the section changed nothing.</summary>
+        [TestMethod]
+        public void RecordWithoutTheModifierCount_KeepsTheTypeAndRarityFormula()
+        {
+            var provider = ModifierRollingProvider(authored: null);
+
+            Assert.AreEqual(
+                NpcTypeDefaults.ModifierCount(ModifierRollingType, ModifierRollingRarity),
+                provider.CreateDefinition(TestNpcId).Modifiers.Count);
+        }
+
+        /// <summary>A negative number is not a count of anything. The record still spoke, so the
+        /// formula stays out of it and the spawn comes out bare — the only reading a spawn can act on,
+        /// and the quiet one (falling back to the roll) would hand modifiers to the author who was
+        /// trying to take them away.</summary>
+        [TestMethod]
+        public void NegativeAuthoredModifierCount_LeavesTheNpcBare_InsteadOfFallingBackToTheFormula()
+        {
+            var provider = ModifierRollingProvider(new NpcAuthoredData { ModifierCount = NegativeModifiers });
+
+            Assert.AreEqual(0, provider.CreateDefinition(TestNpcId).Modifiers.Count);
+        }
+
         /// <summary>A provider holding one NPC and the archetype of the stance it rolls.</summary>
         private static NpcProvider LoadedProvider(NpcData npc)
         {
@@ -331,14 +401,46 @@ namespace LastBreathTest.WorldTesting
             return provider;
         }
 
-        private static NpcProvider CreateProvider(IReadOnlyCollection<string> abilityIds)
+        /// <summary>A provider whose modifier catalog is stocked (Elit × Mythic, so the formula asks
+        /// for several) and whose only NPC carries the section under test — the number of modifiers
+        /// its definition comes out with is then the count rule and nothing else.</summary>
+        private static NpcProvider ModifierRollingProvider(NpcAuthoredData? authored)
+        {
+            var npc = Npc() with
+            {
+                EntityType = ModifierRollingType.ToString(),
+                Rarity = ModifierRollingRarity.ToString(),
+                Authored = authored,
+            };
+
+            var provider = CreateProvider([PoolAbility], ModifierPool());
+            provider.Apply(DataCatalog.Npc, NpcFile(npc));
+            provider.Apply(DataCatalog.NpcBehaviors, BehaviorFile(Archetype(nameof(Stance.Dexterity))));
+            return provider;
+        }
+
+        /// <summary>Pickable modifiers of equal weight; an empty pool (the default) never reaches the
+        /// weighted roll, which is all the other tests need from the catalog.</summary>
+        private static List<INpcModifier> ModifierPool() =>
+            [.. Enumerable.Range(0, ModifierPoolSize).Select(index => PoolModifier($"Modifier_{index}"))];
+
+        private static INpcModifier PoolModifier(string id)
+        {
+            var modifier = new Mock<INpcModifier>();
+            modifier.SetupGet(entry => entry.Id).Returns(id);
+            modifier.SetupGet(entry => entry.Weight).Returns(1f);
+            return modifier.Object;
+        }
+
+        private static NpcProvider CreateProvider(IReadOnlyCollection<string> abilityIds, IReadOnlyList<INpcModifier>? modifierPool = null)
         {
             var abilities = new Mock<IAbilityProvider>();
             abilities.SetupGet(provider => provider.KnownAbilityIds).Returns(abilityIds);
             abilities.Setup(provider => provider.CreateAbility(It.IsAny<string>())).Returns(() => Mock.Of<IAbility>());
 
             var modifiers = new Mock<INpcModifierProvider>();
-            modifiers.Setup(provider => provider.GetAllModifiers()).Returns([]);
+            modifiers.Setup(provider => provider.GetAllModifiers()).Returns(modifierPool ?? []);
+            modifiers.Setup(provider => provider.GetModifier(It.IsAny<string>())).Returns(() => Mock.Of<INpcModifier>());
 
             return new NpcProvider(abilities.Object, modifiers.Object);
         }

@@ -76,10 +76,13 @@ namespace Core.Data.NpcData
     /// happen to freeze a fact — a single-element "stances", "levelMin" == "levelMax", the top-level
     /// "rarity" field — keep working unchanged for records without a section, but they read as
     /// coincidence and a routine balance edit (a second stance, a wider cap) silently thaws them.</para>
-    /// <para>What the section deliberately does NOT pin: the npc modifiers and the ability pick.
-    /// They are not identity in this codebase (see <see cref="NpcDefinitionOverrides"/>): the save
-    /// system re-rolls both for every restored body, so pinning them here would hold only until the
-    /// first save/load. A record needing an exact kit already names it in "abilities".</para>
+    /// <para>What the section deliberately does NOT pin: WHICH npc modifiers a spawn wears, and the
+    /// ability pick. Neither is identity in this codebase (see <see cref="NpcDefinitionOverrides"/>):
+    /// the save system re-rolls both for every restored body, so pinning them here would hold only
+    /// until the first save/load. A record needing an exact kit already names it in "abilities".
+    /// "modifierCount" is the single thing the section does state about the modifiers — how many of
+    /// them there are, up to none at all — and it survives every reload because it is read off the
+    /// record again on each rebuild, unlike a list of ids would be.</para>
     /// </summary>
     public record NpcAuthoredData
     {
@@ -96,6 +99,16 @@ namespace Core.Data.NpcData
         /// <summary>Fixed rarity name; absent = the top-level "rarity" field, then the weighted roll.
         /// Present, it wins over "rarity": one authored block must read as the whole truth about the npc.</summary>
         [JsonProperty("rarity")] public string? Rarity { get; init; }
+
+        /// <summary>How many npc modifiers the spawn picks; absent = the type × rarity formula of
+        /// <see cref="NpcTypeDefaults.ModifierCount"/>. Named, it replaces that formula whole, and 0
+        /// is a real answer — nothing is picked at all, which is what an authored villager who should
+        /// simply be a person wants. The field is nullable precisely so 0 can mean zero: the older
+        /// "abilityCount" spends its 0 on "unset" and therefore cannot say this.
+        /// <para>It names the COUNT and never the SET: which modifiers land is still rolled.</para>
+        /// <para>A negative number is read as 0 rather than as an absent field — the record did name
+        /// a count, so the formula is out of the picture, and "fewer than none" is none.</para></summary>
+        [JsonProperty("modifierCount")] public int? ModifierCount { get; init; }
     }
 
     /// <summary>The "passives" section entry: a skill id from the passive registry plus its numbers

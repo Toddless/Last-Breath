@@ -71,7 +71,7 @@ namespace Core.Entity
                 NpcId = data.Id,
                 Level = level,
                 Rarity = rarity,
-                Modifiers = RollModifiers(entityType, rarity),
+                Modifiers = RollModifiers(entityType, rarity, data.Authored),
                 EntityType = entityType,
                 Fraction = EnumParser.ParseEnum<Fractions>(data.Fraction),
                 Stance = stance,
@@ -187,10 +187,22 @@ namespace Core.Entity
             return s_rarityWeights[Math.Max(0, (int)index)].Rarity;
         }
 
-        /// <summary>Weighted pick without replacement from the shared modifier pool; count = type × rarity.</summary>
-        private List<INpcModifier> RollModifiers(EntityType entityType, Rarity rarity)
+        /// <summary>The modifier count the "authored" section names, or null when it names none and
+        /// the type × rarity formula answers instead. A negative number is floored to zero and not
+        /// handed back as null: the record spoke, so the formula stays out, and the only reading of
+        /// "fewer than no modifiers" that a spawn can act on is none.</summary>
+        private static int? AuthoredModifierCount(NpcAuthoredData? data) =>
+            data?.ModifierCount is int count ? Math.Max(0, count) : null;
+
+        /// <summary>Weighted pick without replacement from the shared modifier pool; count = the number
+        /// the "authored" section names, else type × rarity. An authored 0 leaves the loop unentered,
+        /// so the npc comes out bare and no weighted pick happens at all — which is the point of the
+        /// field: an authored villager is allowed to be a person and not a rolled encounter. WHICH
+        /// modifiers a spawn wears stays rolled either way; overrides carry none, so nothing above
+        /// this line has an opinion about the count.</summary>
+        private List<INpcModifier> RollModifiers(EntityType entityType, Rarity rarity, NpcAuthoredData? authored)
         {
-            int count = NpcTypeDefaults.ModifierCount(entityType, rarity);
+            int count = AuthoredModifierCount(authored) ?? NpcTypeDefaults.ModifierCount(entityType, rarity);
             var pool = modifierProvider.GetAllModifiers().ToList();
 
             List<INpcModifier> rolled = [];
