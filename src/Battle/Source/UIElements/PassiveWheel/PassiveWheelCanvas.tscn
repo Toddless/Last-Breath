@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cqv8mz4rt6nd3"]
+[gd_scene format=3 uid="uid://cqv8m04rt6nd3"]
 
 [ext_resource type="Script" uid="uid://cwkkn655fkv8b" path="res://Source/UIElements/PassiveWheel/PassiveWheelCanvas.cs" id="1_canvas"]
 [ext_resource type="Script" uid="uid://bydqibgb11sb7" path="res://Source/UIElements/PassiveWheel/WheelBackdropLayer.cs" id="2_backdrop"]

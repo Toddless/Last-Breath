@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://dnx5tw9bkc2ef"]
+[gd_scene format=3 uid="uid://dnx5txabkc2ef"]
 
 [ext_resource type="Script" uid="uid://bnhfp0qdqvk1o" path="res://Source/UIElements/PassiveWheel/PassiveNodeView.cs" id="1_view"]
 [ext_resource type="Shader" uid="uid://cooc5lr58d26b" path="res://Source/UIElements/PassiveWheel/PassiveNodePulse.gdshader" id="2_pulse"]

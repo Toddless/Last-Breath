@@ -66,28 +66,23 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         public override void _Ready()
         {
-            if (_close != null) _close.Pressed += Close;
-            if (_frame != null) _frame.Pressed += () => _canvas?.FrameAll();
-            if (_respec != null) _respec.Pressed += AskRespec;
-            if (_respecConfirm != null) _respecConfirm.Confirmed += Respec;
+            _close?.Pressed += Close;
+            _frame?.Pressed += () => _canvas?.FrameAll();
+            _respec?.Pressed += AskRespec;
+            _respecConfirm?.Confirmed += Respec;
 
-            if (_card != null)
-            {
-                _card.TakePressed += () => _canvas?.TakeSelected();
-                _card.RefundPressed += () => _canvas?.RefundSelected();
-            }
+            _card?.TakePressed += () => _canvas?.TakeSelected();
+            _card?.RefundPressed += () => _canvas?.RefundSelected();
 
-            if (_canvas == null) return;
-
-            _canvas.SelectionChanged += OnSelectionChanged;
-            _canvas.HoveredChanged += OnHoveredChanged;
-            _canvas.StatusChanged += ShowHint;
+            _canvas?.SelectionChanged += OnSelectionChanged;
+            _canvas?.HoveredChanged += OnHoveredChanged;
+            _canvas?.StatusChanged += ShowHint;
         }
 
         public override void _ExitTree()
         {
-            if (_tree != null) _tree.AllocationChanged -= RefreshAllocation;
-            if (_board != null) _board.Changed -= RefreshAllocation;
+            _tree?.AllocationChanged -= RefreshAllocation;
+            _board?.Changed -= RefreshAllocation;
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -102,8 +97,8 @@ namespace Battle.Source.UIElements.PassiveWheel
             _knobs = provider.Optional<ContextModifierFormatter>();
             _localization = provider.Optional<ILocalizationProvider>();
 
-            if (_tree != null) _tree.AllocationChanged += RefreshAllocation;
-            if (_board != null) _board.Changed += RefreshAllocation;
+             _tree?.AllocationChanged += RefreshAllocation;
+             _board?.Changed += RefreshAllocation;
 
             _canvas?.InjectServices(provider);
             _sockets?.InjectServices(provider);
@@ -146,7 +141,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             bool showsAbility = abilityId.Length > 0 && node != null
                                                      && NodeKindRules.SocketTier(node.Kind) != NodeKindRules.NoSocket;
 
-            if (_abilityPane != null) _abilityPane.Visible = showsAbility;
+            _abilityPane?.Visible = showsAbility;
             if (showsAbility) _sockets?.ShowAbility(abilityId);
         }
 
@@ -231,7 +226,7 @@ namespace Battle.Source.UIElements.PassiveWheel
                         new Dictionary<string, object?> { [PassiveWheelText.CountValue] = waiting });
             }
 
-            if (_respec != null) _respec.Disabled = _tree == null || _tree.SpentPoints == 0;
+            _respec?.Disabled = _tree == null || _tree.SpentPoints == 0;
 
             ShowCard(_canvas?.Selected);
         }

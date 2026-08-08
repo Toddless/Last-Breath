@@ -5,6 +5,7 @@
     using System.Linq;
     using Battle.Source;
     using Battle.Source.UIElements;
+    using Battle.Source.UIElements.PassiveWheel;
     using Core;
     using Core.Constants;
     using Core.Data;
@@ -166,6 +167,7 @@
             [Settings.Quests] = typeof(QuestJournalWindow),
             [Settings.Character] = typeof(CharacterWindow),
             [Settings.Mastery] = typeof(MartialArtMasteryWindow),
+            [Settings.PassivesTree] = typeof(PassiveWheelWindow)
         };
 
         private static Control? CreateNotificationPopup()

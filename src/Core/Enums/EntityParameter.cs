@@ -45,5 +45,11 @@
         AllAttribute,
         AllDefence,
         AllResistancePenetration,
+
+        AllElementalDamage,
+        /// <summary>
+        /// All damage at once: phys, elemental, spell
+        /// </summary>
+        Damage
     }
 }
