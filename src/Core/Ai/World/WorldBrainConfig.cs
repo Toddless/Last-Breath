@@ -10,7 +10,8 @@ namespace Core.Ai.World
         Rest,
         Sleep,
         Hunt,
-        Harvest
+        Harvest,
+        Work
     }
 
     /// <summary>World behavior tuning of one NPC (the "world" section of Npc.json).</summary>

@@ -3,9 +3,11 @@ namespace Core.Ai.World.Activities
     using Godot;
 
     /// <summary>
-    /// Rest and Sleep are configurations of one activity: claim a smart point of the tag (fallback
-    /// — home), walk there, hold the pose. Sleep-style configurations dampen the senses while the
-    /// pose holds (sneaking up on a sleeper works); the multipliers reset on any interruption.
+    /// Rest, Sleep and Work are configurations of one activity: claim a smart point of the tag
+    /// (fallback — home), walk there, hold the pose. Sleep-style configurations dampen the senses
+    /// while the pose holds (sneaking up on a sleeper works); the multipliers reset on any
+    /// interruption. Work is the plain form — the tag comes from data, so a smith at the forge and
+    /// a trader at the stall are two schedule rows, not two classes.
     /// </summary>
     public class PointPoseActivity(string pose, string tag, WorldActivityContext context, bool dampenSenses = false) : IWorldActivity
     {

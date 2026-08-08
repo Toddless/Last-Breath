@@ -9,9 +9,10 @@ namespace Core.Ai.World.SmartPoints
         public const string Tent = "Tent";
         public const string OreVein = "OreVein";
         public const string TradeStall = "TradeStall";
+        public const string Forge = "Forge";
     }
 
-    /// <summary>A claimable spot of interest in the world (campfire, tent, ore vein, trade stall).</summary>
+    /// <summary>A claimable spot of interest in the world (campfire, tent, ore vein, trade stall, forge).</summary>
     public interface ISmartPoint
     {
         string Tag { get; }

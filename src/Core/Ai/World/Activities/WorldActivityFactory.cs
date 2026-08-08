@@ -15,6 +15,7 @@ namespace Core.Ai.World.Activities
             WorldActivityType.Sleep => new PointPoseActivity(ActivityPoses.Sleep, pointTag ?? SmartPointTags.Tent, context, dampenSenses: true),
             WorldActivityType.Hunt => new HuntActivity(context),
             WorldActivityType.Harvest => new HarvestActivity(pointTag ?? SmartPointTags.OreVein, context),
+            WorldActivityType.Work => new PointPoseActivity(ActivityPoses.Work, pointTag ?? SmartPointTags.Forge, context),
             _ => new IdleActivity()
         };
     }
