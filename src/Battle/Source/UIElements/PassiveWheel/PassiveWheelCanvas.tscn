@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://cqv8mz4rt6nd3"]
+
+[ext_resource type="Script" uid="uid://cwkkn655fkv8b" path="res://Source/UIElements/PassiveWheel/PassiveWheelCanvas.cs" id="1_canvas"]
+[ext_resource type="Script" uid="uid://bydqibgb11sb7" path="res://Source/UIElements/PassiveWheel/WheelBackdropLayer.cs" id="2_backdrop"]
+[ext_resource type="Script" uid="uid://db44epcayfdvm" path="res://Source/UIElements/PassiveWheel/WheelEdgeLayer.cs" id="3_edges"]
+[ext_resource type="Script" uid="uid://bvbgx6qr2hqqk" path="res://Source/UIElements/PassiveWheel/WheelFieldLayer.cs" id="4_field"]
+[ext_resource type="Script" uid="uid://do1bejy3kj6rc" path="res://Source/UIElements/PassiveWheel/WheelCursorLayer.cs" id="5_cursor"]
+[ext_resource type="Resource" uid="uid://ctm2vd7hnxs4b" path="res://Source/UIElements/PassiveWheel/PassiveWheelStyle.tres" id="6_style"]
+[ext_resource type="PackedScene" uid="uid://dnx5tw9bkc2ef" path="res://Source/UIElements/PassiveWheel/PassiveNodeView.tscn" id="7_nodeview"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_void"]
+bg_color = Color(0.043, 0.035, 0.024, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.227, 0.188, 0.125, 1)
+
+[node name="PassiveWheelCanvas" type="Control" node_paths=PackedStringArray("_rig", "_backdrop", "_idleEdges", "_takenEdges", "_field", "_cursor", "_nodeViews", "_effects")]
+clip_contents = true
+custom_minimum_size = Vector2(640, 480)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_canvas")
+_rig = NodePath("Rig")
+_backdrop = NodePath("Rig/Backdrop")
+_idleEdges = NodePath("Rig/IdleEdges")
+_takenEdges = NodePath("Rig/TakenEdges")
+_field = NodePath("Rig/Field")
+_cursor = NodePath("Rig/Cursor")
+_nodeViews = NodePath("Rig/NodeViews")
+_effects = NodePath("Rig/Effects")
+_nodeViewScene = ExtResource("7_nodeview")
+_style = ExtResource("6_style")
+
+[node name="Void" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_void")
+
+[node name="Rig" type="Node2D" parent="."]
+
+[node name="Backdrop" type="Node2D" parent="Rig"]
+script = ExtResource("2_backdrop")
+_style = ExtResource("6_style")
+
+[node name="IdleEdges" type="Node2D" parent="Rig"]
+script = ExtResource("3_edges")
+_role = 0
+_style = ExtResource("6_style")
+
+[node name="TakenEdges" type="Node2D" parent="Rig"]
+script = ExtResource("3_edges")
+_role = 1
+_style = ExtResource("6_style")
+
+[node name="Field" type="Node2D" parent="Rig"]
+script = ExtResource("4_field")
+_style = ExtResource("6_style")
+
+[node name="Cursor" type="Node2D" parent="Rig"]
+script = ExtResource("5_cursor")
+_style = ExtResource("6_style")
+
+[node name="NodeViews" type="Node2D" parent="Rig"]
+
+[node name="Effects" type="Node2D" parent="Rig"]

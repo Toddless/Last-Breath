@@ -6,7 +6,6 @@ namespace PassiveTreeEditor.Source.Io
     using System.Text;
     using Core.Data;
     using Core.Enums;
-    using Navigation;
     using Newtonsoft.Json;
     using Simulation;
 

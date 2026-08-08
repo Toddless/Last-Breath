@@ -60,10 +60,23 @@ namespace Core.PassiveTree.Allocation
 
         public AllocationResult CheckTake(string nodeId) => _allocation.CheckTake(SyncedTree(), nodeId, TotalPoints);
 
+        public AllocationResult CheckRefund(string nodeId) => _allocation.CheckRefund(SyncedTree(), nodeId);
+
+        public IReadOnlyList<string> PathTo(string nodeId) => _allocation.PathTo(SyncedTree(), nodeId);
+
         public AllocationResult Take(string nodeId)
         {
             PassiveTreeDocument tree = SyncedTree();
             AllocationResult result = _allocation.TryTake(tree, nodeId, TotalPoints);
+            if (result == AllocationResult.Success) Publish(tree);
+
+            return result;
+        }
+
+        public AllocationResult TakePath(IReadOnlyList<string> route)
+        {
+            PassiveTreeDocument tree = SyncedTree();
+            AllocationResult result = _allocation.TryTakePath(tree, route, TotalPoints);
             if (result == AllocationResult.Success) Publish(tree);
 
             return result;

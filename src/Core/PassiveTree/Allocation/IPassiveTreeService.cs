@@ -47,7 +47,22 @@ namespace Core.PassiveTree.Allocation
         /// or a console asks to show whether a node is available and why it is not.</summary>
         AllocationResult CheckTake(string nodeId);
 
+        /// <summary>The answer <see cref="Refund"/> would give, without giving anything back — the
+        /// mirror of <see cref="CheckTake"/>, and what a canvas asks to grey out a button and name the
+        /// reason before the click rather than after it.</summary>
+        AllocationResult CheckRefund(string nodeId);
+
+        /// <summary>The cheapest route from the current allocation to a node, the nodes still to be
+        /// bought and in the order they would be bought. Empty when the node is already taken or
+        /// nothing reaches it. Its length is what reaching the node costs — the only place a price
+        /// bigger than one point exists, since a single node always costs one.</summary>
+        IReadOnlyList<string> PathTo(string nodeId);
+
         AllocationResult Take(string nodeId);
+
+        /// <summary>Buys a whole route at once, all-or-nothing, naming the first refusal. What
+        /// <see cref="PathTo"/> hands back goes straight in.</summary>
+        AllocationResult TakePath(IReadOnlyList<string> route);
 
         AllocationResult Refund(string nodeId);
 

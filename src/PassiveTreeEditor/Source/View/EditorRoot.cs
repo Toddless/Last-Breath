@@ -13,7 +13,6 @@ namespace PassiveTreeEditor.Source.View
     using Editing.History;
     using Godot;
     using Io;
-    using Navigation;
     using Simulation;
     using Validation;
     using EditorSettings = Io.EditorSettings;

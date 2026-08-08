@@ -182,9 +182,19 @@ namespace Core.PassiveTree.Allocation
 
         /// <summary>Takes a whole route at once. All-or-nothing: a route that does not fit the budget
         /// is not taken partially, because a half-bought path is never what was asked for.</summary>
-        public bool TakePath(PassiveTreeDocument document, IReadOnlyList<string> route, int budget)
+        public bool TakePath(PassiveTreeDocument document, IReadOnlyList<string> route, int budget) =>
+            TryTakePath(document, route, budget) == AllocationResult.Success;
+
+        /// <summary>
+        /// The same purchase as <see cref="TakePath"/>, naming the first refusal instead of collapsing
+        /// it into a false — what an interface needs to say why a route it offered cannot be bought.
+        /// An empty route lands on <see cref="AllocationResult.NotConnected"/>: that is what
+        /// <see cref="PathTo"/> hands back for a node nothing reaches.
+        /// </summary>
+        public AllocationResult TryTakePath(PassiveTreeDocument document, IReadOnlyList<string> route, int budget)
         {
-            if (route.Count == 0 || Spent + route.Count > budget) return false;
+            if (route.Count == 0) return AllocationResult.NotConnected;
+            if (Spent + route.Count > budget) return AllocationResult.NotEnoughPoints;
 
             // The budget pre-check is not the only way a step can be refused — adjacency can fail on a
             // route that did not come from PathTo — so the promise is kept by rollback, not by luck.
@@ -193,15 +203,16 @@ namespace Core.PassiveTree.Allocation
 
             foreach (string id in route)
             {
-                if (Take(document, id, budget)) continue;
+                AllocationResult step = TryTake(document, id, budget);
+                if (step == AllocationResult.Success) continue;
 
                 _taken.Clear();
                 _taken.UnionWith(takenBefore);
                 Spent = spentBefore;
-                return false;
+                return step;
             }
 
-            return true;
+            return AllocationResult.Success;
         }
 
         /// <summary>Nodes adjacent to the allocation — what a canvas highlights as "next".</summary>

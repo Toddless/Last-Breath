@@ -39,6 +39,7 @@
     using Presentation;
     using RequestHandlers;
     using UIElements;
+    using UIElements.PassiveWheel;
     using World;
 
     public static class BattleSystemModuleDependencies
@@ -157,8 +158,28 @@
             uiElementManager.RegisterHudFactory(typeof(BattleHud), () => BattleHud.Initialize().Instantiate<BattleHud>());
             // Not read-only (augments are seated from here) — so not available mid-battle.
             uiElementManager.RegisterWindowFactory(typeof(MartialArtMasteryWindow), () => MartialArtMasteryWindow.Initialize().Instantiate<MartialArtMasteryWindow>(), UiContext.World);
+            RegisterPassiveWheel(uiElementManager);
             uiElementManager.RegisterPopupFactory(typeof(TextTooltipPopup), () => TextTooltipPopup.Initialize().Instantiate<TextTooltipPopup>());
             uiElementManager.RegisterPopupFactory(typeof(NpcInspectPopup), () => new NpcInspectPopup()); // thin wrapper; the card inside is the shared CharacterBar scene
+        }
+
+        /// <summary>
+        /// The passive wheel. Registered here rather than in the game project because the scene and its
+        /// script live in Battle — the window exports the socket panel, which is a Battle class — and
+        /// the game project compiles them through the shared source link. The battle sandbox composes
+        /// no tree service; the window resolves it optionally and shows an empty wheel there, the same
+        /// way the mastery screen does.
+        /// <para>World only, for the same reason as the mastery screen: augments are seated from here.</para>
+        /// <para>The scene is not built yet, so the factory is registered only once there is something
+        /// to instantiate — opening the wheel before that is a silent no-op instead of a crash.</para>
+        /// </summary>
+        private static void RegisterPassiveWheel(IUiElementsManager uiElementManager)
+        {
+            PackedScene? wheel = PassiveWheelWindow.Initialize();
+            if (wheel == null) return;
+
+            uiElementManager.RegisterWindowFactory(typeof(PassiveWheelWindow),
+                () => wheel.Instantiate<PassiveWheelWindow>(), UiContext.World);
         }
     }
 }

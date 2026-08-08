@@ -104,7 +104,7 @@ namespace Battle.Source.UIElements
         /// a drag is in the air, so a tooltip here would never be read.</summary>
         public override bool _CanDropData(Vector2 atPosition, Variant data)
         {
-            if (_view == null || _host == null || !TryReadCopy(data, out string instanceId)) return false;
+            if (_view == null || _host == null || !DragPayloadReader.TryReadInstance(data, out string instanceId)) return false;
 
             AugmentInstallResult verdict = _host.Judge(_view.SocketAddress, instanceId);
             SetHighlight(verdict.Installed);
@@ -114,7 +114,7 @@ namespace Battle.Source.UIElements
 
         public override void _DropData(Vector2 atPosition, Variant data)
         {
-            if (_view == null || _host == null || !TryReadCopy(data, out string instanceId)) return;
+            if (_view == null || _host == null || !DragPayloadReader.TryReadInstance(data, out string instanceId)) return;
 
             _host.Install(_view.SocketAddress, instanceId);
         }
@@ -130,21 +130,6 @@ namespace Battle.Source.UIElements
 
         public static PackedScene? Initialize() =>
             string.IsNullOrEmpty(UID) ? null : ResourceLoader.Load<PackedScene>(UID);
-
-        /// <summary>The copy being dragged. Only the instance key is read: it is what a bag slot and a
-        /// tray tile both put in, so an augment travels into a socket from either without a second
-        /// protocol.</summary>
-        private static bool TryReadCopy(Variant data, out string instanceId)
-        {
-            instanceId = string.Empty;
-            if (data.VariantType != Variant.Type.Dictionary) return false;
-
-            Dictionary payload = data.AsGodotDictionary();
-            if (!payload.ContainsKey(DragPayload.Instance)) return false;
-
-            instanceId = payload[DragPayload.Instance].AsString();
-            return !string.IsNullOrEmpty(instanceId);
-        }
 
         /// <summary>A filled cell borrows the augment's rarity for its frame; a remove-only one is
         /// dimmed on top of that, and an empty one falls back to the scene's neutral stylebox.</summary>

@@ -4,10 +4,10 @@ namespace PassiveTreeEditor.Source.View
     using System.Collections.Generic;
     using System.Globalization;
     using Core.PassiveTree;
+    using Core.PassiveTree.View;
     using Editing;
     using Editing.History;
     using Godot;
-    using Navigation;
     using Simulation;
 
     /// <summary>
@@ -35,6 +35,11 @@ namespace PassiveTreeEditor.Source.View
         private const float SquareCircumradius = 1.41421356f;
 
         private const float PickScreenSlack = 6f;
+
+        /// <summary>How small a node may get on screen before it stops shrinking. Shared with picking
+        /// through <see cref="NodeGeometry"/>, so the dot that is still visible is still clickable.</summary>
+        private const float MinNodeScreenRadius = 1.5f;
+
         private const float FineSnap = 1f;
         private const float CoarseSnap = 25f;
 
@@ -46,6 +51,9 @@ namespace PassiveTreeEditor.Source.View
         /// <summary>Zoom, pan and layout spread in one place, and the only arithmetic that turns a
         /// document coordinate into a pixel.</summary>
         private readonly CanvasTransform _view = new();
+
+        /// <summary>Node sizes and the rule for what a click landed on, shared with the game.</summary>
+        private readonly NodeGeometry _geometry = new(AuthoredRadii(), MinNodeScreenRadius, PickScreenSlack);
 
         private readonly List<PassiveNode> _drawCandidates = [];
         private readonly List<PassiveNode> _pickCandidates = [];
@@ -445,8 +453,7 @@ namespace PassiveTreeEditor.Source.View
 
                 // Size follows the zoom alone: spreading the layout moves nodes apart, it does not
                 // grow them, and that is the whole difference between this handle and zooming out.
-                float radius = visual.Radius * _view.Zoom;
-                if (radius < 1.5f) radius = 1.5f;
+                float radius = _geometry.ScreenRadius(node.Kind, _view.Zoom);
 
                 bool taken = _allocation.IsTaken(node.Id);
                 NodeState state = taken ? NodeState.Taken
@@ -846,41 +853,22 @@ namespace PassiveTreeEditor.Source.View
         }
 
         /// <summary>
-        /// The node under a point on screen, decided in screen pixels against the same radius the
-        /// drawing used. Measuring where the eye is looking is the whole point: at any layout spread a
-        /// node covers exactly the pixels it is painted on, so the click lands where it was aimed.
-        /// <para>Small nodes shrink to a couple of pixels when the whole tree is on screen; the slack
-        /// keeps them clickable without making overlapping picks ambiguous when zoomed in.</para>
+        /// The node under a point on screen — the shared rule, so the tool and the game cannot disagree
+        /// about what was clicked. Measuring in screen pixels is the whole point: at any layout spread a
+        /// node covers exactly the pixels it is painted on, so the click lands where it was aimed, and
+        /// the nearest centre wins where two shapes overlap.
         /// </summary>
-        private PassiveNode? NodeAt(Vector2 screen)
+        private PassiveNode? NodeAt(Vector2 screen) => _geometry.At(Document, _view, screen.X, screen.Y);
+
+        /// <summary>The authored radii the tool draws with, handed to the shared geometry: the look is
+        /// the tool's own, the sizes behind it are the game's.</summary>
+        private static Dictionary<PassiveNodeKind, float> AuthoredRadii()
         {
-            Vector2 document = ToDocument(screen);
+            var radii = new Dictionary<PassiveNodeKind, float>();
+            foreach (PassiveNodeKind kind in Enum.GetValues<PassiveNodeKind>())
+                radii[kind] = CanvasStyle.Visual(kind).Radius;
 
-            // The grid is indexed in document coordinates, so the widest node on screen has to be
-            // asked for in those — pixels of reach are worth less of the document the wider it is spread.
-            float reach = _view.DocumentLength(CanvasStyle.MaxRadius * _view.Zoom + PickScreenSlack);
-
-            _pickCandidates.Clear();
-            Document.Index.Query(document.X - reach, document.Y - reach, document.X + reach, document.Y + reach, _pickCandidates);
-
-            PassiveNode? best = null;
-            float bestDistance = float.MaxValue;
-
-            foreach (PassiveNode node in _pickCandidates)
-            {
-                float radius = CanvasStyle.Visual(node.Kind).Radius * _view.Zoom + PickScreenSlack;
-                float deltaX = _view.ScreenX(node.X) - screen.X;
-                float deltaY = _view.ScreenY(node.Y) - screen.Y;
-                float distance = deltaX * deltaX + deltaY * deltaY;
-
-                if (distance <= radius * radius && distance < bestDistance)
-                {
-                    best = node;
-                    bestDistance = distance;
-                }
-            }
-
-            return best;
+            return radii;
         }
 
         /// <summary>The class picker, opened at the cursor by a click in Add mode. Each entry shows
