@@ -62,6 +62,40 @@ namespace Core.Data.NpcData
 
         /// <summary>Species capabilities (talking, later trading). Null = can do none of it.</summary>
         [JsonProperty("interaction")] public NpcInteractionData? Interaction { get; init; }
+
+        /// <summary>Authored identity (named villagers, trial targets): the facts this section names
+        /// stop being rolled, so two spawns of the id are the same fighter. Null = everything rolls.</summary>
+        [JsonProperty("authored")] public NpcAuthoredData? Authored { get; init; }
+    }
+
+    /// <summary>
+    /// The "authored" section: identity facts a NAMED npc states instead of rolling them. Every
+    /// field is optional and independent — a named field replaces its roll, an unnamed one keeps
+    /// rolling, so a record pins only what its author actually cares about.
+    /// <para>This is the PREFERRED channel for pinning a named npc. The three older tricks that also
+    /// happen to freeze a fact — a single-element "stances", "levelMin" == "levelMax", the top-level
+    /// "rarity" field — keep working unchanged for records without a section, but they read as
+    /// coincidence and a routine balance edit (a second stance, a wider cap) silently thaws them.</para>
+    /// <para>What the section deliberately does NOT pin: the npc modifiers and the ability pick.
+    /// They are not identity in this codebase (see <see cref="NpcDefinitionOverrides"/>): the save
+    /// system re-rolls both for every restored body, so pinning them here would hold only until the
+    /// first save/load. A record needing an exact kit already names it in "abilities".</para>
+    /// </summary>
+    public record NpcAuthoredData
+    {
+        /// <summary>Fixed stance name; absent = rolled from "stances". A typo is refused, never defaulted.
+        /// Named, it ignores "stances" ENTIRELY — the list is not a whitelist and a stance outside it
+        /// is taken without complaint, so an authored record is expected to leave "stances" empty
+        /// rather than carry a list nobody reads.</summary>
+        [JsonProperty("stance")] public string? Stance { get; init; }
+
+        /// <summary>Fixed level; absent = rolled between "levelMin" and the "levelMax"/EntityType cap.
+        /// Named, neither "levelMin" nor "levelMax" takes part in building the definition.</summary>
+        [JsonProperty("level")] public int? Level { get; init; }
+
+        /// <summary>Fixed rarity name; absent = the top-level "rarity" field, then the weighted roll.
+        /// Present, it wins over "rarity": one authored block must read as the whole truth about the npc.</summary>
+        [JsonProperty("rarity")] public string? Rarity { get; init; }
     }
 
     /// <summary>The "passives" section entry: a skill id from the passive registry plus its numbers

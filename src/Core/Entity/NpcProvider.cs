@@ -18,6 +18,8 @@ namespace Core.Entity
     /// <see cref="NpcDefinition"/>s — stance from the allowed set (the behavior archetype follows
     /// it), level within the EntityType cap, rarity by weight, a weighted ability pick from the
     /// archetype pool. Every project spawning NPCs binds <see cref="INpcProvider"/> to this class.
+    /// A record carrying an "authored" section (<see cref="NpcAuthoredData"/>) replaces the rolls it
+    /// names with the values the data states — that is how a named villager is placed by hand.
     /// </summary>
     public class NpcProvider(IAbilityProvider abilityProvider, INpcModifierProvider modifierProvider) : INpcProvider, IGameDataParticipant
     {
@@ -52,12 +54,16 @@ namespace Core.Entity
                        ?? throw new KeyNotFoundException($"No NPC data loaded for '{npcId}'");
 
             var entityType = EnumParser.ParseEnum<EntityType>(data.EntityType);
-            var stance = overrides?.Stance ?? RollStance(data);
+            // Authored facts (named villagers, trial targets) are placed by hand and never rolled:
+            // two spawns of the id must hand out one fighter. Runtime overrides still beat them —
+            // the save system rebuilding a body knows better than the catalog what that body was.
+            var stance = overrides?.Stance ?? ParseAuthoredStance(data.Authored) ?? RollStance(data);
             var behaviorData = _behaviors.GetValueOrDefault(stance)
                                ?? throw new KeyNotFoundException($"No behavior archetype loaded for stance '{stance}'");
-            int level = overrides?.Level ?? _rnd.RandIntRange(data.LevelMin, data.LevelMax ?? NpcTypeDefaults.MaxLevel(entityType));
+            int level = overrides?.Level ?? data.Authored?.Level
+                        ?? _rnd.RandIntRange(data.LevelMin, data.LevelMax ?? NpcTypeDefaults.MaxLevel(entityType));
             // Authored rarity (bosses/uniques) beats the weighted roll; explicit overrides beat both.
-            var rarity = overrides?.Rarity ?? ParseFixedRarity(data) ?? RollRarity();
+            var rarity = overrides?.Rarity ?? ParseAuthoredRarity(data.Authored) ?? ParseFixedRarity(data) ?? RollRarity();
             var stages = NpcStageParser.Parse(data.Id, data.Stages);
 
             return new NpcDefinition
@@ -152,6 +158,23 @@ namespace Core.Entity
             if (data.Stances.Count == 0) return Stance.Dexterity;
             string rolled = data.Stances[_rnd.RandIntRange(0, data.Stances.Count - 1)];
             return EnumParser.ParseEnum<Stance>(rolled);
+        }
+
+        /// <summary>Stance the "authored" section names. No section or no "stance" = the stance is
+        /// still rolled from "stances"; a typo is refused like any other enum of the file, so a
+        /// hand-placed villager can never quietly come out of the dice.</summary>
+        private static Stance? ParseAuthoredStance(NpcAuthoredData? data)
+        {
+            string? stance = data?.Stance;
+            return string.IsNullOrEmpty(stance) ? null : EnumParser.ParseEnum<Stance>(stance);
+        }
+
+        /// <summary>Rarity the "authored" section names — it wins over the older top-level "rarity"
+        /// field, which keeps working alone for every record that has no section.</summary>
+        private static Rarity? ParseAuthoredRarity(NpcAuthoredData? data)
+        {
+            string? rarity = data?.Rarity;
+            return string.IsNullOrEmpty(rarity) ? null : EnumParser.ParseEnum<Rarity>(rarity);
         }
 
         /// <summary>Fixed rarity from the data ("rarity" field, bosses/uniques); absent = roll by weight.</summary>

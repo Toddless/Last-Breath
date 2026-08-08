@@ -23,6 +23,16 @@ namespace LastBreathTest.WorldTesting
         private const string TestNpcId = "Npc_Test";
         private const string PoolAbility = "Ability_Pool";
 
+        /// <summary>The level an authored record names — inside the rollable range, so a definition
+        /// carrying it proves the section was read and not that the range had no other value.</summary>
+        private const int AuthoredLevel = 7;
+
+        private const int RollableLevelMin = 1;
+        private const int RollableLevelMax = 40;
+
+        /// <summary>Spawns drawn when a test judges whether a fact still rolls.</summary>
+        private const int RollSamples = 30;
+
         [TestMethod]
         public void ShippedCatalogs_LoadAndSpawnEveryAuthoredNpc()
         {
@@ -203,12 +213,121 @@ namespace LastBreathTest.WorldTesting
             Assert.AreEqual(Rarity.Mythic, provider.CreateDefinition(TestNpcId).Rarity);
         }
 
+        /// <summary>The authored spawn: the named villager is placed by hand, not rolled, so two
+        /// spawns of one id must hand out the same fighter — the stance, level and rarity the data
+        /// names and nothing the dice picked.</summary>
+        [TestMethod]
+        public void AuthoredSection_HandsOutTheSameFighterTwice_InsteadOfRolling()
+        {
+            var provider = RollableProvider(new NpcAuthoredData
+            {
+                Stance = nameof(Stance.Strength),
+                Level = AuthoredLevel,
+                Rarity = nameof(Rarity.Uncommon),
+            });
+
+            var first = provider.CreateDefinition(TestNpcId);
+            var second = provider.CreateDefinition(TestNpcId);
+
+            Assert.AreEqual(Stance.Strength, first.Stance, "the authored stance must replace the roll");
+            Assert.AreEqual(Stance.Strength, first.Behavior.Stance, "the archetype must follow the authored stance, not a roll of its own");
+            Assert.AreEqual(AuthoredLevel, first.Level, "the authored level must replace the roll");
+            Assert.AreEqual(Rarity.Uncommon, first.Rarity, "the authored rarity must replace the roll");
+            Assert.AreEqual(Stance.Strength, second.Behavior.Stance, "a second spawn of the same id fought by another archetype");
+            Assert.AreEqual(first.Stance, second.Stance, "a second spawn of the same id changed stance");
+            Assert.AreEqual(first.Level, second.Level, "a second spawn of the same id changed level");
+            Assert.AreEqual(first.Rarity, second.Rarity, "a second spawn of the same id changed rarity");
+        }
+
+        /// <summary>The precondition of the authored test and the regression of every shipped record:
+        /// a record naming no section still rolls all three facts, exactly as it did before authoring
+        /// existed. Rolls with these ranges collapsing to one value across the whole batch is beyond
+        /// astronomical, so a frozen fact here means the roll was lost, not that luck ran out.</summary>
+        [TestMethod]
+        public void RecordWithoutTheSection_StillRollsStanceLevelAndRarity()
+        {
+            var provider = RollableProvider(authored: null);
+
+            var definitions = Enumerable.Range(0, RollSamples).Select(_ => provider.CreateDefinition(TestNpcId)).ToList();
+
+            Assert.IsTrue(definitions.Select(definition => definition.Stance).Distinct().Count() > 1, "the stance stopped rolling");
+            Assert.IsTrue(definitions.Select(definition => definition.Level).Distinct().Count() > 1, "the level stopped rolling");
+            Assert.IsTrue(definitions.Select(definition => definition.Rarity).Distinct().Count() > 1, "the rarity stopped rolling");
+        }
+
+        /// <summary>Partial sections are legal: an author pins the facts that matter and leaves the
+        /// rest to the dice. The unnamed facts must keep rolling — a section is not a freeze switch.</summary>
+        [TestMethod]
+        public void SectionNamingOnlyTheLevel_PinsTheLevelAndLeavesTheRestRolling()
+        {
+            var provider = RollableProvider(new NpcAuthoredData { Level = AuthoredLevel });
+
+            var definitions = Enumerable.Range(0, RollSamples).Select(_ => provider.CreateDefinition(TestNpcId)).ToList();
+
+            Assert.IsTrue(definitions.All(definition => definition.Level == AuthoredLevel), "the named level must be fixed");
+            Assert.IsTrue(definitions.Select(definition => definition.Stance).Distinct().Count() > 1, "an unnamed stance must keep rolling");
+            Assert.IsTrue(definitions.Select(definition => definition.Rarity).Distinct().Count() > 1, "an unnamed rarity must keep rolling");
+        }
+
+        /// <summary>A fixed rarity has two homes — the older top-level field and the authored block.
+        /// The block is meant to read as the whole truth about a named npc, so it wins.</summary>
+        [TestMethod]
+        public void AuthoredRarity_BeatsTheTopLevelRarityField()
+        {
+            var provider = LoadedProvider(Npc() with
+            {
+                Rarity = nameof(Rarity.Rare),
+                Authored = new NpcAuthoredData { Rarity = nameof(Rarity.Mythic) },
+            });
+
+            Assert.AreEqual(Rarity.Mythic, provider.CreateDefinition(TestNpcId).Rarity);
+        }
+
+        [TestMethod]
+        public void MisspelledAuthoredStance_IsRefused_NotSilentlyRolled()
+        {
+            var provider = LoadedProvider(Npc() with { Authored = new NpcAuthoredData { Stance = "Dexterety" } });
+
+            Assert.ThrowsException<FormatException>(() => provider.CreateDefinition(TestNpcId));
+        }
+
+        [TestMethod]
+        public void MisspelledAuthoredRarity_IsRefused_NotSilentlyRolled()
+        {
+            var provider = LoadedProvider(Npc() with { Authored = new NpcAuthoredData { Rarity = "Legendery" } });
+
+            Assert.ThrowsException<FormatException>(() => provider.CreateDefinition(TestNpcId));
+        }
+
         /// <summary>A provider holding one NPC and the archetype of the stance it rolls.</summary>
         private static NpcProvider LoadedProvider(NpcData npc)
         {
             var provider = CreateProvider([PoolAbility]);
             provider.Apply(DataCatalog.Npc, NpcFile(npc));
             provider.Apply(DataCatalog.NpcBehaviors, BehaviorFile(Archetype(nameof(Stance.Dexterity))));
+            return provider;
+        }
+
+        /// <summary>A provider whose only NPC has every fact left to the dice — a wide level range,
+        /// all three stances (each with its archetype) and no fixed rarity — so anything that comes
+        /// out frozen came out of the authored section and nowhere else.</summary>
+        private static NpcProvider RollableProvider(NpcAuthoredData? authored)
+        {
+            var npc = Npc() with
+            {
+                Stances = [nameof(Stance.Dexterity), nameof(Stance.Strength), nameof(Stance.Intelligence)],
+                LevelMin = RollableLevelMin,
+                LevelMax = RollableLevelMax,
+                Rarity = null,
+                Authored = authored,
+            };
+
+            var provider = CreateProvider([PoolAbility]);
+            provider.Apply(DataCatalog.Npc, NpcFile(npc));
+            provider.Apply(DataCatalog.NpcBehaviors, BehaviorFile(
+                Archetype(nameof(Stance.Dexterity)),
+                Archetype(nameof(Stance.Strength)),
+                Archetype(nameof(Stance.Intelligence))));
             return provider;
         }
 
