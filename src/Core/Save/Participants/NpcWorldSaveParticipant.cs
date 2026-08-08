@@ -18,6 +18,12 @@ namespace Core.Save.Participants
     /// point owns them (points refill independently; a conscious simplification), so rising and
     /// burning still flow through the global events and the population cap. Concrete NPC classes
     /// are project-private: instantiation goes through <see cref="INpcWorldSpawner"/>.
+    /// <para>
+    /// How a restored body ends is the business of the cycle the DEFINITION builds, never of the kind
+    /// written in the file: a body on a cycle that gets up alive (a peaceful resident) is laid down by
+    /// the very same path, and then it neither burns nor publishes anything — it simply stands back up
+    /// as itself, so none of the global events above are its story.
+    /// </para>
     /// </summary>
     public class NpcWorldSaveParticipant(
         INpcWorldRegistry registry,
@@ -78,7 +84,11 @@ namespace Core.Save.Participants
                 switch (body.Kind)
                 {
                     case NpcBodySaveData.RisenKind:
-                        npc.RestoreAsRisen(body.RisingBonus);
+                        // The cycle the definition built decides the ending, not the kind in the file:
+                        // a record written while this NPC still rose undead must not hand the fate to
+                        // today's peaceful resident. A resident that was up and about at save time is
+                        // simply alive — the fresh spawn already stands there, nothing to restore.
+                        if (npc.Lifecycle is IUndeadRiseLifecycle) npc.RestoreAsRisen(body.RisingBonus);
                         break;
                     case NpcBodySaveData.DormantKind:
                         npc.RestoreAsBody(NpcLifeStage.Dormant, body.ResurrectDelay, body.Elapsed);
