@@ -90,6 +90,21 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsFalse(lifecycle.TryBurn()); // already burned
         }
 
+        [TestMethod]
+        public void UndeadCycleRisesUndeadAndHasNoAliveRising()
+        {
+            NpcLifecycle lifecycle = CreateLifecycle();
+
+            // Binds statically: the undead rising is reachable from this cycle without a cast, and the
+            // alive rising is not reachable from it at all — the compiler is the first assert.
+            IUndeadRiseLifecycle risesUndead = lifecycle;
+            INpcLifecycle body = risesUndead;
+
+            Assert.IsInstanceOfType<IUndeadRiseLifecycle>(lifecycle, "this is the cycle whose body comes back as undead");
+            Assert.IsNotInstanceOfType<IAliveRiseLifecycle>(lifecycle, "the same creature never comes back alive, so nobody may await that outcome from this cycle");
+            Assert.AreEqual(NpcLifeStage.Alive, body.Stage);
+        }
+
         private static NpcLifecycle CreateLifecycle(float minSeconds = 10f, float maxSeconds = 20f, float maxStrengthBonus = 1f) =>
             new(new NpcLifecycleConfig
             {
