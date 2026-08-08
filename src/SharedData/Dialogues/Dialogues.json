@@ -478,6 +478,81 @@
 					]
 				}
 			]
+		},
+		{
+			"npcId": "Npc_Ronald",
+			"entryRules": [
+				{
+					"priority": 0,
+					"conditions": [],
+					"node": "Greeting"
+				}
+			],
+			"nodes": [
+				{
+					"id": "Greeting",
+					"lines": [
+						{
+							"speaker": "Npc",
+							"key": "Dlg_Ronald_Greeting_1"
+						}
+					],
+					"options": [
+						{
+							"id": "Trade",
+							"key": "Dlg_Ronald_Opt_Trade",
+							"actions": [
+								{
+									"type": "StartTrade",
+									"traderId": "Trader_Ronald"
+								}
+							]
+						},
+						{
+							"id": "AskForge",
+							"key": "Dlg_Ronald_Opt_AskForge",
+							"oncePerConversation": true,
+							"next": "AboutForge"
+						},
+						{
+							"id": "Leave",
+							"key": "Dlg_Opt_Leave",
+							"next": "Farewell"
+						}
+					]
+				},
+				{
+					"id": "AboutForge",
+					"lines": [
+						{
+							"speaker": "Npc",
+							"key": "Dlg_Ronald_AboutForge_1"
+						}
+					],
+					"options": [
+						{
+							"id": "Back",
+							"key": "Dlg_Opt_Back",
+							"next": "Greeting"
+						}
+					]
+				},
+				{
+					"id": "Farewell",
+					"lines": [
+						{
+							"speaker": "Npc",
+							"key": "Dlg_Ronald_Farewell_1"
+						}
+					],
+					"options": [
+						{
+							"id": "Leave",
+							"key": "Dlg_Opt_Leave"
+						}
+					]
+				}
+			]
 		}
 	]
 }

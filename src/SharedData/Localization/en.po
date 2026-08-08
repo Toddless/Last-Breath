@@ -4403,3 +4403,21 @@ msgstr "No room in the backpack"
 
 msgid "UI_Augment_Extract_CannotBeHeld"
 msgstr "That augment cannot be carried"
+
+msgid "Npc_Ronald"
+msgstr "Ronald the Smith"
+
+msgid "Dlg_Ronald_Greeting_1"
+msgstr "Mind the sparks. You need steel, or you need talking to? Either way, say it plain."
+
+msgid "Dlg_Ronald_Opt_Trade"
+msgstr "What metal have you got?"
+
+msgid "Dlg_Ronald_Opt_AskForge"
+msgstr "You were not always a smith."
+
+msgid "Dlg_Ronald_AboutForge_1"
+msgstr "No. I carried a spear before I carried a hammer. The forge feeds the village; the spear only fed the crows."
+
+msgid "Dlg_Ronald_Farewell_1"
+msgstr "Go on, then. Keep your edge oiled and your back to a wall."

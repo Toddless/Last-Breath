@@ -1229,6 +1229,83 @@
             "interaction": {
                 "canTalk": true
             }
+        },
+        {
+            "id": "Npc_Ronald",
+            "fraction": "Human",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Strength"
+            ],
+            "levelScaling": 0,
+            "abilityCount": 1,
+            "baseParameters": {
+                "Health": 1200,
+                "Barrier": 0,
+                "Mana": 200,
+                "Strength": 7,
+                "Dexterity": 3,
+                "Intelligence": 2,
+                "Armor": 300,
+                "CriticalChance": 0.1,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 1.5,
+                "PhysicalDamage": 150,
+                "SpellDamage": 0,
+                "Accuracy": 400,
+                "Evade": 180
+            },
+            "world": {
+                "visionRadius": 320,
+                "hearingRadius": 600,
+                "leashRadius": 500,
+                "moveSpeed": 95,
+                "chaseSpeedMultiplier": 1.4,
+                "aggressive": false,
+                "activity": "Work",
+                "wanderRadius": 150,
+                "schedule": [
+                    {
+                        "from": "06:00",
+                        "to": "14:00",
+                        "activity": "Work",
+                        "point": "Forge"
+                    },
+                    {
+                        "from": "14:00",
+                        "to": "20:00",
+                        "activity": "Work",
+                        "point": "TradeStall"
+                    },
+                    {
+                        "from": "20:00",
+                        "to": "23:00",
+                        "activity": "Rest",
+                        "point": "Campfire"
+                    },
+                    {
+                        "from": "23:00",
+                        "to": "06:00",
+                        "activity": "Sleep",
+                        "point": "Tent"
+                    }
+                ]
+            },
+            "lifecycle": {
+                "kind": "Villager",
+                "recoverMinSeconds": 120,
+                "recoverMaxSeconds": 300
+            },
+            "interaction": {
+                "canTalk": true
+            },
+            "authored": {
+                "stance": "Strength",
+                "level": 8,
+                "rarity": "Uncommon",
+                "modifierCount": 0
+            }
         }
     ]
 }

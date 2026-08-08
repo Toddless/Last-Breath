@@ -27,6 +27,27 @@
                     "Legendary": 1
                 }
             }
+        },
+        {
+            "id": "Trader_Ronald",
+            "fraction": "Human",
+            "restockGameMinutes": 1440,
+            "catalog": [
+                { "itemId": "Crafting_Resource_Copper_Ore", "count": 25 },
+                { "itemId": "Crafting_Resource_Iron_Ore", "count": 18 },
+                { "itemId": "Crafting_Resource_Silver_Ore", "count": 8, "chance": 0.7 },
+                { "itemId": "Crafting_Resource_Gold_Ore", "count": 4, "chance": 0.35 }
+            ],
+            "randomEquip": {
+                "count": 4,
+                "rarityWeights": {
+                    "Common": 50,
+                    "Uncommon": 30,
+                    "Rare": 15,
+                    "Epic": 4,
+                    "Legendary": 1
+                }
+            }
         }
     ]
 }

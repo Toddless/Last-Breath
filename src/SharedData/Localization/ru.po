@@ -3859,3 +3859,21 @@ msgstr ""
 
 msgid "UI_Augment_Extract_CannotBeHeld"
 msgstr ""
+
+msgid "Npc_Ronald"
+msgstr ""
+
+msgid "Dlg_Ronald_Greeting_1"
+msgstr ""
+
+msgid "Dlg_Ronald_Opt_Trade"
+msgstr ""
+
+msgid "Dlg_Ronald_Opt_AskForge"
+msgstr ""
+
+msgid "Dlg_Ronald_AboutForge_1"
+msgstr ""
+
+msgid "Dlg_Ronald_Farewell_1"
+msgstr ""
