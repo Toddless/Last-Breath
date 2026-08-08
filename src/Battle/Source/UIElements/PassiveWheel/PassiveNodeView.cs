@@ -143,11 +143,12 @@ namespace Battle.Source.UIElements.PassiveWheel
         }
 
         /// <summary>
-        /// The one write a zoom step makes into a view. <paramref name="bodyScale"/> is the
-        /// counter-scale that keeps a node its floored size on screen — a constant per class, so a
-        /// wheel-click writes a handful of numbers and not one per node — and
-        /// <paramref name="labelScale"/> undoes both it and the frame's zoom so the caption keeps its
-        /// point size.
+        /// The one write a zoom step makes into a view, and the only thing a view is told about the
+        /// view transform at all — a pan never reaches here. <paramref name="bodyScale"/> is the
+        /// counter-scale that keeps a node its floored size on screen: it follows the class and the
+        /// zoom and nothing else, so every node of a class is handed the same number, though the canvas
+        /// walks its views and writes it into each of them. <paramref name="labelScale"/> undoes both
+        /// it and the frame's zoom so the caption keeps its point size.
         /// </summary>
         public void ApplyZoom(float bodyScale, float labelScale, bool labelsVisible)
         {

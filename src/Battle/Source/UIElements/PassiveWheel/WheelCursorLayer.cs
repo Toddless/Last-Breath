@@ -11,13 +11,37 @@ namespace Battle.Source.UIElements.PassiveWheel
     /// pointer and the dashed route to it. The most frequently invalidated drawing in the window is
     /// isolated in the layer with the fewest primitives, and it serves nodes with and without a scene
     /// alike — the hover rule is written once here instead of once per node.
+    /// <para>A ring here is measured off the node it marks (<see cref="NodeGeometry.DocumentRingRadius"/>)
+    /// and not off a gap in pixels. The node's size has a floor under it: a constant gap outlives that
+    /// floor and the mark ends up several times the dot it is about, which reads as an object of its
+    /// own rather than as "this one". The ring WIDTHS go the other way and are held in screen pixels —
+    /// a mark on the thing under the pointer is an affordance and not part of the map, so it keeps its
+    /// weight however deep the wheel is zoomed. The dashed route is part of the map and scales with
+    /// it.</para>
     /// </summary>
     [GlobalClass]
     public partial class WheelCursorLayer : Node2D
     {
-        private const int RingSegments = 24;
-        private const float FrontierGap = 3f;
-        private const float HoverGap = 5f;
+        /// <summary>How much bigger than the node itself each ring is drawn. The pointer's sits outside
+        /// the frontier's so that the two never coincide on the node that wears both.</summary>
+        private const float FrontierRingScale = 1.3f;
+
+        private const float HoverRingScale = 1.55f;
+
+        /// <summary>Ring weights in screen pixels. The pointer's is the heavier of the two: there is one
+        /// of it and it answers a question the player is asking right now, while the frontier is a
+        /// standing mark on everything within reach.</summary>
+        private const float FrontierRingWidth = 1.5f;
+
+        private const float HoverRingWidth = 2.5f;
+
+        /// <summary>Straight pieces per screen pixel of radius, and the ends of the range. A ring drawn
+        /// in document units is blown up by the frame, so a count fixed in the source is a circle at one
+        /// zoom and a visible polygon at another.</summary>
+        private const float SegmentsPerPixel = 1.2f;
+
+        private const int FewestSegments = 10;
+        private const int MostSegments = 48;
         private const float DashLength = 7f;
 
         [Export] private PassiveWheelStyle? _style;
@@ -95,15 +119,16 @@ namespace Battle.Source.UIElements.PassiveWheel
         {
             if (_document == null || _style == null || _geometry == null) return;
 
-            float width = _style.DocumentEdgeWidth(_style.IdleEdgeWidth, _zoom);
-
             foreach (string id in _frontier)
             {
+                // The node under the pointer wears the pointer's ring instead: on a small node the two
+                // are a pixel apart and read as one thick smudge rather than as two answers.
+                if (string.Equals(id, _hovered, StringComparison.Ordinal)) continue;
+
                 PassiveNode? node = _document.Find(id);
                 if (node == null) continue;
 
-                DrawArc(new Vector2(node.X, node.Y), _geometry.DocumentRadius(node.Kind, _zoom) + Gap(FrontierGap),
-                    0f, Mathf.Tau, RingSegments, _style.Frontier, width, true);
+                Ring(node, FrontierRingScale, _style.Frontier, FrontierRingWidth);
             }
         }
 
@@ -114,9 +139,18 @@ namespace Battle.Source.UIElements.PassiveWheel
             PassiveNode? node = _document.Find(_hovered);
             if (node == null) return;
 
-            DrawArc(new Vector2(node.X, node.Y), _geometry.DocumentRadius(node.Kind, _zoom) + Gap(HoverGap),
-                0f, Mathf.Tau, RingSegments, _style.Hover,
-                _style.DocumentEdgeWidth(_style.TakenEdgeWidth, _zoom), true);
+            Ring(node, HoverRingScale, _style.Hover, HoverRingWidth);
+        }
+
+        /// <summary>The one place a ring around a node is drawn, so the pointer's mark and the frontier's
+        /// cannot come to be measured two different ways.</summary>
+        private void Ring(PassiveNode node, float scale, Color color, float screenWidth)
+        {
+            if (_geometry == null) return;
+
+            DrawArc(new Vector2(node.X, node.Y), _geometry.DocumentRingRadius(node.Kind, _zoom, scale),
+                0f, Mathf.Tau, Segments(_geometry.ScreenRingRadius(node.Kind, _zoom, scale)),
+                color, FromScreen(screenWidth), true);
         }
 
         /// <summary>The route as a dashed line through the nodes still to be bought, starting from
@@ -126,7 +160,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (_document == null || _style == null || _path.Count == 0) return;
 
             float width = _style.DocumentEdgeWidth(_style.TakenEdgeWidth, _zoom);
-            float dash = Gap(DashLength);
+            float dash = FromScreen(DashLength);
 
             for (int step = 0; step < _path.Count; step++)
             {
@@ -154,7 +188,12 @@ namespace Battle.Source.UIElements.PassiveWheel
             return null;
         }
 
-        /// <summary>A gap authored in screen pixels, in the document units the frame will scale.</summary>
-        private float Gap(float screenGap) => _zoom <= 0f ? screenGap : screenGap / _zoom;
+        /// <summary>Enough straight pieces for the ring to read as one at the size it is being seen at:
+        /// a dozen is a circle at three pixels across and a visible polygon at sixty.</summary>
+        private static int Segments(float screenRadius) =>
+            Math.Clamp((int)MathF.Ceiling(screenRadius * SegmentsPerPixel), FewestSegments, MostSegments);
+
+        /// <summary>A length authored in screen pixels, in the document units the frame will scale.</summary>
+        private float FromScreen(float pixels) => _zoom <= 0f ? pixels : pixels / _zoom;
     }
 }

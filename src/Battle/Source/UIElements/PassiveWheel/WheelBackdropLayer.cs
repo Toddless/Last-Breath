@@ -6,8 +6,10 @@ namespace Battle.Source.UIElements.PassiveWheel
 
     /// <summary>
     /// The wheel behind the tree: six wedges, the ring radii and the glow at the core. Drawn in
-    /// document units inside the frame, so panning and zooming cost it nothing — a redraw happens only
-    /// when the zoom crosses a screen floor and the ring line would otherwise vanish.
+    /// document units inside the frame, so panning costs it nothing; a zoom costs it one redraw,
+    /// because the ring line is floored in screen pixels and the wedge names are glyphs, and neither
+    /// survives being scaled instead of drawn. An allocation pass costs it the same redraw — the canvas
+    /// hands the zoom down at the end of one — over a picture nothing about it can have changed.
     /// </summary>
     [GlobalClass]
     public partial class WheelBackdropLayer : Node2D
@@ -102,6 +104,15 @@ namespace Battle.Source.UIElements.PassiveWheel
             }
         }
 
+        /// <summary>
+        /// The wedge names, at the point size they were authored at whatever the zoom.
+        /// <para>A glyph is rasterised at the size it is asked for and the frame then scales the result,
+        /// so asking for a smaller size at a deeper zoom only makes a smaller picture to blow up — which
+        /// is what turned the names into blurred giants. The size asked for is the authored one and the
+        /// DRAWING is counter-scaled instead: inside the counter-scale one unit is one screen pixel, the
+        /// frame multiplies it back to exactly one, and the glyph lands on screen at the size it was
+        /// rasterised at.</para>
+        /// </summary>
         private void DrawWedgeLabels()
         {
             if (_style == null) return;
@@ -109,11 +120,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             Font? font = ThemeDB.Singleton.FallbackFont;
             if (font == null) return;
 
-            // Drawn inside the frame, so a point size has to be divided by the zoom the frame will
-            // multiply it back by — otherwise the wedge names grow and shrink with the wheel.
-            float scale = _zoom <= 0f ? 1f : 1f / _zoom;
-            int fontSize = Math.Max(1, (int)(_style.LabelFontSize * scale));
-            float width = LabelWidth * scale;
+            float counter = _zoom <= 0f ? 1f : 1f / _zoom;
             float radius = _style.SectorRadius + LabelOffset;
 
             foreach (WheelSector sector in _style.Sectors)
@@ -122,9 +129,15 @@ namespace Battle.Source.UIElements.PassiveWheel
 
                 float radians = Mathf.DegToRad(sector.AngleDegrees);
                 Vector2 at = new Vector2(MathF.Cos(radians), MathF.Sin(radians)) * radius;
-                DrawString(font, new Vector2(at.X - width * 0.5f, at.Y), Localization.Localize(sector.LabelKey),
-                    HorizontalAlignment.Center, width, fontSize, sector.Tint);
+
+                DrawSetTransform(at, 0f, new Vector2(counter, counter));
+                DrawString(font, new Vector2(-LabelWidth * 0.5f, 0f), Localization.Localize(sector.LabelKey),
+                    HorizontalAlignment.Center, LabelWidth, _style.LabelFontSize, sector.Tint);
             }
+
+            // The transform outlives the call that set it, so the next thing drawn on this layer would
+            // inherit a counter-scale that has nothing to do with it.
+            DrawSetTransform(Vector2.Zero, 0f, Vector2.One);
         }
     }
 }

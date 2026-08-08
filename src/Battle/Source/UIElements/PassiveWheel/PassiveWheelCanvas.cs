@@ -17,10 +17,15 @@ namespace Battle.Source.UIElements.PassiveWheel
     /// only place that decides what a point on it means.
     ///
     /// <para>Everything inside is drawn in DOCUMENT coordinates within one <see cref="Node2D"/> frame.
-    /// Panning and zooming write two fields of that frame and nothing else — no layer is redrawn, no
-    /// view is moved — which is why the tree can be dragged around at any size without touching the
-    /// scene tree. The only thing a zoom step can still cost is a screen floor coming into force, and
-    /// that is a redraw per wheel click rather than per frame.</para>
+    /// PANNING writes one field of that frame and nothing else — no layer is redrawn, no view is moved
+    /// — which is why the tree can be dragged around at any size without touching the scene tree.
+    /// ZOOMING writes the frame too, but the frame only scales what has already been drawn, and a
+    /// picture scaled is not a picture drawn: glyphs keep the size they were rasterised at, a screen
+    /// floor stops being the size it promised and a width authored in screen pixels stops being that
+    /// many. So a wheel click also re-derives everything that is measured in pixels and hands it down
+    /// (<see cref="ApplyZoom"/>) — five redraws and a scale per view, at a click of the wheel and at
+    /// the two other things that take the same road (a reframe and an allocation pass), never per
+    /// frame.</para>
     ///
     /// <para>The frame is a MIRROR of <see cref="CanvasTransform"/>, written by <see cref="ApplyTransform"/>
     /// and by nothing else. Picking reads the transform, the GPU reads the frame, and the two agree only
@@ -86,11 +91,8 @@ namespace Battle.Source.UIElements.PassiveWheel
         private string? _hovered;
         private string? _selected;
 
-        private bool _pressing;
         private bool _panning;
         private bool _framed;
-        private bool _floorsEngaged;
-        private bool _labelsVisible;
         private bool _reportedMissingScene;
 
         /// <summary>A drag is in the air. An allocation pass while it is would free the view under the
@@ -99,6 +101,11 @@ namespace Battle.Source.UIElements.PassiveWheel
         private bool _dragging;
 
         private bool _reconcilePending;
+
+        /// <summary>The button holding the surface, or <see cref="MouseButton.None"/>. One gesture at a
+        /// time: a second button pressed while one is down is not a second gesture.</summary>
+        private MouseButton _pressed = MouseButton.None;
+
         private Vector2 _pressPosition;
 
         /// <summary>The node under the cursor, or null when the pointer left every node.</summary>
@@ -165,7 +172,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             {
                 _view.ResetZoom(Size.X, Size.Y);
                 ApplyTransform();
-                ApplyZoomDetail(force: true);
+                ApplyZoom();
                 return;
             }
 
@@ -180,7 +187,7 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             _view.Fit(minX, minY, maxX, maxY, Size.X, Size.Y, _framePadding);
             ApplyTransform();
-            ApplyZoomDetail(force: true);
+            ApplyZoom();
         }
 
         /// <summary>Buys the selected node through the allocation service — the same road a click on it
@@ -280,38 +287,62 @@ namespace Battle.Source.UIElements.PassiveWheel
                     AcceptEvent();
                     return;
                 case MouseButton.Middle:
-                    _panning = button.Pressed;
-                    AcceptEvent();
-                    return;
-                case MouseButton.Right when button.Pressed:
-                    OnRightClick(button.Position);
+                    // Nothing a middle click could mean, so there is no gesture to tell it apart from:
+                    // it pans from the press itself rather than from the distance travelled.
+                    if (button.Pressed) _panning = true;
+                    else PanEnded(button.Position);
                     AcceptEvent();
                     return;
                 case MouseButton.Left:
-                    if (button.Pressed) BeginPress(button.Position);
-                    else EndPress(button.Position);
+                case MouseButton.Right:
+                    if (button.Pressed) BeginPress(button.ButtonIndex, button.Position);
+                    else EndPress(button.ButtonIndex, button.Position);
                     AcceptEvent();
                     return;
             }
         }
 
-        private void BeginPress(Vector2 position)
+        /// <summary>Both buttons that mean something on the wheel start the same way: a press that may
+        /// still turn out to be a drag of the view.</summary>
+        private void BeginPress(MouseButton button, Vector2 position)
         {
+            if (_pressed != MouseButton.None) return;
+
             GrabFocus();
-            _pressing = true;
+            _pressed = button;
             _panning = false;
             _pressPosition = position;
         }
 
-        /// <summary>A press that did not travel is a click; one that did was a pan and buys nothing.</summary>
-        private void EndPress(Vector2 position)
+        /// <summary>A press that did not travel is that button's click; one that did was a pan and
+        /// buys, sells and selects nothing.</summary>
+        private void EndPress(MouseButton button, Vector2 position)
         {
-            bool panned = _panning;
-            _pressing = false;
-            _panning = false;
-            if (panned) return;
+            if (_pressed != button) return;
+
+            _pressed = MouseButton.None;
+            if (_panning)
+            {
+                PanEnded(position);
+                return;
+            }
 
             PassiveNode? node = NodeAt(position);
+            if (button == MouseButton.Right) OnRightClick(node);
+            else OnLeftClick(node);
+        }
+
+        /// <summary>The wheel moved under a hand that has come to rest, so what the pointer is on has
+        /// changed with no motion event to say so. Read once when the drag lets go — during it the
+        /// pointer is holding the view, not asking about a node.</summary>
+        private void PanEnded(Vector2 position)
+        {
+            _panning = false;
+            Hover(NodeAt(position));
+        }
+
+        private void OnLeftClick(PassiveNode? node)
+        {
             if (node == null)
             {
                 Select(null);
@@ -322,9 +353,8 @@ namespace Battle.Source.UIElements.PassiveWheel
             Take(node);
         }
 
-        private void OnRightClick(Vector2 position)
+        private void OnRightClick(PassiveNode? node)
         {
-            PassiveNode? node = NodeAt(position);
             if (node == null)
             {
                 Select(null);
@@ -343,7 +373,7 @@ namespace Battle.Source.UIElements.PassiveWheel
                 return;
             }
 
-            if (_pressing && motion.Position.DistanceTo(_pressPosition) > _dragThresholdPixels)
+            if (_pressed != MouseButton.None && motion.Position.DistanceTo(_pressPosition) > _dragThresholdPixels)
             {
                 _panning = true;
                 return;
@@ -356,11 +386,13 @@ namespace Battle.Source.UIElements.PassiveWheel
         {
             _view.ZoomBy(factor, pivot.X, pivot.Y);
             ApplyTransform();
-            ApplyZoomDetail();
+            ApplyZoom();
         }
 
-        /// <summary>The single writer of the frame. Panning is one assignment and zooming is two; no
-        /// layer and no view hears about either.</summary>
+        /// <summary>The single writer of the frame, and it writes nothing else: a pan is one assignment
+        /// and no layer or view hears about it at all. What a ZOOM additionally owes the drawing is
+        /// <see cref="ApplyZoom"/>'s business — keeping the two apart is what keeps dragging the wheel
+        /// around free.</summary>
         private void ApplyTransform()
         {
             if (_rig == null) return;
@@ -370,23 +402,24 @@ namespace Battle.Source.UIElements.PassiveWheel
         }
 
         /// <summary>
-        /// The part of a zoom the frame cannot carry: the screen floors under node radii and edge
-        /// widths, and whether captions are on. Does nothing at all while no floor is in force and the
-        /// caption threshold has not been crossed, which is most of the working range — above them a
-        /// zoom step costs two field writes and no drawing.
+        /// The part of a zoom the frame cannot carry, handed to everything that draws.
+        /// <para>Every layer draws in document units and is blown up by the frame, so anything MEASURED
+        /// IN PIXELS is only right for the zoom it was drawn at: the screen floor under a node radius,
+        /// the floor under an edge width, a ring measured off a node's screen size, the length of a dash
+        /// and the point size of a caption. Scaling that picture instead of drawing it again is what
+        /// turned captions into blur and rings into halos, so a wheel click redraws the lot.</para>
+        /// <para>Deliberately unconditional, and reached from a reframe and from an allocation pass as
+        /// well as from the wheel — those two hand the layers a zoom they already had and pay the same
+        /// price for it. All three are rare, deliberate acts; five layer redraws and one scale per node
+        /// scene is what an honest picture costs, and none of it is work per frame: none of these
+        /// classes has a <c>_Process</c>.</para>
         /// </summary>
-        private void ApplyZoomDetail(bool force = false)
+        private void ApplyZoom()
         {
             if (_geometry == null || _style == null) return;
 
             float zoom = _view.Zoom;
-            bool floors = _geometry.FloorsEngaged(zoom);
             bool labels = zoom >= _style.LabelZoomThreshold;
-
-            if (!force && !floors && !_floorsEngaged && labels == _labelsVisible) return;
-
-            _floorsEngaged = floors;
-            _labelsVisible = labels;
 
             _backdrop?.SetZoom(zoom, labels);
             _idleEdges?.SetZoom(zoom);
@@ -497,7 +530,7 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             UpdatePathPreview();
             RefreshSocketMarks();
-            ApplyZoomDetail(force: true);
+            ApplyZoom();
         }
 
         private bool HasOwnView(PassiveNodeKind kind) => _style?.Visual(kind).HasView ?? false;

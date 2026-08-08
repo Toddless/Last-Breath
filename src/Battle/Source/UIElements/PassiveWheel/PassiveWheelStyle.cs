@@ -40,7 +40,12 @@ namespace Battle.Source.UIElements.PassiveWheel
         [Export] private Color _edgePath = new(0.941f, 0.831f, 0.537f);
 
         [Export] private Color _frontier = new(0.847f, 0.706f, 0.369f);
-        [Export] private Color _hover = new(0.945f, 0.906f, 0.827f);
+
+        /// <summary>The pointer's mark: the gold of what is taken, one step brighter. A near-white ring
+        /// among gold and red reads as a foreign element sitting on the wheel rather than as the wheel
+        /// answering the cursor.</summary>
+        [Export] private Color _hover = new(0.988f, 0.898f, 0.620f);
+
         [Export] private Color _select = new(1f, 0.965f, 0.875f);
 
         [Export] private Color _nodeIdleFill = new(0.086f, 0.067f, 0.039f);

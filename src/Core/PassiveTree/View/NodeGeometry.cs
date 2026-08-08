@@ -10,8 +10,8 @@ namespace Core.PassiveTree.View
     /// click, and nothing says so until somebody misses.
     /// <para>Everything is derived from <see cref="ScreenRadius"/>: the layer that draws the mass of
     /// nodes asks for it in document units, a node scene asks for the counter-scale that keeps it that
-    /// size, and the pick asks for it plus its slack. One table of authored radii, two floors, no
-    /// second arithmetic anywhere.</para>
+    /// size, a ring drawn around a node asks for a multiple of it, and the pick asks for it plus its
+    /// slack. One table of authored radii, two floors, no second arithmetic anywhere.</para>
     /// <para>The look is not here. Shape, hue and texture differ between the game and the authoring
     /// tool; the geometry does not, so only the geometry moved.</para>
     /// </summary>
@@ -73,23 +73,36 @@ namespace Core.PassiveTree.View
         public float DocumentRadius(PassiveNodeKind kind, float zoom) =>
             ScreenRadius(kind, zoom) / SafeZoom(zoom);
 
+        /// <summary>
+        /// The radius of a ring drawn AROUND a node — the mark under the pointer, the one on what can be
+        /// bought next — as a multiple of what the node actually measures on screen.
+        /// <para>Never a fixed number of pixels outside it: <see cref="ScreenRadius"/> has a floor and a
+        /// gap in pixels does not, so pulling the view out leaves the dot standing still at the floor
+        /// while the ring keeps its distance, and the mark ends up several times the size of the thing
+        /// it is about. A ring that big stops reading as that node's mark and starts reading as an
+        /// object of its own.</para>
+        /// </summary>
+        public float ScreenRingRadius(PassiveNodeKind kind, float zoom, float ringScale) =>
+            ScreenRadius(kind, zoom) * MathF.Max(ringScale, 1f);
+
+        /// <summary>The same ring in document units, for a layer drawing inside the scaled frame.</summary>
+        public float DocumentRingRadius(PassiveNodeKind kind, float zoom, float ringScale) =>
+            ScreenRingRadius(kind, zoom, ringScale) / SafeZoom(zoom);
+
         /// <summary>The radius a click is measured against: what is drawn plus the slack that keeps a
         /// node aimable when the whole tree is on screen.</summary>
         public float PickRadius(PassiveNodeKind kind, float zoom) =>
             ScreenRadius(kind, zoom) + _pickScreenSlack;
 
         /// <summary>What a node scene must be scaled by inside the frame so it ends up
-        /// <see cref="ScreenRadius"/> across. Always at least 1, and constant per class — a zoom step
-        /// writes one number per class, not one per node.</summary>
+        /// <see cref="ScreenRadius"/> across. Always at least 1, and a function of the class and the
+        /// zoom alone — every node of a class is scaled by the same number, however many scenes the
+        /// zoom step then walks through to write it.</summary>
         public float ViewScale(PassiveNodeKind kind, float zoom)
         {
             float authored = _radii[kind] * SafeZoom(zoom);
             return authored <= 0f ? 1f : ScreenRadius(kind, zoom) / authored;
         }
-
-        /// <summary>Whether any class is currently held up by the floor. The one thing a zoom step has
-        /// to redraw for: above this the picture is the frame's business and a zoom costs nothing.</summary>
-        public bool FloorsEngaged(float zoom) => MinAuthoredRadius * zoom < _minScreenRadius;
 
         /// <summary>
         /// The node under a point on screen, or null. Nearest centre wins among everything the point

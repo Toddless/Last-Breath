@@ -8,19 +8,27 @@ namespace Battle.Source.UIElements.PassiveWheel
     /// <summary>Which half of the graph a layer draws.</summary>
     public enum EdgeLayerRole
     {
-        /// <summary>Every link of the document, dim. Changes with the document and with nothing else —
-        /// buying a node does not move a single line of it.</summary>
+        /// <summary>Every link of the document, dim. Nothing but the document itself ever changes what
+        /// it draws — buying a node does not move a line of it — though a zoom step still redraws the
+        /// lot.</summary>
         All,
 
         /// <summary>The links whose both ends are taken, drawn opaque over the dim ones. The only edge
-        /// drawing an allocation change touches.</summary>
+        /// drawing an allocation change actually changes.</summary>
         Taken
     }
 
     /// <summary>
-    /// Edges in document units inside the frame. Split in two by how often they change rather than by
-    /// how they look: the dim mesh of the whole tree is drawn once and then only moved by the frame,
-    /// while the allocation redraws a set the size of the point budget.
+    /// Edges in document units inside the frame. Split in two by what CHANGES them rather than by how
+    /// they look: an allocation change is a set the size of the point budget, and not one line of the
+    /// dim mesh of the whole tree behind it.
+    /// <para>What INVALIDATES them is coarser than that. Panning reaches neither — the frame moves, not
+    /// the drawing — but a zoom redraws both, the whole mesh included, because the edge width has a
+    /// screen floor under it (<see cref="PassiveWheelStyle.DocumentEdgeWidth"/>) and a floor only holds
+    /// at the zoom it was measured for: a mesh scaled instead of drawn again thins out of sight as the
+    /// view pulls back. The canvas hands the zoom down after an allocation pass as well, so the mesh is
+    /// laid out again there too, identical to what it was. Neither is work per frame — no class here
+    /// has a <c>_Process</c>, and both a wheel click and a bought node are rare, deliberate acts.</para>
     /// </summary>
     [GlobalClass]
     public partial class WheelEdgeLayer : Node2D
