@@ -325,7 +325,7 @@ namespace LastBreath.Npc
             AttachWorldBrain(definition.World);
 
             _lifecycle = new NpcLifecycle(definition.Lifecycle, new DefaultRandomNumberGenerator());
-            _lifecycle.ResurrectionReady += OnResurrectionReady;
+            if (_lifecycle is IUndeadRiseLifecycle undead) undead.ResurrectionReady += OnResurrectionReady;
         }
 
         /// <summary>Bosses and archons get diminishing returns on hard control (CombatRules.json);

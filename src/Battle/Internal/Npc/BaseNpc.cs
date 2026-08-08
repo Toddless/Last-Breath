@@ -325,7 +325,7 @@ namespace Battle.Internal.Npc
             AttachWorldBrain(definition.World);
 
             _lifecycle = new NpcLifecycle(definition.Lifecycle, new DefaultRandomNumberGenerator());
-            _lifecycle.ResurrectionReady += OnResurrectionReady;
+            if (_lifecycle is IUndeadRiseLifecycle undead) undead.ResurrectionReady += OnResurrectionReady;
         }
 
         /// <summary>Per-NPC art from the shared visual library; no entry — the scene's placeholder frames stay.</summary>

@@ -34,15 +34,17 @@ namespace Core.Ai.World
     /// (the longer it takes, the stronger the rising), undead lie dormant; burning is final
     /// and the only way to keep a body down. Pure logic — the node ticks it and reacts to events.
     /// </summary>
-    public class NpcLifecycle(NpcLifecycleConfig config, IRandomNumberGenerator rnd) : INpcLifecycle
+    public class NpcLifecycle(NpcLifecycleConfig config, IRandomNumberGenerator rnd) : IUndeadRiseLifecycle
     {
+        private readonly BodyRiseTimer _timer = new(rnd);
+
         public NpcLifeStage Stage { get; private set; } = NpcLifeStage.Alive;
 
         /// <summary>The rolled rise delay of the current Defeated stage (save system reads it).</summary>
-        public float ResurrectDelay { get; private set; }
+        public float ResurrectDelay => _timer.Delay;
 
         /// <summary>Seconds already lain of the current Defeated stage (save system reads it).</summary>
-        public float Elapsed { get; private set; }
+        public float Elapsed => _timer.Elapsed;
 
         /// <summary>
         /// Fired once when the timer completes; the argument is the parameter bonus of the rising
@@ -62,8 +64,7 @@ namespace Core.Ai.World
             }
 
             Stage = NpcLifeStage.Defeated;
-            Elapsed = 0;
-            ResurrectDelay = rnd.RandFloatRange(config.ResurrectMinSeconds, config.ResurrectMaxSeconds);
+            _timer.Roll(config.ResurrectMinSeconds, config.ResurrectMaxSeconds);
         }
 
         /// <summary>Save-load path: puts a freshly built body straight into a lying stage with its timer.</summary>
@@ -71,16 +72,13 @@ namespace Core.Ai.World
         {
             if (stage is not (NpcLifeStage.Defeated or NpcLifeStage.Dormant)) return;
             Stage = stage;
-            ResurrectDelay = resurrectDelay;
-            Elapsed = elapsed;
+            _timer.Restore(resurrectDelay, elapsed);
         }
 
         public void Tick(float delta)
         {
             if (Stage != NpcLifeStage.Defeated) return;
-
-            Elapsed += delta;
-            if (Elapsed < ResurrectDelay) return;
+            if (!_timer.Advance(delta)) return;
 
             Stage = NpcLifeStage.Alive;
             ResurrectionReady?.Invoke(StrengthFraction() * config.MaxStrengthBonus);
