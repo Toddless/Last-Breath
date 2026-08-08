@@ -75,8 +75,8 @@
                 PoisonCatalog().With(Augment(LowAugment, tier: 1, [AbilityTags.Poison])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 3));
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(LowAugment)));
-            Assert.AreEqual(LowAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId);
+            Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(LowAugment)));
+            Assert.AreEqual(LowAugment, board.Find(board.At(PoisonSlotOne))?.Augment?.AugmentId);
         }
 
         [TestMethod]
@@ -86,8 +86,8 @@
                 PoisonCatalog().With(Augment(EqualAugment, tier: 2, [AbilityTags.Poison])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(EqualAugment)));
-            Assert.AreEqual(EqualAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId);
+            Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(EqualAugment)));
+            Assert.AreEqual(EqualAugment, board.Find(board.At(PoisonSlotOne))?.Augment?.AugmentId);
         }
 
         [TestMethod]
@@ -97,9 +97,9 @@
                 PoisonCatalog().With(Augment(HighAugment, tier: 3, [AbilityTags.Poison])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(HighAugment)));
+            Assert.IsFalse(board.Install(board.At(PoisonSlotOne), Copy(HighAugment)));
 
-            Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty, "the augment went in against the rule");
+            Assert.IsTrue(board.Find(board.At(PoisonSlotOne))?.IsEmpty, "the augment went in against the rule");
             Assert.AreEqual(0, board.Occupants.Count, "the refused augment is still written into the save");
         }
 
@@ -110,7 +110,7 @@
                 PoisonCatalog().With(Augment(EqualAugment, tier: 2, [AbilityTags.Poison, AbilityTags.Spell])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(EqualAugment)));
+            Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(EqualAugment)));
         }
 
         [TestMethod]
@@ -120,8 +120,8 @@
                 PoisonCatalog().With(Augment(ColdAugment, tier: 1, [AbilityTags.Cold])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(ColdAugment)));
-            Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
+            Assert.IsFalse(board.Install(board.At(PoisonSlotOne), Copy(ColdAugment)));
+            Assert.IsTrue(board.Find(board.At(PoisonSlotOne))?.IsEmpty);
         }
 
         [TestMethod]
@@ -133,8 +133,8 @@
                 PoisonCatalog().With(Augment(BoundAugment, tier: 1, [AbilityTags.Cold], abilityId: PoisonAbility)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(BoundAugment)));
-            Assert.AreEqual(BoundAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId);
+            Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(BoundAugment)));
+            Assert.AreEqual(BoundAugment, board.Find(board.At(PoisonSlotOne))?.Augment?.AugmentId);
         }
 
         [TestMethod]
@@ -146,8 +146,8 @@
                 PoisonCatalog().With(Augment(BoundAugment, tier: 1, [AbilityTags.Poison], abilityId: ColdAbility)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(BoundAugment)));
-            Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
+            Assert.IsFalse(board.Install(board.At(PoisonSlotOne), Copy(BoundAugment)));
+            Assert.IsTrue(board.Find(board.At(PoisonSlotOne))?.IsEmpty);
         }
 
         [TestMethod]
@@ -161,8 +161,8 @@
                 PoisonCatalog().With(Augment(UniversalAugment, tier: 2, [AbilityTags.Cold], fitsAnyAbility: true)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2));
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(UniversalAugment)));
-            Assert.AreEqual(UniversalAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId);
+            Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(UniversalAugment)));
+            Assert.AreEqual(UniversalAugment, board.Find(board.At(PoisonSlotOne))?.Augment?.AugmentId);
         }
 
         [TestMethod]
@@ -174,8 +174,8 @@
                 PoisonCatalog().With(Augment(UniversalAugment, tier: 3, [], fitsAnyAbility: true)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 1));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(UniversalAugment)));
-            Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty, "the claim carried the augment past its tier");
+            Assert.IsFalse(board.Install(board.At(PoisonSlotOne), Copy(UniversalAugment)));
+            Assert.IsTrue(board.Find(board.At(PoisonSlotOne))?.IsEmpty, "the claim carried the augment past its tier");
         }
 
         [TestMethod]
@@ -189,12 +189,12 @@
                     .With(Augment(UniversalAugment, tier: 2, [], exclusionGroup: DurationGroup, fitsAnyAbility: true)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(PoisonSlotTwo, PoisonAbility, tier: 2));
-            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(GroupedAugment)), "the first of the group would not go in at all");
+            Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(GroupedAugment)), "the first of the group would not go in at all");
 
-            Assert.IsFalse(board.Install(PoisonSlotTwo, Copy(UniversalAugment)));
+            Assert.IsFalse(board.Install(board.At(PoisonSlotTwo), Copy(UniversalAugment)));
 
-            Assert.IsTrue(board.Find(PoisonSlotTwo)?.IsEmpty);
-            Assert.AreEqual(GroupedAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId, "the refusal took the seated one with it");
+            Assert.IsTrue(board.Find(board.At(PoisonSlotTwo))?.IsEmpty);
+            Assert.AreEqual(GroupedAugment, board.Find(board.At(PoisonSlotOne))?.Augment?.AugmentId, "the refusal took the seated one with it");
         }
 
         [TestMethod]
@@ -208,8 +208,8 @@
                 PoisonCatalog().With(Augment(SilentAugment, tier: 1, [])),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 3));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(SilentAugment)));
-            Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
+            Assert.IsFalse(board.Install(board.At(PoisonSlotOne), Copy(SilentAugment)));
+            Assert.IsTrue(board.Find(board.At(PoisonSlotOne))?.IsEmpty);
             Assert.AreEqual(AugmentFitResult.NoSharedTag,
                 AugmentFit.Check(Slot(PoisonSlotOne, PoisonAbility, tier: 3), [AbilityTags.Poison], Augment(SilentAugment, tier: 1, []), []));
         }
@@ -228,8 +228,8 @@
                 AugmentFit.Check(Slot(PoisonSlotOne, PoisonAbility, tier: 2), [AbilityTags.Poison], contradictory, []));
 
             var board = BoardOver(PoisonCatalog().With(contradictory), Slot(PoisonSlotOne, PoisonAbility, tier: 2));
-            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(ContradictoryAugment)));
-            Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
+            Assert.IsFalse(board.Install(board.At(PoisonSlotOne), Copy(ContradictoryAugment)));
+            Assert.IsTrue(board.Find(board.At(PoisonSlotOne))?.IsEmpty);
         }
 
         [TestMethod]
@@ -241,12 +241,12 @@
                     .With(Augment(SameGroupAugment, tier: 2, [AbilityTags.Poison], exclusionGroup: DurationGroup)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(PoisonSlotTwo, PoisonAbility, tier: 2));
-            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(GroupedAugment)), "the first of the group would not go in at all");
+            Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(GroupedAugment)), "the first of the group would not go in at all");
 
-            Assert.IsFalse(board.Install(PoisonSlotTwo, Copy(SameGroupAugment)));
+            Assert.IsFalse(board.Install(board.At(PoisonSlotTwo), Copy(SameGroupAugment)));
 
-            Assert.IsTrue(board.Find(PoisonSlotTwo)?.IsEmpty);
-            Assert.AreEqual(GroupedAugment, board.Find(PoisonSlotOne)?.Augment?.AugmentId, "the refusal took the seated one with it");
+            Assert.IsTrue(board.Find(board.At(PoisonSlotTwo))?.IsEmpty);
+            Assert.AreEqual(GroupedAugment, board.Find(board.At(PoisonSlotOne))?.Augment?.AugmentId, "the refusal took the seated one with it");
         }
 
         [TestMethod]
@@ -260,10 +260,10 @@
                     .With(Augment(OtherGroupAugment, tier: 2, [AbilityTags.Poison], exclusionGroup: SpreadGroup)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(PoisonSlotTwo, PoisonAbility, tier: 2));
-            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(GroupedAugment)),
+            Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(GroupedAugment)),
                 "the first group never went on â€” the second augment is being measured against a bare ability");
 
-            Assert.IsTrue(board.Install(PoisonSlotTwo, Copy(OtherGroupAugment)));
+            Assert.IsTrue(board.Install(board.At(PoisonSlotTwo), Copy(OtherGroupAugment)));
         }
 
         [TestMethod]
@@ -278,10 +278,10 @@
                     .With(Augment(SameGroupAugment, tier: 2, [AbilityTags.Cold], exclusionGroup: DurationGroup)),
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(ColdSlot, ColdAbility, tier: 2));
-            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(GroupedAugment)),
+            Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(GroupedAugment)),
                 "the poison ability never wore the group â€” the cold slot is crossing nothing");
 
-            Assert.IsTrue(board.Install(ColdSlot, Copy(SameGroupAugment)));
+            Assert.IsTrue(board.Install(board.At(ColdSlot), Copy(SameGroupAugment)));
         }
 
         [TestMethod]
@@ -291,8 +291,8 @@
             // its spelling is how an augment ends up in a slot nobody agreed to.
             var board = BoardOver(PoisonCatalog(), Slot(PoisonSlotOne, PoisonAbility, tier: 3));
 
-            Assert.IsFalse(board.Install(PoisonSlotOne, Copy(UnknownAugment)));
-            Assert.IsTrue(board.Find(PoisonSlotOne)?.IsEmpty);
+            Assert.IsFalse(board.Install(board.At(PoisonSlotOne), Copy(UnknownAugment)));
+            Assert.IsTrue(board.Find(board.At(PoisonSlotOne))?.IsEmpty);
         }
 
         [TestMethod]
@@ -304,7 +304,7 @@
             var board = new AbilitySocketBoard();
             board.Sync([Slot(PoisonSlotOne, PoisonAbility, tier: 1)]);
 
-            Assert.IsTrue(board.Install(PoisonSlotOne, Copy(HighAugment)));
+            Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(HighAugment)));
         }
 
         [TestMethod]

@@ -16,87 +16,170 @@ namespace Core.Battle.Abilities
     public sealed class AbilitySocketBoard(IAbilityAugmentCatalog? augments = null)
         : IAbilitySocketBoard, ISessionResettable
     {
+        /// <summary>Every slot the character has, live and closed alike, keyed by
+        /// <see cref="AbilitySocketPlacement.Address"/>. The key is the whole signature and not the node
+        /// id, which is what lets the slot a refunded node left behind sit beside the live slot the same
+        /// node opens after being repointed: both are the player's, and a dictionary keyed by node could
+        /// only keep one of them.</summary>
         private readonly Dictionary<string, AbilitySocket> _sockets = new(StringComparer.Ordinal);
 
-        /// <summary>Saved augments no slot could take, held because nothing has been able to judge
-        /// them yet. Filled only on a board no allocation has ever spoken to, and emptied by the first
-        /// one that does: an entry the allocation opens its slot for is seated, the rest is dropped.</summary>
-        private readonly List<AbilitySocketOccupant> _waiting = [];
-
-        /// <summary>Whether <see cref="Sync"/> has ever run. Until it has, "no slot of that id" means
-        /// the slots are unknown, not that the allocation refused one.</summary>
-        private bool _allocationRead;
+        public event Action? Changed;
 
         public IReadOnlyList<AbilitySocket> Sockets => [.. _sockets.Values];
 
-        public IReadOnlyCollection<AbilitySocketOccupant> Occupants => [.. Installed(), .. _waiting];
+        public IReadOnlyCollection<AbilitySocketOccupant> Occupants => [.. Installed()];
 
         public IReadOnlyList<AbilitySocket> SocketsOf(string abilityId) =>
         [
             .. _sockets.Values
                 .Where(socket => string.Equals(socket.AbilityId, abilityId, StringComparison.Ordinal))
                 .OrderBy(socket => socket.Tier)
+                .ThenBy(socket => socket.Address, StringComparer.Ordinal)
         ];
 
-        public AbilitySocket? Find(string socketId) => _sockets.GetValueOrDefault(socketId);
+        public AbilitySocket? Find(string socketAddress) => _sockets.GetValueOrDefault(socketAddress);
 
-        public bool Install(string socketId, AugmentInstance augment) =>
-            Find(socketId) is { } socket && Verdict(socket, augment) == AugmentFitResult.Fits && socket.Install(augment);
+        public bool Install(string socketAddress, AugmentInstance augment)
+        {
+            if (Find(socketAddress) is not { } socket
+                || Verdict(socket, augment) != AugmentFitResult.Fits
+                || !socket.Install(augment)) return false;
 
-        public AugmentFitResult? Judge(string socketId, AugmentInstance augment) =>
-            Find(socketId) is { } socket ? Verdict(socket, augment) : null;
+            Changed?.Invoke();
+            return true;
+        }
 
-        public AugmentInstance? Extract(string socketId) => Find(socketId)?.Extract();
+        public AugmentFitResult? Judge(string socketAddress, AugmentInstance augment) =>
+            Find(socketAddress) is { } socket ? Verdict(socket, augment) : null;
+
+        public AugmentInstance? Extract(string socketAddress)
+        {
+            if (Find(socketAddress) is not { } socket || socket.Extract() is not { } augment) return null;
+
+            // A closed slot exists only to give its augment back; emptied, there is nothing left of it
+            // to show and nothing a node backs. This is what takes the last row out of a socket window.
+            if (!socket.IsOpen) _sockets.Remove(socketAddress);
+
+            Changed?.Invoke();
+            return augment;
+        }
 
         public void Sync(IReadOnlyCollection<AbilitySocketPlacement> open)
         {
+            bool moved = false;
             HashSet<string> opened = new(StringComparer.Ordinal);
 
             foreach (AbilitySocketPlacement placement in open)
             {
-                opened.Add(placement.SocketId);
-                if (Matches(Find(placement.SocketId), placement)) continue;
+                string address = placement.Address;
+                opened.Add(address);
+                if (_sockets.TryGetValue(address, out AbilitySocket? standing))
+                {
+                    // The same signature is the same slot: a node bought back is the place the augment
+                    // was sitting in, so the slot wakes up around whatever is still in it.
+                    if (standing.IsOpen) continue;
+                    standing.Reopen();
+                    moved = true;
+                    continue;
+                }
 
-                _sockets[placement.SocketId] = new AbilitySocket(placement.SocketId, placement.AbilityId, placement.Tier);
+                _sockets[address] = new AbilitySocket(placement.SocketId, placement.AbilityId, placement.Tier);
+                moved = true;
             }
 
-            foreach (string closed in _sockets.Keys.Where(socketId => !opened.Contains(socketId)).ToList())
-                _sockets.Remove(closed);
+            foreach (string address in _sockets.Keys.Where(address => !opened.Contains(address)).ToList())
+                moved |= Retire(address);
 
-            _allocationRead = true;
-            JudgeHeld();
+            if (moved) Changed?.Invoke();
         }
 
         public void Restore(IReadOnlyCollection<AbilitySocketOccupant> saved)
         {
+            // The closed slots of the playthrough being left behind go with it: the board is a
+            // singleton, and a slot held open by another character's augment would be written into
+            // this one's first save.
+            foreach (string address in _sockets.Where(entry => !entry.Value.IsOpen).Select(entry => entry.Key).ToList())
+                _sockets.Remove(address);
             foreach (AbilitySocket socket in _sockets.Values) socket.Extract();
-            _waiting.Clear();
 
-            foreach (AbilitySocketOccupant occupant in saved)
-                if (!Seat(occupant) && !_allocationRead) _waiting.Add(occupant);
+            foreach (AbilitySocketOccupant occupant in saved) Seat(occupant);
+
+            Changed?.Invoke();
         }
 
-        /// <summary>Back to the board of a fresh character: no slots, and nothing waiting outside
-        /// them. The sockets themselves come back from the allocation, so a tree that can be read
-        /// empties the board through its own reset — but a launch whose document never parsed syncs
-        /// nothing at all, and the entries held from the file it loaded would otherwise be written
-        /// into the save of the playthrough that follows.</summary>
+        /// <summary>Back to the board of a fresh character: no slots at all. The sockets themselves come
+        /// back from the allocation, so a tree that can be read fills the board again through its own
+        /// reset — and a launch whose document never parsed would otherwise carry the closed slots of
+        /// the file it loaded into the playthrough that follows.</summary>
         public void ResetSession()
         {
+            if (_sockets.Count == 0) return;
+
             _sockets.Clear();
-            _waiting.Clear();
+            Changed?.Invoke();
         }
 
-        /// <summary>Puts the held entries to the allocation that has just spoken: one naming a slot
-        /// it opens under the same signature goes in, the rest are dropped. The holding lasts until
-        /// the first allocation able to answer for them and not a pass longer — an entry kept past
-        /// that point is an augment outside every slot, and it would go on being written under a
-        /// socket id whose slot the player has since filled himself.</summary>
-        private void JudgeHeld()
+        /// <summary>What becomes of a slot the allocation no longer opens: an empty one is dropped, one
+        /// holding an augment is closed. True when anything changed.</summary>
+        private bool Retire(string address)
         {
-            foreach (AbilitySocketOccupant occupant in _waiting) Seat(occupant);
+            AbilitySocket socket = _sockets[address];
+            if (socket.IsEmpty)
+            {
+                _sockets.Remove(address);
+                return true;
+            }
 
-            _waiting.Clear();
+            if (!socket.IsOpen) return false;
+
+            socket.Close();
+            return true;
+        }
+
+        /// <summary>
+        /// Puts one saved augment back where the file says it was. The live slot of that address takes
+        /// it; where the allocation opens no such slot the entry brings its own back CLOSED, so it can
+        /// be taken out and nothing else. Nothing is dropped and nothing is judged: the fitting rule
+        /// answered once, when the player seated the augment, and a record edited between builds must
+        /// cost him the use of what he owns rather than the thing itself. A seating the rule would
+        /// refuse today is reported instead, with the address and the verdict, so the edit is visible
+        /// to whoever made it.
+        /// </summary>
+        private void Seat(AbilitySocketOccupant occupant)
+        {
+            string address = occupant.Slot.Address;
+            ReportIllFitting(occupant, address);
+
+            if (_sockets.TryGetValue(address, out AbilitySocket? standing) && standing.Install(occupant.Augment)) return;
+
+            var closed = new AbilitySocket(occupant.Slot.SocketId, occupant.Slot.AbilityId, occupant.Slot.Tier);
+            closed.Install(occupant.Augment); // before Close(): a closed slot refuses every install, this one included
+            closed.Close();
+            _sockets[address] = closed;
+        }
+
+        /// <summary>Says out loud that the file carries an arrangement today's records would not allow.
+        /// The augment is seated anyway — see <see cref="Seat"/> — and the line is for whoever moved the
+        /// record, who would otherwise find out from a player.</summary>
+        private void ReportIllFitting(AbilitySocketOccupant occupant, string address)
+        {
+            if (augments is null) return;
+
+            AbilityUpgradeData? record = augments.Find(occupant.Augment.AugmentId);
+            AugmentFitResult? verdict = record is null
+                ? null
+                : AugmentFit.Check(
+                    occupant.Slot,
+                    augments.TagsOf(occupant.Slot.AbilityId),
+                    record,
+                    WornGroups(occupant.Slot.AbilityId));
+
+            if (verdict == AugmentFitResult.Fits) return;
+
+            Tracker.TrackError(
+                $"Saved augment '{occupant.Augment.AugmentId}' no longer fits the slot it was seated in " +
+                $"({address}): {verdict?.ToString() ?? "no record declares it"}. It is restored so the player keeps it.",
+                this);
         }
 
         /// <summary>How the slot judges that augment. The rule is not written here — the board only
@@ -123,14 +206,15 @@ namespace Core.Battle.Abilities
 
         /// <summary>The exclusion groups already standing in one ability's slots. Only that ability's
         /// own sockets are counted: the group says one of these at a time on one ability, not one of
-        /// these in the whole build.</summary>
+        /// these in the whole build. Read off what the ability WEARS — an augment left in a closed slot
+        /// does nothing, and blocking its group would charge the player for property he cannot use.</summary>
         private IReadOnlyCollection<string> WornGroups(string abilityId)
         {
             HashSet<string> worn = new(StringComparer.Ordinal);
 
             foreach (AbilitySocket socket in SocketsOf(abilityId))
             {
-                if (socket.Augment is not { } installed) continue;
+                if (socket.WorkingAugment is not { } installed) continue;
 
                 string? group = augments?.Find(installed.AugmentId)?.ExclusionGroup;
                 if (!string.IsNullOrWhiteSpace(group)) worn.Add(group);
@@ -139,29 +223,14 @@ namespace Core.Battle.Abilities
             return worn;
         }
 
-        /// <summary>The augments sitting in the open slots, each paired with the slot it sits in.</summary>
+        /// <summary>The augments sitting in the slots, each paired with the slot it sits in. Closed
+        /// slots are in it because they are in the same collection: what the player owns is what the
+        /// file writes, and a slot whose node he gave back still holds his augment.</summary>
         private IEnumerable<AbilitySocketOccupant> Installed()
         {
             foreach (AbilitySocket socket in _sockets.Values)
                 if (socket.Augment is { } augment)
                     yield return new AbilitySocketOccupant(socket.Placement, augment);
         }
-
-        /// <summary>Puts one saved augment back where the file says it was. Refused when no slot of
-        /// that id is open, or when the slot standing there is not the one the augment was chosen for
-        /// — the id is all a file can name, and a build is free to have moved the node behind it — or
-        /// when the augment no longer fits that slot. A file records what was seated, not permission
-        /// to seat it again: the records themselves move between builds, and a load puts the same
-        /// question to the same rule as a player's own install.</summary>
-        private bool Seat(AbilitySocketOccupant occupant) =>
-            Matches(Find(occupant.Slot.SocketId), occupant.Slot) && Install(occupant.Slot.SocketId, occupant.Augment);
-
-        /// <summary>Whether the slot standing at that id is still the slot described. A mismatch means
-        /// the node was repointed, and the occupant belongs to what the node used to be — the socket is
-        /// rebuilt rather than quietly re-labelled around its contents. This is the signature of a
-        /// placement, not the fitting rule: it asks whether the node moved, and says nothing about
-        /// which augments the slot takes (<see cref="AugmentFit"/>).</summary>
-        private static bool Matches(AbilitySocket? socket, AbilitySocketPlacement placement) =>
-            socket?.Placement == placement;
     }
 }

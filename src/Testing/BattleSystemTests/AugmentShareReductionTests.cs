@@ -284,7 +284,7 @@
                 Assert.IsTrue(strangers.Length > 0, $"'{id}' shares a tag with every shipped ability, so the claim on strangers has nothing to be proved on");
 
                 foreach (string stranger in strangers)
-                    Assert.IsTrue(board.Install(Socket(stranger), Copy(id)), $"'{id}' claims every ability and stayed out of a slot of '{stranger}'");
+                    Assert.IsTrue(board.Install(board.At(Socket(stranger)), Copy(id)), $"'{id}' claims every ability and stayed out of a slot of '{stranger}'");
             }
         }
 

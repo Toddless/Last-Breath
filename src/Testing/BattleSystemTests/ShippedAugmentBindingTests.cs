@@ -94,7 +94,7 @@
 
                 foreach (string ability in abilities)
                 {
-                    bool seated = board.Install(SocketOf(ability), Copy(id));
+                    bool seated = board.Install(board.At(SocketOf(ability)), Copy(id));
 
                     if (string.Equals(ability, record.AbilityId, StringComparison.Ordinal))
                         Assert.IsTrue(seated, $"'{id}' stayed out of a tier {record.Tier} slot of '{ability}', the ability its own record names");
@@ -127,7 +127,7 @@
 
                 IAbilitySocketBoard board = BoardOver(catalog, abilities, record.Tier);
                 foreach (string stranger in strangers)
-                    Assert.IsTrue(board.Install(SocketOf(stranger), Copy(id)),
+                    Assert.IsTrue(board.Install(board.At(SocketOf(stranger)), Copy(id)),
                         $"'{id}' claims every ability and stayed out of a tier {record.Tier} slot of '{stranger}'");
 
                 universal++;
@@ -152,7 +152,7 @@
                 IAbilitySocketBoard board = BoardOver(catalog, abilities, record.Tier);
 
                 foreach (string stranger in abilities.Where(ability => !AbilityTags.SharesAny(record.Tags, catalog.TagsOf(ability))))
-                    Assert.IsFalse(board.Install(SocketOf(stranger), Copy(id)),
+                    Assert.IsFalse(board.Install(board.At(SocketOf(stranger)), Copy(id)),
                         $"'{id}' names no ability, claims no book and shares no tag with '{stranger}', and went in anyway");
 
                 silent++;

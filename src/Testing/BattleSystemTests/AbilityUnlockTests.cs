@@ -227,7 +227,7 @@ namespace LastBreathTest.BattleSystemTests
             CreateService(book, SeededTree(DexAbility), board);
 
             CollectionAssert.AreEquivalent(new[] { DexAbility }, LearnedIds(book), "the empty reference reached the book");
-            Assert.IsNull(board.Find(CoreSeed), "the empty reference became a slot on an ability nobody names");
+            Assert.IsNull(board.Find(board.At(CoreSeed)), "the empty reference became a slot on an ability nobody names");
             Assert.AreEqual(1, board.Sockets.Count, "the core seed put a second slot on the board");
         }
 
@@ -258,14 +258,14 @@ namespace LastBreathTest.BattleSystemTests
 
             foreach (PassiveNode seed in opening)
             {
-                AbilitySocket? socket = board.Find(seed.Id);
+                AbilitySocket? socket = board.Find(board.At(seed.Id));
                 Assert.IsNotNull(socket, $"{seed.Id} opened '{seed.AbilityId}' without the slot that comes with it");
                 Assert.AreEqual(NodeKindRules.UnlockSocketTier, socket.Tier);
                 Assert.AreEqual(seed.AbilityId, socket.AbilityId);
             }
 
             foreach (PassiveNode seed in seeds.Except(opening))
-                Assert.IsNull(board.Find(seed.Id), $"{seed.Id} names no ability and still opened a slot");
+                Assert.IsNull(board.Find(board.At(seed.Id)), $"{seed.Id} names no ability and still opened a slot");
         }
 
         [TestMethod]

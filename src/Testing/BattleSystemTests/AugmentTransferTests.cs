@@ -76,7 +76,7 @@ namespace LastBreathTest.BattleSystemTests
             AugmentInstallResult result = await bench.Install(PoisonSlot, held.InstanceId);
 
             Assert.IsTrue(result.Installed, $"the augment stayed out of the slot: {result.Outcome} / {result.Fit}");
-            Assert.AreSame(held.Augment, bench.Board.Find(PoisonSlot)?.Augment,
+            Assert.AreSame(held.Augment, bench.Board.Find(bench.Board.At(PoisonSlot))?.Augment,
                 "the slot holds something other than the copy that was handed over");
             Assert.IsNull(bench.Bag.GetItem<IAugmentItem>(held.InstanceId), "the seated augment is lying in the bag as well");
             Assert.AreEqual(0, bench.Bag.GetContents().Count, "the bag still carries something after giving up its only augment");
@@ -95,7 +95,7 @@ namespace LastBreathTest.BattleSystemTests
             AugmentInstallResult again = await bench.Install(SecondPoisonSlot, held.InstanceId);
 
             Assert.AreEqual(AugmentInstallOutcome.AugmentNotHeld, again.Outcome);
-            Assert.IsTrue(bench.Board.Find(SecondPoisonSlot)?.IsEmpty, "one copy of the augment ended up in two slots at once");
+            Assert.IsTrue(bench.Board.Find(bench.Board.At(SecondPoisonSlot))?.IsEmpty, "one copy of the augment ended up in two slots at once");
         }
 
         [TestMethod]
@@ -111,7 +111,7 @@ namespace LastBreathTest.BattleSystemTests
             AugmentExtractResult result = await bench.Extract(PoisonSlot);
 
             Assert.AreEqual(AugmentExtractResult.Extracted, result);
-            Assert.IsTrue(bench.Board.Find(PoisonSlot)?.IsEmpty, "the augment is in the bag and in the slot at once");
+            Assert.IsTrue(bench.Board.Find(bench.Board.At(PoisonSlot))?.IsEmpty, "the augment is in the bag and in the slot at once");
             IAugmentItem returned = TheOnlyAugmentIn(bench.Bag);
             Assert.AreSame(held.Augment, returned.Augment, "what came back is another copy of the record, not the one that went in");
             Assert.AreEqual(rolled, returned.Augment.Values[Property], "the augment came back at another number");
@@ -132,9 +132,9 @@ namespace LastBreathTest.BattleSystemTests
             AugmentExtractResult result = await bench.Extract(PoisonSlot);
 
             Assert.AreEqual(AugmentExtractResult.NoBagRoom, result);
-            Assert.AreEqual(Sharpened, bench.Board.Find(PoisonSlot)?.Augment?.AugmentId,
+            Assert.AreEqual(Sharpened, bench.Board.Find(bench.Board.At(PoisonSlot))?.Augment?.AugmentId,
                 "the augment left the slot on its way to a bag that could not take it");
-            Assert.AreEqual(rolled, bench.Board.Find(PoisonSlot)?.Augment?.Values[Property], "the augment left its numbers behind");
+            Assert.AreEqual(rolled, bench.Board.Find(bench.Board.At(PoisonSlot))?.Augment?.Values[Property], "the augment left its numbers behind");
             Assert.AreEqual(1, bench.Bag.GetContents().Count, "the bag took the augment after saying it could not");
         }
 
@@ -151,7 +151,7 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(AugmentInstallOutcome.DoesNotFit, refused.Outcome);
             Assert.AreEqual(AugmentFitResult.NoSharedTag, refused.Fit, "the caller is told that it did not fit and never why");
-            Assert.IsTrue(bench.Board.Find(ColdSlot)?.IsEmpty, "the refused augment went in anyway");
+            Assert.IsTrue(bench.Board.Find(bench.Board.At(ColdSlot))?.IsEmpty, "the refused augment went in anyway");
             Assert.IsNotNull(bench.Bag.GetItem<IAugmentItem>(held.InstanceId), "the refused augment left the bag all the same");
             Assert.IsTrue((await bench.Install(PoisonSlot, held.InstanceId)).Installed,
                 "the augment goes into no slot at all, so the refusal above says nothing about the rule");
@@ -171,7 +171,7 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(AugmentInstallOutcome.SocketOccupied, refused.Outcome);
             Assert.IsNull(refused.Fit, "a slot that was never asked about fitting came back with a verdict");
-            Assert.AreSame(seated.Augment, bench.Board.Find(PoisonSlot)?.Augment, "the occupant was pushed out of its slot");
+            Assert.AreSame(seated.Augment, bench.Board.Find(bench.Board.At(PoisonSlot))?.Augment, "the occupant was pushed out of its slot");
             Assert.IsNotNull(bench.Bag.GetItem<IAugmentItem>(offered.InstanceId), "the refused augment left the bag");
         }
 
@@ -208,7 +208,7 @@ namespace LastBreathTest.BattleSystemTests
             target.BagSection().Restore(bagFile, target.BagSection().Version);
             target.BookSection().Restore(bookFile, target.BookSection().Version);
 
-            AugmentInstance? restoredSeat = target.Board.Find(PoisonSlot)?.Augment;
+            AugmentInstance? restoredSeat = target.Board.Find(target.Board.At(PoisonSlot))?.Augment;
             Assert.AreEqual(Ornament, restoredSeat?.AugmentId, "the slot came back holding another augment, or none");
             Assert.AreEqual(seatedRoll, restoredSeat?.Values[Property], "the seated copy came back at another number");
             IAugmentItem restoredBag = TheOnlyAugmentIn(target.Bag);
@@ -317,12 +317,12 @@ namespace LastBreathTest.BattleSystemTests
             }
 
             internal Task<AugmentInstallResult> Install(string socketId, string itemInstanceId) =>
-                new InstallAugmentRequestHandler(Board, Bag, Binder)
-                    .HandleRequest(new InstallAugmentRequest(socketId, itemInstanceId));
+                new InstallAugmentRequestHandler(new AugmentInstallGate(Board, Binder, Bag))
+                    .HandleRequest(new InstallAugmentRequest(Board.At(socketId), itemInstanceId));
 
             internal Task<AugmentExtractResult> Extract(string socketId) =>
                 new ExtractAugmentRequestHandler(Board, Augments, Bag, Binder)
-                    .HandleRequest(new ExtractAugmentRequest(socketId));
+                    .HandleRequest(new ExtractAugmentRequest(Board.At(socketId)));
 
             /// <summary>The bag section as the game registers it, minus the item data: an augment must
             /// travel as an augment, and a strict provider fails the walk the moment one is written

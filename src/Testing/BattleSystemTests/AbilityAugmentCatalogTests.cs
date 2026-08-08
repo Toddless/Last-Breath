@@ -113,13 +113,13 @@
             IAbilitySocketBoard composed = container.GetRequiredService<IAbilitySocketBoard>();
             composed.Sync([new AbilitySocketPlacement(Slot, ability, tier - 1)]);
 
-            Assert.IsFalse(composed.Install(Slot, Copy(augment)), $"'{augment}' of tier {tier} went into a tier {tier - 1} slot");
-            Assert.IsFalse(composed.Install(Slot, Copy(UnwrittenAugment)), "an id nothing declares went in on the strength of its spelling");
-            Assert.IsTrue(composed.Find(Slot)?.IsEmpty, "the refused augments are sitting in the slot anyway");
+            Assert.IsFalse(composed.Install(composed.At(Slot), Copy(augment)), $"'{augment}' of tier {tier} went into a tier {tier - 1} slot");
+            Assert.IsFalse(composed.Install(composed.At(Slot), Copy(UnwrittenAugment)), "an id nothing declares went in on the strength of its spelling");
+            Assert.IsTrue(composed.Find(composed.At(Slot))?.IsEmpty, "the refused augments are sitting in the slot anyway");
 
             var plain = new AbilitySocketBoard();
             plain.Sync([new AbilitySocketPlacement(Slot, ability, tier - 1)]);
-            Assert.IsTrue(plain.Install(Slot, Copy(augment)),
+            Assert.IsTrue(plain.Install(plain.At(Slot), Copy(augment)),
                 "a board without a catalog stopped holding what it is handed, so the refusal above says nothing about the wiring");
         }
 
@@ -138,8 +138,8 @@
                 new AbilitySocketPlacement(ColdSlot, ColdAbility, 2),
             ]);
 
-            Assert.IsTrue(board.Install(Slot, Copy(PoisonAugment)), "the augment did not go onto the ability it shares a tag with");
-            Assert.IsFalse(board.Install(ColdSlot, Copy(PoisonAugment)), "the augment went onto an ability sharing none of its tags");
+            Assert.IsTrue(board.Install(board.At(Slot), Copy(PoisonAugment)), "the augment did not go onto the ability it shares a tag with");
+            Assert.IsFalse(board.Install(board.At(ColdSlot), Copy(PoisonAugment)), "the augment went onto an ability sharing none of its tags");
         }
 
         /// <summary>What a project registers: the participants Core holds for every composition, and

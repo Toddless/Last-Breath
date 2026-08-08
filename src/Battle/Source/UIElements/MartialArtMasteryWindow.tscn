@@ -1,27 +1,27 @@
 [gd_scene format=3 uid="uid://ds0wq0f8ha2x5"]
 
 [ext_resource type="Script" uid="uid://cq2nb2bnie0iy" path="res://Source/UIElements/MartialArtMasteryWindow.cs" id="1_j6uko"]
-[ext_resource type="PackedScene" uid="uid://dxxuu85fbrdj" path="res://Source/UIElements/StanceTree.tscn" id="2_c8hsu"]
+[ext_resource type="PackedScene" uid="uid://bh2sn5qe8dc1r" path="res://Source/UIElements/StanceSocketSection.tscn" id="2_section"]
+[ext_resource type="PackedScene" uid="uid://cm0ug8yh3ls6n" path="res://Source/UIElements/AugmentTray.tscn" id="3_tray"]
 
-[node name="MartialArtMasteryWindow" type="Control" node_paths=PackedStringArray("_dexTree", "_strTree", "_intTree", "_levelLabel", "_experienceLabel", "_experienceBar", "_close")]
+[node name="MartialArtMasteryWindow" type="Control" node_paths=PackedStringArray("_sections", "_tray", "_levelLabel", "_experienceLabel", "_experienceBar", "_pointsLabel", "_waitingLabel", "_close")]
 layout_mode = 3
-anchors_preset = 9
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 1400.0
-offset_bottom = -10.0
+grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_j6uko")
-_dexTree = NodePath("Panel/Margin/Layout/Trees/Dex")
-_strTree = NodePath("Panel/Margin/Layout/Trees/Str")
-_intTree = NodePath("Panel/Margin/Layout/Trees/Int")
-_levelLabel = NodePath("Panel/Margin/Layout/Header/LevelLabel")
-_experienceLabel = NodePath("Panel/Margin/Layout/Header/ExpLabel")
-_experienceBar = NodePath("Panel/Margin/Layout/Header/ExpBar")
-_close = NodePath("Panel/Margin/Layout/Header/CloseBtn")
+_sections = [NodePath("Center/Panel/Margin/Layout/Body/Sheet/Dexterity"), NodePath("Center/Panel/Margin/Layout/Body/Sheet/Strength"), NodePath("Center/Panel/Margin/Layout/Body/Sheet/Intelligence")]
+_tray = NodePath("Center/Panel/Margin/Layout/Body/Tray")
+_levelLabel = NodePath("Center/Panel/Margin/Layout/Header/LevelLabel")
+_experienceLabel = NodePath("Center/Panel/Margin/Layout/Header/ExpLabel")
+_experienceBar = NodePath("Center/Panel/Margin/Layout/Header/ExpBar")
+_pointsLabel = NodePath("Center/Panel/Margin/Layout/Header/PointsLabel")
+_waitingLabel = NodePath("Center/Panel/Margin/Layout/Header/WaitingLabel")
+_close = NodePath("Center/Panel/Margin/Layout/Header/CloseBtn")
 
-[node name="Panel" type="PanelContainer" parent="."]
+[node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -29,64 +29,125 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Margin" type="MarginContainer" parent="Panel"]
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(1180, 760)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel"]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="Layout" type="VBoxContainer" parent="Panel/Margin"]
+[node name="Layout" type="VBoxContainer" parent="Center/Panel/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Header" type="HBoxContainer" parent="Panel/Margin/Layout"]
+[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/Layout"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Title" type="Label" parent="Panel/Margin/Layout/Header"]
+[node name="Title" type="Label" parent="Center/Panel/Margin/Layout/Header"]
 layout_mode = 2
 theme_type_variation = &"HeaderLabel"
 text = "Martial Art Mastery"
 
-[node name="LevelLabel" type="Label" parent="Panel/Margin/Layout/Header"]
+[node name="LevelLabel" type="Label" parent="Center/Panel/Margin/Layout/Header"]
 layout_mode = 2
+text = "Level"
 
-[node name="ExpBar" type="ProgressBar" parent="Panel/Margin/Layout/Header"]
+[node name="ExpBar" type="ProgressBar" parent="Center/Panel/Margin/Layout/Header"]
 custom_minimum_size = Vector2(240, 20)
 layout_mode = 2
 size_flags_vertical = 4
 show_percentage = false
 
-[node name="ExpLabel" type="Label" parent="Panel/Margin/Layout/Header"]
+[node name="ExpLabel" type="Label" parent="Center/Panel/Margin/Layout/Header"]
 layout_mode = 2
 theme_type_variation = &"DimLabel"
 
-[node name="Spacer" type="Control" parent="Panel/Margin/Layout/Header"]
+[node name="Spacer" type="Control" parent="Center/Panel/Margin/Layout/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 
-[node name="CloseBtn" type="Button" parent="Panel/Margin/Layout/Header"]
+[node name="PointsLabel" type="Label" parent="Center/Panel/Margin/Layout/Header"]
+custom_minimum_size = Vector2(112, 0)
+layout_mode = 2
+tooltip_text = "Passive points still to spend"
+text = "0"
+vertical_alignment = 1
+
+[node name="PointsCaption" type="Label" parent="Center/Panel/Margin/Layout/Header/PointsLabel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"DimLabel"
+text = "points"
+vertical_alignment = 1
+
+[node name="WaitingLabel" type="Label" parent="Center/Panel/Margin/Layout/Header"]
+visible = false
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+tooltip_text = "Augments left in slots no node backs any more. They can only be taken out."
+text = "0"
+vertical_alignment = 1
+
+[node name="WaitingCaption" type="Label" parent="Center/Panel/Margin/Layout/Header/WaitingLabel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"DimLabel"
+text = "held, remove only"
+vertical_alignment = 1
+
+[node name="CloseBtn" type="Button" parent="Center/Panel/Margin/Layout/Header"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 focus_mode = 0
 text = "X"
 
-[node name="Trees" type="HBoxContainer" parent="Panel/Margin/Layout"]
+[node name="Body" type="HBoxContainer" parent="Center/Panel/Margin/Layout"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 20
+theme_override_constants/separation = 16
 
-[node name="Dex" parent="Panel/Margin/Layout/Trees" instance=ExtResource("2_c8hsu")]
+[node name="Sheet" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
 
-[node name="Str" parent="Panel/Margin/Layout/Trees" instance=ExtResource("2_c8hsu")]
+[node name="Dexterity" parent="Center/Panel/Margin/Layout/Body/Sheet" instance=ExtResource("2_section")]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Strength" parent="Center/Panel/Margin/Layout/Body/Sheet" instance=ExtResource("2_section")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 _stance = 1
 
-[node name="Int" parent="Panel/Margin/Layout/Trees" instance=ExtResource("2_c8hsu")]
+[node name="Intelligence" parent="Center/Panel/Margin/Layout/Body/Sheet" instance=ExtResource("2_section")]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 _stance = 2
+
+[node name="Tray" parent="Center/Panel/Margin/Layout/Body" instance=ExtResource("3_tray")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 3

@@ -14,8 +14,13 @@ namespace Core.Battle.Abilities
         /// <summary>The bag holds no augment under that instance id. Nothing moved.</summary>
         AugmentNotHeld,
 
-        /// <summary>No slot of that id is open.</summary>
+        /// <summary>No slot of that address exists at all.</summary>
         NoSuchSocket,
+
+        /// <summary>The slot is still there but the node behind it is not: it holds an augment the
+        /// player may take out and takes nothing in. Answered before <see cref="SocketOccupied"/>, so
+        /// he is told the slot is gone rather than that it is busy.</summary>
+        SocketClosed,
 
         /// <summary>An augment already stands in the slot. Extraction is the only way out of one, so
         /// an install never puts the previous occupant out of the game.</summary>

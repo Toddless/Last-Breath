@@ -32,10 +32,14 @@ namespace Core.Save.Participants
     /// own, and a load must not rearrange it.
     ///
     /// Version 2 dropped the learned list, version 3 added the sockets, version 4 made each of them
-    /// carry the numbers its augment rolled, and version 5 dropped the chosen upgrades: an ability is
-    /// upgraded by exactly what stands in its sockets, so the second list had nothing left to say. A
-    /// version 4 file is still read — everything version 5 needs is in it — and the choices it carries
-    /// are reported as dropped rather than silently skipped. Nothing older: a version 3 entry names a
+    /// carry the numbers its augment rolled, version 5 dropped the chosen upgrades (an ability is
+    /// upgraded by exactly what stands in its sockets, so the second list had nothing left to say) and
+    /// version 6 turned the socket map into a LIST. The map was keyed by node, and a node repointed
+    /// between builds can leave two entries under one id — the augment the player put in the slot it
+    /// used to open and the one in the slot it opens now — so a map could only ever keep one of them.
+    /// A version 4 or 5 file is still read: it carries every field the list carries, with the node id
+    /// in the key instead of a field, and the choices a version 4 file names are reported as dropped
+    /// rather than silently skipped. Nothing older: a version 3 entry names a
     /// record and no copy of it, and the only ways to finish reading one are to invent numbers the
     /// player never rolled or to hand him the record's bases — one is a different augment, the other is
     /// the tooltip lying about what is in the slot. Such a file is reported and the section is refused
@@ -59,8 +63,13 @@ namespace Core.Save.Participants
         /// <summary>The property a version 4 file kept its free upgrade choices under.</summary>
         private const string RetiredChoices = "upgrades";
 
+        /// <summary>The property the socket entries live under. Read straight off the token rather than
+        /// through the DTO: its SHAPE moved between versions, and a body deserialized whole would throw
+        /// on the older one instead of migrating it.</summary>
+        private const string SocketsProperty = "sockets";
+
         public string SectionId => "abilityBook";
-        public int Version => 5;
+        public int Version => 6;
         public int RestoreOrder => Save.RestoreOrder.Abilities;
 
         public JToken Capture()
@@ -88,26 +97,46 @@ namespace Core.Save.Participants
             }
 
             ReportRetiredChoices(data, savedVersion);
-            var book = playerAccessor.Player?.AbilityBook;
-            var saved = data.ToObject<AbilityBookSaveData>();
-            if (saved == null) return;
-
-            sockets?.Restore(SavedOccupants(saved));
-
-            if (book != null)
-            {
-                foreach ((string stanceName, StanceBookSaveData stanceData) in saved.Stances)
-                {
-                    if (!Enum.TryParse(stanceName, out Stance stance)) continue; // stance removed from the game
-                    RestoreSlots(book, stance, stanceData.Slots);
-                }
-
-                book.SetStance(saved.CurrentStance);
-            }
+            // Before the body and before any guard that could return early: the sockets are the one part
+            // of this section that carries the player's property, and a body this build could not make
+            // sense of must not leave the board dressed in the playthrough before.
+            sockets?.Restore(SavedOccupants(data));
+            RestoreLayout(data);
 
             // After the slots and whether or not there is a book: the binder is what turns the restored
             // arrangement into upgrades, and it is the same one a player's own install goes through.
             augments?.Bind();
+        }
+
+        /// <summary>Puts the stances back the way the file left them. Skipped whole where there is no
+        /// book to lay them onto, or where the body says nothing this build can read — neither costs the
+        /// player anything, because the slots were restored before this ran.</summary>
+        private void RestoreLayout(JToken data)
+        {
+            var book = playerAccessor.Player?.AbilityBook;
+            if (book == null) return;
+
+            var saved = Body(data)?.ToObject<AbilityBookSaveData>();
+            if (saved == null) return;
+
+            foreach ((string stanceName, StanceBookSaveData stanceData) in saved.Stances)
+            {
+                if (!Enum.TryParse(stanceName, out Stance stance)) continue; // stance removed from the game
+                RestoreSlots(book, stance, stanceData.Slots);
+            }
+
+            book.SetStance(saved.CurrentStance);
+        }
+
+        /// <summary>The section without its socket entries. They are read on their own, by shape, and
+        /// leaving them in would make the whole body unreadable on a file that wrote them as a map.</summary>
+        private static JToken Body(JToken data)
+        {
+            if (data is not JObject section) return data;
+
+            var body = (JObject)section.DeepClone();
+            body.Remove(SocketsProperty);
+            return body;
         }
 
         /// <summary>
@@ -157,29 +186,53 @@ namespace Core.Save.Participants
                 this);
         }
 
-        /// <summary>Writes the occupied slots only. An empty one carries nothing to remember, and the
-        /// slot itself comes back with the node that opened it. Each augment goes down with the slot
-        /// it was chosen for, so the load can tell that slot from another one wearing the same id —
-        /// and with the numbers this copy rolled, which nothing else in the game can say again.</summary>
+        /// <summary>Writes the occupied slots only, one entry each. An empty one carries nothing to
+        /// remember, and the slot itself comes back with the node that opened it. Each augment goes down
+        /// with the slot it was chosen for, so the load can tell that slot from another one the same
+        /// node opens today — and with the numbers this copy rolled, which nothing else in the game can
+        /// say again. A slot the allocation no longer backs is written like any other: it holds the
+        /// player's property, and a file that forgot it would be a file that spent it.</summary>
         private void CaptureSockets(AbilityBookSaveData data)
         {
             foreach (AbilitySocketOccupant occupant in sockets?.Occupants ?? [])
-                data.Sockets[occupant.Slot.SocketId] = new SocketSaveData
+                data.Sockets.Add(new SocketSaveData
                 {
+                    Socket = occupant.Slot.SocketId,
                     Augment = occupant.Augment.AugmentId,
                     Values = new Dictionary<string, float>(occupant.Augment.Values),
                     Ability = occupant.Slot.AbilityId,
                     Tier = occupant.Slot.Tier
-                };
+                });
         }
 
-        /// <summary>The file's occupied slots in the board's own terms.</summary>
-        private static IReadOnlyCollection<AbilitySocketOccupant> SavedOccupants(AbilityBookSaveData saved) =>
-        [
-            .. saved.Sockets.Select(entry => new AbilitySocketOccupant(
-                new AbilitySocketPlacement(entry.Key, entry.Value.Ability, entry.Value.Tier),
-                new AugmentInstance(entry.Value.Augment, entry.Value.Values)))
-        ];
+        /// <summary>
+        /// The file's occupied slots in the board's own terms, read off the raw token because the shape
+        /// of this one property moved: a list is today's, an object is what versions 4 and 5 wrote, and
+        /// there the node id was the key. Anything else is a section with no sockets in it.
+        /// </summary>
+        private static IReadOnlyCollection<AbilitySocketOccupant> SavedOccupants(JToken data) =>
+            data[SocketsProperty] switch
+            {
+                JArray entries =>
+                [
+                    .. entries
+                        .Select(entry => entry.ToObject<SocketSaveData>())
+                        .Where(entry => entry != null)
+                        .Select(entry => Occupant(entry!.Socket, entry))
+                ],
+                JObject keyed =>
+                [
+                    .. keyed.Properties()
+                        .Select(property => (property.Name, Entry: property.Value.ToObject<SocketSaveData>()))
+                        .Where(pair => pair.Entry != null)
+                        .Select(pair => Occupant(pair.Name, pair.Entry!))
+                ],
+                _ => []
+            };
+
+        private static AbilitySocketOccupant Occupant(string socketId, SocketSaveData entry) =>
+            new(new AbilitySocketPlacement(socketId, entry.Ability, entry.Tier),
+                new AugmentInstance(entry.Augment, entry.Values));
 
         /// <summary>Lays the slots out as the file left them. A slot naming an ability the book does
         /// not hold stays empty: the abilities are the allocation's to give, and the file's memory of

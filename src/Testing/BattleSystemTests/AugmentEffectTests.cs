@@ -71,7 +71,7 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(bare + (int)rolled, bench.Ability.CostValue, "the augment is in the slot and the cast costs what it always did");
             Assert.AreEqual(1, bench.Ability.InstalledUpgrades.Count, "the ability does not know it is wearing anything");
-            Assert.AreEqual(Augment, bench.Ability.InstalledUpgrades[SocketNode].Id, "the slot is worn by something else");
+            Assert.AreEqual(Augment, bench.Ability.InstalledUpgrades[bench.Board.At(SocketNode)].Id, "the slot is worn by something else");
         }
 
         [TestMethod]
@@ -108,21 +108,24 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void GivingTheNodeBackTakesTheAugmentOffTheAbility()
+        public void GivingTheNodeBackTakesTheAugmentOffTheAbilityAndLeavesItInTheSlot()
         {
-            // The road nobody drives on purpose. The slot is the node's, and refunding it drops the
-            // slot together with what stood in it — so the ability has to stop wearing the augment in
-            // the same pass, without any hand having touched the socket.
+            // The road nobody drives on purpose, and the one that must not cost the player anything.
+            // The slot is the node's, so refunding it stops the augment working — in the same pass and
+            // without any hand having touched the socket. The augment itself is the PLAYER's: it stays
+            // in the slot, which stays on the board as the way back out of itself.
             var bench = new Bench();
             int bare = bench.Ability.CostValue;
+            string slot = bench.Board.At(SocketNode);
             Assert.IsTrue(bench.Seat(Copy(Augment, (CostProperty, bench.Declared * 2f))), "the augment never reached the slot");
             Assert.AreNotEqual(bare, bench.Ability.CostValue, "the seating did nothing, so the refund below proves nothing");
 
             Assert.AreEqual(AllocationResult.Success, bench.Tree.Refund(SocketNode));
 
-            Assert.IsNull(bench.Board.Find(SocketNode), "the slot outlived the point that paid for it");
             Assert.AreEqual(bare, bench.Ability.CostValue, "the node came back and the ability kept the augment it opened");
             Assert.AreEqual(0, bench.Ability.InstalledUpgrades.Count);
+            Assert.AreEqual(Augment, bench.Board.Find(slot)?.Augment?.AugmentId, "the refund spent the augment the player owns");
+            Assert.IsFalse(bench.Board.Find(slot)?.IsOpen, "the refunded node goes on backing its slot");
         }
 
         [TestMethod]
@@ -139,9 +142,9 @@ namespace LastBreathTest.BattleSystemTests
             var target = new Bench(taken: false);
             target.Save().Restore(source.Save().Capture(new SaveMetadata()));
 
-            Assert.AreEqual(Augment, target.Board.Find(SocketNode)?.Augment?.AugmentId, "the slot came back empty");
+            Assert.AreEqual(Augment, target.Board.Find(target.Board.At(SocketNode))?.Augment?.AugmentId, "the slot came back empty");
             Assert.AreEqual(worn, target.Ability.CostValue, "the load brought the augment back and the ability does not wear it");
-            Assert.AreEqual(rolled, target.Board.Find(SocketNode)?.Augment?.Values[CostProperty], "the copy came back at another number");
+            Assert.AreEqual(rolled, target.Board.Find(target.Board.At(SocketNode))?.Augment?.Values[CostProperty], "the copy came back at another number");
         }
 
         [TestMethod]
@@ -248,15 +251,15 @@ namespace LastBreathTest.BattleSystemTests
                 Assert.IsNotNull(item, $"the shipped catalog declares no '{copy.AugmentId}'");
                 Assert.IsTrue(_bag.TryAddItem(item), "the bag would not take the augment the case is about");
 
-                return new InstallAugmentRequestHandler(Board, _bag, _binder)
-                    .HandleRequest(new InstallAugmentRequest(SocketNode, item.InstanceId))
+                return new InstallAugmentRequestHandler(new AugmentInstallGate(Board, _binder, _bag))
+                    .HandleRequest(new InstallAugmentRequest(Board.At(SocketNode), item.InstanceId))
                     .Result.Installed;
             }
 
             /// <summary>And back out, through the mirror gate.</summary>
             internal AugmentExtractResult Unseat() =>
                 new ExtractAugmentRequestHandler(Board, _minter, _bag, _binder)
-                    .HandleRequest(new ExtractAugmentRequest(SocketNode))
+                    .HandleRequest(new ExtractAugmentRequest(Board.At(SocketNode)))
                     .Result;
 
             /// <summary>The two sections that carry a character's build, in the order the manager

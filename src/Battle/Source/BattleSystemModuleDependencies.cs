@@ -111,12 +111,22 @@
             services.TryAddSingleton<LoadScope>();
             services.TryAddSingleton<ILoadScope>(sp => sp.GetRequiredService<LoadScope>());
 
-            services.AddTransient<IRequestHandler<GetStanceAbilityRequest, IReadOnlyList<AbilitySlotView>>, GetStanceAbilityRequestHandler>();
-            services.AddTransient<IRequestHandler<GetAbilityUpgradeViewRequest, AbilityUpgradeView>, GetAbilityUpgradeViewRequestHandler>();
+            // The order of checks an install goes through, written once. A singleton because the socket
+            // panel reads it straight — the engine asks whether a drop is allowed inside the frame the
+            // pointer moved in, and the request bus answers a frame later — and a preview reading
+            // anything but the gate itself would be a second reading of the same rule.
+            services.AddSingleton<IAugmentInstallGate>(sp => new AugmentInstallGate(
+                sp.GetRequiredService<IAbilitySocketBoard>(),
+                sp.GetRequiredService<IAbilityAugmentBinder>(),
+                sp.GetService<IInventory>()));
+
+            // The socket sheet and the carried augments beside it: reads, both of them. Everything that
+            // MOVES an augment goes through the two request gates below.
+            services.AddTransient<IRequestHandler<GetAbilitySocketRowsRequest, IReadOnlyList<AbilitySocketRowView>>, AbilitySocketRowsRequestHandler>();
+            services.AddTransient<IRequestHandler<GetCarriedAugmentsRequest, IReadOnlyList<AugmentTrayTileView>>, CarriedAugmentsRequestHandler>();
             // The gates an augment travels between the bag and a slot. They need a bag, which is the
-            // game project's — a composition without one owns no augment to move and never sends
-            // either request, so the seam is left as a plain dependency instead of an optional one
-            // that would answer a question nobody asked.
+            // game project's — a composition without one owns no augment to move and answers every id
+            // as one it does not carry.
             services.AddTransient<IRequestHandler<InstallAugmentRequest, AugmentInstallResult>, InstallAugmentRequestHandler>();
             services.AddTransient<IRequestHandler<ExtractAugmentRequest, AugmentExtractResult>, ExtractAugmentRequestHandler>();
             return services;
@@ -145,9 +155,8 @@
         {
             var uiElementManager = provider.GetService<IUiElementsManager>();
             uiElementManager.RegisterHudFactory(typeof(BattleHud), () => BattleHud.Initialize().Instantiate<BattleHud>());
-            // Not read-only (upgrades apply from here) — so not available mid-battle (design, Todd 2026-07-11).
+            // Not read-only (augments are seated from here) — so not available mid-battle.
             uiElementManager.RegisterWindowFactory(typeof(MartialArtMasteryWindow), () => MartialArtMasteryWindow.Initialize().Instantiate<MartialArtMasteryWindow>(), UiContext.World);
-            uiElementManager.RegisterWindowFactory(typeof(AbilityUpgradeWindow), () => AbilityUpgradeWindow.Initialize().Instantiate<AbilityUpgradeWindow>(), UiContext.World);
             uiElementManager.RegisterPopupFactory(typeof(TextTooltipPopup), () => TextTooltipPopup.Initialize().Instantiate<TextTooltipPopup>());
             uiElementManager.RegisterPopupFactory(typeof(NpcInspectPopup), () => new NpcInspectPopup()); // thin wrapper; the card inside is the shared CharacterBar scene
         }

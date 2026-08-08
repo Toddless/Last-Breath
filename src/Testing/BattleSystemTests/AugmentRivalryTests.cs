@@ -312,13 +312,13 @@ namespace LastBreathTest.BattleSystemTests
 
             internal void Seat(string socketId, AugmentInstance copy)
             {
-                Assert.IsTrue(Board.Install(socketId, copy), $"the copy never reached '{socketId}'");
+                Assert.IsTrue(Board.Install(Board.At(socketId), copy), $"the copy never reached '{socketId}'");
                 _binder.Bind();
             }
 
             internal void Pull(string socketId)
             {
-                Assert.IsNotNull(Board.Extract(socketId), $"'{socketId}' held nothing to pull");
+                Assert.IsNotNull(Board.Extract(Board.At(socketId)), $"'{socketId}' held nothing to pull");
                 _binder.Bind();
             }
 

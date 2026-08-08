@@ -93,9 +93,9 @@
                 new AbilitySocketPlacement(Socket(Stranger), Stranger, tier),
             ]);
 
-            Assert.IsTrue(board.Install(Socket(ability), Copy(augment)),
+            Assert.IsTrue(board.Install(board.At(Socket(ability)), Copy(augment)),
                 $"'{augment}' stayed out of a slot of '{ability}', the ability its own record names");
-            Assert.IsFalse(board.Install(Socket(Stranger), Copy(augment)),
+            Assert.IsFalse(board.Install(board.At(Socket(Stranger)), Copy(augment)),
                 $"'{augment}' went onto '{Stranger}', which its record does not name");
         }
 

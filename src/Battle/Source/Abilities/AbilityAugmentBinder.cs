@@ -36,14 +36,17 @@ namespace Battle.Source.Abilities
         /// <summary>The upgrades one ability wears, read off its own slots. A socket standing empty
         /// contributes nothing, and so does one holding a copy this build can make no upgrade of — the
         /// silence is reported where the upgrade is built, and an ability is never left wearing half an
-        /// arrangement because of it.</summary>
+        /// arrangement because of it.
+        /// What is read is the WORKING occupant: a slot whose node was given back keeps the augment as
+        /// the player's property but stops handing it to the ability, otherwise a refund would leave a
+        /// paid-for upgrade running for nothing.</summary>
         private Dictionary<string, IAbilityUpgrade> SeatedOn(string abilityId)
         {
             Dictionary<string, IAbilityUpgrade> seated = new(StringComparer.Ordinal);
 
             foreach (AbilitySocket socket in sockets.SocketsOf(abilityId))
-                if (socket.Augment is { } augment && abilities.CreateUpgrade(augment) is { } upgrade)
-                    seated[socket.SocketId] = upgrade;
+                if (socket.WorkingAugment is { } augment && abilities.CreateUpgrade(augment) is { } upgrade)
+                    seated[socket.Address] = upgrade;
 
             return seated;
         }

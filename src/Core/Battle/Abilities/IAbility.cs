@@ -29,9 +29,10 @@
         /// <summary>Riders fired on every delivery impact (per hit / bounce / attack of a series).</summary>
         Dictionary<string, IImpactRider> ImpactRiders { get; }
         /// <summary>
-        /// The augments the ability is wearing, keyed by the socket each of them sits in. A socket and
-        /// not a tier: two nodes of one tier on one ability are two slots (see
-        /// <see cref="IAbilitySocketBoard"/>), and a tier-keyed arrangement could only hold one of them.
+        /// The augments the ability is wearing, keyed by the ADDRESS of the socket each of them sits in
+        /// (<see cref="AbilitySocketPlacement.Address"/>). A socket and not a tier: two nodes of one tier
+        /// on one ability are two slots (see <see cref="IAbilitySocketBoard"/>), and a tier-keyed
+        /// arrangement could only hold one of them.
         /// Each entry was built from the COPY that was seated, so its numbers are that copy's own.
         /// </summary>
         IReadOnlyDictionary<string, IAbilityUpgrade> InstalledUpgrades { get; }

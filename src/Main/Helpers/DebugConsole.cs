@@ -45,7 +45,7 @@ namespace LastBreath.Helpers
             "passive tree | passive frontier | passive node <nodeId> | passive take <nodeId> | passive refund <nodeId> | passive dump | passive respec";
 
         private const string AugmentUsage =
-            "aug catalog [filter] | aug bag | aug sockets | aug install <socketId> <copy> | aug extract <socketId>";
+            "aug catalog [filter] | aug bag | aug sockets | aug install <socket> <copy> | aug extract <socket>";
 
         /// <summary>How many frontier rows one answer prints: the whole frontier of a wide allocation
         /// would scroll the useful lines out of the console.</summary>
@@ -358,7 +358,7 @@ namespace LastBreath.Helpers
             }
 
             PrintTable(
-                ["socket (node)", "augment", "tier", "working at"],
+                ["socket (address)", "augment", "tier", "working at"],
                 [
                     .. ability.InstalledUpgrades
                         .OrderBy(worn => worn.Value.Tier)
@@ -867,9 +867,11 @@ namespace LastBreath.Helpers
                 .OrderBy(item => item.Id, StringComparer.Ordinal)
         ];
 
-        /// <summary>Every slot the allocation opens and what stands in it. A slot's id IS the passive
-        /// node that opened it, so a row names the node to give back as well as the ability it serves
-        /// and the tier it takes.</summary>
+        /// <summary>Every slot the character has and what stands in it. The first column is the ADDRESS
+        /// the commands take — a node id is not enough on its own, because a node repointed between
+        /// builds can leave the slot it used to open holding an augment beside the one it opens now.
+        /// A slot no node backs any more is marked: it is remove-only, and what is in it is still the
+        /// player's.</summary>
         private void PrintSockets()
         {
             var board = Service<IAbilitySocketBoard>();
@@ -878,85 +880,107 @@ namespace LastBreath.Helpers
                 .. board.Sockets
                     .OrderBy(socket => socket.AbilityId, StringComparer.Ordinal)
                     .ThenBy(socket => socket.Tier)
-                    .ThenBy(socket => socket.SocketId, StringComparer.Ordinal)
+                    .ThenBy(socket => socket.Address, StringComparer.Ordinal)
             ];
 
-            Print($"Sockets: {sockets.Count} open, {sockets.Count(socket => !socket.IsEmpty)} filled");
+            Print($"Sockets: {sockets.Count(socket => socket.IsOpen)} open, " +
+                  $"{sockets.Count(socket => !socket.IsOpen)} remove-only, {sockets.Count(socket => !socket.IsEmpty)} filled");
             if (sockets.Count == 0)
+            {
                 Print("No node opens one yet: an ability node opens the tier-1 slot of its ability, a socket node the higher ones (passive frontier)");
-            else
-                PrintTable(
-                    ["socket (node)", "ability", "tier", "holds"],
-                    [.. sockets.Select(socket => new[] { socket.SocketId, socket.AbilityId, Text(socket.Tier), HoldingOf(socket) })]);
+                return;
+            }
 
-            PrintAugmentsHeldOutsideSockets(board, sockets);
+            PrintTable(
+                ["socket (address)", "ability", "tier", "state", "holds"],
+                [.. sockets.Select(socket => new[]
+                {
+                    socket.Address, socket.AbilityId, Text(socket.Tier), StateOf(socket), HoldingOf(socket)
+                })]);
         }
 
-        /// <summary>The augments a save left the board holding with no slot to put them in — what a
-        /// launch whose tree failed to parse carries until an allocation can answer for them. Printed
-        /// because they are otherwise invisible and are written back into the next save: they are in no
-        /// socket, and they are not in the bag either.</summary>
-        private void PrintAugmentsHeldOutsideSockets(IAbilitySocketBoard board, IReadOnlyList<AbilitySocket> sockets)
-        {
-            HashSet<string> seated = [.. sockets.Where(socket => !socket.IsEmpty).Select(socket => socket.SocketId)];
-            List<AbilitySocketOccupant> waiting = [.. board.Occupants.Where(occupant => !seated.Contains(occupant.Slot.SocketId))];
-            if (waiting.Count == 0) return;
+        /// <summary>Whether the allocation still backs the slot, in a word.</summary>
+        private static string StateOf(AbilitySocket socket) => socket.IsOpen ? "open" : "remove-only";
 
-            Print($"{waiting.Count} augment(s) held outside the slots, waiting for an allocation that can judge them:");
-            foreach (AbilitySocketOccupant occupant in waiting)
-                Print($"  {occupant.Slot.SocketId} ({occupant.Slot.AbilityId}, tier {occupant.Slot.Tier}): {occupant.Augment.AugmentId}");
-        }
-
-        /// <summary>Hands one carried copy to a slot through the gate the socket window will use. A
-        /// refusal is named in words: the gate says which of them answered and carries the fitting
-        /// rule's own verdict with it, so nothing here works the rule out a second time.</summary>
-        private void InstallAugment(string socketId, string copy)
+        /// <summary>Hands one carried copy to a slot through the gate the socket window uses. A refusal
+        /// is named in words: the gate says which of them answered and carries the fitting rule's own
+        /// verdict with it, so nothing here works the rule out a second time.</summary>
+        private void InstallAugment(string socket, string copy)
         {
-            if (!TryResolveCopy(copy, out string instanceId)) return;
+            if (!TryResolveCopy(copy, out string instanceId) || !TryResolveSocket(socket, out string address)) return;
 
             SendAndReport<InstallAugmentRequest, AugmentInstallResult>(
-                new InstallAugmentRequest(socketId, instanceId),
-                result => ReportInstall(socketId, result));
+                new InstallAugmentRequest(address, instanceId),
+                result => ReportInstall(address, result));
         }
 
         /// <summary>Takes the augment out of a slot and back into the bag through the mirror gate.</summary>
-        private void ExtractAugment(string socketId) =>
-            SendAndReport<ExtractAugmentRequest, AugmentExtractResult>(
-                new ExtractAugmentRequest(socketId),
-                result => ReportExtract(socketId, result));
+        private void ExtractAugment(string socket)
+        {
+            if (!TryResolveSocket(socket, out string address)) return;
 
-        private void ReportInstall(string socketId, AugmentInstallResult result)
+            SendAndReport<ExtractAugmentRequest, AugmentExtractResult>(
+                new ExtractAugmentRequest(address),
+                result => ReportExtract(address, result));
+        }
+
+        /// <summary>
+        /// Turns what was typed into a slot address. A full address is passed through; a node id
+        /// naming exactly one slot resolves to it, which is what makes the short form usable while a
+        /// node opens one slot. A node naming several is the one refusal made here — the console has no
+        /// ground to choose between an augment the player is wearing and one he is only keeping.
+        /// Anything else goes through untouched: an address no slot has is the gate's answer to give.
+        /// </summary>
+        private bool TryResolveSocket(string typed, out string address)
+        {
+            address = typed;
+            var board = Service<IAbilitySocketBoard>();
+            if (board.Find(typed) != null) return true;
+
+            List<AbilitySocket> named = [.. board.Sockets.Where(socket => socket.SocketId == typed)];
+            if (named.Count > 1)
+            {
+                Print($"[color=red]node \"{typed}\" carries {named.Count} slots — name the address (aug sockets)[/color]");
+                return false;
+            }
+
+            if (named.Count == 1) address = named[0].Address;
+            return true;
+        }
+
+        private void ReportInstall(string address, AugmentInstallResult result)
         {
             if (!result.Installed)
             {
-                Print($"[color=red]install {socketId}: refused — {RefusalOf(result)}[/color]");
+                Print($"[color=red]install {address}: refused — {RefusalOf(result)}[/color]");
                 return;
             }
 
-            Print($"install {socketId}: ok");
-            PrintSocket(socketId);
+            Print($"install {address}: ok");
+            PrintSocket(address);
         }
 
-        private void ReportExtract(string socketId, AugmentExtractResult result)
+        private void ReportExtract(string address, AugmentExtractResult result)
         {
             if (result != AugmentExtractResult.Extracted)
             {
-                Print($"[color=red]extract {socketId}: refused — {ExtractRefusalOf(result)}[/color]");
+                Print($"[color=red]extract {address}: refused — {ExtractRefusalOf(result)}[/color]");
                 return;
             }
 
-            Print($"extract {socketId}: ok");
-            PrintSocket(socketId);
+            Print($"extract {address}: ok");
+            PrintSocket(address);
             PrintCarriedAugments();
         }
 
         /// <summary>The one slot an operation just touched, so its new state is on screen without
-        /// listing the whole board again.</summary>
-        private void PrintSocket(string socketId)
+        /// listing the whole board again. An extraction that emptied a remove-only slot takes the slot
+        /// with it, and there is then nothing left to print.</summary>
+        private void PrintSocket(string address)
         {
-            if (Service<IAbilitySocketBoard>().Find(socketId) is not { } socket) return;
+            if (Service<IAbilitySocketBoard>().Find(address) is not { } socket) return;
 
-            Print($"  {socket.SocketId} ({socket.AbilityId}, tier {socket.Tier}): {HoldingOf(socket)}");
+            Print($"  {socket.Address} ({socket.AbilityId}, tier {socket.Tier}, {StateOf(socket)}): {HoldingOf(socket)}");
         }
 
         /// <summary>Sends one socket command and prints the answer when it comes. Void-returning because
@@ -1007,8 +1031,9 @@ namespace LastBreath.Helpers
         private static string RefusalOf(AugmentInstallResult result) => result.Outcome switch
         {
             AugmentInstallOutcome.AugmentNotHeld => "the bag holds no augment under that copy id (aug bag)",
-            AugmentInstallOutcome.NoSuchSocket => "no socket of that id is open (aug sockets)",
-            AugmentInstallOutcome.SocketOccupied => "the socket already holds an augment — take it out first (aug extract <socketId>)",
+            AugmentInstallOutcome.NoSuchSocket => "no socket of that address exists (aug sockets)",
+            AugmentInstallOutcome.SocketClosed => "no node backs that socket any more — it can only be emptied (aug extract <socket>)",
+            AugmentInstallOutcome.SocketOccupied => "the socket already holds an augment — take it out first (aug extract <socket>)",
             AugmentInstallOutcome.DoesNotFit => FitRefusalOf(result.Fit),
             _ => result.Outcome.ToString(),
         };
@@ -1028,7 +1053,7 @@ namespace LastBreath.Helpers
 
         private static string ExtractRefusalOf(AugmentExtractResult result) => result switch
         {
-            AugmentExtractResult.NothingToExtract => "no socket of that id is open, or it stands empty (aug sockets)",
+            AugmentExtractResult.NothingToExtract => "no socket of that address exists, or it stands empty (aug sockets)",
             AugmentExtractResult.NoBagRoom => "the bag has no room — the augment stays in the socket rather than being lost on the way",
             AugmentExtractResult.CannotBeHeld => "no record declares that augment any more — it stays in the socket",
             _ => result.ToString(),
