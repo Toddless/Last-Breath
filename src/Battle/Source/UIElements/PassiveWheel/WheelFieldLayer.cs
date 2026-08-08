@@ -24,7 +24,7 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         private PassiveTreeDocument? _document;
         private NodeGeometry? _geometry;
-        private float _zoom = 1f;
+        private ICanvasScale? _scale;
 
         public void SetDocument(PassiveTreeDocument? document)
         {
@@ -46,27 +46,28 @@ namespace Battle.Source.UIElements.PassiveWheel
             QueueRedraw();
         }
 
-        public void SetZoom(float zoom)
+        public void SetScale(ICanvasScale scale)
         {
-            _zoom = zoom;
+            _scale = scale;
             QueueRedraw();
         }
 
         public override void _Draw()
         {
-            if (_document == null || _style == null || _geometry == null) return;
+            if (_document == null || _style == null || _geometry == null || _scale == null) return;
+
+            float outline = _style.DocumentEdgeWidth(_style.IdleEdgeWidth, _scale);
 
             foreach (PassiveNode node in _document.Nodes)
             {
                 if (_carriers.Contains(node.Id)) continue;
 
                 var centre = new Vector2(node.X, node.Y);
-                float radius = _geometry.DocumentRadius(node.Kind, _zoom);
+                float radius = _geometry.DocumentRadius(node.Kind, _scale);
 
                 DrawCircle(centre, radius, _style.NodeIdleFill);
                 DrawArc(centre, radius, 0f, Mathf.Tau, CircleSegments,
-                    new Color(_style.ColorOf(node), _style.NodeIdleOutline.A),
-                    _style.DocumentEdgeWidth(_style.IdleEdgeWidth, _zoom), true);
+                    new Color(_style.ColorOf(node), _style.NodeIdleOutline.A), outline, true);
             }
         }
     }

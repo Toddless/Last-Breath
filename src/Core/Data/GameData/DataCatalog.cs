@@ -25,6 +25,11 @@ namespace Core.Data.GameData
         public const string Player = "Player";
         public const string PlayerStats = "PlayerStats";
         public const string PassiveTree = "PassiveTree";
+
+        /// <summary>Tuning of what the tree COSTS, kept out of the PassiveTree catalog on purpose: the
+        /// reader of that one parses every file in it as a tree, so a second document there would be
+        /// read as a tree with no nodes and take the allocation down with it.</summary>
+        public const string PassiveTreeRules = "PassiveTreeRules";
         public const string LootTables = "LootTables";
         public const string LootConfiguration = "LootConfiguration";
         public const string Items = "Items";

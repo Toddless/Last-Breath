@@ -66,6 +66,19 @@ namespace Core.PassiveTree.Allocation
 
         AllocationResult Refund(string nodeId);
 
+        /// <summary>
+        /// The answer <see cref="RefundSet"/> would give, without giving anything back. Asked of the
+        /// whole set rather than of each node, because those are different questions: on a chain
+        /// seed—A—B—C the pair {B, C} is legal while B on its own strands C, so a set checked node by
+        /// node would be refused for a break it repairs itself.
+        /// </summary>
+        AllocationResult CheckRefundSet(IReadOnlyCollection<string> nodeIds);
+
+        /// <summary>Gives a whole set back at once, all-or-nothing. The one road for a planned respec:
+        /// the price of one is charged for the set, so a set half given back would leave the character
+        /// paid up and still holding nodes.</summary>
+        AllocationResult RefundSet(IReadOnlyCollection<string> nodeIds);
+
         /// <summary>Drops the whole allocation back to the granted seeds.</summary>
         void Respec();
 

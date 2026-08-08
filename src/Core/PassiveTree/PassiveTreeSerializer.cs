@@ -19,6 +19,10 @@ namespace Core.PassiveTree
     /// </summary>
     public static class PassiveTreeSerializer
     {
+        /// <summary>Half a step of the grid the spread is stored on: below this two values are the same
+        /// stop, so anything nearer the default than this IS the default.</summary>
+        private const float SpreadEpsilon = View.CanvasTransform.SpreadStep / 2f;
+
         public static string Serialize(PassiveTreeDocument document)
         {
             var builder = new StringBuilder();
@@ -89,7 +93,8 @@ namespace Core.PassiveTree
             var dto = new PassiveTreeDto
             {
                 Version = PassiveTreeFormat.Version,
-                Budget = document.Budget
+                Budget = document.Budget,
+                Spread = SpreadOrNothing(document.Spread)
             };
 
             foreach (PassiveNode node in document.Nodes.OrderBy(node => node.Id, StringComparer.Ordinal))
@@ -137,7 +142,17 @@ namespace Core.PassiveTree
 
         private static PassiveTreeDocument FromDto(PassiveTreeDto dto, List<string> issues)
         {
-            var document = new PassiveTreeDocument { Budget = dto.Budget > 0 ? dto.Budget : PassiveTreeDocument.DefaultBudget };
+            var document = new PassiveTreeDocument
+            {
+                Budget = dto.Budget > 0 ? dto.Budget : PassiveTreeDocument.DefaultBudget,
+
+                // Mirror of the budget rule: a missing key, or a value that is not a spread at all, falls
+                // back to the authored default instead of clamping up to the nearest legal one, which
+                // would be a number nobody chose. Anything else lands on the same grid a save writes.
+                Spread = dto.Spread is > 0f
+                    ? View.CanvasTransform.NormalizeSpread(dto.Spread.Value)
+                    : View.CanvasTransform.DefaultSpread
+            };
 
             foreach (PassiveNodeDto nodeDto in dto.Nodes)
             {
@@ -264,5 +279,15 @@ namespace Core.PassiveTree
         }
 
         private static string? NullIfBlank(string value) => string.IsNullOrWhiteSpace(value) ? null : value;
+
+        /// <summary>The spread on the grid it is stored on, or nothing at the authored default: absent
+        /// already means the default, so writing it would add a line saying "unchanged" to every tree
+        /// ever saved and re-diff files whose layout nobody touched.</summary>
+        private static float? SpreadOrNothing(float spread)
+        {
+            float normalized = View.CanvasTransform.NormalizeSpread(spread);
+
+            return MathF.Abs(normalized - View.CanvasTransform.DefaultSpread) < SpreadEpsilon ? null : normalized;
+        }
     }
 }

@@ -52,8 +52,8 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         private PassiveTreeDocument? _document;
         private NodeGeometry? _geometry;
+        private ICanvasScale? _scale;
         private string? _hovered;
-        private float _zoom = 1f;
 
         public void SetDocument(PassiveTreeDocument? document)
         {
@@ -100,15 +100,15 @@ namespace Battle.Source.UIElements.PassiveWheel
             QueueRedraw();
         }
 
-        public void SetZoom(float zoom)
+        public void SetScale(ICanvasScale scale)
         {
-            _zoom = zoom;
+            _scale = scale;
             QueueRedraw();
         }
 
         public override void _Draw()
         {
-            if (_document == null || _style == null || _geometry == null) return;
+            if (_document == null || _style == null || _geometry == null || _scale == null) return;
 
             DrawPath();
             DrawFrontier();
@@ -144,12 +144,12 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         /// <summary>The one place a ring around a node is drawn, so the pointer's mark and the frontier's
         /// cannot come to be measured two different ways.</summary>
-        private void Ring(PassiveNode node, float scale, Color color, float screenWidth)
+        private void Ring(PassiveNode node, float ringScale, Color color, float screenWidth)
         {
-            if (_geometry == null) return;
+            if (_geometry == null || _scale == null) return;
 
-            DrawArc(new Vector2(node.X, node.Y), _geometry.DocumentRingRadius(node.Kind, _zoom, scale),
-                0f, Mathf.Tau, Segments(_geometry.ScreenRingRadius(node.Kind, _zoom, scale)),
+            DrawArc(new Vector2(node.X, node.Y), _geometry.DocumentRingRadius(node.Kind, _scale, ringScale),
+                0f, Mathf.Tau, Segments(_geometry.ScreenRingRadius(node.Kind, _scale.Zoom, ringScale)),
                 color, FromScreen(screenWidth), true);
         }
 
@@ -157,9 +157,9 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// whatever taken node it hangs off.</summary>
         private void DrawPath()
         {
-            if (_document == null || _style == null || _path.Count == 0) return;
+            if (_document == null || _style == null || _scale == null || _path.Count == 0) return;
 
-            float width = _style.DocumentEdgeWidth(_style.TakenEdgeWidth, _zoom);
+            float width = _style.DocumentEdgeWidth(_style.TakenEdgeWidth, _scale);
             float dash = FromScreen(DashLength);
 
             for (int step = 0; step < _path.Count; step++)
@@ -193,7 +193,7 @@ namespace Battle.Source.UIElements.PassiveWheel
         private static int Segments(float screenRadius) =>
             Math.Clamp((int)MathF.Ceiling(screenRadius * SegmentsPerPixel), FewestSegments, MostSegments);
 
-        /// <summary>A length authored in screen pixels, in the document units the frame will scale.</summary>
-        private float FromScreen(float pixels) => _zoom <= 0f ? pixels : pixels / _zoom;
+        /// <summary>A length authored in screen pixels, in the units the frame will scale back up.</summary>
+        private float FromScreen(float pixels) => _scale?.DocumentLength(pixels) ?? pixels;
     }
 }

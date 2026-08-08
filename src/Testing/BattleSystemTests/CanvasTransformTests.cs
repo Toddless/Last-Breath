@@ -43,6 +43,45 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(2f, view.DocumentLength(12f), Tolerance, "a screen length is worth less document the wider it is spread");
         }
 
+        /// <summary>The frame the canvas assigns to its drawing node, checked against the arithmetic the
+        /// picker uses. It is one value and not two readings of "scale" on purpose: the frame carries
+        /// POSITIONS, so its multiplier is the position scale, and a frame scaled by the zoom alone draws
+        /// a tree at one spread while every click is measured at another.</summary>
+        [TestMethod]
+        public void TheFrameDrawsANodeWhereTheTransformPlacesIt()
+        {
+            var view = new CanvasTransform();
+            view.SetSpread(2.25f, 0f, 0f);
+            view.ZoomBy(1.5f, 0f, 0f);
+            view.SetPan(240f, -60f);
+
+            CanvasFrame frame = view.Frame();
+
+            Assert.AreEqual(view.PositionScale, frame.Scale, Tolerance, "the frame is scaled by something other than the position scale");
+            Assert.AreEqual(view.PanX, frame.X, Tolerance);
+            Assert.AreEqual(view.PanY, frame.Y, Tolerance);
+            Assert.AreEqual(view.ScreenX(180f), frame.X + 180f * frame.Scale, Tolerance);
+            Assert.AreEqual(view.ScreenY(-90f), frame.Y + -90f * frame.Scale, Tolerance);
+        }
+
+        /// <summary>One rule for putting a spread on its grid, used when a value is read out of a
+        /// document and when one is written back. Rounding on only one side is how a file comes to hold
+        /// 2.3 while the view shows 2.25 — the picture and the document parting company at the first
+        /// save.</summary>
+        [TestMethod]
+        public void NormalizingASpread_SnapsToTheStoredGridAndStaysInsideTheBounds()
+        {
+            Assert.AreEqual(2.25f, CanvasTransform.NormalizeSpread(2.3f), Tolerance);
+            Assert.AreEqual(CanvasTransform.DefaultSpread, CanvasTransform.NormalizeSpread(1.06f), Tolerance);
+            Assert.AreEqual(CanvasTransform.MaxSpread, CanvasTransform.NormalizeSpread(400f), Tolerance);
+            Assert.AreEqual(CanvasTransform.MinSpread, CanvasTransform.NormalizeSpread(-3f), Tolerance);
+
+            var view = new CanvasTransform();
+            view.SetSpread(2.3f, 0f, 0f);
+            Assert.AreEqual(CanvasTransform.NormalizeSpread(2.3f), view.Spread, Tolerance,
+                "the view snapped a spread by a rule of its own");
+        }
+
         [TestMethod]
         public void ZoomingAboutAPoint_LeavesTheDocumentUnderThatPixel()
         {

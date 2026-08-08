@@ -3,6 +3,7 @@ namespace Battle.Source.UIElements.PassiveWheel
     using System;
     using System.Collections.Generic;
     using Core.PassiveTree;
+    using Core.PassiveTree.View;
     using Godot;
 
     /// <summary>Which half of the graph a layer draws.</summary>
@@ -39,7 +40,7 @@ namespace Battle.Source.UIElements.PassiveWheel
         private readonly HashSet<string> _taken = new(StringComparer.Ordinal);
 
         private PassiveTreeDocument? _document;
-        private float _zoom = 1f;
+        private ICanvasScale? _scale;
 
         public void SetDocument(PassiveTreeDocument? document)
         {
@@ -59,15 +60,15 @@ namespace Battle.Source.UIElements.PassiveWheel
             QueueRedraw();
         }
 
-        public void SetZoom(float zoom)
+        public void SetScale(ICanvasScale scale)
         {
-            _zoom = zoom;
+            _scale = scale;
             QueueRedraw();
         }
 
         public override void _Draw()
         {
-            if (_document == null || _style == null) return;
+            if (_document == null || _style == null || _scale == null) return;
 
             if (_role == EdgeLayerRole.Taken) DrawTaken();
             else DrawAll();
@@ -75,9 +76,9 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         private void DrawAll()
         {
-            if (_document == null || _style == null) return;
+            if (_document == null || _style == null || _scale == null) return;
 
-            float width = _style.DocumentEdgeWidth(_style.IdleEdgeWidth, _zoom);
+            float width = _style.DocumentEdgeWidth(_style.IdleEdgeWidth, _scale);
 
             foreach (NodeLink link in _document.Links)
             {
@@ -93,9 +94,9 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// there are never more taken nodes than the budget allows, however big the tree grows.</summary>
         private void DrawTaken()
         {
-            if (_document == null || _style == null) return;
+            if (_document == null || _style == null || _scale == null) return;
 
-            float width = _style.DocumentEdgeWidth(_style.TakenEdgeWidth, _zoom);
+            float width = _style.DocumentEdgeWidth(_style.TakenEdgeWidth, _scale);
 
             foreach (string id in _taken)
             {

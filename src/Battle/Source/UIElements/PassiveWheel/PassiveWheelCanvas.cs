@@ -23,7 +23,7 @@ namespace Battle.Source.UIElements.PassiveWheel
     /// picture scaled is not a picture drawn: glyphs keep the size they were rasterised at, a screen
     /// floor stops being the size it promised and a width authored in screen pixels stops being that
     /// many. So a wheel click also re-derives everything that is measured in pixels and hands it down
-    /// (<see cref="ApplyZoom"/>) — five redraws and a scale per view, at a click of the wheel and at
+    /// (<see cref="ApplyScale"/>) — five redraws and a scale per view, at a click of the wheel and at
     /// the two other things that take the same road (a reframe and an allocation pass), never per
     /// frame.</para>
     ///
@@ -67,8 +67,9 @@ namespace Battle.Source.UIElements.PassiveWheel
         [Export] private float _framePadding = 160f;
 
         /// <summary>Zoom, pan and spread, and the only arithmetic that turns a document coordinate into
-        /// a pixel. The game never touches the spread — it stretches distances without touching sizes,
-        /// which a frame scale physically cannot carry — so the frame is scaled by the zoom alone.</summary>
+        /// a pixel. The spread is read off the document the tree was authored at, so the wheel is drawn
+        /// with the gaps its author laid it out with; the frame carries it together with the zoom, and
+        /// every size drawn inside the frame is converted back through the same transform.</summary>
         private readonly CanvasTransform _view = new();
 
         private readonly Dictionary<string, PassiveNodeView> _views = new(StringComparer.Ordinal);
@@ -172,7 +173,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             {
                 _view.ResetZoom(Size.X, Size.Y);
                 ApplyTransform();
-                ApplyZoom();
+                ApplyScale();
                 return;
             }
 
@@ -187,7 +188,7 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             _view.Fit(minX, minY, maxX, maxY, Size.X, Size.Y, _framePadding);
             ApplyTransform();
-            ApplyZoom();
+            ApplyScale();
         }
 
         /// <summary>Buys the selected node through the allocation service — the same road a click on it
@@ -386,55 +387,64 @@ namespace Battle.Source.UIElements.PassiveWheel
         {
             _view.ZoomBy(factor, pivot.X, pivot.Y);
             ApplyTransform();
-            ApplyZoom();
+            ApplyScale();
         }
 
         /// <summary>The single writer of the frame, and it writes nothing else: a pan is one assignment
-        /// and no layer or view hears about it at all. What a ZOOM additionally owes the drawing is
-        /// <see cref="ApplyZoom"/>'s business — keeping the two apart is what keeps dragging the wheel
-        /// around free.</summary>
+        /// and no layer or view hears about it at all. What a change of SCALE additionally owes the
+        /// drawing is <see cref="ApplyScale"/>'s business — keeping the two apart is what keeps dragging
+        /// the wheel around free.
+        /// <para>Nothing is computed here: the placement arrives as one value from the transform, so the
+        /// picker and the GPU are reading the same arithmetic rather than two spellings of it.</para></summary>
         private void ApplyTransform()
         {
             if (_rig == null) return;
 
-            _rig.Position = new Vector2(_view.PanX, _view.PanY);
-            _rig.Scale = new Vector2(_view.Zoom, _view.Zoom);
+            CanvasFrame frame = _view.Frame();
+            _rig.Position = new Vector2(frame.X, frame.Y);
+            _rig.Scale = new Vector2(frame.Scale, frame.Scale);
         }
 
         /// <summary>
-        /// The part of a zoom the frame cannot carry, handed to everything that draws.
-        /// <para>Every layer draws in document units and is blown up by the frame, so anything MEASURED
-        /// IN PIXELS is only right for the zoom it was drawn at: the screen floor under a node radius,
-        /// the floor under an edge width, a ring measured off a node's screen size, the length of a dash
-        /// and the point size of a caption. Scaling that picture instead of drawing it again is what
-        /// turned captions into blur and rings into halos, so a wheel click redraws the lot.</para>
+        /// The part of a scale the frame cannot carry, handed to everything that draws.
+        /// <para>Every layer draws in the frame's units and is blown up by it, so anything MEASURED IN
+        /// PIXELS is only right for the scale it was drawn at: the screen floor under a node radius, the
+        /// floor under an edge width, a ring measured off a node's screen size, the length of a dash and
+        /// the point size of a caption. Scaling that picture instead of drawing it again is what turned
+        /// captions into blur and rings into halos, so a wheel click redraws the lot.</para>
+        /// <para>The layers are handed the transform's two readings of scale and never the transform, so
+        /// none of them can reach the pan and start culling. Whether a caption is shown still hangs on
+        /// the ZOOM alone: it is a question about how small the glyphs would be, and the spread makes
+        /// nothing smaller.</para>
         /// <para>Deliberately unconditional, and reached from a reframe and from an allocation pass as
-        /// well as from the wheel — those two hand the layers a zoom they already had and pay the same
+        /// well as from the wheel — those two hand the layers a scale they already had and pay the same
         /// price for it. All three are rare, deliberate acts; five layer redraws and one scale per node
         /// scene is what an honest picture costs, and none of it is work per frame: none of these
         /// classes has a <c>_Process</c>.</para>
         /// </summary>
-        private void ApplyZoom()
+        private void ApplyScale()
         {
             if (_geometry == null || _style == null) return;
 
-            float zoom = _view.Zoom;
-            bool labels = zoom >= _style.LabelZoomThreshold;
+            bool labels = _view.Zoom >= _style.LabelZoomThreshold;
+            float frameScale = _view.Frame().Scale;
 
-            _backdrop?.SetZoom(zoom, labels);
-            _idleEdges?.SetZoom(zoom);
-            _takenEdges?.SetZoom(zoom);
-            _field?.SetZoom(zoom);
-            _cursor?.SetZoom(zoom);
+            _backdrop?.SetScale(_view, labels);
+            _idleEdges?.SetScale(_view);
+            _takenEdges?.SetScale(_view);
+            _field?.SetScale(_view);
+            _cursor?.SetScale(_view);
 
             foreach (KeyValuePair<string, PassiveNodeView> entry in _views)
             {
                 PassiveNode? node = _document?.Find(entry.Key);
                 if (node == null) continue;
 
-                float bodyScale = _geometry.ViewScale(node.Kind, zoom);
-                float labelScale = zoom * bodyScale <= 0f ? 1f : 1f / (zoom * bodyScale);
-                entry.Value.ApplyZoom(bodyScale, labelScale, labels);
+                // The scene ends up on screen at frameScale x bodyScale, so that product is what a
+                // caption inside it has to undo to land at the point size it was rasterised at.
+                float bodyScale = _geometry.ViewScale(node.Kind, _view);
+                float onScreen = frameScale * bodyScale;
+                entry.Value.ApplyZoom(bodyScale, onScreen <= 0f ? 1f : 1f / onScreen, labels);
             }
         }
 
@@ -455,6 +465,12 @@ namespace Battle.Source.UIElements.PassiveWheel
         private void Rebuild()
         {
             _document = _tree?.Tree;
+
+            // The spread the tree was laid out at, before anything is framed: framing multiplies the
+            // extent by it, so reading it afterwards would fit the wheel to a layout it is not drawn at.
+            // Clamping and snapping are the transform's own business and happen nowhere else.
+            if (_document != null) _view.SetSpread(_document.Spread, Size.X * 0.5f, Size.Y * 0.5f);
+
             ReleaseAllViews();
             _hovered = null;
             _selected = null;
@@ -530,7 +546,7 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             UpdatePathPreview();
             RefreshSocketMarks();
-            ApplyZoom();
+            ApplyScale();
         }
 
         private bool HasOwnView(PassiveNodeKind kind) => _style?.Visual(kind).HasView ?? false;

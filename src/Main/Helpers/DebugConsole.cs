@@ -26,6 +26,7 @@ namespace LastBreath.Helpers
     using Core.PassiveTree;
     using Core.PassiveTree.Allocation;
     using Core.PassiveTree.Context;
+    using Core.PassiveTree.Rules;
     using Core.Save;
     using Core.Services;
     using Godot;
@@ -476,14 +477,27 @@ namespace LastBreath.Helpers
                 case "take" when args.Length > 2: PrintAllocation(tree, "take", args[2], tree.Take(args[2])); break;
                 case "refund" when args.Length > 2: PrintAllocation(tree, "refund", args[2], tree.Refund(args[2])); break;
                 case "dump": PrintTreeModifiers(tree); break;
-                case "respec":
-                    tree.Respec();
-                    Print($"Respec done. {PointsOf(tree)}");
-                    break;
+                case "respec": Respec(tree); break;
                 default:
                     Print(PassiveTreeUsage);
                     break;
             }
+        }
+
+        /// <summary>
+        /// The console's respec is the free, systemic one — the same road a new game and a session reset
+        /// take — because a debug command that could not undo an allocation without gold would be a
+        /// debug command nobody can use.
+        /// <para>It prints what the player would have paid all the same: a free command that says nothing
+        /// about the price is a quiet way around it, and the number stops being looked at.</para>
+        /// </summary>
+        private void Respec(IPassiveTreeService tree)
+        {
+            int paidFor = tree.SpentPoints;
+            int price = Service<IPassiveRespecPricing>().PriceOf(paidFor, Service<Core.Battle.IMartialArtMastery>().EarnedLevel);
+
+            tree.Respec();
+            Print($"Respec done, free. {paidFor} node(s) would have cost the player {price} gold. {PointsOf(tree)}");
         }
 
         private void PrintTreeState(IPassiveTreeService tree)

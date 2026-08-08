@@ -58,36 +58,71 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>The floor under a drawn node is the floor under its clickable area too. Split apart
-        /// they drift, and the drift is invisible until somebody misses a dot he can plainly see.</summary>
+        /// they drift, and the drift is invisible until somebody misses a dot he can plainly see. Walked
+        /// at every spread as well: what a size is divided by on its way into the frame is the frame's
+        /// own scale, and dividing by the zoom instead is right only while the spread is one.</summary>
         [TestMethod]
-        public void ADrawnNodeIsClickableAtEveryZoom()
+        public void ADrawnNodeIsClickableAtEveryZoomAndEverySpread()
         {
             NodeGeometry geometry = Geometry();
 
-            foreach (float zoom in Zooms())
+            foreach (CanvasTransform view in Views())
                 foreach (PassiveNodeKind kind in Enum.GetValues<PassiveNodeKind>())
                 {
-                    float drawn = geometry.DocumentRadius(kind, zoom) * zoom;
-                    Assert.IsTrue(geometry.PickRadius(kind, zoom) >= drawn,
-                        $"{kind} at zoom {zoom} is drawn larger than the area that answers a click");
+                    float drawn = geometry.DocumentRadius(kind, view) * view.Frame().Scale;
+                    Assert.IsTrue(geometry.PickRadius(kind, view.Zoom) >= drawn,
+                        $"{kind} at zoom {view.Zoom} spread {view.Spread} is drawn larger than the area that answers a click");
                 }
         }
 
         /// <summary>A node scene lives inside the scaled frame, so the counter-scale is what keeps it the
-        /// size the floor promised. Never below 1: shrinking a scene under its authored size is what the
-        /// zoom already does.</summary>
+        /// size the floor promised — at every spread, since the frame carries the spread too. Never below
+        /// 1 while the layout is drawn at its authored spread: shrinking a scene under its authored size
+        /// is what the zoom already does.</summary>
         [TestMethod]
         public void TheCounterScale_KeepsASceneAtTheSizeTheFloorPromised()
         {
             NodeGeometry geometry = Geometry();
 
-            foreach (float zoom in Zooms())
+            foreach (CanvasTransform view in Views())
                 foreach (PassiveNodeKind kind in Enum.GetValues<PassiveNodeKind>())
                 {
-                    float onScreen = geometry.AuthoredRadius(kind) * zoom * geometry.ViewScale(kind, zoom);
-                    Assert.AreEqual(geometry.ScreenRadius(kind, zoom), onScreen, Tolerance, $"{kind} at zoom {zoom}");
-                    Assert.IsTrue(geometry.ViewScale(kind, zoom) >= 1f - Tolerance, $"{kind} at zoom {zoom}");
+                    string at = $"{kind} at zoom {view.Zoom} spread {view.Spread}";
+                    float onScreen = geometry.AuthoredRadius(kind) * view.Frame().Scale * geometry.ViewScale(kind, view);
+
+                    Assert.AreEqual(geometry.ScreenRadius(kind, view.Zoom), onScreen, Tolerance, at);
+
+                    if (MathF.Abs(view.Spread - CanvasTransform.DefaultSpread) < Tolerance)
+                        Assert.IsTrue(geometry.ViewScale(kind, view) >= 1f - Tolerance, at);
                 }
+        }
+
+        /// <summary>The drawing and the pick, cross-checked through the very value the canvas assigns to
+        /// its frame. The frame lives in an engine node no test here can reach, so the aim point is built
+        /// the way the frame builds it — origin plus coordinate times scale — and the picker has to
+        /// answer at that pixel. Aiming through the transform's own <c>ScreenX</c> instead would be the
+        /// pick checked against itself, which is exactly the check that passed while the frame was
+        /// scaled by the zoom and the pick by the zoom times the spread.</summary>
+        [TestMethod]
+        public void APointTheFrameDrawsANodeAt_IsAPointThePickerAnswers()
+        {
+            NodeGeometry geometry = Geometry();
+            PassiveTreeDocument document = Tree(("only", 40f));
+            PassiveNode node = document.Nodes[0];
+
+            foreach (CanvasTransform view in Views())
+            {
+                view.SetPan(310f, 190f);
+                CanvasFrame frame = view.Frame();
+
+                float drawnX = frame.X + node.X * frame.Scale;
+                float drawnY = frame.Y + node.Y * frame.Scale;
+
+                Assert.AreEqual(drawnX, view.ScreenX(node.X), Tolerance,
+                    $"the frame draws the node somewhere the transform does not place it at spread {view.Spread}");
+                Assert.IsNotNull(geometry.At(document, view, drawnX, drawnY),
+                    $"the node is drawn at zoom {view.Zoom} spread {view.Spread} where nothing answers a click");
+            }
         }
 
         /// <summary>A mark around a node is a proportion of that node and stays that proportion at every
@@ -151,6 +186,8 @@ namespace LastBreathTest.BattleSystemTests
         public void TheSizesAtBothEndsOfTheRange_AreTheAuthoredOneAndTheFloor()
         {
             NodeGeometry geometry = Geometry();
+            CanvasTransform deepest = View(CanvasTransform.MaxZoom, CanvasTransform.DefaultSpread);
+            CanvasTransform widest = View(CanvasTransform.MinZoom, CanvasTransform.DefaultSpread);
 
             foreach (PassiveNodeKind kind in Enum.GetValues<PassiveNodeKind>())
             {
@@ -158,15 +195,16 @@ namespace LastBreathTest.BattleSystemTests
 
                 Assert.AreEqual(authored * CanvasTransform.MaxZoom, geometry.ScreenRadius(kind, CanvasTransform.MaxZoom),
                     Tolerance, $"{kind} is held up by a floor where nothing should be");
-                Assert.AreEqual(1f, geometry.ViewScale(kind, CanvasTransform.MaxZoom), Tolerance);
+                Assert.AreEqual(1f, geometry.ViewScale(kind, deepest), Tolerance);
 
                 Assert.AreEqual(MinScreenRadius, geometry.ScreenRadius(kind, CanvasTransform.MinZoom), Tolerance);
-                Assert.IsTrue(geometry.ViewScale(kind, CanvasTransform.MinZoom) > 1f,
+                Assert.IsTrue(geometry.ViewScale(kind, widest) > 1f,
                     $"{kind} draws smaller than the floor it was promised");
 
-                foreach (float zoom in Zooms())
-                    Assert.AreEqual(geometry.ScreenRadius(kind, zoom), geometry.DocumentRadius(kind, zoom) * zoom,
-                        Tolerance, $"{kind} at zoom {zoom} is handed to the frame as another size");
+                foreach (CanvasTransform view in Views())
+                    Assert.AreEqual(geometry.ScreenRadius(kind, view.Zoom),
+                        geometry.DocumentRadius(kind, view) * view.Frame().Scale, Tolerance,
+                        $"{kind} at zoom {view.Zoom} spread {view.Spread} is handed to the frame as another size");
             }
         }
 
@@ -209,6 +247,28 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         private static float[] Zooms() => [CanvasTransform.MinZoom, 0.2f, 0.55f, 1f, 2f, CanvasTransform.MaxZoom];
+
+        /// <summary>Both ends of the spread range and the two stops in between that matter: the authored
+        /// default, and the value the tree is actually laid out at today.</summary>
+        private static float[] Spreads() => [CanvasTransform.MinSpread, CanvasTransform.DefaultSpread, 2.25f, CanvasTransform.MaxSpread];
+
+        /// <summary>Every zoom crossed with every spread. A size must come out of the geometry the same
+        /// number of pixels across in all of them — that is what the spread means — and the frame's scale
+        /// is what carries it there.</summary>
+        private static IEnumerable<CanvasTransform> Views()
+        {
+            foreach (float spread in Spreads())
+                foreach (float zoom in Zooms())
+                    yield return View(zoom, spread);
+        }
+
+        private static CanvasTransform View(float zoom, float spread)
+        {
+            var view = new CanvasTransform();
+            view.SetSpread(spread, 0f, 0f);
+            view.ZoomBy(zoom, 0f, 0f);
+            return view;
+        }
 
         private static float[] Rings() => [FrontierRing, HoverRing];
 

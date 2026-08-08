@@ -52,6 +52,21 @@ namespace Battle.Source
             }
         }
 
+        /// <summary>Levels earned by experience: the only number the save keeps, the only one the tree
+        /// budget is counted from, and the only one a price scaled by progress may read. Equipment levels
+        /// are added on top by <see cref="CurrentLevel"/> and never earned into this one.</summary>
+        public int EarnedLevel
+        {
+            get;
+            private set
+            {
+                if (value == field) return;
+                field = value;
+                GrantPassivePoints();
+                CurrentLevelChange?.Invoke(CurrentLevel);
+            }
+        }
+
         public int CurrentLevel => EarnedLevel + BonusLevel;
 
         public int MaximumLevel => _config.MaxLevel;
@@ -62,21 +77,6 @@ namespace Battle.Source
         public IReadOnlyList<string> Catalogs => [DataCatalog.MartialArtMastery];
 
         public event Action<int>? BonusLevelChange, CurrentLevelChange, ExperienceChange;
-
-        /// <summary>Levels earned by experience: the only number the save keeps and the only one the
-        /// tree budget is counted from. Equipment levels are added on top by <see cref="CurrentLevel"/>
-        /// and never earned into this one.</summary>
-        private int EarnedLevel
-        {
-            get;
-            set
-            {
-                if (value == field) return;
-                field = value;
-                GrantPassivePoints();
-                CurrentLevelChange?.Invoke(CurrentLevel);
-            }
-        }
 
         public void Apply(string catalog, GameDataFile file)
         {

@@ -488,6 +488,11 @@ namespace PassiveTreeEditor.Source.View
             _editor.SetDocument(document);
             _canvas.DocumentReplaced(_allocation);
             _budget.Value = document.Budget;
+
+            // The spread the tree was laid out at travels with the tree, so a file opens looking the way
+            // its author left it and the game draws the same picture. The toolbar box follows through
+            // the canvas's own notification, like it does for the keys.
+            _canvas.LayoutSpread = document.Spread;
             _inspector.Rebuild();
             _find.SetDocument(document);
 
@@ -550,7 +555,11 @@ namespace PassiveTreeEditor.Source.View
             _settings.BaseStats = _baseStats.Overrides();
 
             // Read off the canvas, not off the box: the keys move the canvas first and the box after.
+            // It goes into the document as well: the spread is a decision about the layout and the game
+            // reads it from there, while the settings copy only supplies a starting value for the next
+            // session before any tree is open.
             _settings.LayoutSpread = _canvas.LayoutSpread;
+            _canvas.Document.Spread = _canvas.LayoutSpread;
         }
 
         /// <summary>Only a root the author chose is written down. The default is a different folder in a

@@ -1,6 +1,7 @@
 namespace Core.PassiveTree
 {
     using Enums;
+    using Modifiers;
 
     /// <summary>
     /// One player-facing stat line of a node: which parameter, which value bucket, how much.
@@ -24,6 +25,17 @@ namespace Core.PassiveTree
         public string Condition { get; set; } = string.Empty;
 
         public bool IsConditional => !string.IsNullOrWhiteSpace(Condition);
+
+        /// <summary>The line as the modifier the game resolves values through, stamped with the tree's
+        /// source so a refund can find it again. Written once here rather than at each reader: the
+        /// character's live contribution and every summary of an allocation have to mint the same
+        /// modifier from the same line.</summary>
+        public SimpleModifier ToModifier() => ToModifier(Parameter);
+
+        /// <summary>The same line minted onto another parameter — what an aggregate becomes for a reader
+        /// with nothing behind it to fold the family back together.</summary>
+        public SimpleModifier ToModifier(EntityParameter parameter) =>
+            new(parameter, ValueType, Value, PassiveTreeDocument.ModifierSource);
 
         public ModifierLine Copy() => new()
         {

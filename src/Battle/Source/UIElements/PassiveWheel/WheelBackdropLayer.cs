@@ -2,6 +2,7 @@ namespace Battle.Source.UIElements.PassiveWheel
 {
     using System;
     using Core.Localization;
+    using Core.PassiveTree.View;
     using Godot;
 
     /// <summary>
@@ -26,22 +27,23 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         [Export] private PassiveWheelStyle? _style;
 
-        private float _zoom = 1f;
+        private ICanvasScale? _scale;
         private bool _labels;
 
-        /// <summary>The only thing a layer is ever told. It is never given the pan or the viewport
-        /// size, so it cannot start culling — and it has no reason to: the frame moves, not the
-        /// drawing.</summary>
-        public void SetZoom(float zoom, bool labels)
+        /// <summary>The only thing a layer is ever told, and it is the two readings of scale rather than
+        /// the transform itself: no layer is given the pan or the viewport size, so none of them can
+        /// start culling — and none has a reason to, because the frame moves and the drawing does
+        /// not.</summary>
+        public void SetScale(ICanvasScale scale, bool labels)
         {
-            _zoom = zoom;
+            _scale = scale;
             _labels = labels;
             QueueRedraw();
         }
 
         public override void _Draw()
         {
-            if (_style == null) return;
+            if (_style == null || _scale == null) return;
 
             DrawWedges();
             DrawRings();
@@ -74,9 +76,9 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         private void DrawRings()
         {
-            if (_style == null) return;
+            if (_style == null || _scale == null) return;
 
-            float width = _style.DocumentEdgeWidth(_style.RingWidth, _zoom);
+            float width = _style.DocumentEdgeWidth(_style.RingWidth, _scale);
 
             foreach (float radius in _style.RingRadii)
             {
@@ -115,12 +117,16 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// </summary>
         private void DrawWedgeLabels()
         {
-            if (_style == null) return;
+            if (_style == null || _scale == null) return;
 
             Font? font = ThemeDB.Singleton.FallbackFont;
             if (font == null) return;
 
-            float counter = _zoom <= 0f ? 1f : 1f / _zoom;
+            // One unit inside the counter-scale is one screen pixel, so it is the FRAME's scale that is
+            // undone here and not the zoom: at a spread the frame carries, undoing only the zoom would
+            // leave every caption a spread too large. The offset it is placed at, by contrast, is a
+            // distance in the layout and stays in the layout's own units.
+            float counter = _scale.DocumentLength(1f);
             float radius = _style.SectorRadius + LabelOffset;
 
             foreach (WheelSector sector in _style.Sectors)

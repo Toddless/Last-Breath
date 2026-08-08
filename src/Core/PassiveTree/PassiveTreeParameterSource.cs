@@ -104,12 +104,9 @@ namespace Core.PassiveTree
                 _modifiers[line.Parameter] = lines;
             }
 
-            lines.Add(condition is null ? Plain(line) : Conditional(line, condition));
+            lines.Add(condition is null ? line.ToModifier() : Conditional(line, condition));
             affected.Add(line.Parameter);
         }
-
-        private static IModifierInstance Plain(ModifierLine line) =>
-            new SimpleModifier(line.Parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource);
 
         /// <summary>A line that only counts while its condition holds. It goes into the same map as every
         /// other line and is never written onto the fighter: value resolution skips it while it is off, and

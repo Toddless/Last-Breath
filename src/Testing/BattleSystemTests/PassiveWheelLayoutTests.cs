@@ -67,32 +67,44 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(carriers.Contains(plain), "a taken node has nothing to animate on");
         }
 
-        /// <summary>Every node of the shipped markup answers a hand aimed at it, at the zoom the whole
-        /// wheel is framed at as well as at the zoom it is read at. Aimed a pixel off centre on purpose:
-        /// a hand is never exact, and a dot that shrinks below the floor or loses its slack stops
-        /// answering long before it stops being visible.</summary>
+        /// <summary>
+        /// Every node of the shipped markup answers a hand aimed at it, at the zoom the whole wheel is
+        /// framed at as well as at the zoom it is read at, and at every spread the layout may be authored
+        /// with. Aimed a pixel off centre on purpose: a hand is never exact, and a dot that shrinks below
+        /// the floor or loses its slack stops answering long before it stops being visible.
+        /// <para>The aim point is built the way the CANVAS FRAME builds it — its origin plus the node's
+        /// coordinate times its scale — and not through the transform's own <c>ScreenX</c>. The frame is
+        /// an engine node no headless test can reach, so this is the one place the drawing and the pick
+        /// are checked against each other; aiming through <c>ScreenX</c> would be the pick checked
+        /// against itself and would pass on a frame scaled by the wrong multiplier.</para>
+        /// </summary>
         [TestMethod]
-        public void EveryShippedNode_AnswersAHandAimedAtIt()
+        public void EveryShippedNode_AnswersAHandAimedWhereTheFrameDrewIt()
         {
             const float aimSlipPixels = 1f;
             PassiveTreeDocument document = ShippedTree();
             NodeGeometry geometry = ShippedGeometry();
 
             float[] zooms = [CanvasTransform.MinZoom, 0.3f, 1f, 2f];
-            foreach (float zoom in zooms)
-            {
-                var view = new CanvasTransform();
-                view.ZoomBy(zoom, 0f, 0f);
-                view.SetPan(640f, 360f);
+            float[] spreads = [CanvasTransform.MinSpread, CanvasTransform.DefaultSpread, 2.25f, CanvasTransform.MaxSpread];
 
-                foreach (PassiveNode node in document.Nodes)
+            foreach (float spread in spreads)
+                foreach (float zoom in zooms)
                 {
-                    PassiveNode? picked = geometry.At(document, view,
-                        view.ScreenX(node.X) + aimSlipPixels, view.ScreenY(node.Y));
+                    var view = new CanvasTransform();
+                    view.SetSpread(spread, 0f, 0f);
+                    view.ZoomBy(zoom, 0f, 0f);
+                    view.SetPan(640f, 360f);
+                    CanvasFrame frame = view.Frame();
 
-                    Assert.IsNotNull(picked, $"{node.Id} answers nothing at zoom {zoom}");
+                    foreach (PassiveNode node in document.Nodes)
+                    {
+                        PassiveNode? picked = geometry.At(document, view,
+                            frame.X + node.X * frame.Scale + aimSlipPixels, frame.Y + node.Y * frame.Scale);
+
+                        Assert.IsNotNull(picked, $"{node.Id} answers nothing at zoom {zoom} spread {spread}");
+                    }
                 }
-            }
         }
 
         /// <summary>Both edge layers walk the document the way they draw it. A link naming a node that

@@ -18,7 +18,7 @@ namespace Core.PassiveTree.View
     /// the eye aimed at, and a mismatch between drawing and picking is invisible until someone misses.
     /// It has to be readable on its own.</para>
     /// </summary>
-    public sealed class CanvasTransform
+    public sealed class CanvasTransform : ICanvasScale
     {
         /// <summary>Zoom bounds are bounds on how big a node may get on screen, so the spread does not
         /// enter them: a node is the same number of pixels across at every spread by design.</summary>
@@ -69,6 +69,26 @@ namespace Core.PassiveTree.View
         /// picking slack are worth to a query against the spatial grid.</summary>
         public float DocumentLength(float screenLength) => screenLength / PositionScale;
 
+        /// <summary>
+        /// A spread put on the grid it is stored on: clamped to the bounds and snapped to
+        /// <see cref="SpreadStep"/>. The one rule, used both when a value is read out of a document and
+        /// when one is written back — rounding on only one side would let a file keep 2.3 while the view
+        /// shows 2.25, and the picture and the document would part company at the first save.
+        /// </summary>
+        public static float NormalizeSpread(float value) =>
+            Clamp(MathF.Round(value / SpreadStep) * SpreadStep, MinSpread, MaxSpread);
+
+        /// <summary>
+        /// The placement of the frame everything is drawn inside: where its origin sits on screen and
+        /// what it multiplies by. The scale is <see cref="PositionScale"/> and not the zoom, because the
+        /// frame carries POSITIONS — a frame scaled by the zoom alone draws a tree at one spread and
+        /// picks it at another, and nothing says so until somebody misses.
+        /// <para>Handed out as one value so a caller assigns it rather than assembling it: the frame
+        /// lives in an engine node no headless test can reach, and a test that computes an aim point
+        /// from this struct is aiming exactly where the frame put the node.</para>
+        /// </summary>
+        public CanvasFrame Frame() => new(PanX, PanY, PositionScale);
+
         public void SetPan(float x, float y)
         {
             PanX = x;
@@ -103,7 +123,7 @@ namespace Core.PassiveTree.View
         /// </summary>
         public bool SetSpread(float value, float anchorScreenX, float anchorScreenY)
         {
-            float snapped = Clamp(MathF.Round(value / SpreadStep) * SpreadStep, MinSpread, MaxSpread);
+            float snapped = NormalizeSpread(value);
             if (MathF.Abs(snapped - _spread) < Epsilon) return false;
 
             float anchorX = DocumentX(anchorScreenX);

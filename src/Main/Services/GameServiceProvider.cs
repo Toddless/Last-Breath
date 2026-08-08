@@ -1,6 +1,7 @@
 namespace LastBreath.Services
 {
     using Battle.Source;
+    using Battle.Source.RequestHandlers;
     using Core.Ai.World;
     using Core.Ai.World.Raids;
     using Core.Ai.World.Skirmish;
@@ -23,6 +24,7 @@ namespace LastBreath.Services
     using Core.Narrative.Quests;
     using Core.PassiveTree;
     using Core.PassiveTree.Allocation;
+    using Core.PassiveTree.Rules;
     using Core.Reputation;
     using Core.Save;
     using Core.Save.Participants;
@@ -88,7 +90,13 @@ namespace LastBreath.Services
             services.AddGameDataParticipant<IPlayerStatsProvider, PlayerStatsProvider>();
             services.AddConditionCatalog();
             services.AddGameDataParticipant<IPassiveTreeProvider, PassiveTreeProvider>();
+            services.AddGameDataParticipant<IPassiveRespecPricing, PassiveTreeRulesProvider>();
             services.AddSingleton<IPassiveTreeService, PassiveTreeService>();
+
+            // Undoing an allocation spends gold, and the tree and the wallet know nothing about each
+            // other: the order lives in the handler, like every other operation that settles two systems.
+            // Registered here rather than by the battle module because the wallet is this project's.
+            services.AddTransient<IRequestHandler<RespecPassiveNodesRequest, RespecResult>, RespecPassiveNodesRequestHandler>();
             services.AddSingleton<INpcPopulationService, NpcPopulationService>();
             services.AddSingleton<INpcSkirmishService, NpcSkirmishService>();
             services.AddSingleton<INpcWorldSpawner, BattleNpcWorldSpawner>();

@@ -68,10 +68,12 @@ namespace Core.PassiveTree.View
         public float ScreenRadius(PassiveNodeKind kind, float zoom) =>
             MathF.Max(_radii[kind] * zoom, _minScreenRadius);
 
-        /// <summary>The same size expressed in document units — what a layer drawing inside a scaled
-        /// frame has to hand the draw call, since the frame multiplies by the zoom again.</summary>
-        public float DocumentRadius(PassiveNodeKind kind, float zoom) =>
-            ScreenRadius(kind, zoom) / SafeZoom(zoom);
+        /// <summary>The same size expressed in the units of the frame — what a layer drawing inside it
+        /// has to hand the draw call, since the frame multiplies by its own scale again. The scale is
+        /// asked for as a whole rather than as a zoom: the frame carries positions and therefore the
+        /// spread as well, and a size divided by the zoom alone would be drawn a spread too large.</summary>
+        public float DocumentRadius(PassiveNodeKind kind, ICanvasScale scale) =>
+            scale.DocumentLength(ScreenRadius(kind, scale.Zoom));
 
         /// <summary>
         /// The radius of a ring drawn AROUND a node — the mark under the pointer, the one on what can be
@@ -85,9 +87,9 @@ namespace Core.PassiveTree.View
         public float ScreenRingRadius(PassiveNodeKind kind, float zoom, float ringScale) =>
             ScreenRadius(kind, zoom) * MathF.Max(ringScale, 1f);
 
-        /// <summary>The same ring in document units, for a layer drawing inside the scaled frame.</summary>
-        public float DocumentRingRadius(PassiveNodeKind kind, float zoom, float ringScale) =>
-            ScreenRingRadius(kind, zoom, ringScale) / SafeZoom(zoom);
+        /// <summary>The same ring in the units of the frame, for a layer drawing inside it.</summary>
+        public float DocumentRingRadius(PassiveNodeKind kind, ICanvasScale scale, float ringScale) =>
+            scale.DocumentLength(ScreenRingRadius(kind, scale.Zoom, ringScale));
 
         /// <summary>The radius a click is measured against: what is drawn plus the slack that keeps a
         /// node aimable when the whole tree is on screen.</summary>
@@ -95,13 +97,14 @@ namespace Core.PassiveTree.View
             ScreenRadius(kind, zoom) + _pickScreenSlack;
 
         /// <summary>What a node scene must be scaled by inside the frame so it ends up
-        /// <see cref="ScreenRadius"/> across. Always at least 1, and a function of the class and the
-        /// zoom alone — every node of a class is scaled by the same number, however many scenes the
-        /// zoom step then walks through to write it.</summary>
-        public float ViewScale(PassiveNodeKind kind, float zoom)
+        /// <see cref="ScreenRadius"/> across on screen. A function of the class and the view alone —
+        /// every node of a class is scaled by the same number, however many scenes the zoom step then
+        /// walks through to write it. It falls below 1 wherever the frame is already blowing the layout
+        /// up past the authored size, which is what a spread above 1 does.</summary>
+        public float ViewScale(PassiveNodeKind kind, ICanvasScale scale)
         {
-            float authored = _radii[kind] * SafeZoom(zoom);
-            return authored <= 0f ? 1f : ScreenRadius(kind, zoom) / authored;
+            float authored = _radii[kind];
+            return authored <= 0f ? 1f : DocumentRadius(kind, scale) / authored;
         }
 
         /// <summary>
@@ -139,9 +142,5 @@ namespace Core.PassiveTree.View
 
             return best;
         }
-
-        /// <summary>A zoom of zero is not a view anyone is looking through, and dividing by it would
-        /// turn every size into infinity rather than into a visible mistake.</summary>
-        private static float SafeZoom(float zoom) => zoom <= 0f ? float.Epsilon : zoom;
     }
 }

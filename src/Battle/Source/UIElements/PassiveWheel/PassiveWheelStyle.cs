@@ -5,6 +5,7 @@ namespace Battle.Source.UIElements.PassiveWheel
     using Core;
     using Core.Enums;
     using Core.PassiveTree;
+    using Core.PassiveTree.View;
     using Godot;
 
     /// <summary>
@@ -133,21 +134,6 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         public Texture2D? SocketMark => _socketMark;
 
-        /// <summary>The widest class on the board. Computed from the table, never a second export that
-        /// could disagree with it.</summary>
-        public float MaxRadius
-        {
-            get
-            {
-                float largest = 0f;
-                foreach (PassiveNodeVisual visual in ByKind.Values)
-                    if (visual.Radius > largest)
-                        largest = visual.Radius;
-
-                return largest;
-            }
-        }
-
         public PassiveNodeVisual Visual(PassiveNodeKind kind) => ByKind[kind];
 
         /// <summary>The authored radii, the way <see cref="Core.PassiveTree.View.NodeGeometry"/> wants
@@ -177,11 +163,16 @@ namespace Battle.Source.UIElements.PassiveWheel
             _ => _neutral
         };
 
-        /// <summary>An authored width in document units, floored so it stays visible on screen. Written
-        /// once and read by both edge layers: an idle edge that vanished while a taken one held would
-        /// be a wheel that looks like it lost its links.</summary>
-        public float DocumentEdgeWidth(float authoredWidth, float zoom) =>
-            zoom <= 0f ? authoredWidth : MathF.Max(authoredWidth, _minEdgeScreenWidth / zoom);
+        /// <summary>
+        /// An authored width, floored so it stays visible on screen and expressed in the units of the
+        /// frame that will scale it. Written once and read by both edge layers: an idle edge that
+        /// vanished while a taken one held would be a wheel that looks like it lost its links.
+        /// <para>A width is a SIZE, so the authored figure travels through the zoom exactly like a node
+        /// radius and never through the spread — pulling the layout apart must not also thicken every
+        /// line in it. Only the last step, back into frame units, uses the frame's own scale.</para>
+        /// </summary>
+        public float DocumentEdgeWidth(float authoredWidth, ICanvasScale scale) =>
+            scale.DocumentLength(MathF.Max(authoredWidth * scale.Zoom, _minEdgeScreenWidth));
 
         /// <summary>Built once and reported rather than thrown: an artist half way through filling the
         /// resource must still get a wheel he can look at, and a class with no row gets a placeholder

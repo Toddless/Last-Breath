@@ -166,6 +166,76 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(65, reloaded.Budget);
         }
 
+        /// <summary>The spread is a decision about the layout, so it travels in the document the layout
+        /// travels in — the authoring tool writes it and the game reads it, and neither may hold a spread
+        /// the other cannot see.</summary>
+        [TestMethod]
+        public void TheAuthoredSpreadSurvivesSaveAndLoad()
+        {
+            const float authored = 2.25f;
+            var document = new PassiveTreeDocument { Budget = 30, Spread = authored };
+            document.AddNode(new PassiveNode { Id = "small_1", Kind = PassiveNodeKind.Small, Stance = Stance.Strength });
+            List<string> issues = [];
+
+            string json = PassiveTreeSerializer.Serialize(document);
+            PassiveTreeDocument reloaded = PassiveTreeSerializer.Deserialize(json, issues);
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            StringAssert.Contains(json, "\"spread\": 2.25", "the spread never reached the file");
+            Assert.AreEqual(authored, reloaded.Spread, 0.0001f);
+        }
+
+        /// <summary>Every tree written before the field existed, and every tree laid out at the authored
+        /// default: no key, and the default is exactly what those files meant. The writer leaves it out
+        /// at that value for the same reason — a line saying "unchanged" would re-diff every tree.</summary>
+        [TestMethod]
+        public void ADocumentWithNoSpreadFieldReadsAsTheDefault()
+        {
+            const string json = """
+                {
+                    "version": 1,
+                    "budget": 10,
+                    "nodes": [ { "id": "small_1", "kind": "Small", "x": 0.0, "y": 0.0 } ],
+                    "edges": []
+                }
+                """;
+            List<string> issues = [];
+
+            PassiveTreeDocument document = PassiveTreeSerializer.Deserialize(json, issues);
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            Assert.AreEqual(Core.PassiveTree.View.CanvasTransform.DefaultSpread, document.Spread, 0.0001f);
+            Assert.IsFalse(PassiveTreeSerializer.Serialize(document).Contains("spread"),
+                "the default spread was written back into a file that never carried it");
+        }
+
+        /// <summary>A spread that is not a spread at all falls back to the default rather than clamping
+        /// up to the nearest legal stop, which would be a layout nobody composed. Anything else lands on
+        /// the grid the view snaps to, so the file and the picture cannot part company.</summary>
+        [TestMethod]
+        public void ASpreadOffTheGridIsSnapped_AndAnImpossibleOneFallsBackToTheDefault()
+        {
+            List<string> issues = [];
+
+            Assert.AreEqual(2.25f, PassiveTreeSerializer.Deserialize(TreeWithSpread("2.3"), issues).Spread, 0.0001f);
+            Assert.AreEqual(Core.PassiveTree.View.CanvasTransform.MaxSpread,
+                PassiveTreeSerializer.Deserialize(TreeWithSpread("400"), issues).Spread, 0.0001f);
+            Assert.AreEqual(Core.PassiveTree.View.CanvasTransform.DefaultSpread,
+                PassiveTreeSerializer.Deserialize(TreeWithSpread("0"), issues).Spread, 0.0001f);
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+        }
+
+        private static string TreeWithSpread(string spread) => $$"""
+            {
+                "version": 1,
+                "budget": 10,
+                "spread": {{spread}},
+                "nodes": [ { "id": "small_1", "kind": "Small", "x": 0.0, "y": 0.0 } ],
+                "edges": []
+            }
+            """;
+
         [TestMethod]
         public void ContextLineSurvivesSaveAndLoadOnItsOwnChannel()
         {

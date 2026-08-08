@@ -50,6 +50,17 @@ namespace Core.PassiveTree
 
         public const int DefaultBudget = 62;
 
+        /// <summary>
+        /// How far apart the layout is pulled when it is drawn. It multiplies DISTANCES and nothing
+        /// else, so raising it opens the gaps a dense wheel hides its edges in while every node keeps
+        /// the size it was authored at.
+        /// <para>It belongs to the document and not to a viewer's settings: the author lays the tree out
+        /// while looking at it spread, so a reader that drew the same coordinates at another spread
+        /// would be showing a wheel nobody composed. Coordinates themselves are never touched by it —
+        /// the file keeps the numbers their author typed.</para>
+        /// </summary>
+        public float Spread { get; set; } = View.CanvasTransform.DefaultSpread;
+
         /// <summary>Stamped on every modifier a tree node contributes. Taking a node back means
         /// dropping the modifiers carrying this source, so two spellings of it would mean lines that
         /// can be granted and never revoked.</summary>

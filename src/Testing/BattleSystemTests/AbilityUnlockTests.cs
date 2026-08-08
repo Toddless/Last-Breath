@@ -118,6 +118,33 @@ namespace LastBreathTest.BattleSystemTests
                 "the forgotten ability stayed on the bar");
         }
 
+        /// <summary>
+        /// A node someone is only PLANNING to buy hands nothing over. This is the expensive failure the
+        /// plan is built to make impossible: a marked unlock node would put its ability in the book and
+        /// open the slot that comes with it, the player would seat an augment in that slot, and dropping
+        /// the plan would close the slot around property of his.
+        /// </summary>
+        [TestMethod]
+        public void APlannedNodeGrantsNothing_UntilThePlanIsApplied()
+        {
+            var book = NewBook();
+            var board = new AbilitySocketBoard();
+            IPassiveTreeService tree = NewTree();
+            CreateService(book, tree, board);
+            using var draft = new PassiveTreeDraft(tree);
+
+            Assert.AreEqual(AllocationResult.Success, draft.Mark(DexNode));
+
+            Assert.AreEqual(0, book.AllAbilities.Count, "a planned node handed its ability over before it was paid for");
+            Assert.IsNull(board.Find(board.At(DexNode)), "a planned node opened its augment slot before it was paid for");
+            Assert.AreEqual(0, tree.SpentPoints);
+
+            Assert.AreEqual(AllocationResult.Success, draft.ApplyTakes());
+
+            CollectionAssert.AreEquivalent(new[] { DexAbility }, LearnedIds(book));
+            Assert.IsNotNull(board.Find(board.At(DexNode)), "the applied node did not open its slot");
+        }
+
         [TestMethod]
         public void RespecEmptiesTheBook()
         {

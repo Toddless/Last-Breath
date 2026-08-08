@@ -91,6 +91,18 @@ namespace Core.PassiveTree.Allocation
             return result;
         }
 
+        public AllocationResult CheckRefundSet(IReadOnlyCollection<string> nodeIds) =>
+            _allocation.CheckRefundAll(SyncedTree(), nodeIds);
+
+        public AllocationResult RefundSet(IReadOnlyCollection<string> nodeIds)
+        {
+            PassiveTreeDocument tree = SyncedTree();
+            AllocationResult result = _allocation.TryRefundAll(tree, nodeIds);
+            if (result == AllocationResult.Success) Publish(tree);
+
+            return result;
+        }
+
         public void Respec()
         {
             PassiveTreeDocument tree = SyncedTree();

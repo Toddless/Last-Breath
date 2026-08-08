@@ -127,6 +127,53 @@ namespace Core.PassiveTree.Allocation
                 : AllocationResult.WouldOrphan;
         }
 
+        /// <summary>
+        /// Whether the whole set can go back AT ONCE, and why not when it cannot. Not the same question
+        /// as asking about each node in turn and it cannot be built out of that one: on a chain
+        /// seed—A—B—C the pair {B, C} is a legal thing to give back, while B alone would strand C. What
+        /// is checked is the state that would be LEFT — every node still taken must reach a seed through
+        /// taken nodes — so a set that unwinds a whole branch passes and a set with a hole in it does not.
+        /// <para>An empty set is <see cref="AllocationResult.NotTaken"/>: giving nothing back is not an
+        /// operation that succeeded, and whoever charges for one must not be handed a yes.</para>
+        /// </summary>
+        public AllocationResult CheckRefundAll(PassiveTreeDocument document, IReadOnlyCollection<string> ids)
+        {
+            if (ids.Count == 0) return AllocationResult.NotTaken;
+
+            foreach (string id in ids)
+            {
+                PassiveNode? node = document.Find(id);
+                if (node is null) return AllocationResult.UnknownNode;
+                if (!_taken.Contains(id)) return AllocationResult.NotTaken;
+                if (!NodeKindRules.CostsPoint(node.Kind)) return AllocationResult.Granted;
+            }
+
+            var remaining = new HashSet<string>(_taken, StringComparer.Ordinal);
+            remaining.ExceptWith(ids);
+
+            return Reachable(document, remaining).Count == remaining.Count
+                ? AllocationResult.Success
+                : AllocationResult.WouldOrphan;
+        }
+
+        /// <summary>Gives the whole set back when the rules allow it; returns the same reason
+        /// <see cref="CheckRefundAll"/> would. All-or-nothing without a rollback to arrange: the one
+        /// check that can refuse it happens before anything is removed.</summary>
+        public AllocationResult TryRefundAll(PassiveTreeDocument document, IReadOnlyCollection<string> ids)
+        {
+            AllocationResult result = CheckRefundAll(document, ids);
+            if (result != AllocationResult.Success) return result;
+
+            int before = _taken.Count;
+            _taken.ExceptWith(ids);
+
+            // What left the set is what was paid for: every id was verified to be taken and to cost a
+            // point, and counting the difference rather than the argument survives a set listing one
+            // node twice.
+            Spent -= before - _taken.Count;
+            return result;
+        }
+
         /// <summary>Gives the node back when the rules allow it; returns the same reason <see cref="CheckRefund"/> would.</summary>
         public AllocationResult TryRefund(PassiveTreeDocument document, string id)
         {

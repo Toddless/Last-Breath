@@ -14,6 +14,14 @@ namespace Core.PassiveTree
 
         [JsonProperty("budget")] public int Budget { get; set; } = PassiveTreeDocument.DefaultBudget;
 
+        /// <summary>
+        /// How far apart the layout is drawn. Absent means the authored default, which is what a file
+        /// written before the field existed meant, so the writer leaves the key out at that value rather
+        /// than adding a line to every tree ever saved to say "unchanged".
+        /// </summary>
+        [JsonProperty("spread", NullValueHandling = NullValueHandling.Ignore)]
+        public float? Spread { get; set; }
+
         [JsonProperty("nodes")] public List<PassiveNodeDto> Nodes { get; set; } = [];
 
         [JsonProperty("edges")] public List<PassiveEdgeDto> Edges { get; set; } = [];
