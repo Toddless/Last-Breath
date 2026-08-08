@@ -174,6 +174,37 @@ namespace Core.PassiveTree.Allocation
             return result;
         }
 
+        /// <summary>
+        /// The node and everything that would be left hanging without it. The rule that unwinding happens
+        /// from the ends is not lifted — this FINDS the ends instead of demanding them from the player.
+        /// <para>Ordered from the leaves inward: removing the set in this order strands nobody at any
+        /// step, so the list doubles as the order the removals may be made in. A node that is unknown,
+        /// not taken or granted comes back as itself alone — <see cref="CheckRefundAll"/> is what gives a
+        /// verdict about such a node, and an empty list would always answer
+        /// <see cref="AllocationResult.NotTaken"/> and so lie about a seed.</para>
+        /// </summary>
+        public List<string> RefundClosure(PassiveTreeDocument document, string id)
+        {
+            PassiveNode? node = document.Find(id);
+            if (node is null || !_taken.Contains(id) || !NodeKindRules.CostsPoint(node.Kind)) return [id];
+
+            var remaining = new HashSet<string>(_taken, StringComparer.Ordinal);
+            remaining.Remove(id);
+            HashSet<string> standing = Reachable(document, remaining);
+
+            List<string> closure = [id];
+            foreach (string held in remaining)
+                if (!standing.Contains(held))
+                    closure.Add(held);
+
+            // Deepest first: whatever depended on a node stands further from a seed than it does, so the
+            // deepest node left is never anybody's only road.
+            Dictionary<string, int> depth = Depths(document, _taken);
+            closure.Sort((first, second) => depth.GetValueOrDefault(second) - depth.GetValueOrDefault(first));
+
+            return closure;
+        }
+
         /// <summary>Gives the node back when the rules allow it; returns the same reason <see cref="CheckRefund"/> would.</summary>
         public AllocationResult TryRefund(PassiveTreeDocument document, string id)
         {
@@ -287,24 +318,32 @@ namespace Core.PassiveTree.Allocation
         }
 
         /// <summary>Breadth-first walk from every seed, stepping only through the given set.</summary>
-        private static HashSet<string> Reachable(PassiveTreeDocument document, HashSet<string> allowed)
+        private static HashSet<string> Reachable(PassiveTreeDocument document, HashSet<string> allowed) =>
+            new(Depths(document, allowed).Keys, StringComparer.Ordinal);
+
+        /// <summary>The same walk, keeping how many steps from a seed each node stands. One implementation
+        /// of "what still holds together", so reachability and distance can never be answered by two
+        /// different traversals.</summary>
+        private static Dictionary<string, int> Depths(PassiveTreeDocument document, HashSet<string> allowed)
         {
-            var visited = new HashSet<string>(StringComparer.Ordinal);
+            var depths = new Dictionary<string, int>(StringComparer.Ordinal);
             var queue = new Queue<string>();
 
             foreach (PassiveNode node in document.Nodes)
-                if (node.Kind == PassiveNodeKind.Start && allowed.Contains(node.Id) && visited.Add(node.Id))
+                if (node.Kind == PassiveNodeKind.Start && allowed.Contains(node.Id) && depths.TryAdd(node.Id, 0))
                     queue.Enqueue(node.Id);
 
             while (queue.Count > 0)
             {
                 string current = queue.Dequeue();
+                int next = depths[current] + 1;
+
                 foreach (string neighbour in document.Neighbours(current))
-                    if (allowed.Contains(neighbour) && visited.Add(neighbour))
+                    if (allowed.Contains(neighbour) && depths.TryAdd(neighbour, next))
                         queue.Enqueue(neighbour);
             }
 
-            return visited;
+            return depths;
         }
     }
 }

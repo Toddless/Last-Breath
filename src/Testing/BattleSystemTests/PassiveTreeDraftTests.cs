@@ -1,9 +1,12 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using Battle.Source;
+    using Core.Battle.Abilities;
     using Core.Entity.Components;
     using Core.Enums;
     using Core.PassiveTree;
     using Core.PassiveTree.Allocation;
+    using Core.Services;
 
     /// <summary>
     /// Planning an allocation without paying for it. The claim the whole thing rests on is NEGATIVE: a
@@ -21,6 +24,9 @@ namespace LastBreathTest.BattleSystemTests
         private const string Second = "second";
         private const string Third = "third";
         private const string Branch = "branch";
+
+        /// <summary>The ability the socket fixture hangs its slots on.</summary>
+        private const string SeedAbility = "Ability_Seed";
 
         private const float NodeStrength = 2f;
         private const float BaseStrength = 10f;
@@ -48,6 +54,43 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(BaseStrength + NodeStrength, fighter[EntityParameter.Strength], 0f);
             Assert.AreEqual(1, service.SpentPoints);
             Assert.IsTrue(service.IsTaken(First));
+        }
+
+        /// <summary>
+        /// The same negative claim in the channel it is easiest to lose: a marked socket node opens no
+        /// augment slot. The board is synced from the ALLOCATION and the plan lives outside it, so this
+        /// holds because there is no channel and not because anybody agreed to it.
+        /// </summary>
+        [TestMethod]
+        public void AMarkedSocketNode_OpensNoSlotUntilThePlanIsApplied()
+        {
+            var document = new PassiveTreeDocument();
+            document.AddNode(new PassiveNode
+            {
+                Id = Seed,
+                Kind = PassiveNodeKind.Start,
+                Stance = Stance.Dexterity,
+                AbilityId = SeedAbility
+            });
+            document.AddNode(new PassiveNode { Id = First, Kind = PassiveNodeKind.SocketTier2, AbilityId = SeedAbility });
+            document.Link(Seed, First);
+
+            var service = new PassiveTreeService(new TreeProviderStub(document), ConditionCatalogs.Empty());
+            service.SetTotalPoints(3);
+            var board = new AbilitySocketBoard();
+            using var unlocks = new AbilityUnlockService(new PlayerAccessor(), new OneAbility(), service, board);
+            using var draft = new PassiveTreeDraft(service);
+
+            Assert.AreEqual(1, board.SocketsOf(SeedAbility).Count, "the fixture must start with the seed's own slot");
+
+            Assert.AreEqual(AllocationResult.Success, draft.Mark(First));
+
+            Assert.AreEqual(1, board.SocketsOf(SeedAbility).Count, "a marked node opened a slot nobody has paid for");
+            Assert.IsNull(board.Find(new AbilitySocketPlacement(First, SeedAbility, 2).Address));
+
+            Assert.AreEqual(AllocationResult.Success, draft.ApplyTakes());
+
+            Assert.AreEqual(2, board.SocketsOf(SeedAbility).Count, "the applied plan did not open the slot");
         }
 
         /// <summary>The point of a projection rather than a list of intentions: the second step is legal
@@ -106,27 +149,49 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>
-        /// A return is planned by the same rules a return happens by. The middle of a branch is refused
-        /// while the tail is still in — and it is refused rather than quietly widened to take the tail
-        /// with it, because every node of a respec is paid for and a mark that tripled the bill would be
-        /// a price nobody agreed to.
+        /// A return takes the node together with whatever would be left hanging behind it. The rule that
+        /// unwinding happens from the ends is not lifted — the plan FINDS the ends instead of demanding
+        /// them from the player — and the widening is not a bill nobody agreed to, because the size of
+        /// the tail is named before the click (<see cref="PassiveTreeDraft.RefundTailOf"/>).
         /// </summary>
         [TestMethod]
-        public void MarkingTheMiddleOfABranchForReturn_IsRefusedUntilTheTailIsInThePlan()
+        public void MarkingTheMiddleOfABranchForReturn_TakesTheTailWithIt()
         {
             IPassiveTreeService service = Service(points: 5);
             service.TakePath(service.PathTo(Third));
             using var draft = new PassiveTreeDraft(service) { Mode = DraftMode.Refund };
 
-            Assert.AreEqual(AllocationResult.WouldOrphan, draft.CanMark(Second));
-            Assert.AreEqual(AllocationResult.WouldOrphan, draft.Mark(Second));
-            Assert.AreEqual(0, draft.PendingRefunds.Count, "a refused mark entered the plan");
+            CollectionAssert.AreEqual(new[] { Third, Second }, draft.RefundTailOf(Second).ToArray(),
+                "the price named before the click is not the set the click takes, and it is ordered from the leaves");
 
-            Assert.AreEqual(AllocationResult.Success, draft.Mark(Third));
-            Assert.AreEqual(AllocationResult.Success, draft.Mark(Second), "the middle becomes an end once the tail is in the plan");
+            Assert.AreEqual(AllocationResult.Success, draft.CanMark(Second));
+            Assert.AreEqual(AllocationResult.Success, draft.Mark(Second));
 
-            CollectionAssert.AreEquivalent(new[] { Third, Second }, draft.PendingRefunds.ToArray());
+            CollectionAssert.AreEquivalent(new[] { Third, Second }, draft.PendingRefunds.ToArray(),
+                "the tail was left hanging in the air");
             Assert.AreEqual(3, service.SpentPoints, "planning a return gave a point back");
+            Assert.IsTrue(service.IsTaken(Second), "planning a return took the node off the character");
+        }
+
+        /// <summary>Dropping a mark is a replay without it, and a tail is no exception: without its head
+        /// the tail no longer projects, so the plan falls apart from the leaf up. Taking the HEAD out
+        /// leaves the tail standing — a branch end is a legal thing to give back on its own.</summary>
+        [TestMethod]
+        public void DroppingOneMarkOfAReturn_KeepsOnlyWhatStillHoldsWithoutIt()
+        {
+            IPassiveTreeService service = Service(points: 5);
+            service.TakePath(service.PathTo(Third));
+            using var draft = new PassiveTreeDraft(service) { Mode = DraftMode.Refund };
+            draft.Mark(Second);
+
+            draft.Unmark(Third);
+            Assert.AreEqual(0, draft.PendingRefunds.Count, "the head of the plan outlived the tail it depended on");
+
+            draft.Mark(Second);
+            draft.Unmark(Second);
+
+            CollectionAssert.AreEqual(new[] { Third }, draft.PendingRefunds.ToArray(),
+                "dropping the head took the branch end with it, and the end is legal on its own");
         }
 
         /// <summary>Seeds come with the character and are never given back, so they cannot be planned
@@ -296,6 +361,23 @@ namespace LastBreathTest.BattleSystemTests
             public PassiveTreeDocument Tree { get; set; } = tree;
 
             public IReadOnlyList<string> Issues => [];
+        }
+
+        /// <summary>A catalog holding the one ability the socket fixture names. Nothing here builds an
+        /// ability: the walk composes no player, so the book is never filled and only the socket half of
+        /// the unlock pass runs.</summary>
+        private sealed class OneAbility : IAbilityProvider
+        {
+            public IReadOnlyCollection<string> KnownAbilityIds => [SeedAbility];
+
+            public IAbility CreateAbility(string abilityId) =>
+                throw new NotSupportedException("no player in this walk, so nothing is ever learned");
+
+            public IAbilityUpgrade? CreateUpgrade(AugmentInstance augment) => null;
+
+            public Stance GetAbilityStance(string abilityId) => Stance.Dexterity;
+
+            public bool IsHidden(string abilityId) => false;
         }
     }
 }

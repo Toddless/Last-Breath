@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dnx5txabkc2ef"]
 
-[ext_resource type="Script" uid="uid://bnhfp0qdqvk1o" path="res://Source/UIElements/PassiveWheel/PassiveNodeView.cs" id="1_view"]
-[ext_resource type="Shader" uid="uid://cooc5lr58d26b" path="res://Source/UIElements/PassiveWheel/PassiveNodePulse.gdshader" id="2_pulse"]
+[ext_resource type="Script" uid="uid://bnhfp0qdqvk1o" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeView.cs" id="1_view"]
+[ext_resource type="Shader" uid="uid://cooc5lr58d26b" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodePulse.gdshader" id="2_pulse"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pulse"]
 resource_local_to_scene = true
@@ -17,14 +17,6 @@ shader_parameter/phase = 0.0
 offsets = PackedFloat32Array(0, 0.62, 0.82, 1)
 colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
 
-[sub_resource type="GradientTexture2D" id="Ring_select"]
-gradient = SubResource("Gradient_ring")
-width = 44
-height = 44
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
 [sub_resource type="GradientTexture2D" id="Ring_drop"]
 gradient = SubResource("Gradient_ring")
 width = 56
@@ -33,14 +25,12 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
-[node name="PassiveNodeView" type="Node2D" node_paths=PackedStringArray("_body", "_glow", "_socketMark", "_dropMark", "_selectRing", "_title", "_fx")]
+[node name="PassiveNodeView" type="Node2D" node_paths=PackedStringArray("_body", "_glow", "_socketMark", "_dropMark", "_fx")]
 script = ExtResource("1_view")
 _body = NodePath("Body")
 _glow = NodePath("Glow")
 _socketMark = NodePath("SocketMark")
 _dropMark = NodePath("DropMark")
-_selectRing = NodePath("SelectRing")
-_title = NodePath("Title")
 _fx = NodePath("Fx")
 
 [node name="Glow" type="Sprite2D" parent="."]
@@ -49,11 +39,6 @@ material = SubResource("ShaderMaterial_pulse")
 
 [node name="Body" type="Sprite2D" parent="."]
 
-[node name="SelectRing" type="Sprite2D" parent="."]
-visible = false
-modulate = Color(1, 0.965, 0.875, 0.9)
-texture = SubResource("Ring_select")
-
 [node name="DropMark" type="Sprite2D" parent="."]
 visible = false
 texture = SubResource("Ring_drop")
@@ -61,16 +46,5 @@ texture = SubResource("Ring_drop")
 [node name="SocketMark" type="Sprite2D" parent="."]
 visible = false
 position = Vector2(9, -9)
-
-[node name="Title" type="Label" parent="."]
-visible = false
-offset_left = -72.0
-offset_top = 14.0
-offset_right = 72.0
-offset_bottom = 36.0
-mouse_filter = 2
-theme_override_font_sizes/font_size = 13
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="Fx" type="AnimationPlayer" parent="."]

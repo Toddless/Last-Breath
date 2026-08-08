@@ -47,7 +47,12 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// answering the cursor.</summary>
         [Export] private Color _hover = new(0.988f, 0.898f, 0.620f);
 
-        [Export] private Color _select = new(1f, 0.965f, 0.875f);
+        /// <summary>The dashed outline of what the plan would buy, and of what it would give back. Two
+        /// colours because the two plans are opposite acts and the wheel must never be ambiguous about
+        /// which one the button is about to charge for.</summary>
+        [Export] private Color _planTake = new(0.529f, 0.804f, 0.541f);
+
+        [Export] private Color _planRefund = new(0.851f, 0.412f, 0.353f);
 
         [Export] private Color _nodeIdleFill = new(0.086f, 0.067f, 0.039f);
         [Export] private Color _nodeIdleOutline = new(0.298f, 0.259f, 0.192f);
@@ -75,9 +80,42 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         [Export] private float _pickScreenSlack = 6f;
 
-        [Export] private float _labelZoomThreshold = 0.55f;
+        /// <summary>
+        /// How much larger than the node a node texture is authored. A body is drawn at
+        /// <c>2 × Radius × TextureOversample</c> pixels and the sprite is then normalised by the SIZE OF
+        /// THE TEXTURE, never by the class — a texture authored at twice the radius is exactly the size
+        /// the node has at zoom 1 and is stretched by the card at every zoom above it, which is what the
+        /// player reads as blur.
+        /// <para>Floored at <see cref="CanvasTransform.MaxZoom"/>, the deepest the wheel can be zoomed:
+        /// lowering the authored figure is a decision about how much sharper than necessary the art is,
+        /// never a way to stop the check below noticing that it is too small.</para>
+        /// </summary>
+        [Export] private float _textureOversample = CanvasTransform.MaxZoom;
 
-        [Export] private int _labelFontSize = 13;
+        /// <summary>Where the pips of an ability's socket ring sit, as a multiple of what the node
+        /// measures on screen. Never a gap in pixels — see <see cref="SocketRingGeometry"/>.</summary>
+        [Export] private float _socketRingRadiusScale = 2.1f;
+
+        [Export] private float _socketPipRadiusScale = 0.55f;
+
+        /// <summary>How wide the fan of pips opens, centred on the direction away from the core.</summary>
+        [Export] private float _socketArcDegrees = 120f;
+
+        [Export] private float _minPipScreenRadius = 2f;
+
+        /// <summary>How small the ability node may get on screen before its ring stops being drawn. Not
+        /// the old caption threshold in another spelling: a mark on a dot a pixel and a half across has
+        /// stopped being that dot's mark.</summary>
+        [Export] private float _socketRingMinNodeScreenRadius = 6f;
+
+        /// <summary>The four things a pip can be saying, and the fifth it says while a drag is in the
+        /// air.</summary>
+        [Export] private Color _socketOpen = new(0.847f, 0.706f, 0.369f);
+
+        [Export] private Color _socketFilled = new(0.988f, 0.898f, 0.620f);
+        [Export] private Color _socketHeld = new(0.478f, 0.427f, 0.322f);
+        [Export] private Color _socketUnopened = new(0.298f, 0.259f, 0.192f);
+        [Export] private Color _socketDropTarget = new(0.529f, 0.804f, 0.541f);
 
         /// <summary>Put on a socket node whose slot is occupied. The augment's own icon lives in the
         /// socket panel, where there is room to read it; on the wheel the question is only whether the
@@ -102,7 +140,9 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         public Color Hover => _hover;
 
-        public Color Select => _select;
+        public Color PlanTake => _planTake;
+
+        public Color PlanRefund => _planRefund;
 
         public Color NodeIdleFill => _nodeIdleFill;
 
@@ -128,13 +168,29 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         public float PickScreenSlack => _pickScreenSlack;
 
-        public float LabelZoomThreshold => _labelZoomThreshold;
+        /// <inheritdoc cref="_textureOversample"/>
+        public float TextureOversample => MathF.Max(_textureOversample, CanvasTransform.MaxZoom);
 
-        public int LabelFontSize => _labelFontSize;
+        public Color SocketOpen => _socketOpen;
+
+        public Color SocketFilled => _socketFilled;
+
+        public Color SocketHeld => _socketHeld;
+
+        public Color SocketUnopened => _socketUnopened;
+
+        public Color SocketDropTarget => _socketDropTarget;
 
         public Texture2D? SocketMark => _socketMark;
 
         public PassiveNodeVisual Visual(PassiveNodeKind kind) => ByKind[kind];
+
+        /// <summary>The socket ring measured off the same node table the wheel is drawn with. Built here
+        /// so the authored numbers reach the geometry through one channel, the way
+        /// <see cref="Radii"/> is the one channel for the node sizes themselves.</summary>
+        public SocketRingGeometry RingGeometry(NodeGeometry nodes) => new(
+            nodes, _socketRingRadiusScale, _socketPipRadiusScale, _socketArcDegrees,
+            _minPipScreenRadius, _socketRingMinNodeScreenRadius);
 
         /// <summary>The authored radii, the way <see cref="Core.PassiveTree.View.NodeGeometry"/> wants
         /// them. The only channel from the look to the geometry, so the size a node is drawn at and the
@@ -191,7 +247,7 @@ namespace Battle.Source.UIElements.PassiveWheel
                     if (_byKind.ContainsKey(kind)) continue;
 
                     Tracker.TrackNotFound($"Passive wheel style has no visual for node class '{kind}'", this);
-                    _byKind[kind] = new PassiveNodeVisual { Kind = kind, HasView = false, Labelled = false };
+                    _byKind[kind] = new PassiveNodeVisual { Kind = kind, HasView = false };
                 }
 
                 return _byKind;

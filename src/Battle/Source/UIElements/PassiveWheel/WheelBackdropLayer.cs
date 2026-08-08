@@ -1,16 +1,17 @@
 namespace Battle.Source.UIElements.PassiveWheel
 {
     using System;
-    using Core.Localization;
     using Core.PassiveTree.View;
     using Godot;
 
     /// <summary>
     /// The wheel behind the tree: six wedges, the ring radii and the glow at the core. Drawn in
     /// document units inside the frame, so panning costs it nothing; a zoom costs it one redraw,
-    /// because the ring line is floored in screen pixels and the wedge names are glyphs, and neither
-    /// survives being scaled instead of drawn. An allocation pass costs it the same redraw — the canvas
-    /// hands the zoom down at the end of one — over a picture nothing about it can have changed.
+    /// because the ring line is floored in screen pixels and a floor only holds at the zoom it was
+    /// measured for. An allocation pass costs it the same redraw — the canvas hands the zoom down at the
+    /// end of one — over a picture nothing about it can have changed.
+    /// <para>The wedges carry no names. A ray is read by where it points and what colour it is; six
+    /// words floating over the tree were a second map laid on top of the first.</para>
     /// </summary>
     [GlobalClass]
     public partial class WheelBackdropLayer : Node2D
@@ -22,22 +23,18 @@ namespace Battle.Source.UIElements.PassiveWheel
         private const int WedgeSegments = 14;
         private const int GlowLayers = 7;
         private const float WedgeAlpha = 0.07f;
-        private const float LabelOffset = 28f;
-        private const float LabelWidth = 240f;
 
         [Export] private PassiveWheelStyle? _style;
 
         private ICanvasScale? _scale;
-        private bool _labels;
 
         /// <summary>The only thing a layer is ever told, and it is the two readings of scale rather than
         /// the transform itself: no layer is given the pan or the viewport size, so none of them can
         /// start culling — and none has a reason to, because the frame moves and the drawing does
         /// not.</summary>
-        public void SetScale(ICanvasScale scale, bool labels)
+        public void SetScale(ICanvasScale scale)
         {
             _scale = scale;
-            _labels = labels;
             QueueRedraw();
         }
 
@@ -48,7 +45,6 @@ namespace Battle.Source.UIElements.PassiveWheel
             DrawWedges();
             DrawRings();
             DrawCoreGlow();
-            if (_labels) DrawWedgeLabels();
         }
 
         private void DrawWedges()
@@ -104,46 +100,6 @@ namespace Battle.Source.UIElements.PassiveWheel
                 DrawCircle(Vector2.Zero, _style.CoreGlowRadius * factor,
                     new Color(_style.CoreGlow, 0.10f * (1f - factor) + 0.04f));
             }
-        }
-
-        /// <summary>
-        /// The wedge names, at the point size they were authored at whatever the zoom.
-        /// <para>A glyph is rasterised at the size it is asked for and the frame then scales the result,
-        /// so asking for a smaller size at a deeper zoom only makes a smaller picture to blow up — which
-        /// is what turned the names into blurred giants. The size asked for is the authored one and the
-        /// DRAWING is counter-scaled instead: inside the counter-scale one unit is one screen pixel, the
-        /// frame multiplies it back to exactly one, and the glyph lands on screen at the size it was
-        /// rasterised at.</para>
-        /// </summary>
-        private void DrawWedgeLabels()
-        {
-            if (_style == null || _scale == null) return;
-
-            Font? font = ThemeDB.Singleton.FallbackFont;
-            if (font == null) return;
-
-            // One unit inside the counter-scale is one screen pixel, so it is the FRAME's scale that is
-            // undone here and not the zoom: at a spread the frame carries, undoing only the zoom would
-            // leave every caption a spread too large. The offset it is placed at, by contrast, is a
-            // distance in the layout and stays in the layout's own units.
-            float counter = _scale.DocumentLength(1f);
-            float radius = _style.SectorRadius + LabelOffset;
-
-            foreach (WheelSector sector in _style.Sectors)
-            {
-                if (sector.LabelKey.Length == 0) continue;
-
-                float radians = Mathf.DegToRad(sector.AngleDegrees);
-                Vector2 at = new Vector2(MathF.Cos(radians), MathF.Sin(radians)) * radius;
-
-                DrawSetTransform(at, 0f, new Vector2(counter, counter));
-                DrawString(font, new Vector2(-LabelWidth * 0.5f, 0f), Localization.Localize(sector.LabelKey),
-                    HorizontalAlignment.Center, LabelWidth, _style.LabelFontSize, sector.Tint);
-            }
-
-            // The transform outlives the call that set it, so the next thing drawn on this layer would
-            // inherit a counter-scale that has nothing to do with it.
-            DrawSetTransform(Vector2.Zero, 0f, Vector2.One);
         }
     }
 }

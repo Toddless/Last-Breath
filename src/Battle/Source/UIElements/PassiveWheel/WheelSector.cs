@@ -3,8 +3,9 @@ namespace Battle.Source.UIElements.PassiveWheel
     using Godot;
 
     /// <summary>
-    /// One wedge of the backdrop: where it points, what colour it tints and what it is called. Pure
-    /// decoration for the eye and a landmark for the hand — nothing snaps to it and no node reads it.
+    /// One wedge of the backdrop: where it points and what colour it tints. Pure decoration for the eye
+    /// and a landmark for the hand — nothing snaps to it, no node reads it, and it wears no caption: the
+    /// wheel is read by the shape of its rays and not by six words floating over them.
     /// </summary>
     [GlobalClass]
     public partial class WheelSector : Resource
@@ -14,9 +15,5 @@ namespace Battle.Source.UIElements.PassiveWheel
         [Export] public float AngleDegrees { get; set; }
 
         [Export] public Color Tint { get; set; } = Colors.White;
-
-        /// <summary>Localisation key rather than the word itself: the wheel is a screen the player
-        /// reads, and its wedges are named in his language.</summary>
-        [Export] public string LabelKey { get; set; } = string.Empty;
     }
 }

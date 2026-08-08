@@ -2,6 +2,7 @@ namespace Battle.Source.UIElements.PassiveWheel
 {
     using System;
     using System.Collections.Generic;
+    using System.Text;
     using Core;
     using Core.Battle.Abilities;
     using Core.Data;
@@ -20,37 +21,50 @@ namespace Battle.Source.UIElements.PassiveWheel
     /// PANNING writes one field of that frame and nothing else — no layer is redrawn, no view is moved
     /// — which is why the tree can be dragged around at any size without touching the scene tree.
     /// ZOOMING writes the frame too, but the frame only scales what has already been drawn, and a
-    /// picture scaled is not a picture drawn: glyphs keep the size they were rasterised at, a screen
-    /// floor stops being the size it promised and a width authored in screen pixels stops being that
-    /// many. So a wheel click also re-derives everything that is measured in pixels and hands it down
-    /// (<see cref="ApplyScale"/>) — five redraws and a scale per view, at a click of the wheel and at
-    /// the two other things that take the same road (a reframe and an allocation pass), never per
-    /// frame.</para>
+    /// picture scaled is not a picture drawn: a screen floor stops being the size it promised and a width
+    /// authored in screen pixels stops being that many. So a wheel click also re-derives everything that
+    /// is measured in pixels and hands it down (<see cref="ApplyScale"/>) — a handful of layer redraws
+    /// and a scale per view, at a click of the wheel and at the two other things that take the same road
+    /// (a reframe and an allocation pass), never per frame.</para>
     ///
     /// <para>The frame is a MIRROR of <see cref="CanvasTransform"/>, written by <see cref="ApplyTransform"/>
     /// and by nothing else. Picking reads the transform, the GPU reads the frame, and the two agree only
     /// because there is one writer: an animation that flew the view to a node by tweening the frame
     /// would silently move every click somewhere else for as long as it ran.</para>
     ///
-    /// <para>Hit testing is one rule for the whole surface (<see cref="NodeGeometry.At"/>, nearest centre
-    /// wins). The engine's own picking is not used and cannot be: the node scenes are Node2D with every
-    /// control under them locked out of the mouse pass, because the authored layout has around a hundred
-    /// and fifty pairs of overlapping shapes and the GUI walk would resolve them by the order of lines
-    /// in a file that is rewritten daily. Dropping an augment lands on this node too and resolves the
-    /// target the same way, so there is one rule and not two.</para>
+    /// <para>Hit testing is ONE rule for the whole surface (<see cref="Resolve"/>), and it answers a pair:
+    /// the node under the pointer and the socket pip under it, if any. The engine's own picking is not
+    /// used and cannot be: the node scenes are Node2D with every control under them locked out of the
+    /// mouse pass, because the authored layout has around a hundred and fifty pairs of overlapping shapes
+    /// and the GUI walk would resolve them by the order of lines in a file that is rewritten daily.
+    /// Dropping an augment lands on this node too and resolves the target the same way.</para>
+    ///
+    /// <para>Nothing here spends anything by itself. A click MARKS, and marks live in the draft the window
+    /// owns; the two roads that actually move the character are a Ctrl-click, which buys through the
+    /// service, and the confirmation button, which is the window's.</para>
     /// </summary>
     [GlobalClass]
     public partial class PassiveWheelCanvas : Control, IRequireServices
     {
-        /// <summary>Filled in when the scene is built.</summary>
-        private const string UID = "uid://cqv8mz4rt6nd3";
+        /// <summary>The uid the scene file declares in its own header — the authority, so a copy that
+        /// drifts from it resolves to nothing at all in the game project.</summary>
+        private const string UID = "uid://cqv8m04rt6nd3";
 
         [Export] private Node2D? _rig;
         [Export] private WheelBackdropLayer? _backdrop;
         [Export] private WheelEdgeLayer? _idleEdges;
         [Export] private WheelEdgeLayer? _takenEdges;
         [Export] private WheelFieldLayer? _field;
-        [Export] private WheelCursorLayer? _cursor;
+
+        /// <summary>Under the node scenes: the previewed route, the frontier and the outline of the
+        /// plan.</summary>
+        [Export] private WheelCursorLayer? _route;
+
+        /// <summary>Over the node scenes: the gold rim of whatever the pointer is on. It follows the edge
+        /// of the node's own body, and under the scene the body's own sprite would hide it.</summary>
+        [Export] private WheelCursorLayer? _rim;
+
+        [Export] private WheelSocketLayer? _socketRings;
         [Export] private Node2D? _nodeViews;
 
         /// <summary>Above the views and empty today: a one-off effect belongs over the node it happens
@@ -73,11 +87,18 @@ namespace Battle.Source.UIElements.PassiveWheel
         private readonly CanvasTransform _view = new();
 
         private readonly Dictionary<string, PassiveNodeView> _views = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, List<SocketRingSlot>> _rings = new(StringComparer.Ordinal);
         private readonly Stack<PassiveNodeView> _pool = new();
         private readonly HashSet<string> _carriers = new(StringComparer.Ordinal);
         private readonly HashSet<string> _frontier = new(StringComparer.Ordinal);
 
+        /// <summary>Reused across allocation passes: the union of what the character holds and what the
+        /// plan would hold, which is what gets a scene. A fresh set per pass would make every purchase an
+        /// allocation.</summary>
+        private readonly HashSet<string> _lit = new(StringComparer.Ordinal);
+
         private NodeGeometry? _geometry;
+        private SocketRingGeometry? _ringGeometry;
         private IPassiveTreeService? _tree;
         private IAbilitySocketBoard? _board;
         private IAugmentCellHost? _sockets;
@@ -87,10 +108,11 @@ namespace Battle.Source.UIElements.PassiveWheel
         private ILocalizationProvider? _localization;
         private HoverTooltipHandle? _tooltip;
 
+        private PassiveTreeDraft? _draft;
+        private PassiveRespecQuotes? _quotes;
         private PassiveTreeDocument? _document;
         private IReadOnlyList<string> _path = [];
         private string? _hovered;
-        private string? _selected;
 
         private bool _panning;
         private bool _framed;
@@ -109,16 +131,9 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         private Vector2 _pressPosition;
 
-        /// <summary>The node under the cursor, or null when the pointer left every node.</summary>
-        public event Action<PassiveNode?>? HoveredChanged;
-
-        public event Action<PassiveNode?>? SelectionChanged;
-
-        /// <summary>One line for the window to print: the price of a route, or why the last gesture was
-        /// refused. Said synchronously, where the player is looking.</summary>
+        /// <summary>One line for the window to print: why the last gesture was refused, or what it did
+        /// besides what was asked. Said synchronously, where the player is looking.</summary>
         public event Action<string>? StatusChanged;
-
-        public PassiveNode? Selected => _selected == null ? null : _document?.Find(_selected);
 
         public override void _Ready()
         {
@@ -134,6 +149,7 @@ namespace Battle.Source.UIElements.PassiveWheel
         {
             if (_tree != null) _tree.AllocationChanged -= OnAllocationChanged;
             if (_board != null) _board.Changed -= OnBoardChanged;
+            if (_draft != null) _draft.Changed -= OnDraftChanged;
             _tooltip?.Cancel();
         }
 
@@ -152,13 +168,30 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (_board != null) _board.Changed += OnBoardChanged;
 
             BuildGeometry();
+            _socketRings?.SetBoard(_board);
             _tooltip = HoverTooltip.Follow(this, ShowNodeTooltip);
             Rebuild();
         }
 
-        /// <summary>Where an augment seated from the wheel goes: the socket panel beside it, which is
-        /// already the one road from a cell to the install gate. The wheel writes no request of its own
-        /// — a second copy of that road would be a second reading of the same rule.</summary>
+        /// <summary>The plan the wheel draws and marks into. Owned by the window and never registered
+        /// anywhere: the canvas reads it and writes marks into it, and nothing downstream of the
+        /// allocation can see either.</summary>
+        public void UseDraft(PassiveTreeDraft? draft)
+        {
+            if (_draft != null) _draft.Changed -= OnDraftChanged;
+
+            _draft = draft;
+            if (_draft != null) _draft.Changed += OnDraftChanged;
+
+            ReconcileAllocation();
+        }
+
+        /// <summary>Where the price of a planned return comes from — the same reading the button and the
+        /// close guard print, so the popup under the cursor cannot quote a different number.</summary>
+        public void UseQuotes(PassiveRespecQuotes? quotes) => _quotes = quotes;
+
+        /// <summary>Where an augment dropped on the wheel goes. The wheel writes no request of its own —
+        /// a second copy of that road would be a second reading of the same rule.</summary>
         public void UseSocketHost(IAugmentCellHost? host) => _sockets = host;
 
         /// <summary>Fits the whole tree on screen — the recovery hatch when panning has taken the view
@@ -191,25 +224,11 @@ namespace Battle.Source.UIElements.PassiveWheel
             ApplyScale();
         }
 
-        /// <summary>Buys the selected node through the allocation service — the same road a click on it
-        /// takes, so the card's button and the wheel cannot disagree.</summary>
-        public void TakeSelected()
-        {
-            PassiveNode? node = Selected;
-            if (node != null) Take(node);
-        }
-
-        public void RefundSelected()
-        {
-            PassiveNode? node = Selected;
-            if (node != null) Refund(node);
-        }
-
         public static PackedScene? Initialize() =>
             string.IsNullOrEmpty(UID) ? null : ResourceLoader.Load<PackedScene>(UID);
 
-        /// <summary>Lights up every socket node that would take the copy the moment a drag starts, and
-        /// clears the lot when it ends — one pass per drag rather than one per mouse move.</summary>
+        /// <summary>Lights up every slot that would take the copy the moment a drag starts, and clears
+        /// the lot when it ends — one pass per drag rather than one per mouse move.</summary>
         public override void _Notification(int what)
         {
             switch ((long)what)
@@ -221,6 +240,7 @@ namespace Battle.Source.UIElements.PassiveWheel
                 case NotificationDragEnd:
                     _dragging = false;
                     foreach (PassiveNodeView view in _views.Values) view.SetDropTarget(null);
+                    _socketRings?.SetDropPreview(null);
                     Announce(string.Empty);
                     if (_reconcilePending) OnAllocationChanged();
                     break;
@@ -228,34 +248,34 @@ namespace Battle.Source.UIElements.PassiveWheel
         }
 
         /// <summary>The drop check, answered from the same gate the install goes through and about the
-        /// node the same rule says is under the cursor.</summary>
+        /// slot the same rule says is under the cursor.</summary>
         public override bool _CanDropData(Vector2 atPosition, Variant data)
         {
             if (_sockets == null || !DragPayloadReader.TryReadInstance(data, out string instanceId)) return false;
 
-            PassiveNode? node = NodeAt(atPosition);
-            string? address = AddressOf(node);
-            if (node == null || address == null) return false;
+            WheelTarget target = Resolve(atPosition);
+            if (SlotAt(target) is not { } slot) return false;
 
-            AugmentInstallResult verdict = _sockets.Judge(address, instanceId);
-            if (_views.TryGetValue(node.Id, out PassiveNodeView? view)) view.SetDropTarget(verdict.Installed);
-            Announce(verdict.Installed ? string.Empty : Localization.Localize(AugmentRefusalText.KeyFor(verdict)));
+            string? refusal = OwnRefusal(slot.OpenerId);
+            AugmentInstallResult verdict = _sockets.Judge(slot.Address, instanceId);
+            bool accepted = refusal == null && verdict.Installed;
 
-            return verdict.Installed;
+            if (target.Node != null && _views.TryGetValue(target.Node.Id, out PassiveNodeView? view))
+                view.SetDropTarget(accepted);
+
+            Announce(accepted
+                ? string.Empty
+                : Localization.Localize(refusal ?? AugmentRefusalText.KeyFor(verdict)));
+
+            return accepted;
         }
 
-        /// <summary>Selects first, then installs: the panel beside the wheel shows the selected node's
-        /// ability, so the asynchronous half of the answer lands under the right one.</summary>
         public override void _DropData(Vector2 atPosition, Variant data)
         {
             if (_sockets == null || !DragPayloadReader.TryReadInstance(data, out string instanceId)) return;
+            if (SlotAt(Resolve(atPosition)) is not { } slot || OwnRefusal(slot.OpenerId) != null) return;
 
-            PassiveNode? node = NodeAt(atPosition);
-            string? address = AddressOf(node);
-            if (node == null || address == null) return;
-
-            Select(node);
-            _sockets.Install(address, instanceId);
+            _sockets.Install(slot.Address, instanceId);
         }
 
         public override void _GuiInput(InputEvent @event)
@@ -297,7 +317,7 @@ namespace Battle.Source.UIElements.PassiveWheel
                 case MouseButton.Left:
                 case MouseButton.Right:
                     if (button.Pressed) BeginPress(button.ButtonIndex, button.Position);
-                    else EndPress(button.ButtonIndex, button.Position);
+                    else EndPress(button.ButtonIndex, button.Position, button.CtrlPressed);
                     AcceptEvent();
                     return;
             }
@@ -315,9 +335,9 @@ namespace Battle.Source.UIElements.PassiveWheel
             _pressPosition = position;
         }
 
-        /// <summary>A press that did not travel is that button's click; one that did was a pan and
-        /// buys, sells and selects nothing.</summary>
-        private void EndPress(MouseButton button, Vector2 position)
+        /// <summary>A press that did not travel is that button's click; one that did was a pan and marks,
+        /// buys and extracts nothing.</summary>
+        private void EndPress(MouseButton button, Vector2 position, bool immediate)
         {
             if (_pressed != button) return;
 
@@ -328,9 +348,9 @@ namespace Battle.Source.UIElements.PassiveWheel
                 return;
             }
 
-            PassiveNode? node = NodeAt(position);
-            if (button == MouseButton.Right) OnRightClick(node);
-            else OnLeftClick(node);
+            WheelTarget target = Resolve(position);
+            if (button == MouseButton.Right) OnRightClick(target);
+            else OnLeftClick(target, immediate);
         }
 
         /// <summary>The wheel moved under a hand that has come to rest, so what the pointer is on has
@@ -339,30 +359,108 @@ namespace Battle.Source.UIElements.PassiveWheel
         private void PanEnded(Vector2 position)
         {
             _panning = false;
-            Hover(NodeAt(position));
+            Hover(Resolve(position).Node);
         }
 
-        private void OnLeftClick(PassiveNode? node)
+        /// <summary>
+        /// A click means the same thing on a node and on one of its pips: the ring is part of its own
+        /// node's presence, not a target of its own.
+        /// <para>With Ctrl held it buys immediately, and only in the buying mode: the single road to the
+        /// purse is a button with the price written on it, and one slipped modifier must not be able to
+        /// spend gold without a question.</para>
+        /// </summary>
+        private void OnLeftClick(WheelTarget target, bool immediate)
         {
-            if (node == null)
+            if (target.Node is not { } node || _draft == null || _document == null) return;
+
+            if (_draft.Mode == DraftMode.Refund)
             {
-                Select(null);
+                if (immediate) Announce(Localization.Localize(PassiveWheelText.RefundNeedsButton));
+                MarkReturn(node);
                 return;
             }
 
-            Select(node);
-            Take(node);
-        }
-
-        private void OnRightClick(PassiveNode? node)
-        {
-            if (node == null)
+            if (immediate)
             {
-                Select(null);
+                TakeNow(node);
                 return;
             }
 
-            Refund(node);
+            if (_draft.IsMarked(node.Id))
+            {
+                DropMark(node.Id);
+                return;
+            }
+
+            IReadOnlyList<string> route = _draft.PathTo(node.Id);
+            AllocationResult result = route.Count == 0 ? _draft.CanMark(node.Id) : _draft.MarkPath(route);
+            if (result != AllocationResult.Success)
+                Announce(Localization.Localize(PassiveTreeRefusalText.TakeKey(_document, node.Id, result)));
+        }
+
+        /// <summary>
+        /// Right-click resolves in this order and no other: a pip holding something gives its augment
+        /// back, then a node the plan touches loses its mark, then nothing happens. A pip sits outside the
+        /// body of its node but inside the picking slack of small neighbours, so asking about the node
+        /// first would sometimes drop a stranger's mark instead of emptying the slot aimed at.
+        /// </summary>
+        private void OnRightClick(WheelTarget target)
+        {
+            if (target.Pip is { State: SocketSlotState.Filled or SocketSlotState.Held } pip)
+            {
+                _sockets?.Extract(pip.Address);
+                return;
+            }
+
+            if (target.Node is not { } node || _draft == null) return;
+
+            if (_draft.IsMarked(node.Id) || PlannedReturn(node.Id)) DropMark(node.Id);
+        }
+
+        /// <summary>Buys the cheapest route to the node through the service — the one place a click
+        /// spends a point. The picture that follows comes from the allocation event rather than from this
+        /// call, which is what keeps this window and the mastery window showing the same numbers.</summary>
+        private void TakeNow(PassiveNode node)
+        {
+            if (_tree == null || _document == null) return;
+
+            AllocationResult result = _tree.TakePath(_tree.PathTo(node.Id));
+            if (result != AllocationResult.Success)
+                Announce(Localization.Localize(PassiveTreeRefusalText.TakeKey(_document, node.Id, result)));
+        }
+
+        /// <summary>Plans the node's return together with everything that would be left hanging behind
+        /// it. The size and the price of that tail were already in the popup before the click.</summary>
+        private void MarkReturn(PassiveNode node)
+        {
+            if (_draft == null) return;
+
+            if (PlannedReturn(node.Id))
+            {
+                DropMark(node.Id);
+                return;
+            }
+
+            AllocationResult result = _draft.Mark(node.Id);
+            if (result != AllocationResult.Success)
+                Announce(Localization.Localize(PassiveTreeRefusalText.RefundKey(result)));
+        }
+
+        /// <summary>Takes a mark out of the plan and says how much else went with it. Dropping a mark is a
+        /// replay without it, so whatever stood only on that mark stops standing — and the player has to
+        /// be told, or a dozen marks vanish without a word.</summary>
+        private void DropMark(string nodeId)
+        {
+            if (_draft == null) return;
+
+            int before = _draft.Marked.Count;
+            _draft.Unmark(nodeId);
+            int also = before - _draft.Marked.Count - 1;
+
+            Announce(also <= 0
+                ? string.Empty
+                : Localization.Render(PassiveWheelText.UnmarkedAlso,
+                    new Dictionary<string, object?> { [PassiveWheelText.CountValue] = also }));
         }
 
         private void HandleMouseMotion(InputEventMouseMotion motion)
@@ -380,7 +478,7 @@ namespace Battle.Source.UIElements.PassiveWheel
                 return;
             }
 
-            Hover(NodeAt(motion.Position));
+            Hover(Resolve(motion.Position).Node);
         }
 
         private void Zoom(float factor, Vector2 pivot)
@@ -409,42 +507,35 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// The part of a scale the frame cannot carry, handed to everything that draws.
         /// <para>Every layer draws in the frame's units and is blown up by it, so anything MEASURED IN
         /// PIXELS is only right for the scale it was drawn at: the screen floor under a node radius, the
-        /// floor under an edge width, a ring measured off a node's screen size, the length of a dash and
-        /// the point size of a caption. Scaling that picture instead of drawing it again is what turned
-        /// captions into blur and rings into halos, so a wheel click redraws the lot.</para>
+        /// floor under an edge width, a ring measured off a node's screen size, the length of a dash.
+        /// Scaling that picture instead of drawing it again is what turned rings into halos, so a wheel
+        /// click redraws the lot.</para>
         /// <para>The layers are handed the transform's two readings of scale and never the transform, so
-        /// none of them can reach the pan and start culling. Whether a caption is shown still hangs on
-        /// the ZOOM alone: it is a question about how small the glyphs would be, and the spread makes
-        /// nothing smaller.</para>
-        /// <para>Deliberately unconditional, and reached from a reframe and from an allocation pass as
-        /// well as from the wheel — those two hand the layers a scale they already had and pay the same
-        /// price for it. All three are rare, deliberate acts; five layer redraws and one scale per node
-        /// scene is what an honest picture costs, and none of it is work per frame: none of these
-        /// classes has a <c>_Process</c>.</para>
+        /// none of them can reach the pan and start culling.</para>
+        /// <para>Deliberately unconditional, and reached from three places. A wheel click and a REFRAME
+        /// are both real zoom steps — a reframe computes a new zoom through <see cref="CanvasTransform.Fit"/>
+        /// — and have earned the redraw. Only the allocation pass pays for a redraw it does not need, and
+        /// it pays deliberately, so there is one road down to the drawing instead of two. None of it is
+        /// work per frame: no class here has a <c>_Process</c>.</para>
         /// </summary>
         private void ApplyScale()
         {
             if (_geometry == null || _style == null) return;
 
-            bool labels = _view.Zoom >= _style.LabelZoomThreshold;
-            float frameScale = _view.Frame().Scale;
-
-            _backdrop?.SetScale(_view, labels);
+            _backdrop?.SetScale(_view);
             _idleEdges?.SetScale(_view);
             _takenEdges?.SetScale(_view);
             _field?.SetScale(_view);
-            _cursor?.SetScale(_view);
+            _route?.SetScale(_view);
+            _rim?.SetScale(_view);
+            _socketRings?.SetScale(_view);
 
             foreach (KeyValuePair<string, PassiveNodeView> entry in _views)
             {
                 PassiveNode? node = _document?.Find(entry.Key);
                 if (node == null) continue;
 
-                // The scene ends up on screen at frameScale x bodyScale, so that product is what a
-                // caption inside it has to undo to land at the point size it was rasterised at.
-                float bodyScale = _geometry.ViewScale(node.Kind, _view);
-                float onScreen = frameScale * bodyScale;
-                entry.Value.ApplyZoom(bodyScale, onScreen <= 0f ? 1f : 1f / onScreen, labels);
+                entry.Value.ApplyZoom(_geometry.ViewScale(node.Kind, _view));
             }
         }
 
@@ -457,6 +548,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             }
 
             _geometry = new NodeGeometry(_style.Radii(), _style.MinNodeScreenRadius, _style.PickScreenSlack);
+            _ringGeometry = _style.RingGeometry(_geometry);
         }
 
         /// <summary>Everything pointing into the previous document is dropped rather than re-matched: a
@@ -473,23 +565,37 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             ReleaseAllViews();
             _hovered = null;
-            _selected = null;
             _path = [];
             _tooltip?.Cancel();
+
+            _rings.Clear();
+            if (_document != null) SocketRings.Collect(_document, _rings);
 
             _idleEdges?.SetDocument(_document);
             _takenEdges?.SetDocument(_document);
             _field?.SetDocument(_document);
             _field?.SetGeometry(_geometry);
-            _cursor?.SetDocument(_document);
-            _cursor?.SetGeometry(_geometry);
-            _cursor?.SetHovered(null);
-            _cursor?.SetPath([]);
+
+            ResetCursorLayer(_route);
+            ResetCursorLayer(_rim);
+
+            _socketRings?.SetDocument(_document);
+            _socketRings?.SetGeometry(_geometry, _ringGeometry);
+            _socketRings?.SetRings(_rings);
 
             ReconcileAllocation();
-            HoveredChanged?.Invoke(null);
-            SelectionChanged?.Invoke(null);
             FrameAll();
+        }
+
+        /// <summary>Both cursor layers are told the same things and each ignores the half that is not its
+        /// role, so a new document reaches them through one call rather than through two spellings of
+        /// it.</summary>
+        private void ResetCursorLayer(WheelCursorLayer? layer)
+        {
+            layer?.SetDocument(_document);
+            layer?.SetGeometry(_geometry);
+            layer?.SetHovered(null);
+            layer?.SetPath([]);
         }
 
         private void OnAllocationChanged()
@@ -517,14 +623,23 @@ namespace Battle.Source.UIElements.PassiveWheel
         {
             if (_dragging || _document == null) return;
 
+            _socketRings?.SetBoard(_board);
             RefreshSocketMarks();
         }
 
+        /// <summary>The plan moved. It costs the same pass a purchase does: the two produce the same
+        /// picture and a cheaper road for one of them would be a second reading of what a node looks
+        /// like.</summary>
+        private void OnDraftChanged() => ReconcileAllocation();
+
         /// <summary>
-        /// One pass over the allocation for the whole wheel. The taken set is read ONCE and answers both
-        /// halves of the same question — which nodes get a scene and which are left to the mass layer —
-        /// so a node cannot end up drawn twice or not at all. A second road into the view set would be
-        /// the one way to break that.
+        /// One pass over the allocation for the whole wheel. What the character holds and what the plan
+        /// would hold are read ONCE into a single set, and that set answers both halves of the same
+        /// question — which nodes get a scene and which are left to the mass layer — so a node cannot end
+        /// up drawn twice or not at all.
+        /// <para>The union rather than the projection alone: a node marked to go BACK drops out of the
+        /// projection, and carrying only the projection would leave it with no scene to be painted
+        /// with — the plan to give it up would be invisible.</para>
         /// </summary>
         private void ReconcileAllocation()
         {
@@ -532,22 +647,34 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             IReadOnlyCollection<string> taken = _tree?.TakenNodes ?? [];
 
-            if (CanCarryViews()) NodeCarriers.Collect(_document, taken, HasOwnView, _carriers);
+            _lit.Clear();
+            foreach (string id in taken) _lit.Add(id);
+            if (_draft != null)
+                foreach (string id in _draft.Projected)
+                    _lit.Add(id);
+
+            if (CanCarryViews()) NodeCarriers.Collect(_document, _lit, HasOwnView, _carriers);
             else _carriers.Clear();
 
             PromoteAndDemote();
 
             _field?.SetCarriers(_carriers);
             _takenEdges?.SetTaken(taken);
-            _cursor?.SetTaken(taken);
+            _route?.SetTaken(taken);
+            _socketRings?.SetTaken(taken);
 
             RefreshFrontier();
-            _cursor?.SetFrontier(_frontier);
+            _route?.SetFrontier(_frontier);
+            _route?.SetPlan(PlannedNodes(), _draft?.Mode == DraftMode.Refund);
 
             UpdatePathPreview();
             RefreshSocketMarks();
             ApplyScale();
         }
+
+        private IReadOnlyCollection<string> PlannedNodes() => _draft == null
+            ? []
+            : _draft.Mode == DraftMode.Refund ? _draft.PendingRefunds : _draft.PendingTakes;
 
         private bool HasOwnView(PassiveNodeKind kind) => _style?.Visual(kind).HasView ?? false;
 
@@ -596,21 +723,25 @@ namespace Battle.Source.UIElements.PassiveWheel
             }
 
             foreach (KeyValuePair<string, PassiveNodeView> entry in _views)
-            {
                 entry.Value.SetState(StateOf(entry.Key));
-                entry.Value.SetSelected(entry.Key == _selected);
-            }
         }
 
+        /// <summary>What the node is to the character and to his plan, asked of the one place that
+        /// answers it — the same reading the layer that marks the whole field goes through, so a node
+        /// cannot be one thing to its own scene and another to the drawing over it.</summary>
         private PassiveNodeVisualState StateOf(string id)
         {
-            if (_tree?.IsTaken(id) == true) return PassiveNodeVisualState.Taken;
+            bool taken = _tree?.IsTaken(id) == true;
+            return PassiveNodeStates.Of(taken, _draft?.IsProjected(id) ?? taken, OnPath(id));
+        }
 
+        private bool OnPath(string id)
+        {
             foreach (string step in _path)
                 if (string.Equals(step, id, StringComparison.Ordinal))
-                    return PassiveNodeVisualState.OnPath;
+                    return true;
 
-            return PassiveNodeVisualState.Idle;
+            return false;
         }
 
         /// <summary>Nodes taken from the pool rather than built: after the first open an allocation
@@ -637,7 +768,6 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (!_views.Remove(id, out PassiveNodeView? view)) return;
 
             view.SetDropTarget(null);
-            view.SetSelected(false);
             view.SetSocketMark(null);
             view.Visible = false;
             _pool.Push(view);
@@ -651,18 +781,18 @@ namespace Battle.Source.UIElements.PassiveWheel
         }
 
         /// <summary>
-        /// What can be bought right now, asked of the very check a click goes through. Deliberately not
-        /// the allocation's own frontier walk: that one tests the budget once before the loop and knows
-        /// nothing about the classes that cost no point, so the ring it draws could offer a node the
-        /// click then refuses.
+        /// What a click could mark right now, asked of the very check the click goes through — the
+        /// draft's, so a node reachable only through something already marked is offered. Nothing is
+        /// marked in the giving-back mode: everything held can go back, and a ring on every taken node is
+        /// noise rather than an answer.
         /// </summary>
         private void RefreshFrontier()
         {
             _frontier.Clear();
-            if (_document == null || _tree == null) return;
+            if (_document == null || _draft == null || _draft.Mode == DraftMode.Refund) return;
 
             foreach (PassiveNode node in _document.Nodes)
-                if (_tree.CheckTake(node.Id) == AllocationResult.Success)
+                if (_draft.CanMark(node.Id) == AllocationResult.Success)
                     _frontier.Add(node.Id);
         }
 
@@ -672,53 +802,101 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             foreach (KeyValuePair<string, PassiveNodeView> entry in _views)
             {
-                PassiveNode? node = _document.Find(entry.Key);
-                string? address = AddressOf(node);
+                string? address = AddressOf(_document.Find(entry.Key));
                 bool occupied = address != null && _board.Find(address) is { IsEmpty: false };
                 entry.Value.SetSocketMark(occupied ? _style.SocketMark : null);
             }
         }
 
         /// <summary>
-        /// The slot a socket node opens, asked of the board rather than assembled here. The signature of
-        /// a slot is built in one place, and asking for it also answers for free whether the slot exists
-        /// at all — it exists only while the node is taken.
+        /// The slot a socket node stands for, built from the DOCUMENT with the board's own constructor.
+        /// Not asked of the board: a slot exists there only while its node is taken, and a drop aimed at a
+        /// node nobody has bought has to be refused for the reason it was refused for — "you have not
+        /// bought it" — rather than for "there is no such slot".
         /// </summary>
-        private string? AddressOf(PassiveNode? node)
+        private static string? AddressOf(PassiveNode? node)
         {
-            if (node == null || _board == null) return null;
-            if (NodeKindRules.SocketTier(node.Kind) == NodeKindRules.NoSocket) return null;
-            if (string.IsNullOrWhiteSpace(node.AbilityId)) return null;
+            if (node == null) return null;
 
-            foreach (AbilitySocket socket in _board.SocketsOf(node.AbilityId))
-                if (string.Equals(socket.SocketId, node.Id, StringComparison.Ordinal))
-                    return socket.Address;
+            int tier = NodeKindRules.SocketTier(node.Kind);
+            if (tier == NodeKindRules.NoSocket || string.IsNullOrWhiteSpace(node.AbilityId)) return null;
 
-            return null;
+            return new AbilitySocketPlacement(node.Id, node.AbilityId, tier).Address;
         }
+
+        /// <summary>The slot a point on the wheel aims at: a pip if the pointer is on one, otherwise the
+        /// socket node under it.</summary>
+        private DropSlot? SlotAt(WheelTarget target)
+        {
+            if (target.Pip is { } pip) return new DropSlot(pip.Address, pip.OpenerId);
+            if (target.Node is not { } node || AddressOf(node) is not { } address) return null;
+
+            return new DropSlot(address, node.Id);
+        }
+
+        /// <summary>The wheel's own refusals, answered before the install gate is ever asked and read off
+        /// the allocation and the plan — see <see cref="PassiveSocketRefusalText"/>.</summary>
+        private string? OwnRefusal(string openerId) =>
+            PassiveSocketRefusalText.KeyFor(_tree?.IsTaken(openerId) == true, PlannedReturn(openerId));
+
+        /// <summary>The node is held and the plan means to give it back.</summary>
+        private bool PlannedReturn(string nodeId) =>
+            _tree?.IsTaken(nodeId) == true && _draft?.IsProjected(nodeId) == false;
 
         private void PreviewDrag()
         {
             if (_sockets == null || GetViewport()?.GuiGetDragData() is not { } data) return;
             if (!DragPayloadReader.TryReadInstance(data, out string instanceId)) return;
 
+            HashSet<string> accepting = new(StringComparer.Ordinal);
+
+            foreach (PassiveSocketPip pip in _socketRings?.Pips ?? [])
+                if (OwnRefusal(pip.OpenerId) == null && _sockets.Judge(pip.Address, instanceId).Installed)
+                    accepting.Add(pip.Address);
+
             foreach (KeyValuePair<string, PassiveNodeView> entry in _views)
             {
                 string? address = AddressOf(_document?.Find(entry.Key));
                 if (address == null) continue;
 
-                entry.Value.SetDropTarget(_sockets.Judge(address, instanceId).Installed);
+                bool accepted = OwnRefusal(entry.Key) == null && _sockets.Judge(address, instanceId).Installed;
+                entry.Value.SetDropTarget(accepted);
+                if (accepted) accepting.Add(address);
             }
+
+            _socketRings?.SetDropPreview(accepting);
         }
 
-        private PassiveNode? NodeAt(Vector2 position) =>
-            _document == null || _geometry == null ? null : _geometry.At(_document, _view, position.X, position.Y);
+        /// <summary>
+        /// The one reading of "what is under the cursor", and it answers a PAIR. A pip is asked about
+        /// first and without any slack of its own, so its priority holds exactly inside its own small
+        /// circle; everything else falls through to the node rule, which has the slack that keeps a dot
+        /// aimable when the whole tree is on screen.
+        /// <para>A pip resolves to the node whose ring it belongs to. The ring is part of that node's
+        /// presence, so hovering a pip opens that node's popup and clicking one is a click on that node —
+        /// there is no second question about what a point means.</para>
+        /// </summary>
+        private WheelTarget Resolve(Vector2 position)
+        {
+            if (_document == null || _geometry == null) return default;
+
+            foreach (PassiveSocketPip pip in _socketRings?.Pips ?? [])
+            {
+                float deltaX = _view.ScreenX(pip.X) - position.X;
+                float deltaY = _view.ScreenY(pip.Y) - position.Y;
+                if (deltaX * deltaX + deltaY * deltaY > pip.ScreenRadius * pip.ScreenRadius) continue;
+
+                return new WheelTarget(_document.Find(pip.NodeId), pip);
+            }
+
+            return new WheelTarget(_geometry.At(_document, _view, position.X, position.Y), null);
+        }
 
         private void ClearHover() => Hover(null);
 
-        /// <summary>The one reading of "what is under the cursor". The views never hear about it: hover
-        /// happens to nodes with a scene and to nodes without one alike, so the ring is drawn by the one
-        /// layer that serves both.</summary>
+        /// <summary>The one reading of "what is hovered". The views never hear about it: hover happens to
+        /// nodes with a scene and to nodes without one alike, so the rim is drawn by the one layer that
+        /// serves both.</summary>
         private void Hover(PassiveNode? node)
         {
             if (node?.Id == _hovered) return;
@@ -726,59 +904,34 @@ namespace Battle.Source.UIElements.PassiveWheel
             _hovered = node?.Id;
             UpdatePathPreview();
 
-            _cursor?.SetHovered(node);
+            _route?.SetHovered(node);
+            _rim?.SetHovered(node);
             _tooltip?.Target(_hovered);
-            HoveredChanged?.Invoke(node);
         }
 
-        /// <summary>The cheapest route to what the cursor is on, and its length is what reaching it
-        /// costs. The service walks the graph — the window never grows a search of its own.</summary>
+        /// <summary>The cheapest route to what the cursor is on, priced FROM THE PLAN, and its length is
+        /// what reaching it costs. The draft walks the graph — the window never grows a search of its
+        /// own. Nothing is previewed while a return is being planned: there is no route to draw, and what
+        /// the click would take is said in the popup instead.</summary>
         private void UpdatePathPreview()
         {
-            _path = _hovered == null || _tree == null ? [] : _tree.PathTo(_hovered);
-            _cursor?.SetPath(_path);
+            _path = _hovered == null || _draft == null || _draft.Mode == DraftMode.Refund
+                ? []
+                : _draft.PathTo(_hovered);
+
+            _route?.SetPath(_path);
 
             foreach (KeyValuePair<string, PassiveNodeView> entry in _views)
                 entry.Value.SetState(StateOf(entry.Key));
         }
 
-        private void Select(PassiveNode? node)
-        {
-            if (node?.Id == _selected) return;
-
-            _selected = node?.Id;
-            foreach (KeyValuePair<string, PassiveNodeView> entry in _views)
-                entry.Value.SetSelected(entry.Key == _selected);
-
-            SelectionChanged?.Invoke(node);
-        }
-
-        /// <summary>Buying goes straight to the service: it is already the single gate, its answer is
-        /// needed synchronously to say why a refusal happened, and the picture that follows comes from
-        /// the allocation event rather than from this call — which is what keeps this window and the
-        /// mastery window showing the same numbers.</summary>
-        private void Take(PassiveNode node)
-        {
-            if (_tree == null || _document == null) return;
-
-            AllocationResult result = _tree.Take(node.Id);
-            Announce(result == AllocationResult.Success
-                ? string.Empty
-                : Localization.Localize(PassiveTreeRefusalText.TakeKey(_document, node.Id, result)));
-        }
-
-        private void Refund(PassiveNode node)
-        {
-            if (_tree == null) return;
-
-            AllocationResult result = _tree.Refund(node.Id);
-            Announce(result == AllocationResult.Success
-                ? string.Empty
-                : Localization.Localize(PassiveTreeRefusalText.RefundKey(result)));
-        }
-
         private void Announce(string text) => StatusChanged?.Invoke(text);
 
+        /// <summary>
+        /// Everything the node says, in one popup: its name once, its class, its lines, what reaching it
+        /// would cost, what its ability's slots hold, and — while a return is being planned — how much
+        /// the click would take back and what that would cost in gold.
+        /// </summary>
         private IPopup? ShowNodeTooltip(object? key)
         {
             if (_windows == null || _document == null || key is not string id) return null;
@@ -787,18 +940,125 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (node == null) return null;
             if (_windows.ShowPopup(typeof(TextTooltipPopup)) is not TextTooltipPopup popup) return null;
 
-            List<PassiveNodeLine> lines = PassiveNodeLines.Of(node, _modifiers, _knobs, _localization, TextFormat.Rich);
-            var body = new System.Text.StringBuilder();
-            foreach (PassiveNodeLine line in lines)
-            {
-                if (body.Length > 0) body.Append('\n');
-                body.Append(line.Text);
-            }
+            var body = new StringBuilder();
+            foreach (PassiveNodeLine line in PassiveNodeLines.Of(node, _modifiers, _knobs, _localization, TextFormat.Rich))
+                Append(body, line.Text);
+
+            AppendCost(body, node);
+            AppendSlots(body, node);
+            AppendReturn(body, node);
 
             popup.Show(PassiveNodeLines.TitleOf(node, _localization),
                 Localization.Localize($"{PassiveWheelText.KindPrefix}{node.Kind}"), body.ToString());
 
             return popup;
+        }
+
+        /// <summary>What reaching the node would cost in points, priced from the plan so a step already
+        /// marked is not charged for twice. Said only where it says something the wheel does not — see
+        /// <see cref="PassiveNodeLines.PricesTheRoute"/>.</summary>
+        private void AppendCost(StringBuilder body, PassiveNode node)
+        {
+            if (_draft == null || _draft.Mode == DraftMode.Refund) return;
+
+            int cost = _draft.PathTo(node.Id).Count;
+            if (!PassiveNodeLines.PricesTheRoute(cost)) return;
+
+            Append(body, Localization.Render(PassiveWheelText.PathCost,
+                new Dictionary<string, object?> { [PassiveWheelText.PointsValue] = cost }));
+        }
+
+        /// <summary>The ability's slots in words. The ring beside the node says the same thing in colour,
+        /// and an icon inside a pip eight pixels across would be unreadable — so what is IN a slot is
+        /// printed here and shown nowhere else.</summary>
+        private void AppendSlots(StringBuilder body, PassiveNode node)
+        {
+            if (!_rings.TryGetValue(node.Id, out List<SocketRingSlot>? slots)) return;
+
+            Append(body, Localization.Localize(PassiveWheelText.SlotsCaption));
+            foreach (SocketRingSlot slot in slots)
+            {
+                AbilitySocket? socket = _board?.Find(slot.Address);
+                string key = SocketRings.StateOf(socket) switch
+                {
+                    SocketSlotState.Held => PassiveWheelText.SlotHeld,
+                    SocketSlotState.Open => PassiveWheelText.SlotOpen,
+                    SocketSlotState.Filled => PassiveWheelText.SlotFilled,
+                    _ => PassiveWheelText.SlotUnopened
+                };
+
+                Append(body, Localization.Render(key, new Dictionary<string, object?>
+                {
+                    [PassiveWheelText.TierValue] = slot.Tier,
+                    [PassiveWheelText.NameValue] = socket?.Augment is { } augment
+                        ? Localization.Localize(augment.AugmentId)
+                        : string.Empty
+                }));
+            }
+        }
+
+        /// <summary>
+        /// What clicking would give back and what it would cost — said BEFORE the click, and beside the
+        /// node rather than at the cursor, because the popup is already following the cursor and a second
+        /// number chasing it would only flicker.
+        /// <para>The price printed is the price of the WHOLE plan once this node joins it, not of the tail
+        /// on its own: the pricing has a ceiling, so a tail priced separately would stop adding up to the
+        /// figure on the button the moment the plan reached it.</para>
+        /// </summary>
+        private void AppendReturn(StringBuilder body, PassiveNode node)
+        {
+            if (_draft == null || _draft.Mode != DraftMode.Refund || _tree?.IsTaken(node.Id) != true) return;
+            if (PlannedReturn(node.Id)) return;
+
+            IReadOnlyList<string> tail = _draft.RefundTailOf(node.Id);
+            Append(body, Localization.Render(PassiveWheelText.RefundTail,
+                new Dictionary<string, object?> { [PassiveWheelText.CountValue] = tail.Count }));
+
+            if (_quotes is { CanCharge: true })
+            {
+                RespecQuote quote = _quotes.Quote(_draft.PendingRefunds.Count + tail.Count);
+                string gold = Localization.Render(PassiveWheelText.RefundPrice,
+                    new Dictionary<string, object?> { [PassiveWheelText.GoldValue] = quote.Gold });
+
+                Append(body, TextPalette.Colorize(gold, quote.Affordable ? TextPalette.Number : TextPalette.Debuff));
+            }
+
+            int stranded = StrandedAugments(tail);
+            if (stranded > 0)
+                Append(body, Localization.Render(PassiveWheelText.StrandedAugments,
+                    new Dictionary<string, object?> { [PassiveWheelText.CountValue] = stranded }));
+        }
+
+        /// <summary>How many augments the return would leave sitting in closed slots. The warning the
+        /// respec dialog used to carry, and it has to outlive the dialog: property of the player's ends up
+        /// somewhere he has to go and fetch it from.</summary>
+        private int StrandedAugments(IReadOnlyList<string> tail)
+        {
+            if (_board == null) return 0;
+
+            int stranded = 0;
+            foreach (AbilitySocket socket in _board.Sockets)
+                if (!socket.IsEmpty && Contains(tail, socket.SocketId))
+                    stranded++;
+
+            return stranded;
+        }
+
+        private static bool Contains(IReadOnlyList<string> ids, string id)
+        {
+            foreach (string candidate in ids)
+                if (string.Equals(candidate, id, StringComparison.Ordinal))
+                    return true;
+
+            return false;
+        }
+
+        private static void Append(StringBuilder body, string line)
+        {
+            if (line.Length == 0) return;
+            if (body.Length > 0) body.Append('\n');
+
+            body.Append(line);
         }
 
         /// <summary>The control has no size until the layout has run, and framing a tree into nothing
@@ -809,5 +1069,12 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             FrameAll();
         }
+
+        /// <summary>What a point on the wheel means: the node it belongs to, and the pip of that node's
+        /// socket ring if the point landed on one.</summary>
+        private readonly record struct WheelTarget(PassiveNode? Node, PassiveSocketPip? Pip);
+
+        /// <summary>A slot a drop could go into, and the node that has to be bought for it to exist.</summary>
+        private readonly record struct DropSlot(string Address, string OpenerId);
     }
 }

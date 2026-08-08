@@ -21,6 +21,12 @@ namespace Core.PassiveTree.View
     /// </summary>
     public static class PassiveNodeLines
     {
+        /// <summary>How many steps a route needs before its price is worth printing beside the node. Every
+        /// node in the tree costs a point, so on a neighbour the figure only repeats what the player
+        /// already knows; from two steps on it stops being a property of the node and becomes one of the
+        /// distance to it, which is the number a plan is actually made with.</summary>
+        public const int ShortestPricedRoute = 2;
+
         /// <summary>Wraps the condition after the sentence it gates: "…  (WhileWounded)".</summary>
         private const string ConditionTemplate = "{0}  ({1})";
 
@@ -46,6 +52,10 @@ namespace Core.PassiveTree.View
 
             return lines;
         }
+
+        /// <summary>Whether a route of this many steps is worth quoting a price for — see
+        /// <see cref="ShortestPricedRoute"/>. Unreachable nodes price at nothing and say nothing.</summary>
+        public static bool PricesTheRoute(int steps) => steps >= ShortestPricedRoute;
 
         /// <summary>The node's headline: its title, or what it is about when it was never titled.</summary>
         public static string TitleOf(PassiveNode node, ILocalizationProvider? localization)

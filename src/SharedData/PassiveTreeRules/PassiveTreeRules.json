@@ -1,0 +1,7 @@
+{
+  "respec": {
+    "goldPerNode": 15,
+    "masteryScale": 0.04,
+    "maxCost": 2000
+  }
+}

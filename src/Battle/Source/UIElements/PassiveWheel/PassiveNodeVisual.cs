@@ -17,10 +17,24 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// alone — the layout spread moves nodes apart without making any of them bigger.</summary>
         [Export] public float Radius { get; set; } = 6f;
 
+        /// <summary>How far the glow reaches, in document units — always wider than the body, which is
+        /// the whole point of it. Authored beside the radius because the two textures are normalised to
+        /// different sizes and a glow scaled by the body's number would be cropped to the body.</summary>
+        [Export] public float GlowRadius { get; set; } = 12f;
+
+        /// <summary>
+        /// The body texture. Authored at <c>2 × Radius × PassiveWheelStyle.TextureOversample</c> pixels
+        /// and NOT at twice the radius: the wheel zooms in past 1, so a texture the size of the node at
+        /// zoom 1 is stretched by the card at every zoom above it and the player reads a blurred dot. The
+        /// sprite is normalised by the SIZE OF THE TEXTURE rather than by the class, so an artist who
+        /// brings a sharper one changes nothing but the file.
+        /// </summary>
         [Export] public Texture2D? Body { get; set; }
 
         [Export] public Texture2D? BodyTaken { get; set; }
 
+        /// <summary>Authored at <c>2 × GlowRadius × PassiveWheelStyle.TextureOversample</c> pixels, by
+        /// the rule <see cref="Body"/> is authored under.</summary>
         [Export] public Texture2D? Glow { get; set; }
 
         /// <summary>
@@ -30,9 +44,5 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// mass ever needs to animate it moves out the same way.
         /// </summary>
         [Export] public bool HasView { get; set; }
-
-        /// <summary>Whether the node wears its name on the wheel above the label zoom threshold.
-        /// Captions on every small node turn the wheel into noise.</summary>
-        [Export] public bool Labelled { get; set; }
     }
 }

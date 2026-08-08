@@ -108,32 +108,31 @@ namespace Core.PassiveTree.Allocation
         /// planned node from a bought one.</summary>
         public bool IsProjected(string nodeId) => _projection.IsTaken(nodeId);
 
+        /// <summary>What marking the node for return would take with it: the node and everything that
+        /// would be left hanging behind it. Counted FROM THE PLAN, so a tail already marked is not counted
+        /// a second time and the number the player is shown is the one he is charged for.</summary>
+        public IReadOnlyList<string> RefundTailOf(string nodeId) => _projection.RefundClosure(_tree.Tree, nodeId);
+
         /// <summary>
         /// Whether the node can be marked, and why not when it cannot — the tree's own vocabulary, asked
-        /// of the projection. Already-marked nodes answer for free: in <see cref="DraftMode.Take"/> the
-        /// projection already holds one, so it comes back <see cref="AllocationResult.AlreadyTaken"/>,
-        /// and in <see cref="DraftMode.Refund"/> it no longer does, so it comes back
-        /// <see cref="AllocationResult.NotTaken"/>.
+        /// of the projection. In <see cref="DraftMode.Refund"/> the question is about the whole tail the
+        /// mark would take (<see cref="RefundTailOf"/>) and not about the node alone. Already-marked nodes
+        /// answer for free: in <see cref="DraftMode.Take"/> the projection already holds one, so it comes
+        /// back <see cref="AllocationResult.AlreadyTaken"/>, and in <see cref="DraftMode.Refund"/> it no
+        /// longer does, so it comes back <see cref="AllocationResult.NotTaken"/>.
         /// </summary>
         public AllocationResult CanMark(string nodeId) => _mode == DraftMode.Take
             ? _projection.CheckTake(_tree.Tree, nodeId, _tree.TotalPoints)
-            : _projection.CheckRefundAll(_tree.Tree, [nodeId]);
+            : _projection.CheckRefundAll(_tree.Tree, RefundTailOf(nodeId));
 
         /// <summary>
-        /// Puts the node in the plan, or names the reason it cannot go in. A return that would strand a
-        /// branch behind it is REFUSED rather than quietly widened to take the branch with it: every node
-        /// of a respec is paid for, and a mark that tripled the bill without being asked would be a price
-        /// nobody agreed to.
+        /// Puts the node in the plan, or names the reason it cannot go in. A return takes the node
+        /// TOGETHER WITH whatever would be left hanging behind it, marked from the leaves inward so no
+        /// step of the plan strands anything. The size and the price of that tail are named before the
+        /// click, so the widening is not a bill nobody agreed to.
         /// </summary>
-        public AllocationResult Mark(string nodeId)
-        {
-            AllocationResult result = Project(nodeId);
-            if (result != AllocationResult.Success) return result;
-
-            _marked.Add(nodeId);
-            Changed?.Invoke();
-            return result;
-        }
+        public AllocationResult Mark(string nodeId) =>
+            _mode == DraftMode.Take ? MarkOne(nodeId) : MarkPath(RefundTailOf(nodeId));
 
         /// <summary>
         /// Marks a whole route at once — what a click on a node several steps away means. All-or-nothing:
@@ -204,6 +203,18 @@ namespace Core.PassiveTree.Allocation
         public AllocationResult ApplyTakes() => _tree.TakePath(_mode == DraftMode.Take ? _marked : []);
 
         public void Dispose() => _tree.AllocationChanged -= Revalidate;
+
+        /// <summary>One node into the plan — what a purchase mark is, and the step a tail is built out
+        /// of.</summary>
+        private AllocationResult MarkOne(string nodeId)
+        {
+            AllocationResult result = Project(nodeId);
+            if (result != AllocationResult.Success) return result;
+
+            _marked.Add(nodeId);
+            Changed?.Invoke();
+            return result;
+        }
 
         /// <summary>The node's own operation, performed on the projection. One place, so a mark and the
         /// replay behind every other change of the plan cannot come to mean different things.</summary>

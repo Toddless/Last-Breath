@@ -11,7 +11,11 @@ namespace Battle.Source.UIElements.PassiveWheel
     /// complement of the carrier set it is handed, so a node is drawn here or as a scene and never
     /// both — the two are the same one pass over the allocation, not two answers to the same question.
     /// <para>Nothing in here is ever taken: taking a node makes it a carrier by definition, which is
-    /// why the mass never has to pulse, animate or wear a mark.</para>
+    /// why the mass never has to pulse or animate.</para>
+    /// <para>Nor does it know anything about the PLAN. What the plan touches is marked over the whole
+    /// field by <see cref="WheelCursorLayer"/>, so a node wears the same mark whether it is drawn here or
+    /// as a scene, and marking one costs this layer nothing beyond the redraw the carrier set already
+    /// asks for.</para>
     /// </summary>
     [GlobalClass]
     public partial class WheelFieldLayer : Node2D

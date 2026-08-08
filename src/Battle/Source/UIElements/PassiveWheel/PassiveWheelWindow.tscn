@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://bwh3pk2vqx7la"]
 
-[ext_resource type="Script" uid="uid://c1lblpir47xnf" path="res://Source/UIElements/PassiveWheel/PassiveWheelWindow.cs" id="1_window"]
-[ext_resource type="PackedScene" uid="uid://cqv8mz4rt6nd3" path="res://Source/UIElements/PassiveWheel/PassiveWheelCanvas.tscn" id="2_canvas"]
-[ext_resource type="PackedScene" uid="uid://b6ykr3jsvpq0m" path="res://Source/UIElements/PassiveWheel/PassiveNodeCard.tscn" id="3_card"]
-[ext_resource type="PackedScene" uid="uid://dk3fp7ag2wr5h" path="res://Source/UIElements/AbilitySocketPanel.tscn" id="4_sockets"]
-[ext_resource type="PackedScene" uid="uid://cm0ug8yh3ls6n" path="res://Source/UIElements/AugmentTray.tscn" id="5_tray"]
+[ext_resource type="Script" uid="uid://c1lblpir47xnf" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveWheelWindow.cs" id="1_window"]
+[ext_resource type="PackedScene" uid="uid://ctb7pw2knr4qd" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveWheelTopBar.tscn" id="2_topbar"]
+[ext_resource type="PackedScene" uid="uid://cqv8m04rt6nd3" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveWheelCanvas.tscn" id="3_canvas"]
+[ext_resource type="PackedScene" uid="uid://bsp5mq3vhtx2n" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveSummaryPanel.tscn" id="4_summary"]
+[ext_resource type="PackedScene" uid="uid://bcg8rtv5nqm3w" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveCloseGuard.tscn" id="5_guard"]
 
-[node name="PassiveWheelWindow" type="Control" node_paths=PackedStringArray("_canvas", "_card", "_abilityPane", "_sockets", "_tray", "_available", "_spent", "_total", "_hint", "_noPoints", "_waiting", "_respec", "_frame", "_close", "_respecConfirm")]
+[node name="PassiveWheelWindow" type="Control" node_paths=PackedStringArray("_canvas", "_topBar", "_summary", "_hint", "_closeGuard")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,21 +14,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_window")
-_canvas = NodePath("Background/Margin/Split/Left/Canvas")
-_card = NodePath("Background/Margin/Split/Sidebar/Card")
-_abilityPane = NodePath("Background/Margin/Split/Sidebar/AbilityPane")
-_sockets = NodePath("Background/Margin/Split/Sidebar/AbilityPane/Sockets")
-_tray = NodePath("Background/Margin/Split/Sidebar/AbilityPane/Tray")
-_available = NodePath("Background/Margin/Split/Left/Header/Available")
-_spent = NodePath("Background/Margin/Split/Left/Header/Spent")
-_total = NodePath("Background/Margin/Split/Left/Header/Total")
-_hint = NodePath("Background/Margin/Split/Sidebar/Hint")
-_noPoints = NodePath("Background/Margin/Split/Left/Header/NoPoints")
-_waiting = NodePath("Background/Margin/Split/Left/Header/Waiting")
-_respec = NodePath("Background/Margin/Split/Left/Header/RespecBtn")
-_frame = NodePath("Background/Margin/Split/Left/Header/FrameBtn")
-_close = NodePath("Background/Margin/Split/Left/Header/CloseBtn")
-_respecConfirm = NodePath("RespecConfirm")
+_canvas = NodePath("Background/Margin/Layout/Body/Canvas")
+_topBar = NodePath("Background/Margin/Layout/TopBar")
+_summary = NodePath("Background/Margin/Layout/Body/Summary")
+_hint = NodePath("Background/Margin/Layout/Body/Hint")
+_closeGuard = NodePath("Background/Margin/Layout/Body/CloseGuard")
 
 [node name="Background" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -45,141 +35,66 @@ theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="Split" type="HSplitContainer" parent="Background/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Left" type="VBoxContainer" parent="Background/Margin/Split"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="Header" type="HBoxContainer" parent="Background/Margin/Split/Left"]
+[node name="Layout" type="VBoxContainer" parent="Background/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="Background/Margin/Split/Left/Header"]
+[node name="TopBar" parent="Background/Margin/Layout" instance=ExtResource("2_topbar")]
 layout_mode = 2
-theme_type_variation = &"HeaderLabel"
-text = "Passive Tree"
-vertical_alignment = 1
 
-[node name="AvailableCaption" type="Label" parent="Background/Margin/Split/Left/Header"]
-layout_mode = 2
-theme_type_variation = &"DimLabel"
-text = "available"
-vertical_alignment = 1
-
-[node name="Available" type="Label" parent="Background/Margin/Split/Left/Header"]
-custom_minimum_size = Vector2(56, 0)
-layout_mode = 2
-tooltip_text = "Passive points still to spend"
-theme_override_font_sizes/font_size = 26
-text = "0"
-vertical_alignment = 1
-
-[node name="SpentCaption" type="Label" parent="Background/Margin/Split/Left/Header"]
-layout_mode = 2
-theme_type_variation = &"DimLabel"
-text = "spent"
-vertical_alignment = 1
-
-[node name="Spent" type="Label" parent="Background/Margin/Split/Left/Header"]
-custom_minimum_size = Vector2(36, 0)
-layout_mode = 2
-text = "0"
-vertical_alignment = 1
-
-[node name="TotalCaption" type="Label" parent="Background/Margin/Split/Left/Header"]
-layout_mode = 2
-theme_type_variation = &"DimLabel"
-text = "of"
-vertical_alignment = 1
-
-[node name="Total" type="Label" parent="Background/Margin/Split/Left/Header"]
-custom_minimum_size = Vector2(36, 0)
-layout_mode = 2
-text = "0"
-vertical_alignment = 1
-
-[node name="NoPoints" type="Label" parent="Background/Margin/Split/Left/Header"]
-visible = false
-layout_mode = 2
-theme_type_variation = &"DimLabel"
-vertical_alignment = 1
-
-[node name="Waiting" type="Label" parent="Background/Margin/Split/Left/Header"]
-visible = false
-layout_mode = 2
-theme_type_variation = &"DimLabel"
-tooltip_text = "Augments left in slots no node backs any more. They can only be taken out."
-vertical_alignment = 1
-
-[node name="Spacer" type="Control" parent="Background/Margin/Split/Left/Header"]
+[node name="Body" type="Control" parent="Background/Margin/Layout"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Canvas" parent="Background/Margin/Layout/Body" instance=ExtResource("3_canvas")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Summary" parent="Background/Margin/Layout/Body" instance=ExtResource("4_summary")]
+visible = false
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -480.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Hint" type="Label" parent="Background/Margin/Layout/Body"]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -56.0
+offset_right = -496.0
+grow_horizontal = 2
+grow_vertical = 0
 mouse_filter = 2
-
-[node name="FrameBtn" type="Button" parent="Background/Margin/Split/Left/Header"]
-layout_mode = 2
-focus_mode = 0
-tooltip_text = "Fit the whole tree on screen (F)"
-text = "Fit"
-
-[node name="RespecBtn" type="Button" parent="Background/Margin/Split/Left/Header"]
-layout_mode = 2
-focus_mode = 0
-text = "Respec"
-
-[node name="CloseBtn" type="Button" parent="Background/Margin/Split/Left/Header"]
-custom_minimum_size = Vector2(36, 36)
-layout_mode = 2
-focus_mode = 0
-text = "X"
-
-[node name="Canvas" parent="Background/Margin/Split/Left" instance=ExtResource("2_canvas")]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Sidebar" type="VBoxContainer" parent="Background/Margin/Split"]
-custom_minimum_size = Vector2(360, 0)
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 10
-
-[node name="Card" parent="Background/Margin/Split/Sidebar" instance=ExtResource("3_card")]
-layout_mode = 2
-
-[node name="AbilityPane" type="VBoxContainer" parent="Background/Margin/Split/Sidebar"]
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="SocketsCaption" type="Label" parent="Background/Margin/Split/Sidebar/AbilityPane"]
-layout_mode = 2
-theme_type_variation = &"HeaderLabel"
-text = "Augment sockets"
-
-[node name="Sockets" parent="Background/Margin/Split/Sidebar/AbilityPane" instance=ExtResource("4_sockets")]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="Tray" parent="Background/Margin/Split/Sidebar/AbilityPane" instance=ExtResource("5_tray")]
-custom_minimum_size = Vector2(300, 200)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Hint" type="Label" parent="Background/Margin/Split/Sidebar"]
-visible = false
-layout_mode = 2
 theme_type_variation = &"DimLabel"
 autowrap_mode = 3
+vertical_alignment = 2
 
-[node name="RespecConfirm" type="ConfirmationDialog" parent="."]
-title = "Respec"
-size = Vector2i(420, 170)
+[node name="CloseGuard" parent="Background/Margin/Layout/Body" instance=ExtResource("5_guard")]
 visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -230.0
+offset_top = -95.0
+offset_right = 230.0
+offset_bottom = 95.0
+grow_horizontal = 2
+grow_vertical = 2

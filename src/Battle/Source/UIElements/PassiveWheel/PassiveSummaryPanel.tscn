@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://bsp5mq3vhtx2n"]
+
+[ext_resource type="Script" uid="uid://p8phv1fap2t5" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveSummaryPanel.cs" id="1_summary"]
+[ext_resource type="PackedScene" uid="uid://dsr6knc4mfp8t" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveSummaryRow.tscn" id="2_row"]
+
+[node name="PassiveSummaryPanel" type="PanelContainer" node_paths=PackedStringArray("_title", "_empty", "_planned", "_conditional", "_unlocksCaption", "_parametersCaption", "_knobsCaption", "_keystonesCaption", "_unlocks", "_parameters", "_knobs", "_keystones")]
+custom_minimum_size = Vector2(480, 0)
+offset_right = 480.0
+offset_bottom = 640.0
+script = ExtResource("1_summary")
+_title = NodePath("Margin/Layout/Title")
+_empty = NodePath("Margin/Layout/Empty")
+_planned = NodePath("Margin/Layout/Planned")
+_conditional = NodePath("Margin/Layout/Conditional")
+_unlocksCaption = NodePath("Margin/Layout/Scroll/Sections/UnlocksCaption")
+_parametersCaption = NodePath("Margin/Layout/Scroll/Sections/ParametersCaption")
+_knobsCaption = NodePath("Margin/Layout/Scroll/Sections/KnobsCaption")
+_keystonesCaption = NodePath("Margin/Layout/Scroll/Sections/KeystonesCaption")
+_unlocks = NodePath("Margin/Layout/Scroll/Sections/Unlocks")
+_parameters = NodePath("Margin/Layout/Scroll/Sections/Parameters")
+_knobs = NodePath("Margin/Layout/Scroll/Sections/Knobs")
+_keystones = NodePath("Margin/Layout/Scroll/Sections/Keystones")
+_rowScene = ExtResource("2_row")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="Layout" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Margin/Layout"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+
+[node name="Empty" type="Label" parent="Margin/Layout"]
+visible = false
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+autowrap_mode = 3
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Sections" type="VBoxContainer" parent="Margin/Layout/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="UnlocksCaption" type="Label" parent="Margin/Layout/Scroll/Sections"]
+visible = false
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+
+[node name="Unlocks" type="VBoxContainer" parent="Margin/Layout/Scroll/Sections"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ParametersCaption" type="Label" parent="Margin/Layout/Scroll/Sections"]
+visible = false
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+
+[node name="Parameters" type="VBoxContainer" parent="Margin/Layout/Scroll/Sections"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="KnobsCaption" type="Label" parent="Margin/Layout/Scroll/Sections"]
+visible = false
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+
+[node name="Knobs" type="VBoxContainer" parent="Margin/Layout/Scroll/Sections"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="KeystonesCaption" type="Label" parent="Margin/Layout/Scroll/Sections"]
+visible = false
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+
+[node name="Keystones" type="VBoxContainer" parent="Margin/Layout/Scroll/Sections"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Planned" type="Label" parent="Margin/Layout"]
+visible = false
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Conditional" type="Label" parent="Margin/Layout"]
+visible = false
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+autowrap_mode = 3

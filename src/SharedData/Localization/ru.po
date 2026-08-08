@@ -1370,6 +1370,12 @@ msgstr[0] "выпад"
 msgstr[1] "выпада"
 msgstr[2] "выпадов"
 
+msgid "point"
+msgid_plural "points"
+msgstr[0] "очко"
+msgstr[1] "очка"
+msgstr[2] "очков"
+
 msgid "Ability_Poison_Coating"
 msgstr "Ядовитое покрытие"
 
@@ -3593,4 +3599,263 @@ msgid "UI_Inventory_Missing_Items"
 msgstr ""
 
 msgid "UI_Exhaustion"
+msgstr ""
+
+# -----------------------
+# Passive tree and augments
+# -----------------------
+
+msgid "UI_PassiveTree_Title"
+msgstr ""
+
+msgid "UI_PassiveTree_Points_Caption"
+msgstr ""
+
+msgid "UI_PassiveTree_Spent_Caption"
+msgstr ""
+
+msgid "UI_PassiveTree_Total_Caption"
+msgstr ""
+
+msgid "UI_PassiveTree_Points_Delta_Take"
+msgstr ""
+
+msgid "UI_PassiveTree_Points_Delta_Refund"
+msgstr ""
+
+msgid "UI_PassiveTree_NoPoints"
+msgstr ""
+
+msgid "UI_PassiveTree_AugmentsWaiting"
+msgstr ""
+
+msgid "UI_PassiveTree_Cost_Path"
+msgstr "Вся дорога сюда — {points|point|points}"
+
+msgid "UI_PassiveTree_Apply_Take"
+msgstr ""
+
+msgid "UI_PassiveTree_Apply_Refund"
+msgstr ""
+
+msgid "UI_PassiveTree_Apply_Empty"
+msgstr ""
+
+msgid "UI_PassiveTree_Cancel"
+msgstr ""
+
+msgid "UI_PassiveTree_Respec_Mode"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Toggle"
+msgstr ""
+
+msgid "UI_PassiveTree_Frame"
+msgstr ""
+
+msgid "UI_PassiveTree_Close"
+msgstr ""
+
+msgid "UI_PassiveTree_ModeCleared"
+msgstr ""
+
+msgid "UI_PassiveTree_RefundNeedsButton"
+msgstr ""
+
+msgid "UI_PassiveTree_UnmarkedAlso"
+msgstr ""
+
+msgid "UI_PassiveTree_NotEnoughGold"
+msgstr ""
+
+msgid "UI_PassiveTree_RespecDone"
+msgstr ""
+
+msgid "UI_PassiveTree_RefundTail"
+msgstr ""
+
+msgid "UI_PassiveTree_RefundPrice"
+msgstr ""
+
+msgid "UI_PassiveTree_StrandedAugments"
+msgstr ""
+
+msgid "UI_PassiveTree_Slots_Caption"
+msgstr ""
+
+msgid "UI_PassiveTree_Slot_Open"
+msgstr ""
+
+msgid "UI_PassiveTree_Slot_Filled"
+msgstr ""
+
+msgid "UI_PassiveTree_Slot_Held"
+msgstr ""
+
+msgid "UI_PassiveTree_Slot_Unopened"
+msgstr ""
+
+msgid "UI_PassiveTree_Socket_NotOpened"
+msgstr ""
+
+msgid "UI_PassiveTree_Socket_PlannedRefund"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Title"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Empty"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Planned"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Conditional"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Unlocks"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Parameters"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Knobs"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Keystones"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Col_Flat"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Col_Increase"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Col_More"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Col_Total"
+msgstr ""
+
+msgid "UI_PassiveTree_Close_Title"
+msgstr ""
+
+msgid "UI_PassiveTree_Close_Take"
+msgstr ""
+
+msgid "UI_PassiveTree_Close_Refund"
+msgstr ""
+
+msgid "UI_PassiveTree_Close_Apply"
+msgstr ""
+
+msgid "UI_PassiveTree_Close_Discard"
+msgstr ""
+
+msgid "UI_PassiveTree_Close_Stay"
+msgstr ""
+
+msgid "UI_PassiveTree_Kind_Small"
+msgstr ""
+
+msgid "UI_PassiveTree_Kind_Notable"
+msgstr ""
+
+msgid "UI_PassiveTree_Kind_Keystone"
+msgstr ""
+
+msgid "UI_PassiveTree_Kind_AbilityUnlock"
+msgstr ""
+
+msgid "UI_PassiveTree_Kind_SocketTier2"
+msgstr ""
+
+msgid "UI_PassiveTree_Kind_SocketTier3"
+msgstr ""
+
+msgid "UI_PassiveTree_Kind_Start"
+msgstr ""
+
+msgid "UI_PassiveTree_Refused_UnknownNode"
+msgstr ""
+
+msgid "UI_PassiveTree_Refused_AlreadyTaken"
+msgstr ""
+
+msgid "UI_PassiveTree_Refused_NotTaken"
+msgstr ""
+
+msgid "UI_PassiveTree_Refused_Granted"
+msgstr ""
+
+msgid "UI_PassiveTree_Refused_NotEnoughPoints"
+msgstr ""
+
+msgid "UI_PassiveTree_Refused_NotConnected"
+msgstr ""
+
+msgid "UI_PassiveTree_Refused_WouldOrphan"
+msgstr ""
+
+msgid "UI_PassiveTree_Refused_Unlinked"
+msgstr ""
+
+msgid "UI_PassiveTree_Refund_UnknownNode"
+msgstr ""
+
+msgid "UI_PassiveTree_Refund_AlreadyTaken"
+msgstr ""
+
+msgid "UI_PassiveTree_Refund_NotTaken"
+msgstr ""
+
+msgid "UI_PassiveTree_Refund_Granted"
+msgstr ""
+
+msgid "UI_PassiveTree_Refund_NotEnoughPoints"
+msgstr ""
+
+msgid "UI_PassiveTree_Refund_NotConnected"
+msgstr ""
+
+msgid "UI_PassiveTree_Refund_WouldOrphan"
+msgstr ""
+
+msgid "UI_Augment_Refused_AugmentNotHeld"
+msgstr ""
+
+msgid "UI_Augment_Refused_NoSuchSocket"
+msgstr ""
+
+msgid "UI_Augment_Refused_SocketClosed"
+msgstr ""
+
+msgid "UI_Augment_Refused_SocketOccupied"
+msgstr ""
+
+msgid "UI_Augment_Refused_TierAboveSocket"
+msgstr ""
+
+msgid "UI_Augment_Refused_BoundToAnotherAbility"
+msgstr ""
+
+msgid "UI_Augment_Refused_NoSharedTag"
+msgstr ""
+
+msgid "UI_Augment_Refused_ExclusionGroupTaken"
+msgstr ""
+
+msgid "UI_Augment_Refused_ContradictoryDeclaration"
+msgstr ""
+
+msgid "UI_Augment_Refused_UnknownRecord"
+msgstr ""
+
+msgid "UI_Augment_Extract_NothingToExtract"
+msgstr ""
+
+msgid "UI_Augment_Extract_NoBagRoom"
+msgstr ""
+
+msgid "UI_Augment_Extract_CannotBeHeld"
 msgstr ""

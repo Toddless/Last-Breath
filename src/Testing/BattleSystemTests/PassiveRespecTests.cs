@@ -1,6 +1,7 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source.RequestHandlers;
+    using Battle.Source.UIElements.PassiveWheel;
     using Core.Battle;
     using Core.Data.GameData;
     using Core.Enums;
@@ -144,6 +145,62 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(4000, provider.PriceOf(4, 0), "the catalog did not reach the formula");
             Assert.AreNotEqual(shipped, provider.PriceOf(4, 0));
+        }
+
+        /// <summary>
+        /// The number the screen prints and the number the gate takes are the same number, and the screen
+        /// reaches it through one reading of its own (<see cref="PassiveRespecQuotes"/>). A second
+        /// arithmetic anywhere on the way to the button is a price the player agreed to and did not pay.
+        /// </summary>
+        [TestMethod]
+        public void TheScreenQuotesExactlyWhatTheGateCharges()
+        {
+            Bench bench = Bench.WithChainTaken(gold: 10_000);
+            bench.Mastery.AddExperience(20_000);
+            var quotes = new PassiveRespecQuotes(Pricing(), bench.Mastery, bench.Wallet);
+
+            RespecQuote quote = quotes.Quote(2);
+            Assert.IsTrue(quote.Affordable, "the fixture must be able to afford what it is about to buy");
+
+            RespecResult result = bench.Respec(Third, Second);
+
+            Assert.IsTrue(result.Refunded);
+            Assert.AreEqual(quote.Gold, result.GoldSpent, "the button and the till disagree");
+        }
+
+        /// <summary>An empty purse is reported by the quote before the click, so the confirmation can be
+        /// shut with the reason named instead of being sent to the gate to fail.</summary>
+        [TestMethod]
+        public void AQuoteSaysWhetherThePurseCoversIt()
+        {
+            Bench bench = Bench.WithChainTaken(gold: 0);
+            var quotes = new PassiveRespecQuotes(Pricing(), bench.Mastery, bench.Wallet);
+
+            Assert.IsFalse(quotes.Quote(2).Affordable);
+
+            bench.Wallet.Add(quotes.Quote(2).Gold);
+
+            Assert.IsTrue(quotes.Quote(2).Affordable);
+            Assert.IsFalse(new PassiveRespecQuotes(null, null, null).CanCharge,
+                "a build with no purse behind it quoted a price it could charge");
+        }
+
+        /// <summary>The shipped file is what the game charges by. Its absence was invisible — the code
+        /// defaults matched it — so what is pinned is that the file PARSES and prices the same, which is
+        /// the only way a typo in it would ever be noticed.</summary>
+        [TestMethod]
+        public void TheShippedRulesFileIsReadAndPricesWhatTheCodeDefaultsTo()
+        {
+            string path = Path.Combine(SharedData.Catalog(DataCatalog.PassiveTreeRules), "PassiveTreeRules.json");
+            Assert.IsTrue(File.Exists(path), $"the shipped passive tree rules are missing at {path}");
+
+            var shipped = new PassiveTreeRulesProvider();
+            shipped.Apply(DataCatalog.PassiveTreeRules, new GameDataFile(Path.GetFileName(path), File.ReadAllText(path)));
+
+            IPassiveRespecPricing defaults = Pricing();
+            foreach ((int nodes, int level) in new[] { (1, 0), (4, 12), (40, 50), (10_000, 50) })
+                Assert.AreEqual(defaults.PriceOf(nodes, level), shipped.PriceOf(nodes, level),
+                    $"the shipped file prices {nodes} nodes at level {level} differently from the code it mirrors");
         }
 
         private static IPassiveRespecPricing Pricing() => new PassiveTreeRulesProvider();
