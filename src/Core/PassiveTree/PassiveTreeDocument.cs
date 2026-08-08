@@ -192,6 +192,7 @@ namespace Core.PassiveTree
             foreach (PassiveNode node in _nodes)
             {
                 NodeKindRule rule = NodeKindRules.For(node.Kind);
+                bool hub = NodeKindRules.IsWheelHub(node);
 
                 // Both channels count against one limit: a line is content whichever road it takes to
                 // the fighter, and counting only the parametric ones would let a node carry a second
@@ -202,19 +203,27 @@ namespace Core.PassiveTree
                 if (node.LineCount > rule.MaxModifiers)
                     issues.Add($"{node.Id}: {node.Kind} allows at most {rule.MaxModifiers} modifier line(s), has {node.LineCount}");
 
-                if (rule.RequiresAbility && string.IsNullOrWhiteSpace(node.AbilityId))
+                // The hub is the one start that opens no stance, so it is also the one start with no
+                // ability to open: what a stance is given at its seed, the centre of the wheel is not.
+                if (rule.RequiresAbility && !hub && string.IsNullOrWhiteSpace(node.AbilityId))
                     issues.Add($"{node.Id}: {node.Kind} must reference an ability");
 
-                if (node.Kind == PassiveNodeKind.Start && node.Stance is null)
-                    issues.Add($"{node.Id}: a start point must belong to a stance");
+                if (hub && !string.IsNullOrWhiteSpace(node.AbilityId))
+                    issues.Add($"{node.Id}: the wheel hub belongs to no stance, so the ability it names would be handed to every character for free, outside any stance");
 
                 if (node.Kind != PassiveNodeKind.Start && _adjacency[node.Id].Count == 0)
                     issues.Add($"{node.Id}: not connected to anything");
             }
 
-            int startCount = _nodes.Count(node => node.Kind == PassiveNodeKind.Start);
-            if (_nodes.Count > 0 && startCount != StartPointCount)
-                issues.Add($"the tree has {startCount} start point(s), the design calls for {StartPointCount}");
+            int seedCount = _nodes.Count(NodeKindRules.IsStanceSeed);
+            if (_nodes.Count > 0 && seedCount != StartPointCount)
+                issues.Add($"the tree has {seedCount} stance start point(s), the design calls for {StartPointCount}");
+
+            // More than one centre is a wheel with more than one middle: every extra hub is another root
+            // granted with the character, and the rays would hang off whichever one the author forgot.
+            int hubCount = _nodes.Count(NodeKindRules.IsWheelHub);
+            if (hubCount > 1)
+                issues.Add($"the tree has {hubCount} wheel hub(s) — start points without a stance — and the wheel has one centre");
 
             return issues;
         }

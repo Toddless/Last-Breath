@@ -43,6 +43,22 @@ namespace Core.PassiveTree
         public static bool CostsPoint(PassiveNodeKind kind) => kind != PassiveNodeKind.Start;
 
         /// <summary>
+        /// The neutral centre of the wheel: a start belonging to no stance, sitting where the stance
+        /// seeds meet so every ray hangs off one point. It is a start because that is what the layout
+        /// needs — free with the character and a root the rest of the tree grows from — and not a
+        /// fourth seed: it belongs to nobody, so it hands out no ability and is not one of the
+        /// <see cref="PassiveTreeDocument.StartPointCount"/> stance seeds the design counts.
+        /// <para>Whoever asks whether a node is the hub asks it here. The class alone cannot answer —
+        /// the hub and a seed are the same class in the file — so a second reading of "no stance" is a
+        /// second answer.</para>
+        /// </summary>
+        public static bool IsWheelHub(PassiveNode node) => node.Kind == PassiveNodeKind.Start && node.Stance is null;
+
+        /// <summary>A start that opens a stance: the seed one ray of the wheel begins at. Exactly the
+        /// starts that are not the hub, so the two readings can never overlap or leave a gap.</summary>
+        public static bool IsStanceSeed(PassiveNode node) => node.Kind == PassiveNodeKind.Start && !IsWheelHub(node);
+
+        /// <summary>
         /// Which tier of augment slot taking the node opens, or <see cref="NoSocket"/> for the classes
         /// that open none. A total answer from the table rather than a switch with an unreachable arm:
         /// the tier is a number the socket carries, so a class opening a tier the game has not used
