@@ -79,12 +79,27 @@ namespace Core.Data.NpcData
         [JsonProperty("canTalk")] public bool CanTalk { get; init; }
     }
 
-    /// <summary>The "lifecycle" section — maps 1:1 to Core.Ai.World.NpcLifecycleConfig.</summary>
+    /// <summary>
+    /// The "lifecycle" section: WHICH post-defeat cycle the NPC lives by plus the numbers of that
+    /// cycle. Each kind reads its own timer fields — the two cycles end differently, so one pair of
+    /// names could only lie about one of them. Fields of the kind not chosen are simply not read.
+    /// </summary>
     public record NpcLifecycleData
     {
+        /// <summary>Cycle name (<see cref="NpcLifecycleKind"/>). Absent = <see cref="NpcLifecycleKind.Undead"/>,
+        /// so every record authored before the villager cycle existed keeps its old fate; a typo is
+        /// refused, never silently defaulted.</summary>
+        [JsonProperty("kind")] public string? Kind { get; init; }
+
+        /// <summary>Undead cycle only — maps 1:1 to Core.Ai.World.NpcLifecycleConfig.</summary>
         [JsonProperty("resurrectMinSeconds")] public float ResurrectMinSeconds { get; init; } = 60f;
         [JsonProperty("resurrectMaxSeconds")] public float ResurrectMaxSeconds { get; init; } = 600f;
         [JsonProperty("maxStrengthBonus")] public float MaxStrengthBonus { get; init; } = 1f;
+
+        /// <summary>Villager cycle only — maps 1:1 to Core.Ai.World.VillagerLifecycleConfig. Named
+        /// "recover" and not "resurrect": the body gets up ALIVE, nothing is resurrected.</summary>
+        [JsonProperty("recoverMinSeconds")] public float RecoverMinSeconds { get; init; } = 30f;
+        [JsonProperty("recoverMaxSeconds")] public float RecoverMaxSeconds { get; init; } = 180f;
     }
 
     /// <summary>The "world" section of an NPC definition — maps 1:1 to Core.Ai.World.WorldBrainConfig.</summary>

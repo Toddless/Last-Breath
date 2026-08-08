@@ -74,7 +74,9 @@ namespace Core.Entity
                 Abilities = stages.Count > 0 ? [] : PickAbilities(data, behaviorData, entityType),
                 Behavior = BuildProfile(behaviorData, EnumParser.ParseEnum<AiIntellect>(data.AiIntellect), data.FleeHealthThreshold, data.AbilityBehaviors),
                 World = BuildWorldConfig(data.World),
+                LifecycleKind = ParseLifecycleKind(data.Lifecycle),
                 Lifecycle = BuildLifecycleConfig(data.Lifecycle),
+                VillagerLifecycle = BuildVillagerLifecycleConfig(data.Lifecycle),
                 CanTalk = data.Interaction?.CanTalk ?? false,
                 Reactions = NpcReactionParser.Parse(data.Id, data.Reactions),
                 Passives = data.Passives,
@@ -82,11 +84,23 @@ namespace Core.Entity
             };
         }
 
+        /// <summary>Which post-defeat cycle the record chose. No section or no "kind" = the undead
+        /// cycle every NPC had before the villager one existed; a typo is refused like any other
+        /// enum of the file, so a villager can never quietly become a rising undead.</summary>
+        private static NpcLifecycleKind ParseLifecycleKind(NpcLifecycleData? data) =>
+            EnumParser.ParseEnumOrDefault<NpcLifecycleKind>(data?.Kind);
+
         private static NpcLifecycleConfig BuildLifecycleConfig(NpcLifecycleData? data) => data == null ? new NpcLifecycleConfig() : new NpcLifecycleConfig
         {
             ResurrectMinSeconds = data.ResurrectMinSeconds,
             ResurrectMaxSeconds = data.ResurrectMaxSeconds,
             MaxStrengthBonus = data.MaxStrengthBonus,
+        };
+
+        private static VillagerLifecycleConfig BuildVillagerLifecycleConfig(NpcLifecycleData? data) => data == null ? new VillagerLifecycleConfig() : new VillagerLifecycleConfig
+        {
+            RecoverMinSeconds = data.RecoverMinSeconds,
+            RecoverMaxSeconds = data.RecoverMaxSeconds,
         };
 
         private static WorldBrainConfig? BuildWorldConfig(NpcWorldData? data) => data == null ? null : new WorldBrainConfig

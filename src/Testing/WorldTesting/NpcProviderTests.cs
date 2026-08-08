@@ -115,6 +115,87 @@ namespace LastBreathTest.WorldTesting
         }
 
         [TestMethod]
+        public void LifecycleWithoutAKind_StaysTheUndeadCycleWithItsOldNumbers()
+        {
+            var lifecycle = new NpcLifecycleData { ResurrectMinSeconds = 20f, ResurrectMaxSeconds = 90f, MaxStrengthBonus = 0.5f };
+            var provider = LoadedProvider(Npc() with { Lifecycle = lifecycle });
+
+            var definition = provider.CreateDefinition(TestNpcId);
+
+            Assert.AreEqual(NpcLifecycleKind.Undead, definition.LifecycleKind, "a section naming no kind must keep the old fate");
+            Assert.AreEqual(20f, definition.Lifecycle.ResurrectMinSeconds);
+            Assert.AreEqual(90f, definition.Lifecycle.ResurrectMaxSeconds);
+            Assert.AreEqual(0.5f, definition.Lifecycle.MaxStrengthBonus);
+        }
+
+        [TestMethod]
+        public void NoLifecycleSectionAtAll_StaysTheUndeadCycleWithTheDesignDefaults()
+        {
+            var provider = LoadedProvider(Npc());
+
+            var definition = provider.CreateDefinition(TestNpcId);
+            var defaults = new NpcLifecycleConfig();
+
+            Assert.AreEqual(NpcLifecycleKind.Undead, definition.LifecycleKind);
+            Assert.AreEqual(defaults.ResurrectMinSeconds, definition.Lifecycle.ResurrectMinSeconds);
+            Assert.AreEqual(defaults.ResurrectMaxSeconds, definition.Lifecycle.ResurrectMaxSeconds);
+            Assert.AreEqual(defaults.MaxStrengthBonus, definition.Lifecycle.MaxStrengthBonus);
+        }
+
+        [TestMethod]
+        public void VillagerKind_CarriesTheVillagerCycleAndItsOwnTimers()
+        {
+            var lifecycle = new NpcLifecycleData
+            {
+                Kind = nameof(NpcLifecycleKind.Villager),
+                RecoverMinSeconds = 5f,
+                RecoverMaxSeconds = 9f,
+            };
+            var provider = LoadedProvider(Npc() with { Lifecycle = lifecycle });
+
+            var definition = provider.CreateDefinition(TestNpcId);
+
+            Assert.AreEqual(NpcLifecycleKind.Villager, definition.LifecycleKind);
+            Assert.AreEqual(5f, definition.VillagerLifecycle.RecoverMinSeconds, "the villager reads its own recovery timers");
+            Assert.AreEqual(9f, definition.VillagerLifecycle.RecoverMaxSeconds);
+        }
+
+        [TestMethod]
+        public void VillagerWithoutTimers_TakesTheVillagerDefaults_NotTheUndeadOnes()
+        {
+            var provider = LoadedProvider(Npc() with { Lifecycle = new NpcLifecycleData { Kind = nameof(NpcLifecycleKind.Villager) } });
+
+            var definition = provider.CreateDefinition(TestNpcId);
+            var defaults = new VillagerLifecycleConfig();
+
+            Assert.AreEqual(NpcLifecycleKind.Villager, definition.LifecycleKind);
+            Assert.AreEqual(defaults.RecoverMinSeconds, definition.VillagerLifecycle.RecoverMinSeconds);
+            Assert.AreEqual(defaults.RecoverMaxSeconds, definition.VillagerLifecycle.RecoverMaxSeconds);
+        }
+
+        [TestMethod]
+        public void MisspelledLifecycleKind_IsRefused_NotSilentlyUndead()
+        {
+            var provider = LoadedProvider(Npc() with { Lifecycle = new NpcLifecycleData { Kind = "Vilager" } });
+
+            Assert.ThrowsException<FormatException>(() => provider.CreateDefinition(TestNpcId));
+        }
+
+        /// <summary>The shipped records predate the villager cycle: none of them names a kind, and every
+        /// one of them must still come out of the provider on the undead cycle it always had.</summary>
+        [TestMethod]
+        public void ShippedRecordsNamingNoKind_KeepTheUndeadCycle()
+        {
+            var provider = CreateProvider(ShippedAbilityIds());
+            provider.Apply(DataCatalog.Npc, ShippedFile(DataCatalog.Npc, "Npc.json"));
+            provider.Apply(DataCatalog.NpcBehaviors, ShippedFile(DataCatalog.NpcBehaviors, "NpcBehavior.json"));
+            var shipped = JsonConvert.DeserializeObject<NpcsData>(ShippedFile(DataCatalog.Npc, "Npc.json").Json)!;
+
+            foreach (var npc in shipped.Npcs.Where(npc => string.IsNullOrEmpty(npc.Lifecycle?.Kind)))
+                Assert.AreEqual(NpcLifecycleKind.Undead, provider.CreateDefinition(npc.Id).LifecycleKind, $"'{npc.Id}' changed its post-defeat fate");
+        }
+
+        [TestMethod]
         public void AuthoredRarity_BeatsTheWeightedRoll()
         {
             var provider = LoadedProvider(Npc() with { Rarity = nameof(Rarity.Mythic) });

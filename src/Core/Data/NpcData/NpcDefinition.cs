@@ -7,6 +7,21 @@ namespace Core.Data.NpcData
     using Enums;
 
     /// <summary>
+    /// Which post-defeat cycle an NPC lives by. The choice travels as this enum and not as the
+    /// authored string, so the wiring builds the cycle class by a switch and never by comparing text.
+    /// <see cref="Undead"/> is the default member on purpose: a record that names no kind gets the
+    /// only cycle that existed before the villager one.
+    /// </summary>
+    public enum NpcLifecycleKind : byte
+    {
+        /// <summary>Core.Ai.World.NpcLifecycle: the body rises AS UNDEAD, stronger the longer it lay.</summary>
+        Undead,
+
+        /// <summary>Core.Ai.World.VillagerLifecycle: the body gets up ALIVE, same faction, no strength gained.</summary>
+        Villager
+    }
+
+    /// <summary>
     /// A fully rolled NPC ready to be applied to an entity: the provider resolved the stance,
     /// level, rarity, ability instances and behavior; parameters are already level-scaled.
     /// </summary>
@@ -39,8 +54,16 @@ namespace Core.Data.NpcData
         /// <summary>World-mode brain tuning; null = the NPC stands still like before.</summary>
         public Ai.World.WorldBrainConfig? World { get; init; }
 
-        /// <summary>Post-defeat rules (resurrection/burning). Always present — defaults if not authored.</summary>
+        /// <summary>Which post-defeat cycle to build; the config of the other kind is inert, never null,
+        /// so the wiring switches on this and hands over a config without a null check of its own.</summary>
+        public NpcLifecycleKind LifecycleKind { get; init; }
+
+        /// <summary>Numbers of the UNDEAD cycle (resurrection/burning). Always present — defaults if not authored.</summary>
         public required Ai.World.NpcLifecycleConfig Lifecycle { get; init; }
+
+        /// <summary>Numbers of the VILLAGER cycle (recovery timer). Always present — defaults if not
+        /// authored; read only when <see cref="LifecycleKind"/> is <see cref="NpcLifecycleKind.Villager"/>.</summary>
+        public Ai.World.VillagerLifecycleConfig VillagerLifecycle { get; init; } = new();
 
         /// <summary>Species capability, not state: whether this kind of NPC converses at all.</summary>
         public bool CanTalk { get; init; }
