@@ -20,14 +20,6 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class PassiveTreeServiceTests
     {
-        /// <summary>A chain hanging off the seed: the third node is only reachable through the second.</summary>
-        private const string FirstNode = "small_dex_strength_1";
-        private const string SecondNode = "small_dex_strength_2";
-        private const string ThirdNode = "small_dex_strength_3";
-
-        /// <summary>Flat Strength carried by every node of the chain above.</summary>
-        private const float ChainStrengthPerNode = 2f;
-
         private const float BaseStrength = 10f;
 
         /// <summary>Flat Strength carried by the one gated line the fixtures below hang on a node.</summary>
@@ -40,13 +32,14 @@ namespace LastBreathTest.BattleSystemTests
         {
             var fighter = new Fighter();
             IPassiveTreeService service = ShippedService(points: 5);
+            NodeChain chain = Chain(service);
             fighter.Modifiers.RegisterSource(service.ParameterSource);
             fighter.Parameters.SetBaseValueForParameter(EntityParameter.Strength, BaseStrength);
 
-            Assert.AreEqual(AllocationResult.Success, service.Take(FirstNode));
-            Assert.AreEqual(BaseStrength + ChainStrengthPerNode, fighter[EntityParameter.Strength], 0f);
+            Assert.AreEqual(AllocationResult.Success, service.Take(chain.First));
+            Assert.AreEqual(BaseStrength + chain.FirstStrength, fighter[EntityParameter.Strength], 0f);
 
-            Assert.AreEqual(AllocationResult.Success, service.Refund(FirstNode));
+            Assert.AreEqual(AllocationResult.Success, service.Refund(chain.First));
             Assert.AreEqual(BaseStrength, fighter[EntityParameter.Strength], 0f, "the refund must land exactly on the base value");
             Assert.AreEqual(0, service.SpentPoints);
         }
@@ -56,6 +49,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             var fighter = new Fighter();
             IPassiveTreeService service = ShippedService(points: 5);
+            NodeChain chain = Chain(service);
             var worn = new StubSource(new SimpleModifier(EntityParameter.Strength, ModifierValueType.Flat, 5f, "TestItem"));
             var loose = new SimpleModifier(EntityParameter.Strength, ModifierValueType.Flat, 3f, "TestBuff");
 
@@ -65,10 +59,10 @@ namespace LastBreathTest.BattleSystemTests
             fighter.Parameters.SetBaseValueForParameter(EntityParameter.Strength, BaseStrength);
             float withoutTree = fighter[EntityParameter.Strength];
 
-            service.Take(FirstNode);
-            Assert.AreEqual(withoutTree + ChainStrengthPerNode, fighter[EntityParameter.Strength], 0f);
+            service.Take(chain.First);
+            Assert.AreEqual(withoutTree + chain.FirstStrength, fighter[EntityParameter.Strength], 0f);
 
-            service.Refund(FirstNode);
+            service.Refund(chain.First);
 
             Assert.AreEqual(withoutTree, fighter[EntityParameter.Strength], 0f, "the refund took more than the node gave");
             Assert.AreEqual(BaseStrength + 5f + 3f, withoutTree, 0f, "the fixture itself lost a contribution");
@@ -85,7 +79,7 @@ namespace LastBreathTest.BattleSystemTests
             IPassiveTreeService service = ShippedService(points: 5);
             fighter.Modifiers.RegisterSource(service.ParameterSource);
 
-            service.Take(FirstNode);
+            service.Take(Chain(service).First);
 
             AssertNothingOfTheTreeIsOwnedBy(fighter.Modifiers);
             Assert.AreEqual(1, TreeLinesFor(fighter, EntityParameter.Strength),
@@ -133,16 +127,18 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void TakingANodeNothingLinksTo_IsRefusedInsteadOfThrowing()
         {
-            IPassiveTreeService service = ShippedService(points: 65);
-            string[] unlinked = service.Tree.Nodes
-                .Where(node => node.Kind != PassiveNodeKind.Start && service.Tree.Neighbours(node.Id).Count == 0)
-                .Select(node => node.Id).ToArray();
+            // The document is built here rather than taken from the markup: a node with no edge is a
+            // defect the author has since cleaned out (the case below holds him to it), and the rule
+            // still has to answer for the day an edit leaves one behind.
+            PassiveTreeDocument document = SeedOnlyTree();
+            document.AddNode(new PassiveNode { Id = UnlinkedNode, Kind = PassiveNodeKind.Small, Stance = Stance.Strength });
+            IPassiveTreeService service = Service(document, points: 5);
 
-            Assert.IsTrue(unlinked.Length > 0,
-                "the shipped tree used to carry unlinked nodes (keystone_4, sockettier2_Increasing_Pressure_2) — this case needs one");
+            Assert.AreEqual(0, service.Tree.Neighbours(UnlinkedNode).Count, "the fixture linked the node the case is about");
 
-            foreach (string id in unlinked)
-                Assert.AreEqual(AllocationResult.NotConnected, service.Take(id), id);
+            Assert.AreEqual(AllocationResult.NotConnected, service.Take(UnlinkedNode));
+            Assert.IsFalse(service.IsTaken(UnlinkedNode));
+            Assert.AreEqual(0, service.SpentPoints, "a refused purchase was charged for");
         }
 
         [TestMethod]
@@ -158,13 +154,14 @@ namespace LastBreathTest.BattleSystemTests
         public void RefundingFromTheMiddleOfAPath_IsRefused_AndFromItsEndPasses()
         {
             IPassiveTreeService service = ShippedService(points: 5);
-            service.Take(FirstNode);
-            service.Take(SecondNode);
-            service.Take(ThirdNode);
+            NodeChain chain = Chain(service);
+            service.Take(chain.First);
+            service.Take(chain.Second);
+            service.Take(chain.Third);
 
-            Assert.AreEqual(AllocationResult.WouldOrphan, service.Refund(SecondNode), "refunding the middle strands the end");
-            Assert.AreEqual(AllocationResult.Success, service.Refund(ThirdNode));
-            Assert.AreEqual(AllocationResult.Success, service.Refund(SecondNode), "the middle becomes an end once the tail is gone");
+            Assert.AreEqual(AllocationResult.WouldOrphan, service.Refund(chain.Second), "refunding the middle strands the end");
+            Assert.AreEqual(AllocationResult.Success, service.Refund(chain.Third));
+            Assert.AreEqual(AllocationResult.Success, service.Refund(chain.Second), "the middle becomes an end once the tail is gone");
             Assert.AreEqual(1, service.SpentPoints);
         }
 
@@ -172,14 +169,15 @@ namespace LastBreathTest.BattleSystemTests
         public void GrantedPoints_CapWhatCanBeTaken()
         {
             IPassiveTreeService service = ShippedService(points: 1);
+            NodeChain chain = Chain(service);
 
-            Assert.AreEqual(AllocationResult.Success, service.Take(FirstNode));
+            Assert.AreEqual(AllocationResult.Success, service.Take(chain.First));
             Assert.AreEqual(0, service.AvailablePoints);
-            Assert.AreEqual(AllocationResult.NotEnoughPoints, service.Take(SecondNode));
+            Assert.AreEqual(AllocationResult.NotEnoughPoints, service.Take(chain.Second));
 
             service.SetTotalPoints(2);
 
-            Assert.AreEqual(AllocationResult.Success, service.Take(SecondNode));
+            Assert.AreEqual(AllocationResult.Success, service.Take(chain.Second));
             Assert.AreEqual(2, service.SpentPoints);
             Assert.AreEqual(0, service.AvailablePoints);
         }
@@ -206,35 +204,47 @@ namespace LastBreathTest.BattleSystemTests
         {
             var fighter = new Fighter();
             IPassiveTreeService service = ShippedService(points: 5);
+            NodeChain chain = Chain(service);
             fighter.Modifiers.RegisterSource(service.ParameterSource);
-            fighter.Parameters.SetBaseValueForParameter(EntityParameter.Strength, BaseStrength);
-            fighter.Parameters.SetBaseValueForParameter(EntityParameter.Dexterity, BaseStrength);
 
-            service.Take(FirstNode);
-            service.Take(SecondNode);
-            service.Take(ThirdNode);
+            foreach (EntityParameter parameter in chain.Parameters)
+                fighter.Parameters.SetBaseValueForParameter(parameter, BaseStrength);
+
+            float[] withoutTree = [.. chain.Parameters.Select(parameter => fighter[parameter])];
+
+            Assert.AreEqual(AllocationResult.Success, service.Take(chain.First));
+            Assert.AreEqual(AllocationResult.Success, service.Take(chain.Second));
+            Assert.AreEqual(AllocationResult.Success, service.Take(chain.Third));
+            Assert.AreEqual(3, service.SpentPoints, "the fixture never bought the chain the respec is about");
+
+            foreach (EntityParameter parameter in chain.Parameters)
+                Assert.IsTrue(TreeLinesFor(fighter, parameter) > 0, $"{parameter} was never touched — the respec has nothing to return");
 
             service.Respec();
 
             Assert.AreEqual(0, service.SpentPoints);
-            Assert.AreEqual(BaseStrength, fighter[EntityParameter.Strength], 0f);
-            Assert.AreEqual(BaseStrength, fighter[EntityParameter.Dexterity], 0f);
-            Assert.AreEqual(0, TreeLinesFor(fighter, EntityParameter.Strength));
-            Assert.AreEqual(0, TreeLinesFor(fighter, EntityParameter.Dexterity));
+
+            for (int index = 0; index < chain.Parameters.Count; index++)
+            {
+                EntityParameter parameter = chain.Parameters[index];
+                Assert.AreEqual(withoutTree[index], fighter[parameter], 0f, $"{parameter} did not land back on its base");
+                Assert.AreEqual(0, TreeLinesFor(fighter, parameter), $"{parameter} kept a line of the tree");
+            }
         }
 
         [TestMethod]
         public void TheTakenSetAnnouncesEveryChange()
         {
             IPassiveTreeService service = ShippedService(points: 5);
+            NodeChain chain = Chain(service);
             Assert.IsTrue(service.TakenNodes.Count > 0, "adopting the loaded document puts the granted seeds in the set");
 
             int changes = 0;
             service.AllocationChanged += () => changes++;
 
-            service.Take(FirstNode);
+            service.Take(chain.First);
             service.Take("no_such_node");
-            service.Refund(FirstNode);
+            service.Refund(chain.First);
             service.Respec();
 
             Assert.AreEqual(3, changes, "a refused request must not announce a change");
@@ -265,16 +275,17 @@ namespace LastBreathTest.BattleSystemTests
         public void CheckTake_GivesTheAnswerWithoutBuying()
         {
             IPassiveTreeService service = ShippedService(points: 1);
+            NodeChain chain = Chain(service);
 
-            Assert.AreEqual(AllocationResult.Success, service.CheckTake(FirstNode));
+            Assert.AreEqual(AllocationResult.Success, service.CheckTake(chain.First));
             Assert.AreEqual(0, service.SpentPoints, "a check must not spend a point");
-            Assert.IsFalse(service.IsTaken(FirstNode), "a check must not take the node");
+            Assert.IsFalse(service.IsTaken(chain.First), "a check must not take the node");
             Assert.AreEqual(AllocationResult.UnknownNode, service.CheckTake("no_such_node"));
 
-            service.Take(FirstNode);
+            service.Take(chain.First);
 
-            Assert.AreEqual(AllocationResult.AlreadyTaken, service.CheckTake(FirstNode));
-            Assert.AreEqual(AllocationResult.NotEnoughPoints, service.CheckTake(SecondNode));
+            Assert.AreEqual(AllocationResult.AlreadyTaken, service.CheckTake(chain.First));
+            Assert.AreEqual(AllocationResult.NotEnoughPoints, service.CheckTake(chain.Second));
         }
 
         [TestMethod]
@@ -283,7 +294,7 @@ namespace LastBreathTest.BattleSystemTests
             // RegisterSource walks AffectedParameters while announcing the source; a handler that ends
             // in another Rebuild would empty the live key set out from under that walk.
             IPassiveTreeService service = ShippedService(points: 5);
-            service.Take(FirstNode);
+            service.Take(Chain(service).First);
             IReadOnlyCollection<EntityParameter> affected = service.ParameterSource.AffectedParameters;
             IEnumerable<IModifierInstance> lines = service.ParameterSource.GetModifiers(EntityParameter.Strength);
 
@@ -303,10 +314,11 @@ namespace LastBreathTest.BattleSystemTests
             // mastery that paid for them already back at zero, so nothing could be bought either.
             var fighter = new Fighter();
             IPassiveTreeService service = ShippedService(points: 5);
+            NodeChain chain = Chain(service);
             fighter.Modifiers.RegisterSource(service.ParameterSource);
             fighter.Parameters.SetBaseValueForParameter(EntityParameter.Strength, BaseStrength);
-            service.Take(FirstNode);
-            service.Take(SecondNode);
+            service.Take(chain.First);
+            service.Take(chain.Second);
 
             int changes = 0;
             service.AllocationChanged += () => changes++;
@@ -327,7 +339,7 @@ namespace LastBreathTest.BattleSystemTests
             // No stand-in for the wiring: the reset has to reach the tree through the container the
             // game builds, not only through a hand-made cast.
             IPassiveTreeService service = ShippedService(points: 5);
-            service.Take(FirstNode);
+            service.Take(Chain(service).First);
 
             var services = new ServiceCollection();
             services.AddSingleton<LoadScope>();
@@ -368,6 +380,88 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsNotNull(service.Tree.Find(SyntheticNode), "the last document that did load must stay in force");
         }
 
+        /// <summary>
+        /// Three nodes of the shipped tree in a row: the first hangs off a granted seed and is the whole
+        /// of what its carrier gets on Strength, and each of the other two is reachable only through the
+        /// one before it. That shape is everything the cases below need — naming ids instead would tie
+        /// them to a corner of a wheel the author redraws whenever he pleases.
+        /// <para><paramref name="Parameters"/> is what the three of them actually reach, read off the
+        /// nodes themselves. A case about giving a contribution back has to name the parameters the
+        /// contribution is made of: naming them by hand would hold whether the chain touched them or not,
+        /// and go quiet the day the author redraws the run onto other stats.</para>
+        /// </summary>
+        private sealed record NodeChain(string First, string Second, string Third, float FirstStrength,
+            IReadOnlyList<EntityParameter> Parameters);
+
+        /// <summary>The chain found in the very document the service serves, so the fixture and the
+        /// subject can never be two different trees.</summary>
+        private static NodeChain Chain(IPassiveTreeService service)
+        {
+            NodeChain? chain = FindChain(service.Tree);
+
+            Assert.IsNotNull(chain,
+                "the shipped tree holds no seed—node—node—node run whose head grants flat Strength: every case about paths needs one");
+
+            return chain;
+        }
+
+        private static NodeChain? FindChain(PassiveTreeDocument tree)
+        {
+            HashSet<string> granted = [.. tree.Nodes.Where(node => !NodeKindRules.CostsPoint(node.Kind)).Select(node => node.Id)];
+
+            foreach (PassiveNode first in tree.Nodes)
+            {
+                if (granted.Contains(first.Id) || !TouchesGranted(tree, granted, first.Id)) continue;
+                if (OnlyFlatStrength(first) is not float strength) continue;
+
+                foreach (string second in tree.Neighbours(first.Id))
+                {
+                    // The middle may not have a road of its own back to a seed, or refunding it would
+                    // strand nobody and the case about orphans would pass on a chain that is not one.
+                    if (granted.Contains(second) || TouchesGranted(tree, granted, second)) continue;
+
+                    foreach (string third in tree.Neighbours(second))
+                        if (third != first.Id && !granted.Contains(third)
+                            && !TouchesGranted(tree, granted, third) && !tree.AreLinked(first.Id, third))
+                            return new NodeChain(first.Id, second, third, strength, ParametersOf(tree, first.Id, second, third));
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>Every parameter a taken run of nodes puts a line on, aggregates already folded into
+        /// the family they stand for. Conditional and flag lines are left out: neither reaches a
+        /// parameter through a fixture with no catalog behind it, so counting them would promise a
+        /// contribution the entity never sees.</summary>
+        private static EntityParameter[] ParametersOf(PassiveTreeDocument tree, params string[] ids) =>
+            [.. ids.Select(tree.Find)
+                .SelectMany(node => node?.Modifiers ?? [])
+                .Where(line => !line.IsConditional && line.ValueType != ModifierValueType.Flag)
+                .SelectMany(line => Reached(line.Parameter))
+                .Distinct()];
+
+        /// <summary>The concrete parameters a line lands on — the aggregate's family where it names one,
+        /// and the parameter itself otherwise.</summary>
+        private static IReadOnlyList<EntityParameter> Reached(EntityParameter parameter) =>
+            AggregateParameters.Members(parameter) is { Count: > 0 } members ? members : [parameter];
+
+        private static bool TouchesGranted(PassiveTreeDocument tree, HashSet<string> granted, string id) =>
+            tree.Neighbours(id).Any(granted.Contains);
+
+        /// <summary>The flat Strength a node hands out, when one unconditional flat line is the whole of
+        /// what it gives that parameter. The cases that count Strength need to know everything reaching
+        /// it — including a line written as the aggregate the family folds back in.</summary>
+        private static float? OnlyFlatStrength(PassiveNode node)
+        {
+            List<ModifierLine> reaching = [.. node.Modifiers.Where(line => Reaches(line.Parameter, EntityParameter.Strength))];
+
+            return reaching is [{ ValueType: ModifierValueType.Flat, IsConditional: false } line] ? line.Value : null;
+        }
+
+        private static bool Reaches(EntityParameter line, EntityParameter parameter) =>
+            line == parameter || AggregateParameters.Members(line).Contains(parameter);
+
         private static string[] SeedsOf(IPassiveTreeService service) =>
             service.Tree.Nodes.Where(node => node.Kind == PassiveNodeKind.Start).Select(node => node.Id).ToArray();
 
@@ -377,6 +471,9 @@ namespace LastBreathTest.BattleSystemTests
         private const string SyntheticNode = "small_1";
 
         private const string SyntheticSeed = "start";
+
+        /// <summary>A node put in the document with no edge at all — the defect the shipped markup no longer has.</summary>
+        private const string UnlinkedNode = "small_unlinked";
 
         private static int TreeLinesFor(Fighter fighter, EntityParameter parameter) =>
             fighter.Modifiers.GetModifiers(parameter).Count(modifier => modifier.Source == PassiveTreeDocument.ModifierSource);

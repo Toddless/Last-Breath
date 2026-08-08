@@ -63,6 +63,24 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void TheShippedTreeLeavesNoNodeNothingLinksTo()
+        {
+            // Reachability is the only way a node is ever bought, so an unlinked one is content the
+            // player cannot get to at any budget — and a shape the wheel draws floating on its own.
+            List<string> issues = [];
+            PassiveTreeDocument tree = PassiveTreeSerializer.Load(ShippedTreePath(), issues);
+
+            PassiveNode[] purchasable = [.. tree.Nodes.Where(node => NodeKindRules.CostsPoint(node.Kind))];
+            string[] unlinked = [.. purchasable.Where(node => tree.Neighbours(node.Id).Count == 0).Select(node => node.Id)];
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            // An absence proves nothing about a document that holds nothing: a tree that failed to load
+            // would answer "no unlinked nodes" the same way a clean one does.
+            Assert.IsTrue(purchasable.Length > 0, "the shipped tree produced no node to check");
+            Assert.AreEqual(0, unlinked.Length, "the shipped tree carries nodes nothing links to: " + string.Join(", ", unlinked));
+        }
+
+        [TestMethod]
         public void EveryConditionTheShippedTreeNamesIsInTheShippedCatalog()
         {
             // A condition is a reference across two hand-written files, and the reader of the tree cannot

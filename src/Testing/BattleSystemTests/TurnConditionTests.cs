@@ -25,6 +25,9 @@ namespace LastBreathTest.BattleSystemTests
     /// inverted form of a tally, so a tally that never fills makes such a line permanent. A predicate with
     /// no turn behind it — out of combat, before the owner's first turn — must therefore be met by nothing,
     /// inverted or not, and every action the family claims to count has to actually be counted.</para>
+    /// <para>The last case is not of this family at all: it is the line the shipped tree hangs on its
+    /// carrier's health. It lives here because this is the family it could be taken for — both come and go
+    /// inside a fight — and what proves it is not one of them is telling it apart from them.</para>
     /// </summary>
     [TestClass]
     public class TurnConditionTests
@@ -37,6 +40,16 @@ namespace LastBreathTest.BattleSystemTests
         private const string WhileOpeningTurns = "Battle_Before_Its_Fourth_Turn";
         private const string WhileDraggingOn = "Battle_From_Its_Fourth_Turn";
         private const int Boundary = 4;
+
+        /// <summary>The gate the shipped tree hangs its conditional lines on: a share of the carrier's health.</summary>
+        private const string LowLifeGate = "Health_Below_30";
+
+        /// <summary>The share of maximum health the gate's id names, and the step taken to either side of
+        /// it: a case that only ever reads a hair above zero would pass on a gate watching any share at all.</summary>
+        private const float LowLifeThreshold = 0.3f;
+
+        private const float LowLifeStep = 0.02f;
+
         private const float MaxHealth = 100f;
         private const float BaseStrength = 10f;
         private const float Grant = 6f;
@@ -376,25 +389,37 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void TheEvasionNodeHoldsItsBonusUntilSomebodySwingsAtTheOwner()
+        public void TheLowLifeNodeHoldsItsBonusOffItsCarrier_AndNotOffHisTurn()
         {
-            // The node grants a flat pile of evasion "until getting an attack", which is a turn-scoped
-            // predicate and nothing else: a line on the owner's health would give the bonus back on a heal
-            // and take it away on a scratch nobody swung.
-            ModifierLine line = EvasionNodeLine();
-            var owner = new ConditionOwner();
-            ICondition condition = Shipped(ShippedCatalog(), line.Condition, owner);
+            // The gated line the shipped tree hangs on its carrier's health, read end to end: the tree
+            // names the gate, the shipped catalog answers it, and the predicate has to arrive with the
+            // state it is named for and leave with it. The turn family is the one it could be confused
+            // with — both come and go inside a fight — and a turn tally in its place would hand the bonus
+            // out at the start of every turn and let a swing nobody healed take it away.
+            Assert.IsTrue(ShippedTreeGatesALineOn(LowLifeGate),
+                $"the shipped tree hangs no line on '{LowLifeGate}' — this case reads the tree's own gate, not one of its own making");
 
-            Assert.IsFalse(condition.IsMet, "the node's bonus counted out of combat");
+            var owner = new ConditionOwner();
+            owner.SetMaximum(EntityParameter.Health, MaxHealth);
+            owner.CurrentHealth = MaxHealth;
+            ICondition condition = Shipped(ShippedCatalog(), LowLifeGate, owner);
+
+            Assert.IsFalse(condition.IsMet, "the node's bonus counted on a carrier at full health");
 
             StartTurn(owner);
-            Assert.IsTrue(condition.IsMet, "the node's bonus was not there at the start of the owner's turn");
+            Assert.IsFalse(condition.IsMet, "the start of a turn armed a line written about the carrier's health");
+
+            owner.CurrentHealth = MaxHealth * (LowLifeThreshold + LowLifeStep);
+            Assert.IsFalse(condition.IsMet, $"the gate armed above the {LowLifeThreshold} share its id names");
+
+            owner.CurrentHealth = MaxHealth * (LowLifeThreshold - LowLifeStep);
+            Assert.IsTrue(condition.IsMet, "the carrier dropped below the share the id names and the line never armed");
 
             Evade(owner);
-            Assert.IsFalse(condition.IsMet, "the node kept its bonus through an attack on its owner");
+            Assert.IsTrue(condition.IsMet, "a swing at the carrier spent a line no turn tally holds up");
 
-            StartTurn(owner);
-            Assert.IsTrue(condition.IsMet, "the node never gave the bonus back on the next turn");
+            owner.CurrentHealth = MaxHealth;
+            Assert.IsFalse(condition.IsMet, "the carrier healed back to full and kept the bonus");
         }
 
         private static float Strength(ConditionOwner owner) => owner.Parameters.GetValueForParameter(EntityParameter.Strength);
@@ -469,19 +494,17 @@ namespace LastBreathTest.BattleSystemTests
             return catalog;
         }
 
-        /// <summary>The conditional evasion line of the shipped tree's Evasion node.</summary>
-        private static ModifierLine EvasionNodeLine()
+        /// <summary>Whether the shipped tree still hangs a line on the given gate, on either channel. The
+        /// fixture is the authored markup, so a gate the tree stopped naming is a case that fails instead
+        /// of one that quietly goes on testing a line nobody ships.</summary>
+        private static bool ShippedTreeGatesALineOn(string condition)
         {
             var tree = new PassiveTreeProvider();
             new GameDataService(new FileSystemDataSource(SharedData.Root()), [tree]).LoadAll();
 
-            List<ModifierLine> gated = [.. tree.Tree.Nodes
-                .SelectMany(node => node.Modifiers)
-                .Where(line => line.Parameter == EntityParameter.Evade && line.IsConditional)];
-
-            Assert.AreEqual(1, gated.Count, "the shipped tree holds no single conditional evasion line to read");
-
-            return gated[0];
+            return tree.Tree.Nodes.Any(node =>
+                node.Modifiers.Any(line => line.Condition == condition)
+                || node.ContextModifiers.Any(line => line.Condition == condition));
         }
 
         private static ConditionProvider Catalog() => ConditionCatalogs.Of(
