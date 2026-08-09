@@ -4421,3 +4421,106 @@ msgstr "No. I carried a spear before I carried a hammer. The forge feeds the vil
 
 msgid "Dlg_Ronald_Farewell_1"
 msgstr "Go on, then. Keep your edge oiled and your back to a wall."
+
+# ------------------------------
+# Trials of the Strong (Ronald)
+# ------------------------------
+
+msgid "Quest_Trial_Of_The_Fang"
+msgstr "Trial of the Fang"
+
+msgid "Quest_Trial_Of_The_Fang_Description"
+msgstr "Ronald has set out the first of his trials. A wolf waits on the flat ground past the forge — the smallest thing he could find that still bites back. Put it down and come back to him."
+
+msgid "Quest_Trial_Of_The_Fang_Stage_Hunt"
+msgstr "Put the wolf down"
+
+msgid "Quest_Trial_Of_The_Fang_Obj_Kill"
+msgstr "Kill the wolf on the trial ground"
+
+msgid "Quest_Trial_Of_The_Pack"
+msgstr "Trial of the Pack"
+
+msgid "Quest_Trial_Of_The_Pack_Description"
+msgstr "The second trial. A direwolf — bigger than the last one, quicker than it looks, and it hunts thinking. Ronald wants to see whether you can finish what you start."
+
+msgid "Quest_Trial_Of_The_Pack_Stage_Hunt"
+msgstr "Put the direwolf down"
+
+msgid "Quest_Trial_Of_The_Pack_Obj_Kill"
+msgstr "Kill the direwolf on the trial ground"
+
+msgid "Quest_Trial_Of_The_Mountain"
+msgstr "Trial of the Mountain"
+
+msgid "Quest_Trial_Of_The_Mountain_Description"
+msgstr "The third trial. A bear: slow, enormous, and it takes a great deal of killing. Ronald says there is no clever way past it — only through."
+
+msgid "Quest_Trial_Of_The_Mountain_Stage_Hunt"
+msgstr "Put the bear down"
+
+msgid "Quest_Trial_Of_The_Mountain_Obj_Kill"
+msgstr "Kill the bear on the trial ground"
+
+msgid "Quest_Trial_Of_The_Grave"
+msgstr "Trial of the Grave"
+
+msgid "Quest_Trial_Of_The_Grave_Description"
+msgstr "The fourth trial. Ronald has arranged something the graves gave back — old, patient, and far past anything the forest sends. He calls it the last lesson he has to give."
+
+msgid "Quest_Trial_Of_The_Grave_Stage_Hunt"
+msgstr "Put the revenant down"
+
+msgid "Quest_Trial_Of_The_Grave_Obj_Kill"
+msgstr "Kill the grave revenant on the trial ground"
+
+msgid "Dlg_Ronald_Opt_Trials"
+msgstr "I want a real test. Have you got one?"
+
+msgid "Dlg_Ronald_Trials_1"
+msgstr "Trials, then. I keep a patch of flat ground past the forge, and I put something worth beating on it. Beat it, and I will show you what I saw while you fought. That is the whole arrangement."
+
+msgid "Dlg_Ronald_Opt_Trial_Fang"
+msgstr "Start me small. What is first?"
+
+msgid "Dlg_Ronald_Opt_Trial_Pack"
+msgstr "I am ready for the second."
+
+msgid "Dlg_Ronald_Opt_Trial_Mountain"
+msgstr "Give me the third."
+
+msgid "Dlg_Ronald_Opt_Trial_Grave"
+msgstr "Whatever is left. Set it loose."
+
+msgid "Dlg_Ronald_TrialAccepted_1"
+msgstr "It is waiting past the forge, out where the fence gives up. Take your time walking. Take none once you are there."
+
+msgid "Dlg_Ronald_TrialWatch_1"
+msgstr "Still on my side of the fence, I see. The ground has not moved."
+
+msgid "Dlg_Ronald_Opt_TrialHint"
+msgstr "Remind me what I am walking into."
+
+msgid "Dlg_Ronald_TrialHint_Fang_1"
+msgstr "A wolf, and not a big one. Past the forge, out where the fence gives up and the trees start. Mind its footing, not its teeth."
+
+msgid "Dlg_Ronald_TrialHint_Pack_1"
+msgstr "A direwolf. Bigger than the last, and it picks its moment instead of just charging. Same ground past the forge. Do not let it pick the moment for you."
+
+msgid "Dlg_Ronald_TrialHint_Mountain_1"
+msgstr "A bear. It will not dodge and there is a great deal of it to get through. Same ground past the forge. Go through it, or do not go at all."
+
+msgid "Dlg_Ronald_TrialHint_Grave_1"
+msgstr "Something the graves gave back — older than this village and in no hurry at all. Past the forge, same as always. It thinks, so do not give it time to."
+
+msgid "Dlg_Ronald_TrialReport_1"
+msgstr "You walked back. That is already more than some manage. Say it."
+
+msgid "Dlg_Ronald_Opt_TrialTurnIn"
+msgstr "It is done."
+
+msgid "Dlg_Ronald_TrialPraise_1"
+msgstr "Good. You held ground where I would have expected you to give it. Breathe, then come find me — there is a harder one waiting."
+
+msgid "Dlg_Ronald_TrialPraiseLast_1"
+msgstr "Done, and done well. That is the end of what I can set in front of you. Whatever comes next, you will be the one choosing it."

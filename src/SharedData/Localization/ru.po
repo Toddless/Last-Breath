@@ -3877,3 +3877,106 @@ msgstr ""
 
 msgid "Dlg_Ronald_Farewell_1"
 msgstr ""
+
+# ------------------------------
+# Trials of the Strong (Ronald)
+# ------------------------------
+
+msgid "Quest_Trial_Of_The_Fang"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Fang_Description"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Fang_Stage_Hunt"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Fang_Obj_Kill"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Pack"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Pack_Description"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Pack_Stage_Hunt"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Pack_Obj_Kill"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Mountain"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Mountain_Description"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Mountain_Stage_Hunt"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Mountain_Obj_Kill"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Grave"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Grave_Description"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Grave_Stage_Hunt"
+msgstr ""
+
+msgid "Quest_Trial_Of_The_Grave_Obj_Kill"
+msgstr ""
+
+msgid "Dlg_Ronald_Opt_Trials"
+msgstr ""
+
+msgid "Dlg_Ronald_Trials_1"
+msgstr ""
+
+msgid "Dlg_Ronald_Opt_Trial_Fang"
+msgstr ""
+
+msgid "Dlg_Ronald_Opt_Trial_Pack"
+msgstr ""
+
+msgid "Dlg_Ronald_Opt_Trial_Mountain"
+msgstr ""
+
+msgid "Dlg_Ronald_Opt_Trial_Grave"
+msgstr ""
+
+msgid "Dlg_Ronald_TrialAccepted_1"
+msgstr ""
+
+msgid "Dlg_Ronald_TrialWatch_1"
+msgstr ""
+
+msgid "Dlg_Ronald_Opt_TrialHint"
+msgstr ""
+
+msgid "Dlg_Ronald_TrialHint_Fang_1"
+msgstr ""
+
+msgid "Dlg_Ronald_TrialHint_Pack_1"
+msgstr ""
+
+msgid "Dlg_Ronald_TrialHint_Mountain_1"
+msgstr ""
+
+msgid "Dlg_Ronald_TrialHint_Grave_1"
+msgstr ""
+
+msgid "Dlg_Ronald_TrialReport_1"
+msgstr ""
+
+msgid "Dlg_Ronald_Opt_TrialTurnIn"
+msgstr ""
+
+msgid "Dlg_Ronald_TrialPraise_1"
+msgstr ""
+
+msgid "Dlg_Ronald_TrialPraiseLast_1"
+msgstr ""

@@ -44,6 +44,171 @@
           { "type": "AddReputation", "faction": "Human", "delta": 150, "reason": "Quest_Field_Of_Bones" }
         ]
       }
+    },
+    {
+      "id": "Quest_Trial_Of_The_Fang",
+      "giverNpcId": "Npc_Ronald",
+      "faction": "Human",
+      "tier": 1,
+      "turnInNpcIds": [ "Npc_Ronald" ],
+      "declinePolicy": "Cooldown",
+      "declineCooldownHours": 24,
+      "canFail": false,
+      "timeLimitHours": 0,
+      "acceptConditions": [],
+      "stages": [
+        {
+          "id": "Hunt",
+          "onEnter": [
+            {
+              "type": "SpawnNpc",
+              "npcId": "Npc_Wolf",
+              "pointId": "Trial_Grounds",
+              "modifiers": []
+            }
+          ],
+          "objectives": [
+            {
+              "id": "Kill",
+              "counter": { "key": "Kill_Count:Npc_Wolf", "amount": 1, "retroactive": false }
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "influenceExp": 0,
+        "items": [],
+        "actions": [
+          { "type": "GrantTreePoints", "amount": 2 }
+        ]
+      }
+    },
+    {
+      "id": "Quest_Trial_Of_The_Pack",
+      "giverNpcId": "Npc_Ronald",
+      "faction": "Human",
+      "tier": 2,
+      "turnInNpcIds": [ "Npc_Ronald" ],
+      "declinePolicy": "Cooldown",
+      "declineCooldownHours": 24,
+      "canFail": false,
+      "timeLimitHours": 0,
+      "acceptConditions": [
+        { "type": "QuestStatus", "questId": "Quest_Trial_Of_The_Fang", "status": "Completed" }
+      ],
+      "stages": [
+        {
+          "id": "Hunt",
+          "onEnter": [
+            {
+              "type": "SpawnNpc",
+              "npcId": "Npc_Direwolf",
+              "pointId": "Trial_Grounds",
+              "modifiers": [ "Npc_Modifier_Scale_Double_Health_Recovery" ]
+            }
+          ],
+          "objectives": [
+            {
+              "id": "Kill",
+              "counter": { "key": "Kill_Count:Npc_Direwolf", "amount": 1, "retroactive": false }
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "influenceExp": 0,
+        "items": [],
+        "actions": [
+          { "type": "GrantTreePoints", "amount": 3 }
+        ]
+      }
+    },
+    {
+      "id": "Quest_Trial_Of_The_Mountain",
+      "giverNpcId": "Npc_Ronald",
+      "faction": "Human",
+      "tier": 3,
+      "turnInNpcIds": [ "Npc_Ronald" ],
+      "declinePolicy": "Cooldown",
+      "declineCooldownHours": 24,
+      "canFail": false,
+      "timeLimitHours": 0,
+      "acceptConditions": [
+        { "type": "QuestStatus", "questId": "Quest_Trial_Of_The_Pack", "status": "Completed" }
+      ],
+      "stages": [
+        {
+          "id": "Hunt",
+          "onEnter": [
+            {
+              "type": "SpawnNpc",
+              "npcId": "Npc_Bear",
+              "pointId": "Trial_Grounds",
+              "modifiers": [
+                "Npc_Modifier_Scale_Double_Defence",
+                "Npc_Modifier_Item_Effect_Burning"
+              ]
+            }
+          ],
+          "objectives": [
+            {
+              "id": "Kill",
+              "counter": { "key": "Kill_Count:Npc_Bear", "amount": 1, "retroactive": false }
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "influenceExp": 0,
+        "items": [],
+        "actions": [
+          { "type": "GrantTreePoints", "amount": 4 }
+        ]
+      }
+    },
+    {
+      "id": "Quest_Trial_Of_The_Grave",
+      "giverNpcId": "Npc_Ronald",
+      "faction": "Human",
+      "tier": 4,
+      "turnInNpcIds": [ "Npc_Ronald" ],
+      "declinePolicy": "Cooldown",
+      "declineCooldownHours": 24,
+      "canFail": false,
+      "timeLimitHours": 0,
+      "acceptConditions": [
+        { "type": "QuestStatus", "questId": "Quest_Trial_Of_The_Mountain", "status": "Completed" }
+      ],
+      "stages": [
+        {
+          "id": "Hunt",
+          "onEnter": [
+            {
+              "type": "SpawnNpc",
+              "npcId": "Npc_Grave_Revenant",
+              "pointId": "Trial_Grounds",
+              "modifiers": [
+                "Npc_Modifier_Scale_Double_Health",
+                "Npc_Modifier_Scale_Double_Damage",
+                "Npc_Modifier_Item_Effect_Vampire"
+              ]
+            }
+          ],
+          "objectives": [
+            {
+              "id": "Kill",
+              "counter": { "key": "Kill_Count:Npc_Grave_Revenant", "amount": 1, "retroactive": false }
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "influenceExp": 0,
+        "items": [],
+        "actions": [
+          { "type": "GrantTreePoints", "amount": 6 }
+        ]
+      }
     }
   ]
 }
