@@ -262,8 +262,39 @@ script = ExtResource("10_kwijy")
 _tag = "TradeStall"
 metadata/_custom_type_script = "uid://dhdmfoqlhrspe"
 
+[node name="Label" type="Label" parent="TradeStal" unique_id=2056788263]
+offset_right = 40.0
+offset_bottom = 22.0
+text = "Trade"
+
 [node name="Forge" type="Node2D" parent="." unique_id=1315272964]
 position = Vector2(-148, 15)
 script = ExtResource("10_kwijy")
 _tag = "Forge"
 metadata/_custom_type_script = "uid://dhdmfoqlhrspe"
+
+[node name="Label" type="Label" parent="Forge" unique_id=2138795002]
+offset_right = 40.0
+offset_bottom = 22.0
+text = "Forge"
+
+[node name="Campfire" type="Node2D" parent="." unique_id=259760643]
+position = Vector2(-534, -112)
+script = ExtResource("10_kwijy")
+metadata/_custom_type_script = "uid://dhdmfoqlhrspe"
+
+[node name="Label" type="Label" parent="Campfire" unique_id=755307752]
+offset_right = 40.0
+offset_bottom = 22.0
+text = "Campfire"
+
+[node name="Tent" type="Node2D" parent="." unique_id=1515376102]
+position = Vector2(-551, 55)
+script = ExtResource("10_kwijy")
+_tag = "Tent"
+metadata/_custom_type_script = "uid://dhdmfoqlhrspe"
+
+[node name="Label" type="Label" parent="Tent" unique_id=295173954]
+offset_right = 40.0
+offset_bottom = 22.0
+text = "Tent"
