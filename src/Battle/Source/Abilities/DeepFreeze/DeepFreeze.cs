@@ -107,7 +107,7 @@ namespace Battle.Source.Abilities.DeepFreeze
                 });
             }
 
-            TrySpreadFreeze(plan, owner, field);
+            await TrySpreadFreeze(plan, owner, field);
         }
 
         private async Task ApplyPayload(DeepFreezePlan plan, IFightable owner, IFightable target)
@@ -126,8 +126,11 @@ namespace Battle.Source.Abilities.DeepFreeze
                     .Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId });
         }
 
-        /// <summary>L2 upgrade: a coin flip freezes one random enemy the cast did not touch.</summary>
-        private void TrySpreadFreeze(DeepFreezePlan plan, IFightable owner, IBattleField field)
+        /// <summary>L2 upgrade: a coin flip freezes one random enemy the cast did not touch. He is a
+        /// touched target all the same — a landing without damage is still a landing — but a SPLASH one:
+        /// the plan never aimed at him (he is picked from the enemies it left out), and he is only frozen
+        /// because the cast landed on somebody else.</summary>
+        private async Task TrySpreadFreeze(DeepFreezePlan plan, IFightable owner, IBattleField field)
         {
             if (SpreadFreezeChance <= 0 || CombatRandom.Rolls.RandFloat() > SpreadFreezeChance) return;
 
@@ -137,8 +140,13 @@ namespace Battle.Source.Abilities.DeepFreeze
             if (untouched.Count == 0) return;
 
             IFightable lucky = untouched[CombatRandom.Rolls.RandIntRange(0, untouched.Count - 1)];
-            _ = new FreezeEffect(plan.FreezeDuration)
+            await new FreezeEffect(plan.FreezeDuration)
                 .Apply(new EffectApplyingContext { Caster = owner, Target = lucky, Source = InstanceId });
+            await ApplyImpactRiders(new AbilityImpact(owner, lucky, field, Succeeded: true, IsCritical: false, Damage: 0)
+            {
+                Source = this,
+                Kind = ImpactKind.Splash
+            });
         }
     }
 }

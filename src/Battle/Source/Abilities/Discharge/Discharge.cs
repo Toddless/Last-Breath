@@ -98,7 +98,7 @@ namespace Battle.Source.Abilities.Discharge
                 var hit = await DealPlanDamage(plan, owner, target);
                 if (plan.BarrierRestorePercent > 0)
                     owner.CurrentBarrier += hit.Damage * plan.BarrierRestorePercent;
-                TrySplashOverkill(plan, owner, field, target, hit.Damage, healthBefore + barrierBefore);
+                await TrySplashOverkill(plan, owner, field, target, hit.Damage, healthBefore + barrierBefore);
 
                 await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage)
                 {
@@ -122,8 +122,10 @@ namespace Battle.Source.Abilities.Discharge
             return barrier;
         }
 
-        /// <summary>L3 upgrade: whatever exceeded the victim's remaining pool jumps to a random other enemy.</summary>
-        private void TrySplashOverkill(DischargePlan plan, IFightable owner, IBattleField field, IFightable victim, float dealt, float victimPool)
+        /// <summary>L3 upgrade: whatever exceeded the victim's remaining pool jumps to a random other enemy.
+        /// Nobody aimed the leap and it exists only because the strike had already landed — splash by the
+        /// letter of the dictionary, and its victim is a touched target like any other.</summary>
+        private async Task TrySplashOverkill(DischargePlan plan, IFightable owner, IBattleField field, IFightable victim, float dealt, float victimPool)
         {
             if (!OverkillToRandom || victim.IsAlive) return;
             float overkill = dealt - victimPool;
@@ -140,7 +142,13 @@ namespace Battle.Source.Abilities.Discharge
                 IgnoreResistances = plan.IgnoreResistances
             };
             context.Add(plan.DamageType, overkill);
-            _ = others[CombatRandom.Rolls.RandIntRange(0, others.Count - 1)].TakeDamage(context);
+            IFightable neighbour = others[CombatRandom.Rolls.RandIntRange(0, others.Count - 1)];
+            await neighbour.TakeDamage(context);
+            await ApplyImpactRiders(new AbilityImpact(owner, neighbour, field, Succeeded: true, IsCritical: false, context.TotalDamage)
+            {
+                Source = this,
+                Kind = ImpactKind.Splash
+            });
         }
     }
 }

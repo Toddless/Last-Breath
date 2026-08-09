@@ -6,6 +6,7 @@ namespace Battle.Source.Abilities.IceAegis
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Data;
     using Core.Data.AbilityData;
     using Core.Entity;
     using Core.Enums;
@@ -117,11 +118,22 @@ namespace Battle.Source.Abilities.IceAegis
                 (int)this[Parameters.ClumsinessDuration], (int)this[Parameters.ClumsinessMaxStacks], this[Parameters.ClumsinessValue]);
         }
 
+        /// <summary>Stage 4: the shattering of the barrier freezes the field. Nobody was aimed at and the
+        /// freeze exists only because the aegis broke — splash. The reaction is the effect's, but the
+        /// closure is the ability's own and holds it, so there is nothing here to wait for a later wave:
+        /// a frozen enemy is a touched target and reports as one.</summary>
         private void FreezeAllEnemies(IFightable owner, IBattleField field)
         {
             foreach (IFightable enemy in field.GetEnemies(owner).Where(e => e.IsAlive))
+            {
                 _ = new FreezeEffect((int)this[Parameters.FreezeDuration])
                     .Apply(new EffectApplyingContext { Caster = owner, Target = enemy, Source = InstanceId });
+                _ = ApplyImpactRiders(new AbilityImpact(owner, enemy, field, Succeeded: true, IsCritical: false, Damage: 0)
+                {
+                    Source = this,
+                    Kind = ImpactKind.Splash
+                });
+            }
         }
     }
 }

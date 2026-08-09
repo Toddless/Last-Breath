@@ -120,7 +120,7 @@ namespace Battle.Source.Abilities.IceBlock
                         .Apply(new EffectApplyingContext { Caster = owner, Target = hit.Target, Source = InstanceId }));
                     break;
                 case 4:
-                    plan.OnHitRiders.Add(hit => DropExtraBlocks(plan, owner, field, hit.Target));
+                    plan.OnHitRiders.Add(hit => _ = DropExtraBlocks(plan, owner, field, hit.Target));
                     break;
             }
         }
@@ -153,8 +153,12 @@ namespace Battle.Source.Abilities.IceBlock
         }
 
         /// <summary>Stage 4: three more blocks crash down, each at a share of the main block's damage.
-        /// With the L3 upgrade every extra block picks its own random enemy.</summary>
-        private void DropExtraBlocks(IceBlockPlan plan, IFightable owner, IBattleField field, IFightable target)
+        /// With the L3 upgrade every extra block picks its own random enemy.
+        /// A hit and not a splash, on countability: the ability owns the number of them
+        /// (<see cref="ExtraBlocks"/>, a parameter an augment can raise), each carries its own share of
+        /// the damage and, upgraded, picks its own victim — while a splash is by definition the touch
+        /// nobody counts, spilled by an impact rather than aimed by the cast.</summary>
+        private async Task DropExtraBlocks(IceBlockPlan plan, IFightable owner, IBattleField field, IFightable target)
         {
             float blockDamage = CalculateHitDamage(plan, owner) * this[Parameters.ExtraBlockDamagePercent];
             for (int i = 0; i < ExtraBlocks; i++)
@@ -163,7 +167,12 @@ namespace Battle.Source.Abilities.IceBlock
                 if (victim is not { IsAlive: true }) return;
                 var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, CastId = CastId };
                 context.Add(DamageType.Cold, blockDamage);
-                _ = victim.TakeDamage(context);
+                await victim.TakeDamage(context);
+                await ApplyImpactRiders(new AbilityImpact(owner, victim, field, Succeeded: true, IsCritical: false, context.TotalDamage)
+                {
+                    Source = this,
+                    Kind = ImpactKind.Hit
+                });
             }
         }
 

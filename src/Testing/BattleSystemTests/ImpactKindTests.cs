@@ -5,9 +5,12 @@ namespace LastBreathTest.BattleSystemTests
     using System.Threading.Tasks;
     using Battle.Source;
     using Battle.Source.Abilities;
+    using Battle.Source.Abilities.PoisonExplosion;
     using Battle.Source.Abilities.SeriesOfAttacks;
+    using Battle.Source.Effects;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Data;
     using Core.Data.AbilityData;
     using Core.Entity;
@@ -15,7 +18,12 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Enums;
     using Moq;
     using ChainLightningCast = Battle.Source.Abilities.ChainLightning.ChainLightning;
+    using DeepFreezeCast = Battle.Source.Abilities.DeepFreeze.DeepFreeze;
+    using DischargeCast = Battle.Source.Abilities.Discharge.Discharge;
+    using IceAegisCast = Battle.Source.Abilities.IceAegis.IceAegis;
+    using IceBlocksCast = Battle.Source.Abilities.IceBlock.IceBlocks;
     using IceShardsCast = Battle.Source.Abilities.IceShards.IceShards;
+    using PoisonExplosionCast = Battle.Source.Abilities.PoisonExplosion.PoisonExplosion;
     using SeriesOfAttacksCast = Battle.Source.Abilities.SeriesOfAttacks.SeriesOfAttacks;
 
     /// <summary>
@@ -30,6 +38,9 @@ namespace LastBreathTest.BattleSystemTests
     public class ImpactKindTests
     {
         private const float Health = 100f;
+        private const float Barrier = 1000f;
+        private const int ExtraShards = 2;
+        private const int PoisonTurns = 3;
 
         [TestMethod]
         public async Task EveryAttackOfASeriesReachesTheRidersAsAnAttack()
@@ -133,6 +144,269 @@ namespace LastBreathTest.BattleSystemTests
                 Assert.AreSame(chain, impact.Source, "an impact of the chain arrived without the ability that cast it");
         }
 
+        [TestMethod]
+        public async Task TwoMoreShardsAreTwoMoreRiderApplicationsOnEveryTarget()
+        {
+            // The arithmetic the whole wave rests on. Nobody sells projectiles yet, so the parameter is
+            // moved by the mechanism an augment would move it by — a decorator over the ability's own
+            // Shards key — and what is measured is the rider, not the damage: a volley that grew by two
+            // has to hand the riders exactly two more impacts per target, with no code knowing that an
+            // augment and a rider were bought together.
+            using var rolls = new CombatRandomScope(new HighestRoll());
+            var owner = Fighter();
+            var target = Fighter();
+            var bystander = Fighter();
+            var shards = new IceShardsCast(Data());
+            var seen = Riding(shards);
+            shards.SetOwner(owner);
+            IBattleField field = FieldOf(owner, target, bystander);
+            int shardsBefore = shards.Shards;
+
+            await shards.Execute([target, bystander], field);
+            int impactsBefore = seen.Count;
+            Assert.AreEqual(shardsBefore * 2, impactsBefore, "the volley did not even hand one impact per shard per target");
+
+            seen.Clear();
+            shards.AddParameterDecorator(new SimpleAbilityParameterDecorator(
+                IceShardsCast.Parameters.Shards, Priority.Weak, OperationType.Add, ExtraShards,
+                "Ability_Parameter_Decorator_Test_Extra_Shards", "Test"));
+
+            await shards.Execute([target, bystander], field);
+
+            Assert.AreEqual(shardsBefore + ExtraShards, shards.Shards, "the decorator never reached the shard count");
+            Assert.AreEqual(impactsBefore + (ExtraShards * 2), seen.Count,
+                "two more shards over two targets left the riders with something other than four more impacts");
+            Assert.AreEqual(ExtraShards, seen.FindAll(impact => ReferenceEquals(impact.Target, target)).Count - shardsBefore,
+                "the extra shards did not reach the chosen target as impacts of its own");
+            foreach (AbilityImpact impact in seen)
+                Assert.AreEqual(ImpactKind.Projectile, impact.Kind, "an added shard arrived as something other than a projectile");
+        }
+
+        [TestMethod]
+        public async Task EveryPoisonedTargetTheExplosionBurstsReachesTheRiders()
+        {
+            // The explosion touches whoever carries poison — it deals their whole remaining poison at
+            // once and can execute them outright — and until this pin it called no rider at all, so an
+            // augment seated on it was seated on nothing.
+            using var rolls = new CombatRandomScope(new HighestRoll());
+            var owner = Fighter();
+            var poisoned = Fighter();
+            var alsoPoisoned = Fighter();
+            var clean = Fighter();
+            await Poison(owner, poisoned);
+            await Poison(owner, alsoPoisoned);
+            var explosion = new PoisonExplosionCast(Data());
+            var seen = Riding(explosion);
+            explosion.SetOwner(owner);
+
+            await explosion.Execute([poisoned, alsoPoisoned, clean], FieldOf(owner, poisoned, alsoPoisoned, clean));
+
+            Assert.AreEqual(2, seen.Count, "the explosion reached the riders a number of times other than once per poisoned target");
+            Assert.IsTrue(seen.Exists(impact => ReferenceEquals(impact.Target, poisoned)), "the first poisoned target was blown up unnoticed");
+            Assert.IsTrue(seen.Exists(impact => ReferenceEquals(impact.Target, alsoPoisoned)), "the second poisoned target was blown up unnoticed");
+            Assert.IsFalse(seen.Exists(impact => ReferenceEquals(impact.Target, clean)),
+                "a target carrying no poison was reported as touched — nothing happened to him");
+            foreach (AbilityImpact impact in seen)
+            {
+                Assert.AreEqual(ImpactKind.Hit, impact.Kind, "the burst is the cast reaching its own target — that road is a hit");
+                Assert.AreSame(explosion, impact.Source, "the burst arrived without the ability that set it off");
+            }
+        }
+
+        [TestMethod]
+        public async Task TheOverkillOfADischargeLeapsToTheNeighbourAsASplash()
+        {
+            // Whatever exceeded the victim's remaining pool is dealt to somebody who was never aimed at,
+            // and it exists only because the strike had already landed: splash by the letter of the
+            // dictionary. It dealt that damage in silence before this pin.
+            using var rolls = new CombatRandomScope(new HighestRoll());
+            var owner = Fighter();
+            owner.CurrentBarrier = Barrier;
+            Mock<IFightable> victim = Mortal(Health);
+            var bystander = Fighter();
+            var discharge = new DischargeCast(Data()) { OverkillToRandom = true };
+            var seen = Riding(discharge);
+            discharge.SetOwner(owner);
+
+            await discharge.Execute([victim.Object], FieldOf(owner, victim.Object, bystander));
+
+            Assert.IsFalse(victim.Object.IsAlive, "the victim survived, so there was no overkill to leap and the test proves nothing");
+            List<AbilityImpact> splash = seen.FindAll(impact => impact.Kind == ImpactKind.Splash);
+            Assert.AreEqual(1, splash.Count, "the leftover damage leapt to a neighbour without telling a single rider");
+            Assert.AreSame(bystander, splash[0].Target, "the leap was reported on somebody other than the neighbour it hit");
+            Assert.AreSame(discharge, splash[0].Source, "the leap arrived without the ability whose overkill it is");
+            Assert.IsTrue(seen.Exists(impact => impact.Kind == ImpactKind.Hit && ReferenceEquals(impact.Target, victim.Object)),
+                "the strike that caused the overkill never reached the riders itself");
+        }
+
+        [TestMethod]
+        public async Task EveryExtraBlockOfTheFinalStageIsAHitOfItsOwn()
+        {
+            // Stage 4 drops more blocks: its own count, its own share of the damage and — with the L3
+            // upgrade — its own choice of victim. That is a delivery of the ability, not something spilled
+            // by the block that landed, so each one is a hit and an augment adding blocks buys rider work
+            // by arithmetic. The lowest roll is what opens stage 4 at all.
+            // The count below holds because the drop is started and not awaited (`_ =`, the shrapnel
+            // precedent) and everything it awaits completes synchronously here — the same footing the
+            // shrapnel pin stands on. A delivery that ever waits for real would need this pin rewritten.
+            using var rolls = new CombatRandomScope(new LowestRoll());
+            var owner = Fighter();
+            var target = Fighter();
+            var blocks = new IceBlocksCast(Data());
+            var seen = Riding(blocks);
+            blocks.SetOwner(owner);
+
+            await blocks.Execute([target], FieldOf(owner, target));
+
+            Assert.AreEqual(1 + blocks.ExtraBlocks, seen.Count,
+                "the block that was aimed and the blocks that followed it did not add up to one impact each");
+            foreach (AbilityImpact impact in seen)
+            {
+                Assert.AreEqual(ImpactKind.Hit, impact.Kind, "a block crashed down as something other than a hit");
+                Assert.AreSame(blocks, impact.Source, "a block arrived without the ability that dropped it");
+                Assert.AreSame(target, impact.Target, "a block landed on somebody the cast never aimed at");
+            }
+        }
+
+        [TestMethod]
+        public async Task ThePoisonSpreadingOffAnExplosionCatchesEveryOtherEnemyAsASplash()
+        {
+            // The spread reaches fighters the cast never aimed at, and it reaches them with an effect
+            // rather than with damage — a landing all the same. Splash: nobody aimed it and it exists
+            // only because somebody else's stacks went off. The exploded target is not among them: his
+            // own poison is what is being carried away from him.
+            using var rolls = new CombatRandomScope(new HighestRoll());
+            var owner = Fighter();
+            var poisoned = Fighter();
+            var neighbour = Fighter();
+            var farther = Fighter();
+            await Poison(owner, poisoned);
+            var explosion = new PoisonExplosionCast(Data()) { SpreadMode = new SpreadPoisonToAll() };
+            var seen = Riding(explosion);
+            explosion.SetOwner(owner);
+
+            await explosion.Execute([poisoned], FieldOf(owner, poisoned, neighbour, farther));
+
+            List<AbilityImpact> splash = seen.FindAll(impact => impact.Kind == ImpactKind.Splash);
+            Assert.AreEqual(1, seen.FindAll(impact => impact.Kind == ImpactKind.Hit).Count, "the burst on the poisoned target itself went unreported");
+            Assert.AreEqual(2, splash.Count, "the spread reached a number of bystanders other than the two other enemies on the field");
+            Assert.IsTrue(splash.Exists(impact => ReferenceEquals(impact.Target, neighbour)), "the nearer bystander caught the poison unnoticed");
+            Assert.IsTrue(splash.Exists(impact => ReferenceEquals(impact.Target, farther)), "the farther bystander caught the poison unnoticed");
+            Assert.IsFalse(splash.Exists(impact => ReferenceEquals(impact.Target, poisoned)), "the target that exploded was reported as caught by his own spread");
+            foreach (AbilityImpact impact in splash)
+                Assert.AreSame(explosion, impact.Source, "a caught bystander arrived without the ability whose spread caught him");
+        }
+
+        [TestMethod]
+        public async Task TheRandomSpreadOfAnExplosionLandsOnAnotherEnemyAndNobodyElse()
+        {
+            // The arena hands out a random fighter without looking at what it was asked — the caster and
+            // the freshly exploded target included — and the impact this spread now reports is what
+            // carries rider payload to whoever it names. So the pick has to be the cast's own: another
+            // living enemy, never the caster and never the target the poison was taken from.
+            using var rolls = new CombatRandomScope(new HighestRoll());
+            var owner = Fighter();
+            var poisoned = Fighter();
+            var neighbour = Fighter();
+            await Poison(owner, poisoned);
+            var explosion = new PoisonExplosionCast(Data()) { SpreadMode = new SpreadPoisonToRandomTarget() };
+            var seen = Riding(explosion);
+            explosion.SetOwner(owner);
+
+            await explosion.Execute([poisoned], FieldOf(owner, poisoned, neighbour));
+
+            List<AbilityImpact> splash = seen.FindAll(impact => impact.Kind == ImpactKind.Splash);
+            Assert.AreEqual(1, splash.Count, "the spread carried the poison to a number of fighters other than one");
+            Assert.AreSame(neighbour, splash[0].Target, "the spread landed on the caster or on the victim it was taken from");
+            Assert.AreSame(explosion, splash[0].Source, "the spread arrived without the ability that carried it");
+        }
+
+        [TestMethod]
+        public async Task TheFreezeSpreadingOffADeepFreezeCatchesOneUntouchedEnemyAsASplash()
+        {
+            // The L2 spread picks from the enemies the plan left OUT, so nothing aimed at him and he is
+            // frozen only because the cast landed on somebody else. Damage-free again, and again a
+            // landing: what makes an impact is the touch, not the payload.
+            using var rolls = new CombatRandomScope(new HighestRoll());
+            var owner = Fighter();
+            var target = Fighter();
+            var untouched = Fighter();
+            var freeze = new DeepFreezeCast(Data()) { SpreadFreezeChance = 1f };
+            var seen = Riding(freeze);
+            freeze.SetOwner(owner);
+
+            await freeze.Execute([target], FieldOf(owner, target, untouched));
+
+            List<AbilityImpact> splash = seen.FindAll(impact => impact.Kind == ImpactKind.Splash);
+            Assert.AreEqual(1, splash.Count, "the spread froze somebody without telling a single rider");
+            Assert.AreSame(untouched, splash[0].Target, "the spread was reported on a target the plan had already frozen");
+            Assert.AreSame(freeze, splash[0].Source, "the spread arrived without the ability that cast it");
+            Assert.IsTrue(seen.Exists(impact => impact.Kind == ImpactKind.Hit && ReferenceEquals(impact.Target, target)),
+                "the cast's own target went unreported, so the splash above proves nothing about the pair");
+        }
+
+        [TestMethod]
+        public async Task TheShatteringOfTheAegisFreezesTheFieldAsSplashes()
+        {
+            // Stage 4's reaction lives in the barrier effect but the closure is the ability's own and
+            // holds it, so nothing here has to wait for the ability's trail to reach effects. The
+            // shattering is reproduced the way a fight does it: the bearer's barrier runs out.
+            using var rolls = new CombatRandomScope(new LowestRoll());
+            var owner = Fighter();
+            var first = Fighter();
+            var second = Fighter();
+            var aegis = new IceAegisCast(Data());
+            var seen = Riding(aegis);
+            aegis.SetOwner(owner);
+
+            await aegis.Execute([owner], FieldOf(owner, first, second));
+            Assert.AreEqual(0, seen.Count, "the aegis touched somebody on the way up — it is a buff on its bearer and nothing else");
+
+            owner.CurrentBarrier = 0;
+
+            Assert.AreEqual(2, seen.Count, "the field was frozen by the shattering and no rider heard of it");
+            foreach (AbilityImpact impact in seen)
+            {
+                Assert.AreEqual(ImpactKind.Splash, impact.Kind, "a freeze from the shattering arrived as an aimed delivery");
+                Assert.AreSame(aegis, impact.Source, "the freeze arrived without the ability whose barrier broke");
+            }
+
+            Assert.IsTrue(seen.Exists(impact => ReferenceEquals(impact.Target, first)), "the first enemy was frozen unnoticed");
+            Assert.IsTrue(seen.Exists(impact => ReferenceEquals(impact.Target, second)), "the second enemy was frozen unnoticed");
+        }
+
+        /// <summary>One poison stack on the victim, laid the way any cast lays one.</summary>
+        private static async Task Poison(IFightable caster, IFightable victim) =>
+            await new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison).Apply(new EffectApplyingContext
+            {
+                Caster = caster,
+                Target = victim,
+                Source = "Test_Poison",
+                Damage = Health
+            });
+
+        /// <summary>A fighter who actually dies of what he is dealt: <see cref="ConditionOwner"/> swallows
+        /// damage whole, and an overkill leap only exists once somebody's pool has run out.</summary>
+        private static Mock<IFightable> Mortal(float health)
+        {
+            string instanceId = Guid.NewGuid().ToString();
+            float left = health;
+            var mock = new Mock<IFightable>();
+            mock.SetupGet(fighter => fighter.InstanceId).Returns(instanceId);
+            mock.SetupGet(fighter => fighter.CurrentHealth).Returns(() => left);
+            mock.SetupGet(fighter => fighter.CurrentBarrier).Returns(0f);
+            mock.SetupGet(fighter => fighter.IsAlive).Returns(() => left > 0f);
+            mock.Setup(fighter => fighter.IsSame(It.IsAny<string>())).Returns((string other) => instanceId == other);
+            mock.Setup(fighter => fighter.TakeDamage(It.IsAny<IDamageContext>()))
+                .Returns((IDamageContext context) =>
+                {
+                    left -= context.TotalDamage;
+                    return Task.CompletedTask;
+                });
+
+            return mock;
+        }
+
         /// <summary>Seats a rider that only remembers, and hands back what it collected.</summary>
         private static List<AbilityImpact> Riding(IAbility ability)
         {
@@ -160,6 +434,10 @@ namespace LastBreathTest.BattleSystemTests
             field.Setup(battlefield => battlefield.GetEnemies(It.IsAny<IFightable>())).Returns(enemies);
             field.Setup(battlefield => battlefield.GetAllies(It.IsAny<IFightable>())).Returns([owner]);
             field.Setup(battlefield => battlefield.GetAll()).Returns([owner, .. enemies]);
+            // The arena's own answer to this one: ANY living fighter, the caster included, whatever it
+            // was handed. A delivery that leans on it has to be tested against that answer and not
+            // against a null nobody ships.
+            field.Setup(battlefield => battlefield.GetRandomEntity(It.IsAny<IFightable>())).Returns(owner);
 
             return field.Object;
         }
