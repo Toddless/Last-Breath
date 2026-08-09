@@ -13,20 +13,15 @@ namespace Battle.Source.Abilities.JarOfPoison
 
     public class JarOfPoison(AbilityBaseData data) : DamagingAbility(data)
     {
-        public int PoisonDuration => (int)this[Parameters.PoisonDuration];
+        public int PoisonDuration => (int)this[AbilityParameter.PoisonDuration];
 
         /// <summary>How the jar reaches its victims: the selected target, N bounces or every enemy (L3 upgrades swap it).</summary>
         public IHitSequenceStrategy HitSequence { get; set; } = new SelectedTargetsHits();
 
-        public static class Parameters
-        {
-            public const string PoisonDuration = nameof(PoisonDuration);
-        }
-
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.PoisonDuration, 3);
+            parameters.RegisterDefault(AbilityParameter.PoisonDuration, 3);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new JarOfPoison(Data));

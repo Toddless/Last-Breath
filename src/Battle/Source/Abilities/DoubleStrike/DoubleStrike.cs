@@ -23,7 +23,7 @@ namespace Battle.Source.Abilities.DoubleStrike
         public float SecondDamage => this[Parameters.SecondDamage];
         public float SecondWeaponScale => this[Parameters.SecondWeaponScale];
         public float SecondSpellScale => this[Parameters.SecondSpellScale];
-        public float DamageMultiplier => this[Parameters.DamageMultiplier];
+        public float DamageMultiplier => this[AbilityParameter.DamageMultiplier];
         public float HealthRestore => this[Parameters.HealthRestore];
         public float ManaRestore => this[Parameters.ManaRestore];
         public AttackModifierPipeline AttackModifiers { get; } = new();
@@ -38,9 +38,14 @@ namespace Battle.Source.Abilities.DoubleStrike
             public const string SecondSpellScale = nameof(SecondSpellScale);
             public const string ArmorReduce = nameof(ArmorReduce);
             public const string EvadeReduce = nameof(EvadeReduce);
+
+            /// <summary>How long the strikes' debuff holds on the TARGET. Not the book's
+            /// <see cref="AbilityParameter.Duration"/>, which is the buff a cast lays on its caster:
+            /// what a blow leaves on its victim and what a caster wears are two axes, and an augment
+            /// offering a longer buff has no business lengthening a debuff.</summary>
             public const string DebuffDuration = nameof(DebuffDuration);
+
             public const string DebuffMaxStacks = nameof(DebuffMaxStacks);
-            public const string DamageMultiplier = nameof(DamageMultiplier);
             public const string HealthRestore = nameof(HealthRestore);
             public const string ManaRestore = nameof(ManaRestore);
         }
@@ -55,7 +60,7 @@ namespace Battle.Source.Abilities.DoubleStrike
             parameters.RegisterDefault(Parameters.EvadeReduce, 0.15f);
             parameters.RegisterDefault(Parameters.DebuffDuration, 3);
             parameters.RegisterDefault(Parameters.DebuffMaxStacks, 3);
-            parameters.RegisterDefault(Parameters.DamageMultiplier, 1f);
+            parameters.RegisterDefault(AbilityParameter.DamageMultiplier, 1f);
             parameters.RegisterDefault(Parameters.HealthRestore, 0f);
             parameters.RegisterDefault(Parameters.ManaRestore, 0f);
         }

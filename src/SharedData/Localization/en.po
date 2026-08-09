@@ -2468,7 +2468,7 @@ msgid "Ability_Poison_Coating"
 msgstr "Poison Coating"
 
 msgid "Ability_Poison_Coating_Description"
-msgstr "For {CoatingDuration|turn|turns} every attack applies a poison stack. Each stack deals {PoisonMultiplier:%} of the damage dealt over {PoisonDuration|turn|turns}."
+msgstr "For {Duration|turn|turns} every attack applies a poison stack. Each stack deals {PoisonMultiplier:%} of the damage dealt over {PoisonDuration|turn|turns}."
 
 msgid "Ability_Poison_Explosion"
 msgstr "Poison Explosion"

@@ -37,7 +37,6 @@ namespace Battle.Source.Abilities.StaticArmor
 
         public static class Parameters
         {
-            public const string Duration = nameof(Duration);
             public const string DetonationDamage = nameof(DetonationDamage);
             public const string DetonationWeaponScale = nameof(DetonationWeaponScale);
             public const string DetonationSpellScale = nameof(DetonationSpellScale);
@@ -50,7 +49,7 @@ namespace Battle.Source.Abilities.StaticArmor
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.Duration, 3);
+            parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.DetonationDamage, 250f);
             parameters.RegisterDefault(Parameters.DetonationWeaponScale, 0.85f);
             parameters.RegisterDefault(Parameters.DetonationSpellScale, 0.75f);
@@ -69,7 +68,7 @@ namespace Battle.Source.Abilities.StaticArmor
         protected override StaticArmorPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field) =>
             new()
             {
-                Duration = (int)this[Parameters.Duration],
+                Duration = (int)this[AbilityParameter.Duration],
                 DetonationDamage = this[Parameters.DetonationDamage],
                 WeaponScale = this[Parameters.DetonationWeaponScale],
                 SpellScale = this[Parameters.DetonationSpellScale],

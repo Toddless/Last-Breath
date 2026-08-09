@@ -15,28 +15,35 @@ namespace Battle.Source.Abilities.CriticalCalculation
     /// </summary>
     public class CriticalCalculation(AbilityBaseData data) : Ability(data)
     {
-        public int BuffStacks => (int)this[Parameters.Stacks];
-        public int BuffDuration => (int)this[Parameters.Duration];
+        /// <summary>Critical chance one stack of the default buff is worth before effectiveness.</summary>
+        private const float BaseCriticalChance = 0.15f;
+
+        public int BuffStacks => (int)this[AbilityParameter.Stacks];
+        public int BuffDuration => (int)this[AbilityParameter.Duration];
+
+        /// <summary>How strongly the buff lands — the multiplier its value is read through.</summary>
+        public float Effectiveness => this[AbilityParameter.Effectiveness];
 
         /// <summary>
-        /// The buff the ability stacks on cast, built from the given duration. Default is the crit-chance
-        /// buff; the L3 "replace" upgrade swaps it for an additional-attack-chance buff.
-        /// ExecuteInternal applies <see cref="BuffStacks"/> stacks of whatever this returns.
+        /// The buff the ability stacks on cast, built from the given duration, stack cap and
+        /// effectiveness. Default is the crit-chance buff; the L3 "replace" upgrade swaps it for an
+        /// additional-attack-chance buff. ExecuteInternal applies <see cref="BuffStacks"/> stacks of
+        /// whatever this returns.
+        ///
+        /// Effectiveness is passed in rather than applied afterwards because each factory knows its own
+        /// value and nothing outside knows which of them is seated: a swap that ignored the multiplier
+        /// would silently switch the ability's effectiveness augments off along with the buff.
         /// </summary>
-        public Func<int, int, IEffect> PrimaryBuffFactory { get; set; } =
-            (duration, maxStacks) => new CritCalculationBuff(duration, maxStacks, value: 0.15f);
-
-        public static class Parameters
-        {
-            public const string Stacks = nameof(Stacks);
-            public const string Duration = nameof(Duration);
-        }
+        public Func<int, int, float, IEffect> PrimaryBuffFactory { get; set; } =
+            (duration, maxStacks, effectiveness) =>
+                new CritCalculationBuff(duration, maxStacks, value: BaseCriticalChance * effectiveness);
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.Stacks, 3);
-            parameters.RegisterDefault(Parameters.Duration, 1);
+            parameters.RegisterDefault(AbilityParameter.Stacks, 3);
+            parameters.RegisterDefault(AbilityParameter.Duration, 1);
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new CriticalCalculation(Data));
@@ -45,7 +52,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
         {
             var context = new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId };
             int stacks = BuffStacks;
-            await PrimaryBuffFactory(BuffDuration, stacks).ApplyStacks(context, stacks);
+            await PrimaryBuffFactory(BuffDuration, stacks, Effectiveness).ApplyStacks(context, stacks);
         }
     }
 }

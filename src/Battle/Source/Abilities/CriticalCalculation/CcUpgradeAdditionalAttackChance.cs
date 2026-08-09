@@ -11,12 +11,13 @@ namespace Battle.Source.Abilities.CriticalCalculation
     public class CcUpgradeAdditionalAttackChance(string id, string[] tags, int tier, float value = 0.15f)
         : AbilityUpgrade<CriticalCalculation>(id, tags, tier)
     {
-        private Func<int, int, IEffect>? _previous;
+        private Func<int, int, float, IEffect>? _previous;
 
         public override void ApplyUpgrade(CriticalCalculation ability)
         {
             _previous = ability.PrimaryBuffFactory;
-            ability.PrimaryBuffFactory = (duration, maxStacks) => new AttackChanceCalculationBuff(duration, maxStacks, value: value);
+            ability.PrimaryBuffFactory = (duration, maxStacks, effectiveness) =>
+                new AttackChanceCalculationBuff(duration, maxStacks, value: value * effectiveness);
         }
 
         public override void RemoveUpgrade(CriticalCalculation ability)

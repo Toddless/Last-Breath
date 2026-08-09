@@ -16,20 +16,14 @@ namespace Battle.Source.Abilities.HeadButt
     /// </summary>
     public class HeadButt(AbilityBaseData data) : DamagingAbility(data)
     {
-        public int StunDuration => (int)this[Parameters.StunDuration];
-        public int Attacks => (int)this[Parameters.Attacks];
-
-        public static class Parameters
-        {
-            public const string StunDuration = nameof(StunDuration);
-            public const string Attacks = nameof(Attacks);
-        }
+        public int StunDuration => (int)this[AbilityParameter.StunDuration];
+        public int Attacks => (int)this[AbilityParameter.Attacks];
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.StunDuration, 1);
-            parameters.RegisterDefault(Parameters.Attacks, 1);
+            parameters.RegisterDefault(AbilityParameter.StunDuration, 1);
+            parameters.RegisterDefault(AbilityParameter.Attacks, 1);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new HeadButt(Data));

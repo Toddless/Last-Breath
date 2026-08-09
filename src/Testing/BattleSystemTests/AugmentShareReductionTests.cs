@@ -387,7 +387,7 @@
         /// <summary>Head Butt's own tier-two augment: a longer stun bought with fifty more mana.</summary>
         private static IAbilityUpgrade StunSurcharge() =>
             new AbilityUpgradeParameterSet(CostSurcharge, [], 2,
-                [(HeadButt.Parameters.StunDuration, OperationType.Add, 1f), (AbilityParameter.CostValue, OperationType.Add, 50f)]);
+                [(AbilityParameter.StunDuration, OperationType.Add, 1f), (AbilityParameter.CostValue, OperationType.Add, 50f)]);
 
         private static IAbilityUpgrade CostShareUpgrade() => new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare);
 

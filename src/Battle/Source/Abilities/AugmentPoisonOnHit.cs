@@ -9,8 +9,10 @@ namespace Battle.Source.Abilities
     /// series, a shard of a volley and a jump of a chain are all impacts, and the rider works on each
     /// of them alike — so the class names none.
     ///
-    /// What it installs is two things and not one: the rider, and the two numbers the rider stands on
-    /// (<see cref="PoisonOnHitRider.Parameters"/>), laid on the ability as parameters of its own. The
+    /// What it installs is two things and not one: the rider, and the two numbers the rider stands on —
+    /// how long a stack lasts (<see cref="AbilityParameter.PoisonDuration"/>, a concept the book shares)
+    /// and how much of a blow a tick carries (<see cref="PoisonOnHitRider.Parameters.PoisonPotency"/>,
+    /// the rider's own) — laid on the ability as parameters of its own. The
     /// second half is what makes the augment composable — a parameter is a thing other augments can
     /// decorate, so "poison lasts a turn longer" lands on the poison THIS augment applies without a
     /// line of code knowing the two were bought together. Numbers held privately by the rider would be
@@ -28,7 +30,7 @@ namespace Battle.Source.Abilities
         public override void ApplyUpgrade(Ability ability)
         {
             base.ApplyUpgrade(ability);
-            Lend(ability, PoisonOnHitRider.Parameters.PoisonDuration, poisonDuration);
+            Lend(ability, AbilityParameter.PoisonDuration, poisonDuration);
             Lend(ability, PoisonOnHitRider.Parameters.PoisonPotency, poisonPotency);
         }
 

@@ -29,7 +29,7 @@ namespace Battle.Source.Abilities.IceBlock
         public float Damage => this[AbilityParameter.Damage];
         public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
         public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
-        public int StunDuration => (int)this[Parameters.StunDuration];
+        public int StunDuration => (int)this[AbilityParameter.StunDuration];
         public int ExtraBlocks => (int)this[Parameters.ExtraBlocks];
 
         /// <summary>L3 upgrade point: chance to reset the cooldown after the cast.</summary>
@@ -43,7 +43,6 @@ namespace Battle.Source.Abilities.IceBlock
 
         public static class Parameters
         {
-            public const string StunDuration = nameof(StunDuration);
             public const string WitheringDuration = nameof(WitheringDuration);
             public const string WitheringMaxStacks = nameof(WitheringMaxStacks);
             public const string WitheringValue = nameof(WitheringValue);
@@ -55,7 +54,7 @@ namespace Battle.Source.Abilities.IceBlock
         {
             base.RegisterBaseParameters(parameters);
             RegisterDamageParameters(parameters);
-            parameters.RegisterDefault(Parameters.StunDuration, 1);
+            parameters.RegisterDefault(AbilityParameter.StunDuration, 1);
             parameters.RegisterDefault(Parameters.WitheringDuration, 3);
             parameters.RegisterDefault(Parameters.WitheringMaxStacks, 3);
             parameters.RegisterDefault(Parameters.WitheringValue, 0.15f);

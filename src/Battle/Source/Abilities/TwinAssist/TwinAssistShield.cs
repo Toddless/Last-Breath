@@ -15,19 +15,18 @@ namespace Battle.Source.Abilities.TwinAssist
     /// </summary>
     public class TwinAssistShield(AbilityBaseData data) : Ability(data)
     {
-        public float ShieldStrength => this[Parameters.ShieldStrength];
+        public float ShieldStrength => this[AbilityParameter.ShieldStrength];
         public float HealthRegenPercent => this[Parameters.HealthRegenPercent];
 
         public static class Parameters
         {
-            public const string ShieldStrength = nameof(ShieldStrength);
             public const string HealthRegenPercent = nameof(HealthRegenPercent);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.ShieldStrength, 500f);
+            parameters.RegisterDefault(AbilityParameter.ShieldStrength, 500f);
             parameters.RegisterDefault(Parameters.HealthRegenPercent, 0.05f);
         }
 

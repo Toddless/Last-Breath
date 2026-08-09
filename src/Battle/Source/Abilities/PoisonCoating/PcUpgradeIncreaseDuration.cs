@@ -6,7 +6,7 @@ namespace Battle.Source.Abilities.PoisonCoating
     /// <summary>L1 upgrade: the coating buff itself lasts additional turns.</summary>
     public class PcUpgradeIncreaseDuration(string id, string[] tags, int tier, int duration)
         : SimpleUpgrade<PoisonCoating>(id, tags, tier, new SimpleAbilityParameterDecorator(
-            PoisonCoating.Parameters.CoatingDuration,
+            AbilityParameter.Duration,
             Priority.Weak,
             OperationType.Add,
             duration,

@@ -25,6 +25,11 @@ namespace Battle.Source.Abilities
         /// An augment reaching into the members of one ability class is not here — it stays a factory
         /// of its own in <c>AbilityProvider.Upgrades.cs</c>, and so do the augments whose amount is a
         /// share of the number they move rather than a figure of their own.
+        ///
+        /// The headings below say which ability a record was WRITTEN for, and that is all they say. A
+        /// row standing on a key of <see cref="AbilityParameter"/> works on every ability that declared
+        /// the concept, and a row standing on one ability's own key works on that ability alone — which
+        /// of the two a record is is read off the key it names and nowhere else.
         /// </summary>
         private readonly Dictionary<string, AugmentParameterMove[]> _parameterAugments = new()
         {
@@ -35,7 +40,7 @@ namespace Battle.Source.Abilities
             ],
             ["Augment_More_Attack_Damage"] =
             [
-                new(SeriesOfAttacks.SeriesOfAttacks.Parameters.DamageMultiplier, OperationType.Add, "damageMultiplier", 0.15f)
+                new(AbilityParameter.DamageMultiplier, OperationType.Add, "damageMultiplier", 0.15f)
             ],
             ["Augment_Additional_Attacks"] =
             [
@@ -46,7 +51,7 @@ namespace Battle.Source.Abilities
             // Increasing Pressure
             ["Augment_Additional_Amount_Attacks"] =
             [
-                new(IncreasingPressure.IncreasingPressure.Parameters.Attacks, OperationType.Add, "amountAttacks", 2f)
+                new(AbilityParameter.Attacks, OperationType.Add, "amountAttacks", 2f)
             ],
             ["Augment_Additional_Damage_Multiplier"] =
             [
@@ -61,7 +66,7 @@ namespace Battle.Source.Abilities
             ],
             ["Augment_Poison_Duration"] =
             [
-                new(JarOfPoison.JarOfPoison.Parameters.PoisonDuration, OperationType.Add, "poisonDuration", 1f)
+                new(AbilityParameter.PoisonDuration, OperationType.Add, "poisonDuration", 1f)
             ],
 
             // Overload
@@ -115,7 +120,7 @@ namespace Battle.Source.Abilities
             // Ares Blessing
             ["Augment_Buff_Duration"] =
             [
-                new(AresBlessing.AresBlessing.Parameters.Duration, OperationType.Add, "duration", 1f)
+                new(AbilityParameter.Duration, OperationType.Add, "duration", 1f)
             ],
             ["Augment_Recovery_Bonus"] =
             [
@@ -129,7 +134,7 @@ namespace Battle.Source.Abilities
             // Double Strike
             ["Augment_Damage_Multiplier"] =
             [
-                new(DoubleStrike.DoubleStrike.Parameters.DamageMultiplier, OperationType.Add, "amount", 0.25f)
+                new(AbilityParameter.DamageMultiplier, OperationType.Add, "amount", 0.25f)
             ],
             ["Augment_Restore_On_Hit"] =
             [
@@ -145,18 +150,18 @@ namespace Battle.Source.Abilities
             ],
             ["Augment_Extend_Stun_Add_Cost"] =
             [
-                new(HeadButt.HeadButt.Parameters.StunDuration, OperationType.Add, "stunDuration", 1f),
+                new(AbilityParameter.StunDuration, OperationType.Add, "stunDuration", 1f),
                 new(AbilityParameter.CostValue, OperationType.Add, "additionalCost", 50f)
             ],
             ["Augment_Additional_Lunges"] =
             [
-                new(HeadButt.HeadButt.Parameters.Attacks, OperationType.Add, "amount", 1f)
+                new(AbilityParameter.Attacks, OperationType.Add, "amount", 1f)
             ],
 
             // Critical Calculation
             ["Augment_More_Stacks_More_Cost"] =
             [
-                new(CriticalCalculation.CriticalCalculation.Parameters.Stacks, OperationType.Add, "stacks", 1f),
+                new(AbilityParameter.Stacks, OperationType.Add, "stacks", 1f),
                 new(AbilityParameter.CostValue, OperationType.Add, "cost", 50f)
             ],
 
@@ -167,12 +172,12 @@ namespace Battle.Source.Abilities
             ],
             ["Augment_Add_Effectiveness_Reduce_Stacks"] =
             [
-                new(DarkShroud.DarkShroud.Parameters.Effectiveness, OperationType.Add, "additionalEffectiveness", 0.35f),
-                new(DarkShroud.DarkShroud.Parameters.Stacks, OperationType.Subtract, "amountStacks", 2f)
+                new(AbilityParameter.Effectiveness, OperationType.Add, "additionalEffectiveness", 0.35f),
+                new(AbilityParameter.Stacks, OperationType.Subtract, "amountStacks", 2f)
             ],
             ["Augment_Increased_Buff_Duration"] =
             [
-                new(DarkShroud.DarkShroud.Parameters.Duration, OperationType.Add, "duration", 1f)
+                new(AbilityParameter.Duration, OperationType.Add, "duration", 1f)
             ],
 
             // Poison Explosion
@@ -252,7 +257,7 @@ namespace Battle.Source.Abilities
             ],
             ["Ability_Sa_Augment_Buff_Duration"] =
             [
-                new(StaticArmor.StaticArmor.Parameters.Duration, OperationType.Add, "amount", 1f)
+                new(AbilityParameter.Duration, OperationType.Add, "amount", 1f)
             ],
             ["Ability_Sa_Augment_More_Splash"] =
             [

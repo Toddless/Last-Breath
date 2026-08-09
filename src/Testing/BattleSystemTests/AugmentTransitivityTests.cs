@@ -6,7 +6,6 @@ namespace LastBreathTest.BattleSystemTests
     using System.Threading.Tasks;
     using Battle.Source;
     using Battle.Source.Abilities;
-    using Battle.Source.Abilities.Riders;
     using Battle.Source.Abilities.SeriesOfAttacks;
     using Core.Battle;
     using Core.Battle.Abilities;
@@ -59,7 +58,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>The parameter the applier lends the ability — the one an amplifier of poison
         /// duration stands on, and the one that must outlive any single copy of the applier.</summary>
-        private const string TurnsKey = PoisonOnHitRider.Parameters.PoisonDuration;
+        private const string TurnsKey = AbilityParameter.PoisonDuration;
         private const string AttacksProperty = "amountAttacks";
 
         private const float Blow = 100f;

@@ -9,27 +9,28 @@ namespace Battle.Source.Abilities.PoisonCoating
     using Effects;
 
     /// <summary>
-    /// Self-cast buff. For <see cref="CoatingDuration"/> turns, each of the caster's attacks
+    /// Self-cast buff. For <see cref="Duration"/> turns, each of the caster's attacks
     /// applies a poison stack to the target.
     /// </summary>
     public class PoisonCoating(AbilityBaseData data) : Ability(data)
     {
-        public int CoatingDuration => (int)this[Parameters.CoatingDuration];
-        public int PoisonDuration => (int)this[Parameters.PoisonDuration];
+        /// <summary>How long the coating buff itself holds on the caster — the common buff duration, not
+        /// a coating-only number: an augment offering a longer buff is offering exactly this one.</summary>
+        public int Duration => (int)this[AbilityParameter.Duration];
+
+        public int PoisonDuration => (int)this[AbilityParameter.PoisonDuration];
         public float PoisonDamagePercent => this[Parameters.PoisonMultiplier];
 
         public static class Parameters
         {
-            public const string CoatingDuration = nameof(CoatingDuration);
-            public const string PoisonDuration = nameof(PoisonDuration);
             public const string PoisonMultiplier = nameof(PoisonMultiplier);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.CoatingDuration, 3);
-            parameters.RegisterDefault(Parameters.PoisonDuration, 5);
+            parameters.RegisterDefault(AbilityParameter.Duration, 3);
+            parameters.RegisterDefault(AbilityParameter.PoisonDuration, 5);
             parameters.RegisterDefault(Parameters.PoisonMultiplier, 0.45f);
         }
 
@@ -39,7 +40,7 @@ namespace Battle.Source.Abilities.PoisonCoating
         {
             // Apply the coating buff to the caster; PoisonCoatingEffect handles attack interception
             var coatingBuff = new PoisonCoatingEffect(
-                duration: CoatingDuration,
+                duration: Duration,
                 maxStacks: 1,
                 poisonDuration: PoisonDuration,
                 poisonDamagePercent: PoisonDamagePercent);

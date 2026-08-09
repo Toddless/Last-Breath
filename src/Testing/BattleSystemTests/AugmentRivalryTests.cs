@@ -2,7 +2,6 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
     using Battle.Source.Abilities;
-    using Battle.Source.Abilities.HeadButt;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Entity;
@@ -259,10 +258,10 @@ namespace LastBreathTest.BattleSystemTests
         /// book ships on a berserker's own burn (Augment_More_Burn and Augment_Less_Burn). Stood in for
         /// on a key of Head Butt's, because which number it is has nothing to do with the question.</summary>
         private static IAbilityUpgrade MoreAttacks() =>
-            new AbilityUpgradeParameterSet("Augment_More_Attacks", [], 2, [(HeadButt.Parameters.Attacks, OperationType.Add, 2f)]);
+            new AbilityUpgradeParameterSet("Augment_More_Attacks", [], 2, [(AbilityParameter.Attacks, OperationType.Add, 2f)]);
 
         private static IAbilityUpgrade FewerAttacks() =>
-            new AbilityUpgradeParameterSet("Augment_Fewer_Attacks", [], 2, [(HeadButt.Parameters.Attacks, OperationType.Subtract, 1f)]);
+            new AbilityUpgradeParameterSet("Augment_Fewer_Attacks", [], 2, [(AbilityParameter.Attacks, OperationType.Subtract, 1f)]);
 
         /// <summary>Head Butt's own tier-two augment: a longer stun bought with fifty more mana.</summary>
         private static IAbilityUpgrade StunSurchargeUpgrade() =>

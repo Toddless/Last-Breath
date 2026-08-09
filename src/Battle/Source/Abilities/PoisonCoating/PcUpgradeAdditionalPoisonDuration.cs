@@ -6,7 +6,7 @@ namespace Battle.Source.Abilities.PoisonCoating
     /// <summary>L2 upgrade: poison stacks applied by the coating last additional turns.</summary>
     public class PcUpgradeAdditionalPoisonDuration(string id, string[] tags, int tier, int additionalDuration)
         : SimpleUpgrade<PoisonCoating>(id, tags, tier, new SimpleAbilityParameterDecorator(
-            PoisonCoating.Parameters.PoisonDuration,
+            AbilityParameter.PoisonDuration,
             Priority.Weak,
             OperationType.Add,
             additionalDuration,

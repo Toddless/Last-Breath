@@ -11,13 +11,18 @@
     {
         public int MinAttacks => (int)this[Parameters.MinAttacks];
         public int MaxAttacks => (int)this[Parameters.MaxAttacks];
-        public float DamageMultiplier => this[Parameters.DamageMultiplier];
+        public float DamageMultiplier => this[AbilityParameter.DamageMultiplier];
         public ISoAExecutionStrategy ExecutionStrategy { get; set; } = new SoAsDefaultExecutionStrategy();
         public AttackModifierPipeline AttackModifiers { get; } = new();
 
+        /// <summary>
+        /// The series is a RANGE and not a count, which is why the ability does not register
+        /// <see cref="AbilityParameter.Attacks"/>: a floor and a ceiling are two decisions, and one
+        /// number offering "+1 attack" cannot say which of them it is buying. An augment on the common
+        /// count is inert here on purpose — the two ends are moved by records that name them.
+        /// </summary>
         public static class Parameters
         {
-            public const string DamageMultiplier = nameof(DamageMultiplier);
             public const string MinAttacks = nameof(MinAttacks);
             public const string MaxAttacks = nameof(MaxAttacks);
         }
@@ -25,7 +30,7 @@
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.DamageMultiplier, 1.3f);
+            parameters.RegisterDefault(AbilityParameter.DamageMultiplier, 1.3f);
             parameters.RegisterDefault(Parameters.MinAttacks, 2);
             parameters.RegisterDefault(Parameters.MaxAttacks, 5);
         }

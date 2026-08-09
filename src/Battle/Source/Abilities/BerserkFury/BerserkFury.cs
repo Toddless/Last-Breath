@@ -32,7 +32,16 @@ namespace Battle.Source.Abilities.BerserkFury
 
         public static class Parameters
         {
+            /// <summary>
+            /// How long the Fury on the caster holds — the common buff duration by meaning, and its move
+            /// onto <see cref="AbilityParameter.Duration"/> is planned rather than refused. It waits
+            /// because of what stands beside it: <c>Augment_Fury_Duration</c> SHORTENS this number (a
+            /// shorter fury burns less health), so the ability's own record and the book's "your buff
+            /// lasts longer" pull it opposite ways. Two directions are two identities and both would be
+            /// worn, which is a balance answer and not a rename.
+            /// </summary>
             public const string FuryDuration = nameof(FuryDuration);
+
             public const string FuryHealthPercent = nameof(FuryHealthPercent);
         }
 

@@ -10,7 +10,7 @@
     public class IncreasingPressure(AbilityBaseData data) : DamagingAbility(data)
     {
         public AttackModifierPipeline AttackModifiers { get; } = new();
-        public float Attacks => this[Parameters.Attacks];
+        public float Attacks => this[AbilityParameter.Attacks];
         public float AttackDamageMultiplier => this[Parameters.AttackDamageStepMultiplier];
         public IIpExecutionStrategy ExecutionStrategy = new IpDefaultExecutionStrategy();
 
@@ -25,14 +25,13 @@
 
         public static class Parameters
         {
-            public const string Attacks = nameof(Attacks);
             public const string AttackDamageStepMultiplier = nameof(AttackDamageStepMultiplier);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.Attacks, 5);
+            parameters.RegisterDefault(AbilityParameter.Attacks, 5);
             parameters.RegisterDefault(Parameters.AttackDamageStepMultiplier, 0.15f);
         }
 

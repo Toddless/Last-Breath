@@ -34,22 +34,27 @@ namespace Battle.Source.Abilities.IceAegis
     {
         public float BarrierBase => this[Parameters.BarrierBase];
         public float PerIntelligenceScale => this[Parameters.PerIntelligenceScale];
-        public int Duration => (int)this[Parameters.Duration];
+        public int Duration => (int)this[AbilityParameter.Duration];
 
         public static class Parameters
         {
             public const string BarrierBase = nameof(BarrierBase);
             public const string PerIntelligenceScale = nameof(PerIntelligenceScale);
-            public const string Duration = nameof(Duration);
             public const string StageTwoScaleBonus = nameof(StageTwoScaleBonus);
+
+            /// <summary>How long the Clumsiness the aegis puts on an attacker holds. An effect laid on
+            /// somebody else and therefore not the book's <see cref="AbilityParameter.Duration"/>, which
+            /// is how long the aegis itself holds on its caster; the ability names both and they are
+            /// moved by different augments. The freeze below is the aegis's third such number, which is
+            /// why neither of them is a shared "applied effect duration" either.</summary>
             public const string ClumsinessDuration = nameof(ClumsinessDuration);
+
             public const string ClumsinessMaxStacks = nameof(ClumsinessMaxStacks);
             public const string ClumsinessValue = nameof(ClumsinessValue);
             public const string FreezeDuration = nameof(FreezeDuration);
             public const string ReflectPercent = nameof(ReflectPercent);
             public const string HealPerTurn = nameof(HealPerTurn);
             public const string StunAttackersChance = nameof(StunAttackersChance);
-            public const string StunDuration = nameof(StunDuration);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
@@ -57,7 +62,7 @@ namespace Battle.Source.Abilities.IceAegis
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(Parameters.BarrierBase, 500f);
             parameters.RegisterDefault(Parameters.PerIntelligenceScale, 35f);
-            parameters.RegisterDefault(Parameters.Duration, 3);
+            parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.StageTwoScaleBonus, 15f);
             parameters.RegisterDefault(Parameters.ClumsinessDuration, 3);
             parameters.RegisterDefault(Parameters.ClumsinessMaxStacks, 5);
@@ -67,7 +72,7 @@ namespace Battle.Source.Abilities.IceAegis
             parameters.RegisterDefault(Parameters.ReflectPercent, 0f);
             parameters.RegisterDefault(Parameters.HealPerTurn, 0f);
             parameters.RegisterDefault(Parameters.StunAttackersChance, 0f);
-            parameters.RegisterDefault(Parameters.StunDuration, 1);
+            parameters.RegisterDefault(AbilityParameter.StunDuration, 1);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new IceAegis(Data));
@@ -112,7 +117,7 @@ namespace Battle.Source.Abilities.IceAegis
         {
             float stunChance = this[Parameters.StunAttackersChance];
             if (stunChance > 0 && CombatRandom.Rolls.RandFloat() <= stunChance)
-                return new StunEffect((int)this[Parameters.StunDuration]);
+                return new StunEffect((int)this[AbilityParameter.StunDuration]);
 
             return new Clumsiness(
                 (int)this[Parameters.ClumsinessDuration], (int)this[Parameters.ClumsinessMaxStacks], this[Parameters.ClumsinessValue]);

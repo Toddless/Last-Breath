@@ -15,13 +15,12 @@ namespace Battle.Source.Abilities.AresBlessing
     /// </summary>
     public class AresBlessing(AbilityBaseData data) : Ability(data)
     {
-        public int Duration => (int)this[Parameters.Duration];
+        public int Duration => (int)this[AbilityParameter.Duration];
         public float HealthBonus => this[Parameters.HealthBonus];
         public float RecoveryBonus => this[Parameters.RecoveryBonus];
 
         public static class Parameters
         {
-            public const string Duration = nameof(Duration);
             public const string HealthBonus = nameof(HealthBonus);
             public const string RecoveryBonus = nameof(RecoveryBonus);
         }
@@ -29,7 +28,7 @@ namespace Battle.Source.Abilities.AresBlessing
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.Duration, 3);
+            parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.HealthBonus, 0.3f);
             parameters.RegisterDefault(Parameters.RecoveryBonus, 0.3f);
         }

@@ -18,14 +18,13 @@ namespace Battle.Source.Abilities.Sacrifice
     {
         public float SacrificePercent => this[Parameters.SacrificePercent];
         public float RatePerHundred => this[Parameters.RatePerHundred];
-        public int Charges => (int)this[Parameters.Charges];
+        public int Charges => (int)this[AbilityParameter.Charges];
         public float HealPercent => this[Parameters.HealPercent];
 
         public static class Parameters
         {
             public const string SacrificePercent = nameof(SacrificePercent);
             public const string RatePerHundred = nameof(RatePerHundred);
-            public const string Charges = nameof(Charges);
             public const string HealPercent = nameof(HealPercent);
         }
 
@@ -34,7 +33,7 @@ namespace Battle.Source.Abilities.Sacrifice
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(Parameters.SacrificePercent, 0.15f);
             parameters.RegisterDefault(Parameters.RatePerHundred, 0.01f);
-            parameters.RegisterDefault(Parameters.Charges, 1);
+            parameters.RegisterDefault(AbilityParameter.Charges, 1);
             parameters.RegisterDefault(Parameters.HealPercent, 0f);
         }
 

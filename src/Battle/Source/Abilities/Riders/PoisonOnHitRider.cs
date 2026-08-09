@@ -25,12 +25,11 @@ namespace Battle.Source.Abilities.Riders
     /// </summary>
     public class PoisonOnHitRider : IImpactRider
     {
-        /// <summary>Keys the rider reads off the ability it is riding on.</summary>
+        /// <summary>Keys the rider reads off the ability it is riding on. How long a stack lasts is a
+        /// concept the book shares (<see cref="AbilityParameter.PoisonDuration"/>) and is named there;
+        /// how much of a blow a tick carries belongs to this rider alone and is named here.</summary>
         public static class Parameters
         {
-            /// <summary>Turns a stack laid by this rider lasts.</summary>
-            public const string PoisonDuration = nameof(PoisonDuration);
-
             /// <summary>Share of the impact's damage one tick of the stack carries.</summary>
             public const string PoisonPotency = nameof(PoisonPotency);
         }
@@ -44,7 +43,7 @@ namespace Battle.Source.Abilities.Riders
             if (!impact.Succeeded) return;
 
             var poison = new DamageOverTurnEffect(
-                (int)impact.Source[Parameters.PoisonDuration],
+                (int)impact.Source[AbilityParameter.PoisonDuration],
                 StatusEffects.Poison,
                 percentFromDamage: impact.Source[Parameters.PoisonPotency]);
 

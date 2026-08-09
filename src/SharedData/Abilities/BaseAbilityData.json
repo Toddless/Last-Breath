@@ -99,7 +99,7 @@
             "costType": 1,
             "abilityProperties": {
                 "poisonMultiplier": 0.45,
-                "coatingDuration": 3,
+                "duration": 3,
                 "poisonDuration": 5
             }
         },

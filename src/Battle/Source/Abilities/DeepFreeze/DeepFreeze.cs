@@ -33,6 +33,12 @@ namespace Battle.Source.Abilities.DeepFreeze
         /// <summary>L2 upgrade point: every effect already on the target lasts 1 more turn.</summary>
         public bool ExtendTargetEffects { get; set; }
 
+        /// <summary>
+        /// Every duration here is an effect laid on the TARGET, and there are four of them. That is why
+        /// none is the book's <see cref="AbilityParameter.Duration"/> — that key is the buff on the
+        /// caster — and why the ability owns no single "applied effect duration" either: one number
+        /// cannot say which of four an augment is lengthening.
+        /// </summary>
         public static class Parameters
         {
             public const string FreezeDuration = nameof(FreezeDuration);

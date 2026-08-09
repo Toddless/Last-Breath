@@ -28,7 +28,7 @@ namespace Battle.Source.Abilities.Armageddon
         private Activation.ChargedActivation Charge =>
             field ??= new Activation.ChargedActivation(maxStage: 3, stage => Owner != null && HpCost(stage) < Owner.CurrentHealth);
 
-        public int StunDuration => (int)this[Parameters.StunDuration];
+        public int StunDuration => (int)this[AbilityParameter.StunDuration];
         public float HpCostMultiplier => this[Parameters.HpCostMultiplier];
         public float MissingHpRate => this[Parameters.MissingHpRate];
 
@@ -53,7 +53,6 @@ namespace Battle.Source.Abilities.Armageddon
 
         public static class Parameters
         {
-            public const string StunDuration = nameof(StunDuration);
             public const string HpCostMultiplier = nameof(HpCostMultiplier);
             public const string MissingHpRate = nameof(MissingHpRate);
             public const string SecondDamage = nameof(SecondDamage);
@@ -70,7 +69,7 @@ namespace Battle.Source.Abilities.Armageddon
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.StunDuration, 2);
+            parameters.RegisterDefault(AbilityParameter.StunDuration, 2);
             parameters.RegisterDefault(Parameters.HpCostMultiplier, 1f);
             parameters.RegisterDefault(Parameters.MissingHpRate, 0f);
             parameters.RegisterDefault(Parameters.SecondDamage, 600f);

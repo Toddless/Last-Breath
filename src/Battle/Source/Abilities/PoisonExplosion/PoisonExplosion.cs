@@ -25,7 +25,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
         }
 
         public int ExecutionThreshold => (int)this[Parameters.ExecutionThreshold];
-        public float DamageMultiplier => this[Parameters.DamageMultiplier];
+        public float DamageMultiplier => this[AbilityParameter.DamageMultiplier];
 
         public bool PreserveStacks { get; set; }
         public IPoisonSpreadMode? SpreadMode { get; set; }
@@ -34,13 +34,12 @@ namespace Battle.Source.Abilities.PoisonExplosion
         public static class Parameters
         {
             public const string ExecutionThreshold = nameof(ExecutionThreshold);
-            public const string DamageMultiplier = nameof(DamageMultiplier);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.DamageMultiplier, 0f);
+            parameters.RegisterDefault(AbilityParameter.DamageMultiplier, 0f);
             parameters.RegisterDefault(Parameters.ExecutionThreshold, 42);
         }
 

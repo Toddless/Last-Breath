@@ -1380,7 +1380,7 @@ msgid "Ability_Poison_Coating"
 msgstr "Ядовитое покрытие"
 
 msgid "Ability_Poison_Coating_Description"
-msgstr "В течение {CoatingDuration|turn|turns} все атаки накладывают стак яда. Каждый стак наносит {PoisonMultiplier:%} от нанесённого урона в течение {PoisonDuration|turn|turns}."
+msgstr "В течение {Duration|turn|turns} все атаки накладывают стак яда. Каждый стак наносит {PoisonMultiplier:%} от нанесённого урона в течение {PoisonDuration|turn|turns}."
 
 msgid "Ability_Poison_Explosion"
 msgstr "Взрыв яда"
