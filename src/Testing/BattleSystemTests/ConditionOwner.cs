@@ -250,6 +250,10 @@ namespace LastBreathTest.BattleSystemTests
 
         public bool IsStronger(IEffect otherEffect) => false;
         public IEffect Copy() => new FakeEffect(Id, IsHarmful);
+
+        /// <summary>The conditions this stand-in is read by never extend anything; a budget-free
+        /// duration bump here would be a quiet second opinion about a rule the real effect owns.</summary>
+        public int Extend(int turns) => throw new NotSupportedException("conditions do not extend");
     }
 
     internal sealed class FakeShield() : FakeEffect("Effect_Shield", isHarmful: false), IShieldEffect

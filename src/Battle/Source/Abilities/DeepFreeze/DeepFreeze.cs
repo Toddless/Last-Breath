@@ -95,7 +95,7 @@ namespace Battle.Source.Abilities.DeepFreeze
                 // The extension counts only effects present BEFORE this cast lands its own payload
                 if (ExtendTargetEffects)
                     foreach (IEffect effect in target.Effects.GetBy(_ => true).ToList())
-                        effect.Duration += 1;
+                        effect.Extend(1);
 
                 await ApplyPayload(plan, owner, target);
                 // A landing that carries no damage is still a landing: the road is the plan's own target

@@ -7,5 +7,6 @@ namespace Core.Battle
         ArenaRules Arena { get; }
         ExhaustionRules Exhaustion { get; }
         AugmentValueRules AugmentValues { get; }
+        EffectRules Effects { get; }
     }
 }

@@ -17,8 +17,10 @@ namespace Battle.Source.Abilities.Riders
         {
             if (!impact.Succeeded) return Task.CompletedTask;
 
+            // Through the effect's own road: what a hit adds is charged to the poison's extension
+            // budget, so a rider firing on every impact of a long series cannot make one stack eternal.
             foreach (IEffect effect in impact.Target.Effects.GetBy(x => x.Status == StatusEffects.Poison))
-                effect.Duration += duration;
+                effect.Extend(duration);
             return Task.CompletedTask;
         }
     }

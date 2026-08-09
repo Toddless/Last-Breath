@@ -14,5 +14,7 @@ namespace LastBreathTest.BattleSystemTests
         public ExhaustionRules Exhaustion => ExhaustionRules.Disabled;
 
         public AugmentValueRules AugmentValues { get; } = values;
+
+        public EffectRules Effects => EffectRules.Default;
     }
 }

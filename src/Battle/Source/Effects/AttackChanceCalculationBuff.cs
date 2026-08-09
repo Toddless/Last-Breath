@@ -7,7 +7,8 @@ namespace Battle.Source.Effects
 
     /// <summary>
     /// Self-extending additional-attack-chance buff — the L3 "replace" variant of
-    /// <see cref="CritCalculationBuff"/>: same stack/duration/extend-on-crit mechanic, but boosts
+    /// <see cref="CritCalculationBuff"/>: same stack/duration/extend-on-crit mechanic (budget and
+    /// all), but boosts
     /// <see cref="EntityParameter.AdditionalHitChance"/> instead of critical chance.
     /// </summary>
     public class AttackChanceCalculationBuff(int duration, int maxStacks, float value)
@@ -30,7 +31,9 @@ namespace Battle.Source.Effects
 
         private void OnAfterAttack(AfterAttackEvent evt)
         {
-            if (evt.Context.IsCritical) Duration++;
+            // Self-extension travels the same road every other extender does, so a crit loop runs into
+            // the instance's budget instead of holding the buff up for the rest of the fight.
+            if (evt.Context.IsCritical) Extend(1);
         }
 
         public override IEffect Copy() => new AttackChanceCalculationBuff(Duration, MaxStacks, Value);

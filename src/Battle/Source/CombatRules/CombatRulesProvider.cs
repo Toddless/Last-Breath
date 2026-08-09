@@ -21,6 +21,8 @@ namespace Battle.Source.CombatRules
 
         public AugmentValueRules AugmentValues { get; private set; } = AugmentValueRules.Fixed;
 
+        public EffectRules Effects { get; private set; } = EffectRules.Default;
+
         public IReadOnlyList<string> Catalogs => [DataCatalog.CombatRules];
 
         public void Apply(string catalog, GameDataFile file)
@@ -39,6 +41,7 @@ namespace Battle.Source.CombatRules
             Arena = new ArenaRules(data.Arena.MaxBattleSlots);
             Exhaustion = new ExhaustionRules(data.Exhaustion.CostIncreasePerStack, data.Exhaustion.DecayPerTurn);
             AugmentValues = new AugmentValueRules(data.AbilityAugments.ValueSpread);
+            Effects = new EffectRules(data.Effects.MaxExtendedTurns);
         }
     }
 }

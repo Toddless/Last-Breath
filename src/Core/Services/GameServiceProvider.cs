@@ -31,6 +31,14 @@ namespace Core.Services
             s_instance ?? throw new InvalidOperationException(
                 $"{nameof(GameServiceProvider)} is not initialized. Call {nameof(Initialize)} from the project's bootstrap first.");
 
+        /// <summary>The soft read of <see cref="IGameServiceProvider.TryGet{T}"/> for code holding no
+        /// provider at all: nothing when no project bootstrapped a composition, where
+        /// <see cref="Instance"/> throws and would turn a caller's default into a crash. Same rule as
+        /// the instance door — a caller that cannot work without the service asks through
+        /// <see cref="Instance"/> instead.</summary>
+        public static T? TryGet<T>()
+            where T : class => ((IGameServiceProvider?)s_instance)?.TryGet<T>();
+
         /// <summary>Idempotent: the first configuration wins, later calls return the existing provider.</summary>
         public static IGameServiceProvider Initialize(Action<IServiceCollection> configureProject)
         {

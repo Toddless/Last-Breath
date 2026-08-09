@@ -116,7 +116,7 @@
             // still fights, the twin gate simply never blocks.
             _worldFacts = provider.GetServices<Core.Narrative.Facts.IWorldFactsService>().FirstOrDefault();
             // All optional for the same reason: a project without them fights with defaults and no summons.
-            _arenaRules = provider.GetServices<ICombatRulesProvider>().FirstOrDefault()?.Arena ?? ArenaRules.Default;
+            _arenaRules = provider.TryGet<ICombatRulesProvider>()?.Arena ?? ArenaRules.Default;
             _npcProvider = provider.GetServices<Core.Entity.INpcProvider>().FirstOrDefault();
             _summonSpawner = provider.GetServices<IBattleNpcSpawner>().FirstOrDefault();
         }

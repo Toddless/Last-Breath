@@ -27,5 +27,17 @@
         void TurnEnd();
         bool IsStronger(IEffect otherEffect);
         IEffect Copy();
+
+        /// <summary>
+        /// Makes an effect that has ALREADY landed last longer, and the only road that does: raising
+        /// <see cref="Duration"/> from outside bypasses the budget every instance extends within.
+        /// Extending is not applying — the mutators that shape a duration while the effect is being
+        /// applied (scaling, flat bonuses, control resistance, a re-application refreshing the
+        /// standing stack) run before the effect stands and are not charged here. An effect whose
+        /// duration has run out is past extending too — that would be a resurrection.
+        /// </summary>
+        /// <returns>Turns actually added: less than asked for once the budget runs short, zero once
+        /// it is spent, so a caller can tell a real extension from one the cap swallowed.</returns>
+        int Extend(int turns);
     }
 }

@@ -7,8 +7,8 @@ namespace Battle.Source.Effects
 
     /// <summary>
     /// Base "Crit Calculation" buff: raises critical chance by <c>value</c> and extends its own
-    /// duration by 1 turn each time the bearer scores a critical hit. (The "Lucky" mechanic is a
-    /// separate L3 effect — see <see cref="LuckyCritChanceEffect"/>.)
+    /// duration by 1 turn each time the bearer scores a critical hit, within the instance's extension
+    /// budget. (The "Lucky" mechanic is a separate L3 effect — see <see cref="LuckyCritChanceEffect"/>.)
     /// </summary>
     public class CritCalculationBuff(int duration, int maxStacks, float value)
         : ParameterChangeEffect(
@@ -30,7 +30,9 @@ namespace Battle.Source.Effects
 
         private void OnAfterAttack(AfterAttackEvent evt)
         {
-            if (evt.Context.IsCritical) Duration++;
+            // Self-extension travels the same road every other extender does, so a crit loop runs into
+            // the instance's budget instead of holding the buff up for the rest of the fight.
+            if (evt.Context.IsCritical) Extend(1);
         }
 
         public override IEffect Copy() => new CritCalculationBuff(Duration, MaxStacks, Value);

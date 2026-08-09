@@ -8,6 +8,14 @@ namespace Core.Data.CombatRulesData
         [JsonProperty("arena")] public ArenaData Arena { get; init; } = new();
         [JsonProperty("exhaustion")] public ExhaustionData Exhaustion { get; init; } = new();
         [JsonProperty("abilityAugments")] public AbilityAugmentsData AbilityAugments { get; init; } = new();
+        [JsonProperty("effects")] public EffectsData Effects { get; init; } = new();
+    }
+
+    /// <summary>The "effects" section: what holds for every effect instance (see EffectRules).</summary>
+    public record EffectsData
+    {
+        /// <summary>Turns one instance may gain from extensions in total. Balance placeholder.</summary>
+        [JsonProperty("maxExtendedTurns")] public int MaxExtendedTurns { get; init; } = 3;
     }
 
     /// <summary>The "abilityAugments" section: what every augment instance shares (see AugmentValueRules).</summary>

@@ -11,6 +11,7 @@
     using Core.Enums;
     using Core.Events;
     using Core.Localization;
+    using Core.Services;
     using Godot;
 
     public abstract class Effect(
@@ -20,6 +21,15 @@
         StatusEffects statusEffect = StatusEffects.None) : IEffect
     {
         private readonly List<Action> _unsubscribes = [];
+
+        /// <summary>Turns this instance has already been given by extensions, all sources together.</summary>
+        private int _extendedTurns;
+
+        /// <summary>Resolved on first use rather than in the constructor: effects are built in bulk
+        /// (every copy of every stack) while extensions are rare, and the rules are the same file all
+        /// the way through a fight.</summary>
+        private int? _extensionBudget;
+
         protected EffectApplyingContext? Context { get; private set; }
 
         /// <summary>True when the stacking rules actually accepted this instance (see EffectsComponent).</summary>
@@ -56,6 +66,17 @@
         } = duration;
 
         public int MaxStacks { get; set; } = maxStacks;
+
+        /// <summary>
+        /// Turns this instance may gain from <see cref="Extend"/> in total, taken from the combat
+        /// rules. The budget belongs to the INSTANCE: two stacks of one effect carry a budget each,
+        /// so a second stack is worth stacking rather than a share of the first one's room.
+        /// A copy is a new instance with a budget of its own; a spread or a transfer carries the
+        /// duration already extended into it, which is deliberate — what moves is the effect as it
+        /// stands, and the room to extend it further is the new instance's own.
+        /// </summary>
+        public int ExtensionBudget => _extensionBudget ??= ResolveExtensionBudget();
+
         public string Source { get; private set; } = string.Empty;
         public bool Expired => Duration == 0;
         public string Description => FormatDescription();
@@ -128,6 +149,33 @@
 
         public bool IsSame(string otherId) => Id.Equals(otherId);
 
+        /// <summary>
+        /// The one road that makes a standing effect last longer. Every extension is charged to this
+        /// instance's <see cref="ExtensionBudget"/>, so no number of extenders — riders, augments, an
+        /// ability extending what it touched — can keep an effect alive for the rest of the fight.
+        /// The boundary the budget is drawn at: EXTENSION happens to an effect that has already
+        /// landed, APPLICATION shapes the duration an effect lands with (duration scaling, flat
+        /// duration bonuses, control resistance, a re-application refreshing the standing stack) and
+        /// pays nothing here — those mutators run before there is an instance standing to extend.
+        /// An effect whose duration has run out is not extended either: it has lived its last turn and
+        /// lies in the list until the turn end takes it away, and lengthening it there would be a
+        /// resurrection rather than an extension.
+        /// </summary>
+        /// <param name="turns">Turns asked for. Nothing and less is not an extension and costs nothing.</param>
+        /// <returns>Turns actually added: what was left of the budget when it runs short, zero once it
+        /// is spent. A caller reads it to tell a real extension from one the cap swallowed.</returns>
+        public int Extend(int turns)
+        {
+            if (turns <= 0 || Duration <= 0) return 0;
+
+            int granted = Math.Min(turns, ExtensionBudget - _extendedTurns);
+            if (granted <= 0) return 0;
+
+            _extendedTurns += granted;
+            Duration += granted;
+            return granted;
+        }
+
         public virtual bool IsStronger(IEffect otherEffect) => false;
 
         public abstract IEffect Copy();
@@ -150,6 +198,13 @@
         protected virtual Dictionary<string, object?> DescriptionValues => new() { [nameof(Duration)] = Duration, [nameof(MaxStacks)] = MaxStacks, };
 
         protected virtual string FormatDescription() => Localization.RenderDescription(Id, DescriptionValues, TextFormat.Rich);
+
+        /// <summary>The budget the combat rules give, or the working default when there are no rules to
+        /// reach: effects are built by hosts that compose no services at all, and a cap that quietly
+        /// disappears there would be a cap that never held.</summary>
+        private static int ResolveExtensionBudget() =>
+            GameServiceProvider.TryGet<ICombatRulesProvider>()?.Effects.MaxExtendedTurns
+            ?? EffectRules.Default.MaxExtendedTurns;
 
         private void ClearSubscriptions()
         {
