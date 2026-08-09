@@ -194,6 +194,7 @@ namespace LastBreath.Services
             services.AddSingleton<INarrativeActionFactory, AddInfluenceExpActionFactory>();
             services.AddSingleton<INarrativeActionFactory, StartTradeActionFactory>();
             services.AddSingleton<INarrativeActionFactory, SpawnNpcActionFactory>();
+            services.AddSingleton<INarrativeActionFactory, GrantTreePointsActionFactory>();
             foreach (var kind in System.Enum.GetValues<QuestActionKind>())
                 services.AddSingleton<INarrativeActionFactory>(sp => new QuestActionFactory(sp.GetRequiredService<IQuestLogService>, kind));
         }

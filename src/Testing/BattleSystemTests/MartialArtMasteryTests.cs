@@ -69,7 +69,7 @@ namespace LastBreathTest.BattleSystemTests
 
             for (int level = 0; level < mastery.MaximumLevel; level++)
             {
-                mastery.RestoreState(level, 0);
+                mastery.RestoreState(level, 0, 0);
                 int cost = mastery.ExpToNextLevelTotal();
 
                 Assert.IsTrue(cost > previous,
@@ -83,11 +83,11 @@ namespace LastBreathTest.BattleSystemTests
         {
             var mastery = CreateMastery();
 
-            mastery.RestoreState(-5, -100);
+            mastery.RestoreState(-5, -100, 0);
             Assert.AreEqual(0, mastery.CurrentLevel);
             Assert.AreEqual(0, mastery.CurrentExperience);
 
-            mastery.RestoreState(500, 10);
+            mastery.RestoreState(500, 10, 0);
             Assert.AreEqual(mastery.MaximumLevel, mastery.CurrentLevel);
         }
 
@@ -96,7 +96,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             var mastery = CreateMastery();
 
-            mastery.RestoreState(1, 0); // saves written before the zero-based scale start here
+            mastery.RestoreState(1, 0, 0); // saves written before the zero-based scale start here
 
             Assert.AreEqual(1, mastery.CurrentLevel);
             Assert.IsTrue(mastery.ExpToNextLevelTotal() > 0);
@@ -216,8 +216,8 @@ namespace LastBreathTest.BattleSystemTests
             var tree = new TreePointsSpy();
             var mastery = CreateMastery(tree.Service);
 
-            mastery.RestoreState(mastery.MaximumLevel, 0);
-            mastery.RestoreState(mastery.MaximumLevel, 0); // a second load inside the same session
+            mastery.RestoreState(mastery.MaximumLevel, 0, 0);
+            mastery.RestoreState(mastery.MaximumLevel, 0, 0); // a second load inside the same session
 
             Assert.AreEqual(50, tree.TotalPoints, "the total is stated, not added — a reload must not duplicate the budget");
         }

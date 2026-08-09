@@ -15,8 +15,9 @@ namespace Battle.Source
 
     /// <summary>
     /// Martial art mastery. Levels are counted from ZERO, so the fifty levels of the curve are fifty
-    /// level ups — and fifty passive tree points, one per level. Curve tuning lives in the
-    /// MartialArtMastery catalog; the constructor reads nothing.
+    /// level ups — and fifty passive tree points, one per level. Quests pay points on top of that
+    /// (<see cref="BonusPoints"/>), and the sum is the whole budget the tree is ever told about.
+    /// Curve tuning lives in the MartialArtMastery catalog; the constructor reads nothing.
     /// The passive tree is optional: only the game project owns an allocation, so the battle sandbox
     /// resolves null and the points go nowhere.
     /// </summary>
@@ -67,7 +68,22 @@ namespace Battle.Source
             }
         }
 
+        /// <summary>Points handed out beside the curve — quest rewards. Restating the tree total on
+        /// every change is what makes a grant reach the wheel the same way a level up does.</summary>
+        public int BonusPoints
+        {
+            get;
+            private set
+            {
+                if (value == field) return;
+                field = value;
+                GrantPassivePoints();
+            }
+        }
+
         public int CurrentLevel => EarnedLevel + BonusLevel;
+
+        public int TotalPoints => EarnedLevel + BonusPoints;
 
         public int MaximumLevel => _config.MaxLevel;
 
@@ -97,17 +113,32 @@ namespace Battle.Source
             CheckForLevel();
         }
 
-        public void RestoreState(int baseLevel, int experience)
+        /// <summary>Grants tree points a quest paid for. Not idempotent by design — the reward is
+        /// kept to one payment by the quest being unrepeatable. A grant that is not a reward is
+        /// reported instead of quietly resized: it would move a budget the player already spent.</summary>
+        public void AddBonusPoints(int points)
+        {
+            if (points <= 0)
+            {
+                Tracker.TrackError($"Martial art mastery: a grant of {points} passive tree points is not a reward");
+                return;
+            }
+
+            BonusPoints += points;
+        }
+
+        public void RestoreState(int baseLevel, int experience, int bonusPoints)
         {
             EarnedLevel = Mathf.Clamp(baseLevel, 0, MaximumLevel);
             CurrentExperience = Mathf.Max(0, experience);
+            BonusPoints = Mathf.Max(0, bonusPoints);
         }
 
         /// <summary>Unlike RestoreState, the bonus levels zero too: the fresh session has no equipment granting them.</summary>
         public void ResetSession()
         {
             BonusLevel = 0;
-            RestoreState(0, 0);
+            RestoreState(0, 0, 0);
         }
 
         public void AddBonusLevel() => BonusLevel++;
@@ -142,9 +173,10 @@ namespace Battle.Source
         private float GetProgressFactor() =>
             Mathf.Clamp((CurrentLevel + BonusLevel - 1) / ((float)MaximumLevel + BonusLevel - 1), 0f, 1f) + 1;
 
-        /// <summary>One tree point per earned level. The total is STATED, never added to: a save applied
-        /// twice restates the same budget instead of duplicating it.</summary>
-        private void GrantPassivePoints() => passiveTree?.Invoke()?.SetTotalPoints(EarnedLevel);
+        /// <summary>One tree point per earned level, plus whatever was granted beside the curve. The
+        /// total is STATED, never added to: a save applied twice restates the same budget instead of
+        /// duplicating it.</summary>
+        private void GrantPassivePoints() => passiveTree?.Invoke()?.SetTotalPoints(TotalPoints);
 
         // Same piece of code like within Crafting mastery class.
         // I don't want to couple two projects via a Core library to reduce code duplication

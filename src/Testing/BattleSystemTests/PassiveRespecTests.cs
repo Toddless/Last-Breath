@@ -275,7 +275,11 @@ namespace LastBreathTest.BattleSystemTests
 
             public int BonusLevel { get; private set; }
 
+            public int BonusPoints { get; private set; }
+
             public int CurrentLevel => EarnedLevel + BonusLevel;
+
+            public int TotalPoints => EarnedLevel + BonusPoints;
 
             public int MaximumLevel => 50;
 
@@ -309,13 +313,19 @@ namespace LastBreathTest.BattleSystemTests
 
             public void RemoveBonusLevel() => BonusLevel--;
 
+            public void AddBonusPoints(int points) => BonusPoints += points;
+
             public int ExpToNextLevelRemain() => 0;
 
             public int ExpToNextLevelTotal() => 0;
 
             public bool IsSame(string otherId) => InstanceId.Equals(otherId, StringComparison.Ordinal);
 
-            public void RestoreState(int baseLevel, int experience) => EarnedLevel = baseLevel;
+            public void RestoreState(int baseLevel, int experience, int bonusPoints)
+            {
+                EarnedLevel = baseLevel;
+                BonusPoints = bonusPoints;
+            }
         }
 
         private sealed class TreeProviderStub(PassiveTreeDocument tree) : IPassiveTreeProvider
