@@ -2821,10 +2821,10 @@ msgstr "First Attack Crit Damage"
 msgid "Ability_Ip_Augment_First_Attack_Crit_Damage_Description"
 msgstr "The first attack deals +{critDamageBonus:%} critical damage."
 
-msgid "Augment_Attack_Extend_Poison"
-msgstr "Attack Extend Poison"
+msgid "Augment_Extend_Poison"
+msgstr "Extend Poison"
 
-msgid "Augment_Attack_Extend_Poison_Description"
+msgid "Augment_Extend_Poison_Description"
 msgstr "A successful attack extends poison by {poisonDuration|turn|turns}."
 
 msgid "Ability_Ip_Augment_Unevadable"
@@ -3036,12 +3036,6 @@ msgstr "Apply Stack For Each Enemy"
 
 msgid "Ability_Pc_Augment_Apply_Stack_For_Each_Enemy_Description"
 msgstr "Applies a poison stack for each enemy on the battlefield."
-
-msgid "Ability_Pc_Augment_Increase_Poison_On_Target"
-msgstr "Increase Poison On Target"
-
-msgid "Ability_Pc_Augment_Increase_Poison_On_Target_Description"
-msgstr "+{poisonDuration|turn|turns} poison duration on the target."
 
 msgid "Ability_Pc_Augment_Additional_Poison_Stack_Duration"
 msgstr "Additional Poison Stack Duration"

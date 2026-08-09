@@ -423,6 +423,7 @@
             "id": "Augment_Poison_On_Hit",
             "tier": 3,
             "tags": [ "poison" ],
+            "abilityId": "Ability_Series_Of_Attacks",
             "upgradeProperties": {
                 "poisonDuration": 3
             }
@@ -493,6 +494,7 @@
             "id": "Augment_Attack_Random_Target",
             "tier": 3,
             "tags": [],
+            "abilityId": "Ability_Increasing_Pressure",
             "upgradeProperties": {
                 "splashDamage": 0.45
             }
@@ -514,9 +516,9 @@
             }
         },
         {
-            "id": "Augment_Attack_Extend_Poison",
+            "id": "Augment_Extend_Poison",
             "tier": 2,
-            "tags": [ "poison", "duration" ],
+            "tags": [ "attack", "poison" ],
             "upgradeProperties": {
                 "poisonDuration": 1
             }
@@ -557,6 +559,7 @@
             "id": "Augment_Transfer_Poison_On_Death",
             "tier": 3,
             "tags": [ "poison" ],
+            "abilityId": "Ability_Jar_Of_Poison",
             "upgradeProperties": {}
         },
         {
@@ -570,6 +573,7 @@
             "id": "Augment_Clumsiness",
             "tier": 2,
             "tags": [ "evasion" ],
+            "abilityId": "Ability_Jar_Of_Poison",
             "upgradeProperties": {
                 "evadeReduce": 0.15,
                 "maxStacks": 5,
@@ -580,6 +584,7 @@
             "id": "Augment_Apply_Blind",
             "tier": 2,
             "tags": [],
+            "abilityId": "Ability_Jar_Of_Poison",
             "upgradeProperties": {
                 "accuracyReduce": 0.15,
                 "maxStacks": 5,
@@ -590,6 +595,7 @@
             "id": "Augment_Apply_Weakness",
             "tier": 2,
             "tags": [ "damage" ],
+            "abilityId": "Ability_Jar_Of_Poison",
             "upgradeProperties": {
                 "damageReduce": 0.15,
                 "maxStacks": 5,
@@ -635,6 +641,7 @@
             "id": "Augment_Immortality",
             "tier": 3,
             "tags": [ "buff" ],
+            "abilityId": "Ability_Dark_Shroud",
             "upgradeProperties": {
                 "duration": 3,
                 "stacks": 1
@@ -702,6 +709,7 @@
             "id": "Augment_Additional_Crit_Multiplier",
             "tier": 2,
             "tags": [ "crit", "damage" ],
+            "abilityId": "Ability_Critical_Calculation",
             "upgradeProperties": {
                 "multiplier": 0.15,
                 "duration": 3
@@ -711,6 +719,7 @@
             "id": "Augment_Leach_On_Crit",
             "tier": 2,
             "tags": [ "crit", "health" ],
+            "abilityId": "Ability_Critical_Calculation",
             "upgradeProperties": {
                 "amount": 0.15
             }
@@ -719,6 +728,7 @@
             "id": "Augment_Apply_Enhanced_Defence",
             "tier": 2,
             "tags": [ "buff", "duration" ],
+            "abilityId": "Ability_Critical_Calculation",
             "upgradeProperties": {
                 "duration": 3,
                 "stacks": 3,
@@ -738,6 +748,7 @@
             "id": "Augment_Apply_Seal_Of_Oblivion",
             "tier": 3,
             "tags": [],
+            "abilityId": "Ability_Poison_Explosion",
             "upgradeProperties": {
                 "duration": 3
             }
@@ -819,15 +830,6 @@
             "upgradeProperties": {}
         },
         {
-            "id": "Ability_Pc_Augment_Increase_Poison_On_Target",
-            "tier": 2,
-            "tags": [],
-            "abilityId": "Ability_Poison_Coating",
-            "upgradeProperties": {
-                "poisonDuration": 1
-            }
-        },
-        {
             "id": "Ability_Pc_Augment_Additional_Poison_Stack_Duration",
             "tier": 2,
             "tags": [],
@@ -868,6 +870,7 @@
             "id": "Augment_Restore_On_Hit",
             "tier": 3,
             "tags": [ "hit" ],
+            "abilityId": "Ability_Double_Strike",
             "upgradeProperties": {
                 "healthRestore": 0.07,
                 "manaRestore": 0.07
@@ -973,6 +976,7 @@
             "id": "Augment_Heal_On_Hit",
             "tier": 2,
             "tags": [ "hit" ],
+            "abilityId": "Ability_Porcupine",
             "upgradeProperties": {
                 "amount": 0.07
             }
@@ -989,6 +993,7 @@
             "id": "Augment_More_Damage_Return",
             "tier": 2,
             "tags": [ "damage" ],
+            "abilityId": "Ability_Porcupine",
             "upgradeProperties": {
                 "amount": 0.20
             }
@@ -997,6 +1002,7 @@
             "id": "Augment_Cooldown_Chance",
             "tier": 1,
             "tags": [],
+            "abilityId": "Ability_Porcupine",
             "upgradeProperties": {
                 "chance": 0.15
             }
@@ -1051,6 +1057,7 @@
             "id": "Augment_Less_Burn",
             "tier": 2,
             "tags": [],
+            "abilityId": "Ability_Berserk_Fury",
             "upgradeProperties": {
                 "amount": 0.02
             }

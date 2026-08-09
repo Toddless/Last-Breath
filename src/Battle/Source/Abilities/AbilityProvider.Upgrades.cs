@@ -63,6 +63,14 @@
                     data.Tags,
                     data.Tier,
                     Costs.Health),
+            // Belongs to no ability either, though it is not the base contract it works through but the
+            // delivery one: whoever lands a hit extends the poison on what he hit.
+            ["Augment_Extend_Poison"] = data =>
+                new AugmentExtendPoison(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("poisonDuration", 1)),
             ["Augment_Poison_On_Hit"] = data =>
                 new SoAsUpgradePoisonOnHit(
                     data.Id,
@@ -115,12 +123,6 @@
                     data.Tags,
                     data.Tier,
                     new FirstAttackCritContextModifier(data.UpgradeProperties.GetValueOrDefault("critDamageBonus", 1.3f))),
-            ["Augment_Attack_Extend_Poison"] = data =>
-                new IpUpgradeExtendPoison(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("poisonDuration", 1)),
             ["Ability_Ip_Augment_Unevadable"] = data =>
                 new IpUpgradeUnevadable(
                     data.Id,
@@ -463,12 +465,6 @@
                     data.Id,
                     data.Tags,
                     data.Tier),
-            ["Ability_Pc_Augment_Increase_Poison_On_Target"] = data =>
-                new PcUpgradeExtendExistingPoison(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("poisonDuration", 1)),
             ["Ability_Pc_Augment_Additional_Poison_Stack_Duration"] = data =>
                 new PcUpgradeAdditionalPoisonDuration(
                     data.Id,

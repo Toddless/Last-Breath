@@ -2147,10 +2147,10 @@ msgstr ""
 msgid "Ability_Ip_Augment_First_Attack_Crit_Damage_Description"
 msgstr "Первая атака наносит +{critDamageBonus:%} критического урона."
 
-msgid "Augment_Attack_Extend_Poison"
+msgid "Augment_Extend_Poison"
 msgstr ""
 
-msgid "Augment_Attack_Extend_Poison_Description"
+msgid "Augment_Extend_Poison_Description"
 msgstr "Успешная атака продлевает яд на {poisonDuration|turn|turns}."
 
 msgid "Ability_Ip_Augment_Unevadable"
@@ -2362,12 +2362,6 @@ msgstr ""
 
 msgid "Ability_Pc_Augment_Apply_Stack_For_Each_Enemy_Description"
 msgstr "Накладывает стак яда за каждого врага на поле боя."
-
-msgid "Ability_Pc_Augment_Increase_Poison_On_Target"
-msgstr ""
-
-msgid "Ability_Pc_Augment_Increase_Poison_On_Target_Description"
-msgstr "+{poisonDuration|turn|turns} длительности яда на цели."
 
 msgid "Ability_Pc_Augment_Additional_Poison_Stack_Duration"
 msgstr ""

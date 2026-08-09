@@ -24,14 +24,14 @@
         /// <summary>How many records the section declares. Held because the records no longer sit
         /// inside the abilities: a block that used to go missing took its ability's augments with it
         /// and left the rest readable, and a section loses them one bulk edit at a time.</summary>
-        private const int ShippedRecordCount = 134;
+        private const int ShippedRecordCount = 133;
 
         /// <summary>How many records name an ability. The registry triage
         /// (<c>Docs/UpgradeRegistryTriage.md</c>) counted them: 58 reaching into the members of one
         /// ability class, and 25 more that look general and are inert or throw anywhere else. The
         /// number is held so that bindings cannot go missing in a bulk edit the way they were missing
         /// before â€” the failure of a lost binding is an augment silently offered to the whole family.</summary>
-        private const int BoundRecords = 83;
+        private const int BoundRecords = 98;
 
         /// <summary>How many records claim every ability there is â€” cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
@@ -44,7 +44,7 @@
         /// <summary>How many records name neither an ability nor the whole book, and are judged by
         /// their tags alone. Most of them carry tags now; the number is held because a record losing
         /// its last tag belongs nowhere and says so nowhere.</summary>
-        private const int SilentRecords = 40;
+        private const int SilentRecords = 24;
 
         [TestMethod]
         public void TheSectionDeclaresTheRecordsTheTriageCounted()
@@ -159,6 +159,77 @@
             }
 
             Assert.IsTrue(silent > 0, "every shipped record declares a binding or a claim, so the refusal has nothing left to be proved on");
+        }
+
+        [TestMethod]
+        public void EveryRecordSeatsOnAnAbilityItsOwnUpgradeWasWrittenFor()
+        {
+            // The hole the three walks above leave open, and the one the catalogue actually fell
+            // through. They read what a record DECLARES; none of them asks what the code behind it
+            // demands. An upgrade written for one ability class says so in its own type
+            // (AbilityUpgrade&lt;T&gt;), and a record whose tags carry it anywhere else fails in the
+            // quietest way the system has: the seating succeeds, the install reports a cast that could
+            // not be made, and the player wears an augment that does nothing. A record no tag and no
+            // binding carries anywhere at all is the same silence one step earlier.
+            //
+            // So both directions are walked here, off the demand rather than off the declaration:
+            // every record reaches at least one ability its upgrade can be applied to, and every
+            // ability it reaches is one of them.
+            (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            string[] abilities = [.. book.KnownAbilityIds];
+            var made = abilities.ToDictionary(id => id, id => book.CreateAbility(id).GetType(), StringComparer.Ordinal);
+            List<string> nowhere = [];
+            List<string> strangers = [];
+
+            foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog))
+            {
+                IAbilityUpgrade? upgrade = book.CreateUpgrade(record);
+                Assert.IsNotNull(upgrade, $"the registry builds nothing for '{id}'");
+                Type demanded = DemandedAbility(upgrade.GetType());
+
+                string[] seats = [.. abilities.Where(ability => AugmentFit.Check(
+                    new AbilitySocketPlacement(SocketOf(ability), ability, record.Tier),
+                    catalog.TagsOf(ability), record, []) == AugmentFitResult.Fits)];
+
+                if (seats.Length == 0)
+                    nowhere.Add($"'{id}' (its upgrade is written for {demanded.Name})");
+
+                string[] refused = [.. seats.Where(ability => !demanded.IsAssignableFrom(made[ability]))];
+                if (refused.Length > 0)
+                    strangers.Add($"'{id}' is written for {demanded.Name} and seats on {string.Join(", ", refused)}");
+            }
+
+            Assert.AreEqual(0, nowhere.Count,
+                $"declared, minted, offered and seatable nowhere:\n  {string.Join("\n  ", nowhere)}");
+            Assert.AreEqual(0, strangers.Count,
+                $"seated where its own upgrade cannot be applied, which is an augment worn and doing nothing:\n  {string.Join("\n  ", strangers)}");
+        }
+
+        /// <summary>The ability class the code behind a record was written for — the argument of the
+        /// <c>AbilityUpgrade&lt;T&gt;</c> it descends from. Upgrades working through the contract every
+        /// ability honours name the base class there and so demand nothing in particular.
+        ///
+        /// Which is also the shape of what this walk CANNOT see, and both blind spots are the same
+        /// blind spot: an upgrade whose demand is written somewhere other than its own type says
+        /// <c>Ability</c> here and is judged to fit everywhere.
+        /// <list type="number">
+        /// <item>The hard cast inside a factory's lambda — <c>AbilityUpgradeCastEffect</c> is built for
+        /// any ability and handed <c>ability =&gt; new …(((Porcupine)ability).Duration)</c>, so the
+        /// demand lives in a closure and blows up at cast time rather than at install time.</item>
+        /// <item>The private parameter key — every row of the parameter table is an
+        /// <c>AbilityUpgradeParameterSet</c>, and a record standing on a key only one ability
+        /// publishes is inert on every other one without a word: 21 of the 24 records still judged by
+        /// their tags are of this kind.</item>
+        /// </list>
+        /// Both close the same way and not here: an ability declaring the key (wave B) and a behaviour
+        /// declaring what it needs (wave C) of <c>Docs/PLAN-Augments.md</c>.</summary>
+        private static Type DemandedAbility(Type upgrade)
+        {
+            for (Type? type = upgrade; type != null; type = type.BaseType)
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(AbilityUpgrade<>))
+                    return type.GetGenericArguments()[0];
+
+            return typeof(IAbility);
         }
 
         private static bool Bound((string Id, AbilityUpgradeData Record) entry) =>

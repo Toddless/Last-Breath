@@ -15,6 +15,17 @@ namespace LastBreathTest.BattleSystemTests
     /// that is the ONLY thing carrying at least one augment onto it. Pairs where the augment would
     /// arrive by another tag anyway are not here — losing such a tag costs nothing and holding it
     /// would make this a copy of the file rather than a claim about it.
+    ///
+    /// The table shrinks when a record stops being judged by its tags. Thirteen pairs went that way in
+    /// the catalogue pass of 2026-08-09, which named an ability on every record whose upgrade type names
+    /// one ability AND whose tags carried it to a stranger or to nowhere — not on every record written
+    /// for one ability's members. The ones whose tags happened to land right were left judged by their
+    /// tags, and they are only as safe as that accident: 'Augment_Lucky_Crit' still travels by 'crit'
+    /// because 'crit' is today worn by Critical Calculation alone, and the day a second ability claims
+    /// it the augment throws on arrival there. So an augment that used to reach a stranger through
+    /// 'buff', 'hit' or 'evasion' now goes where it works, those three tags carry nothing of their own
+    /// meanwhile, and the accidents stay accidents until the augments meant to be general are written
+    /// to be general (waves A–C of PLAN-Augments).
     /// </summary>
     [TestClass]
     public class AbilityTagMarkupTests
@@ -35,13 +46,10 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Jar_Of_Poison", AbilityTags.Stacks),
             ("Ability_Jar_Of_Poison", AbilityTags.Duration),
 
-            ("Ability_Dark_Shroud", AbilityTags.Buff),
-            ("Ability_Dark_Shroud", AbilityTags.Evasion),
             ("Ability_Dark_Shroud", AbilityTags.Health),
             ("Ability_Dark_Shroud", AbilityTags.Stacks),
             ("Ability_Dark_Shroud", AbilityTags.Duration),
 
-            ("Ability_Critical_Calculation", AbilityTags.Buff),
             ("Ability_Critical_Calculation", AbilityTags.Crit),
             ("Ability_Critical_Calculation", AbilityTags.Stacks),
             ("Ability_Critical_Calculation", AbilityTags.Duration),
@@ -50,7 +58,6 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Poison_Explosion", AbilityTags.Execute),
 
             ("Ability_Poison_Coating", AbilityTags.Poison),
-            ("Ability_Poison_Coating", AbilityTags.Buff),
             ("Ability_Poison_Coating", AbilityTags.Stacks),
             ("Ability_Poison_Coating", AbilityTags.Duration),
 
@@ -59,12 +66,10 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Double_Strike", AbilityTags.Stacks),
             ("Ability_Double_Strike", AbilityTags.Duration),
 
-            ("Ability_Ares_Blessing", AbilityTags.Buff),
             ("Ability_Ares_Blessing", AbilityTags.Health),
             ("Ability_Ares_Blessing", AbilityTags.Stacks),
             ("Ability_Ares_Blessing", AbilityTags.Duration),
 
-            ("Ability_Porcupine", AbilityTags.Buff),
             ("Ability_Porcupine", AbilityTags.Armor),
             ("Ability_Porcupine", AbilityTags.Stacks),
             ("Ability_Porcupine", AbilityTags.Duration),
@@ -80,7 +85,6 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Head_Butt", AbilityTags.Damage),
 
             ("Ability_Sacrifice", AbilityTags.Health),
-            ("Ability_Sacrifice", AbilityTags.Buff),
             ("Ability_Sacrifice", AbilityTags.Duration),
 
             ("Ability_Armageddon", AbilityTags.Health),
@@ -88,26 +92,20 @@ namespace LastBreathTest.BattleSystemTests
 
             ("Ability_Ice_Block", AbilityTags.Control),
             ("Ability_Ice_Block", AbilityTags.Damage),
-            ("Ability_Ice_Block", AbilityTags.Hit),
 
-            ("Ability_Ice_Aegis", AbilityTags.Buff),
             ("Ability_Ice_Aegis", AbilityTags.Stacks),
             ("Ability_Ice_Aegis", AbilityTags.Duration),
 
             ("Ability_Ice_Shards", AbilityTags.Damage),
-            ("Ability_Ice_Shards", AbilityTags.Hit),
 
             ("Ability_Deep_Freeze", AbilityTags.Stacks),
             ("Ability_Deep_Freeze", AbilityTags.Duration),
 
             ("Ability_Discharge", AbilityTags.Damage),
-            ("Ability_Discharge", AbilityTags.Hit),
 
-            ("Ability_Static_Armor", AbilityTags.Buff),
             ("Ability_Static_Armor", AbilityTags.Stacks),
             ("Ability_Static_Armor", AbilityTags.Duration),
             ("Ability_Static_Armor", AbilityTags.Damage),
-            ("Ability_Static_Armor", AbilityTags.Hit),
 
             ("Ability_Twin_Assist_Attack", AbilityTags.Attack)
         ];

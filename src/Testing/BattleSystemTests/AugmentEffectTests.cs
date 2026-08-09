@@ -1,14 +1,18 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using System.Threading.Tasks;
     using Battle.Source;
     using Battle.Source.Abilities;
+    using Battle.Source.Effects;
     using Battle.Source.RequestHandlers;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Data.AbilityData;
     using Core.Data.GameData;
     using Core.Entity;
     using Core.Entity.Components;
+    using Core.Enums;
     using Core.Events;
     using Core.Inventory;
     using Core.Items;
@@ -52,6 +56,16 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>The property of that record which lands on the price of the cast.</summary>
         private const string CostProperty = "additionalCost";
+
+        /// <summary>The one augment in the book written for no ability and installed through the
+        /// delivery contract rather than the base one: a landing hit extends the poison it touched.</summary>
+        private const string ExtendPoison = "Augment_Extend_Poison";
+
+        /// <summary>An ability that hits and names no poison anywhere — the reach the merge was for.</summary>
+        private const string Attacker = "Ability_Series_Of_Attacks";
+
+        private const int PoisonTurns = 3;
+        private const int Extension = 1;
 
         private const string Seed = "start";
         private const string UnlockNode = "abilityunlock_head_butt";
@@ -182,6 +196,77 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsNotNull(binder, "the board has no road onto the abilities at all");
             Assert.AreSame(binder, container.GetService<IAbilityAugmentBinder>(), "every caller gets a binder of its own");
             Assert.IsInstanceOfType<ISessionResettable>(binder, "a new playthrough cannot undress the abilities of the old one");
+        }
+
+        [TestMethod]
+        public async Task TheAugmentWrittenForNoAbilityExtendsPoisonOnWhoeverSwings()
+        {
+            // The merge of 2026-08-09. "A hit extends the poison on what it touched" used to be said
+            // twice, bolted onto two ability classes, and neither copy could run: one was written for
+            // an ability its record's tags never led to, the other installed nothing at all. It is one
+            // record and one class now, and what has to be shown is both halves of that — the record
+            // reaches an attacking ability it names nowhere, and the ability then does the thing.
+            //
+            // Two halves and no more: the seating and the rider's own work, driven through the impact
+            // the deliveries hand it. That every delivery hands it one, per attack and per projectile,
+            // is not asked here — it is the DoD of A-2 in Docs/PLAN-Augments.md, and today twelve
+            // abilities do not call ApplyImpactRiders at all.
+            (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            AbilityUpgradeData? record = catalog.Find(ExtendPoison);
+            Assert.IsNotNull(record, $"the shipped data declares no '{ExtendPoison}'");
+            Assert.AreEqual(AugmentFitResult.Fits,
+                AugmentFit.Check(new AbilitySocketPlacement("socket", Attacker, record.Tier), catalog.TagsOf(Attacker), record, []),
+                $"'{ExtendPoison}' stays out of a slot of '{Attacker}', which it was made general for");
+
+            IAbilityUpgrade? upgrade = book.CreateUpgrade(record);
+            Assert.IsNotNull(upgrade, $"the registry builds nothing for '{ExtendPoison}'");
+            var ability = (Ability)book.CreateAbility(Attacker);
+            upgrade.Apply(ability);
+            Assert.IsTrue(upgrade.Learned, $"'{ExtendPoison}' refused '{Attacker}' — it is written for one ability after all");
+
+            var caster = new Fighter();
+            var victim = new Fighter();
+            var poison = new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison);
+            await poison.Apply(new EffectApplyingContext
+            {
+                Caster = caster.Object,
+                Target = victim.Object,
+                Source = "Test_Poison",
+                Damage = 100f
+            });
+            Assert.AreEqual(PoisonTurns, poison.Duration, "the poison never landed, so the extension below proves nothing");
+
+            await ability.ApplyImpactRiders(new Core.Data.AbilityImpact(caster.Object, victim.Object, Mock.Of<IBattleField>()));
+
+            Assert.AreEqual(PoisonTurns + Extension, poison.Duration,
+                "the augment is on an attacking ability and the hit left the poison exactly as long as it was");
+
+            upgrade.Remove(ability);
+            await ability.ApplyImpactRiders(new Core.Data.AbilityImpact(caster.Object, victim.Object, Mock.Of<IBattleField>()));
+
+            Assert.AreEqual(PoisonTurns + Extension, poison.Duration,
+                "the augment came off and the ability goes on extending poison");
+        }
+
+        /// <summary>A fightable an effect can actually land on: real effects and modifier pipelines,
+        /// only the entity itself is a mock.</summary>
+        private sealed class Fighter
+        {
+            private readonly Mock<IFightable> _mock = new();
+
+            public IFightable Object => _mock.Object;
+
+            public Fighter()
+            {
+                var effects = new EffectsComponent(_mock.Object);
+                _mock.Setup(fighter => fighter.InstanceId).Returns(Guid.NewGuid().ToString());
+                _mock.Setup(fighter => fighter.IsAlive).Returns(true);
+                _mock.Setup(fighter => fighter.Effects).Returns(effects);
+                _mock.Setup(fighter => fighter.ModifierHandler).Returns(new ModifierHandlerComponent());
+                _mock.Setup(fighter => fighter.CombatEvents).Returns(new CombatEventBus());
+                _mock.Setup(fighter => fighter.Parameters).Returns(Mock.Of<IEntityParametersComponent>());
+                _mock.Setup(fighter => fighter.TryApplyStatusEffect(It.IsAny<StatusEffects>())).Returns(false);
+            }
         }
 
         /// <summary>
