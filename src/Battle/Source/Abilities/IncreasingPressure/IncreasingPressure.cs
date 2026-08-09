@@ -25,6 +25,13 @@
 
         public static class Parameters
         {
+            /// <summary>
+            /// How much each landed attack empowers the NEXT one. Not the book's
+            /// <see cref="AbilityParameter.DamageMultiplier"/>, which multiplies the cast's damage once
+            /// and the same for every blow: this one compounds down a series, so the same figure means
+            /// a different amount of damage here than it does anywhere else. A record offering "+25%
+            /// damage" and landing on a step would be selling one number and delivering another.
+            /// </summary>
             public const string AttackDamageStepMultiplier = nameof(AttackDamageStepMultiplier);
         }
 

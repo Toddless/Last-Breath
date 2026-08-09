@@ -22,7 +22,13 @@ namespace Battle.Source.Abilities.BerserkFury
         private const float MinContinueChance = 0.05f;
         private const float MaxContinueChance = 0.80f;
 
-        public int FuryDuration => (int)this[Parameters.FuryDuration];
+        /// <summary>
+        /// How long the Fury on the caster holds — the book's buff duration, so "your buff lasts longer"
+        /// works here and lengthens the burn along with the series. That is the deal the ability offers
+        /// and the player takes: a longer fury is more attacks AND more health spent on them.
+        /// </summary>
+        public int FuryDuration => (int)this[AbilityParameter.Duration];
+
         public float FuryHealthPercent => this[Parameters.FuryHealthPercent];
         public AttackModifierPipeline AttackModifiers { get; } = new();
 
@@ -32,23 +38,16 @@ namespace Battle.Source.Abilities.BerserkFury
 
         public static class Parameters
         {
-            /// <summary>
-            /// How long the Fury on the caster holds — the common buff duration by meaning, and its move
-            /// onto <see cref="AbilityParameter.Duration"/> is planned rather than refused. It waits
-            /// because of what stands beside it: <c>Augment_Fury_Duration</c> SHORTENS this number (a
-            /// shorter fury burns less health), so the ability's own record and the book's "your buff
-            /// lasts longer" pull it opposite ways. Two directions are two identities and both would be
-            /// worn, which is a balance answer and not a rename.
-            /// </summary>
-            public const string FuryDuration = nameof(FuryDuration);
-
+            /// <summary>Share of current health each attack of the series burns. The ability's own
+            /// bargain and not the book's effectiveness: it is what the fury COSTS, and a record
+            /// offering "your buff lands harder" would be offering to raise the price.</summary>
             public const string FuryHealthPercent = nameof(FuryHealthPercent);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.FuryDuration, 3);
+            parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.FuryHealthPercent, 0.05f);
         }
 

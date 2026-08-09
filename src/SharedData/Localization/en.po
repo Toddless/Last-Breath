@@ -2501,7 +2501,7 @@ msgid "Ability_Series_Of_Attacks_Description"
 msgstr "A series of {MinAttacks}-{MaxAttacks} attacks. Each attack deals an additional {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) base damage. An evade interrupts the series."
 
 msgid "Ability_Berserk_Fury_Description"
-msgstr "Applies {@Effect_Fury} ({FuryDuration|turn|turns}, each attack burns {FuryHealthPercent:%} of current health) and performs consecutive attacks — the chance to continue the series depends on current health: the lower it is, the lower the chance."
+msgstr "Applies {@Effect_Fury} ({Duration|turn|turns}, each attack burns {FuryHealthPercent:%} of current health) and performs consecutive attacks — the chance to continue the series depends on current health: the lower it is, the lower the chance."
 
 msgid "Ability_Armageddon"
 msgstr "Armageddon"
@@ -2537,7 +2537,7 @@ msgid "Ability_Ice_Shards"
 msgstr "Ice Shards"
 
 msgid "Ability_Ice_Shards_Description"
-msgstr "Fires {Shards} ice shards. Each shard deals {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) damage to the target.\nActivation level 2: shard damage increases to {SecondStageDamage} + ({SecondStageWeaponDamageScale:%} + {SecondStageSpellDamageScale:%}).\nActivation level 3: shards strike every target on the battlefield.\nActivation level 4: on a critical strike the shards shatter into shrapnel, dealing {ShrapnelDamage} + ({ShrapnelWeaponDamageScale:%} + {ShrapnelSpellDamageScale:%}) damage to all enemies."
+msgstr "Fires {ProjectileCount} ice shards. Each shard deals {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) damage to the target.\nActivation level 2: shard damage increases to {SecondStageDamage} + ({SecondStageWeaponDamageScale:%} + {SecondStageSpellDamageScale:%}).\nActivation level 3: shards strike every target on the battlefield.\nActivation level 4: on a critical strike the shards shatter into shrapnel, dealing {ShrapnelDamage} + ({ShrapnelWeaponDamageScale:%} + {ShrapnelSpellDamageScale:%}) damage to all enemies."
 
 msgid "Ability_Ice_Block"
 msgstr "Ice Block"
@@ -2826,6 +2826,24 @@ msgstr "Extend Poison"
 
 msgid "Augment_Extend_Poison_Description"
 msgstr "A successful attack extends poison by {poisonDuration|turn|turns}."
+
+msgid "Augment_Additional_Projectiles"
+msgstr "Additional Projectiles"
+
+msgid "Augment_Additional_Projectiles_Description"
+msgstr "The ability fires {amount} more projectiles."
+
+msgid "Augment_Buff_Effectiveness"
+msgstr "Buff Effectiveness"
+
+msgid "Augment_Buff_Effectiveness_Description"
+msgstr "Increases the effectiveness of the buff by {effectiveness:%}."
+
+msgid "Augment_Recovery_Effectiveness"
+msgstr "Recovery Effectiveness"
+
+msgid "Augment_Recovery_Effectiveness_Description"
+msgstr "Increases the effectiveness of the recovery by {effectiveness:%}."
 
 msgid "Ability_Ip_Augment_Unevadable"
 msgstr "Unevadable"

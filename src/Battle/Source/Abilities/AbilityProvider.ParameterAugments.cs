@@ -106,7 +106,7 @@ namespace Battle.Source.Abilities
             // Berserk Fury
             ["Augment_Fury_Duration"] =
             [
-                new(BerserkFury.BerserkFury.Parameters.FuryDuration, OperationType.Subtract, "duration", 1f)
+                new(AbilityParameter.Duration, OperationType.Subtract, "duration", 1f)
             ],
             ["Augment_More_Burn"] =
             [
@@ -180,6 +180,20 @@ namespace Battle.Source.Abilities
                 new(AbilityParameter.Duration, OperationType.Add, "duration", 1f)
             ],
 
+            // The effectiveness family. One key and one direction, so any two of these are one offer at
+            // two strengths — what tells them apart is the tags, which decide WHICH abilities are
+            // offered the deal at all. That is the whole segmentation: the kind of thing an ability
+            // applies is a fact about the ability, and a key that tried to carry it would need one per
+            // kind and an owner able to answer "which of my three".
+            ["Augment_Buff_Effectiveness"] =
+            [
+                new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.25f)
+            ],
+            ["Augment_Recovery_Effectiveness"] =
+            [
+                new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.35f)
+            ],
+
             // Poison Explosion
             ["Augment_Reduce_Execution_Trahsold"] =
             [
@@ -187,6 +201,10 @@ namespace Battle.Source.Abilities
             ],
 
             // Ice Shards
+            ["Augment_Additional_Projectiles"] =
+            [
+                new(AbilityParameter.ProjectileCount, OperationType.Add, "amount", 2f)
+            ],
             ["Ability_Is_Augment_Additional_Scales"] =
             [
                 new(AbilityParameter.WeaponDamageScale, OperationType.Add, "weaponDamageScale", 0.05f),

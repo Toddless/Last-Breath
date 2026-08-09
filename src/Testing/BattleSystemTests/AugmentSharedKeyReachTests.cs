@@ -78,20 +78,38 @@ namespace LastBreathTest.BattleSystemTests
                  "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
                  "Ability_Porcupine", "Ability_Sacrifice", "Ability_Static_Armor"]),
 
+            // The berserker joined the buff durations: his fury is a buff on his own caster, so "your
+            // buff lasts longer" reaches it and lengthens the health it burns along with it.
             ("Augment_Buff_Duration", AbilityParameter.Duration,
-                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
-                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
-                ["Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Jar_Of_Poison",
-                 "Ability_Sacrifice"]),
+                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
+                 "Ability_Ice_Aegis", "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
+                ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Jar_Of_Poison", "Ability_Sacrifice"]),
 
             ("Augment_Increased_Buff_Duration", AbilityParameter.Duration,
-                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
-                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
-                ["Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Jar_Of_Poison",
-                 "Ability_Sacrifice"]),
+                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
+                 "Ability_Ice_Aegis", "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
+                ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Jar_Of_Poison", "Ability_Sacrifice"]),
 
             // A record naming its ability reaches that one and no other, shared key or not.
             ("Ability_Sa_Augment_Buff_Duration", AbilityParameter.Duration, ["Ability_Static_Armor"], []),
+
+            // The one record in the book that SHORTENS a buff, and the reason it names its ability: a
+            // shorter fury burns less health, and there is no such trade anywhere else — on any other
+            // buff the same move is a loss with nothing bought. Left on its tag it reached eight.
+            ("Augment_Fury_Duration", AbilityParameter.Duration, ["Ability_Berserk_Fury"], []),
+
+            ("Augment_Additional_Projectiles", AbilityParameter.ProjectileCount, ["Ability_Ice_Shards"], []),
+
+            // Both effectiveness records stand on one key in one direction, so where they meet they are
+            // one offer and the better works. What separates them is which abilities are offered the
+            // deal — tags, not keys, which is the whole segmentation of the family.
+            ("Augment_Buff_Effectiveness", AbilityParameter.Effectiveness,
+                ["Ability_Critical_Calculation", "Ability_Dark_Shroud"],
+                ["Ability_Ares_Blessing", "Ability_Ice_Aegis", "Ability_Poison_Coating", "Ability_Porcupine",
+                 "Ability_Sacrifice", "Ability_Static_Armor"]),
+
+            ("Augment_Recovery_Effectiveness", AbilityParameter.Effectiveness,
+                ["Ability_Dark_Shroud"], ["Ability_Ares_Blessing"]),
 
             ("Augment_More_Stacks_More_Cost", AbilityParameter.Stacks,
                 ["Ability_Critical_Calculation", "Ability_Dark_Shroud"],

@@ -36,7 +36,12 @@ namespace Battle.Source.Abilities.Discharge
 
         public static class Parameters
         {
+            /// <summary>What one point of spent barrier is worth as damage. Not the book's
+            /// <see cref="AbilityParameter.DamageMultiplier"/>: that one multiplies damage the cast
+            /// already has, while this is the exchange rate that CREATES it, and a record raising both
+            /// on one ability would be paid twice for the same word.</summary>
             public const string BarrierMultiplier = nameof(BarrierMultiplier);
+
             public const string StageTwoMultiplierBonus = nameof(StageTwoMultiplierBonus);
             public const string StageThreeBarrierRestore = nameof(StageThreeBarrierRestore);
         }

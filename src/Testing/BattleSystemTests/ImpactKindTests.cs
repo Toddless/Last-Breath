@@ -40,6 +40,12 @@ namespace LastBreathTest.BattleSystemTests
         private const float Health = 100f;
         private const float Barrier = 1000f;
         private const int ExtraShards = 2;
+
+        /// <summary>The shipped ability that counts its projectiles, and the shipped record that sells
+        /// two more of them — the count the walk above moves by hand.</summary>
+        private const string ShardsId = "Ability_Ice_Shards";
+        private const string ProjectileRecord = "Augment_Additional_Projectiles";
+
         private const int PoisonTurns = 3;
 
         [TestMethod]
@@ -78,7 +84,7 @@ namespace LastBreathTest.BattleSystemTests
 
             await shards.Execute([target], FieldOf(owner, target));
 
-            Assert.AreEqual(shards.Shards, seen.Count, "one target took a number of impacts other than the shards fired at him");
+            Assert.AreEqual(shards.ProjectileCount, seen.Count, "one target took a number of impacts other than the shards fired at him");
             foreach (AbilityImpact impact in seen)
             {
                 Assert.AreEqual(ImpactKind.Projectile, impact.Kind, "a shard arrived as something other than a projectile");
@@ -108,7 +114,7 @@ namespace LastBreathTest.BattleSystemTests
 
             List<AbilityImpact> volley = seen.FindAll(impact => impact.Kind == ImpactKind.Projectile);
             List<AbilityImpact> burst = seen.FindAll(impact => impact.Kind == ImpactKind.Splash);
-            Assert.AreEqual(shards.Shards * 2, volley.Count, "stage 3 fires every shard at both enemies, and that is not what landed");
+            Assert.AreEqual(shards.ProjectileCount * 2, volley.Count, "stage 3 fires every shard at both enemies, and that is not what landed");
             Assert.AreEqual(volley.Count * 2, burst.Count, "every crit shard bursts over the whole field — the field is two enemies wide here");
             Assert.AreEqual(seen.Count, volley.Count + burst.Count, "the cast produced an impact of some third kind");
 
@@ -147,11 +153,11 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public async Task TwoMoreShardsAreTwoMoreRiderApplicationsOnEveryTarget()
         {
-            // The arithmetic the whole wave rests on. Nobody sells projectiles yet, so the parameter is
-            // moved by the mechanism an augment would move it by — a decorator over the ability's own
-            // Shards key — and what is measured is the rider, not the damage: a volley that grew by two
-            // has to hand the riders exactly two more impacts per target, with no code knowing that an
-            // augment and a rider were bought together.
+            // The arithmetic the whole wave rests on, measured on the mechanism alone: a bare decorator
+            // over the shared projectile count, no record involved. What is measured is the rider, not
+            // the damage — a volley that grew by two has to hand the riders exactly two more impacts
+            // per target, with no code knowing that a count and a rider were bought together. The walk
+            // below buys the count with the shipped record instead, over the same delivery.
             using var rolls = new CombatRandomScope(new HighestRoll());
             var owner = Fighter();
             var target = Fighter();
@@ -160,7 +166,7 @@ namespace LastBreathTest.BattleSystemTests
             var seen = Riding(shards);
             shards.SetOwner(owner);
             IBattleField field = FieldOf(owner, target, bystander);
-            int shardsBefore = shards.Shards;
+            int shardsBefore = shards.ProjectileCount;
 
             await shards.Execute([target, bystander], field);
             int impactsBefore = seen.Count;
@@ -168,18 +174,54 @@ namespace LastBreathTest.BattleSystemTests
 
             seen.Clear();
             shards.AddParameterDecorator(new SimpleAbilityParameterDecorator(
-                IceShardsCast.Parameters.Shards, Priority.Weak, OperationType.Add, ExtraShards,
+                AbilityParameter.ProjectileCount, Priority.Weak, OperationType.Add, ExtraShards,
                 "Ability_Parameter_Decorator_Test_Extra_Shards", "Test"));
 
             await shards.Execute([target, bystander], field);
 
-            Assert.AreEqual(shardsBefore + ExtraShards, shards.Shards, "the decorator never reached the shard count");
+            Assert.AreEqual(shardsBefore + ExtraShards, shards.ProjectileCount, "the decorator never reached the shard count");
             Assert.AreEqual(impactsBefore + (ExtraShards * 2), seen.Count,
                 "two more shards over two targets left the riders with something other than four more impacts");
             Assert.AreEqual(ExtraShards, seen.FindAll(impact => ReferenceEquals(impact.Target, target)).Count - shardsBefore,
                 "the extra shards did not reach the chosen target as impacts of its own");
             foreach (AbilityImpact impact in seen)
                 Assert.AreEqual(ImpactKind.Projectile, impact.Kind, "an added shard arrived as something other than a projectile");
+        }
+
+        [TestMethod]
+        public async Task TheShippedProjectileRecordBuysTheSameExtraImpacts()
+        {
+            // The same claim with the augment the player actually holds: the record, built by the
+            // registry, seated on the ability the shipped data builds. Nothing between the two walks is
+            // shared — one moves the count by hand, this one buys it — so a record that names the wrong
+            // key, falls back to the wrong number or is refused by the ability shows up here alone.
+            using var rolls = new CombatRandomScope(new HighestRoll());
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            var owner = Fighter();
+            var target = Fighter();
+            var bystander = Fighter();
+
+            IAbility bare = registry.CreateAbility(ShardsId);
+            int shardsBefore = (int)bare[AbilityParameter.ProjectileCount];
+
+            IAbility shards = registry.CreateAbility(ShardsId);
+            var seen = Riding(shards);
+            shards.SetOwner(owner);
+
+            AbilityUpgradeData? record = catalog.Find(ProjectileRecord);
+            Assert.IsNotNull(record, $"the shipped data declares no '{ProjectileRecord}'");
+            IAbilityUpgrade? upgrade = registry.CreateUpgrade(record);
+            Assert.IsNotNull(upgrade, $"the registry builds nothing for '{ProjectileRecord}'");
+
+            shards.InstallUpgrades(new Dictionary<string, IAbilityUpgrade> { ["socket_projectiles"] = upgrade });
+            await shards.Execute([target, bystander], FieldOf(owner, target, bystander));
+
+            Assert.AreEqual(shardsBefore + ExtraShards, (int)shards[AbilityParameter.ProjectileCount],
+                $"'{ProjectileRecord}' did not reach the shared projectile count");
+            Assert.AreEqual((shardsBefore + ExtraShards) * 2, seen.Count,
+                "the bought projectiles did not arrive at the riders as impacts of their own");
+            foreach (AbilityImpact impact in seen)
+                Assert.AreEqual(ImpactKind.Projectile, impact.Kind, "a bought shard arrived as something other than a projectile");
         }
 
         [TestMethod]

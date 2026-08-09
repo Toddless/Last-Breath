@@ -24,14 +24,14 @@
         /// <summary>How many records the section declares. Held because the records no longer sit
         /// inside the abilities: a block that used to go missing took its ability's augments with it
         /// and left the rest readable, and a section loses them one bulk edit at a time.</summary>
-        private const int ShippedRecordCount = 133;
+        private const int ShippedRecordCount = 136;
 
         /// <summary>How many records name an ability. The registry triage
         /// (<c>Docs/UpgradeRegistryTriage.md</c>) counted them: 58 reaching into the members of one
         /// ability class, and 25 more that look general and are inert or throw anywhere else. The
         /// number is held so that bindings cannot go missing in a bulk edit the way they were missing
         /// before â€” the failure of a lost binding is an augment silently offered to the whole family.</summary>
-        private const int BoundRecords = 98;
+        private const int BoundRecords = 99;
 
         /// <summary>How many records claim every ability there is â€” cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
@@ -44,7 +44,7 @@
         /// <summary>How many records name neither an ability nor the whole book, and are judged by
         /// their tags alone. Most of them carry tags now; the number is held because a record losing
         /// its last tag belongs nowhere and says so nowhere.</summary>
-        private const int SilentRecords = 24;
+        private const int SilentRecords = 26;
 
         [TestMethod]
         public void TheSectionDeclaresTheRecordsTheTriageCounted()

@@ -164,7 +164,7 @@
             "weaponDamageScale": 0,
             "spellDamageScale": 0,
             "abilityProperties": {
-                "furyDuration": 3,
+                "duration": 3,
                 "furyHealthPercent": 0.05
             }
         },
@@ -299,7 +299,7 @@
         },
         {
             "id": "Ability_Ice_Shards",
-            "tags": [ "spell", "cold", "scale", "damage", "hit" ],
+            "tags": [ "spell", "cold", "scale", "damage", "hit", "projectile" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 4,
@@ -309,7 +309,7 @@
             "weaponDamageScale": 0.25,
             "spellDamageScale": 0.90,
             "abilityProperties": {
-                "shards": 3,
+                "projectileCount": 3,
                 "shrapnelDamage": 50,
                 "shrapnelWeaponDamageScale": 0.15,
                 "shrapnelSpellDamageScale": 0.55,
@@ -521,6 +521,30 @@
             "tags": [ "attack", "poison" ],
             "upgradeProperties": {
                 "poisonDuration": 1
+            }
+        },
+        {
+            "id": "Augment_Additional_Projectiles",
+            "tier": 2,
+            "tags": [ "projectile" ],
+            "upgradeProperties": {
+                "amount": 2
+            }
+        },
+        {
+            "id": "Augment_Buff_Effectiveness",
+            "tier": 1,
+            "tags": [ "buff", "effectiveness" ],
+            "upgradeProperties": {
+                "effectiveness": 0.25
+            }
+        },
+        {
+            "id": "Augment_Recovery_Effectiveness",
+            "tier": 2,
+            "tags": [ "recovery", "effectiveness" ],
+            "upgradeProperties": {
+                "effectiveness": 0.35
             }
         },
         {
@@ -1066,6 +1090,7 @@
             "id": "Augment_Fury_Duration",
             "tier": 1,
             "tags": [ "duration" ],
+            "abilityId": "Ability_Berserk_Fury",
             "upgradeProperties": {
                 "duration": 1
             }

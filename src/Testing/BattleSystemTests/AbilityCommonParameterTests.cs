@@ -1,8 +1,12 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using System.Threading.Tasks;
     using Battle.Source.Abilities;
+    using Battle.Source.Effects;
+    using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
+    using Moq;
     using static AugmentBench;
 
     /// <summary>
@@ -55,6 +59,25 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>The record that trades stacks for effectiveness — the one that has to arrive whole
         /// or not at all: half of it is a bill (two stacks fewer) and half is what pays for it.</summary>
         private const string StrongerFewer = "Augment_Add_Effectiveness_Reduce_Stacks";
+
+        /// <summary>The berserker, whose fury is a buff on its own caster like any other — and the
+        /// ability's own record, which SHORTENS that same buff.</summary>
+        private const string FuryId = "Ability_Berserk_Fury";
+        private const string ShorterFury = "Augment_Fury_Duration";
+
+        /// <summary>The augment that puts Life-Giving Shade on the shroud's caster, and the record that
+        /// raises how strongly what the shroud lays lands.</summary>
+        private const string Immortality = "Augment_Immortality";
+        private const string StrongerRecovery = "Augment_Recovery_Effectiveness";
+
+        /// <summary>The family's other record — the weaker of the two where they meet.</summary>
+        private const string StrongerBuff = "Augment_Buff_Effectiveness";
+
+        /// <summary>Share of health the shade restores per evade before effectiveness, and what the
+        /// record above is worth — both written out, because a walk that read either off the shipped
+        /// files would agree with whatever those files became.</summary>
+        private const float ShadeRestore = 0.35f;
+        private const float RecoveryBonus = 0.35f;
 
         [TestMethod]
         public void OneRecordOnASharedKeyLengthensTheBuffOfEveryAbilityThatDeclaresIt()
@@ -115,6 +138,27 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void ARecordThatShortensABuffAndOneThatLengthensItAreBothWorn()
+        {
+            // The berserker's fury is a buff on his own caster, so the book's "your buff lasts longer"
+            // reaches it — and lengthens the health it burns along with the series it grants. His own
+            // record pulls the same number the other way. Reaching for one number is not doing the same
+            // thing: told apart by the direction they leave it in, the two are two effects and the
+            // ability wears both. Read as one, the pair would silently drop whichever rolled lower.
+            IAbility bare = Wearing(FuryId);
+            IAbility longer = Wearing(FuryId, LongerBuff);
+            IAbility shorter = Wearing(FuryId, ShorterFury);
+            IAbility both = Wearing(FuryId, LongerBuff, ShorterFury);
+
+            Assert.AreEqual(bare[AbilityParameter.Duration] + 1f, longer[AbilityParameter.Duration],
+                "the buff record does not reach the fury, so the pair below proves nothing");
+            Assert.AreEqual(bare[AbilityParameter.Duration] - 1f, shorter[AbilityParameter.Duration],
+                "the ability's own record stopped shortening the fury");
+            Assert.AreEqual(bare[AbilityParameter.Duration], both[AbilityParameter.Duration],
+                "one of the two records was read as a weaker copy of the other and dropped");
+        }
+
+        [TestMethod]
         public void TwoRecordsLengtheningOneBuffAreOneOfferAndOnlyTheBetterIsWorn()
         {
             // Two shipped records, written for two different abilities, both offering a longer buff.
@@ -126,6 +170,51 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(4f, alone[AbilityParameter.Duration], "one record no longer lengthens the shroud at all");
             Assert.AreEqual(alone[AbilityParameter.Duration], both[AbilityParameter.Duration],
                 "the two records that offer one longer buff were added up instead of the better one being worn");
+        }
+
+        [TestMethod]
+        public void TwoRecordsOfTheEffectivenessFamilyAreOneOfferWhereTheyMeet()
+        {
+            // The family is segmented by tags and not by keys, so on an ability carrying both tags the
+            // two records are one offer at two strengths and the better one works. That is the price of
+            // the segmentation and it is deliberate — read as two, the shroud would wear both raises.
+            IAbility bare = Wearing(ShroudId);
+            IAbility both = Wearing(ShroudId, StrongerBuff, StrongerRecovery);
+
+            Assert.AreEqual(bare[AbilityParameter.Effectiveness] + RecoveryBonus, both[AbilityParameter.Effectiveness],
+                0.0001f, "the two records of one family were added up instead of the better one being worn");
+        }
+
+        [TestMethod]
+        public async Task EffectivenessReachesTheContentACastLaysAndNotOnlyItsOwnNumbers()
+        {
+            // What effectiveness IS: the multiplier the values of what a cast lays are read through —
+            // including the content an augment added, which is where it would be easiest to lose. The
+            // shade is put on the caster by one augment and its restore is raised by another, and
+            // neither was written for the other: the applier reads the key at the moment of the cast,
+            // so whatever is seated on it by then is already in the number.
+            float alone = await ShadeRestoredBy(Immortality);
+            float raised = await ShadeRestoredBy(Immortality, StrongerRecovery);
+
+            Assert.AreEqual(ShadeRestore, alone, 0.0001f, "the shade no longer restores what its own record declares");
+            Assert.AreEqual(ShadeRestore * (1f + RecoveryBonus), raised, 0.0001f,
+                "the effectiveness record never reached the shade the shroud lays");
+        }
+
+        /// <summary>What one evade under the shade gives back, with the named records seated: the shroud
+        /// is cast on a real fighter and the effect is read off the one it landed on.</summary>
+        private static async Task<float> ShadeRestoredBy(params string[] augmentIds)
+        {
+            var owner = new ConditionOwner();
+            IAbility shroud = Wearing(ShroudId, augmentIds);
+            shroud.SetOwner(owner);
+
+            await shroud.Execute([owner], Mock.Of<IBattleField>());
+
+            IEffect? shade = owner.Effects.Effects.FirstOrDefault(effect => effect.Id == "Effect_Life_Giving_Shade");
+            Assert.IsNotNull(shade, "the shroud never laid the shade at all, so the figure below proves nothing");
+
+            return ((LifeGivingShadeEffect)shade).LifeToRecover;
         }
 
         /// <summary>The ability as the game builds it, wearing the named shipped records in the order

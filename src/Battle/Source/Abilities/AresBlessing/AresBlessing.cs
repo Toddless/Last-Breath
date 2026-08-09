@@ -19,6 +19,15 @@ namespace Battle.Source.Abilities.AresBlessing
         public float HealthBonus => this[Parameters.HealthBonus];
         public float RecoveryBonus => this[Parameters.RecoveryBonus];
 
+        /// <summary>
+        /// The blessing's two bonuses. They are VALUES an effectiveness would multiply and not the
+        /// multiplier, so the ability could declare <see cref="AbilityParameter.Effectiveness"/> and
+        /// read it through them — it deliberately does not yet, and the reason is one record:
+        /// <c>Augment_Add_Effectiveness_Reduce_Stacks</c> pays for its raise in stacks and the blessing
+        /// has none, so the bill would land nowhere and the raise would arrive free. The other records
+        /// of the family charge nothing and would be welcome; declaring the concept here waits on that
+        /// one having a bill this ability can carry.
+        /// </summary>
         public static class Parameters
         {
             public const string HealthBonus = nameof(HealthBonus);

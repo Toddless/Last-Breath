@@ -1422,7 +1422,7 @@ msgid "Ability_Berserk_Fury"
 msgstr "Ярость берсерка"
 
 msgid "Ability_Berserk_Fury_Description"
-msgstr "Накладывает {@Effect_Fury} ({FuryDuration|turn|turns}, каждая атака сжигает {FuryHealthPercent:%} текущего здоровья) и совершает последовательные атаки — шанс продолжить серию зависит от текущего здоровья: чем оно ниже, тем ниже шанс."
+msgstr "Накладывает {@Effect_Fury} ({Duration|turn|turns}, каждая атака сжигает {FuryHealthPercent:%} текущего здоровья) и совершает последовательные атаки — шанс продолжить серию зависит от текущего здоровья: чем оно ниже, тем ниже шанс."
 
 msgid "Ability_Armageddon"
 msgstr "Армагедон"
@@ -1464,7 +1464,7 @@ msgid "Ability_Ice_Shards"
 msgstr "Ледяные осколки"
 
 msgid "Ability_Ice_Shards_Description"
-msgstr "Выстреливает {Shards} осколками льда. Каждый осколок наносит цели {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) урона.\nУровень активации 2: урон осколков увеличивается до {SecondStageDamage} + ({SecondStageWeaponDamageScale:%} + {SecondStageSpellDamageScale:%}).\nУровень активации 3: осколки летят во все цели на поле боя.\nУровень активации 4: при критическом ударе осколки распадаются на шрапнель, нанося {ShrapnelDamage} + ({ShrapnelWeaponDamageScale:%} + {ShrapnelSpellDamageScale:%}) урона всем противникам."
+msgstr "Выстреливает {ProjectileCount} осколками льда. Каждый осколок наносит цели {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) урона.\nУровень активации 2: урон осколков увеличивается до {SecondStageDamage} + ({SecondStageWeaponDamageScale:%} + {SecondStageSpellDamageScale:%}).\nУровень активации 3: осколки летят во все цели на поле боя.\nУровень активации 4: при критическом ударе осколки распадаются на шрапнель, нанося {ShrapnelDamage} + ({ShrapnelWeaponDamageScale:%} + {ShrapnelSpellDamageScale:%}) урона всем противникам."
 
 msgid "Ability_Ice_Block"
 msgstr "Глыба льда"
@@ -2152,6 +2152,24 @@ msgstr ""
 
 msgid "Augment_Extend_Poison_Description"
 msgstr "Успешная атака продлевает яд на {poisonDuration|turn|turns}."
+
+msgid "Augment_Additional_Projectiles"
+msgstr "Дополнительные снаряды"
+
+msgid "Augment_Additional_Projectiles_Description"
+msgstr "Способность выпускает на {amount} снаряда больше."
+
+msgid "Augment_Buff_Effectiveness"
+msgstr "Эффективность бафа"
+
+msgid "Augment_Buff_Effectiveness_Description"
+msgstr "Увеличивает эффективность бафа на {effectiveness:%}."
+
+msgid "Augment_Recovery_Effectiveness"
+msgstr "Эффективность восстановления"
+
+msgid "Augment_Recovery_Effectiveness_Description"
+msgstr "Увеличивает эффективность восстановления на {effectiveness:%}."
 
 msgid "Ability_Ip_Augment_Unevadable"
 msgstr ""

@@ -44,7 +44,14 @@ namespace Battle.Source.Abilities.IceBlock
         public static class Parameters
         {
             public const string WitheringDuration = nameof(WitheringDuration);
+
+            /// <summary>How many stacks of Withering the block may pile on its TARGET. Not the book's
+            /// <see cref="AbilityParameter.Stacks"/>, which counts the stacks a cast lays on its own
+            /// caster: what a blow leaves on its victim and what a caster wears are two axes, and the
+            /// block's stun duration beside this one is the second number on the target's axis, so
+            /// neither is a single shared "applied" count either.</summary>
             public const string WitheringMaxStacks = nameof(WitheringMaxStacks);
+
             public const string WitheringValue = nameof(WitheringValue);
             public const string ExtraBlocks = nameof(ExtraBlocks);
             public const string ExtraBlockDamagePercent = nameof(ExtraBlockDamagePercent);

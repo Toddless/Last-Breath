@@ -31,7 +31,6 @@ namespace Battle.Source.Abilities.IceShards
 
         public static class Parameters
         {
-            public const string Shards = nameof(Shards);
             public const string ShrapnelDamage = nameof(ShrapnelDamage);
             public const string ShrapnelWeaponDamageScale = nameof(ShrapnelWeaponDamageScale);
             public const string ShrapnelSpellDamageScale = nameof(ShrapnelSpellDamageScale);
@@ -41,14 +40,14 @@ namespace Battle.Source.Abilities.IceShards
             public const string SecondStageSpellDamageScale = nameof(SecondStageSpellDamageScale);
         }
 
-        public int Shards => (int)this[Parameters.Shards];
+        public int ProjectileCount => (int)this[AbilityParameter.ProjectileCount];
         public float ShrapnelBarrierLeach => this[Parameters.ShrapnelBarrierLeach];
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
             RegisterDamageParameters(parameters);
-            parameters.RegisterDefault(Parameters.Shards, 3);
+            parameters.RegisterDefault(AbilityParameter.ProjectileCount, 3);
             parameters.RegisterDefault(Parameters.ShrapnelDamage, 50f);
             parameters.RegisterDefault(Parameters.ShrapnelWeaponDamageScale, 0.15f);
             parameters.RegisterDefault(Parameters.ShrapnelSpellDamageScale, 0.55f);
@@ -64,7 +63,7 @@ namespace Battle.Source.Abilities.IceShards
         protected override VolleyCastPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field) =>
             new()
             {
-                ProjectilesCount = Shards,
+                ProjectilesCount = ProjectileCount,
                 Damage = Damage,
                 WeaponDamageScale = WeaponDamageScale,
                 SpellDamageScale = SpellDamageScale,

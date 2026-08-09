@@ -20,6 +20,14 @@ namespace Core.Battle.Abilities
     /// same word but means something else registers a key of its own instead, or the augment would move
     /// a number it was never offered for. A key nobody would ever register twice belongs to its
     /// ability, not here.</para>
+    ///
+    /// <para><b>Latent pairs, named so they are not discovered twice.</b> Two spellings are already
+    /// registered by two abilities each and are NOT keys here, because no record stands on either and a
+    /// concept nobody buys is a constant nobody reads: <c>SecondDamage</c> / <c>SecondWeaponScale</c> /
+    /// <c>SecondSpellScale</c> (Armageddon and Double Strike — the blow after the first) and
+    /// <c>FreezeDuration</c> (Deep Freeze and Ice Aegis). The first record to reach for either has to
+    /// promote the spelling to a key in the same breath, or it will share a number by coincidence of
+    /// wording — which is the whole thing this class exists to stop.</para>
     /// </summary>
     public static class AbilityParameter
     {
@@ -70,6 +78,13 @@ namespace Core.Battle.Abilities
         /// How strongly what a cast lays lands — the multiplier the values of its buff are read through.
         /// Deliberately one knob rather than one per value: an ability that scales its buff scales all
         /// of it, or the key would say nothing about what an augment standing on it actually buys.
+        ///
+        /// <para>The kind of thing an ability applies is segmented by the RECORDS and their tags, never
+        /// by keys of its own: "buff effectiveness" and "recovery effectiveness" are one key in one
+        /// direction and therefore one offer wherever they meet, and what tells them apart is which
+        /// abilities are offered the deal at all. A consequence worth knowing: the tier-one buff record
+        /// is strictly outbid on the one ability that carries both tags, so the ability it actually
+        /// works on alone is Critical Calculation.</para>
         /// </summary>
         public const string Effectiveness = nameof(Effectiveness);
 
@@ -80,6 +95,14 @@ namespace Core.Battle.Abilities
         /// it by moving both silently would make "+1 attack" mean two different things on two abilities.
         /// </summary>
         public const string Attacks = nameof(Attacks);
+
+        /// <summary>
+        /// How many projectiles one cast sends. A COUNTED kind of touch, like <see cref="Attacks"/>:
+        /// every projectile is an impact of its own, so a record raising this multiplies the work of
+        /// every impact rider the ability wears without either of them being written for the other —
+        /// two more projectiles put two more poison stacks on each target and nothing had to say so.
+        /// </summary>
+        public const string ProjectileCount = nameof(ProjectileCount);
 
         /// <summary>
         /// How long the stun a cast puts on its target holds, in turns. Four abilities stun and all four

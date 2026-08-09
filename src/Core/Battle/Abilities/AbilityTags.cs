@@ -21,6 +21,8 @@ namespace Core.Battle.Abilities
         /// <summary>Positive effect the caster puts on itself (or an ally).</summary>
         public const string Buff = "buff";
         public const string Poison = "poison";
+        /// <summary>Delivery that sends counted projectiles, each of them an impact of its own.</summary>
+        public const string Projectile = "projectile";
         public const string Cold = "cold";
         public const string Lightning = "lightning";
         public const string Fire = "fire";
@@ -90,7 +92,7 @@ namespace Core.Battle.Abilities
         public static readonly IReadOnlySet<string> All = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             Attack, Spell, Series, Buff, Poison, Cold, Lightning, Fire, Stun, Freeze, Crit, Barrier,
-            Mana, Health, Evasion, Execute, Retaliation, Empower, Shield, Summon, Npc,
+            Mana, Health, Evasion, Execute, Retaliation, Empower, Shield, Summon, Npc, Projectile,
             Accuracy, Armor, Burn, Charged, Control, Cooldown, Cost, Curse, Damage, Debuff, Defence,
             Duration, Effect, Effectiveness, Evadable, Heal, Hit, Leech, Recovery, Restore, Scale,
             Splash, Spread, Stacks, Target, Thorn,

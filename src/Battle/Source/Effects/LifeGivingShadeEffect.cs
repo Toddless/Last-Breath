@@ -27,11 +27,15 @@
 
         public override async Task Apply(EffectApplyingContext context)
         {
-            if (Target == null) return;
+            // Whom the shade landed on is settled by the base and nowhere earlier: it is what assigns
+            // Target, so a guard on Target ahead of the call refuses every fresh instance and the
+            // effect never lands at all. What the base leaves null it left null on purpose — a resisted
+            // application — and the two lines below skip themselves for it.
             await base.Apply(context);
-            var copy = _modifier.Copy();
-            copy.ApplyTo(Target);
-            Target?.CombatEvents.Subscribe<AttackEvadedEvent>(OnAttackEvaded);
+            if (Target == null) return;
+
+            _modifier.Copy().ApplyTo(Target);
+            Target.CombatEvents.Subscribe<AttackEvadedEvent>(OnAttackEvaded);
         }
 
         private void OnAttackEvaded(AttackEvadedEvent obj)

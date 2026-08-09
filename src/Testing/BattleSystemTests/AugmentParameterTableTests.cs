@@ -26,7 +26,7 @@ namespace LastBreathTest.BattleSystemTests
     public class AugmentParameterTableTests
     {
         /// <summary>How many records the table took over from a class of their own.</summary>
-        private const int TranslatedRecords = 47;
+        private const int TranslatedRecords = 50;
 
         /// <summary>Two bases every move is measured on. One of them has to be something other than
         /// nothing: an override and an addition are the same number on a base of zero, and a walk that
@@ -60,7 +60,7 @@ namespace LastBreathTest.BattleSystemTests
 
             ("Augment_Heal_From_Damage", "HealPercent", OperationType.Add, 0.15f),
 
-            ("Augment_Fury_Duration", "FuryDuration", OperationType.Subtract, 1f),
+            ("Augment_Fury_Duration", "Duration", OperationType.Subtract, 1f),
             ("Augment_More_Burn", "FuryHealthPercent", OperationType.Add, 0.035f),
             ("Augment_Less_Burn", "FuryHealthPercent", OperationType.Subtract, 0.02f),
 
@@ -87,6 +87,10 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Increased_Buff_Duration", "Duration", OperationType.Add, 1f),
 
             ("Augment_Reduce_Execution_Trahsold", "ExecutionThreshold", OperationType.Subtract, 5f),
+
+            ("Augment_Additional_Projectiles", "ProjectileCount", OperationType.Add, 2f),
+            ("Augment_Buff_Effectiveness", "Effectiveness", OperationType.Add, 0.25f),
+            ("Augment_Recovery_Effectiveness", "Effectiveness", OperationType.Add, 0.35f),
 
             ("Ability_Is_Augment_Additional_Scales", "WeaponDamageScale", OperationType.Add, 0.05f),
             ("Ability_Is_Augment_Additional_Scales", "SpellDamageScale", OperationType.Add, 0.15f),
