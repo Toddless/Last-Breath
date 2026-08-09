@@ -57,6 +57,9 @@ gradient = SubResource("Gradient_kwijy")
 [sub_resource type="LabelSettings" id="LabelSettings_s1n7v"]
 font_size = 69
 
+[sub_resource type="LabelSettings" id="LabelSettings_ffbc7"]
+font_size = 56
+
 [node name="MainWorld" type="Node2D" unique_id=1612394780]
 script = ExtResource("1_4xxmu")
 
@@ -235,3 +238,32 @@ offset_right = 155.0
 offset_bottom = 103.0
 text = "Merchant"
 label_settings = SubResource("LabelSettings_s1n7v")
+
+[node name="Ronald" type="Node2D" parent="." unique_id=543728218]
+position = Vector2(-324, 26)
+script = ExtResource("8_hv00y")
+_npcIds = PackedStringArray("Npc_Ronald")
+_maxCount = 1
+_spawnRadius = 1.0
+_pointId = "Npc_Ronald"
+_recoveryZone = false
+metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="Label" type="Label" parent="Ronald" unique_id=663526096]
+offset_left = -79.0
+offset_right = 109.0
+offset_bottom = 77.0
+text = "Ronald"
+label_settings = SubResource("LabelSettings_ffbc7")
+
+[node name="TradeStal" type="Node2D" parent="." unique_id=1332433692]
+position = Vector2(-406, 145)
+script = ExtResource("10_kwijy")
+_tag = "TradeStall"
+metadata/_custom_type_script = "uid://dhdmfoqlhrspe"
+
+[node name="Forge" type="Node2D" parent="." unique_id=1315272964]
+position = Vector2(-148, 15)
+script = ExtResource("10_kwijy")
+_tag = "Forge"
+metadata/_custom_type_script = "uid://dhdmfoqlhrspe"
