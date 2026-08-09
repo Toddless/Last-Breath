@@ -228,20 +228,55 @@
         }
 
         [TestMethod]
-        public void AWaitTooShortForTheShareToReachATurnStillLosesOne()
+        public void APriceTooSmallForTheShareToReachAWholePointStillLosesOne()
         {
-            // The floor, on the only base small enough to need it, for both augments that cut a wait.
+            // The rounding away from nothing, pinned on the parameter that has no floor under it. A
+            // share of a small base is a fraction of a point, points are whole, and a cut that rounds
+            // down to zero leaves the augment chosen, worn, paid for and doing nothing at all — the
+            // silent refusal this system has already been bitten by once on effect durations. The
+            // cooldown records can no longer stand as witness to it: their floor now catches exactly
+            // the bases the rounding used to, so the price is the only place the two rules can still
+            // be told apart.
+            var ability = AbilityWith(cost: 1);
+
+            new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare).Apply(ability);
+
+            Assert.AreEqual(0, ability.CostValue, "a share too small to reach a whole point took nothing at all");
+        }
+
+        [TestMethod]
+        public void ACutDeepEnoughToTakeTheWholeWaitLeavesTheAbilityWaitingATurn()
+        {
+            // The floor, on the only base small enough to reach it, for both augments that cut a wait.
+            // What these records offer is a shorter cooldown and never the removal of one: rounding the
+            // share up to a whole turn — which a share is worthless without — would otherwise take the
+            // whole of a one-turn wait and hand the caster an ability that comes round every turn.
             // Nothing the game ships waits a single turn today, so this is the rule stated for the data
-            // that will: a fraction of one turn is a fraction of a turn, and rounding it honestly leaves
-            // the augment inert.
+            // that will.
             var cut = AbilityWith(cooldown: 1);
             var surcharged = AbilityWith(cooldown: 1);
 
             new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(cut);
             new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
 
-            Assert.AreEqual(0f, cut.Cooldown, "a share too small to reach a whole turn took nothing at all");
-            Assert.AreEqual(0f, surcharged.Cooldown, "the surcharge augment charged for a wait it was too small to shorten");
+            Assert.AreEqual(1f, cut.Cooldown, "the cut took the ability's whole wait instead of stopping at the floor");
+            Assert.AreEqual(1f, surcharged.Cooldown, "the surcharge record took the ability's whole wait instead of stopping at the floor");
+        }
+
+        [TestMethod]
+        public void TheFloorHoldsBackOnlyTheCutThatWouldBreakThroughIt()
+        {
+            // The other half of the rule. A floor that is read before the share is measured would be a
+            // second, quieter nerf to every wait in the book — the augments the players actually wear go
+            // on the numbers the game ships, and those must lose exactly the turns they lost before.
+            var cut = AbilityWith(cooldown: 3);
+            var surcharged = AbilityWith(cooldown: 9);
+
+            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(cut);
+            new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
+
+            Assert.AreEqual(2f, cut.Cooldown, "a quarter of three turns no longer comes to one");
+            Assert.AreEqual(5f, surcharged.Cooldown, "two fifths of nine turns no longer comes to four");
         }
 
         [TestMethod]
@@ -249,7 +284,9 @@
         {
             // The augments now go onto every ability there is, and the book holds casts that are free
             // and instant. A floor of one unit applied blindly would hand the caster a negative price
-            // on one side and a bill for a free cast on the other.
+            // on one side and a bill for a free cast on the other — and the floor the cooldown cut now
+            // stops at would be a WAIT given to an ability written without one, which is the augment
+            // charging the player to make their cast slower.
             var discounted = AbilityWith(cost: 0, cooldown: 0);
             var surcharged = AbilityWith(cost: 0, cooldown: 0);
 

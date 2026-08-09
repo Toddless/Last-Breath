@@ -6,7 +6,9 @@ namespace Core.Battle.Abilities
     /// <summary>
     /// Keys of the parameters every ability owns. Parameter keys are strings — the same names the
     /// JSON data and the description placeholders use; ability-specific keys live in a nested
-    /// <c>Parameters</c> constants class of the ability itself.
+    /// <c>Parameters</c> constants class of the ability itself. Rules that hold for a parameter across
+    /// the whole book — which of them are prices, how far one may be moved — belong here beside its
+    /// key, so a system reading the parameter finds what it is allowed to do with it in one place.
     /// </summary>
     public static class AbilityParameter
     {
@@ -35,5 +37,16 @@ namespace Core.Battle.Abilities
 
         /// <summary>Fractional increase of the owner's critical damage for this ability: final = owner and bonus.</summary>
         public const string CriticalDamageBonus = nameof(CriticalDamageBonus);
+
+        /// <summary>
+        /// The shortest wait a SHARE-shaped cut of the cooldown may leave: those augments offer a shorter
+        /// cooldown and not a cooldown removed, so however deep the share they are written with, the cut
+        /// stops here. It binds the decorators that honour it and nothing else — a flat subtraction
+        /// written into an ability's own upgrade cuts straight past it, deliberately, because a number
+        /// authored for one ability is a decision already taken about that ability's wait.
+        /// The floor is on the REDUCTION alone: an ability written to wait for nothing keeps its instant
+        /// cast, because a floor may never raise a number the data did not ask for.
+        /// </summary>
+        public const float MinimumCooldown = 1f;
     }
 }

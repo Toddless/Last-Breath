@@ -39,6 +39,10 @@ namespace Core.Narrative.Actions
         string pointId,
         IReadOnlyList<string>? modifierIds) : INarrativeAction
     {
+        /// <summary>What the refusal says instead of a list when the scene registered no point at all —
+        /// a world loaded without its spawn points is a different fault from a mistyped id.</summary>
+        private const string NoPointsRegistered = "none registered";
+
         public void Execute(NarrativeContext context)
         {
             if (!npcs.KnownNpcIds.Contains(npcId))
@@ -103,13 +107,15 @@ namespace Core.Narrative.Actions
         }
 
         /// <summary>Where the named point stands. Points carry their world position as raid spawn
-        /// sites; one that does not (a point outside that contract) cannot be addressed by data.</summary>
+        /// sites; one that does not (a point outside that contract) cannot be addressed by data.
+        /// A miss names every point the scene did register: the id is authored by hand in two places
+        /// at once, and a singular against a plural is the whole of the mistake.</summary>
         private Vector2? ResolvePosition()
         {
             var point = points.All.FirstOrDefault(entry => entry.PointId == pointId);
             if (point == null)
             {
-                Tracker.TrackNotFound($"SpawnNpc action '{npcId}': spawn point '{pointId}'", this);
+                Tracker.TrackNotFound($"SpawnNpc action '{npcId}': spawn point '{pointId}' ({KnownPointIds()})", this);
                 return null;
             }
 
@@ -120,6 +126,18 @@ namespace Core.Narrative.Actions
             }
 
             return site.Position;
+        }
+
+        /// <summary>The ids the scene registered, for the refusal above — parenthesised there, because
+        /// the tracker closes every miss with "not found" and a bare list would hand that negation to
+        /// its last id. Sorted, because the answer is read by eye against an id typed in a quest file;
+        /// an empty world says so in words rather than leaving the reader to wonder whether the list was
+        /// simply left off.</summary>
+        private string KnownPointIds()
+        {
+            string[] ids = [.. points.All.Select(entry => entry.PointId).OrderBy(id => id, StringComparer.Ordinal)];
+
+            return $"known points: {(ids.Length == 0 ? NoPointsRegistered : string.Join(", ", ids))}";
         }
     }
 

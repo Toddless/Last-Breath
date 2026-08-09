@@ -22,8 +22,14 @@ namespace Battle.Source.Abilities
     /// nothing — the silent refusal a share is worthless without. A base of nothing has nothing to give
     /// and is left alone, so a free and instant cast is neither handed a negative price nor charged for
     /// being free.
+    ///
+    /// A cut may also be given a <paramref name="floor"/> it must not go under — a wait the augment is
+    /// allowed to shorten but not to remove. The floor only ever holds a cut back: a base already at or
+    /// below it keeps what it has, so a floor can never be the thing that RAISES a number, and a base of
+    /// nothing stays nothing. Additions ignore it, and a floor of zero is the same decorator as before.
     /// </summary>
-    public class AbilityParameterShare(string parameter, OperationType operation, float share, string id, string source)
+    public class AbilityParameterShare(
+        string parameter, OperationType operation, float share, string id, string source, float floor = 0f)
         : AbilityParameterDecorator(parameter, Priority.Base, id, source)
     {
         /// <summary>Which way the share moves the parameter. <see cref="Decorate"/> honours a
@@ -34,9 +40,13 @@ namespace Battle.Source.Abilities
         public override float Decorate(float baseValue) => operation switch
         {
             OperationType.Add => baseValue + Share(baseValue),
-            OperationType.Subtract => baseValue - Share(baseValue),
+            OperationType.Subtract => MathF.Max(baseValue - Share(baseValue), FloorUnder(baseValue)),
             _ => baseValue
         };
+
+        /// <summary>How low this cut may take the base. Never above the base itself — the floor holds a
+        /// reduction back and is not licence to hand the ability a number it was not written with.</summary>
+        private float FloorUnder(float baseValue) => MathF.Min(baseValue, floor);
 
         private float Share(float baseValue) =>
             baseValue <= 0f

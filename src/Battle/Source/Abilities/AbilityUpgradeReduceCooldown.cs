@@ -8,7 +8,10 @@ namespace Battle.Source.Abilities
     /// serves the whole book, and the waits it goes on run from no turns at all to nine. Turns are
     /// whole, so what the share comes to is rounded and floored at one turn, and it is measured against
     /// the ability's own base wait — see <see cref="AbilityParameterShare"/> — so the augment cuts
-    /// the same number of turns whatever else is worn beside it.
+    /// the same number of turns whatever else is worn beside it. What is left is a wait of at least
+    /// <see cref="AbilityParameter.MinimumCooldown"/>: the augment sells a shorter cooldown, never the
+    /// removal of one. An ability written to wait for nothing is untouched — the floor holds the cut
+    /// back and does not hand out a wait the data never asked for.
     /// </summary>
     public class AbilityUpgradeReduceCooldown(string id, string[] tags, int tier, float cooldownShare)
         : AbilityUpgrade<Ability>(id, tags, tier)
@@ -21,7 +24,8 @@ namespace Battle.Source.Abilities
                 OperationType.Subtract,
                 cooldownShare,
                 DecoratorId,
-                Id));
+                Id,
+                floor: AbilityParameter.MinimumCooldown));
 
         public override void RemoveUpgrade(Ability ability) =>
             ability.RemoveParameterDecorator(DecoratorId, AbilityParameter.Cooldown);

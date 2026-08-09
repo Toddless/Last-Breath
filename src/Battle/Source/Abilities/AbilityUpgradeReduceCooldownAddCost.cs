@@ -10,7 +10,9 @@ namespace Battle.Source.Abilities
     /// five hundred, and a flat pair of figures would be a rewritten ability at one end and a change
     /// nobody notices at the other. Both shares are measured against the ability's own base numbers and
     /// rounded there — see <see cref="AbilityParameterShare"/> — so the turns taken off and the points
-    /// added on are the same whatever else is worn beside this augment.
+    /// added on are the same whatever else is worn beside this augment. The wait it leaves is at least
+    /// <see cref="AbilityParameter.MinimumCooldown"/> — the same floor the plain cut honours, and the
+    /// same reason: the record charges for a shorter cooldown, not for the removal of one.
     /// </summary>
     public class AbilityUpgradeReduceCooldownAddCost(string id, string[] tags, int tier, float cooldownShare, float costShare)
         : AbilityUpgrade<Ability>(id, tags, tier)
@@ -21,7 +23,8 @@ namespace Battle.Source.Abilities
         public override void ApplyUpgrade(Ability ability)
         {
             ability.AddParameterDecorator(new AbilityParameterShare(
-                AbilityParameter.Cooldown, OperationType.Subtract, cooldownShare, CooldownDecoratorId, Id));
+                AbilityParameter.Cooldown, OperationType.Subtract, cooldownShare, CooldownDecoratorId, Id,
+                floor: AbilityParameter.MinimumCooldown));
             ability.AddParameterDecorator(new AbilityParameterShare(
                 AbilityParameter.CostValue, OperationType.Add, costShare, CostDecoratorId, Id));
         }
