@@ -143,6 +143,10 @@ namespace LastBreath.Npc
         /// Raised once by the battle summon spawner right after the definition is applied.</summary>
         public bool IsSummon { get; private set; }
 
+        /// <summary>Nobody's body: an authored order (the quest spawn action, the save restore) put it
+        /// here, not a spawn point, so no point re-rolls it on load and the save file must carry it.</summary>
+        public bool IsWild { get; private set; }
+
         /// <summary>Species capability from the definition (interaction.canTalk); hostility never changes it.</summary>
         public bool CanTalk { get; private set; }
 
@@ -687,6 +691,9 @@ namespace LastBreath.Npc
 
         /// <summary>Marks the body as a battle-scoped summon (see <see cref="IsSummon"/>).</summary>
         public void MarkAsSummon() => IsSummon = true;
+
+        /// <summary>Marks the body as nobody's (see <see cref="IsWild"/>).</summary>
+        public void MarkAsWild() => IsWild = true;
 
         public void ConsumeResource(Costs type, float amount)
         {

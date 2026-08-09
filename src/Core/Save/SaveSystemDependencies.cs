@@ -85,6 +85,8 @@ namespace Core.Save
                     manager.Register(new NpcWorldSaveParticipant(
                         sp.GetRequiredService<INpcWorldRegistry>(),
                         sp.GetRequiredService<INpcProvider>(),
+                        // Wild living NPCs restate the modifiers they wear instead of re-rolling them.
+                        sp.GetRequiredService<INpcModifierProvider>(),
                         sp.GetRequiredService<INpcPopulationService>(),
                         spawner));
                 manager.Register(new SpawnPointsSaveParticipant(sp.GetRequiredService<ISpawnPointRegistry>()));

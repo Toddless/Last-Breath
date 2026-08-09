@@ -7,7 +7,8 @@ namespace Core.Data.SaveData
 
     /// <summary>
     /// World NPC deltas: only the irreversible facts are stored — lying bodies (with their rise
-    /// timers) and wild risen undead. Regular alive NPCs re-roll from spawn points on load.
+    /// timers), wild risen undead and wild living NPCs nobody re-rolls. Alive NPCs a spawn point
+    /// owns stay out: the point restores its own roster.
     /// </summary>
     public class NpcWorldSaveData
     {
@@ -25,7 +26,17 @@ namespace Core.Data.SaveData
         /// <summary>A wild undead already risen from a body (alive, roaming).</summary>
         public const string RisenKind = "risen";
 
+        /// <summary>A wild living NPC (a quest's trial target): on its feet, owned by no spawn point,
+        /// and the only record that carries its own modifier list.</summary>
+        public const string AliveKind = "alive";
+
         [JsonProperty("kind")] public string Kind { get; init; } = DefeatedKind;
+
+        /// <summary>Whether NO spawn point owned this NPC at save time. False (a version 1 file, or a
+        /// body a point counts in its own roster) means the point restores a resident of its own beside
+        /// this record, so what comes back here must NOT claim to be nobody's — otherwise the pair the
+        /// world used to heal by itself, once the body stands up again, would be written down forever.</summary>
+        [JsonProperty("wild")] public bool Wild { get; init; }
         [JsonProperty("npcId")] public string NpcId { get; init; } = string.Empty;
         [JsonProperty("level")] public int Level { get; init; }
 
@@ -48,5 +59,10 @@ namespace Core.Data.SaveData
 
         /// <summary>Risen only: the parameter bonus the rising granted.</summary>
         [JsonProperty("risingBonus")] public float RisingBonus { get; init; }
+
+        /// <summary>Alive only: the EXACT modifier ids the NPC wears. A trial fought against a
+        /// different set is a different trial, so these are restated instead of re-rolled — the
+        /// bodies keep re-rolling theirs. Empty is an answer (an authored bare target), not a gap.</summary>
+        [JsonProperty("modifiers")] public List<string> Modifiers { get; init; } = [];
     }
 }

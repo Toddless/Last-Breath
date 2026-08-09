@@ -31,6 +31,18 @@
         /// corpse and never returns to the world. Default false: only summon-spawned bodies override.</summary>
         bool IsSummon => false;
 
+        /// <summary>Nobody's NPC: put into the world by an authored order (a quest action, a save
+        /// restore) instead of by a spawn point, so NO point re-rolls it on load — the save file is
+        /// the only thing that can bring it back. Default false: a point's own roster overrides nothing.</summary>
+        bool IsWild => false;
+
+        /// <summary>Raised by the authored order that put this NPC into the world — a quest action, or
+        /// a save restore reading a record that was already nobody's (see <see cref="IsWild"/>).
+        /// Default no-op: implementations that never leave a spawn point stay untouched.</summary>
+        void MarkAsWild()
+        {
+        }
+
         float RisingBonus { get; }
         bool IsRisen { get; }
     }

@@ -72,11 +72,15 @@ namespace Core.Narrative.Actions
                 if (modifierIds != null)
                     definition = definition with { Modifiers = modifierIds.Select(modifierProvider.GetModifier).ToList() };
 
-                if (spawner.Spawn(definition, position) == null)
+                if (spawner.Spawn(definition, position) is not { } spawned)
                 {
                     Tracker.TrackError($"SpawnNpc action '{npcId}': no world to spawn into", this);
                     return;
                 }
+
+                // The point lent coordinates and nothing else: nobody re-rolls this NPC on load, so
+                // the save file is the only thing that can bring the trial target back.
+                spawned.MarkAsWild();
 
                 // Raids and bosses reserve the same way: a named target must never be lost to a full
                 // world, so it takes a slot outside the limit and releases it on final death — regular
