@@ -61,7 +61,7 @@
             }
         }
 
-        protected float this[string parameter] => Params[parameter];
+        public float this[string parameter] => Params[parameter];
 
         /// <summary>
         /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
@@ -216,6 +216,10 @@
         public void AddParameterDecorator(AbilityParameterDecorator decorator) => Params.AddDecorator(decorator);
 
         public void RemoveParameterDecorator(string decoratorId, string parameter) => Params.RemoveDecorator(decoratorId, parameter);
+
+        public bool TryRegisterParameter(string parameter, float value) => Params.TryRegister(parameter, value);
+
+        public void UnregisterParameter(string parameter) => Params.Unregister(parameter);
 
         public virtual void SetOwner(IFightable owner)
         {

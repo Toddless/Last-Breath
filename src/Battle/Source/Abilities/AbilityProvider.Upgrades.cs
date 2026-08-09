@@ -71,12 +71,16 @@
                     data.Tags,
                     data.Tier,
                     (int)data.UpgradeProperties.GetValueOrDefault("poisonDuration", 1)),
+            // Nor does this one: whatever lands the impact, the target is poisoned. Both of its numbers
+            // become parameters of the ability it is seated on, which is what lets an amplifier of
+            // poison reach the stacks it lays.
             ["Augment_Poison_On_Hit"] = data =>
-                new SoAsUpgradePoisonOnHit(
+                new AugmentPoisonOnHit(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("poisonDuration", 3)),
+                    data.UpgradeProperties.GetValueOrDefault("poisonDuration", 3f),
+                    data.UpgradeProperties.GetValueOrDefault("poisonPotency", 0.7f)),
             ["Ability_SoA_Augment_Apply_Buff_Critical_Chance"] = data =>
                 new SoAsUpgradeApplyBuffCriticalChance(
                     data.Id,

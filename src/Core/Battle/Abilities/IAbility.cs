@@ -18,6 +18,14 @@
         /// <summary>How the ability selects its targets. Swappable per ability.</summary>
         ITargetingStrategy Targeting { get; }
 
+        /// <summary>
+        /// The ability's own number under a parameter key, decorated by everything seated on it. This
+        /// is what an impact's <c>Source</c> is a channel to: a rider reaching for it at the moment it
+        /// works reads what the cast is worth NOW, augments and all, instead of what it was worth when
+        /// the rider was built. An unregistered key is reported and answers zero.
+        /// </summary>
+        float this[string parameter] { get; }
+
         /// <summary>False = no backing out once target selection began: the player must pick a
         /// target and the cast fires (charged Armageddon). Default true.</summary>
         bool IsCancellable => true;
@@ -52,6 +60,21 @@
         Task Execute(List<IFightable> targets, IBattleField field);
         void AddParameterDecorator(AbilityParameterDecorator decorator);
         void RemoveParameterDecorator(string decoratorId, string parameter);
+
+        /// <summary>
+        /// Lends the ability a parameter it does not own, for an upgrade that arrives with a number of
+        /// its own: from here on the number is the cast's, readable through the indexer and open to
+        /// every decorator seated on that key — which is what makes "applies poison" and "poison lasts
+        /// longer" add up without either of them being written for the other.
+        /// True when this call is what put the key there; false when the ability already had it, and
+        /// then the base value stays the ability's own.
+        /// </summary>
+        bool TryRegisterParameter(string parameter, float value);
+
+        /// <summary>Takes back a parameter lent by <see cref="TryRegisterParameter"/> — only the
+        /// upgrade whose registration succeeded may, or one leaving would strip a number another is
+        /// still standing on.</summary>
+        void UnregisterParameter(string parameter);
         void SetOwner(IFightable owner);
         bool IsEnoughResource();
 

@@ -20,6 +20,16 @@ namespace Core.Battle.Abilities
         private readonly Dictionary<string, Func<float>> _baseValues = [];
         private readonly Dictionary<string, List<AbilityParameterDecorator>> _decorators = [];
 
+        /// <summary>
+        /// How many upgrades are currently standing on a parameter they LENT the ability
+        /// (<see cref="TryRegister"/>). Only borrowed keys are counted: what the ability registered for
+        /// itself is not anybody's to give back, and a lender leaving must not take a number out from
+        /// under the lenders still seated. Two sockets of one tier on one ability is an ordinary board
+        /// (the shipped tree already has a pair), so "the last one out takes the key with him" is the
+        /// rule rather than an edge case.
+        /// </summary>
+        private readonly Dictionary<string, int> _lenders = [];
+
         public event Action<string>? ParameterChanged;
 
         public IReadOnlyCollection<string> Keys => _baseValues.Keys;
@@ -35,8 +45,60 @@ namespace Core.Battle.Abilities
         }
 
         /// <summary>The ability's fallback for a parameter the data may supply: silently skipped when
-        /// the key is already registered (e.g. auto-registered from abilityProperties).</summary>
+        /// the key is already registered (e.g. auto-registered from abilityProperties). The ability's
+        /// own, so it is never counted as lent and no upgrade can take it away.</summary>
         public void RegisterDefault(string parameter, float value) => _baseValues.TryAdd(parameter, () => value);
+
+        /// <summary>
+        /// Lends the ability a parameter it does not own — an upgrade arriving with a number of its own,
+        /// so that number stands where every other number of the cast stands and is decorated by
+        /// whatever else is seated.
+        ///
+        /// True means the caller now holds a lease and owes exactly one <see cref="Unregister"/> when it
+        /// leaves — including the SECOND upgrade lending the same key, which keeps the base value
+        /// already there and merely joins it. Every lender owing a return is what makes the count
+        /// balance; a second lender told "no" would be a lender nobody expects a return from, and the
+        /// key would outlive every one of them.
+        ///
+        /// False means the ability itself registered the parameter. It keeps its own base value, the
+        /// newcomer reads and decorates that one, and nothing an upgrade does can take it off again.
+        /// </summary>
+        public bool TryRegister(string parameter, float value)
+        {
+            if (!_baseValues.ContainsKey(parameter))
+            {
+                _baseValues[parameter] = () => value;
+                _lenders[parameter] = 1;
+                return true;
+            }
+
+            if (!_lenders.TryGetValue(parameter, out int held)) return false;
+
+            _lenders[parameter] = held + 1;
+            return true;
+        }
+
+        /// <summary>
+        /// Gives back one lease taken through <see cref="TryRegister"/>. The base value goes only with
+        /// the LAST of them: while any lender is still seated the number it is standing on has to be
+        /// there, or its rider would be reading a key nobody registered and applying nothing at all.
+        /// Decorators seated on the key are left where they are: they belong to the upgrades that laid
+        /// them and come off with those, and one upgrade quietly dropping another's move is how a build
+        /// stops matching its sockets.
+        /// </summary>
+        public void Unregister(string parameter)
+        {
+            if (!_lenders.TryGetValue(parameter, out int held)) return;
+
+            if (held > 1)
+            {
+                _lenders[parameter] = held - 1;
+                return;
+            }
+
+            _lenders.Remove(parameter);
+            _baseValues.Remove(parameter);
+        }
 
         public float GetValue(string parameter)
         {
