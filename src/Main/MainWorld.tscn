@@ -60,6 +60,9 @@ font_size = 69
 [sub_resource type="LabelSettings" id="LabelSettings_ffbc7"]
 font_size = 56
 
+[sub_resource type="LabelSettings" id="LabelSettings_m67ao"]
+font_size = 38
+
 [node name="MainWorld" type="Node2D" unique_id=1612394780]
 script = ExtResource("1_4xxmu")
 
@@ -160,7 +163,7 @@ text = "Pack leader"
 label_settings = SubResource("LabelSettings_fmhhv")
 
 [node name="Digri" type="Node2D" parent="." unique_id=1321080777]
-position = Vector2(-127, -1643)
+position = Vector2(254, -1954)
 script = ExtResource("9_hv00y")
 _bossId = "Npc_Boss_Digri"
 _factionDeathsPerRespawn = 0
@@ -179,7 +182,7 @@ text = "Digri"
 label_settings = SubResource("LabelSettings_5f5v3")
 
 [node name="Zigri" type="Node2D" parent="." unique_id=1681300777]
-position = Vector2(-1237, -954)
+position = Vector2(-1367, -1916)
 script = ExtResource("9_hv00y")
 _bossId = "Npc_Boss_Zigri"
 _factionDeathsPerRespawn = 0
@@ -298,3 +301,20 @@ metadata/_custom_type_script = "uid://dhdmfoqlhrspe"
 offset_right = 40.0
 offset_bottom = 22.0
 text = "Tent"
+
+[node name="Trial_Grounds" type="Node2D" parent="." unique_id=1024213785]
+position = Vector2(-2064, -191)
+script = ExtResource("8_hv00y")
+_maxCount = 0
+_spawnRadius = 0.0
+_pointId = "Trial_Grounds"
+_recoveryZone = false
+metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="Label" type="Label" parent="Trial_Grounds" unique_id=1605167911]
+offset_left = -43.0
+offset_top = -5.0
+offset_right = 38.0
+offset_bottom = 48.0
+text = "Trial"
+label_settings = SubResource("LabelSettings_m67ao")
