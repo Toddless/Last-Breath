@@ -80,7 +80,11 @@ namespace Battle.Source.Abilities.IceBlock
                 var hit = await DealBlockDamage(plan, owner, target, multiplier);
                 foreach (var rider in plan.OnHitRiders)
                     rider(hit);
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage));
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage)
+                {
+                    Source = this,
+                    Kind = ImpactKind.Hit
+                });
             }
 
             if (ResetCooldownChance > 0 && CombatRandom.Rolls.RandFloat() <= ResetCooldownChance) CooldownLeft = 0;

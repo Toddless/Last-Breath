@@ -98,7 +98,13 @@ namespace Battle.Source.Abilities.DeepFreeze
                         effect.Duration += 1;
 
                 await ApplyPayload(plan, owner, target);
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, Damage: 0));
+                // A landing that carries no damage is still a landing: the road is the plan's own target
+                // list, the same one every other direct delivery walks.
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, Damage: 0)
+                {
+                    Source = this,
+                    Kind = ImpactKind.Hit
+                });
             }
 
             TrySpreadFreeze(plan, owner, field);

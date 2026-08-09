@@ -237,7 +237,11 @@ namespace LastBreathTest.BattleSystemTests
             var hit = Fighter();
             var bystander = Fighter();
             return new SplashRandomTargetRider(0.5f)
-                .Apply(new AbilityImpact(caster, hit, FieldOf(caster, hit, bystander), Succeeded: true, IsCritical: false, Damage));
+                .Apply(new AbilityImpact(caster, hit, FieldOf(caster, hit, bystander), Succeeded: true, IsCritical: false, Damage)
+                {
+                    Source = new IncreasingPressureCast(Data()),
+                    Kind = ImpactKind.Attack
+                });
         }
 
         private static Task TheDiscountedCooldown()
@@ -325,7 +329,11 @@ namespace LastBreathTest.BattleSystemTests
             var heir = Fighter();
             var poison = new DamageOverTurnEffect(duration: 3, StatusEffects.Poison);
             await poison.Apply(new EffectApplyingContext { Caster = owner, Target = dying, Source = nameof(ThePoisonHeir), Damage = Damage });
-            await new TransferPoisonOnDeathRider().Apply(new AbilityImpact(owner, dying, FieldOf(owner, dying, heir)));
+            await new TransferPoisonOnDeathRider().Apply(new AbilityImpact(owner, dying, FieldOf(owner, dying, heir))
+            {
+                Source = new ChainLightningCast(Data()),
+                Kind = ImpactKind.Hit
+            });
 
             dying.CombatEvents.Publish(new EntityDiedEvent(dying));
         }

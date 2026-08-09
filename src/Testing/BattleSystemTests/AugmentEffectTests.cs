@@ -236,17 +236,26 @@ namespace LastBreathTest.BattleSystemTests
             });
             Assert.AreEqual(PoisonTurns, poison.Duration, "the poison never landed, so the extension below proves nothing");
 
-            await ability.ApplyImpactRiders(new Core.Data.AbilityImpact(caster.Object, victim.Object, Mock.Of<IBattleField>()));
+            await ability.ApplyImpactRiders(Swing(ability, caster, victim));
 
             Assert.AreEqual(PoisonTurns + Extension, poison.Duration,
                 "the augment is on an attacking ability and the hit left the poison exactly as long as it was");
 
             upgrade.Remove(ability);
-            await ability.ApplyImpactRiders(new Core.Data.AbilityImpact(caster.Object, victim.Object, Mock.Of<IBattleField>()));
+            await ability.ApplyImpactRiders(Swing(ability, caster, victim));
 
             Assert.AreEqual(PoisonTurns + Extension, poison.Duration,
                 "the augment came off and the ability goes on extending poison");
         }
+
+        /// <summary>One swing of the attacking ability under test, as its own delivery would hand it to
+        /// the riders: the ability is the impact's source and the kind is what an attack series lands.</summary>
+        private static Core.Data.AbilityImpact Swing(IAbility source, Fighter caster, Fighter victim) =>
+            new(caster.Object, victim.Object, Mock.Of<IBattleField>())
+            {
+                Source = source,
+                Kind = Core.Data.ImpactKind.Attack
+            };
 
         /// <summary>A fightable an effect can actually land on: real effects and modifier pipelines,
         /// only the entity itself is a mock.</summary>

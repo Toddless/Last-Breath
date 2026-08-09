@@ -100,7 +100,11 @@ namespace Battle.Source.Abilities.Discharge
                     owner.CurrentBarrier += hit.Damage * plan.BarrierRestorePercent;
                 TrySplashOverkill(plan, owner, field, target, hit.Damage, healthBefore + barrierBefore);
 
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage));
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage)
+                {
+                    Source = this,
+                    Kind = ImpactKind.Hit
+                });
             }
         }
 

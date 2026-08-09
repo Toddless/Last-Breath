@@ -105,7 +105,11 @@ namespace Battle.Source.Abilities.Armageddon
                 await target.TakeDamage(context);
 
                 if (stage >= MaxStage) await ApplyStageThreeEffects(owner, target, context.TotalDamage);
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, context.TotalDamage));
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, context.TotalDamage)
+                {
+                    Source = this,
+                    Kind = ImpactKind.Hit
+                });
             }
         }
 

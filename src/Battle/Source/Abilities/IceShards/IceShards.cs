@@ -102,13 +102,19 @@ namespace Battle.Source.Abilities.IceShards
                     var hit = await DealPlanDamage(plan, owner, target);
                     foreach (var rider in plan.OnHitRiders)
                         rider(hit);
-                    await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage));
+                    await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage)
+                    {
+                        Source = this,
+                        Kind = ImpactKind.Projectile
+                    });
                 }
             }
         }
 
         /// <summary>Stage 4: a critical shard bursts, damaging every enemy on the field. Each victim is
-        /// a regular impact (fragility/rider effects apply); bursts never spawn further bursts.</summary>
+        /// an impact of its own (fragility/rider effects apply) but a SPLASH one — the burst exists only
+        /// because a shard already landed, so it must not be counted as another shard; bursts never spawn
+        /// further bursts.</summary>
         private async Task DealShrapnelBurst(ProjectileHit hit, IFightable owner, IBattleField field)
         {
             if (!hit.IsCritical) return;
@@ -124,7 +130,11 @@ namespace Battle.Source.Abilities.IceShards
                 context.Add(DamageType.Cold, damage);
                 await enemy.TakeDamage(context);
                 totalDealt += context.TotalDamage;
-                await ApplyImpactRiders(new AbilityImpact(owner, enemy, field, Succeeded: true, IsCritical: false, context.TotalDamage));
+                await ApplyImpactRiders(new AbilityImpact(owner, enemy, field, Succeeded: true, IsCritical: false, context.TotalDamage)
+                {
+                    Source = this,
+                    Kind = ImpactKind.Splash
+                });
             }
 
             if (ShrapnelBarrierLeach > 0)

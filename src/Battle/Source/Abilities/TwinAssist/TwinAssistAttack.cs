@@ -49,7 +49,13 @@ namespace Battle.Source.Abilities.TwinAssist
                 await target.TakeDamage(context);
 
                 await ApplyBurning(owner, target, damage);
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, context.TotalDamage));
+                // Direct hits by design (the class doc): the assist must not chain reactions, so it never
+                // enters the attack pipeline and its touches are hits rather than attacks.
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, context.TotalDamage)
+                {
+                    Source = this,
+                    Kind = ImpactKind.Hit
+                });
             }
         }
 

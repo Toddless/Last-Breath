@@ -42,7 +42,7 @@ namespace Battle.Source.Abilities
                 if (processed.Attacker.InstanceId == owner.InstanceId)
                 {
                     OwnerAttacks++;
-                    await ability.ApplyImpactRiders(processed.ToImpact(field));
+                    await ability.ApplyImpactRiders(processed.ToImpact(field, ability));
                 }
 
                 if (onProcessed == null) continue;

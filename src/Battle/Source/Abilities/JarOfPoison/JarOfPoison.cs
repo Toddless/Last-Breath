@@ -38,7 +38,11 @@ namespace Battle.Source.Abilities.JarOfPoison
             {
                 if (!target.IsAlive) continue;
                 await ApplyPoison(owner, target);
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field));
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field)
+                {
+                    Source = this,
+                    Kind = ImpactKind.Hit
+                });
             }
         }
 
