@@ -1,6 +1,7 @@
 ﻿namespace Core.Entity
 {
     using Ai.World;
+    using Data;
     using Data.NpcData;
     using Enums;
     using Godot;
@@ -24,7 +25,7 @@
         /// parameters, fixes the stance, learns the rolled abilities (Learn auto-equips them)
         /// and attaches the combat behavior. Call after _Ready has built the components.
         /// </summary>
-        void ApplyDefinition(NpcDefinition definition);
+        void ApplyDefinition(NpcDefinition definition, IGameServiceProvider provider);
 
         /// <summary>Save-load path: rebuilds a lying body. Health drops through the normal property —
         /// in Battle the game-bus death event has no subscribers; a future loot orchestrator in Main

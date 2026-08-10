@@ -292,7 +292,7 @@ namespace LastBreath.Npc
         /// parameters, fixes the stance, learns the rolled abilities (Learn auto-equips them)
         /// and attaches the combat behavior. Call after _Ready has built the components.
         /// </summary>
-        public void ApplyDefinition(NpcDefinition definition)
+        public void ApplyDefinition(NpcDefinition definition, IGameServiceProvider provider)
         {
             Id = definition.NpcId;
             Level = definition.Level;
@@ -313,14 +313,14 @@ namespace LastBreath.Npc
                 AbilityBook.Learn(definition.Stance, ability);
 
             // A staged boss opens weakened: stage 0 scales the just-written bases and owns the ability set.
-            if (Stages.Count > 0) ApplyStage(0);
+            if (Stages.Count > 0) ApplyStage(0, provider);
 
             // Loot-side today (difficulty/budget); parameter buffs come when NpcBuffId gets a consumer.
             NpcModifiers.AddModifiers(definition.Modifiers.ToList());
 
-            GrantControlResistance();
+            GrantControlResistance(provider);
             ExhaustionGrant.Attach(this);
-            AttachAuthoredPassives(definition.Passives);
+            AttachAuthoredPassives(definition.Passives, provider);
 
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
@@ -335,9 +335,9 @@ namespace LastBreath.Npc
 
         /// <summary>Bosses and archons get diminishing returns on hard control (CombatRules.json);
         /// the resistance fades over the bearer's turns, so the decay ticks on own turn end.</summary>
-        private void GrantControlResistance()
+        private void GrantControlResistance(IGameServiceProvider provider)
         {
-            var rules = GameServiceProvider.Instance.GetService<ICombatRulesProvider>().ControlResistance;
+            var rules = provider.GetService<ICombatRulesProvider>().ControlResistance;
             if (!rules.AppliesTo.Contains(EntityType)) return;
             var resistance = new Core.Modifiers.Context.ControlResistanceModifier(rules);
             ModifierHandler.Add(resistance);
@@ -347,16 +347,14 @@ namespace LastBreath.Npc
         /// <summary>Authored passives of the kit (Deep Wounds etc.): resolved through the skill
         /// registry — an unknown id or a missing property is reported by the provider and skipped;
         /// a sandbox without the registry simply attaches nothing.</summary>
-        private void AttachAuthoredPassives(IReadOnlyList<NpcPassiveData> passives)
+        private void AttachAuthoredPassives(IReadOnlyList<NpcPassiveData> passives, IGameServiceProvider provider)
         {
             if (passives.Count == 0) return;
-            // TODO:
-            // Hidden dependency
-            var provider = GameServiceProvider.Instance.GetService<Core.Battle.Skills.ISkillProvider>();
+            var skills = provider.GetService<Core.Battle.Skills.ISkillProvider>();
 
             foreach (var entry in passives)
             {
-                var skill = provider.CreateSkill(entry.Id, new RecordProperties(entry.Id, entry.Properties));
+                var skill = skills.CreateSkill(entry.Id, new RecordProperties(entry.Id, entry.Properties));
                 if (skill != null) PassiveSkills.AddSkill(skill);
             }
         }
@@ -366,7 +364,10 @@ namespace LastBreath.Npc
         /// lost) and the ability book is rebuilt to the stage's set. On-attack effects of the stage
         /// are battle-scoped and wired by the arena's BossStagesController.
         /// </summary>
-        public void ApplyStage(int stageIndex)
+        public void ApplyStage(int stageIndex) => ApplyStage(stageIndex, GameServiceProvider.Instance);
+
+        /// <summary>The stage switch with the provider already at hand — the road a definition takes.</summary>
+        private void ApplyStage(int stageIndex, IGameServiceProvider provider)
         {
             if (stageIndex < 0 || stageIndex >= Stages.Count || _definitionParameters == null) return;
 
@@ -376,25 +377,25 @@ namespace LastBreath.Npc
             foreach ((EntityParameter parameter, float value) in _definitionParameters)
                 Parameters.SetBaseValueForParameter(parameter, value * stage.ParameterMultiplier);
 
-            ReplaceStageAbilities(stage);
+            ReplaceStageAbilities(stage, provider);
         }
 
         /// <summary>Unknown ids are reported and skipped — a typo must not abort the stage switch.</summary>
-        private void ReplaceStageAbilities(NpcStageConfig stage)
+        private void ReplaceStageAbilities(NpcStageConfig stage, IGameServiceProvider provider)
         {
             foreach (var learned in AbilityBook.AllAbilities)
                 AbilityBook.Forget(learned.InstanceId);
 
-            var provider = GameServiceProvider.Instance.GetService<Core.Battle.Abilities.IAbilityProvider>();
+            var abilities = provider.GetService<Core.Battle.Abilities.IAbilityProvider>();
             foreach (string abilityId in stage.Abilities)
             {
-                if (!provider.KnownAbilityIds.Contains(abilityId))
+                if (!abilities.KnownAbilityIds.Contains(abilityId))
                 {
                     Tracker.TrackNotFound($"Stage ability '{abilityId}' of npc '{Id}'", this);
                     continue;
                 }
 
-                AbilityBook.Learn(AbilityBook.CurrentStance, provider.CreateAbility(abilityId));
+                AbilityBook.Learn(AbilityBook.CurrentStance, abilities.CreateAbility(abilityId));
             }
         }
 

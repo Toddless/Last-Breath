@@ -187,7 +187,7 @@ namespace LastBreath.World
                 // spawns there) along with it through MoveAndSlide's platform inheritance.
                 npc.Position = world.ToLocal(RollSpotInRadius());
                 world.AddChild(npc); // _Ready builds the components ApplyDefinition configures
-                npc.ApplyDefinition(definition);
+                npc.ApplyDefinition(definition, _gameServiceProvider);
                 AddToGroupIfNeeded(npc);
                 _ownedInstanceIds.Add(npc.InstanceId);
                 return true;

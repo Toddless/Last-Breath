@@ -4,6 +4,7 @@ namespace Battle.Internal.Tools
     using System.Collections.Generic;
     using Npc;
     using Source;
+    using Core.Data;
     using Core.Entity;
     using Core.Modifiers;
     using Godot;
@@ -50,9 +51,10 @@ namespace Battle.Internal.Tools
             string npcId = npcIds[index % npcIds.Count];
             try
             {
-                var provider = GameServiceProvider.Instance.GetService<INpcProvider>();
+                IGameServiceProvider services = GameServiceProvider.Instance;
+                var npcs = services.GetService<INpcProvider>();
                 if (patrolRoute is { Count: > 0 }) npc.SetPatrolRoute(patrolRoute); // before ApplyDefinition: the brain takes the route at construction
-                npc.ApplyDefinition(provider.CreateDefinition(npcId));
+                npc.ApplyDefinition(npcs.CreateDefinition(npcId), services);
             }
             catch (Exception e)
             {

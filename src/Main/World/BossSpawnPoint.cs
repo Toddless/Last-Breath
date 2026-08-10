@@ -119,7 +119,7 @@ namespace LastBreath.World
                 // Position BEFORE AddChild — the (0,0) teleport drag pitfall (see NpcSpawnPoint).
                 npc.Position = world.ToLocal(GlobalPosition);
                 world.AddChild(npc);
-                npc.ApplyDefinition(definition);
+                npc.ApplyDefinition(definition, _gameServiceProvider);
 
                 _population?.ReserveOutsideLimit();
                 _bossInstanceId = npc.InstanceId;

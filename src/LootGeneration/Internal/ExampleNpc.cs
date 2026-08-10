@@ -52,7 +52,7 @@ namespace LootGeneration.Internal
         public EntityType EntityType { get; set; }
         public Fractions Fraction { get; set; }
         public INpcLifecycle? Lifecycle { get; }
-        public void ApplyDefinition(NpcDefinition definition) => throw new NotImplementedException();
+        public void ApplyDefinition(NpcDefinition definition, IGameServiceProvider provider) => throw new NotImplementedException();
 
         public void RestoreAsBody(NpcLifeStage stage, float resurrectDelay, float elapsed) => throw new NotImplementedException();
 

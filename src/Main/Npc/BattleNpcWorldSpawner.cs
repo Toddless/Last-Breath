@@ -1,5 +1,6 @@
 namespace LastBreath.Npc
 {
+    using Core.Data;
     using Core.Data.NpcData;
     using Core.Entity;
     using Core.Services;
@@ -10,24 +11,19 @@ namespace LastBreath.Npc
     /// the world node is the player's parent. Registered in the project bootstrap
     /// (Battle.Services.GameServiceProvider) — the only layer allowed to know Internal classes.
     /// </summary>
-    internal class BattleNpcWorldSpawner(IPlayerAccessor playerAccessor) : INpcWorldSpawner
+    internal class BattleNpcWorldSpawner(IPlayerAccessor playerAccessor, IGameServiceProvider provider) : INpcWorldSpawner
     {
         public IFightableNpc? Spawn(NpcDefinition definition, Vector2 position)
         {
             if (playerAccessor.Player is not Node playerNode || playerNode.GetParent() is not Node2D world) return null;
 
             var npc = BaseNpc.Initialize().Instantiate<BaseNpc>();
-            // TODO:
-            // Данный класс зарегистрирован в DI. Почему вместо передачи зависимости через конструктор
-            // мы обращаемся к конкретному классу напрямую?
-            npc.InjectServices(GameServiceProvider.Instance);
+            npc.InjectServices(provider);
             // Position BEFORE AddChild: entering the tree at (0,0) and teleporting afterwards
             // drags bodies overlapping the origin (the player) via MoveAndSlide's platform logic.
             npc.Position = world.ToLocal(position);
             world.AddChild(npc); // _Ready builds the components ApplyDefinition configures
-            // TODO:
-            // внутри вызова снова обращаемся напрямую к инстанции сервиса. Почему бы не передать провайдер в метод??
-            npc.ApplyDefinition(definition);
+            npc.ApplyDefinition(definition, provider);
             return npc;
         }
 
