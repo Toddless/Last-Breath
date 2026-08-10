@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source
 {
+    using System;
     using System.Collections.Generic;
     using Abilities;
     using CombatRules;
@@ -79,6 +80,9 @@
 
             services.AddSingleton<ISkillProvider, PassiveSkillProvider>();
             services.AddSingleton<IEffectProvider, EffectProvider>();
+            // The ability registry builds data-declared behaviours out of it; lazy so registration order
+            // stays irrelevant and a sandbox without one still mints every other augment.
+            services.AddSingleton<Func<IEffectProvider?>>(sp => sp.GetService<IEffectProvider>);
             // TryAdd: Main registers both module extensions — whichever runs first wins, the lambdas
             // resolve the providers lazily from the FINAL container, so registration order is irrelevant.
             services.TryAddSingleton<IGrantFactory>(sp => new GrantFactory(

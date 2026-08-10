@@ -48,6 +48,21 @@ namespace Core.Data.AbilityData
         /// appliers: amplifiers grant nothing, or they would bootstrap each other without one.</summary>
         [JsonProperty("grantsTags")] public string[] GrantsTags { get; init; } = [];
 
+        /// <summary>What the augment DOES, named out of the behaviour registry — the road that needs no
+        /// code of its own. Empty means the augment is one of the named ones and a factory answers its id.</summary>
+        [JsonProperty("behaviour")] public string Behaviour { get; init; } = string.Empty;
+
+        /// <summary>Effect the behaviour lays, built by the effect registry from
+        /// <see cref="UpgradeProperties"/>. Read by the behaviours that lay one.</summary>
+        [JsonProperty("effectId")] public string EffectId { get; init; } = string.Empty;
+
+        /// <summary>Which touches the behaviour works on: "Attack", "Hit", "Projectile", "ChainJump",
+        /// "Splash", or empty for every one of them. The design list tells attacks from hits.</summary>
+        [JsonProperty("impactKind")] public string ImpactKind { get; init; } = string.Empty;
+
+        /// <summary>Attack modifier the behaviour installs, named out of the modifier registry.</summary>
+        [JsonProperty("attackModifier")] public string AttackModifier { get; init; } = string.Empty;
+
         [JsonProperty("upgradeProperties")] public Dictionary<string, float> UpgradeProperties { get; init; } = [];
     }
 }

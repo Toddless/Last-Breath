@@ -1,5 +1,6 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using Battle.Source;
     using Battle.Source.Abilities;
     using Core.Battle.Abilities;
     using Core.Data.GameData;
@@ -38,7 +39,7 @@ namespace LastBreathTest.BattleSystemTests
         internal static (AbilityProvider Abilities, AbilityAugmentCatalog Augments) LoadFrom(string root)
         {
             var augments = new AbilityAugmentCatalog();
-            var abilities = new AbilityProvider(augments);
+            var abilities = new AbilityProvider(augments, static () => new EffectProvider());
             var service = new GameDataService(new FileSystemDataSource(root), [abilities, augments]);
             List<string> failures = [];
             service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");

@@ -20,9 +20,14 @@
     /// its owner has filled, so the arrangement is put on by <see cref="IAbilityAugmentBinder"/> and
     /// never handed over at construction.
     /// </summary>
-    public partial class AbilityProvider(IAbilityAugmentCatalog augments) : IAbilityProvider, IGameDataParticipant
+    public partial class AbilityProvider(IAbilityAugmentCatalog augments, Func<IEffectProvider?>? effects = null)
+        : IAbilityProvider, IGameDataParticipant
     {
         private readonly Dictionary<string, AbilityBaseData> _abilityBaseData = [];
+
+        /// <summary>Resolved lazily: a sandbox without an effect registry still builds every other
+        /// augment, and a behaviour that needs one refuses out loud instead of throwing.</summary>
+        private readonly Func<IEffectProvider?> _effects = effects ?? (static () => null);
 
         public IReadOnlyList<string> Catalogs => [DataCatalog.Abilities];
 
@@ -32,7 +37,13 @@
         /// is written for and the augments the parameter table describes, which are two halves of one
         /// registry and never name the same id twice. A record the data declares and this collection
         /// does not name is a record that parses, is minted, is seated and then does nothing at all.</summary>
-        public IReadOnlyCollection<string> BuildableAugmentIds => [.. _abilityUpgrades.Keys, .. _parameterAugments.Keys];
+        public IReadOnlyCollection<string> BuildableAugmentIds =>
+        [
+            .. _abilityUpgrades.Keys,
+            .. _parameterAugments.Keys,
+            // Records that carry their own behaviour need no line of code naming them.
+            .. augments.All.Where(record => !string.IsNullOrWhiteSpace(record.Behaviour)).Select(record => record.Id)
+        ];
 
         public void Apply(string catalog, GameDataFile file)
         {
@@ -91,11 +102,15 @@
             return upgrade;
         }
 
-        /// <summary>The two halves of the registry, asked in order: an augment reaching into the members
-        /// of an ability has a factory written for it, one that only moves numbers is a row of the
-        /// parameter table and needs no code of its own.</summary>
+        /// <summary>The three halves of the registry, asked in order: a record that DECLARES a behaviour
+        /// is built from its own data, an augment reaching into the members of an ability has a factory
+        /// written for it, and one that only moves numbers is a row of the parameter table.</summary>
         private IAbilityUpgrade? Build(AbilityUpgradeData data)
         {
+            // Not a priority: a record with both a behaviour and a factory is a duplicate id, which the
+            // uniqueness of BuildableAugmentIds already refuses loudly. The sets do not overlap.
+            if (!string.IsNullOrWhiteSpace(data.Behaviour)) return CreateBehaviour(data);
+
             if (_abilityUpgrades.TryGetValue(data.Id, out var factory)) return factory(data);
 
             return _parameterAugments.TryGetValue(data.Id, out AugmentParameterMove[]? moves)

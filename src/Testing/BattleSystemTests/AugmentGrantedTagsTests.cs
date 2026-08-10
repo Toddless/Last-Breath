@@ -95,6 +95,8 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Hb_Augment_Armor_Debuff", [AbilityTags.Debuff]),
             ("Ability_Is_Augment_Apply_Fragility", [AbilityTags.Debuff]),
             ("Ability_Df_Augment_Enemy_Cooldown", [AbilityTags.Debuff]),
+            // Declared by a record and no code at all — the first applier the behaviour registry builds.
+            ("Augment_Clumsy_Blows", [AbilityTags.Debuff]),
         ];
 
         /// <summary>
@@ -123,7 +125,8 @@ namespace LastBreathTest.BattleSystemTests
                 ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
             ("Augment_Debuff_Effectiveness",
                 ["Ability_Jar_Of_Poison", "Ability_Poison_Coating"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
+                // Increasing Pressure joined through the codeless applier: its attacks now grant "debuff".
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
         ];
 
         /// <summary>The shared key each grant-opened parameter record stands on, for the ledger's

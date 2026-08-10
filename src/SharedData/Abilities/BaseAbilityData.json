@@ -563,6 +563,8 @@
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Increasing_Pressure",
+            "behaviour": "AttackModifier",
+            "attackModifier": "Unevadable",
             "upgradeProperties": {}
         },
         {
@@ -605,13 +607,29 @@
             "upgradeProperties": {}
         },
         {
+            "id": "Augment_Clumsy_Blows",
+            "grantsTags": [ "debuff" ],
+            "tier": 2,
+            "tags": [ "attack" ],
+            "behaviour": "ApplyEffectOnImpact",
+            "effectId": "Effect_Clumsiness",
+            "impactKind": "Attack",
+            "upgradeProperties": {
+                "value": 0.10,
+                "maxStacks": 3,
+                "duration": 2
+            }
+        },
+        {
             "id": "Augment_Clumsiness",
             "grantsTags": [ "debuff" ],
             "tier": 2,
             "tags": [ "evasion" ],
             "abilityId": "Ability_Jar_Of_Poison",
+            "behaviour": "ApplyEffectOnImpact",
+            "effectId": "Effect_Clumsiness",
             "upgradeProperties": {
-                "evadeReduce": 0.15,
+                "value": 0.15,
                 "maxStacks": 5,
                 "duration": 3
             }
@@ -622,8 +640,10 @@
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Jar_Of_Poison",
+            "behaviour": "ApplyEffectOnImpact",
+            "effectId": "Effect_Blind",
             "upgradeProperties": {
-                "accuracyReduce": 0.15,
+                "value": 0.15,
                 "maxStacks": 5,
                 "duration": 3
             }
@@ -634,8 +654,10 @@
             "tier": 2,
             "tags": [ "damage" ],
             "abilityId": "Ability_Jar_Of_Poison",
+            "behaviour": "ApplyEffectOnImpact",
+            "effectId": "Effect_Weakness",
             "upgradeProperties": {
-                "damageReduce": 0.15,
+                "value": 0.15,
                 "maxStacks": 5,
                 "duration": 3
             }
@@ -1185,8 +1207,11 @@
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
+            "behaviour": "BuffOnCast",
+            "effectId": "Effect_Incoming_Damage_Reduction",
             "upgradeProperties": {
                 "reduce": 0.25,
+                "maxStacks": 1,
                 "duration": 3
             }
         },

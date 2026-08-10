@@ -8,7 +8,7 @@ namespace Battle.Source.Abilities
     /// Generic upgrade: the cast additionally applies a self-effect built fresh per activation
     /// (deferred factory — the effect sees the ability's current parameters at cast time).
     /// </summary>
-    public class AbilityUpgradeCastEffect(string id, string[] tags, int tier, Func<Ability, IEffect> effectFactory)
+    public class AbilityUpgradeCastEffect(string id, string[] tags, int tier, Func<Ability, IEffect?> effectFactory)
         : AbilityUpgrade<Ability>(id, tags, tier)
     {
         public override void ApplyUpgrade(Ability ability) =>

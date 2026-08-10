@@ -127,12 +127,6 @@
                     data.Tags,
                     data.Tier,
                     new FirstAttackCritContextModifier(data.UpgradeProperties.GetValueOrDefault("critDamageBonus", 1.3f))),
-            ["Ability_Ip_Augment_Unevadable"] = data =>
-                new IpUpgradeUnevadable(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    new UnevadableAttackContextModifier()),
             ["Ability_JoP_Augment_Bouncing"] = data =>
                 new JoPUpgradeBouncing(
                     data.Id,
@@ -149,34 +143,6 @@
                     data.Id,
                     data.Tags,
                     data.Tier),
-            ["Augment_Clumsiness"] = data =>
-                new JoPDebuffUpgrade(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    new ApplyEffectImpactRider(
-                        new Clumsiness(
-                            (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
-                            (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
-                            data.UpgradeProperties.GetValueOrDefault("evadeReduce", 0.05f)))),
-            ["Augment_Apply_Blind"] = data =>
-                new JoPDebuffUpgrade(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    new ApplyEffectImpactRider(new BlindEffect(
-                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
-                        (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
-                        data.UpgradeProperties.GetValueOrDefault("accuracyReduce", 0.15f)))),
-            ["Augment_Apply_Weakness"] = data =>
-                new JoPDebuffUpgrade(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    new ApplyEffectImpactRider(new Weakness(
-                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
-                        (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
-                        data.UpgradeProperties.GetValueOrDefault("damageReduce", 0.15f)))),
             ["Augment_Random_Cooldown"] = data =>
                 new AbilityUpgradeActivationRider(
                     data.Id,
@@ -258,15 +224,6 @@
                     data.Tier,
                     ability => new EnhanceDefenseEffect(((Porcupine.Porcupine)ability).Duration, maxStacks: 1,
                         data.UpgradeProperties.GetValueOrDefault("amount", 0.8f))),
-            ["Augment_Incoming_Reduction"] = data =>
-                new AbilityUpgradeCastEffect(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    _ => new IncomingDamageReductionEffect(
-                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                        maxStacks: 1,
-                        data.UpgradeProperties.GetValueOrDefault("reduce", 0.25f))),
             ["Augment_Free_Cast"] = data =>
                 new AbilityUpgradeCastEffect(
                     data.Id,

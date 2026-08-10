@@ -17,7 +17,7 @@ namespace Battle.Source.Abilities.BerserkFury
     /// puts the Fury effect on the caster (burns health per attack) — the series self-balances.
     /// L3 swaps the Fury variant through <see cref="FuryFactory"/>.
     /// </summary>
-    public class BerserkFury(AbilityBaseData data) : DamagingAbility(data)
+    public class BerserkFury(AbilityBaseData data) : DamagingAbility(data), IAttackModifierHost
     {
         private const float MinContinueChance = 0.05f;
         private const float MaxContinueChance = 0.80f;

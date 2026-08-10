@@ -7,7 +7,7 @@
     using Core.Data.AbilityData;
     using Core.Entity;
 
-    public class SeriesOfAttacks(AbilityBaseData data) : DamagingAbility(data)
+    public class SeriesOfAttacks(AbilityBaseData data) : DamagingAbility(data), IAttackModifierHost
     {
         public int MinAttacks => (int)this[Parameters.MinAttacks];
         public int MaxAttacks => (int)this[Parameters.MaxAttacks];

@@ -2887,23 +2887,29 @@ msgstr "All Targets"
 msgid "Ability_JoP_Augment_All_Targets_Description"
 msgstr "Applies poison to every enemy."
 
+msgid "Augment_Clumsy_Blows"
+msgstr "Clumsy Blows"
+
+msgid "Augment_Clumsy_Blows_Description"
+msgstr "Every ATTACK applies a stack of {@Effect_Clumsiness} (-{value:%} evade, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
+
 msgid "Augment_Clumsiness"
 msgstr "Clumsiness"
 
 msgid "Augment_Clumsiness_Description"
-msgstr "Applies a stack of {@Effect_Clumsiness} (-{evadeReduce:%} evade, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Applies a stack of {@Effect_Clumsiness} (-{value:%} evade, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Augment_Apply_Blind"
 msgstr "Apply Blind"
 
 msgid "Augment_Apply_Blind_Description"
-msgstr "Applies a stack of {@Effect_Blind} (-{accuracyReduce:%} accuracy, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Applies a stack of {@Effect_Blind} (-{value:%} accuracy, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Augment_Apply_Weakness"
 msgstr "Apply Weakness"
 
 msgid "Augment_Apply_Weakness_Description"
-msgstr "Applies a stack of {@Effect_Weakness} (-{damageReduce:%} damage, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Applies a stack of {@Effect_Weakness} (-{value:%} damage, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Augment_Increasing_Scales"
 msgstr "Increasing Scales"

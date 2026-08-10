@@ -7,7 +7,7 @@
     using Core.Data.AbilityData;
     using Core.Entity;
 
-    public class IncreasingPressure(AbilityBaseData data) : DamagingAbility(data)
+    public class IncreasingPressure(AbilityBaseData data) : DamagingAbility(data), IAttackModifierHost
     {
         public AttackModifierPipeline AttackModifiers { get; } = new();
         public float Attacks => this[AbilityParameter.Attacks];

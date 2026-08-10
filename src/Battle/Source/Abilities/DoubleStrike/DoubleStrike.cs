@@ -16,7 +16,7 @@ namespace Battle.Source.Abilities.DoubleStrike
     /// the second shreds evasion. L3a: both landing grants a damage buff (factory-injected);
     /// L3b: the first hit restores health, the second — mana.
     /// </summary>
-    public class DoubleStrike(AbilityBaseData data) : DamagingAbility(data)
+    public class DoubleStrike(AbilityBaseData data) : DamagingAbility(data), IAttackModifierHost
     {
         public int DebuffDuration => (int)this[Parameters.DebuffDuration];
         public int DebuffMaxStacks => (int)this[AbilityParameter.Stacks];
