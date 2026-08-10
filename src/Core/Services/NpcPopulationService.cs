@@ -1,6 +1,7 @@
 namespace Core.Services
 {
     using System;
+    using System.Threading;
     using Events;
 
     /// <summary>
@@ -13,7 +14,7 @@ namespace Core.Services
         private const int DefaultGlobalLimit = 20;
 
         private readonly IGameEventBus _gameEventBus;
-        private readonly object _sync = new();
+        private readonly Lock _sync = new();
 
         public NpcPopulationService(IGameEventBus gameEventBus)
         {

@@ -4,7 +4,7 @@ namespace Core.Battle.DamageResolution
     using Context;
     using Entity;
 
-    /// <summary>The PoE-like barrier resource: eats damage before health.</summary>
+    /// <summary>Barrier resource: eats damage before health.</summary>
     public class BarrierAbsorptionLayer : IDamageAbsorptionLayer
     {
         public float Absorb(IDamageContext context, IFightable target, float remaining)

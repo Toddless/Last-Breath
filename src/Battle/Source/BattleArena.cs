@@ -16,6 +16,7 @@
     using Core.Events;
     using Core.Extensions;
     using Core.Interfaces;
+    using Core.Narrative.Facts;
     using Core.Views.UI;
     using Godot;
     using Godot.Collections;
@@ -39,11 +40,11 @@
         private IBattleEventBus? _battleEventBus;
         private IGameEventBus? _gameEventBus;
         private IAbilityProvider? _abilityProvider;
-        private Core.Narrative.Facts.IWorldFactsService? _worldFacts;
+        private IWorldFactsService? _worldFacts;
         private NpcReactionsDriver? _reactionsDriver;
         private BossStagesController? _bossStagesController;
         private SummonService? _summonService;
-        private Core.Entity.INpcProvider? _npcProvider;
+        private INpcProvider? _npcProvider;
         private IBattleNpcSpawner? _summonSpawner;
         private ArenaRules _arenaRules = ArenaRules.Default;
         private ArenaFormation? _formation;
@@ -114,10 +115,10 @@
             _abilityProvider = provider.GetService<IAbilityProvider>();
             // Optional like IInventory in the loot pipeline: a sandbox without world facts
             // still fights, the twin gate simply never blocks.
-            _worldFacts = provider.GetServices<Core.Narrative.Facts.IWorldFactsService>().FirstOrDefault();
+            _worldFacts = provider.GetServices<IWorldFactsService>().FirstOrDefault();
             // All optional for the same reason: a project without them fights with defaults and no summons.
             _arenaRules = provider.TryGet<ICombatRulesProvider>()?.Arena ?? ArenaRules.Default;
-            _npcProvider = provider.GetServices<Core.Entity.INpcProvider>().FirstOrDefault();
+            _npcProvider = provider.GetServices<INpcProvider>().FirstOrDefault();
             _summonSpawner = provider.GetServices<IBattleNpcSpawner>().FirstOrDefault();
         }
 
@@ -268,7 +269,7 @@
         private Node2D? ResolveBodyAnchor(string instanceId)
         {
             var fighter = _fighters.FirstOrDefault(entry => entry.InstanceId == instanceId);
-            if (fighter is Node2D body && GodotObject.IsInstanceValid(body) && body.IsInsideTree()) return body;
+            if (fighter is Node2D body && IsInstanceValid(body) && body.IsInsideTree()) return body;
             return FindSpotFor(instanceId);
         }
 

@@ -25,10 +25,12 @@ namespace Battle.Internal.Npc
     using Core.Events;
     using Core.Items;
     using Core.Modifiers;
+    using Core.Modifiers.Context;
     using Core.Narrative.Facts;
     using Core.Services;
     using Godot;
     using Source;
+    using Source.Presentation;
     using GameServiceProvider = Services.GameServiceProvider;
 
     public partial class BaseNpc : CharacterBody2D, IFightableNpc, IWorldAgent, ISkirmishParticipant
@@ -319,7 +321,7 @@ namespace Battle.Internal.Npc
             NpcModifiers.AddModifiers(definition.Modifiers.ToList());
 
             GrantControlResistance();
-            Battle.Source.ExhaustionGrant.Attach(this);
+            ExhaustionGrant.Attach(this);
             AttachAuthoredPassives(definition.Passives);
 
             CurrentHealth = Parameters.MaxHealth;
@@ -336,7 +338,7 @@ namespace Battle.Internal.Npc
         /// <summary>Per-NPC art from the shared visual library; no entry — the scene's placeholder frames stay.</summary>
         private void ApplyVisual(string npcId)
         {
-            var config = GameServiceProvider.Instance.GetService<Battle.Source.Presentation.INpcVisualProvider>()?.GetVisual(npcId);
+            var config = GameServiceProvider.Instance.GetService<INpcVisualProvider>()?.GetVisual(npcId);
             if (config?.Frames == null) return;
             _animationsComponent?.ApplyVisual(config.Frames, config.Scale);
         }
@@ -345,9 +347,11 @@ namespace Battle.Internal.Npc
         /// the resistance fades over the bearer's turns, so the decay ticks on own turn end.</summary>
         private void GrantControlResistance()
         {
-            var rules = GameServiceProvider.Instance.GetService<Core.Battle.ICombatRulesProvider>().ControlResistance;
+            // TODO:
+            // Hidden dependency
+            var rules = GameServiceProvider.Instance.GetService<ICombatRulesProvider>().ControlResistance;
             if (!rules.AppliesTo.Contains(EntityType)) return;
-            var resistance = new Core.Modifiers.Context.ControlResistanceModifier(rules);
+            var resistance = new ControlResistanceModifier(rules);
             ModifierHandler.Add(resistance);
             CombatEvents.Subscribe<TurnEndEvent>(_ => resistance.DecayTick());
         }
@@ -358,12 +362,13 @@ namespace Battle.Internal.Npc
         private void AttachAuthoredPassives(IReadOnlyList<NpcPassiveData> passives)
         {
             if (passives.Count == 0) return;
+            // TODO:
+            // Hidden dependency
             var provider = GameServiceProvider.Instance.GetService<Core.Battle.Skills.ISkillProvider>();
-            if (provider == null) return;
 
             foreach (var entry in passives)
             {
-                var skill = provider.CreateSkill(entry.Id, new Core.Battle.RecordProperties(entry.Id, entry.Properties));
+                var skill = provider.CreateSkill(entry.Id, new RecordProperties(entry.Id, entry.Properties));
                 if (skill != null) PassiveSkills.AddSkill(skill);
             }
         }
@@ -473,13 +478,15 @@ namespace Battle.Internal.Npc
             if (ConsidersPlayerAnEnemy() && _playerAccessor?.Player is { IsAlive: true } and Node2D playerNode)
                 Consider(playerNode.GlobalPosition, ref nearest, ref nearestDistance);
 
-            if (_npcRegistry != null && _factionRelations != null)
+            if (_npcRegistry == null || _factionRelations == null)
             {
-                foreach (var other in _npcRegistry.All)
-                {
-                    if (!IsSkirmishableEnemy(other)) continue;
-                    Consider(other.Position, ref nearest, ref nearestDistance);
-                }
+                return nearest == null ? null : new TargetSighting(nearest.Value);
+            }
+
+            foreach (var other in _npcRegistry.All)
+            {
+                if (!IsSkirmishableEnemy(other)) continue;
+                Consider(other.Position, ref nearest, ref nearestDistance);
             }
 
             return nearest == null ? null : new TargetSighting(nearest.Value);
@@ -1023,7 +1030,7 @@ namespace Battle.Internal.Npc
         {
             if (!disposing) return;
 
-            Battle.Source.ExhaustionGrant.Detach(this);
+            ExhaustionGrant.Detach(this);
             _npcRegistry?.Unregister(this);
             _recovery?.UnregisterParticipant(this);
             _smartPoints?.Release(InstanceId);

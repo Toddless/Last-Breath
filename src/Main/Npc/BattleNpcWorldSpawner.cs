@@ -17,11 +17,16 @@ namespace LastBreath.Npc
             if (playerAccessor.Player is not Node playerNode || playerNode.GetParent() is not Node2D world) return null;
 
             var npc = BaseNpc.Initialize().Instantiate<BaseNpc>();
+            // TODO:
+            // Данный класс зарегистрирован в DI. Почему вместо передачи зависимости через конструктор
+            // мы обращаемся к конкретному классу напрямую?
             npc.InjectServices(GameServiceProvider.Instance);
             // Position BEFORE AddChild: entering the tree at (0,0) and teleporting afterwards
             // drags bodies overlapping the origin (the player) via MoveAndSlide's platform logic.
             npc.Position = world.ToLocal(position);
             world.AddChild(npc); // _Ready builds the components ApplyDefinition configures
+            // TODO:
+            // внутри вызова снова обращаемся напрямую к инстанции сервиса. Почему бы не передать провайдер в метод??
             npc.ApplyDefinition(definition);
             return npc;
         }

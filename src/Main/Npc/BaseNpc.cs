@@ -319,7 +319,7 @@ namespace LastBreath.Npc
             NpcModifiers.AddModifiers(definition.Modifiers.ToList());
 
             GrantControlResistance();
-            Battle.Source.ExhaustionGrant.Attach(this);
+            ExhaustionGrant.Attach(this);
             AttachAuthoredPassives(definition.Passives);
 
             CurrentHealth = Parameters.MaxHealth;
@@ -337,7 +337,7 @@ namespace LastBreath.Npc
         /// the resistance fades over the bearer's turns, so the decay ticks on own turn end.</summary>
         private void GrantControlResistance()
         {
-            var rules = GameServiceProvider.Instance.GetService<Core.Battle.ICombatRulesProvider>().ControlResistance;
+            var rules = GameServiceProvider.Instance.GetService<ICombatRulesProvider>().ControlResistance;
             if (!rules.AppliesTo.Contains(EntityType)) return;
             var resistance = new Core.Modifiers.Context.ControlResistanceModifier(rules);
             ModifierHandler.Add(resistance);
@@ -350,12 +350,13 @@ namespace LastBreath.Npc
         private void AttachAuthoredPassives(IReadOnlyList<NpcPassiveData> passives)
         {
             if (passives.Count == 0) return;
+            // TODO:
+            // Hidden dependency
             var provider = GameServiceProvider.Instance.GetService<Core.Battle.Skills.ISkillProvider>();
-            if (provider == null) return;
 
             foreach (var entry in passives)
             {
-                var skill = provider.CreateSkill(entry.Id, new Core.Battle.RecordProperties(entry.Id, entry.Properties));
+                var skill = provider.CreateSkill(entry.Id, new RecordProperties(entry.Id, entry.Properties));
                 if (skill != null) PassiveSkills.AddSkill(skill);
             }
         }
@@ -1030,7 +1031,7 @@ namespace LastBreath.Npc
         {
             if (!disposing) return;
 
-            Battle.Source.ExhaustionGrant.Detach(this);
+            ExhaustionGrant.Detach(this);
             _npcRegistry?.Unregister(this);
             _recovery?.UnregisterParticipant(this);
             _smartPoints?.Release(InstanceId);
