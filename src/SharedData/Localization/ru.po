@@ -2023,7 +2023,7 @@ msgid "Augment_Mana_Flow"
 msgstr ""
 
 msgid "Augment_Mana_Flow_Description"
-msgstr "Накладывает {@Effect_Mana_Flow} ({regenAmount:%} максимальной маны на {duration|turn|turns})."
+msgstr "Накладывает {@Effect_Mana_Flow} ({percentRegeneration:%} максимальной маны на {duration|turn|turns})."
 
 msgid "Ability_Ov_Augment_Stage4_Resets_Cooldown"
 msgstr ""
@@ -2443,7 +2443,7 @@ msgid "Ability_Porc_Augment_Crit_Mitigation"
 msgstr ""
 
 msgid "Ability_Porc_Augment_Crit_Mitigation_Description"
-msgstr "-{amount:%} получаемого крит-урона."
+msgstr "-{value:%} получаемого крит-урона."
 
 msgid "Augment_Heal_On_Hit"
 msgstr ""
@@ -2473,7 +2473,7 @@ msgid "Ability_Porc_Augment_Armor_Buff"
 msgstr ""
 
 msgid "Ability_Porc_Augment_Armor_Buff_Description"
-msgstr "+{amount:%} брони."
+msgstr "+{value:%} брони."
 
 msgid "Augment_Heal_From_Damage"
 msgstr ""
@@ -2539,13 +2539,13 @@ msgid "Ability_Ar_Augment_Turn_End_Heal"
 msgstr ""
 
 msgid "Ability_Ar_Augment_Turn_End_Heal_Description"
-msgstr "Восстанавливает {regenAmount:%} здоровья в конце хода."
+msgstr "Восстанавливает {percentRegeneration:%} здоровья в конце хода."
 
 msgid "Ability_Ar_Augment_Damage_Buff"
 msgstr ""
 
 msgid "Ability_Ar_Augment_Damage_Buff_Description"
-msgstr "+{amount:%} наносимого урона."
+msgstr "+{value:%} наносимого урона."
 
 msgid "Augment_Recovery_Bonus"
 msgstr ""
@@ -2611,7 +2611,7 @@ msgid "Ability_Hb_Augment_Armor_Debuff"
 msgstr ""
 
 msgid "Ability_Hb_Augment_Armor_Debuff_Description"
-msgstr "Накладывает -{reduceArmorBy:%} брони ({duration|turn|turns}, до {maxStacks|stack|stacks})."
+msgstr "Накладывает -{reduceBy:%} брони ({duration|turn|turns}, до {maxStacks|stack|stacks})."
 
 # ------------------------------
 # Passive skills
@@ -3138,7 +3138,7 @@ msgid "Ability_Ia_Augment_Crit_Mitigation"
 msgstr ""
 
 msgid "Ability_Ia_Augment_Crit_Mitigation_Description"
-msgstr "Получаемый критический урон снижен на {amount:%}, пока щит держится."
+msgstr "Получаемый критический урон снижен на {value:%}, пока щит держится."
 
 # ------------------------------
 # Новые эффекты

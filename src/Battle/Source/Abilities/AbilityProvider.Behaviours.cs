@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
@@ -36,11 +37,15 @@ namespace Battle.Source.Abilities
         {
             ["ApplyEffectOnImpact"] = new(BehaviourField.EffectId | BehaviourField.ImpactKind, (data, effects) =>
                 new AbilityUpgradeImpactRider(data.Id, data.Tags, data.Tier, new DataEffectImpactRider(
-                    data.Id, data.EffectId, Numbers(data), KindOf(data), effects))),
+                    data.Id, data.EffectId, host => Numbers(data, host), KindOf(data), effects))),
 
             ["BuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>
                 new AbilityUpgradeCastEffect(data.Id, data.Tags, data.Tier,
-                    _ => effects()?.CreateEffect(data.EffectId, Numbers(data)))),
+                    host => effects()?.CreateEffect(data.EffectId, Numbers(data, host)))),
+
+            ["DebuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>
+                new AbilityUpgradeCastDebuff(data.Id, data.Tags, data.Tier,
+                    host => effects()?.CreateEffect(data.EffectId, Numbers(data, host)))),
 
             ["AttackModifier"] = new(BehaviourField.AttackModifier, (data, _) =>
                 new AbilityUpgradeAttackModifier(data.Id, data.Tags, data.Tier, s_attackModifiers[data.AttackModifier]())),
@@ -74,6 +79,15 @@ namespace Battle.Source.Abilities
         /// the alternative is a record that parses, is offered and is seated, and throws on the cast.</summary>
         private string? Unbuildable(AbilityUpgradeData data, BehaviourField fields)
         {
+            foreach ((string property, string parameter) in data.PropertyRefs)
+            {
+                if (!s_sharedParameters.Contains(parameter))
+                    return $"points property '{property}' at '{parameter}', which is no shared parameter. Known: {string.Join(", ", s_sharedParameters.Order(StringComparer.Ordinal))}";
+
+                if (!data.UpgradeProperties.ContainsKey(property))
+                    return $"points property '{property}' at '{parameter}' and carries no figure for it to fall back to";
+            }
+
             if (fields.HasFlag(BehaviourField.AttackModifier) && !s_attackModifiers.ContainsKey(data.AttackModifier))
                 return $"names attack modifier '{data.AttackModifier}'. Known: {string.Join(", ", s_attackModifiers.Keys.Order(StringComparer.Ordinal))}";
 
@@ -110,6 +124,30 @@ namespace Battle.Source.Abilities
             string.IsNullOrWhiteSpace(data.ImpactKind) ? null : EnumParser.ParseEnum<ImpactKind>(data.ImpactKind);
 
         private static RecordProperties Numbers(AbilityUpgradeData data) => new(data.Id, data.UpgradeProperties);
+
+        /// <summary>The record's numbers with its <see cref="AbilityUpgradeData.PropertyRefs"/> read off
+        /// the host — decorated and at the moment of use, so an augment moving that key is felt here.
+        /// A key the ability never declared falls back to the record's own figure.</summary>
+        private static RecordProperties Numbers(AbilityUpgradeData data, IAbility? host)
+        {
+            if (data.PropertyRefs.Count == 0 || host == null) return Numbers(data);
+
+            Dictionary<string, float> values = new(data.UpgradeProperties, StringComparer.Ordinal);
+            foreach ((string property, string parameter) in data.PropertyRefs)
+                values[property] = host.ValueOr(parameter, values.GetValueOrDefault(property));
+
+            return new RecordProperties(data.Id, values);
+        }
+
+        /// <summary>Shared parameter names a record may point at — the constants of
+        /// <see cref="AbilityParameter"/>, read once by reflection so the list cannot drift.</summary>
+        private static readonly HashSet<string> s_sharedParameters =
+        [
+            .. typeof(AbilityParameter)
+                .GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Where(field => field is { IsLiteral: true, IsInitOnly: false } && field.FieldType == typeof(string))
+                .Select(field => (string)field.GetRawConstantValue()!)
+        ];
 
         private static IAbilityUpgrade? Refused(AbilityUpgradeData data, string complaint)
         {

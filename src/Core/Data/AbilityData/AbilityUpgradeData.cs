@@ -63,6 +63,12 @@ namespace Core.Data.AbilityData
         /// <summary>Attack modifier the behaviour installs, named out of the modifier registry.</summary>
         [JsonProperty("attackModifier")] public string AttackModifier { get; init; } = string.Empty;
 
+        /// <summary>Properties whose value is taken from the HOST ability instead of the record: property
+        /// key to a shared <see cref="Battle.Abilities.AbilityParameter"/> name, read decorated at the
+        /// moment of use. The record still carries a number for each — what the ability does not own it
+        /// falls back to.</summary>
+        [JsonProperty("propertyRefs")] public Dictionary<string, string> PropertyRefs { get; init; } = [];
+
         [JsonProperty("upgradeProperties")] public Dictionary<string, float> UpgradeProperties { get; init; } = [];
     }
 }

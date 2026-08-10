@@ -120,9 +120,10 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Buff_Effectiveness",
                 ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Block", "Ability_Jar_Of_Poison"],
                 ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
+            // The porcupine reads effectiveness now, so the recovery record stopped being inert on it.
             ("Augment_Recovery_Effectiveness",
-                ["Ability_Critical_Calculation", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Poison_Coating"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
+                ["Ability_Critical_Calculation", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine"],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Sacrifice", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
             ("Augment_Debuff_Effectiveness",
                 ["Ability_Jar_Of_Poison", "Ability_Poison_Coating"],
                 // Increasing Pressure joined through the codeless applier: its attacks now grant "debuff".

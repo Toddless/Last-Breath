@@ -12,7 +12,7 @@ namespace Battle.Source.Abilities.Riders
     public class DataEffectImpactRider(
         string augmentId,
         string effectId,
-        RecordProperties properties,
+        Func<IAbility, RecordProperties> numbers,
         ImpactKind? kind,
         Func<IEffectProvider?> providerAccessor) : IImpactRider
     {
@@ -25,7 +25,7 @@ namespace Battle.Source.Abilities.Riders
             if (!impact.Succeeded) return;
             if (kind != null && impact.Kind != kind) return;
 
-            IEffect? effect = providerAccessor()?.CreateEffect(effectId, properties);
+            IEffect? effect = providerAccessor()?.CreateEffect(effectId, numbers(impact.Source));
             if (effect == null) return;
 
             await effect.Apply(new EffectApplyingContext

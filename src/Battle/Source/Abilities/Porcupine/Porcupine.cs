@@ -31,6 +31,7 @@ namespace Battle.Source.Abilities.Porcupine
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.DamageReturn, 0.25f);
             parameters.RegisterDefault(Parameters.ArmorReturn, 0.15f);
@@ -42,6 +43,6 @@ namespace Battle.Source.Abilities.Porcupine
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) =>
             await new PorcupineBuffEffect(this, Duration, DamageReturn, ArmorReturn, HealOnHit, CooldownReduceChance)
-                .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
+                .Apply(Laying(owner));
     }
 }

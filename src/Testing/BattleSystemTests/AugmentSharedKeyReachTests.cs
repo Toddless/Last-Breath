@@ -61,7 +61,7 @@ namespace LastBreathTest.BattleSystemTests
         private static readonly Dictionary<string, string[]> s_knowinglyFree = new(StringComparer.Ordinal)
         {
             ["Augment_Add_Effectiveness_Reduce_Stacks"] =
-                ["Ability_Ares_Blessing", "Ability_Jar_Of_Poison", "Ability_Poison_Coating"]
+                ["Ability_Ares_Blessing", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine"]
         };
 
         private static IEnumerable<string> Accepted(string augmentId) =>
@@ -163,8 +163,8 @@ namespace LastBreathTest.BattleSystemTests
             // deal — tags, not keys, which is the whole segmentation of the family.
             ("Augment_Buff_Effectiveness", AbilityParameter.Effectiveness,
                 ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
-                 "Ability_Poison_Coating"],
-                ["Ability_Porcupine", "Ability_Sacrifice", "Ability_Static_Armor"]),
+                 "Ability_Poison_Coating", "Ability_Porcupine"],
+                ["Ability_Sacrifice", "Ability_Static_Armor"]),
 
             ("Augment_Recovery_Effectiveness", AbilityParameter.Effectiveness,
                 ["Ability_Ares_Blessing", "Ability_Dark_Shroud"], []),
@@ -190,8 +190,9 @@ namespace LastBreathTest.BattleSystemTests
 
             ("Augment_Add_Effectiveness_Reduce_Stacks", AbilityParameter.Effectiveness,
                 ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze",
-                 "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison", "Ability_Poison_Coating"],
-                ["Ability_Berserk_Fury", "Ability_Porcupine", "Ability_Static_Armor"]),
+                 "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
+                 "Ability_Porcupine"],
+                ["Ability_Berserk_Fury", "Ability_Static_Armor"]),
         ];
 
         [TestMethod]

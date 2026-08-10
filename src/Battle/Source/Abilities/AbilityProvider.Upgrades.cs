@@ -149,16 +149,6 @@
                     data.Tags,
                     data.Tier,
                     new ReduceRandomCooldownActivationRider(data.Id, (int)data.UpgradeProperties.GetValueOrDefault("amount", 1))),
-            ["Augment_Mana_Flow"] = data =>
-                new AbilityUpgradeCastEffect(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    _ => new ManaRegenerationEffect(
-                        data.UpgradeProperties.GetValueOrDefault("regenAmount", 0.15f),
-                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                        maxStacks: 1,
-                        id: "Effect_Mana_Flow")),
             ["Augment_Next_Cast_Pure"] = data =>
                 new AbilityUpgradeCastEffect(
                     data.Id,
@@ -194,13 +184,6 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("additionalCooldown", 3)),
-            ["Ability_Porc_Augment_Armor_Buff"] = data =>
-                new AbilityUpgradeCastEffect(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    ability => new ArmorBuffEffect(((Porcupine.Porcupine)ability).Duration, maxStacks: 1,
-                        data.UpgradeProperties.GetValueOrDefault("amount", 0.25f))),
             ["Ability_Porc_Augment_Echo"] = data =>
                 new AbilityUpgradeCastEffect(
                     data.Id,
@@ -210,20 +193,6 @@
                         new EchoPassiveSkill(
                             data.UpgradeProperties.GetValueOrDefault("delayedPercent", 0.3f),
                             (int)data.UpgradeProperties.GetValueOrDefault("turns", 2)))),
-            ["Ability_Porc_Augment_Incoming_Reduction"] = data =>
-                new AbilityUpgradeCastEffect(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    ability => new IncomingDamageReductionEffect(((Porcupine.Porcupine)ability).Duration, maxStacks: 1,
-                        data.UpgradeProperties.GetValueOrDefault("reduce", 0.25f))),
-            ["Ability_Porc_Augment_Crit_Mitigation"] = data =>
-                new AbilityUpgradeCastEffect(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    ability => new EnhanceDefenseEffect(((Porcupine.Porcupine)ability).Duration, maxStacks: 1,
-                        data.UpgradeProperties.GetValueOrDefault("amount", 0.8f))),
             ["Augment_Free_Cast"] = data =>
                 new AbilityUpgradeCastEffect(
                     data.Id,
@@ -259,27 +228,6 @@
                     {
                         HealAmount = data.UpgradeProperties.GetValueOrDefault("healAmount", 0.5f)
                     }),
-            ["Ability_Ar_Augment_Incoming_Reduction"] = data =>
-                new ArUpgradeAdditionalCastEffect(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    ability => new IncomingDamageReductionEffect(ability.Duration, maxStacks: 1,
-                        data.UpgradeProperties.GetValueOrDefault("reduce", 0.25f))),
-            ["Ability_Ar_Augment_Turn_End_Heal"] = data =>
-                new ArUpgradeAdditionalCastEffect(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    ability => new HealthRegenerationEffect(
-                        data.UpgradeProperties.GetValueOrDefault("regenAmount", 0.08f), ability.Duration, maxStacks: 1)),
-            ["Ability_Ar_Augment_Damage_Buff"] = data =>
-                new ArUpgradeAdditionalCastEffect(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    ability => new DamageBuffEffect(ability.Duration, maxStacks: 1,
-                        data.UpgradeProperties.GetValueOrDefault("amount", 0.55f))),
             ["Ability_Dst_Augment_Accuracy"] = data =>
                 new DstUpgradeAccuracy(
                     data.Id,
@@ -293,15 +241,6 @@
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.25f),
                     (int)data.UpgradeProperties.GetValueOrDefault("duration", 3)),
-            ["Ability_Hb_Augment_Armor_Debuff"] = data =>
-                new AbilityUpgradeImpactRider(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    new ApplyEffectImpactRider(new ArmorReductionEffect(
-                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                        (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 3),
-                        data.UpgradeProperties.GetValueOrDefault("reduceArmorBy", 0.25f)))),
             ["Ability_Cc_Augment_Additional_Attack_Chance"] = data =>
                 new CcUpgradeAdditionalAttackChance(
                     data.Id,
@@ -369,13 +308,6 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("regenAmount", 0.05f)),
-            ["Augment_Apply_Seal_Of_Oblivion"] = data =>
-                new PeUpgradeApplySealOfOblivion(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                    (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 1)),
             ["Ability_Pe_Augment_Execute_Bosses"] = data =>
                 new PeUpgradeExecuteBosses(
                     data.Id,
@@ -450,14 +382,6 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("leachPercent", 0.15f)),
-            ["Ability_Is_Augment_Apply_Fragility"] = data =>
-                new IsUpgradeApplyFragility(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                    (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 3),
-                    data.UpgradeProperties.GetValueOrDefault("critDamageAmp", 0.35f)),
             ["Ability_Is_Augment_Multicast"] = data =>
                 new DelegateUpgrade<IceShards.IceShards>(
                     data.Id,
@@ -493,13 +417,6 @@
                     data.Tier,
                     IceAegis.IceAegis.Parameters.HealPerTurn,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
-            ["Ability_Ia_Augment_Crit_Mitigation"] = data =>
-                new AbilityUpgradeCastEffect(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    ability => new EnhanceDefenseEffect(((IceAegis.IceAegis)ability).Duration, maxStacks: 1,
-                        data.UpgradeProperties.GetValueOrDefault("amount", 0.8f))),
             ["Ability_Ib_Augment_Reset_Chance"] = data =>
                 new DelegateUpgrade<IceBlocks>(
                     data.Id,
@@ -535,14 +452,6 @@
                     data.Tier,
                     ability => ability.ExtendTargetEffects = true,
                     ability => ability.ExtendTargetEffects = false),
-            ["Ability_Df_Augment_Enemy_Cooldown"] = data =>
-                new AbilityUpgradeImpactRider(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    new ApplyEffectImpactRider(new NextAbilityCooldownEffect(
-                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                        data.UpgradeProperties.GetValueOrDefault("amount", 3f)))),
             ["Augment_Reduce_All_Cooldowns"] = data =>
                 new AbilityUpgradeActivationRider(
                     data.Id,

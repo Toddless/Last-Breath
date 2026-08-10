@@ -30,6 +30,10 @@
         /// <see cref="AbilityParameter.Effectiveness"/>, and ONE for an ability that never declared it.</summary>
         float Effectiveness { get; }
 
+        /// <summary>The parameter's decorated value, or the given figure when the ability never declared
+        /// it — for readers where absence is an answer rather than a typo.</summary>
+        float ValueOr(string parameter, float fallback);
+
         /// <summary>False = no backing out once target selection began: the player must pick a
         /// target and the cast fires (charged Armageddon). Default true.</summary>
         bool IsCancellable => true;

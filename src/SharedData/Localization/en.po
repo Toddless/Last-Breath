@@ -2649,7 +2649,7 @@ msgid "Augment_Mana_Flow"
 msgstr "Mana Flow"
 
 msgid "Augment_Mana_Flow_Description"
-msgstr "Applies {@Effect_Mana_Flow} ({regenAmount:%} of maximum mana for {duration|turn|turns})."
+msgstr "Applies {@Effect_Mana_Flow} ({percentRegeneration:%} of maximum mana for {duration|turn|turns})."
 
 msgid "Ability_Ov_Augment_Stage4_Resets_Cooldown"
 msgstr "Stage4 Resets Cooldown"
@@ -3117,7 +3117,7 @@ msgid "Ability_Porc_Augment_Crit_Mitigation"
 msgstr "Crit Mitigation"
 
 msgid "Ability_Porc_Augment_Crit_Mitigation_Description"
-msgstr "-{amount:%} critical damage taken."
+msgstr "-{value:%} critical damage taken."
 
 msgid "Augment_Heal_On_Hit"
 msgstr "Heal On Hit"
@@ -3147,7 +3147,7 @@ msgid "Ability_Porc_Augment_Armor_Buff"
 msgstr "Armor Buff"
 
 msgid "Ability_Porc_Augment_Armor_Buff_Description"
-msgstr "+{amount:%} armor."
+msgstr "+{value:%} armor."
 
 msgid "Augment_Heal_From_Damage"
 msgstr "Heal From Damage"
@@ -3213,13 +3213,13 @@ msgid "Ability_Ar_Augment_Turn_End_Heal"
 msgstr "Turn End Heal"
 
 msgid "Ability_Ar_Augment_Turn_End_Heal_Description"
-msgstr "Restores {regenAmount:%} health at the end of the turn."
+msgstr "Restores {percentRegeneration:%} health at the end of the turn."
 
 msgid "Ability_Ar_Augment_Damage_Buff"
 msgstr "Damage Buff"
 
 msgid "Ability_Ar_Augment_Damage_Buff_Description"
-msgstr "+{amount:%} damage dealt."
+msgstr "+{value:%} damage dealt."
 
 msgid "Augment_Recovery_Bonus"
 msgstr "Recovery Bonus"
@@ -3285,7 +3285,7 @@ msgid "Ability_Hb_Augment_Armor_Debuff"
 msgstr "Armor Debuff"
 
 msgid "Ability_Hb_Augment_Armor_Debuff_Description"
-msgstr "Applies -{reduceArmorBy:%} armor ({duration|turn|turns}, up to {maxStacks|stack|stacks})."
+msgstr "Applies -{reduceBy:%} armor ({duration|turn|turns}, up to {maxStacks|stack|stacks})."
 
 # ------------------------------
 # Passive skills
@@ -4107,7 +4107,7 @@ msgid "Ability_Ia_Augment_Crit_Mitigation"
 msgstr "Crit Mitigation"
 
 msgid "Ability_Ia_Augment_Crit_Mitigation_Description"
-msgstr "Critical damage taken is reduced by {amount:%} while the shield holds."
+msgstr "Critical damage taken is reduced by {value:%} while the shield holds."
 
 # ------------------------------
 # New effects

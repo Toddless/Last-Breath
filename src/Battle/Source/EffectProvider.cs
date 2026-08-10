@@ -64,6 +64,14 @@ namespace Battle.Source
                 new ManaRegenerationEffect(p.Get("percentRegeneration"), p.GetInt("duration"), p.GetInt("maxStacks"))),
             ["Effect_Percent_Health_Regeneration"] = new(["percentRegeneration", "duration", "maxStacks"], p =>
                 new HealthRegenerationEffect(p.Get("percentRegeneration"), p.GetInt("duration"), p.GetInt("maxStacks"))),
+
+            // Mana regeneration under a name of its own: same effect, its own icon and text.
+            ["Effect_Mana_Flow"] = new(["percentRegeneration", "duration", "maxStacks"], p =>
+                new ManaRegenerationEffect(p.Get("percentRegeneration"), p.GetInt("duration"), p.GetInt("maxStacks"), id: "Effect_Mana_Flow")),
+            ["Effect_Fragility"] = new(["duration", "maxStacks", "critDamageAmp"], p =>
+                new FragilityEffect(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("critDamageAmp"))),
+            ["Effect_Seal_Of_Oblivion"] = new(["duration", "maxStacks"], p =>
+                new OblivionSeal(p.GetInt("duration"), p.GetInt("maxStacks"))),
         };
 
         public IReadOnlyCollection<string> KnownIds => s_factories.Keys;

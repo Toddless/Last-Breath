@@ -65,6 +65,8 @@
 
         public float Effectiveness => Params.ValueOr(AbilityParameter.Effectiveness, 1f);
 
+        public float ValueOr(string parameter, float fallback) => Params.ValueOr(parameter, fallback);
+
         /// <summary>
         /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
         /// Damage-dealing descendants stamp it onto their DamageContexts so the BattleDirector

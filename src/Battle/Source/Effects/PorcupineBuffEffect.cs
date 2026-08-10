@@ -16,7 +16,7 @@ namespace Battle.Source.Effects
         int duration,
         float damageReturn,
         float armorReturn,
-        float healOnHitPercent,
+        EffectValue healOnHitPercent,
         float cooldownReduceChance)
         : Effect(id: "Effect_Porcupine", duration, maxStacks: 1)
     {
@@ -44,8 +44,8 @@ namespace Battle.Source.Effects
             var attacker = context.Source;
             if (attacker.IsSame(Target.InstanceId) || !attacker.IsAlive) return;
 
-            if (healOnHitPercent > 0)
-                Target.Heal(new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * healOnHitPercent });
+            if (Effective(healOnHitPercent) > 0)
+                Target.Heal(new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * Effective(healOnHitPercent) });
             if (cooldownReduceChance > 0 && sourceAbility.CooldownLeft > 0 && CombatRandom.Rolls.RandFloat() <= cooldownReduceChance)
                 sourceAbility.CooldownLeft--;
 

@@ -817,8 +817,11 @@
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
+            "behaviour": "DebuffOnCast",
+            "effectId": "Effect_Seal_Of_Oblivion",
             "upgradeProperties": {
-                "duration": 3
+                "duration": 3,
+                "maxStacks": 1
             }
         },
         {
@@ -971,8 +974,13 @@
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ares_Blessing",
+            "behaviour": "BuffOnCast",
+            "effectId": "Effect_Incoming_Damage_Reduction",
+            "propertyRefs": { "duration": "Duration" },
             "upgradeProperties": {
-                "reduce": 0.25
+                "reduce": 0.25,
+                "duration": 3,
+                "maxStacks": 1
             }
         },
         {
@@ -981,8 +989,13 @@
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ares_Blessing",
+            "behaviour": "BuffOnCast",
+            "effectId": "Effect_Percent_Health_Regeneration",
+            "propertyRefs": { "duration": "Duration" },
             "upgradeProperties": {
-                "regenAmount": 0.08
+                "percentRegeneration": 0.08,
+                "duration": 3,
+                "maxStacks": 1
             }
         },
         {
@@ -991,8 +1004,13 @@
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ares_Blessing",
+            "behaviour": "BuffOnCast",
+            "effectId": "Effect_Damage_Buff",
+            "propertyRefs": { "duration": "Duration" },
             "upgradeProperties": {
-                "amount": 0.55
+                "value": 0.55,
+                "duration": 3,
+                "maxStacks": 1
             }
         },
         {
@@ -1037,8 +1055,13 @@
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Porcupine",
+            "behaviour": "BuffOnCast",
+            "effectId": "Effect_Incoming_Damage_Reduction",
+            "propertyRefs": { "duration": "Duration" },
             "upgradeProperties": {
-                "reduce": 0.25
+                "reduce": 0.25,
+                "duration": 3,
+                "maxStacks": 1
             }
         },
         {
@@ -1047,8 +1070,13 @@
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Porcupine",
+            "behaviour": "BuffOnCast",
+            "effectId": "Effect_Enhance_Defense",
+            "propertyRefs": { "duration": "Duration" },
             "upgradeProperties": {
-                "amount": 0.8
+                "value": 0.8,
+                "duration": 3,
+                "maxStacks": 1
             }
         },
         {
@@ -1093,8 +1121,13 @@
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Porcupine",
+            "behaviour": "BuffOnCast",
+            "effectId": "Effect_Armor_Buff",
+            "propertyRefs": { "duration": "Duration" },
             "upgradeProperties": {
-                "amount": 0.25
+                "value": 0.25,
+                "duration": 3,
+                "maxStacks": 1
             }
         },
         {
@@ -1186,8 +1219,10 @@
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Head_Butt",
+            "behaviour": "ApplyEffectOnImpact",
+            "effectId": "Effect_Armor_Reduction",
             "upgradeProperties": {
-                "reduceArmorBy": 0.25,
+                "reduceBy": 0.25,
                 "duration": 3,
                 "maxStacks": 3
             }
@@ -1345,9 +1380,12 @@
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
+            "behaviour": "BuffOnCast",
+            "effectId": "Effect_Mana_Flow",
             "upgradeProperties": {
-                "regenAmount": 0.15,
-                "duration": 3
+                "percentRegeneration": 0.15,
+                "duration": 3,
+                "maxStacks": 1
             }
         },
         {
@@ -1401,8 +1439,13 @@
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Aegis",
+            "behaviour": "BuffOnCast",
+            "effectId": "Effect_Enhance_Defense",
+            "propertyRefs": { "duration": "Duration" },
             "upgradeProperties": {
-                "amount": 0.8
+                "value": 0.8,
+                "duration": 3,
+                "maxStacks": 1
             }
         },
         {
@@ -1420,6 +1463,8 @@
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
+            "behaviour": "ApplyEffectOnImpact",
+            "effectId": "Effect_Fragility",
             "upgradeProperties": {
                 "duration": 3,
                 "maxStacks": 3,
@@ -1510,6 +1555,8 @@
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
+            "behaviour": "ApplyEffectOnImpact",
+            "effectId": "Effect_Next_Ability_Cooldown",
             "upgradeProperties": {
                 "duration": 3,
                 "amount": 3

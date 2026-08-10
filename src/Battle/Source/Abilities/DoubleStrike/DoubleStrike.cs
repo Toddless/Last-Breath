@@ -96,13 +96,13 @@ namespace Battle.Source.Abilities.DoubleStrike
                     {
                         firstLanded = true;
                         await ApplyDebuff(new ArmorReductionEffect(DebuffDuration, DebuffMaxStacks, this[Parameters.ArmorReduce]), owner, target);
-                        RestoreHealth(owner);
+                        await Restore(owner, HealthRestore, manaShare: 0f);
                     }
                     else
                     {
                         secondLanded = true;
                         await ApplyDebuff(new Clumsiness(DebuffDuration, DebuffMaxStacks, this[Parameters.EvadeReduce]), owner, target);
-                        RestoreMana(owner);
+                        await Restore(owner, healthShare: 0f, ManaRestore);
                     }
                 }
 
@@ -122,16 +122,13 @@ namespace Battle.Source.Abilities.DoubleStrike
         private async Task ApplyDebuff(IEffect debuff, IFightable owner, IFightable target) =>
             await debuff.Apply(Laying(target));
 
-        private void RestoreHealth(IFightable owner)
+        /// <summary>What a landed strike gives back, laid as an effect like every other number of the
+        /// cast — so the cast's effectiveness reaches it without a multiplication written here.</summary>
+        private async Task Restore(IFightable owner, float healthShare, float manaShare)
         {
-            if (HealthRestore <= 0) return;
-            owner.Heal(new HealContext(owner, owner) { Amount = owner.Parameters.MaxHealth * HealthRestore, Cause = RecoveryCause.Direct });
-        }
+            if (healthShare <= 0 && manaShare <= 0) return;
 
-        private void RestoreMana(IFightable owner)
-        {
-            if (ManaRestore <= 0) return;
-            owner.RestoreMana(new ManaRecoveryContext(owner, owner) { Amount = owner.Parameters.MaxMana * ManaRestore });
+            await new InstantRestoreEffect(healthShare, manaShare).Apply(Laying(owner));
         }
     }
 }

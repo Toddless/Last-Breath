@@ -2,6 +2,7 @@ namespace LastBreathTest.BattleSystemTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Battle.Source;
     using Battle.Source.Abilities;
@@ -41,6 +42,84 @@ namespace LastBreathTest.BattleSystemTests
                 Assert.IsTrue(registry.BuildableAugmentIds.Contains(record.Id, StringComparer.Ordinal),
                     $"'{record.Id}' is buildable and the registry does not say so");
             }
+        }
+
+        /// <summary>Every record that reads a number off its host: the property it fills, the shared key
+        /// it points at, and the ability that has to own that key. Literal, because a ref pointing at a
+        /// key the host never declared reads the record's own fallback and says nothing about it.</summary>
+        private static readonly (string Record, string Property, string Key, string AbilityId)[] s_propertyRefs =
+        [
+            ("Ability_Porc_Augment_Armor_Buff", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
+            ("Ability_Porc_Augment_Incoming_Reduction", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
+            ("Ability_Porc_Augment_Crit_Mitigation", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
+            ("Ability_Ar_Augment_Incoming_Reduction", "duration", AbilityParameter.Duration, "Ability_Ares_Blessing"),
+            ("Ability_Ar_Augment_Turn_End_Heal", "duration", AbilityParameter.Duration, "Ability_Ares_Blessing"),
+            ("Ability_Ar_Augment_Damage_Buff", "duration", AbilityParameter.Duration, "Ability_Ares_Blessing"),
+            ("Ability_Ia_Augment_Crit_Mitigation", "duration", AbilityParameter.Duration, "Ability_Ice_Aegis"),
+        ];
+
+        [TestMethod]
+        public void EveryPropertyRefPointsAtAKeyItsHostActuallyOwns()
+        {
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            var written = s_propertyRefs.ToDictionary(row => (row.Record, row.Property), row => (row.Key, row.AbilityId));
+
+            foreach (AbilityUpgradeData record in catalog.All.Where(entry => entry.PropertyRefs.Count > 0))
+                foreach ((string property, string key) in record.PropertyRefs)
+                {
+                    Assert.IsTrue(written.TryGetValue((record.Id, property), out (string Key, string AbilityId) row),
+                        $"'{record.Id}' reads '{property}' off its host and the table does not name it");
+                    Assert.AreEqual(row.Key, key, $"'{record.Id}' points '{property}' somewhere else now");
+
+                    // The host has to DECLARE the key, or the ref silently reads the record's fallback.
+                    IAbility host = registry.CreateAbility(row.AbilityId);
+                    Assert.AreNotEqual(Probe, host.ValueOr(key, Probe),
+                        $"'{row.AbilityId}' does not own '{key}', so '{record.Id}' quietly reads its own number");
+                }
+
+            Assert.AreEqual(s_propertyRefs.Length, catalog.All.Sum(entry => entry.PropertyRefs.Count),
+                "the shipped data reads a different number of host values than the table names");
+        }
+
+        /// <summary>A figure no ability would ever carry, so reading it back means nobody answered.</summary>
+        private const float Probe = -12345f;
+
+        [TestMethod]
+        public async Task APropertyRefTakesTheHostsDecoratedNumberAndNotTheRecordsOwn()
+        {
+            // The claim the table above cannot make: that the number actually COMES from the host, and
+            // decorated. The record carries a figure of its own as a fallback, so a ref that quietly
+            // stopped working would read that one and every walk would stay green — which is exactly how
+            // the mechanism was measured to fail.
+            using var rolls = new CombatRandomScope(new SteadyRoll());
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            const string BuffRecord = "Ability_Porc_Augment_Armor_Buff";
+            const string PorcupineId = "Ability_Porcupine";
+
+            Ability bare = Seated(registry, catalog, PorcupineId, BuffRecord);
+            int hostDuration = (int)bare[AbilityParameter.Duration];
+            Assert.AreEqual(hostDuration, await ArmorBuffTurns(bare),
+                "the buff was not laid for the host's own duration");
+
+            // The other half: a longer buff on the ability has to be a longer buff in what it lays. The
+            // record's own figure never moves, so this can only come from reading the decorated key.
+            Ability longer = Seated(registry, catalog, PorcupineId, BuffRecord, "Augment_Buff_Duration");
+
+            Assert.AreEqual(hostDuration + 1, await ArmorBuffTurns(longer),
+                "an augment lengthening the ability's buff was not felt by what the record lays");
+        }
+
+        /// <summary>Turns the armor buff the porcupine laid on its caster came out with.</summary>
+        private static async Task<int> ArmorBuffTurns(Ability porcupine)
+        {
+            var owner = Fighter();
+            porcupine.SetOwner(owner);
+            await porcupine.Execute([owner], FieldOf(owner, Fighter()));
+
+            IEffect? buff = owner.Effects.Effects.FirstOrDefault(effect => effect.Id == "Effect_Armor_Buff");
+            Assert.IsNotNull(buff, "the porcupine laid no armor buff at all, so the turns below prove nothing");
+
+            return buff.Duration;
         }
 
         [TestMethod]

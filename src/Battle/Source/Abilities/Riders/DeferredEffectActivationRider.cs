@@ -22,18 +22,26 @@ namespace Battle.Source.Abilities.Riders
 
         public async Task Apply(IAbilityActivationContext context)
         {
-            // Built once and kept: a factory may roll, and an instance built only to be thrown away
-            // would burn the roll. A factory that came back with nothing has already reported why.
-            IEffect? effect = effectFactory();
-            if (effect == null) return;
-
+            // Every instance built is an instance used: a factory may roll, and one built only to be
+            // thrown away would burn the roll. A factory that came back with nothing has already
+            // reported why, so the rider is not the place to discover it.
             if (applyOnCaster)
-                await effect.Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster, Effectiveness = context.Ability.Effectiveness });
+            {
+                IEffect? onCaster = effectFactory();
+                if (onCaster == null) return;
+
+                await onCaster.Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster, Effectiveness = context.Ability.Effectiveness });
+            }
 
             if (!applyOnTargets) return;
 
             foreach (var target in context.Targets)
-                await effectFactory()!.Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = target, Effectiveness = context.Ability.Effectiveness });
+            {
+                IEffect? onTarget = effectFactory();
+                if (onTarget == null) return;
+
+                await onTarget.Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = target, Effectiveness = context.Ability.Effectiveness });
+            }
         }
     }
 }
