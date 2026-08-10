@@ -43,6 +43,11 @@ namespace Core.Data.AbilityData
         /// Empty conflicts with nothing.</summary>
         [JsonProperty("exclusionGroup")] public string ExclusionGroup { get; init; } = string.Empty;
 
+        /// <summary>Tags the augment, once installed, grants its ability for fitting FURTHER augments —
+        /// the genus of the content it lays (a poison applier grants "poison"). Declared only by
+        /// appliers: amplifiers grant nothing, or they would bootstrap each other without one.</summary>
+        [JsonProperty("grantsTags")] public string[] GrantsTags { get; init; } = [];
+
         [JsonProperty("upgradeProperties")] public Dictionary<string, float> UpgradeProperties { get; init; } = [];
     }
 }

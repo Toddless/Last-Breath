@@ -104,6 +104,10 @@ namespace Core.Battle.Abilities
 
             foreach (AbilitySocketOccupant occupant in saved) Seat(occupant);
 
+            // Judged only after every occupant is back: a grantee's fit depends on the donors beside
+            // it, and reporting mid-restore would let the order of entries in the file pick the verdict.
+            foreach (AbilitySocketOccupant occupant in saved) ReportIllFitting(occupant);
+
             Changed?.Invoke();
         }
 
@@ -148,7 +152,6 @@ namespace Core.Battle.Abilities
         private void Seat(AbilitySocketOccupant occupant)
         {
             string address = occupant.Slot.Address;
-            ReportIllFitting(occupant, address);
 
             if (_sockets.TryGetValue(address, out AbilitySocket? standing) && standing.Install(occupant.Augment)) return;
 
@@ -160,21 +163,30 @@ namespace Core.Battle.Abilities
 
         /// <summary>Says out loud that the file carries an arrangement today's records would not allow.
         /// The augment is seated anyway — see <see cref="Seat"/> — and the line is for whoever moved the
-        /// record, who would otherwise find out from a player.</summary>
-        private void ReportIllFitting(AbilitySocketOccupant occupant, string address)
+        /// record, who would otherwise find out from a player. The occupant's own socket is left out of
+        /// both counts: seated first, it would report itself for wearing its own group.</summary>
+        private void ReportIllFitting(AbilitySocketOccupant occupant)
         {
             if (augments is null) return;
 
+            string address = occupant.Slot.Address;
             AbilityUpgradeData? record = augments.Find(occupant.Augment.AugmentId);
+            IReadOnlyCollection<string> granted = GrantedTags(occupant.Slot.AbilityId, excludingAddress: address);
             AugmentFitResult? verdict = record is null
                 ? null
                 : AugmentFit.Check(
                     occupant.Slot,
                     augments.TagsOf(occupant.Slot.AbilityId),
                     record,
-                    WornGroups(occupant.Slot.AbilityId));
+                    WornGroups(occupant.Slot.AbilityId, excludingAddress: address),
+                    granted);
 
             if (verdict == AugmentFitResult.Fits) return;
+
+            // The one sanctioned NoSharedTag: a grantee outliving its donor beside donors still on the
+            // ability. With no donor left there at all no survivor is possible — the verdict is a data
+            // edit and is said out loud like any other.
+            if (verdict == AugmentFitResult.NoSharedTag && granted.Count > 0) return;
 
             Tracker.TrackError(
                 $"Saved augment '{occupant.Augment.AugmentId}' no longer fits the slot it was seated in " +
@@ -201,19 +213,40 @@ namespace Core.Battle.Abilities
                     socket.Placement,
                     augments.TagsOf(socket.AbilityId),
                     augment,
-                    WornGroups(socket.AbilityId));
+                    WornGroups(socket.AbilityId),
+                    GrantedTags(socket.AbilityId));
+        }
+
+        /// <summary>The tags the ability's installed augments grant it — read off what the ability
+        /// WEARS, like <see cref="WornGroups"/>: an augment in a closed slot does nothing and grants
+        /// nothing.</summary>
+        private IReadOnlyCollection<string> GrantedTags(string abilityId, string? excludingAddress = null)
+        {
+            HashSet<string> granted = new(StringComparer.OrdinalIgnoreCase);
+
+            foreach (AbilitySocket socket in SocketsOf(abilityId))
+            {
+                if (string.Equals(socket.Address, excludingAddress, StringComparison.Ordinal)) continue;
+                if (socket.WorkingAugment is not { } installed) continue;
+
+                foreach (string tag in augments?.Find(installed.AugmentId)?.GrantsTags ?? [])
+                    granted.Add(tag);
+            }
+
+            return granted;
         }
 
         /// <summary>The exclusion groups already standing in one ability's slots. Only that ability's
         /// own sockets are counted: the group says one of these at a time on one ability, not one of
         /// these in the whole build. Read off what the ability WEARS — an augment left in a closed slot
         /// does nothing, and blocking its group would charge the player for property he cannot use.</summary>
-        private IReadOnlyCollection<string> WornGroups(string abilityId)
+        private IReadOnlyCollection<string> WornGroups(string abilityId, string? excludingAddress = null)
         {
             HashSet<string> worn = new(StringComparer.Ordinal);
 
             foreach (AbilitySocket socket in SocketsOf(abilityId))
             {
+                if (string.Equals(socket.Address, excludingAddress, StringComparison.Ordinal)) continue;
                 if (socket.WorkingAugment is not { } installed) continue;
 
                 string? group = augments?.Find(installed.AugmentId)?.ExclusionGroup;

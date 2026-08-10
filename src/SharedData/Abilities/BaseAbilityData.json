@@ -1,4 +1,4 @@
-﻿{
+{
     "abilities": [
         {
             "id": "Ability_Series_Of_Attacks",
@@ -421,6 +421,7 @@
     "augments": [
         {
             "id": "Augment_Poison_On_Hit",
+            "grantsTags": [ "poison", "debuff" ],
             "tier": 3,
             "tags": [ "poison" ],
             "abilityId": "Ability_Series_Of_Attacks",
@@ -430,6 +431,7 @@
         },
         {
             "id": "Ability_SoA_Augment_Apply_Buff_Critical_Chance",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Series_Of_Attacks",
@@ -442,6 +444,7 @@
         },
         {
             "id": "Ability_SoA_Augment_Apply_Buff_Critical_Damage",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Series_Of_Attacks",
@@ -603,6 +606,7 @@
         },
         {
             "id": "Augment_Clumsiness",
+            "grantsTags": [ "debuff" ],
             "tier": 2,
             "tags": [ "evasion" ],
             "abilityId": "Ability_Jar_Of_Poison",
@@ -614,6 +618,7 @@
         },
         {
             "id": "Augment_Apply_Blind",
+            "grantsTags": [ "debuff" ],
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Jar_Of_Poison",
@@ -625,6 +630,7 @@
         },
         {
             "id": "Augment_Apply_Weakness",
+            "grantsTags": [ "debuff" ],
             "tier": 2,
             "tags": [ "damage" ],
             "abilityId": "Ability_Jar_Of_Poison",
@@ -671,6 +677,7 @@
         },
         {
             "id": "Augment_Immortality",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [ "buff" ],
             "abilityId": "Ability_Dark_Shroud",
@@ -681,6 +688,7 @@
         },
         {
             "id": "Ability_Ds_Augment_Mana_Regen",
+            "grantsTags": [ "buff", "recovery" ],
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Dark_Shroud",
@@ -692,6 +700,7 @@
             "id": "Augment_Additional_Health_Regen",
             "tier": 2,
             "tags": [ "recovery", "health" ],
+            "abilityId": "Ability_Dark_Shroud",
             "upgradeProperties": {
                 "additionalRegen": 0.025
             }
@@ -731,6 +740,7 @@
         },
         {
             "id": "Augment_Lucky_Crit",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [ "crit" ],
             "upgradeProperties": {
@@ -739,6 +749,7 @@
         },
         {
             "id": "Augment_Additional_Crit_Multiplier",
+            "grantsTags": [ "buff" ],
             "tier": 2,
             "tags": [ "crit", "damage" ],
             "abilityId": "Ability_Critical_Calculation",
@@ -749,6 +760,7 @@
         },
         {
             "id": "Augment_Leach_On_Crit",
+            "grantsTags": [ "buff" ],
             "tier": 2,
             "tags": [ "crit", "health" ],
             "abilityId": "Ability_Critical_Calculation",
@@ -758,6 +770,7 @@
         },
         {
             "id": "Augment_Apply_Enhanced_Defence",
+            "grantsTags": [ "buff" ],
             "tier": 2,
             "tags": [ "buff", "duration" ],
             "abilityId": "Ability_Critical_Calculation",
@@ -778,6 +791,7 @@
         },
         {
             "id": "Augment_Apply_Seal_Of_Oblivion",
+            "grantsTags": [ "debuff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
@@ -834,6 +848,7 @@
         },
         {
             "id": "Ability_Pc_Augment_Attacks_Reduce_Incoming_Heal",
+            "grantsTags": [ "debuff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -845,6 +860,7 @@
         },
         {
             "id": "Ability_Pc_Augment_Attacks_Reduce_Armor",
+            "grantsTags": [ "debuff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -890,6 +906,7 @@
         },
         {
             "id": "Ability_Dst_Augment_Both_Hits_Buff",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Double_Strike",
@@ -900,6 +917,7 @@
         },
         {
             "id": "Augment_Restore_On_Hit",
+            "grantsTags": [ "recovery" ],
             "tier": 3,
             "tags": [ "hit" ],
             "abilityId": "Ability_Double_Strike",
@@ -927,6 +945,7 @@
         },
         {
             "id": "Ability_Ar_Augment_Incoming_Reduction",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ares_Blessing",
@@ -936,6 +955,7 @@
         },
         {
             "id": "Ability_Ar_Augment_Turn_End_Heal",
+            "grantsTags": [ "buff", "recovery" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ares_Blessing",
@@ -945,6 +965,7 @@
         },
         {
             "id": "Ability_Ar_Augment_Damage_Buff",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ares_Blessing",
@@ -956,6 +977,7 @@
             "id": "Augment_Recovery_Bonus",
             "tier": 2,
             "tags": [ "recovery", "health" ],
+            "abilityId": "Ability_Ares_Blessing",
             "upgradeProperties": {
                 "recoveryBonus": 0.15
             }
@@ -978,6 +1000,7 @@
         },
         {
             "id": "Ability_Porc_Augment_Echo",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Porcupine",
@@ -988,6 +1011,7 @@
         },
         {
             "id": "Ability_Porc_Augment_Incoming_Reduction",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Porcupine",
@@ -997,6 +1021,7 @@
         },
         {
             "id": "Ability_Porc_Augment_Crit_Mitigation",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Porcupine",
@@ -1006,6 +1031,7 @@
         },
         {
             "id": "Augment_Heal_On_Hit",
+            "grantsTags": [ "recovery" ],
             "tier": 2,
             "tags": [ "hit" ],
             "abilityId": "Ability_Porcupine",
@@ -1041,6 +1067,7 @@
         },
         {
             "id": "Ability_Porc_Augment_Armor_Buff",
+            "grantsTags": [ "buff" ],
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Porcupine",
@@ -1050,6 +1077,7 @@
         },
         {
             "id": "Ability_Bf_Augment_Burning_Fury",
+            "grantsTags": [ "burn", "debuff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Berserk_Fury",
@@ -1132,6 +1160,7 @@
         },
         {
             "id": "Ability_Hb_Augment_Armor_Debuff",
+            "grantsTags": [ "debuff" ],
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Head_Butt",
@@ -1145,12 +1174,14 @@
             "id": "Augment_Heal_From_Damage",
             "tier": 3,
             "tags": [ "health", "damage", "recovery" ],
+            "abilityId": "Ability_Sacrifice",
             "upgradeProperties": {
                 "amount": 0.15
             }
         },
         {
             "id": "Augment_Incoming_Reduction",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1161,6 +1192,7 @@
         },
         {
             "id": "Augment_Free_Cast",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1177,6 +1209,7 @@
         },
         {
             "id": "Ability_Arm_Augment_Stage3_Burning",
+            "grantsTags": [ "burn", "debuff" ],
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Armageddon",
@@ -1283,6 +1316,7 @@
         },
         {
             "id": "Augment_Mana_Flow",
+            "grantsTags": [ "buff", "recovery" ],
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1293,6 +1327,7 @@
         },
         {
             "id": "Augment_Next_Cast_Pure",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1318,6 +1353,7 @@
         },
         {
             "id": "Ability_Ia_Augment_Stun_Attackers",
+            "grantsTags": [ "stun", "control" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Aegis",
@@ -1336,6 +1372,7 @@
         },
         {
             "id": "Ability_Ia_Augment_Crit_Mitigation",
+            "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Aegis",
@@ -1354,6 +1391,7 @@
         },
         {
             "id": "Ability_Is_Augment_Apply_Fragility",
+            "grantsTags": [ "debuff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1443,6 +1481,7 @@
         },
         {
             "id": "Ability_Df_Augment_Enemy_Cooldown",
+            "grantsTags": [ "debuff" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",

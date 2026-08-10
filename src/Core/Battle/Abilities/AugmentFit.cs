@@ -23,17 +23,21 @@ namespace Core.Battle.Abilities
         /// <param name="abilityTags">The combat tags of the slot's ability.</param>
         /// <param name="augment">The augment's own record.</param>
         /// <param name="occupiedExclusionGroups">The exclusion groups already worn by that ability.</param>
+        /// <param name="grantedTags">Tags the ability's installed augments grant it (their records'
+        /// <see cref="AbilityUpgradeData.GrantsTags"/>). The effective tags — own ∪ granted — exist
+        /// only inside this rule; extraction never re-judges, so a grantee outlives its donor.</param>
         public static AugmentFitResult Check(
             AbilitySocketPlacement slot,
             IReadOnlyCollection<string> abilityTags,
             AbilityUpgradeData augment,
-            IReadOnlyCollection<string> occupiedExclusionGroups)
+            IReadOnlyCollection<string> occupiedExclusionGroups,
+            IReadOnlyCollection<string>? grantedTags = null)
         {
             if (ContradictsItself(augment)) return AugmentFitResult.ContradictoryDeclaration;
 
             if (augment.Tier > slot.Tier) return AugmentFitResult.TierAboveSocket;
 
-            AugmentFitResult binding = CheckBinding(slot, abilityTags, augment);
+            AugmentFitResult binding = CheckBinding(slot, abilityTags, augment, grantedTags);
             if (binding != AugmentFitResult.Fits) return binding;
 
             return Conflicts(augment, occupiedExclusionGroups)
@@ -53,16 +57,20 @@ namespace Core.Battle.Abilities
         /// claimed rather than inferred, so an augment that merely carries no tag is still refused. A
         /// named ability is otherwise the whole answer — an augment strong enough to be written for
         /// one ability is not offered to a family through a tag it happens to carry. Everything else
-        /// is tag work, and one shared tag is enough.</summary>
+        /// is tag work, and one shared tag is enough — an own tag of the ability or one granted by an
+        /// installed augment count alike, which is what seats a poison amplifier beside the applier
+        /// that taught the ability poison.</summary>
         private static AugmentFitResult CheckBinding(
             AbilitySocketPlacement slot,
             IReadOnlyCollection<string> abilityTags,
-            AbilityUpgradeData augment)
+            AbilityUpgradeData augment,
+            IReadOnlyCollection<string>? grantedTags)
         {
             if (augment.FitsAnyAbility) return AugmentFitResult.Fits;
 
             if (string.IsNullOrWhiteSpace(augment.AbilityId))
                 return AbilityTags.SharesAny(augment.Tags, abilityTags)
+                       || (grantedTags is { Count: > 0 } && AbilityTags.SharesAny(augment.Tags, grantedTags))
                     ? AugmentFitResult.Fits
                     : AugmentFitResult.NoSharedTag;
 
