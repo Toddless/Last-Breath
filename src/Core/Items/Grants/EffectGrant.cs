@@ -17,7 +17,7 @@ namespace Core.Items.Grants
         string id,
         string effectId,
         IReadOnlyDictionary<string, float> properties,
-        Func<IGrantEffectProvider?> providerAccessor,
+        Func<IEffectProvider?> providerAccessor,
         Func<IGameEventBus?> busAccessor) : IItemGrant
     {
         private IFightable? _owner;

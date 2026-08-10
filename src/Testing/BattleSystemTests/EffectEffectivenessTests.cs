@@ -112,6 +112,21 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public async Task ADebuffThatInvertsOutsideTheParameterFamilyIsScaledTheSameWay()
+        {
+            // Weakness carries its loss to a damage modifier instead of a parameter decorator, so
+            // neither sweep above sees it — and it was the last place in the book still inverting by
+            // hand. Same claim, asked of the number it actually hands over.
+            var weakness = new Weakness(duration: 3, maxStacks: 3, value: Authored);
+
+            await weakness.Apply(Laying(new ConditionOwner(), Strong));
+
+            Assert.IsTrue(weakness.DamageLeft < 1f, "Weakness left the bearer hitting harder than before — it is a buff");
+            Assert.AreEqual(1f - (Authored * Strong), weakness.DamageLeft, 0.0001f,
+                "Weakness no longer scales the loss it was written with");
+        }
+
+        [TestMethod]
         public async Task StackingAnInvertedDebuffOnlyEverTakesMoreAway()
         {
             // What a record buying stacks buys. The decorator compounds a multiplicative change over

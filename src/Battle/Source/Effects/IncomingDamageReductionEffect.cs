@@ -9,10 +9,13 @@ namespace Battle.Source.Effects
     /// Buff: the target takes <c>reduce</c> less damage from all incoming hits per stack.
     /// Each stack carries its own incoming-damage modifier, so stacks multiply.
     /// </summary>
-    public class IncomingDamageReductionEffect(int duration, int maxStacks, float reduce)
+    public class IncomingDamageReductionEffect(int duration, int maxStacks, EffectValue reduce)
         : Effect(id: "Effect_Incoming_Damage_Reduction", duration, maxStacks)
     {
         private IDamageModifier? _modifier;
+
+        /// <summary>Share of incoming damage taken away, through the effectiveness of the cast.</summary>
+        public float Reduction => Effective(reduce);
 
         public override async Task Apply(EffectApplyingContext context)
         {
@@ -20,7 +23,7 @@ namespace Battle.Source.Effects
             if (!IsApplied) return;
 
             if (Target == null) return;
-            _modifier = new IncomingDamageReductionContextModifier(Target, reduce);
+            _modifier = new IncomingDamageReductionContextModifier(Target, Reduction);
             Target.ModifierHandler.Add(_modifier);
         }
 

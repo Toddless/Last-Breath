@@ -78,12 +78,12 @@
             services.AddSingleton<IAugmentItemMinter, AugmentItemMinter>();
 
             services.AddSingleton<ISkillProvider, PassiveSkillProvider>();
-            services.AddSingleton<IGrantEffectProvider, GrantEffectProvider>();
+            services.AddSingleton<IEffectProvider, EffectProvider>();
             // TryAdd: Main registers both module extensions — whichever runs first wins, the lambdas
             // resolve the providers lazily from the FINAL container, so registration order is irrelevant.
             services.TryAddSingleton<IGrantFactory>(sp => new GrantFactory(
                 sp.GetService<ISkillProvider>,
-                sp.GetService<IGrantEffectProvider>,
+                sp.GetService<IEffectProvider>,
                 sp.GetService<IGameEventBus>));
             // // Shared on purpose: NPC looks resolve by NpcId for every spawn path in every project.
              services.AddSingleton<INpcVisualProvider, NpcVisualProvider>();

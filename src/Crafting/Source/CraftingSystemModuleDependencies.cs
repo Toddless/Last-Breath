@@ -37,7 +37,7 @@
             // the accessors resolve lazily — a sandbox without a skill/effect registry mints inert grants.
             services.TryAddSingleton<Core.Items.Grants.IGrantFactory>(sp => new Core.Items.Grants.GrantFactory(
                 sp.GetService<Core.Battle.Skills.ISkillProvider>,
-                sp.GetService<Core.Battle.Abilities.IGrantEffectProvider>,
+                sp.GetService<Core.Battle.Abilities.IEffectProvider>,
                 sp.GetService<IGameEventBus>));
             services.AddSingleton<IItemUpgrader, ItemUpgrader>();
             services.AddSingleton<IItemAscender, ItemAscender>();

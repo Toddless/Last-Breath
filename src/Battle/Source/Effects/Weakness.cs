@@ -10,19 +10,23 @@ namespace Battle.Source.Effects
     /// domain of <see cref="FeeblenessEffect"/>). Each stack carries its own outgoing-damage modifier,
     /// so stacks multiply.
     /// </summary>
-    public class Weakness(int duration, int maxStacks, float value)
+    public class Weakness(int duration, int maxStacks, EffectValue value)
         : Effect(id: "Effect_Weakness", duration, maxStacks)
     {
         public override bool IsHarmful => true;
 
         private IDamageModifier? _modifier;
 
+        /// <summary>What the bearer's hits are left dealing — the authored loss through effectiveness,
+        /// inverted after it (never below nothing).</summary>
+        public float DamageLeft => Effective(value, EffectValueShape.ShareLost);
+
         public override async Task Apply(EffectApplyingContext context)
         {
             await base.Apply(context);
             if (!IsApplied || Target == null) return; // a rejected stack must not weaken anything
 
-            _modifier = new HitDamageDealtContextModifier(Target, 1 - value);
+            _modifier = new HitDamageDealtContextModifier(Target, DamageLeft);
             Target.ModifierHandler.Add(_modifier);
         }
 

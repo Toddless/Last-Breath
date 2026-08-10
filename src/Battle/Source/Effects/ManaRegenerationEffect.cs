@@ -5,14 +5,14 @@
     using Core.Enums;
 
     public class ManaRegenerationEffect(
-        float percentRegeneration,
+        EffectValue percentRegeneration,
         int duration,
         int maxStacks,
         string id = "Effect_Mana_Regeneration",
         StatusEffects statusEffect = StatusEffects.None)
         : Effect(id, duration, maxStacks, statusEffect)
     {
-        public float PercentRegeneration { get; } = percentRegeneration;
+        public float PercentRegeneration => Effective(percentRegeneration);
 
         public override void TurnEnd()
         {
@@ -22,6 +22,6 @@
             base.TurnEnd();
         }
 
-        public override IEffect Copy() => new ManaRegenerationEffect(PercentRegeneration, Duration, MaxStacks, Id, Status);
+        public override IEffect Copy() => new ManaRegenerationEffect(percentRegeneration, Duration, MaxStacks, Id, Status);
     }
 }

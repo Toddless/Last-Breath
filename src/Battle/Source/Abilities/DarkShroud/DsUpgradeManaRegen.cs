@@ -16,7 +16,7 @@ namespace Battle.Source.Abilities.DarkShroud
         {
             var modifier = new DeferredEffectActivationRider(
                 "Ability_Apply_Effect_Mana_Regeneration_Post_Activation_Modifier",
-                () => new ManaRegenerationEffect(regenAmount * ability.Effectiveness, (int)ability.Duration, 1));
+                () => new ManaRegenerationEffect(regenAmount, (int)ability.Duration, 1));
             _modifierId = modifier.Id;
             ability.ActivationRiders.TryAdd(modifier.Id, modifier);
         }

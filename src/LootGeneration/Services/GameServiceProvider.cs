@@ -33,7 +33,7 @@ namespace LootGeneration.Services
             // Sandbox has no skill/effect registries: null accessors mint inert grants (display works).
             services.AddSingleton<Core.Items.Grants.IGrantFactory>(sp => new Core.Items.Grants.GrantFactory(
                 sp.GetService<Core.Battle.Skills.ISkillProvider>,
-                sp.GetService<Core.Battle.Abilities.IGrantEffectProvider>,
+                sp.GetService<Core.Battle.Abilities.IEffectProvider>,
                 sp.GetService<Core.Events.IGameEventBus>));
             services.AddSingleton<Core.Items.IEquipItemMinter, Core.Items.EquipItemMinter>();
             services.AddSingleton<Core.Items.IItemMinter, Core.Items.ItemMinter>();

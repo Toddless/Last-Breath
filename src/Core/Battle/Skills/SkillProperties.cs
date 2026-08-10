@@ -9,6 +9,9 @@ namespace Core.Battle.Skills
     {
         public static readonly SkillProperties Empty = new(string.Empty, new Dictionary<string, float>());
 
+        /// <summary>Keys the data actually carried — what a provider checks its declared list against.</summary>
+        public IEnumerable<string> Names => values.Keys;
+
         public float Get(string name) =>
             values.TryGetValue(name, out float value)
                 ? value

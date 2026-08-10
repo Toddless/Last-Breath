@@ -13,7 +13,7 @@ namespace Core.Items.Grants
     /// (the strict provider reports the refusal when one exists, null providers stay silent).</summary>
     public class GrantFactory(
         Func<ISkillProvider?> skillProviderAccessor,
-        Func<IGrantEffectProvider?> effectProviderAccessor,
+        Func<IEffectProvider?> effectProviderAccessor,
         Func<IGameEventBus?> gameEventBusAccessor) : IGrantFactory
     {
         public IItemGrant? Create(GrantKind kind, string id, List<IModifier> modifiers, IReadOnlyDictionary<string, float> properties) => kind switch
