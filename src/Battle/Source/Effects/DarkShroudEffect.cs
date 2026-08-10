@@ -3,7 +3,7 @@
     using Core.Battle.Abilities;
     using Core.Enums;
 
-    public class DarkShroudEffect(int duration, float evadeValue)
+    public class DarkShroudEffect(int duration, EffectValue evadeValue)
         : CompositeParameterChangeEffect(id: "Effect_Dark_Shroud", duration, maxStacks: 1, changes:
         [
             new ParameterChange(EntityParameter.Evade, evadeValue, OperationType.Multiply, Priority.Weak)

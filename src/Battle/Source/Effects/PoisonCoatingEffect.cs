@@ -12,14 +12,19 @@ namespace Battle.Source.Effects
         int duration,
         int maxStacks,
         int poisonDuration,
-        float poisonDamagePercent = 0.7f,
+        EffectValue poisonDamagePercent = default,
         StatusEffects statusEffect = StatusEffects.None)
         : Effect(id: EffectId, duration, maxStacks, statusEffect)
     {
         public const string EffectId = "Effect_Poison_Coating";
 
+        private const float DefaultPoisonPercent = 0.7f;
+
         public int PoisonDuration { get; } = poisonDuration;
-        public float PoisonDamagePercent { get; } = poisonDamagePercent;
+        /// <summary>Share of a blow one poison tick carries, AS AUTHORED: the coating hands it to the
+        /// poison, and the poison scales it with the effectiveness the coating passes along.</summary>
+        public EffectValue PoisonDamagePercent { get; } =
+            poisonDamagePercent.Authored == 0f ? DefaultPoisonPercent : poisonDamagePercent;
 
         public override async Task Apply(EffectApplyingContext context)
         {
@@ -40,7 +45,9 @@ namespace Battle.Source.Effects
                 Target = evt.Context.Target,
                 Source = InstanceId,
                 Damage = evt.Context.FinalDamage,
-                IsCritical = evt.Context.IsCritical
+                IsCritical = evt.Context.IsCritical,
+                // The coating lays the poison, so it lands as hard as the cast that put the coating on.
+                Effectiveness = Effectiveness
             };
             poison.Apply(applyContext);
         }

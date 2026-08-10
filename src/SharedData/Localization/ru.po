@@ -2171,6 +2171,12 @@ msgstr "Эффективность восстановления"
 msgid "Augment_Recovery_Effectiveness_Description"
 msgstr "Увеличивает эффективность восстановления на {effectiveness:%}."
 
+msgid "Augment_Debuff_Effectiveness"
+msgstr "Эффективность дебафа"
+
+msgid "Augment_Debuff_Effectiveness_Description"
+msgstr "Увеличивает эффективность дебафа на {effectiveness:%}."
+
 msgid "Ability_Ip_Augment_Unevadable"
 msgstr ""
 

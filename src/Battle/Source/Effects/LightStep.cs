@@ -5,8 +5,8 @@
 
     public class LightStep(
         int duration,
-        int maxStacks = 5,
-        float value = 0.15f,
+        int maxStacks,
+        EffectValue value,
         string id = "Effect_Light_Step")
         : ParameterChangeEffect(
             id,
@@ -18,6 +18,6 @@
             priority: Priority.Weak,
             statusEffect: StatusEffects.None)
     {
-        public override IEffect Copy() => new LightStep(Duration, MaxStacks, Value, Id);
+        public override IEffect Copy() => new LightStep(Duration, MaxStacks, Authored, Id);
     }
 }

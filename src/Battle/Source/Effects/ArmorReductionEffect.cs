@@ -11,11 +11,12 @@ namespace Battle.Source.Effects
         : ParameterChangeEffect(id: "Effect_Armor_Reduction",
             duration,
             maxStacks,
-            value: 1 - reduceBy,
+            reduceBy,
             parameter: EntityParameter.Armor,
             type: OperationType.Multiply,
             priority: Priority.Weak,
-            statusEffect: StatusEffects.None)
+            statusEffect: StatusEffects.None,
+            shape: EffectValueShape.ShareLost)
     {
         public override bool IsHarmful => true;
 

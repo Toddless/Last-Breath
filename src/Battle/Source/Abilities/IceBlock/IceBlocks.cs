@@ -44,14 +44,6 @@ namespace Battle.Source.Abilities.IceBlock
         public static class Parameters
         {
             public const string WitheringDuration = nameof(WitheringDuration);
-
-            /// <summary>How many stacks of Withering the block may pile on its TARGET. Not the book's
-            /// <see cref="AbilityParameter.Stacks"/>, which counts the stacks a cast lays on its own
-            /// caster: what a blow leaves on its victim and what a caster wears are two axes, and the
-            /// block's stun duration beside this one is the second number on the target's axis, so
-            /// neither is a single shared "applied" count either.</summary>
-            public const string WitheringMaxStacks = nameof(WitheringMaxStacks);
-
             public const string WitheringValue = nameof(WitheringValue);
             public const string ExtraBlocks = nameof(ExtraBlocks);
             public const string ExtraBlockDamagePercent = nameof(ExtraBlockDamagePercent);
@@ -60,10 +52,11 @@ namespace Battle.Source.Abilities.IceBlock
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             RegisterDamageParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.StunDuration, 1);
             parameters.RegisterDefault(Parameters.WitheringDuration, 3);
-            parameters.RegisterDefault(Parameters.WitheringMaxStacks, 3);
+            parameters.RegisterDefault(AbilityParameter.Stacks, 3);
             parameters.RegisterDefault(Parameters.WitheringValue, 0.15f);
             parameters.RegisterDefault(Parameters.ExtraBlocks, 3);
             parameters.RegisterDefault(Parameters.ExtraBlockDamagePercent, 0.5f);
@@ -109,7 +102,7 @@ namespace Battle.Source.Abilities.IceBlock
             };
             // The rider closes over the plan: stage 2 mutations to StunDuration are picked up automatically.
             plan.OnHitRiders.Add(hit => _ = new StunEffect(plan.StunDuration)
-                .Apply(new EffectApplyingContext { Caster = owner, Target = hit.Target, Source = InstanceId }));
+                .Apply(Laying(hit.Target)));
             return plan;
         }
 
@@ -122,8 +115,8 @@ namespace Battle.Source.Abilities.IceBlock
                     break;
                 case 3:
                     plan.OnHitRiders.Add(hit => _ = new WitheringCurseEffect(
-                            (int)this[Parameters.WitheringDuration], (int)this[Parameters.WitheringMaxStacks], this[Parameters.WitheringValue])
-                        .Apply(new EffectApplyingContext { Caster = owner, Target = hit.Target, Source = InstanceId }));
+                            (int)this[Parameters.WitheringDuration], (int)this[AbilityParameter.Stacks], this[Parameters.WitheringValue])
+                        .Apply(Laying(hit.Target)));
                     break;
                 case 4:
                     plan.OnHitRiders.Add(hit => _ = DropExtraBlocks(plan, owner, field, hit.Target));

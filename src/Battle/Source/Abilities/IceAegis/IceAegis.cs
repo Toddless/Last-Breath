@@ -42,14 +42,10 @@ namespace Battle.Source.Abilities.IceAegis
             public const string PerIntelligenceScale = nameof(PerIntelligenceScale);
             public const string StageTwoScaleBonus = nameof(StageTwoScaleBonus);
 
-            /// <summary>How long the Clumsiness the aegis puts on an attacker holds. An effect laid on
-            /// somebody else and therefore not the book's <see cref="AbilityParameter.Duration"/>, which
-            /// is how long the aegis itself holds on its caster; the ability names both and they are
-            /// moved by different augments. The freeze below is the aegis's third such number, which is
-            /// why neither of them is a shared "applied effect duration" either.</summary>
+            /// <summary>How long the Clumsiness the aegis puts on an attacker holds — laid on somebody
+            /// else, so not the caster-side <see cref="AbilityParameter.Duration"/>.</summary>
             public const string ClumsinessDuration = nameof(ClumsinessDuration);
 
-            public const string ClumsinessMaxStacks = nameof(ClumsinessMaxStacks);
             public const string ClumsinessValue = nameof(ClumsinessValue);
             public const string FreezeDuration = nameof(FreezeDuration);
             public const string ReflectPercent = nameof(ReflectPercent);
@@ -60,12 +56,13 @@ namespace Battle.Source.Abilities.IceAegis
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(Parameters.BarrierBase, 500f);
             parameters.RegisterDefault(Parameters.PerIntelligenceScale, 35f);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.StageTwoScaleBonus, 15f);
             parameters.RegisterDefault(Parameters.ClumsinessDuration, 3);
-            parameters.RegisterDefault(Parameters.ClumsinessMaxStacks, 5);
+            parameters.RegisterDefault(AbilityParameter.Stacks, 5);
             parameters.RegisterDefault(Parameters.ClumsinessValue, 0.15f);
             parameters.RegisterDefault(Parameters.FreezeDuration, 1);
             // Zero by default; upgrades raise them with decorators — the ability knows nothing about the upgrades
@@ -109,7 +106,7 @@ namespace Battle.Source.Abilities.IceAegis
             float amount = plan.BarrierBase + (plan.PerIntelligenceScale * intelligence);
             await new IceAegisEffect(plan.Duration, amount, plan.AttackerEffectFactory, plan.OnBarrierBroken,
                     plan.ReflectPercent, plan.HealPerTurnPercent)
-                .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
+                .Apply(Laying(owner));
         }
 
         /// <summary>Stage-3 payload for attackers: Clumsiness, or (with the L3 upgrade) a chance-rolled stun.</summary>
@@ -120,7 +117,7 @@ namespace Battle.Source.Abilities.IceAegis
                 return new StunEffect((int)this[AbilityParameter.StunDuration]);
 
             return new Clumsiness(
-                (int)this[Parameters.ClumsinessDuration], (int)this[Parameters.ClumsinessMaxStacks], this[Parameters.ClumsinessValue]);
+                (int)this[Parameters.ClumsinessDuration], (int)this[AbilityParameter.Stacks], this[Parameters.ClumsinessValue]);
         }
 
         /// <summary>Stage 4: the shattering of the barrier freezes the field. Nobody was aimed at and the
@@ -132,7 +129,7 @@ namespace Battle.Source.Abilities.IceAegis
             foreach (IFightable enemy in field.GetEnemies(owner).Where(e => e.IsAlive))
             {
                 _ = new FreezeEffect((int)this[Parameters.FreezeDuration])
-                    .Apply(new EffectApplyingContext { Caster = owner, Target = enemy, Source = InstanceId });
+                    .Apply(Laying(enemy));
                 _ = ApplyImpactRiders(new AbilityImpact(owner, enemy, field, Succeeded: true, IsCritical: false, Damage: 0)
                 {
                     Source = this,

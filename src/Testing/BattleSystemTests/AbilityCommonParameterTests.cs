@@ -73,6 +73,12 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>The family's other record — the weaker of the two where they meet.</summary>
         private const string StrongerBuff = "Augment_Buff_Effectiveness";
 
+        /// <summary>The family's third record and the ability that carries the tags of two of them: the
+        /// aegis lays a barrier on its caster and clumsiness on whoever hits it, so both deals are
+        /// offered to it and both stand on the one key.</summary>
+        private const string StrongerDebuff = "Augment_Debuff_Effectiveness";
+        private const string AegisId = "Ability_Ice_Aegis";
+
         /// <summary>Share of health the shade restores per evade before effectiveness, and what the
         /// record above is worth — both written out, because a walk that read either off the shipped
         /// files would agree with whatever those files became.</summary>
@@ -183,6 +189,23 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(bare[AbilityParameter.Effectiveness] + RecoveryBonus, both[AbilityParameter.Effectiveness],
                 0.0001f, "the two records of one family were added up instead of the better one being worn");
+        }
+
+        [TestMethod]
+        public void TheThirdRecordOfTheFamilyIsTheSameOfferAsTheOtherTwoWhereItMeetsThem()
+        {
+            // The family grew to three and its price did not change: one key, one direction, so any two
+            // of them that reach the same ability are one deal and the ability wears the better. The
+            // aegis is where the buff record and the debuff record meet — both are worth a quarter, so
+            // what has to be true is that the pair comes to a quarter and not to a half.
+            IAbility bare = Wearing(AegisId);
+            IAbility one = Wearing(AegisId, StrongerDebuff);
+            IAbility both = Wearing(AegisId, StrongerDebuff, StrongerBuff);
+
+            Assert.AreNotEqual(bare[AbilityParameter.Effectiveness], one[AbilityParameter.Effectiveness],
+                "the debuff record does nothing on the aegis, so the pair below proves nothing");
+            Assert.AreEqual(one[AbilityParameter.Effectiveness], both[AbilityParameter.Effectiveness],
+                "two records of one family were added up on the aegis instead of the better one being worn");
         }
 
         [TestMethod]

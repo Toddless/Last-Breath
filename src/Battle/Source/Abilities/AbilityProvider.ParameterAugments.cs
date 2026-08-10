@@ -193,6 +193,10 @@ namespace Battle.Source.Abilities
             [
                 new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.35f)
             ],
+            ["Augment_Debuff_Effectiveness"] =
+            [
+                new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.25f)
+            ],
 
             // Poison Explosion
             ["Augment_Reduce_Execution_Trahsold"] =
@@ -226,7 +230,7 @@ namespace Battle.Source.Abilities
             ],
             ["Ability_Ib_Augment_Withering_Stacks"] =
             [
-                new(IceBlock.IceBlocks.Parameters.WitheringMaxStacks, OperationType.Add, "amount", 1f)
+                new(AbilityParameter.Stacks, OperationType.Add, "amount", 1f)
             ],
             ["Ability_Ib_Augment_Extra_Block_Damage"] =
             [

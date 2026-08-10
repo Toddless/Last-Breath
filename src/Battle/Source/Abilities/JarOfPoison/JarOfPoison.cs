@@ -21,6 +21,7 @@ namespace Battle.Source.Abilities.JarOfPoison
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(AbilityParameter.PoisonDuration, 3);
         }
 
@@ -45,7 +46,7 @@ namespace Battle.Source.Abilities.JarOfPoison
         {
             float damage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
 
-            var context = new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId, Damage = damage };
+            EffectApplyingContext context = Laying(target) with { Damage = damage };
             var poison = new DamageOverTurnEffect(PoisonDuration, StatusEffects.Poison);
             await poison.Apply(context);
         }

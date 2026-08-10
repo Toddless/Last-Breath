@@ -224,6 +224,7 @@ namespace LastBreathTest.BattleSystemTests
         public int Duration { get; set; } = 1;
         public int MaxStacks { get; set; } = 99;
         public string Source => "test";
+        public float Effectiveness => 1f;
         public bool IsHarmful => isHarmful;
         public string Id => id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();

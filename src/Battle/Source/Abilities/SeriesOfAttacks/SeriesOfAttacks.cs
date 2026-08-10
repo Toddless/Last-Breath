@@ -15,12 +15,8 @@
         public ISoAExecutionStrategy ExecutionStrategy { get; set; } = new SoAsDefaultExecutionStrategy();
         public AttackModifierPipeline AttackModifiers { get; } = new();
 
-        /// <summary>
-        /// The series is a RANGE and not a count, which is why the ability does not register
-        /// <see cref="AbilityParameter.Attacks"/>: a floor and a ceiling are two decisions, and one
-        /// number offering "+1 attack" cannot say which of them it is buying. An augment on the common
-        /// count is inert here on purpose — the two ends are moved by records that name them.
-        /// </summary>
+        /// <summary>The series is a RANGE, so the ability owns no <see cref="AbilityParameter.Attacks"/>:
+        /// one number cannot say which end a record is buying.</summary>
         public static class Parameters
         {
             public const string MinAttacks = nameof(MinAttacks);

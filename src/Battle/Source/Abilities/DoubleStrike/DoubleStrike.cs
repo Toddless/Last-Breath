@@ -19,7 +19,7 @@ namespace Battle.Source.Abilities.DoubleStrike
     public class DoubleStrike(AbilityBaseData data) : DamagingAbility(data)
     {
         public int DebuffDuration => (int)this[Parameters.DebuffDuration];
-        public int DebuffMaxStacks => (int)this[Parameters.DebuffMaxStacks];
+        public int DebuffMaxStacks => (int)this[AbilityParameter.Stacks];
         public float SecondDamage => this[Parameters.SecondDamage];
         public float SecondWeaponScale => this[Parameters.SecondWeaponScale];
         public float SecondSpellScale => this[Parameters.SecondSpellScale];
@@ -39,13 +39,10 @@ namespace Battle.Source.Abilities.DoubleStrike
             public const string ArmorReduce = nameof(ArmorReduce);
             public const string EvadeReduce = nameof(EvadeReduce);
 
-            /// <summary>How long the strikes' debuff holds on the TARGET. Not the book's
-            /// <see cref="AbilityParameter.Duration"/>, which is the buff a cast lays on its caster:
-            /// what a blow leaves on its victim and what a caster wears are two axes, and an augment
-            /// offering a longer buff has no business lengthening a debuff.</summary>
+            /// <summary>How long the strikes' debuff holds on the TARGET — not the caster-side
+            /// <see cref="AbilityParameter.Duration"/>.</summary>
             public const string DebuffDuration = nameof(DebuffDuration);
 
-            public const string DebuffMaxStacks = nameof(DebuffMaxStacks);
             public const string HealthRestore = nameof(HealthRestore);
             public const string ManaRestore = nameof(ManaRestore);
         }
@@ -53,13 +50,14 @@ namespace Battle.Source.Abilities.DoubleStrike
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(Parameters.SecondDamage, 60f);
             parameters.RegisterDefault(Parameters.SecondWeaponScale, 1f);
             parameters.RegisterDefault(Parameters.SecondSpellScale, 0.25f);
             parameters.RegisterDefault(Parameters.ArmorReduce, 0.15f);
             parameters.RegisterDefault(Parameters.EvadeReduce, 0.15f);
             parameters.RegisterDefault(Parameters.DebuffDuration, 3);
-            parameters.RegisterDefault(Parameters.DebuffMaxStacks, 3);
+            parameters.RegisterDefault(AbilityParameter.Stacks, 3);
             parameters.RegisterDefault(AbilityParameter.DamageMultiplier, 1f);
             parameters.RegisterDefault(Parameters.HealthRestore, 0f);
             parameters.RegisterDefault(Parameters.ManaRestore, 0f);
@@ -109,7 +107,7 @@ namespace Battle.Source.Abilities.DoubleStrike
                 }
 
                 if (firstLanded && secondLanded && BothHitsBuffFactory != null)
-                    await BothHitsBuffFactory().Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
+                    await BothHitsBuffFactory().Apply(Laying(owner));
             }
         }
 
@@ -122,7 +120,7 @@ namespace Battle.Source.Abilities.DoubleStrike
         }
 
         private async Task ApplyDebuff(IEffect debuff, IFightable owner, IFightable target) =>
-            await debuff.Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId });
+            await debuff.Apply(Laying(target));
 
         private void RestoreHealth(IFightable owner)
         {

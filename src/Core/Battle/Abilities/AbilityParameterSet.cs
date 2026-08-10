@@ -113,6 +113,11 @@ namespace Core.Battle.Abilities
             return Working(decorators, value).Aggregate(value, (current, decorator) => decorator.Decorate(current));
         }
 
+        /// <summary>The parameter's value, or the given figure when the ability never declared it, with
+        /// no report either way — for concepts where absence is an answer rather than a typo.</summary>
+        public float ValueOr(string parameter, float fallback) =>
+            _baseValues.ContainsKey(parameter) ? GetValue(parameter) : fallback;
+
         public void AddDecorator(AbilityParameterDecorator newDecorator)
         {
             // A decorator on a key nobody registered would never be read — that is a data/upgrade typo.

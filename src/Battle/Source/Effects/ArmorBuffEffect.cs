@@ -8,11 +8,12 @@ namespace Battle.Source.Effects
         : ParameterChangeEffect(id: "Effect_Armor_Buff",
             duration,
             maxStacks,
-            value: 1 + value,
+            value,
             parameter: EntityParameter.Armor,
             type: OperationType.Multiply,
             priority: Priority.Weak,
-            statusEffect: StatusEffects.None)
+            statusEffect: StatusEffects.None,
+            shape: EffectValueShape.ShareGained)
     {
         // Copy takes the primary-ctor value, not the transformed base Value — re-transforming would double it.
         public override IEffect Copy() => new ArmorBuffEffect(Duration, MaxStacks, value);

@@ -78,6 +78,10 @@
         public int ExtensionBudget => _extensionBudget ??= ResolveExtensionBudget();
 
         public string Source { get; private set; } = string.Empty;
+
+        /// <summary>Effectiveness of the cast that laid this instance; one for anything not laid by a
+        /// cast. Descendants that derive numbers BEFORE <c>base.Apply</c> stamp it themselves.</summary>
+        public float Effectiveness { get; protected set; } = 1f;
         public bool Expired => Duration == 0;
         public string Description => FormatDescription();
         public string DisplayName => Localization.Localize(Id);
@@ -86,6 +90,10 @@
 
         public virtual Task Apply(EffectApplyingContext context)
         {
+            // Stamped before anything reads a number off this instance — including the mutator
+            // pipelines below, which see the effect as it will actually land.
+            Effectiveness = context.Effectiveness;
+
             // Caster-side application pipeline: item/passive mutators tune the instance
             // (duration, DoT tick) before the stacking rules see it. Descendants have already
             // derived their numbers from the applying context at this point.
@@ -179,6 +187,15 @@
         public virtual bool IsStronger(IEffect otherEffect) => false;
 
         public abstract IEffect Copy();
+
+        /// <summary>What an authored figure is worth on this instance — the ONE place effectiveness is
+        /// applied. Durations and stacks are separate axes and never come through here.</summary>
+        protected float Effective(EffectValue value, EffectValueShape shape = EffectValueShape.Plain) => shape switch
+        {
+            EffectValueShape.ShareGained => 1f + (value.Authored * Effectiveness),
+            EffectValueShape.ShareLost => MathF.Max(0f, 1f - (value.Authored * Effectiveness)),
+            _ => value.Authored * Effectiveness
+        };
 
         /// <summary>
         /// Subscribes to a combat event bus;  protected void SubscribeUntilRemoved<T>(ICombatEventBus bus, Action<T> handler)

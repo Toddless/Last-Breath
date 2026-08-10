@@ -18,11 +18,11 @@ namespace Battle.Source.Effects
     /// </summary>
     public class IceAegisEffect(
         int duration,
-        float amount,
+        EffectValue amount,
         Func<IEffect>? attackerEffectFactory = null,
         Action? onBarrierBroken = null,
-        float reflectPercent = 0,
-        float healPerTurnPercent = 0)
+        EffectValue reflectPercent = default,
+        EffectValue healPerTurnPercent = default)
         : Effect(id: "Effect_Ice_Aegis", duration, maxStacks: 1)
     {
         private float _granted;
@@ -34,10 +34,10 @@ namespace Battle.Source.Effects
             if (!IsApplied || Target == null) return;
 
             float before = Target.CurrentBarrier;
-            Target.CurrentBarrier += amount;
+            Target.CurrentBarrier += Effective(amount);
             _granted = Target.CurrentBarrier - before; // MaxBarrier may clamp the grant
             Target.CurrentBarrierChanged += OnBarrierChanged;
-            if (attackerEffectFactory != null || reflectPercent > 0)
+            if (attackerEffectFactory != null || Effective(reflectPercent) > 0)
                 SubscribeUntilRemoved<DamageTakenEvent>(Target.CombatEvents, OnDamageTaken);
         }
 
@@ -57,8 +57,8 @@ namespace Battle.Source.Effects
 
         public override void TurnEnd()
         {
-            if (Target != null && healPerTurnPercent > 0)
-                Target.Heal(new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * healPerTurnPercent });
+            if (Target != null && Effective(healPerTurnPercent) > 0)
+                Target.Heal(new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * Effective(healPerTurnPercent) });
             base.TurnEnd();
         }
 
@@ -82,9 +82,15 @@ namespace Battle.Source.Effects
             if (attacker.IsSame(Target.InstanceId) || !attacker.IsAlive) return;
 
             if (attackerEffectFactory != null)
-                _ = attackerEffectFactory().Apply(new EffectApplyingContext { Caster = Target, Target = attacker, Source = InstanceId });
+                // The stack the aegis puts on its attacker is content the AEGIS lays, so it lands as
+                // hard as the cast that raised the aegis did: the effectiveness travels on, one step
+                // further from the ability, exactly as it would if the cast had applied it directly.
+                _ = attackerEffectFactory().Apply(new EffectApplyingContext
+                {
+                    Caster = Target, Target = attacker, Source = InstanceId, Effectiveness = Effectiveness
+                });
 
-            float reflected = context.AbsorbedByBarrier * reflectPercent;
+            float reflected = context.AbsorbedByBarrier * Effective(reflectPercent);
             if (reflected <= 0) return;
             var reflection = new DamageContext { Source = Target, Cause = DamageCause.Effect };
             reflection.Add(DamageType.Cold, reflected);

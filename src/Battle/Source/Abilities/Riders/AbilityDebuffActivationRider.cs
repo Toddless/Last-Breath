@@ -16,13 +16,13 @@
             var copy = debuff.Copy();
             if (applyOnSelf)
             {
-                await copy.Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster });
+                await copy.Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster, Effectiveness = context.Ability.Effectiveness });
                 return;
             }
 
             foreach (var applyingContext in context.Targets
                          .Select(contextTarget =>
-                             new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = contextTarget }))
+                             new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = contextTarget, Effectiveness = context.Ability.Effectiveness }))
             {
                 var clone = debuff.Copy();
                 await clone.Apply(applyingContext);

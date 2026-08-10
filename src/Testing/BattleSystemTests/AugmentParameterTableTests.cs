@@ -26,7 +26,7 @@ namespace LastBreathTest.BattleSystemTests
     public class AugmentParameterTableTests
     {
         /// <summary>How many records the table took over from a class of their own.</summary>
-        private const int TranslatedRecords = 50;
+        private const int TranslatedRecords = 51;
 
         /// <summary>Two bases every move is measured on. One of them has to be something other than
         /// nothing: an override and an addition are the same number on a base of zero, and a walk that
@@ -91,6 +91,7 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Additional_Projectiles", "ProjectileCount", OperationType.Add, 2f),
             ("Augment_Buff_Effectiveness", "Effectiveness", OperationType.Add, 0.25f),
             ("Augment_Recovery_Effectiveness", "Effectiveness", OperationType.Add, 0.35f),
+            ("Augment_Debuff_Effectiveness", "Effectiveness", OperationType.Add, 0.25f),
 
             ("Ability_Is_Augment_Additional_Scales", "WeaponDamageScale", OperationType.Add, 0.05f),
             ("Ability_Is_Augment_Additional_Scales", "SpellDamageScale", OperationType.Add, 0.15f),
@@ -98,7 +99,7 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Is_Augment_Additional_Crit_Chance", "CriticalChanceBonus", OperationType.Add, 0.35f),
 
             ("Ability_Ib_Augment_Withering_Value", "WitheringValue", OperationType.Add, 0.05f),
-            ("Ability_Ib_Augment_Withering_Stacks", "WitheringMaxStacks", OperationType.Add, 1f),
+            ("Ability_Ib_Augment_Withering_Stacks", "Stacks", OperationType.Add, 1f),
             ("Ability_Ib_Augment_Extra_Block_Damage", "ExtraBlockDamagePercent", OperationType.Add, 0.25f),
             ("Ability_Ib_Augment_Heavy_Blocks", "Damage", OperationType.Add, 150f),
             ("Ability_Ib_Augment_Heavy_Blocks", "WeaponDamageScale", OperationType.Add, 0.15f),

@@ -23,12 +23,12 @@ namespace Battle.Source.Abilities.Riders
         public async Task Apply(IAbilityActivationContext context)
         {
             if (applyOnCaster)
-                await effectFactory().Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster });
+                await effectFactory().Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster, Effectiveness = context.Ability.Effectiveness });
 
             if (!applyOnTargets) return;
 
             foreach (var target in context.Targets)
-                await effectFactory().Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = target });
+                await effectFactory().Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = target, Effectiveness = context.Ability.Effectiveness });
         }
     }
 }

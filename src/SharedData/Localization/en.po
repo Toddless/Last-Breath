@@ -2845,6 +2845,12 @@ msgstr "Recovery Effectiveness"
 msgid "Augment_Recovery_Effectiveness_Description"
 msgstr "Increases the effectiveness of the recovery by {effectiveness:%}."
 
+msgid "Augment_Debuff_Effectiveness"
+msgstr "Debuff Effectiveness"
+
+msgid "Augment_Debuff_Effectiveness_Description"
+msgstr "Increases the effectiveness of the debuff by {effectiveness:%}."
+
 msgid "Ability_Ip_Augment_Unevadable"
 msgstr "Unevadable"
 

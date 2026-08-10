@@ -5,14 +5,14 @@ namespace Battle.Source.Effects
     using Core.Enums;
 
     public class HealthRegenerationEffect(
-        float percentRegeneration,
+        EffectValue percentRegeneration,
         int duration,
         int maxStacks,
         string id = "Effect_Percent_Health_Regeneration",
         StatusEffects statusEffect = StatusEffects.Regeneration)
         : Effect(id, duration, maxStacks, statusEffect)
     {
-        public float PercentRegeneration { get; } = percentRegeneration;
+        public float PercentRegeneration => Effective(percentRegeneration);
 
         public override void TurnEnd()
         {
@@ -22,6 +22,6 @@ namespace Battle.Source.Effects
             base.TurnEnd();
         }
 
-        public override IEffect Copy() => new HealthRegenerationEffect(PercentRegeneration, Duration, MaxStacks, Id, Status);
+        public override IEffect Copy() => new HealthRegenerationEffect(percentRegeneration, Duration, MaxStacks, Id, Status);
     }
 }

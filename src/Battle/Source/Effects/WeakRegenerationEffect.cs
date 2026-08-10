@@ -8,11 +8,12 @@ namespace Battle.Source.Effects
         : ParameterChangeEffect(id: "Effect_Weak_Regeneration",
             duration,
             maxStacks,
-            value: 1 + value,
+            value,
             parameter: EntityParameter.HealthRecovery,
             type: OperationType.Multiply,
             priority: Priority.Weak,
-            statusEffect: StatusEffects.Regeneration)
+            statusEffect: StatusEffects.Regeneration,
+            shape: EffectValueShape.ShareGained)
     {
         // Copy takes the primary-ctor value, not the transformed base Value — re-transforming would double it.
         public override IEffect Copy() => new WeakRegenerationEffect(Duration, MaxStacks, value);

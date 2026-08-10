@@ -6,7 +6,7 @@ namespace Battle.Source.Effects
     using Core.Modifiers.Context;
 
     /// <summary>Debuff: reduces all incoming healing on the target by <c>reduceBy</c> (0..1).</summary>
-    public class HealReductionEffect(int duration, int maxStacks, float reduceBy)
+    public class HealReductionEffect(int duration, int maxStacks, EffectValue reduceBy)
         : Effect(id: "Effect_Heal_Reduction", duration, maxStacks)
     {
         public override bool IsHarmful => true;
@@ -16,7 +16,7 @@ namespace Battle.Source.Effects
         public override async Task Apply(EffectApplyingContext context)
         {
             await base.Apply(context);
-            _modifier = new HealReductionContextModifier(reduceBy);
+            _modifier = new HealReductionContextModifier(Effective(reduceBy));
             Target?.ModifierHandler.Add(_modifier);
         }
 

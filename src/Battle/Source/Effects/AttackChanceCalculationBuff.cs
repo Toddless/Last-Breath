@@ -11,7 +11,7 @@ namespace Battle.Source.Effects
     /// all), but boosts
     /// <see cref="EntityParameter.AdditionalHitChance"/> instead of critical chance.
     /// </summary>
-    public class AttackChanceCalculationBuff(int duration, int maxStacks, float value)
+    public class AttackChanceCalculationBuff(int duration, int maxStacks, EffectValue value)
         : ParameterChangeEffect(
             id: "Effect_Attack_Chance_Calculation_Buff",
             duration,
@@ -36,6 +36,6 @@ namespace Battle.Source.Effects
             if (evt.Context.IsCritical) Extend(1);
         }
 
-        public override IEffect Copy() => new AttackChanceCalculationBuff(Duration, MaxStacks, Value);
+        public override IEffect Copy() => new AttackChanceCalculationBuff(Duration, MaxStacks, Authored);
     }
 }

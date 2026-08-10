@@ -36,10 +36,8 @@ namespace Battle.Source.Abilities.Overload
         {
             public const string ManaBurnPercent = nameof(ManaBurnPercent);
 
-            /// <summary>Damage multiplier granted per step of absorbed mana — and granted to the NEXT
-            /// ability cast, not to this one. Not the book's
-            /// <see cref="AbilityParameter.DamageMultiplier"/> for that reason alone: this cast deals no
-            /// damage at all, and the figure is a rate rather than a factor.</summary>
+            /// <summary>Damage multiplier granted per step of absorbed mana to the NEXT ability — a rate,
+            /// and this cast deals no damage of its own.</summary>
             public const string DamagePerStep = nameof(DamagePerStep);
 
             public const string ManaPerStep = nameof(ManaPerStep);

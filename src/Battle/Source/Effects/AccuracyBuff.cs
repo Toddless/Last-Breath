@@ -9,7 +9,7 @@ namespace Battle.Source.Effects
     public class AccuracyBuff(
         int duration,
         int maxStacks,
-        float value)
+        EffectValue value)
         : ParameterChangeEffect(
             id: "Effect_Accuracy_Buff",
             duration,
@@ -20,6 +20,6 @@ namespace Battle.Source.Effects
             priority: Priority.Weak,
             statusEffect: StatusEffects.None)
     {
-        public override IEffect Copy() => new AccuracyBuff(Duration, MaxStacks, Value);
+        public override IEffect Copy() => new AccuracyBuff(Duration, MaxStacks, Authored);
     }
 }

@@ -8,13 +8,15 @@ namespace Battle.Source.Effects
         : ParameterChangeEffect(id: "Effect_Mind_Drain",
             duration,
             maxStacks,
-            value: 1 - value,
+            value,
             parameter: EntityParameter.ManaRecovery,
             type: OperationType.Multiply,
             priority: Priority.Weak,
-            statusEffect: StatusEffects.None)
+            statusEffect: StatusEffects.None,
+            shape: EffectValueShape.ShareLost)
     {
-        // Copy takes the primary-ctor value, not the transformed base Value — re-inverting would flip it.
+        // Copy takes the authored share LOST, not the share left standing: the base scales before it
+        // inverts, and a copy fed the inverted figure would invert it a second time.
         public override IEffect Copy() => new MindDrainEffect(Duration, MaxStacks, value);
     }
 }

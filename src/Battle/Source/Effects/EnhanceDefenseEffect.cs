@@ -7,7 +7,7 @@ namespace Battle.Source.Effects
     /// "Усиленная защита" — additively raises the bearer's critical-damage mitigation
     /// (reduces incoming critical damage). Additive across stacks.
     /// </summary>
-    public class EnhanceDefenseEffect(int duration, int maxStacks, float value)
+    public class EnhanceDefenseEffect(int duration, int maxStacks, EffectValue value)
         : ParameterChangeEffect(
             id: "Effect_Enhance_Defense",
             duration,
@@ -18,6 +18,6 @@ namespace Battle.Source.Effects
             priority: Priority.Weak,
             statusEffect: StatusEffects.None)
     {
-        public override IEffect Copy() => new EnhanceDefenseEffect(Duration, MaxStacks, Value);
+        public override IEffect Copy() => new EnhanceDefenseEffect(Duration, MaxStacks, Authored);
     }
 }

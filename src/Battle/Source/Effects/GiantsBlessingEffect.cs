@@ -9,11 +9,12 @@ namespace Battle.Source.Effects
         : ParameterChangeEffect(id: "Effect_Giants_Blessing",
             duration,
             maxStacks,
-            value: 1 + value,
+            value,
             parameter: EntityParameter.Health,
             type: OperationType.Multiply,
             priority: Priority.Weak,
-            statusEffect: StatusEffects.None)
+            statusEffect: StatusEffects.None,
+            shape: EffectValueShape.ShareGained)
     {
         // Copy takes the primary-ctor value, not the transformed base Value — re-transforming would double it.
         public override IEffect Copy() => new GiantsBlessingEffect(Duration, MaxStacks, value);

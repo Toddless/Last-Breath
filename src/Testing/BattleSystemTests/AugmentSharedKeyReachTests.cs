@@ -1,10 +1,17 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using System;
+    using System.Reflection;
     using System.Text;
+    using System.Threading.Tasks;
     using Battle.Source.Abilities;
+    using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
+    using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
+    using Moq;
 
     /// <summary>
     /// Where every record standing on a shared key actually lands, written out. A record reaches an
@@ -31,6 +38,57 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>The move a probe makes on the key to find out whether anything reads it. Any figure
         /// would do — what is measured is that the number moved at all.</summary>
         private const float Probe = 7f;
+
+        /// <summary>Health, mana and barrier the probe fighters carry: enough that no cast is refused
+        /// for want of a resource and no figure is clamped by a pool that ran out.</summary>
+        private const float ProbeVitals = 10000f;
+
+        /// <summary>
+        /// Abilities whose payload a bare cast cannot reach, so the walk below cannot speak for them.
+        /// Double Strike lays its debuffs off REAL attacks, and an attack needs the engine's own roll
+        /// face — which nothing outside Godot may build. Written out rather than skipped silently: the
+        /// walk asserts these lay nothing at all, so an ability that becomes reachable turns up here
+        /// instead of quietly staying unmeasured.
+        /// </summary>
+        private static readonly string[] s_beyondTheProbe = ["Ability_Double_Strike"];
+
+        /// <summary>
+        /// Where a record is knowingly worth more than it charges: the ability reads one of its moves
+        /// and has no concept for the other, and the owner looked at that and let it stand. Written out
+        /// per record so a NEW half-arrival still fails — none of these three counts what it lays, so
+        /// "+effectiveness for two stacks" costs them nothing.
+        /// </summary>
+        private static readonly Dictionary<string, string[]> s_knowinglyFree = new(StringComparer.Ordinal)
+        {
+            ["Augment_Add_Effectiveness_Reduce_Stacks"] =
+                ["Ability_Ares_Blessing", "Ability_Jar_Of_Poison", "Ability_Poison_Coating"]
+        };
+
+        private static IEnumerable<string> Accepted(string augmentId) =>
+            s_knowinglyFree.TryGetValue(augmentId, out string[]? abilities) ? abilities : [];
+
+        /// <summary>Every gate open and every stage reached: the walk needs the cast to lay everything
+        /// it has, because a payload the dice withheld would read as a payload nothing scales.</summary>
+        private sealed class SteadyRoll : IRandomNumberGenerator
+        {
+            public float RandFloat() => 0f;
+
+            public float RandFloatRange(float min, float max) => max;
+
+            public int RandIntRange(int min, int max) => min;
+
+            public float RandFloatN(float mean, float deviation) => mean;
+
+            public uint RandInt() => 0;
+
+            public long RandWeighted(float[] weights) => 0;
+
+            public long RandWeighted(ReadOnlySpan<float> weights) => 0;
+
+            public void Randomize()
+            {
+            }
+        }
 
         /// <summary>
         /// Every move a shipped record makes on a shared key, and the two lists that move comes to:
@@ -104,32 +162,36 @@ namespace LastBreathTest.BattleSystemTests
             // one offer and the better works. What separates them is which abilities are offered the
             // deal — tags, not keys, which is the whole segmentation of the family.
             ("Augment_Buff_Effectiveness", AbilityParameter.Effectiveness,
-                ["Ability_Critical_Calculation", "Ability_Dark_Shroud"],
-                ["Ability_Ares_Blessing", "Ability_Ice_Aegis", "Ability_Poison_Coating", "Ability_Porcupine",
-                 "Ability_Sacrifice", "Ability_Static_Armor"]),
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
+                 "Ability_Poison_Coating"],
+                ["Ability_Porcupine", "Ability_Sacrifice", "Ability_Static_Armor"]),
 
             ("Augment_Recovery_Effectiveness", AbilityParameter.Effectiveness,
-                ["Ability_Dark_Shroud"], ["Ability_Ares_Blessing"]),
+                ["Ability_Ares_Blessing", "Ability_Dark_Shroud"], []),
+
+            // The record the debuff tag was handed out for: it reaches the four abilities that lay
+            // something on their target and read how strongly it lands, and nothing else in the book.
+            ("Augment_Debuff_Effectiveness", AbilityParameter.Effectiveness,
+                ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block"], []),
 
             ("Augment_More_Stacks_More_Cost", AbilityParameter.Stacks,
-                ["Ability_Critical_Calculation", "Ability_Dark_Shroud"],
-                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Double_Strike",
-                 "Ability_Ice_Aegis", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine",
-                 "Ability_Static_Armor"]),
+                ["Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Double_Strike",
+                 "Ability_Ice_Aegis"],
+                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
+                 "Ability_Porcupine", "Ability_Static_Armor"]),
 
             // Both halves of one bargain, so both lists have to be the SAME list: an ability where the
             // stacks come off and the effectiveness does not is charged for nothing.
             ("Augment_Add_Effectiveness_Reduce_Stacks", AbilityParameter.Stacks,
-                ["Ability_Critical_Calculation", "Ability_Dark_Shroud"],
-                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Double_Strike",
-                 "Ability_Ice_Aegis", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine",
-                 "Ability_Static_Armor"]),
+                ["Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Double_Strike",
+                 "Ability_Ice_Aegis"],
+                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
+                 "Ability_Porcupine", "Ability_Static_Armor"]),
 
             ("Augment_Add_Effectiveness_Reduce_Stacks", AbilityParameter.Effectiveness,
-                ["Ability_Critical_Calculation", "Ability_Dark_Shroud"],
-                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Double_Strike",
-                 "Ability_Ice_Aegis", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine",
-                 "Ability_Static_Armor"]),
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze",
+                 "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison", "Ability_Poison_Coating"],
+                ["Ability_Berserk_Fury", "Ability_Porcupine", "Ability_Static_Armor"]),
         ];
 
         [TestMethod]
@@ -154,6 +216,51 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public async Task EveryAbilityThatDeclaresEffectivenessLaysSomethingThatReadsIt()
+        {
+            // The gap this walk exists for. Declaring the key and reading it are two different acts, and
+            // between them a record can be offered, fitted, seated and PAID for while moving nothing at
+            // all: the parameter shows a decorator, the multiplier reaches the effect, and every figure
+            // the effect carries was written as a plain number that never asks for it. The Ice Aegis
+            // shipped in exactly that state — two records worked on it by every measure except the only
+            // one that matters.
+            //
+            // So the cast is actually run, and what is looked for among the effects it left standing is
+            // an EffectValue: a figure that CANNOT be read except through the multiplier. Holding one is
+            // the whole of the claim, because the type is the only way to build such a figure and the
+            // only way to spend it is to ask the effect for it.
+            AbilityProvider registry = ShippedAbilityData.Abilities();
+            List<string> declaring = [];
+
+            foreach (string abilityId in registry.KnownAbilityIds.Where(id => !registry.IsHidden(id)).OrderBy(id => id, StringComparer.Ordinal))
+                if (Moves(registry.CreateAbility(abilityId), AbilityParameter.Effectiveness))
+                    declaring.Add(abilityId);
+
+            Assert.IsTrue(declaring.Count > 0, "no ability declares effectiveness, so this walk proves nothing");
+
+            foreach (string abilityId in declaring)
+            {
+                List<IEffect> laid = await LaidBy(registry, abilityId);
+
+                if (s_beyondTheProbe.Contains(abilityId, StringComparer.Ordinal))
+                {
+                    Assert.AreEqual(0, laid.Count,
+                        $"'{abilityId}' is written off as unreachable by this harness and it laid something anyway — "
+                        + "take it off the list and let the walk measure it");
+                    continue;
+                }
+
+                Assert.IsTrue(laid.Count > 0,
+                    $"'{abilityId}' laid no effect at all: either its payload moved out of reach of a bare cast "
+                    + "(then name it below and say why) or it stopped laying anything");
+                Assert.IsTrue(laid.Exists(HoldsAScalableFigure),
+                    $"'{abilityId}' declares effectiveness and every figure of what it lays is a plain number — "
+                    + $"a record on that key is worn and paid for there and moves nothing. Laid: "
+                    + string.Join(", ", laid.Select(effect => effect.Id).Distinct(StringComparer.Ordinal)));
+            }
+        }
+
+        [TestMethod]
         public void ARecordThatMovesSeveralSharedKeysWorksOnTheSameAbilitiesThroughAllOfThem()
         {
             // A record made of several moves is one bargain, and an ability where only some of them
@@ -161,7 +268,9 @@ namespace LastBreathTest.BattleSystemTests
             // is what the record CHARGES, the leftover is a bill with nothing behind it — which is how
             // "+35% effectiveness for two stacks" spent a wave taking two stacks off an ability that
             // never read effectiveness. The claim below is not about any one record: any record whose
-            // moves come apart between abilities is the same bug wearing a different id.
+            // moves come apart between abilities is the same bug wearing a different id — except where
+            // the owner looked at a particular ability and accepted the arrival as it is, which is
+            // written out in s_knowinglyFree and nowhere else.
             var byRecord = s_reach.GroupBy(row => row.Augment, StringComparer.Ordinal).Where(group => group.Count() > 1);
 
             foreach (IGrouping<string, (string Augment, string Parameter, string[] Works, string[] Inert)> record in byRecord)
@@ -169,10 +278,18 @@ namespace LastBreathTest.BattleSystemTests
                 (_, string firstKey, string[] first, _) = record.First();
 
                 foreach ((_, string parameter, string[] works, _) in record.Skip(1))
-                    Assert.IsTrue(first.OrderBy(id => id, StringComparer.Ordinal)
-                            .SequenceEqual(works.OrderBy(id => id, StringComparer.Ordinal), StringComparer.Ordinal),
-                        $"'{record.Key}' arrives in halves: it moves '{firstKey}' on [{string.Join(", ", first)}] "
-                        + $"but '{parameter}' on [{string.Join(", ", works)}]");
+                {
+                    List<string> apart =
+                    [
+                        .. first.Except(works, StringComparer.Ordinal),
+                        .. works.Except(first, StringComparer.Ordinal)
+                    ];
+                    List<string> unaccounted = [.. apart.Except(Accepted(record.Key), StringComparer.Ordinal)];
+
+                    Assert.AreEqual(0, unaccounted.Count,
+                        $"'{record.Key}' arrives in halves on [{string.Join(", ", unaccounted)}]: it moves '{firstKey}' "
+                        + $"on [{string.Join(", ", first)}] but '{parameter}' on [{string.Join(", ", works)}]");
+                }
             }
         }
 
@@ -206,6 +323,61 @@ namespace LastBreathTest.BattleSystemTests
             float before = ability[parameter];
             new AbilityUpgradeParameterSet("Augment_Reach_Probe", [], 3, [(parameter, OperationType.Add, Probe)]).Apply(ability);
             return Math.Abs(ability[parameter] - before) > 0.0001f;
+        }
+
+        /// <summary>Everything one cast of the ability left standing, on its caster and on the field.</summary>
+        private static async Task<List<IEffect>> LaidBy(AbilityProvider registry, string abilityId)
+        {
+            using var rolls = new CombatRandomScope(new SteadyRoll());
+            var caster = Fighter();
+            var enemy = Fighter();
+            IAbility ability = registry.CreateAbility(abilityId);
+            ability.SetOwner(caster);
+
+            await ability.Execute([enemy], FieldOf(caster, enemy));
+
+            return [.. caster.Effects.Effects, .. enemy.Effects.Effects];
+        }
+
+        /// <summary>Whether the effect carries at least one figure typed so that it cannot be read
+        /// without the multiplier. Fields as well as properties, and private ones too: a primary
+        /// constructor's parameter is captured as a private field and is the usual place such a figure
+        /// lives.</summary>
+        private static bool HoldsAScalableFigure(IEffect effect)
+        {
+            for (Type? type = effect.GetType(); type != null; type = type.BaseType)
+            {
+                const BindingFlags Declared = BindingFlags.Public | BindingFlags.NonPublic
+                    | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
+                if (type.GetFields(Declared).Any(field => field.FieldType == typeof(EffectValue))) return true;
+                if (type.GetProperties(Declared).Any(property => property.PropertyType == typeof(EffectValue))) return true;
+            }
+
+            return false;
+        }
+
+        private static ConditionOwner Fighter()
+        {
+            var fighter = new ConditionOwner();
+            fighter.SetMaximum(EntityParameter.Health, ProbeVitals);
+            fighter.SetMaximum(EntityParameter.Mana, ProbeVitals);
+            fighter.SetMaximum(EntityParameter.Barrier, ProbeVitals);
+            fighter.CurrentHealth = ProbeVitals;
+            fighter.CurrentMana = ProbeVitals;
+
+            return fighter;
+        }
+
+        private static IBattleField FieldOf(IFightable owner, params IFightable[] enemies)
+        {
+            var field = new Mock<IBattleField>();
+            field.Setup(battlefield => battlefield.GetEnemies(It.IsAny<IFightable>())).Returns(enemies);
+            field.Setup(battlefield => battlefield.GetAllies(It.IsAny<IFightable>())).Returns([owner]);
+            field.Setup(battlefield => battlefield.GetAll()).Returns([owner, .. enemies]);
+            field.Setup(battlefield => battlefield.GetRandomEntity(It.IsAny<IFightable>())).Returns(owner);
+
+            return field.Object;
         }
 
         private static void Disagreement(StringBuilder report, string what, IReadOnlyCollection<string> written, IReadOnlyCollection<string> found)

@@ -11,18 +11,19 @@
     public class LifeGivingShadeEffect : Effect
     {
         private readonly IModifierInstance _modifier;
+        private readonly EffectValue _lifeToRecover;
 
-        public LifeGivingShadeEffect(float lifeToRecover,
+        public LifeGivingShadeEffect(EffectValue lifeToRecover,
             int duration,
             int activationAmount,
             StatusEffects statusEffect = StatusEffects.Regeneration) : base(id: "Effect_Life_Giving_Shade", duration, maxStacks: 1, statusEffect)
         {
-            LifeToRecover = lifeToRecover;
+            _lifeToRecover = lifeToRecover;
             Activations = activationAmount;
             _modifier = new SimpleModifier(EntityParameter.Evade, ModifierValueType.Increase, 0.15f, Id);
         }
 
-        public float LifeToRecover { get; }
+        public float LifeToRecover => Effective(_lifeToRecover);
         public int Activations { get; private set; }
 
         public override async Task Apply(EffectApplyingContext context)
@@ -65,6 +66,6 @@
             }
         }
 
-        public override IEffect Copy() => new LifeGivingShadeEffect(LifeToRecover, Duration, Activations, Status);
+        public override IEffect Copy() => new LifeGivingShadeEffect(_lifeToRecover, Duration, Activations, Status);
     }
 }

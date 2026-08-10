@@ -10,7 +10,7 @@ namespace Battle.Source.Effects
     /// "Обморожение": the target takes <c>coldDamageAmp</c> more Cold damage per stack.
     /// Each stack carries its own incoming-damage modifier, so stacks multiply (Fragility pattern).
     /// </summary>
-    public class FrostbiteEffect(int duration, int maxStacks, float coldDamageAmp)
+    public class FrostbiteEffect(int duration, int maxStacks, EffectValue coldDamageAmp)
         : Effect(id: "Effect_Frostbite", duration, maxStacks)
     {
         public override bool IsHarmful => true;
@@ -22,7 +22,7 @@ namespace Battle.Source.Effects
             await base.Apply(context);
             if (!IsApplied || Target == null) return; // a rejected stack must not amplify anything
 
-            _modifier = new DamageTypeTakenContextModifier(Target, DamageType.Cold, coldDamageAmp);
+            _modifier = new DamageTypeTakenContextModifier(Target, DamageType.Cold, Effective(coldDamageAmp));
             Target.ModifierHandler.Add(_modifier);
         }
 

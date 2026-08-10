@@ -39,19 +39,15 @@ namespace Battle.Source.Abilities.StaticArmor
         {
             public const string DetonationDamage = nameof(DetonationDamage);
 
-            /// <summary>Scales of the DETONATION, which is not the cast. The cast itself lays a buff and
-            /// deals nothing, so the book's <see cref="AbilityParameter.WeaponDamageScale"/> and
-            /// <see cref="AbilityParameter.SpellDamageScale"/> here would be scales on no damage; these
-            /// belong to a blow that happens turns later off somebody else's attacks.</summary>
+            /// <summary>Scales of the DETONATION, which happens turns later off somebody else's attacks;
+            /// the cast itself deals nothing.</summary>
             public const string DetonationWeaponScale = nameof(DetonationWeaponScale);
 
             /// <inheritdoc cref="DetonationWeaponScale"/>
             public const string DetonationSpellScale = nameof(DetonationSpellScale);
 
-            /// <summary>How many Charge stacks a target must carry before it detonates — a THRESHOLD,
-            /// and the only number here that is better when it is smaller. Not the book's
-            /// <see cref="AbilityParameter.Stacks"/> (stacks a cast lays on its caster) in either
-            /// meaning or direction: a record offering "one more stack" would be selling a delay.</summary>
+            /// <summary>Threshold of Charge stacks before detonation — smaller is better, so not
+            /// <see cref="AbilityParameter.Stacks"/> in meaning or direction.</summary>
             public const string RequiredStacks = nameof(RequiredStacks);
 
             public const string ChargeDuration = nameof(ChargeDuration);

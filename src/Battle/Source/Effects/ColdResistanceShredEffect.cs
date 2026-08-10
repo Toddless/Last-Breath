@@ -5,7 +5,7 @@ namespace Battle.Source.Effects
 
     /// <summary>Deep Freeze stage-2 payload: reduces the target's cold resistance by <c>value</c>
     /// (0.25 = −25 percentage points) per stack.</summary>
-    public class ColdResistanceShredEffect(int duration, int maxStacks, float value)
+    public class ColdResistanceShredEffect(int duration, int maxStacks, EffectValue value)
         : ParameterChangeEffect(id: "Effect_Cold_Resistance_Shred",
             duration,
             maxStacks,
@@ -17,6 +17,6 @@ namespace Battle.Source.Effects
     {
         public override bool IsHarmful => true;
 
-        public override IEffect Copy() => new ColdResistanceShredEffect(Duration, MaxStacks, Value);
+        public override IEffect Copy() => new ColdResistanceShredEffect(Duration, MaxStacks, Authored);
     }
 }

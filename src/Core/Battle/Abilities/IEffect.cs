@@ -14,6 +14,10 @@
         int MaxStacks { get; set; }
         string Source { get; }
 
+        /// <summary>Effectiveness of the cast that laid this instance, stamped on application; one for
+        /// anything not laid by a cast. Multiplies every number of the effect except duration and stacks.</summary>
+        float Effectiveness { get; }
+
         /// <summary>Buff/debuff split for the UI counters. Default false (a buff); debuff classes
         /// override. Unclassified effects count as buffs until the design pass says otherwise.</summary>
         bool IsHarmful => false;

@@ -26,6 +26,10 @@
         /// </summary>
         float this[string parameter] { get; }
 
+        /// <summary>How strongly what this cast lays lands: the decorated
+        /// <see cref="AbilityParameter.Effectiveness"/>, and ONE for an ability that never declared it.</summary>
+        float Effectiveness { get; }
+
         /// <summary>False = no backing out once target selection began: the player must pick a
         /// target and the cast fires (charged Armageddon). Default true.</summary>
         bool IsCancellable => true;

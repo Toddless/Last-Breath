@@ -105,7 +105,7 @@
         },
         {
             "id": "Ability_Double_Strike",
-            "tags": [ "attack", "damage", "scale", "evadable", "stacks", "duration" ],
+            "tags": [ "attack", "damage", "scale", "evadable", "stacks", "duration", "debuff" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 4,
@@ -121,7 +121,7 @@
                 "armorReduce": 0.15,
                 "evadeReduce": 0.15,
                 "debuffDuration": 3,
-                "debuffMaxStacks": 3
+                "stacks": 3
             }
         },
         {
@@ -224,7 +224,7 @@
         },
         {
             "id": "Ability_Ice_Block",
-            "tags": [ "spell", "cold", "stun", "control", "scale", "damage", "hit" ],
+            "tags": [ "spell", "cold", "stun", "control", "scale", "damage", "hit", "debuff" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 5,
@@ -236,7 +236,7 @@
             "abilityProperties": {
                 "stunDuration": 1,
                 "witheringDuration": 3,
-                "witheringMaxStacks": 3,
+                "stacks": 3,
                 "witheringValue": 0.15,
                 "extraBlocks": 3,
                 "extraBlockDamagePercent": 0.5
@@ -280,7 +280,7 @@
         },
         {
             "id": "Ability_Ice_Aegis",
-            "tags": [ "buff", "cold", "barrier", "stacks", "duration", "scale" ],
+            "tags": [ "buff", "cold", "barrier", "stacks", "duration", "scale", "debuff" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 9,
@@ -292,7 +292,7 @@
                 "duration": 3,
                 "stageTwoScaleBonus": 15,
                 "clumsinessDuration": 3,
-                "clumsinessMaxStacks": 5,
+                "stacks": 5,
                 "clumsinessValue": 0.15,
                 "freezeDuration": 1
             }
@@ -320,7 +320,7 @@
         },
         {
             "id": "Ability_Deep_Freeze",
-            "tags": [ "spell", "cold", "freeze", "control", "stacks", "duration" ],
+            "tags": [ "spell", "cold", "freeze", "control", "stacks", "duration", "debuff" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 6,
@@ -329,7 +329,7 @@
             "abilityProperties": {
                 "freezeDuration": 1,
                 "frostbiteDuration": 3,
-                "frostbiteMaxStacks": 8,
+                "stacks": 8,
                 "frostbiteColdAmp": 0.15,
                 "coldResistanceShred": 0.25,
                 "shredDuration": 3,
@@ -545,6 +545,14 @@
             "tags": [ "recovery", "effectiveness" ],
             "upgradeProperties": {
                 "effectiveness": 0.35
+            }
+        },
+        {
+            "id": "Augment_Debuff_Effectiveness",
+            "tier": 1,
+            "tags": [ "debuff", "effectiveness" ],
+            "upgradeProperties": {
+                "effectiveness": 0.25
             }
         },
         {

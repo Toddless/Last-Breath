@@ -6,7 +6,7 @@
     public class CriticalChanceBuffEffect(
         int duration,
         int maxStacks,
-        float value)
+        EffectValue value)
         : ParameterChangeEffect(
             id:"Effect_Critical_Chance_Buff",
             duration,
@@ -17,6 +17,6 @@
             priority: Priority.Weak,
             statusEffect: StatusEffects.None)
     {
-        public override IEffect Copy() => new CriticalChanceBuffEffect(Duration, MaxStacks, Value);
+        public override IEffect Copy() => new CriticalChanceBuffEffect(Duration, MaxStacks, Authored);
     }
 }

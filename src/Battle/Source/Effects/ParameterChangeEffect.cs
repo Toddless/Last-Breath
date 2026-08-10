@@ -9,20 +9,31 @@
     using Core.Enums;
     using Core.Localization;
 
+    /// <summary>
+    /// Changes one number of the bearer for a while — most of the book's buffs and debuffs. The
+    /// effectiveness of the cast is applied here and nowhere in the descendants; a descendant whose
+    /// authored figure is a share gained or lost says so through <paramref name="shape"/>.
+    /// </summary>
     public abstract class ParameterChangeEffect(
         string id,
         int duration,
         int maxStacks,
-        float value,
+        EffectValue value,
         EntityParameter parameter,
         OperationType type,
         Priority priority,
-        StatusEffects statusEffect = StatusEffects.None) : Effect(id, duration, maxStacks, statusEffect)
+        StatusEffects statusEffect = StatusEffects.None,
+        EffectValueShape shape = EffectValueShape.Plain) : Effect(id, duration, maxStacks, statusEffect)
     {
         private string _decoratorId = string.Empty;
 
         public EntityParameter Parameter { get; } = parameter;
-        public float Value { get; } = value;
+
+        /// <summary>The figure as authored — what a <see cref="Copy"/> hands on, so it is scaled once.</summary>
+        protected EffectValue Authored { get; } = value;
+
+        /// <summary>What the parameter is actually moved by on this instance.</summary>
+        public float Value => Effective(Authored, shape);
 
         /// <summary>The base knows everything a buff/debuff text needs: {Parameter} (localized name)
         /// and {Value} (unit-aware display value, e.g. "+5%") on top of {Duration}/{MaxStacks}.</summary>

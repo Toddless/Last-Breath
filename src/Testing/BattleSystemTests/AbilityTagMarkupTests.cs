@@ -69,6 +69,7 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Double_Strike", AbilityTags.Damage),
             ("Ability_Double_Strike", AbilityTags.Stacks),
             ("Ability_Double_Strike", AbilityTags.Duration),
+            ("Ability_Double_Strike", AbilityTags.Debuff),
 
             ("Ability_Ares_Blessing", AbilityTags.Health),
             ("Ability_Ares_Blessing", AbilityTags.Stacks),
@@ -100,16 +101,19 @@ namespace LastBreathTest.BattleSystemTests
 
             ("Ability_Ice_Block", AbilityTags.Control),
             ("Ability_Ice_Block", AbilityTags.Damage),
+            ("Ability_Ice_Block", AbilityTags.Debuff),
 
             ("Ability_Ice_Aegis", AbilityTags.Stacks),
             ("Ability_Ice_Aegis", AbilityTags.Duration),
             ("Ability_Ice_Aegis", AbilityTags.Buff),
+            ("Ability_Ice_Aegis", AbilityTags.Debuff),
 
             ("Ability_Ice_Shards", AbilityTags.Damage),
             ("Ability_Ice_Shards", AbilityTags.Projectile),
 
             ("Ability_Deep_Freeze", AbilityTags.Stacks),
             ("Ability_Deep_Freeze", AbilityTags.Duration),
+            ("Ability_Deep_Freeze", AbilityTags.Debuff),
 
             ("Ability_Discharge", AbilityTags.Damage),
 

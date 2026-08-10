@@ -4,19 +4,21 @@ namespace Battle.Source.Effects
     using Core.Enums;
 
     /// <summary>"Проклятье увядания": reduces the target's max health by <c>value</c> (0.15 = −15%) per stack.</summary>
-    public class WitheringCurseEffect(int duration, int maxStacks, float value)
+    public class WitheringCurseEffect(int duration, int maxStacks, EffectValue value)
         : ParameterChangeEffect(id: "Effect_Withering_Curse",
             duration,
             maxStacks,
-            value: 1 - value,
+            value,
             parameter: EntityParameter.Health,
             type: OperationType.Multiply,
             priority: Priority.Weak,
-            statusEffect: StatusEffects.Cursed)
+            statusEffect: StatusEffects.Cursed,
+            shape: EffectValueShape.ShareLost)
     {
         public override bool IsHarmful => true;
 
-        // Copy takes the primary-ctor value, not the transformed base Value — re-inverting would flip it.
+        // Copy takes the authored share LOST, not the share left standing: the base scales before it
+        // inverts, and a copy fed the inverted figure would invert it a second time.
         public override IEffect Copy() => new WitheringCurseEffect(Duration, MaxStacks, value);
     }
 }

@@ -25,9 +25,8 @@ namespace Battle.Source.Abilities.Riders
     /// </summary>
     public class PoisonOnHitRider : IImpactRider
     {
-        /// <summary>Keys the rider reads off the ability it is riding on. How long a stack lasts is a
-        /// concept the book shares (<see cref="AbilityParameter.PoisonDuration"/>) and is named there;
-        /// how much of a blow a tick carries belongs to this rider alone and is named here.</summary>
+        /// <summary>Keys the rider reads off the ability. Stack duration is the book's shared
+        /// <see cref="AbilityParameter.PoisonDuration"/>; the tick share belongs to this rider.</summary>
         public static class Parameters
         {
             /// <summary>Share of the impact's damage one tick of the stack carries.</summary>
@@ -53,7 +52,8 @@ namespace Battle.Source.Abilities.Riders
                 Target = impact.Target,
                 Source = InstanceId,
                 Damage = impact.Damage,
-                IsCritical = impact.IsCritical
+                IsCritical = impact.IsCritical,
+                Effectiveness = impact.Source.Effectiveness
             });
         }
     }

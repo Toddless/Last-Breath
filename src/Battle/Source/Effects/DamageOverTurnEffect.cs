@@ -12,14 +12,18 @@
         int duration,
         StatusEffects statusEffect = StatusEffects.None,
         int maxStacks = 999,
-        float percentFromDamage = 0.7f)
+        EffectValue percentFromDamage = default)
         : Effect(IdFor(statusEffect), duration, maxStacks, statusEffect), IDamageOverTurnEffect
     {
         public override bool IsHarmful => true;
 
         private const string BaseId = "Effect_Damage_Over_Turn";
+        private const float DefaultPercentFromDamage = 0.7f;
 
-        public float PercentFromBase { get; } = percentFromDamage;
+        /// <summary>Share of the blow one tick carries, as authored — <see cref="Copy"/> hands it on
+        /// unscaled. The default stands in for the parameterless struct default.</summary>
+        public EffectValue PercentFromBase { get; } =
+            percentFromDamage.Authored == 0f ? DefaultPercentFromDamage : percentFromDamage;
 
         /// <summary>Settable so effect-application mutators ("+X% burning damage") can scale the tick.</summary>
         public float DamagePerTick { get; set; }
@@ -28,8 +32,10 @@
         {
             // Copies (transfer/bounce/spread) arrive with DamagePerTick already carried over via Copy().
             // Recalculating it here would scale the damage by PercentFromBase a second time.
+            // Stamped ahead of base.Apply: the tick is derived here and the mutator pipeline below reads it.
+            Effectiveness = context.Effectiveness;
 
-            if (DamagePerTick == 0) DamagePerTick = context.Damage * PercentFromBase;
+            if (DamagePerTick == 0) DamagePerTick = context.Damage * Effective(PercentFromBase);
             await base.Apply(context);
         }
 

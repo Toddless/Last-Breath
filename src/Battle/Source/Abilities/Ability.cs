@@ -63,6 +63,8 @@
 
         public float this[string parameter] => Params[parameter];
 
+        public float Effectiveness => Params.ValueOr(AbilityParameter.Effectiveness, 1f);
+
         /// <summary>
         /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
         /// Damage-dealing descendants stamp it onto their DamageContexts so the BattleDirector
@@ -264,6 +266,12 @@
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
 
         public abstract IAbility Copy();
+
+        /// <summary>The context every effect this cast lays is applied with — one factory so no delivery
+        /// has to know about <see cref="EffectApplyingContext.Effectiveness"/>. Sites carrying more write
+        /// <c>Laying(target) with { Damage = … }</c>.</summary>
+        protected EffectApplyingContext Laying(IFightable target) =>
+            new() { Caster = Owner!, Target = target, Source = InstanceId, Effectiveness = Effectiveness };
 
         protected void ConsumeResource(IAbilityActivationContext context) => Owner?.ConsumeResource(context.CostType, context.Cost);
 

@@ -14,8 +14,7 @@ namespace Battle.Source.Abilities.PoisonCoating
     /// </summary>
     public class PoisonCoating(AbilityBaseData data) : Ability(data)
     {
-        /// <summary>How long the coating buff itself holds on the caster — the common buff duration, not
-        /// a coating-only number: an augment offering a longer buff is offering exactly this one.</summary>
+        /// <summary>How long the coating buff itself holds on the caster — the common buff duration.</summary>
         public int Duration => (int)this[AbilityParameter.Duration];
 
         public int PoisonDuration => (int)this[AbilityParameter.PoisonDuration];
@@ -29,6 +28,7 @@ namespace Battle.Source.Abilities.PoisonCoating
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(AbilityParameter.PoisonDuration, 5);
             parameters.RegisterDefault(Parameters.PoisonMultiplier, 0.45f);

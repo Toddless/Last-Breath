@@ -9,7 +9,7 @@ namespace Battle.Source.Effects
     public class AdditionalHitChanceEffect(
         int duration,
         int maxStacks,
-        float value)
+        EffectValue value)
         : ParameterChangeEffect(
             id: "Effect_Additional_Hit_Chance_Buff",
             duration,
@@ -20,6 +20,6 @@ namespace Battle.Source.Effects
             priority: Priority.Weak,
             statusEffect: StatusEffects.None)
     {
-        public override IEffect Copy() => new AdditionalHitChanceEffect(Duration, MaxStacks, Value);
+        public override IEffect Copy() => new AdditionalHitChanceEffect(Duration, MaxStacks, Authored);
     }
 }

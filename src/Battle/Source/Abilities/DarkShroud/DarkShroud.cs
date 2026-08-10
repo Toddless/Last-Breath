@@ -15,7 +15,6 @@ namespace Battle.Source.Abilities.DarkShroud
     public class DarkShroud(AbilityBaseData data) : Ability(data)
     {
         public float Duration => this[AbilityParameter.Duration];
-        public float Effectiveness => this[AbilityParameter.Effectiveness];
         public float Stacks => this[AbilityParameter.Stacks];
         public float LightStepValue => this[Parameters.LightStepValue];
         public float HealthRegen => this[Parameters.HealthRegen];
@@ -40,10 +39,10 @@ namespace Battle.Source.Abilities.DarkShroud
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
-            var context = new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId };
-            await new LightStep(Mathf.RoundToInt(Duration), Mathf.RoundToInt(Stacks), LightStepValue * Effectiveness)
+            EffectApplyingContext context = Laying(owner);
+            await new LightStep(Mathf.RoundToInt(Duration), Mathf.RoundToInt(Stacks), LightStepValue)
                 .ApplyStacks(context, Mathf.RoundToInt(Stacks));
-            await new HealthRegenerationEffect(HealthRegen * Effectiveness, Mathf.RoundToInt(Duration), 1).Apply(context);
+            await new HealthRegenerationEffect(HealthRegen, Mathf.RoundToInt(Duration), 1).Apply(context);
         }
     }
 }

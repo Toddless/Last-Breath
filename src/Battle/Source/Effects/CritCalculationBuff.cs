@@ -10,7 +10,7 @@ namespace Battle.Source.Effects
     /// duration by 1 turn each time the bearer scores a critical hit, within the instance's extension
     /// budget. (The "Lucky" mechanic is a separate L3 effect — see <see cref="LuckyCritChanceEffect"/>.)
     /// </summary>
-    public class CritCalculationBuff(int duration, int maxStacks, float value)
+    public class CritCalculationBuff(int duration, int maxStacks, EffectValue value)
         : ParameterChangeEffect(
             id: "Effect_Crit_Calculation_Buff",
             duration,
@@ -35,6 +35,6 @@ namespace Battle.Source.Effects
             if (evt.Context.IsCritical) Extend(1);
         }
 
-        public override IEffect Copy() => new CritCalculationBuff(Duration, MaxStacks, Value);
+        public override IEffect Copy() => new CritCalculationBuff(Duration, MaxStacks, Authored);
     }
 }

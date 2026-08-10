@@ -33,17 +33,12 @@ namespace Battle.Source.Abilities.DeepFreeze
         /// <summary>L2 upgrade point: every effect already on the target lasts 1 more turn.</summary>
         public bool ExtendTargetEffects { get; set; }
 
-        /// <summary>
-        /// Every duration here is an effect laid on the TARGET, and there are four of them. That is why
-        /// none is the book's <see cref="AbilityParameter.Duration"/> — that key is the buff on the
-        /// caster — and why the ability owns no single "applied effect duration" either: one number
-        /// cannot say which of four an augment is lengthening.
-        /// </summary>
+        /// <summary>Four durations of effects laid on the TARGET — none of them the caster-side
+        /// <see cref="AbilityParameter.Duration"/>, and no single one of them "the" applied duration.</summary>
         public static class Parameters
         {
             public const string FreezeDuration = nameof(FreezeDuration);
             public const string FrostbiteDuration = nameof(FrostbiteDuration);
-            public const string FrostbiteMaxStacks = nameof(FrostbiteMaxStacks);
             public const string FrostbiteColdAmp = nameof(FrostbiteColdAmp);
             public const string ColdResistanceShred = nameof(ColdResistanceShred);
             public const string ShredDuration = nameof(ShredDuration);
@@ -54,9 +49,10 @@ namespace Battle.Source.Abilities.DeepFreeze
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(Parameters.FreezeDuration, 1);
             parameters.RegisterDefault(Parameters.FrostbiteDuration, 3);
-            parameters.RegisterDefault(Parameters.FrostbiteMaxStacks, 8);
+            parameters.RegisterDefault(AbilityParameter.Stacks, 8);
             parameters.RegisterDefault(Parameters.FrostbiteColdAmp, 0.15f);
             parameters.RegisterDefault(Parameters.ColdResistanceShred, 0.25f);
             parameters.RegisterDefault(Parameters.ShredDuration, 3);
@@ -119,17 +115,17 @@ namespace Battle.Source.Abilities.DeepFreeze
         private async Task ApplyPayload(DeepFreezePlan plan, IFightable owner, IFightable target)
         {
             await new FreezeEffect(plan.FreezeDuration)
-                .Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId });
-            await new FrostbiteEffect(plan.FrostbiteDuration, (int)this[Parameters.FrostbiteMaxStacks], this[Parameters.FrostbiteColdAmp])
-                .Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId });
+                .Apply(Laying(target));
+            await new FrostbiteEffect(plan.FrostbiteDuration, (int)this[AbilityParameter.Stacks], this[Parameters.FrostbiteColdAmp])
+                .Apply(Laying(target));
 
             if (plan.ColdResistanceShred > 0)
                 await new ColdResistanceShredEffect((int)this[Parameters.ShredDuration], maxStacks: 1, plan.ColdResistanceShred)
-                    .Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId });
+                    .Apply(Laying(target));
 
             if (plan.HealReduction > 0)
                 await new HealReductionEffect((int)this[Parameters.HealReductionDuration], maxStacks: 1, plan.HealReduction)
-                    .Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId });
+                    .Apply(Laying(target));
         }
 
         /// <summary>L2 upgrade: a coin flip freezes one random enemy the cast did not touch. He is a
@@ -147,7 +143,7 @@ namespace Battle.Source.Abilities.DeepFreeze
 
             IFightable lucky = untouched[CombatRandom.Rolls.RandIntRange(0, untouched.Count - 1)];
             await new FreezeEffect(plan.FreezeDuration)
-                .Apply(new EffectApplyingContext { Caster = owner, Target = lucky, Source = InstanceId });
+                .Apply(Laying(lucky));
             await ApplyImpactRiders(new AbilityImpact(owner, lucky, field, Succeeded: true, IsCritical: false, Damage: 0)
             {
                 Source = this,
