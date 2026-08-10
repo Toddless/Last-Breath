@@ -355,7 +355,7 @@ namespace LastBreath.Npc
 
             foreach (var entry in passives)
             {
-                var skill = provider.CreateSkill(entry.Id, new Core.Battle.Skills.SkillProperties(entry.Id, entry.Properties));
+                var skill = provider.CreateSkill(entry.Id, new Core.Battle.RecordProperties(entry.Id, entry.Properties));
                 if (skill != null) PassiveSkills.AddSkill(skill);
             }
         }

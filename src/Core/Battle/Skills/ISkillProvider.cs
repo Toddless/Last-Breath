@@ -6,6 +6,6 @@ namespace Core.Battle.Skills
 
         /// <summary>Item grants pass their JSON-sourced numbers here. Providers with fixed presets
         /// (resource-based) keep the default and ignore the properties.</summary>
-        ISkill? CreateSkill(string id, SkillProperties properties) => CreateSkill(id);
+        ISkill? CreateSkill(string id, RecordProperties properties) => CreateSkill(id);
     }
 }

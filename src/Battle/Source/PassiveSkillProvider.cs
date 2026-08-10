@@ -3,6 +3,7 @@ namespace Battle.Source
     using System;
     using System.Collections.Generic;
     using Core;
+    using Core.Battle;
     using Core.Battle.Skills;
     using PassiveSkills;
 
@@ -11,7 +12,7 @@ namespace Battle.Source
     /// A missing property refuses the grant loudly instead of constructing a mis-tuned skill.</summary>
     public class PassiveSkillProvider : ISkillProvider
     {
-        private static readonly Dictionary<string, Func<SkillProperties, ISkill>> s_factories = new()
+        private static readonly Dictionary<string, Func<RecordProperties, ISkill>> s_factories = new()
         {
             ["Passive_Skill_Regeneration"] =
                 properties => new RegenerationPassiveSkill(properties.Get("percent")),
@@ -96,9 +97,9 @@ namespace Battle.Source
                 => new ResonancePassiveSkill(properties.Get("spellDamagePerStack"), properties.Get("multicastPerStack")),
         };
 
-        public ISkill? CreateSkill(string id) => CreateSkill(id, SkillProperties.Empty);
+        public ISkill? CreateSkill(string id) => CreateSkill(id, RecordProperties.Empty);
 
-        public ISkill? CreateSkill(string id, SkillProperties properties)
+        public ISkill? CreateSkill(string id, RecordProperties properties)
         {
             if (!s_factories.TryGetValue(id, out var create))
             {

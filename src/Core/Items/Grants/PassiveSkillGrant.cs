@@ -3,6 +3,7 @@ namespace Core.Items.Grants
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Battle;
     using Battle.Skills;
     using Entity;
 
@@ -20,7 +21,7 @@ namespace Core.Items.Grants
         {
             get
             {
-                field = providerAccessor()?.CreateSkill(SkillId, new SkillProperties(SkillId, Properties))?.Description ?? string.Empty;
+                field = providerAccessor()?.CreateSkill(SkillId, new RecordProperties(SkillId, Properties))?.Description ?? string.Empty;
                 return field;
             }
         }
@@ -33,7 +34,7 @@ namespace Core.Items.Grants
 
         public void Attach(IFightable owner)
         {
-            _skill = providerAccessor()?.CreateSkill(skillId, new SkillProperties(skillId, properties));
+            _skill = providerAccessor()?.CreateSkill(skillId, new RecordProperties(skillId, properties));
             if (_skill == null) return;
             owner.PassiveSkills.AddSkill(_skill);
         }
@@ -47,7 +48,7 @@ namespace Core.Items.Grants
 
         public IItemGrant Copy() => new PassiveSkillGrant(id, skillId, properties, providerAccessor);
 
-        // Properties are the numeric balance payload the skill provider consumes (SkillProperties):
+        // Properties are the numeric balance payload the skill provider consumes (RecordProperties):
         // scaling every float here is exactly "the granted effect gets +15%". Keys stay untouched.
         public IItemGrant WithScaledValues(float factor) =>
             new PassiveSkillGrant(id, skillId,

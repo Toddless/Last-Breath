@@ -1,8 +1,8 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
+    using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Battle.Skills;
     using Core.Data.GameData;
     using Newtonsoft.Json.Linq;
 
@@ -49,7 +49,7 @@ namespace LastBreathTest.BattleSystemTests
             foreach (string key in keys) withTypo[key] = 1f;
             withTypo["valeu"] = 1f;
 
-            Assert.IsNull(provider.CreateEffect(Id, new SkillProperties(Id, withTypo)),
+            Assert.IsNull(provider.CreateEffect(Id, new RecordProperties(Id, withTypo)),
                 "a property nothing reads was accepted, so a typo in data stays invisible");
         }
 
@@ -63,14 +63,14 @@ namespace LastBreathTest.BattleSystemTests
             var short_ = new Dictionary<string, float>(StringComparer.Ordinal);
             foreach (string key in keys.Skip(1)) short_[key] = 1f;
 
-            Assert.IsNull(provider.CreateEffect(Id, new SkillProperties(Id, short_)),
+            Assert.IsNull(provider.CreateEffect(Id, new RecordProperties(Id, short_)),
                 "an effect was built without one of its numbers");
         }
 
         [TestMethod]
         public void AnIdNobodyBuildsIsRefused()
         {
-            Assert.IsNull(new EffectProvider().CreateEffect("Effect_No_Such_Thing", SkillProperties.Empty),
+            Assert.IsNull(new EffectProvider().CreateEffect("Effect_No_Such_Thing", RecordProperties.Empty),
                 "an id nothing answers came back with an effect");
         }
 
@@ -137,7 +137,7 @@ namespace LastBreathTest.BattleSystemTests
                     yield return entry;
         }
 
-        private static SkillProperties PropertiesFor(string id, IEnumerable<string> keys) =>
+        private static RecordProperties PropertiesFor(string id, IEnumerable<string> keys) =>
             new(id, keys.ToDictionary(key => key, _ => 1f, StringComparer.Ordinal));
     }
 }

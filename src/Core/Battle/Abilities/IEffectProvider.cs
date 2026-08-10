@@ -17,6 +17,6 @@ namespace Core.Battle.Abilities
         IReadOnlyCollection<string>? KeysOf(string effectId);
 
         /// <summary>The effect, or null with a report: unknown id, unknown key or missing key.</summary>
-        IEffect? CreateEffect(string id, SkillProperties properties);
+        IEffect? CreateEffect(string id, RecordProperties properties);
     }
 }

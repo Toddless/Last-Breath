@@ -4,6 +4,7 @@ namespace Battle.Source
     using System.Collections.Generic;
     using System.Linq;
     using Core;
+    using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
     using Effects;
@@ -17,7 +18,7 @@ namespace Battle.Source
     {
         /// <summary>The keys an effect is built from and the builder that reads them. All keys are required:
         /// an effect built without one of its numbers is a mis-tuned effect nobody asked for.</summary>
-        private sealed record EffectFactory(string[] Keys, Func<SkillProperties, IEffect> Build);
+        private sealed record EffectFactory(string[] Keys, Func<RecordProperties, IEffect> Build);
 
         private static readonly Dictionary<string, EffectFactory> s_factories = new(StringComparer.Ordinal)
         {
@@ -70,7 +71,7 @@ namespace Battle.Source
         public IReadOnlyCollection<string>? KeysOf(string effectId) =>
             s_factories.TryGetValue(effectId, out EffectFactory? factory) ? [.. factory.Keys] : null;
 
-        public IEffect? CreateEffect(string id, SkillProperties properties)
+        public IEffect? CreateEffect(string id, RecordProperties properties)
         {
             if (!s_factories.TryGetValue(id, out EffectFactory? factory))
             {

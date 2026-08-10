@@ -3,6 +3,7 @@ namespace Core.Items.Grants
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Battle;
     using Battle.Abilities;
     using Battle.Skills;
     using Entity;
@@ -30,7 +31,7 @@ namespace Core.Items.Grants
         {
             get
             {
-                field = providerAccessor()?.CreateEffect(EffectId, new SkillProperties(effectId, properties))?.Description ?? string.Empty;
+                field = providerAccessor()?.CreateEffect(EffectId, new RecordProperties(effectId, properties))?.Description ?? string.Empty;
                 return field;
             }
         }
@@ -77,7 +78,7 @@ namespace Core.Items.Grants
         private void ApplyEffect()
         {
             if (_owner == null || IsStillCarried()) return;
-            var effect = providerAccessor()?.CreateEffect(effectId, new SkillProperties(effectId, properties));
+            var effect = providerAccessor()?.CreateEffect(effectId, new RecordProperties(effectId, properties));
             if (effect == null) return;
             _current = effect;
             // Self-application: the wearer is both caster and target, so the usual caster/target
