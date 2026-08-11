@@ -71,20 +71,20 @@ namespace LootGeneration.Source
             float[] actualRarityChances = Calculations.CalculateChances<IRarityUpgradeModifier>(npcModifiers, CopyBaseChances(_configuration.BaseRarityChances));
 
             var chosenRecords = SpendBudget(budget, _configuration.TierPrices, actualTierChances, context.TryUpgradeTier, finalLootTable, out float leftoverBudget);
-            var chosenItemsIds = NameTheDrops(chosenRecords);
-            chosenItemsIds.AddRange(context.GuaranteedItems);
+            var chosenDrops = NameTheDrops(chosenRecords);
+            chosenDrops.AddRange(context.GuaranteedItems.Select(id => new DrawnDrop(id, null)));
             _diedEntities.Add(diedEntity.InstanceId);
-            var items = GenerateChosenItems(actualRarityChances, context, chosenItemsIds);
+            var items = GenerateChosenItems(actualRarityChances, context, chosenDrops);
             AppendGoldPile(items, leftoverBudget);
             return items;
         }
 
-        /// <summary>The bought positions as the ids the minter is asked for. A position naming a set
+        /// <summary>The bought positions as the drops the minter is asked for. A position naming a set
         /// is resolved to one of its members HERE, a step before the item is made: what the table
         /// bought is the seat, what the world sees is a thing. A seat that names nothing left in the
-        /// game is reported by the draw and simply produces no id.</summary>
-        private List<string> NameTheDrops(List<TableRecord> chosen) =>
-            chosen.Select(record => _draw.Draw(record)).OfType<string>().ToList();
+        /// game is reported by the draw and simply produces nothing.</summary>
+        private List<DrawnDrop> NameTheDrops(List<TableRecord> chosen) =>
+            chosen.Select(record => _draw.Draw(record)).OfType<DrawnDrop>().ToList();
 
         private Dictionary<int, List<TableRecord>> CreateFinalLootTable(Dictionary<int, List<TableRecord>> baseTable, Dictionary<int, List<TableRecord>> additionalItems)
         {
@@ -237,11 +237,11 @@ namespace LootGeneration.Source
             return budget;
         }
 
-        private List<ItemStack> GenerateChosenItems(float[] actualRarityChances, IModifierApplyingContext context, List<string> chosenItemsIds)
+        private List<ItemStack> GenerateChosenItems(float[] actualRarityChances, IModifierApplyingContext context, List<DrawnDrop> chosenDrops)
         {
             var items = new List<ItemStack>();
             var rarityAmount = Enum.GetValues<Rarity>().ToDictionary(x => x, _ => 0);
-            foreach (string id in chosenItemsIds)
+            foreach ((string id, Rarity? seatRarity) in chosenDrops)
             {
                 if (string.IsNullOrWhiteSpace(id)) continue;
 
@@ -259,10 +259,13 @@ namespace LootGeneration.Source
                 // especially the guaranteed items appended after the rolled ones.
                 try
                 {
+                    // Rolled even when the seat already decided, and in the same place: the roll is one
+                    // step of the kill's random walk, and skipping it for some drops would move every
+                    // rarity after them in a seeded run.
                     Rarity rarity = context.TryUpgradeRarity((Rarity)MakeRoll(actualRarityChances));
                     // ItemModifierMultiplier is the stat gain per point of total difficulty: no modifiers → items at data values.
                     float modifierMultiplier = 1f + _configuration.ItemModifierMultiplier * context.TotalDifficultyMultiplier;
-                    var item = _itemCreationService.CreateItem(id, context.AdditionalItemEffects, rarity, _configuration.EquipItemEffectChance, modifierMultiplier);
+                    var item = _itemCreationService.CreateItem(id, context.AdditionalItemEffects, rarity, _configuration.EquipItemEffectChance, modifierMultiplier, seatRarity);
                     rarityAmount[item.Rarity]++;
                     items.Add(new ItemStack(item) { Stack = 1 });
                 }

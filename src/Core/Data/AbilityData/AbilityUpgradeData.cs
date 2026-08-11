@@ -19,10 +19,22 @@ namespace Core.Data.AbilityData
         /// <summary>The augment's own tier — how strong it is, not which socket it goes into.</summary>
         [JsonProperty("tier")] public int Tier { get; init; }
 
-        /// <summary>Where the augment stands on the common item scale. Written out rather than left to
-        /// the enum's zero, which is <see cref="Rarity.Legendary"/>: an unstated rarity is the plainest
-        /// augment there is, not the best one.</summary>
+        /// <summary>Where the augment stands on the common item scale when it rolls no range. Written
+        /// out rather than left to the enum's zero, which is <see cref="Rarity.Legendary"/>: an unstated
+        /// rarity is the plainest augment there is, not the best one.</summary>
         [JsonProperty("rarity")] public Rarity Rarity { get; init; } = Rarity.Common;
+
+        /// <summary>The WORST a copy of this augment may roll; absent, the record rolls no range and
+        /// every copy comes out at <see cref="Rarity"/>.</summary>
+        [JsonProperty("minRarity")] public Rarity? MinRarity { get; init; }
+
+        /// <summary>The BEST a copy may roll. Note the scale runs downward — <see cref="Rarity.Legendary"/>
+        /// is zero — so the best end is the smaller number.</summary>
+        [JsonProperty("maxRarity")] public Rarity? MaxRarity { get; init; }
+
+        /// <summary>The band a copy is drawn from, worst end first. A record without a range is a band
+        /// of one, so every reader asks one question instead of two.</summary>
+        public (Rarity Worst, Rarity Best) RarityBand => (MinRarity ?? Rarity, MaxRarity ?? Rarity);
 
         /// <summary>Hard binding to a single ability — the exception kept for augments too strong to be
         /// handed to a whole family. Set, it decides alone; empty, the augment is bound to nothing.</summary>

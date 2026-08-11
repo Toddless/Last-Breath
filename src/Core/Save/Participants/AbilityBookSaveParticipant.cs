@@ -5,6 +5,7 @@ namespace Core.Save.Participants
     using System.Linq;
     using Battle.Abilities;
     using Data.SaveData;
+    using Items;
     using Entity.Components;
     using Enums;
     using Newtonsoft.Json.Linq;
@@ -50,10 +51,13 @@ namespace Core.Save.Participants
     /// and the section is then written without its socket entries.</param>
     /// <param name="augments">Optional with the board: what carries the restored arrangement onto the
     /// abilities. A project holding no slots has nothing to carry.</param>
+    /// <param name="copies">Optional, and read only for files written before a copy carried a rarity:
+    /// those are drawn once at load, from the band their record declares now.</param>
     public class AbilityBookSaveParticipant(
         IPlayerAccessor playerAccessor,
         IAbilitySocketBoard? sockets = null,
-        IAbilityAugmentBinder? augments = null)
+        IAbilityAugmentBinder? augments = null,
+        IAugmentItemMinter? copies = null)
         : ISaveParticipant
     {
         /// <summary>The oldest section this build can still dress a character from. Below it the file
@@ -200,6 +204,7 @@ namespace Core.Save.Participants
                     Socket = occupant.Slot.SocketId,
                     Augment = occupant.Augment.AugmentId,
                     Values = new Dictionary<string, float>(occupant.Augment.Values),
+                    Rarity = occupant.Augment.Rarity,
                     Ability = occupant.Slot.AbilityId,
                     Tier = occupant.Slot.Tier
                 });
@@ -210,7 +215,7 @@ namespace Core.Save.Participants
         /// of this one property moved: a list is today's, an object is what versions 4 and 5 wrote, and
         /// there the node id was the key. Anything else is a section with no sockets in it.
         /// </summary>
-        private static IReadOnlyCollection<AbilitySocketOccupant> SavedOccupants(JToken data) =>
+        private IReadOnlyCollection<AbilitySocketOccupant> SavedOccupants(JToken data) =>
             data[SocketsProperty] switch
             {
                 JArray entries =>
@@ -219,6 +224,8 @@ namespace Core.Save.Participants
                         .Select(entry => entry.ToObject<SocketSaveData>())
                         .Where(entry => entry != null)
                         .Select(entry => Occupant(entry!.Socket, entry))
+                        .Where(occupant => occupant.HasValue)
+                        .Select(occupant => occupant!.Value)
                 ],
                 JObject keyed =>
                 [
@@ -226,13 +233,32 @@ namespace Core.Save.Participants
                         .Select(property => (property.Name, Entry: property.Value.ToObject<SocketSaveData>()))
                         .Where(pair => pair.Entry != null)
                         .Select(pair => Occupant(pair.Name, pair.Entry!))
+                        .Where(occupant => occupant.HasValue)
+                        .Select(occupant => occupant!.Value)
                 ],
                 _ => []
             };
 
-        private static AbilitySocketOccupant Occupant(string socketId, SocketSaveData entry) =>
-            new(new AbilitySocketPlacement(socketId, entry.Ability, entry.Tier),
-                new AugmentInstance(entry.Augment, entry.Values));
+        /// <summary>One entry as the board holds it. A file that says what the copy is worth is put back
+        /// exactly as written; one from before rarity was stored has to be DRAWN, and the draw belongs to
+        /// the minter — the record's band is what it must land in, and nothing here can see a record.
+        /// A legacy entry with no minter to draw it is reported rather than seated at a guessed rarity:
+        /// a number invented here would be indistinguishable from one the player rolled.</summary>
+        private AbilitySocketOccupant? Occupant(string socketId, SocketSaveData entry)
+        {
+            AugmentInstance? copy = entry.Rarity is { } written
+                ? new AugmentInstance(entry.Augment, entry.Values, written)
+                : copies?.Remembered(entry.Augment, entry.Values, null);
+
+            if (copy != null)
+                return new AbilitySocketOccupant(new AbilitySocketPlacement(socketId, entry.Ability, entry.Tier), copy);
+
+            Tracker.TrackError(
+                $"Socket '{socketId}' holds '{entry.Augment}' written before copies carried a rarity, and this " +
+                "composition has no augment minter to draw one: the slot comes back empty.",
+                this);
+            return null;
+        }
 
         /// <summary>Lays the slots out as the file left them. A slot naming an ability the book does
         /// not hold stays empty: the abilities are the allocation's to give, and the file's memory of

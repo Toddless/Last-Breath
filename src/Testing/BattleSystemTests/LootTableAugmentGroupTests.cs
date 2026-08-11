@@ -224,12 +224,65 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(drops.Count < Kills * 2, "nothing was lost, so the empty seat never came up and the case proves nothing");
         }
 
+        [TestMethod]
+        public void AGroupDrawsEveryRecordWhoseBandCanReachItsRarityAndNoOther()
+        {
+            // A record rolls a BAND, so "the Rare augments" is not a list of records stamped Rare —
+            // it is every record a Rare copy can come out of. Read as equality the seat would be
+            // answered by whatever record happened to be authored without a range, which after the
+            // markup is none of them.
+            var catalog = Catalog([
+                Band("Augment_Spans_It", 1, Rarity.Uncommon, Rarity.Legendary),
+                Band("Augment_Ends_At_It", 1, Rarity.Rare, Rarity.Legendary),
+                Band("Augment_Stops_Above_It", 1, Rarity.Epic, Rarity.Legendary),
+                Band("Augment_Stops_Below_It", 1, Rarity.Uncommon, Rarity.Uncommon),
+            ]);
+
+            var drops = DropsOverKills(Table(new TableRecord(string.Empty, Seat, new AugmentGroup(1, Rarity.Rare))), catalog, kills: 300);
+
+            CollectionAssert.AreEquivalent(
+                new[] { "Augment_Spans_It", "Augment_Ends_At_It" },
+                drops.Distinct().ToArray(),
+                "the Rare seat was answered by the wrong records — a band it cannot reach, or a band it can");
+        }
+
+        [TestMethod]
+        public void AGroupMintsItsMembersAtTheGroupsOwnRarity()
+        {
+            // The seat is what was bought and priced, so the seat decides what the copy is worth. Left
+            // to the record's own draw, an Uncommon seat would keep paying out Legendary augments —
+            // every wide-band record can roll one.
+            var catalog = Catalog([Band("Augment_Spans_It", 1, Rarity.Uncommon, Rarity.Legendary)]);
+
+            var rarities = ItemsOverKills(Table(new TableRecord(string.Empty, Seat, new AugmentGroup(1, Rarity.Uncommon))), catalog, kills: 200)
+                .Select(item => item.Rarity)
+                .Distinct()
+                .ToList();
+
+            CollectionAssert.AreEquivalent(new[] { Rarity.Uncommon }, rarities,
+                "the seat's rarity did not reach the mint: the copies came out at something the seat never bought");
+        }
+
+        // The same question asked of the files as they ship — that every group named in a shipped
+        // table is answered by an augment — is the loot table audit's
+        // (LootTablesAuditTests.EveryLootTableGroupIsAnsweredByAShippedAugment).
+
         // ---------- the stand ----------
 
         /// <summary>The ids the drop pipeline actually mints over a run of kills, through the real
         /// service: the table arrives the way a kill asks for it, and only the NPC and the item
         /// factory are stubs.</summary>
         private static List<string> DropsOverKills(
+            Dictionary<int, List<TableRecord>> table,
+            IAbilityAugmentCatalog catalog,
+            int kills,
+            int itemsPerKill = 1,
+            int seed = 17) =>
+            [.. ItemsOverKills(table, catalog, kills, itemsPerKill, seed).Select(item => item.Id)];
+
+        /// <summary>The same run, kept as things rather than ids — for the cases that ask what a drop
+        /// turned out to be WORTH.</summary>
+        private static List<IItem> ItemsOverKills(
             Dictionary<int, List<TableRecord>> table,
             IAbilityAugmentCatalog catalog,
             int kills,
@@ -250,9 +303,9 @@ namespace LastBreathTest.BattleSystemTests
                 Configuration(itemsPerKill),
                 new TableRecordDraw(catalog, rnd));
 
-            List<string> dropped = [];
+            List<IItem> dropped = [];
             for (int kill = 0; kill < kills; kill++)
-                dropped.AddRange(service.GenerateItemsAsync(Npc().Object).GetAwaiter().GetResult().Select(stack => stack.Item.Id));
+                dropped.AddRange(service.GenerateItemsAsync(Npc().Object).GetAwaiter().GetResult().Select(stack => stack.Item));
 
             return dropped;
         }
@@ -296,14 +349,16 @@ namespace LastBreathTest.BattleSystemTests
             return configuration.Object;
         }
 
-        /// <summary>Hands back a thing named by the id it was asked for: these cases are about WHICH
-        /// id the table produced, never about what the id is made into.</summary>
+        /// <summary>Hands back a thing named by the id it was asked for, worth what the pipeline said
+        /// it is worth: these cases are about WHICH id the table produced and at what rarity, never
+        /// about how a kind builds itself.</summary>
         private static IItemCreationService ItemFactory()
         {
             var factory = new Mock<IItemCreationService>();
             factory
-                .Setup(service => service.CreateItem(It.IsAny<string>(), It.IsAny<List<string>>(), It.IsAny<Rarity>(), It.IsAny<float>(), It.IsAny<float>()))
-                .Returns((string id, List<string> _, Rarity _, float _, float _) => Mock.Of<IItem>(item => item.Id == id));
+                .Setup(service => service.CreateItem(It.IsAny<string>(), It.IsAny<List<string>>(), It.IsAny<Rarity>(), It.IsAny<float>(), It.IsAny<float>(), It.IsAny<Rarity?>()))
+                .Returns((string id, List<string> _, Rarity rolled, float _, float _, Rarity? fixedRarity) =>
+                    Mock.Of<IItem>(item => item.Id == id && item.Rarity == (fixedRarity ?? rolled)));
             return factory.Object;
         }
 
@@ -328,6 +383,11 @@ namespace LastBreathTest.BattleSystemTests
 
         private static AbilityUpgradeData Augment(string id, int tier, Rarity rarity) =>
             new() { Id = id, Tier = tier, Rarity = rarity };
+
+        /// <summary>A record that rolls a range — what every shipped augment is. Worst end first, the
+        /// way the field reads.</summary>
+        private static AbilityUpgradeData Band(string id, int tier, Rarity worst, Rarity best) =>
+            new() { Id = id, Tier = tier, MinRarity = worst, MaxRarity = best };
 
         /// <summary>The basic table's only tier, read out of a whole document the way the game reads
         /// one — the refusals under test happen inside that read.</summary>

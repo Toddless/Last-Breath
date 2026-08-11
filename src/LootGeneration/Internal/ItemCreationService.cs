@@ -18,15 +18,12 @@ namespace LootGeneration.Internal
     /// into a concrete drop.</summary>
     public class ItemCreationService(IItemDataProvider dataProvider, IRandomNumberGenerator rnd, IItemMinter itemMinter, IModifierMaterializer materializer, ICraftingEffectProvider effectCatalog, IGrantFactory grantFactory) : IItemCreationService
     {
-        public IItem CreateItem(string id)
+        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier, Rarity? fixedRarity = null)
         {
-            // The facade mints equips (rolling their authored ranges) and copies plain resources.
-            return itemMinter.MintItem(id);
-        }
-
-        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier)
-        {
-            var item = CreateItem(id);
+            // The facade mints equips (rolling their authored ranges), draws augments and copies plain
+            // resources. A seat that already decided the rarity says so here and nowhere later: an
+            // augment's rarity is part of the copy, not a label put on it afterwards.
+            var item = itemMinter.MintItem(id, fixedRarity);
             if (item is IEquipItem equipItem) HandleEquipItemGeneration(equipItem, additionalItemEffects, rarity, equipEffectChance, modifierMultiplier);
 
             return item;

@@ -21,5 +21,9 @@ namespace Core.Data.SaveData
         /// file is never the reason a number is lost.
         /// </summary>
         [JsonProperty("values")] public Dictionary<string, float> Values { get; init; } = [];
+
+        /// <summary>What this copy rolled on the rarity scale. Absent in files written before copies
+        /// carried one: those are drawn once on load, from the band their record declares now.</summary>
+        [JsonProperty("rarity")] public Enums.Rarity? Rarity { get; init; }
     }
 }

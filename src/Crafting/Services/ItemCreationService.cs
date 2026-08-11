@@ -25,7 +25,7 @@ namespace Crafting.Services
         IGrantFactory grantFactory)
         : IItemCreationService
     {
-        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier) =>
+        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier, Rarity? fixedRarity = null) =>
             throw new NotImplementedException("Crafting module creates items only by recipe.");
 
         public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifierDescriptor> descriptors, Rarity? minRarity = null)

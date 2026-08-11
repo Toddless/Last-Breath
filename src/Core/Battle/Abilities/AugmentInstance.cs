@@ -14,11 +14,17 @@ namespace Core.Battle.Abilities
     /// </summary>
     /// <param name="augmentId">Stable id of the record this copy was made from.</param>
     /// <param name="values">This copy's own number per property the record declares.</param>
-    public sealed class AugmentInstance(string augmentId, IReadOnlyDictionary<string, float> values)
+    /// <param name="rarity">Where THIS copy landed on the scale — drawn from the record's band at the
+    /// mint, exactly like its numbers, and kept for good.</param>
+    public sealed class AugmentInstance(string augmentId, IReadOnlyDictionary<string, float> values, Enums.Rarity rarity)
     {
         public string AugmentId { get; } = augmentId;
 
         public IReadOnlyDictionary<string, float> Values { get; } = values;
+
+        /// <summary>What this copy is worth. The copy's own, not the record's: a record rebalanced after
+        /// the mint moves neither the numbers nor the rarity of copies already in the world.</summary>
+        public Enums.Rarity Rarity { get; } = rarity;
 
         /// <summary>
         /// The record as this copy rolled it: the declaration unchanged, with the numbers replaced by

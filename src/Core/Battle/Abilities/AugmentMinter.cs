@@ -31,8 +31,26 @@ namespace Core.Battle.Abilities
             return null;
         }
 
-        /// <summary>A copy of a record already in hand.</summary>
-        public AugmentInstance Mint(AbilityUpgradeData record) => new(record.Id, Rolled(record));
+        /// <summary>A copy of a record already in hand, rarity drawn from its own band.</summary>
+        public AugmentInstance Mint(AbilityUpgradeData record) => Mint(record, RollRarity(record));
+
+        /// <summary>A copy at a rarity somebody else decided — a loot table position that says what the
+        /// seat is worth. The numbers are still this copy's own draw.</summary>
+        public AugmentInstance Mint(AbilityUpgradeData record, Enums.Rarity rarity) =>
+            new(record.Id, Rolled(record), rarity);
+
+        /// <summary>One draw from the record's band, uniform across the steps it spans. Uniform is a
+        /// PLACEHOLDER — the curve is a balance decision (see Docs/PLAN-Augments.md §4e).</summary>
+        public Enums.Rarity RollRarity(AbilityUpgradeData record)
+        {
+            (Enums.Rarity worst, Enums.Rarity best) = record.RarityBand;
+            if (worst == best) return worst;
+
+            // The scale runs downward (Legendary is zero), so the band spans from the best value up.
+            int from = (int)best;
+            int to = (int)worst;
+            return (Enums.Rarity)(from <= to ? rnd.RandIntRange(from, to) : rnd.RandIntRange(to, from));
+        }
 
         /// <summary>Every number the record declares, drawn once each.</summary>
         private Dictionary<string, float> Rolled(AbilityUpgradeData record)

@@ -4,6 +4,7 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source.CombatRules;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Enums;
     using Core.Data.AbilityData;
     using Core.Data.GameData;
     using Core.Entity.Components;
@@ -112,6 +113,39 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void EveryCopyLandsInsideItsRecordsBandAndAWideBandDoesNotAlwaysAnswerTheSame()
+        {
+            // The rarity is a draw like the numbers are, taken at the same seam and kept for good. Two
+            // ways for it to go wrong without anything failing: a draw that leaves the band the record
+            // declares — the copy is then worth something its own author never allowed — and a "draw"
+            // that always answers the same, which is an authored rarity wearing a band's clothes.
+            AugmentMinter minter = MinterOver(ShippedSpread, new DefaultRandomNumberGenerator(seed: 4));
+            List<string> outside = [];
+            Dictionary<string, HashSet<Rarity>> seen = [];
+
+            foreach (AbilityUpgradeData record in ShippedAbilityData.Augments().All)
+                for (int draw = 0; draw < 30; draw++)
+                {
+                    Rarity rolled = minter.Mint(record).Rarity;
+                    (Rarity worst, Rarity best) = record.RarityBand;
+                    if ((int)rolled < (int)best || (int)rolled > (int)worst)
+                        outside.Add($"{record.Id}: {rolled} outside {worst}..{best}");
+                    if (!seen.TryGetValue(record.Id, out HashSet<Rarity>? rarities)) seen[record.Id] = rarities = [];
+                    rarities.Add(rolled);
+                }
+
+            Assert.AreEqual(0, outside.Count, $"copies minted outside their record's band: {string.Join(", ", outside.Distinct().Take(5))}");
+
+            var wideBands = ShippedAbilityData.Augments().All
+                .Where(record => record.RarityBand.Worst != record.RarityBand.Best)
+                .Select(record => record.Id)
+                .ToList();
+            Assert.IsTrue(wideBands.Count > 0, "no shipped record declares a range, so the draw has nothing to prove");
+            Assert.IsTrue(wideBands.All(id => seen[id].Count > 1),
+                "a record declaring a range answered with one rarity in thirty draws: the band is not being drawn from");
+        }
+
+        [TestMethod]
         public void ACopyIsDrawnOnceAndReadsTheSameEveryTimeAfter()
         {
             // A value recomputed on every read would move between two looks at the same tooltip, and
@@ -204,11 +238,13 @@ namespace LastBreathTest.BattleSystemTests
         {
             // What a composition holding no rules file gets, and the control the band needs: with the
             // spread closed the copy IS the record. The generator is left untouched as well — a draw
-            // spent on a band of no width would shift every seeded sequence taken after it.
+            // spent on a band of no width would shift every seeded sequence taken after it. The rarity
+            // is handed in rather than drawn, so the only draw left to count is the numbers'.
             var rnd = new CountingRandom(new DefaultRandomNumberGenerator(seed: 3));
             AbilityUpgradeData record = ShippedRecord(ShareAugment);
 
-            AugmentInstance copy = new AugmentMinter(ShippedAbilityData.Augments(), RulesOf(AugmentValueRules.Fixed), rnd).Mint(record);
+            AugmentInstance copy = new AugmentMinter(ShippedAbilityData.Augments(), RulesOf(AugmentValueRules.Fixed), rnd)
+                .Mint(record, record.RarityBand.Worst);
 
             Assert.AreEqual(record.UpgradeProperties[ShareProperty], copy.Values[ShareProperty]);
             Assert.AreEqual(0, rnd.Draws, "a band of no width still spent a draw");
@@ -234,7 +270,7 @@ namespace LastBreathTest.BattleSystemTests
             {
                 UpgradeProperties = new Dictionary<string, float> { [ShareProperty] = 0.3f, ["addedLater"] = 7f }
             };
-            var copy = new AugmentInstance(record.Id, new Dictionary<string, float> { [ShareProperty] = 0.375f });
+            var copy = new AugmentInstance(record.Id, new Dictionary<string, float> { [ShareProperty] = 0.375f }, Rarity.Common);
 
             AbilityUpgradeData applied = copy.Applied(record);
 
@@ -347,8 +383,9 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>A generator pinned to one edge of every range it is asked for — what the extremes
         /// of the band actually produce, rather than what a seeded run gets near. It answers the range
-        /// draw alone: a value reaching the copy through any other door of the generator would not be
-        /// the one the bounds below are read from.</summary>
+        /// draws alone: a value reaching the copy through any other door of the generator would not be
+        /// the one the bounds below are read from. The mint takes two of them — the value's range and
+        /// the rarity's — and both are pinned the same way.</summary>
         private sealed class EdgeRandom(bool atBottom) : IRandomNumberGenerator
         {
             private const string OtherDoor = "the roll took a number out of the generator some other way than as a range";
@@ -357,7 +394,7 @@ namespace LastBreathTest.BattleSystemTests
 
             public float RandFloat() => throw new NotSupportedException(OtherDoor);
 
-            public int RandIntRange(int min, int max) => throw new NotSupportedException(OtherDoor);
+            public int RandIntRange(int min, int max) => atBottom ? min : max;
 
             public float RandFloatN(float mean, float deviation) => throw new NotSupportedException(OtherDoor);
 

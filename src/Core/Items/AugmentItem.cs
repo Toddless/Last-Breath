@@ -40,15 +40,14 @@ namespace Core.Items
         /// places, free to disagree.</summary>
         public const string ItemTag = "Augment";
 
-        /// <param name="augment">The copy this item is the passage of.</param>
-        /// <param name="rarity">Where the augment stands on the common item scale. Taken from the
-        /// record at every birth rather than stored in the file: rarity is the author's word about
-        /// what the augment IS, so a rebalanced record shows on the copies already in the world,
-        /// while the numbers — which are the copy's own — never move.</param>
-        public AugmentItem(AugmentInstance augment, Rarity rarity)
+        /// <param name="augment">The copy this item is the passage of. Its rarity is the copy's own —
+        /// drawn at the mint from the record's band and written down with its numbers. The consequence
+        /// is deliberate: rebalancing a record moves neither the numbers nor the rarity of the copies
+        /// already in the world.</param>
+        public AugmentItem(AugmentInstance augment)
         {
             Augment = augment;
-            Rarity = rarity;
+            Rarity = augment.Rarity;
         }
 
         public AugmentInstance Augment { get; }
@@ -95,7 +94,7 @@ namespace Core.Items
 
         /// <summary>Another passage for the same copy: the numbers are shared because they are frozen,
         /// the identity is not — a copy handed on is still a separate thing in the bag.</summary>
-        public T Copy<T>() => (T)(object)new AugmentItem(Augment, Rarity);
+        public T Copy<T>() => (T)(object)new AugmentItem(Augment);
 
         private Dictionary<string, object?> Printed() =>
             Augment.Values.ToDictionary(rolled => rolled.Key, rolled => (object?)rolled.Value);

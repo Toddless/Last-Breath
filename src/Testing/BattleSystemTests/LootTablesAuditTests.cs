@@ -51,17 +51,18 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>A group is expanded at mint time, so a filter no augment answers is not a load
-        /// error at all — it is a kill that quietly drops one item fewer, forever.</summary>
+        /// error at all — it is a kill that quietly drops one item fewer, forever. Membership is
+        /// COVERAGE, not equality: a record declares a band and belongs to every seat inside it.</summary>
         [TestMethod]
         public void EveryLootTableGroupIsAnsweredByAShippedAugment()
         {
-            var augments = Augments();
+            var bands = AugmentBands();
             var unanswered = Positions()
                 .Select(position => position[GroupProperty])
                 .OfType<JObject>()
-                .Select(group => ((int?)group["tier"], (string?)group["rarity"] ?? DefaultRarity))
-                .Where(filter => !augments.Contains(filter!))
-                .Select(filter => $"tier {filter.Item1?.ToString() ?? "(none)"} / {filter.Item2}")
+                .Select(group => ((int?)group["tier"], Rarity: Parse((string?)group["rarity"] ?? DefaultRarity)))
+                .Where(filter => !bands.Any(band => band.Tier == filter.Item1 && Covers(band, filter.Rarity)))
+                .Select(filter => $"tier {filter.Item1?.ToString() ?? "(none)"} / {filter.Rarity}")
                 .Distinct()
                 .ToList();
 
@@ -72,12 +73,26 @@ namespace LastBreathTest.BattleSystemTests
         /// the same reading <see cref="Core.Data.AbilityData.AbilityUpgradeData"/> gives it.</summary>
         private const string DefaultRarity = nameof(Core.Enums.Rarity.Common);
 
-        /// <summary>The tier/rarity pairs the shipped augment records cover.</summary>
-        private static HashSet<(int? Tier, string Rarity)> Augments() =>
-            CatalogRoots("Abilities")
+        /// <summary>The scale runs downward — Legendary is zero — so the best end is the smaller
+        /// number and a band contains everything between the two.</summary>
+        private static bool Covers((int? Tier, Core.Enums.Rarity Worst, Core.Enums.Rarity Best) band, Core.Enums.Rarity rarity) =>
+            (int)band.Best <= (int)rarity && (int)rarity <= (int)band.Worst;
+
+        /// <summary>The tier and rarity band of every shipped augment record. A record naming no band
+        /// is a band of one around the field it does name.</summary>
+        private static List<(int? Tier, Core.Enums.Rarity Worst, Core.Enums.Rarity Best)> AugmentBands() =>
+            [.. CatalogRoots("Abilities")
                 .SelectMany(root => root[AugmentSection] as JArray ?? [])
-                .Select(augment => ((int?)augment["tier"], (string?)augment["rarity"] ?? DefaultRarity))
-                .ToHashSet();
+                .Select(augment => (
+                    (int?)augment["tier"],
+                    Parse((string?)augment["minRarity"] ?? (string?)augment["rarity"] ?? DefaultRarity),
+                    Parse((string?)augment["maxRarity"] ?? (string?)augment["rarity"] ?? DefaultRarity)))];
+
+        private static Core.Enums.Rarity Parse(string rarity)
+        {
+            Assert.IsTrue(Enum.TryParse(rarity, out Core.Enums.Rarity parsed), $"'{rarity}' is not a rarity the game knows");
+            return parsed;
+        }
 
         private static IEnumerable<JObject> Positions() =>
             CatalogRoots("LootTables").SelectMany(root => root.SelectTokens("$..items[*]")).OfType<JObject>();

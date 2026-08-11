@@ -23,10 +23,10 @@ namespace LastBreath.Services
         ICraftingEffectProvider effectCatalog,
         IGrantFactory grantFactory) : IItemCreationService
     {
-        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier)
+        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier, Rarity? fixedRarity = null)
         {
             // The facade mints equips (rolling their authored ranges) and copies plain resources.
-            var item = itemMinter.MintItem(id);
+            var item = itemMinter.MintItem(id, fixedRarity);
             if (item is IEquipItem equipItem) HandleEquipItemGeneration(equipItem, additionalItemEffects, rarity, equipEffectChance, modifierMultiplier);
 
             return item;

@@ -500,7 +500,7 @@ namespace LastBreathTest.BattleSystemTests
             CreateService(tree, board);
             var data = new AbilityBookSaveData { CurrentStance = Stance.Dexterity };
             data.Sockets.Add(new SocketSaveData { Socket = SocketTwo, Augment = Augment, Ability = DexAbility, Tier = 2 });
-            var participant = new AbilityBookSaveParticipant(AccessorFor(NewBook()), board);
+            var participant = new AbilityBookSaveParticipant(AccessorFor(NewBook()), board, copies: LegacyDraw(Rarity.Rare));
 
             participant.Restore(JToken.FromObject(data), participant.Version);
 
@@ -579,6 +579,10 @@ namespace LastBreathTest.BattleSystemTests
             // Version 5 wrote the entries as a map with the node id for a key. Every field version 6
             // needs is in it, so the file is migrated rather than refused — refusing it would take the
             // player's augments with the shape of the property.
+            // The rarity assertion below is about the SEAM: the minter here is a stub, so what is shown
+            // is that a file saying nothing about rarity reaches the draw at all. That the draw lands
+            // inside the record's band, and lands once, is shown on the bag with a real minter
+            // (AugmentItemTests.ACopyWrittenBeforeRarityWasStoredIsDrawnIntoItsRecordsBandOnce).
             var keyed = new JObject
             {
                 ["currentStance"] = Stance.Dexterity.ToString(),
@@ -599,10 +603,13 @@ namespace LastBreathTest.BattleSystemTests
             IPassiveTreeService tree = NewTree();
             CreateService(tree, board);
             tree.Take(SocketTwo);
-            new AbilityBookSaveParticipant(AccessorFor(NewBook()), board).Restore(keyed, savedVersion: 5);
+            new AbilityBookSaveParticipant(AccessorFor(NewBook()), board, copies: LegacyDraw(Rarity.Rare))
+                .Restore(keyed, savedVersion: 5);
 
             Assert.AreEqual(Augment, board.Find(board.At(SocketTwo))?.Augment?.AugmentId, "a readable file lost the augment in its slot");
             Assert.AreEqual(4f, board.Find(board.At(SocketTwo))?.Augment?.Values[Duration], "the copy came back at another number");
+            Assert.AreEqual(Rarity.Rare, board.Find(board.At(SocketTwo))?.Augment?.Rarity,
+                "a file that says nothing about rarity was seated at whatever the enum's default is instead of a drawn one");
         }
 
         /// <summary>A file holding an allocation and the augments installed into the slots it opened.</summary>

@@ -117,6 +117,14 @@
                         {
                             "id": "Upgrade_Resource_Armorsmith_Mark",
                             "price": 640
+                        },
+                        {
+                            "augments": { "tier": 3, "rarity": "Legendary" },
+                            "price": 600
+                        },
+                        {
+                            "augments": { "tier": 2, "rarity": "Legendary" },
+                            "price": 430
                         }
                     ]
                 },
@@ -202,6 +210,14 @@
                         {
                             "id": "Upgrade_Resource_Master_Rune",
                             "price": 275
+                        },
+                        {
+                            "augments": { "tier": 2, "rarity": "Epic" },
+                            "price": 220
+                        },
+                        {
+                            "augments": { "tier": 1, "rarity": "Legendary" },
+                            "price": 200
                         }
                     ]
                 },
@@ -251,6 +267,26 @@
                         {
                             "id": "Upgrade_Resource_Journeyman_Rune",
                             "price": 105
+                        },
+                        {
+                            "augments": { "tier": 2, "rarity": "Rare" },
+                            "price": 105
+                        },
+                        {
+                            "augments": { "tier": 1, "rarity": "Epic" },
+                            "price": 95
+                        },
+                        {
+                            "augments": { "tier": 2, "rarity": "Uncommon" },
+                            "price": 75
+                        },
+                        {
+                            "augments": { "tier": 1, "rarity": "Rare" },
+                            "price": 65
+                        },
+                        {
+                            "augments": { "tier": 1, "rarity": "Uncommon" },
+                            "price": 50
                         }
                     ]
                 },

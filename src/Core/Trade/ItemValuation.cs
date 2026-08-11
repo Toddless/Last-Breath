@@ -20,8 +20,8 @@ namespace Core.Trade
     /// <param name="blueprints">Where an equip's authored base is written; a composition without it
     /// values no gear.</param>
     /// <param name="augments">What an augment id means. An augment carries no authored base at all —
-    /// its price is computed from the tier and rarity its record already declares — so a composition
-    /// without the catalog values none of them.</param>
+    /// its price is computed from the tier its record declares — so a composition without the catalog
+    /// values none of them. Rarity comes from the copy, like every other item's.</param>
     public class ItemValuation(
         ITradeConfigProvider configProvider,
         IEquipBlueprintProvider? blueprints = null,
@@ -54,10 +54,9 @@ namespace Core.Trade
         };
 
         /// <summary>An augment's base, computed rather than authored: tier is the whole of what one
-        /// augment is worth over another of the same rarity, and it is already on the record. What the
-        /// copy ROLLED never enters — an augment at the top of its band is the same augment as one at
-        /// the bottom, exactly as a sharpened blade prices off its blueprint and not off the numbers
-        /// its lines happen to carry.</summary>
+        /// augment is worth over another of the same rarity, and it is already on the record. The copy's
+        /// NUMBERS never enter — a blade prices off its blueprint, not off the values its lines rolled —
+        /// while the copy's rarity does, above, where every item's rarity is applied.</summary>
         private float AugmentBase(IAugmentItem augment, TradeConfig config) =>
             augments?.Find(augment.Augment.AugmentId) is { } record
                 ? config.AugmentBasePrice * MathF.Pow(config.AugmentTierMultiplier, record.Tier)

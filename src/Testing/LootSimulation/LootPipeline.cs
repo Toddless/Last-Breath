@@ -44,10 +44,15 @@ namespace LastBreathTest.LootSimulation
             var effectCatalog = new Core.Crafting.CraftingEffectProvider();
             ServiceProvider shared = new ServiceCollection().AddSharedGameDataParticipants().BuildServiceProvider();
 
+            // The one battle-module participant the stand reads: an augment copy's numbers are drawn
+            // around the band this file declares, and a drop pipeline that cannot mint an augment
+            // would report the augment seats of the tables as dropping nothing at all.
+            var combatRules = new Battle.Source.CombatRules.CombatRulesProvider();
+
             var dataService = new GameDataService(
                 new FileSystemDataSource(dataRoot),
                 [
-                    itemProvider, modifierProvider, tableProvider, configurationProvider, effectCatalog,
+                    itemProvider, modifierProvider, tableProvider, configurationProvider, effectCatalog, combatRules,
                     .. shared.GetServices<IGameDataParticipant>()
                 ]);
             var loadFailures = new List<string>();
@@ -64,10 +69,13 @@ namespace LastBreathTest.LootSimulation
             var materializer = new Core.Modifiers.ModifierMaterializer(rnd);
             var equipMinter = new Core.Items.EquipItemMinter(itemProvider, factory,
                 new Core.Items.Grants.GrantFactory(() => null, () => null, () => null), materializer, rnd);
-            var itemMinter = new Core.Items.ItemMinter(itemProvider, equipMinter, itemProvider);
+            var augmentCatalog = shared.GetRequiredService<Core.Battle.Abilities.IAbilityAugmentCatalog>();
+            var itemMinter = new Core.Items.ItemMinter(itemProvider, equipMinter, itemProvider,
+                new Core.Items.AugmentItemMinter(augmentCatalog,
+                    new Core.Battle.Abilities.AugmentMinter(augmentCatalog, combatRules, rnd)));
             var itemCreation = new ItemCreationService(itemProvider, rnd, itemMinter, materializer, effectCatalog,
                 new Core.Items.Grants.GrantFactory(() => null, () => null, () => null));
-            var draw = new TableRecordDraw(shared.GetRequiredService<Core.Battle.Abilities.IAbilityAugmentCatalog>(), rnd);
+            var draw = new TableRecordDraw(augmentCatalog, rnd);
             var lootService = new LootGenerationService(rnd, events, messages, itemCreation, configurationProvider, draw);
 
             return new LootPipeline

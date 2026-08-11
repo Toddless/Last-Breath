@@ -421,6 +421,8 @@
     "augments": [
         {
             "id": "Augment_Poison_On_Hit",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "poison", "debuff" ],
             "tier": 3,
             "tags": [ "poison" ],
@@ -431,6 +433,8 @@
         },
         {
             "id": "Ability_SoA_Augment_Apply_Buff_Critical_Chance",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -444,6 +448,8 @@
         },
         {
             "id": "Ability_SoA_Augment_Apply_Buff_Critical_Damage",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -457,6 +463,8 @@
         },
         {
             "id": "Augment_Additional_Max_Attacks",
+            "minRarity": "Rare",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "attack" ],
             "upgradeProperties": {
@@ -465,6 +473,8 @@
         },
         {
             "id": "Augment_More_Attack_Damage",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "damage", "attack" ],
             "upgradeProperties": {
@@ -473,6 +483,8 @@
         },
         {
             "id": "Ability_SoA_Augment_Attacks_Cannot_Be_Evaded",
+            "minRarity": "Epic",
+            "maxRarity": "Epic",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Series_Of_Attacks",
@@ -480,6 +492,8 @@
         },
         {
             "id": "Augment_Additional_Attacks",
+            "minRarity": "Rare",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [ "attack" ],
             "upgradeProperties": {
@@ -488,6 +502,9 @@
         },
         {
             "id": "Ability_Ip_Augment_Single_Empowered_Attack",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
+            "exclusionGroup": "Attack_Count",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Increasing_Pressure",
@@ -495,6 +512,8 @@
         },
         {
             "id": "Augment_Attack_Random_Target",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Increasing_Pressure",
@@ -504,6 +523,8 @@
         },
         {
             "id": "Ability_Ip_Augment_Last_Attack_Always_Crit",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Increasing_Pressure",
@@ -511,6 +532,8 @@
         },
         {
             "id": "Ability_Ip_Augment_First_Attack_Crit_Damage",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Increasing_Pressure",
@@ -520,6 +543,8 @@
         },
         {
             "id": "Augment_Extend_Poison",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "attack", "poison" ],
             "upgradeProperties": {
@@ -528,6 +553,8 @@
         },
         {
             "id": "Augment_Additional_Projectiles",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "projectile" ],
             "upgradeProperties": {
@@ -536,6 +563,8 @@
         },
         {
             "id": "Augment_Buff_Effectiveness",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [ "buff", "effectiveness" ],
             "upgradeProperties": {
@@ -544,6 +573,8 @@
         },
         {
             "id": "Augment_Recovery_Effectiveness",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "recovery", "effectiveness" ],
             "upgradeProperties": {
@@ -552,6 +583,8 @@
         },
         {
             "id": "Augment_Debuff_Effectiveness",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [ "debuff", "effectiveness" ],
             "upgradeProperties": {
@@ -560,6 +593,8 @@
         },
         {
             "id": "Ability_Ip_Augment_Unevadable",
+            "minRarity": "Epic",
+            "maxRarity": "Epic",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Increasing_Pressure",
@@ -569,6 +604,9 @@
         },
         {
             "id": "Augment_Additional_Amount_Attacks",
+            "minRarity": "Rare",
+            "maxRarity": "Legendary",
+            "exclusionGroup": "Attack_Count",
             "tier": 1,
             "tags": [ "attack" ],
             "upgradeProperties": {
@@ -577,6 +615,8 @@
         },
         {
             "id": "Augment_Additional_Damage_Multiplier",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [ "damage", "attack" ],
             "upgradeProperties": {
@@ -585,6 +625,9 @@
         },
         {
             "id": "Ability_JoP_Augment_Bouncing",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
+            "exclusionGroup": "Jar_Reach",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Jar_Of_Poison",
@@ -594,6 +637,8 @@
         },
         {
             "id": "Augment_Transfer_Poison_On_Death",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [ "poison" ],
             "abilityId": "Ability_Jar_Of_Poison",
@@ -601,6 +646,9 @@
         },
         {
             "id": "Ability_JoP_Augment_All_Targets",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
+            "exclusionGroup": "Jar_Reach",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Jar_Of_Poison",
@@ -608,6 +656,8 @@
         },
         {
             "id": "Augment_Clumsy_Blows",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 2,
             "tags": [ "attack" ],
@@ -622,6 +672,8 @@
         },
         {
             "id": "Augment_Clumsiness",
+            "minRarity": "Rare",
+            "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 2,
             "tags": [ "evasion" ],
@@ -636,6 +688,8 @@
         },
         {
             "id": "Augment_Apply_Blind",
+            "minRarity": "Rare",
+            "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 2,
             "tags": [],
@@ -650,6 +704,8 @@
         },
         {
             "id": "Augment_Apply_Weakness",
+            "minRarity": "Rare",
+            "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 2,
             "tags": [ "damage" ],
@@ -664,6 +720,8 @@
         },
         {
             "id": "Augment_Increasing_Scales",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [ "damage" ],
             "upgradeProperties": {
@@ -673,6 +731,8 @@
         },
         {
             "id": "Augment_Poison_Duration",
+            "minRarity": "Epic",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [ "poison", "duration" ],
             "upgradeProperties": {
@@ -681,6 +741,8 @@
         },
         {
             "id": "Ability_Ds_Augment_Additional_Attack_Chance",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Dark_Shroud",
@@ -690,6 +752,8 @@
         },
         {
             "id": "Ability_Ds_Augment_Additional_Accuracy",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Dark_Shroud",
@@ -699,6 +763,8 @@
         },
         {
             "id": "Augment_Immortality",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [ "buff" ],
@@ -710,6 +776,8 @@
         },
         {
             "id": "Ability_Ds_Augment_Mana_Regen",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff", "recovery" ],
             "tier": 2,
             "tags": [],
@@ -720,6 +788,8 @@
         },
         {
             "id": "Augment_Additional_Health_Regen",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "recovery", "health" ],
             "abilityId": "Ability_Dark_Shroud",
@@ -729,6 +799,8 @@
         },
         {
             "id": "Augment_Add_Effectiveness_Reduce_Stacks",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "stacks" ],
             "upgradeProperties": {
@@ -738,6 +810,8 @@
         },
         {
             "id": "Augment_Increased_Buff_Duration",
+            "minRarity": "Epic",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [ "buff", "duration" ],
             "upgradeProperties": {
@@ -746,6 +820,8 @@
         },
         {
             "id": "Ability_Cc_Augment_Additional_Attack_Chance",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Critical_Calculation",
@@ -753,6 +829,8 @@
         },
         {
             "id": "Ability_Cc_Augment_Additional_Crit_Chance",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Critical_Calculation",
@@ -762,6 +840,8 @@
         },
         {
             "id": "Augment_Lucky_Crit",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [ "crit" ],
@@ -771,6 +851,8 @@
         },
         {
             "id": "Augment_Additional_Crit_Multiplier",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 2,
             "tags": [ "crit", "damage" ],
@@ -782,6 +864,8 @@
         },
         {
             "id": "Augment_Leach_On_Crit",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 2,
             "tags": [ "crit", "health" ],
@@ -792,6 +876,8 @@
         },
         {
             "id": "Augment_Apply_Enhanced_Defence",
+            "minRarity": "Rare",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 2,
             "tags": [ "buff", "duration" ],
@@ -804,6 +890,8 @@
         },
         {
             "id": "Augment_More_Stacks_More_Cost",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [ "stacks" ],
             "upgradeProperties": {
@@ -813,6 +901,8 @@
         },
         {
             "id": "Augment_Apply_Seal_Of_Oblivion",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 3,
             "tags": [],
@@ -826,6 +916,8 @@
         },
         {
             "id": "Ability_Pe_Augment_Execute_Bosses",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
@@ -835,6 +927,8 @@
         },
         {
             "id": "Ability_Pe_Augment_Spread_Poison",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
@@ -842,6 +936,8 @@
         },
         {
             "id": "Ability_Pe_Augment_Poison_Not_Removed",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
@@ -849,6 +945,8 @@
         },
         {
             "id": "Augment_Reduce_Execution_Trahsold",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "execute" ],
             "upgradeProperties": {
@@ -857,6 +955,8 @@
         },
         {
             "id": "Ability_Pe_Augment_Transfer_Poison_On_Death",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
@@ -864,6 +964,8 @@
         },
         {
             "id": "Ability_Pe_Augment_Total_Damage_Multiplier",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Poison_Explosion",
@@ -873,6 +975,8 @@
         },
         {
             "id": "Ability_Pc_Augment_Attacks_Reduce_Incoming_Heal",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 3,
             "tags": [],
@@ -885,6 +989,8 @@
         },
         {
             "id": "Ability_Pc_Augment_Attacks_Reduce_Armor",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 3,
             "tags": [],
@@ -897,6 +1003,8 @@
         },
         {
             "id": "Ability_Pc_Augment_Apply_Stack_For_Each_Enemy",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -904,6 +1012,8 @@
         },
         {
             "id": "Ability_Pc_Augment_Additional_Poison_Stack_Duration",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -913,6 +1023,8 @@
         },
         {
             "id": "Ability_Pc_Augment_Additional_Multiplier",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -922,6 +1034,8 @@
         },
         {
             "id": "Ability_Pc_Augment_Increase_Duration",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Poison_Coating",
@@ -931,6 +1045,8 @@
         },
         {
             "id": "Ability_Dst_Augment_Both_Hits_Buff",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -942,6 +1058,8 @@
         },
         {
             "id": "Augment_Restore_On_Hit",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "recovery" ],
             "tier": 3,
             "tags": [ "hit" ],
@@ -953,6 +1071,8 @@
         },
         {
             "id": "Ability_Dst_Augment_Accuracy",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Double_Strike",
@@ -962,6 +1082,8 @@
         },
         {
             "id": "Augment_Damage_Multiplier",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "damage" ],
             "upgradeProperties": {
@@ -970,6 +1092,8 @@
         },
         {
             "id": "Ability_Ar_Augment_Incoming_Reduction",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -985,6 +1109,8 @@
         },
         {
             "id": "Ability_Ar_Augment_Turn_End_Heal",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff", "recovery" ],
             "tier": 3,
             "tags": [],
@@ -1000,6 +1126,8 @@
         },
         {
             "id": "Ability_Ar_Augment_Damage_Buff",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -1015,6 +1143,8 @@
         },
         {
             "id": "Augment_Recovery_Bonus",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "recovery", "health" ],
             "abilityId": "Ability_Ares_Blessing",
@@ -1024,6 +1154,8 @@
         },
         {
             "id": "Augment_Health_Bonus",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "health" ],
             "upgradeProperties": {
@@ -1032,6 +1164,8 @@
         },
         {
             "id": "Augment_Buff_Duration",
+            "minRarity": "Epic",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [ "buff", "duration" ],
             "upgradeProperties": {
@@ -1040,6 +1174,8 @@
         },
         {
             "id": "Ability_Porc_Augment_Echo",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -1051,6 +1187,8 @@
         },
         {
             "id": "Ability_Porc_Augment_Incoming_Reduction",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -1066,6 +1204,8 @@
         },
         {
             "id": "Ability_Porc_Augment_Crit_Mitigation",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -1081,6 +1221,8 @@
         },
         {
             "id": "Augment_Heal_On_Hit",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "grantsTags": [ "recovery" ],
             "tier": 2,
             "tags": [ "hit" ],
@@ -1091,6 +1233,8 @@
         },
         {
             "id": "Augment_More_Armor_Return",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "armor" ],
             "upgradeProperties": {
@@ -1099,6 +1243,8 @@
         },
         {
             "id": "Augment_More_Damage_Return",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "damage" ],
             "abilityId": "Ability_Porcupine",
@@ -1108,6 +1254,8 @@
         },
         {
             "id": "Augment_Cooldown_Chance",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Porcupine",
@@ -1117,6 +1265,8 @@
         },
         {
             "id": "Ability_Porc_Augment_Armor_Buff",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 1,
             "tags": [],
@@ -1132,6 +1282,8 @@
         },
         {
             "id": "Ability_Bf_Augment_Burning_Fury",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "burn", "debuff" ],
             "tier": 3,
             "tags": [],
@@ -1144,6 +1296,8 @@
         },
         {
             "id": "Ability_Bf_Augment_Primal_Fury",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Berserk_Fury",
@@ -1153,6 +1307,8 @@
         },
         {
             "id": "Ability_Bf_Augment_Healing_Fury",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Berserk_Fury",
@@ -1162,6 +1318,8 @@
         },
         {
             "id": "Augment_More_Burn",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "damage" ],
             "upgradeProperties": {
@@ -1170,6 +1328,8 @@
         },
         {
             "id": "Augment_Less_Burn",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Berserk_Fury",
@@ -1179,6 +1339,8 @@
         },
         {
             "id": "Augment_Fury_Duration",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [ "duration" ],
             "abilityId": "Ability_Berserk_Fury",
@@ -1188,6 +1350,9 @@
         },
         {
             "id": "Augment_Additional_Lunges",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
+            "exclusionGroup": "Attack_Count",
             "tier": 3,
             "tags": [ "attack" ],
             "upgradeProperties": {
@@ -1196,6 +1361,8 @@
         },
         {
             "id": "Ability_Hb_Augment_Additional_Scales",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Head_Butt",
@@ -1206,6 +1373,8 @@
         },
         {
             "id": "Augment_Extend_Stun_Add_Cost",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "control", "duration" ],
             "upgradeProperties": {
@@ -1215,6 +1384,8 @@
         },
         {
             "id": "Ability_Hb_Augment_Armor_Debuff",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 2,
             "tags": [],
@@ -1229,6 +1400,8 @@
         },
         {
             "id": "Augment_Heal_From_Damage",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [ "health", "damage", "recovery" ],
             "abilityId": "Ability_Sacrifice",
@@ -1238,6 +1411,8 @@
         },
         {
             "id": "Augment_Incoming_Reduction",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -1252,6 +1427,8 @@
         },
         {
             "id": "Augment_Free_Cast",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -1260,6 +1437,8 @@
         },
         {
             "id": "Ability_Arm_Augment_All_Targets",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Armageddon",
@@ -1269,6 +1448,8 @@
         },
         {
             "id": "Ability_Arm_Augment_Stage3_Burning",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "grantsTags": [ "burn", "debuff" ],
             "tier": 2,
             "tags": [],
@@ -1281,6 +1462,8 @@
         },
         {
             "id": "Ability_Ib_Augment_Withering_Value",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1290,6 +1473,8 @@
         },
         {
             "id": "Ability_Ib_Augment_Withering_Stacks",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1299,6 +1484,8 @@
         },
         {
             "id": "Ability_Ib_Augment_Extra_Block_Damage",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1308,6 +1495,8 @@
         },
         {
             "id": "Ability_Ib_Augment_Heavy_Blocks",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1319,6 +1508,8 @@
         },
         {
             "id": "Ability_Ib_Augment_Reset_Chance",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1328,6 +1519,8 @@
         },
         {
             "id": "Ability_Ib_Augment_Random_Extra_Blocks",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1335,6 +1528,8 @@
         },
         {
             "id": "Ability_Ib_Augment_Consume_Stun",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
@@ -1342,6 +1537,8 @@
         },
         {
             "id": "Ability_Ov_Augment_Mana_Step",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Overload",
@@ -1351,6 +1548,8 @@
         },
         {
             "id": "Augment_Random_Cooldown",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1360,6 +1559,8 @@
         },
         {
             "id": "Ability_Ov_Augment_Additional_Multiplier",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Overload",
@@ -1369,6 +1570,8 @@
         },
         {
             "id": "Ability_Ov_Augment_Stage4_Resets_Cooldown",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Overload",
@@ -1376,6 +1579,8 @@
         },
         {
             "id": "Augment_Mana_Flow",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff", "recovery" ],
             "tier": 3,
             "tags": [],
@@ -1390,6 +1595,8 @@
         },
         {
             "id": "Augment_Next_Cast_Pure",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -1400,6 +1607,8 @@
         },
         {
             "id": "Ability_Cl_Augment_Ignore_Resistances",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Chain_Lightning",
@@ -1407,6 +1616,8 @@
         },
         {
             "id": "Ability_Ia_Augment_Reflect",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Aegis",
@@ -1416,6 +1627,8 @@
         },
         {
             "id": "Ability_Ia_Augment_Stun_Attackers",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "stun", "control" ],
             "tier": 3,
             "tags": [],
@@ -1426,6 +1639,8 @@
         },
         {
             "id": "Ability_Ia_Augment_Turn_End_Heal",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Aegis",
@@ -1435,6 +1650,8 @@
         },
         {
             "id": "Ability_Ia_Augment_Crit_Mitigation",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
             "tags": [],
@@ -1450,6 +1667,8 @@
         },
         {
             "id": "Ability_Is_Augment_Barrier_From_Shrapnel",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1459,6 +1678,8 @@
         },
         {
             "id": "Ability_Is_Augment_Apply_Fragility",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 3,
             "tags": [],
@@ -1473,6 +1694,8 @@
         },
         {
             "id": "Ability_Is_Augment_Additional_Crit_Damage",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1482,6 +1705,8 @@
         },
         {
             "id": "Ability_Is_Augment_Additional_Crit_Chance",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1491,6 +1716,8 @@
         },
         {
             "id": "Ability_Is_Augment_Additional_Scales",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1501,6 +1728,8 @@
         },
         {
             "id": "Ability_Is_Augment_Multicast",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1510,6 +1739,8 @@
         },
         {
             "id": "Ability_Is_Augment_Crit_Ignores_Cold_Res",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
@@ -1517,6 +1748,8 @@
         },
         {
             "id": "Ability_Df_Augment_Frostbite_Duration",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
@@ -1526,6 +1759,8 @@
         },
         {
             "id": "Ability_Df_Augment_Spread_Freeze",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
@@ -1535,6 +1770,8 @@
         },
         {
             "id": "Ability_Df_Augment_Extend_Effects",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
@@ -1542,6 +1779,8 @@
         },
         {
             "id": "Ability_Df_Augment_More_Shred",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
@@ -1551,6 +1790,8 @@
         },
         {
             "id": "Ability_Df_Augment_Enemy_Cooldown",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 3,
             "tags": [],
@@ -1564,6 +1805,8 @@
         },
         {
             "id": "Augment_Reduce_All_Cooldowns",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1573,6 +1816,8 @@
         },
         {
             "id": "Ability_Df_Augment_Execute",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
@@ -1582,6 +1827,8 @@
         },
         {
             "id": "Ability_Dis_Augment_Multiplier",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Discharge",
@@ -1591,6 +1838,8 @@
         },
         {
             "id": "Ability_Dis_Augment_More_Restore",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Discharge",
@@ -1600,6 +1849,8 @@
         },
         {
             "id": "Ability_Dis_Augment_More_Multiplier",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Discharge",
@@ -1609,6 +1860,8 @@
         },
         {
             "id": "Ability_Dis_Augment_Spell_Scale",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Discharge",
@@ -1618,6 +1871,8 @@
         },
         {
             "id": "Ability_Dis_Augment_Overkill",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Discharge",
@@ -1625,6 +1880,8 @@
         },
         {
             "id": "Ability_Dis_Augment_Ignore_Resistances",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Discharge",
@@ -1632,6 +1889,8 @@
         },
         {
             "id": "Ability_Dis_Augment_Consume_Mana",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Discharge",
@@ -1639,6 +1898,8 @@
         },
         {
             "id": "Ability_Sa_Augment_Detonation_Scales",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
@@ -1649,6 +1910,8 @@
         },
         {
             "id": "Ability_Sa_Augment_Buff_Duration",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
@@ -1658,6 +1921,8 @@
         },
         {
             "id": "Ability_Sa_Augment_More_Splash",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
@@ -1667,6 +1932,8 @@
         },
         {
             "id": "Ability_Sa_Augment_Less_Stacks",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 2,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
@@ -1676,6 +1943,8 @@
         },
         {
             "id": "Ability_Sa_Augment_Overkill",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
@@ -1683,6 +1952,8 @@
         },
         {
             "id": "Ability_Sa_Augment_Ignore_Resistances",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Static_Armor",
@@ -1690,6 +1961,8 @@
         },
         {
             "id": "Augment_Cost_Barrier",
+            "minRarity": "Epic",
+            "maxRarity": "Epic",
             "tier": 3,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1697,6 +1970,8 @@
         },
         {
             "id": "Augment_Reduce_Cost",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1706,6 +1981,8 @@
         },
         {
             "id": "Augment_Reduce_Cooldown",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1715,6 +1992,8 @@
         },
         {
             "id": "Augment_Reduce_Cooldown_Add_Cost",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
             "tier": 1,
             "tags": [],
             "fitsAnyAbility": true,
@@ -1725,6 +2004,8 @@
         },
         {
             "id": "Augment_Cost_Type_Health",
+            "minRarity": "Epic",
+            "maxRarity": "Epic",
             "tier": 2,
             "tags": [],
             "fitsAnyAbility": true,

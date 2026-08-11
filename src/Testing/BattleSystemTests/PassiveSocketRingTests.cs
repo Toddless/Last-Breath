@@ -94,7 +94,7 @@ namespace LastBreathTest.BattleSystemTests
             SocketRingSlot slot = rings[Unlock].Single(entry => entry.OpenerId == LongSocket);
             Assert.AreEqual(SocketSlotState.Open, SocketRings.StateOf(board.Find(slot.Address)));
 
-            Assert.IsTrue(board.Install(slot.Address, new AugmentInstance("Augment_Any", new Dictionary<string, float>())));
+            Assert.IsTrue(board.Install(slot.Address, new AugmentInstance("Augment_Any", new Dictionary<string, float>(), Rarity.Common)));
             Assert.AreEqual(SocketSlotState.Filled, SocketRings.StateOf(board.Find(slot.Address)));
 
             // The node behind it goes back: every other slot stays live and this one closes around what

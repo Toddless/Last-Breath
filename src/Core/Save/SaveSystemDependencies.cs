@@ -75,7 +75,10 @@ namespace Core.Save
                     sp.GetService<Battle.Abilities.IAbilitySocketBoard>(),
                     // Optional beside the board: the restored arrangement has to reach the abilities,
                     // and a composition holding no slots holds nothing to carry over to them.
-                    sp.GetService<Battle.Abilities.IAbilityAugmentBinder>()));
+                    sp.GetService<Battle.Abilities.IAbilityAugmentBinder>(),
+                    // Optional again, and needed only by files written before a copy carried its
+                    // rarity: those are drawn once here, from the band their record declares now.
+                    sp.GetService<Items.IAugmentItemMinter>()));
                 manager.Register(new PlayerVitalsSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
                 manager.Register(new PlayerPlacementSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
 

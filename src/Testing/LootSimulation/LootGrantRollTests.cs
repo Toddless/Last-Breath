@@ -75,7 +75,7 @@ namespace LastBreathTest.LootSimulation
         {
             var rnd = new DefaultRandomNumberGenerator(seed: 42);
             var minter = new Mock<IItemMinter>();
-            minter.Setup(mock => mock.MintItem(ItemId))
+            minter.Setup(mock => mock.MintItem(ItemId, It.IsAny<Rarity?>()))
                 .Returns(() => new EquipItem(EquipmentPiece.Body, ItemId, []) { Rarity = mintedRarity });
 
             var dataProvider = new Mock<IItemDataProvider>();

@@ -71,23 +71,39 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void TwoCopiesOfOneRecordAreWorthTheSameHoweverTheyRolled()
+        public void TwoCopiesOfOneRecordAtOneRarityAreWorthTheSameHoweverTheyRolled()
         {
             // The point of pricing off the record: a copy that rolled the top of its band and one that
-            // rolled the bottom are the same augment. Were the roll in the price, a player would sell
-            // the good copy and keep the bad one, and every drop would be worth re-reading before it
-            // was worth using.
+            // rolled the bottom are the same augment. Were the NUMBERS in the price, a player would
+            // sell the good copy and keep the bad one, and every drop would be worth re-reading before
+            // it was worth using. The rarity is the copy's own and does move the price — that is the
+            // whole of the other axis — so it is pinned here rather than left to two draws.
             AugmentItemMinter minter = ShippedMinter(seed: 7);
-            IAugmentItem first = minter.Mint(ShippedRecord)!;
-            IAugmentItem second = minter.Mint(ShippedRecord)!;
+            IAugmentItem first = minter.Mint(ShippedRecord, Rarity.Rare)!;
+            IAugmentItem second = minter.Mint(ShippedRecord, Rarity.Rare)!;
             Assert.AreNotEqual(first.Augment.Values[ShippedProperty], second.Augment.Values[ShippedProperty],
                 "the two draws came out identical, so equal prices would prove nothing");
 
             var valuation = new ItemValuation(Config(), augments: ShippedAbilityData.Augments());
 
             Assert.AreEqual(valuation.Value(first), valuation.Value(second),
-                "the roll leaked into the price: two copies of one record must cost the same");
+                "the numbers leaked into the price: two copies of one record at one rarity must cost the same");
             Assert.IsTrue(valuation.Value(first) > 0, "a shipped augment must be worth something at all");
+        }
+
+        [TestMethod]
+        public void ACopyThatRolledABetterRarityIsWorthMoreThanOneOfTheSameRecordThatDidNot()
+        {
+            // The consequence of the rarity being drawn per copy rather than authored per record: one
+            // record now produces things of different worth, and the shelf has to say so. Priced off
+            // the record's own field instead, every copy of an augment would carry one price and the
+            // band would be invisible to the player who found the good one.
+            var valuation = Valuation(Record("Augment_Banded", tier: 2));
+
+            int plain = valuation.Value(Item("Augment_Banded", Rarity.Common));
+            int lucky = valuation.Value(Item("Augment_Banded", Rarity.Rare));
+
+            Assert.IsTrue(lucky > plain, $"two copies of one record priced the same at {plain}, whatever they rolled");
         }
 
         [TestMethod]
@@ -154,7 +170,7 @@ namespace LastBreathTest.BattleSystemTests
             new() { Id = id, Tier = tier, Rarity = rarity };
 
         private static IAugmentItem Item(string augmentId, Rarity rarity) =>
-            new AugmentItem(new AugmentInstance(augmentId, new Dictionary<string, float> { ["share"] = 0.3f }), rarity);
+            new AugmentItem(new AugmentInstance(augmentId, new Dictionary<string, float> { ["share"] = 0.3f }, rarity));
 
         /// <summary>The formula's own numbers, not the shipped balance: the cases below are about tier
         /// and rarity moving the price, and a balance pass must not turn one of them red.</summary>

@@ -4,12 +4,16 @@ namespace Core.Items
     using System.Collections.Generic;
     using System.Linq;
     using Data;
+    using Enums;
 
     public interface IItemMinter
     {
         /// <summary>Type-agnostic birth point for callers that only hold an id (quests, narrative,
         /// debug): the kind of thing the id names decides how it is born.</summary>
-        IItem MintItem(string id);
+        /// <param name="rarity">What the thing is worth, when the caller already knows — a loot table
+        /// seat that names a set says what the set is worth. Null leaves every kind to its own draw,
+        /// which is what an id on its own says about rarity: nothing.</param>
+        IItem MintItem(string id, Rarity? rarity = null);
     }
 
     /// <summary>
@@ -32,15 +36,17 @@ namespace Core.Items
         /// <summary>The kinds in the order they are offered the id. Each returns null for an id that
         /// is not its own — asking is how the kind is chosen, so a "no" is an answer and never a
         /// report.</summary>
-        private readonly IReadOnlyList<Func<string, IItem?>> _kinds =
+        private readonly IReadOnlyList<Func<string, Rarity?, IItem?>> _kinds =
         [
-            id => blueprints.GetBlueprint(id) != null ? equipMinter.Mint(id) : null,
-            id => augments?.Mint(id),
+            // Equipment takes no rarity here: a piece is stamped with one after the mint, by whoever
+            // rolls its affix lines — the two are one decision and cannot be made in two places.
+            (id, _) => blueprints.GetBlueprint(id) != null ? equipMinter.Mint(id) : null,
+            (id, rarity) => augments?.Mint(id, rarity),
         ];
 
         // Walked lazily: the kind that claims the id is the last one asked, so an id one kind owns
         // reaches neither the kinds after it nor the fallback copy.
-        public IItem MintItem(string id) =>
-            _kinds.Select(kind => kind(id)).FirstOrDefault(item => item != null) ?? items.CopyItem(id);
+        public IItem MintItem(string id, Rarity? rarity = null) =>
+            _kinds.Select(kind => kind(id, rarity)).FirstOrDefault(item => item != null) ?? items.CopyItem(id);
     }
 }

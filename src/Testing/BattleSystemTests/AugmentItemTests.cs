@@ -126,6 +126,44 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void ACopyWrittenBeforeRarityWasStoredIsDrawnIntoItsRecordsBandOnce()
+        {
+            // Files exist from when a copy's rarity was its record's field and nothing was written
+            // down. They say nothing, and "nothing" read as a rarity is the enum's zero — the best one
+            // in the game. Drawn instead, from the band the record declares today, on the same seam a
+            // fresh copy is drawn on.
+            var bag = new SlottedBag(BagSlots);
+            AugmentItemMinter minter = Minter(seed: 12);
+            bag.TryAddItem(minter.Mint(Record)!);
+            var participant = Participant(bag, minter);
+
+            JObject written = JObject.Parse(participant.Capture().ToString(Formatting.None));
+            foreach (JObject entry in written.Descendants().OfType<JObject>().Where(node => node["augment"] is JValue).ToList())
+                entry.Property("rarity")?.Remove();
+
+            participant.Restore(written, participant.Version);
+
+            var restored = bag.GetContents()[0].Item as IAugmentItem;
+            Assert.IsNotNull(restored, "what came back out of the legacy file is not an augment");
+            (Rarity worst, Rarity best) = ShippedAbilityData.Augments().Find(Record)!.RarityBand;
+            Assert.IsTrue((int)restored.Rarity >= (int)best && (int)restored.Rarity <= (int)worst,
+                $"the legacy copy came back at {restored.Rarity}, outside the {worst}..{best} its record allows");
+
+            // ONCE, and the word carries the whole weight: the draw has to end up in the NEXT file, or
+            // every launch redraws the player's collection and an augment he found is a different thing
+            // each time he looks at it. Read off the file rather than off a second load — a second load
+            // that redrew could still land on the same rarity and prove nothing.
+            JObject rewritten = JObject.Parse(participant.Capture().ToString(Formatting.None));
+            var migrated = rewritten.Descendants().OfType<JObject>().First(node => node["augment"] is JValue);
+            Assert.AreEqual((int)restored.Rarity, (int?)migrated["rarity"],
+                "the drawn rarity was not written down, so the next load draws again: a perpetual re-roll of the player's collection");
+
+            participant.Restore(rewritten, participant.Version);
+            Assert.AreEqual(restored.Rarity, (bag.GetContents()[0].Item as IAugmentItem)?.Rarity,
+                "the copy came back at another rarity on the load after the migration");
+        }
+
+        [TestMethod]
         public void AnIdNoRecordDeclaresMintsNoAugment()
         {
             // Nothing says what the augment is or what to draw around. An item minted anyway would be
