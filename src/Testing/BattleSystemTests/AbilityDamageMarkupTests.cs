@@ -57,6 +57,10 @@ namespace LastBreathTest.BattleSystemTests
         private static readonly string[] s_undocumented =
         [
             // "Накладывает стак Яда" — the jar's own blow carries the poison and is left unnumbered.
+            // Its record still holds damage/scales that ExecuteInternal never reads: whether the jar is
+            // meant to strike is an open question with the owner ("the jar carries damage the document
+            // does not name"), so the figures stand rather than being deleted by a guess. Anyone wiring
+            // them up should know the throw is a COUNTED loop now — a blow added here is dealt per jar.
             "Ability_Jar_Of_Poison",
             // "Чем ниже здоровье, тем короче серия" — the series carries plain attacks, the record is zeroed.
             "Ability_Berserk_Fury",

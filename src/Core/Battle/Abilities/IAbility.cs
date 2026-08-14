@@ -34,6 +34,11 @@
         /// it — for readers where absence is an answer rather than a typo.</summary>
         float ValueOr(string parameter, float fallback);
 
+        /// <summary>Whether the ability declared the parameter at all. Distinct from its value being
+        /// nothing: a reader that cannot tell the two apart hands a zero on where it meant to hand
+        /// nothing, and a zero is a number somebody downstream will use.</summary>
+        bool Declares(string parameter);
+
         /// <summary>False = no backing out once target selection began: the player must pick a
         /// target and the cast fires (charged Armageddon). Default true.</summary>
         bool IsCancellable => true;

@@ -216,6 +216,37 @@ namespace LastBreathTest.BattleSystemTests
                 "two records laying one effect did not come out as two stacks on one touch");
         }
 
+        [TestMethod]
+        public async Task ARecordMayCarryALeverOfItsOwnBesideTheEffectItNames()
+        {
+            // The claim CL-3b makes about what a record may still hold. The effect registry judges a key
+            // it does not read as a typo and refuses the WHOLE effect, so a record carrying one of its
+            // own levers used to lay nothing at all — it passed the behaviour gate, passed every walk,
+            // was seated and paid for, and the stack count was the only place it showed. The lever is
+            // filtered out of what the registry is handed; it stays on the record for its own reader.
+            using var rolls = new CombatRandomScope(new SteadyRoll());
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            var owner = Fighter();
+            var target = Fighter();
+
+            AbilityAugmentData carrying = Shipped(Codeless) with
+            {
+                UpgradeProperties = new Dictionary<string, float>(StringComparer.Ordinal) { ["reviewProbeLever"] = 0.42f }
+            };
+
+            IAbilityAugment? upgrade = registry.CreateUpgrade(carrying);
+            Assert.IsNotNull(upgrade, "a record carrying a lever of its own was refused outright");
+
+            var ability = (Ability)registry.CreateAbility("Ability_Series_Of_Attacks");
+            ability.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_lever"] = upgrade });
+            await ability.ApplyImpactRiders(new AbilityImpact(owner, target, FieldOf(owner, target)) { Source = ability, Kind = ImpactKind.Attack });
+
+            Assert.AreEqual(1, Stacks(target, ClumsinessId),
+                "a key the effect does not read took the whole effect down with it — the record laid nothing");
+            Assert.AreEqual(0.42f, carrying.UpgradeProperties["reviewProbeLever"], 0.0001f,
+                "the lever was filtered off the record itself instead of only off what the registry is handed");
+        }
+
         private const string ClumsinessId = "Effect_Clumsiness";
 
         /// <summary>The ability as the game builds it, wearing the named shipped records.</summary>

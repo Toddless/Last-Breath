@@ -173,18 +173,65 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void ANumberOnTheRecordOverridesTheCanonWhileTheTransitionLasts()
+        public void NoAugmentRecordRestatesANumberTheCanonAlreadyBalances()
         {
-            // The transitional precedence, pinned so it is removed on purpose rather than by drift.
+            // The end state of CL-3. A record naming an effect describes WHICH effect and on what
+            // touch; how much it is worth is settled in one file. One record carrying its own figure
+            // is all it takes for the two to start drifting, and the drift is invisible until somebody
+            // reads both — which is how the shipped catalog came to hold seven of them.
+            var provider = Loaded();
+            List<string> restating = [];
+
+            foreach ((string id, string effectId, List<string> keys) in EffectRecordsInData())
+            {
+                IReadOnlyCollection<string>? declared = provider.KeysOf(effectId);
+                if (declared == null)
+                {
+                    restating.Add($"{id}: names '{effectId}', which nothing builds");
+                    continue;
+                }
+
+                string[] restated = [.. keys.Intersect(declared, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+                if (restated.Length > 0) restating.Add($"{id} ({effectId}): [{string.Join(", ", restated)}]");
+            }
+
+            Assert.IsTrue(EffectRecordsInData().Any(), "no effect-laying records were read, so this walk proves nothing");
+            Assert.AreEqual(0, restating.Count,
+                $"records restating figures the canon balances:\n  {string.Join("\n  ", restating)}");
+        }
+
+        [TestMethod]
+        public void AFigureOfferedAlongsideTheCanonStillWinsBecauseTheItemGrantsNeedIt()
+        {
+            // The merge itself is NOT gone: the item-effect catalog has its own weights and its own
+            // reasons to hand a figure over, and it is judged by its own walks. What CL-3b closed is
+            // the AUGMENT record's door to it — see the walk above and the gate in AbilityProvider.
             var provider = Loaded();
             const string Id = "Effect_Blind";
 
             IEffect? canonical = provider.CreateEffect(Id, RecordProperties.Empty);
-            IEffect? overridden = provider.CreateEffect(Id, new RecordProperties(Id, new Dictionary<string, float>(StringComparer.Ordinal) { ["duration"] = 7 }));
+            IEffect? offered = provider.CreateEffect(Id, new RecordProperties(Id, new Dictionary<string, float>(StringComparer.Ordinal) { ["duration"] = 7 }));
 
             Assert.AreEqual(3, canonical?.Duration, "the canon did not supply the duration");
-            Assert.AreEqual(7, overridden?.Duration, "a number the record carries no longer wins over the canon");
-            Assert.AreEqual(3, overridden?.MaxStacks, "the keys the record stayed silent about did not come from the canon");
+            Assert.AreEqual(7, offered?.Duration, "a figure handed over explicitly no longer wins over the canon");
+            Assert.AreEqual(3, offered?.MaxStacks, "the keys nobody spoke about did not come from the canon");
+        }
+
+        /// <summary>Every shipped augment record that names an effect, with the property keys it carries.</summary>
+        private static IEnumerable<(string Id, string EffectId, List<string> Keys)> EffectRecordsInData()
+        {
+            string path = SharedData.Catalog(DataCatalog.Abilities);
+            foreach (string file in Directory.EnumerateFiles(path, "*.json", SearchOption.AllDirectories))
+                foreach (JObject entry in (JObject.Parse(File.ReadAllText(file))["augments"] as JArray ?? []).OfType<JObject>())
+                {
+                    string effectId = (string?)entry["effectId"] ?? string.Empty;
+                    if (string.IsNullOrWhiteSpace(effectId)) continue;
+
+                    List<string> keys = entry["upgradeProperties"] is JObject properties
+                        ? [.. properties.Properties().Select(property => property.Name)]
+                        : [];
+                    yield return ((string?)entry["id"] ?? string.Empty, effectId, keys);
+                }
         }
 
         [TestMethod]

@@ -13,13 +13,15 @@ namespace Battle.Source.Effects
     /// damage. Lives by activations, not turns — attaches on AbilityActivated, detaches on
     /// AbilityExecuted (the cast window). Recasting Overload itself refreshes, never consumes.
     /// </summary>
-    public class OverloadChargeEffect(string sourceAbilityId, float multiplier)
+    public class OverloadChargeEffect(string sourceAbilityId, EffectValue multiplier)
         : Effect(id: "Effect_Overload_Charge", duration: 0, maxStacks: 1)
     {
         private CastDamageScale? _modifier;
         private string _boostedCastId = string.Empty;
 
-        public float Multiplier => multiplier;
+        /// <summary>What the boosted cast is actually scaled by — the authored figure through the
+        /// effectiveness of the cast that laid the charge.</summary>
+        public float Multiplier => Effective(multiplier);
 
         public override async Task Apply(EffectApplyingContext context)
         {
@@ -41,7 +43,7 @@ namespace Battle.Source.Effects
         }
 
         public override bool IsStronger(IEffect otherEffect) =>
-            otherEffect is OverloadChargeEffect other && multiplier > other.Multiplier;
+            otherEffect is OverloadChargeEffect other && Multiplier > other.Multiplier;
 
         public override IEffect Copy() => new OverloadChargeEffect(sourceAbilityId, multiplier);
 
@@ -50,7 +52,7 @@ namespace Battle.Source.Effects
             if (Target == null || _modifier != null) return;
             if (evt.Ability.Id == sourceAbilityId) return; // recasting Overload refreshes, never consumes
 
-            _modifier = new CastDamageScale(Target, 1 + multiplier);
+            _modifier = new CastDamageScale(Target, Effective(multiplier, EffectValueShape.ShareGained));
             Target.ModifierHandler.Add(_modifier);
             _boostedCastId = evt.CastId;
         }

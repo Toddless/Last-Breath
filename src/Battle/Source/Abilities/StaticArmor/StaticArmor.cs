@@ -52,6 +52,8 @@ namespace Battle.Source.Abilities.StaticArmor
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            // The ability wears the 'recovery' tag; the stage-2 refund inside the buff is what it scales.
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.DetonationDamage, 250f);
             parameters.RegisterDefault(Parameters.DetonationWeaponScale, 0.85f);
@@ -105,7 +107,7 @@ namespace Battle.Source.Abilities.StaticArmor
                 ApplyOnHitTaken: plan.ApplyOnHitTaken);
 
             await new StaticArmorEffect(plan.Duration, settings, field)
-                .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
+                .Apply(Laying(owner));
         }
     }
 }

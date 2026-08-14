@@ -44,6 +44,9 @@ namespace LastBreathTest.BattleSystemTests
         private const string ShardsId = "Ability_Ice_Shards";
         private const string ProjectileRecord = "Augment_Additional_Projectiles";
 
+        /// <summary>The second ability the count reaches since CL-3b — one jar by default.</summary>
+        private const string JarId = "Ability_Jar_Of_Poison";
+
         private const int PoisonTurns = 3;
 
         [TestMethod]
@@ -184,6 +187,45 @@ namespace LastBreathTest.BattleSystemTests
                 "the extra shards did not reach the chosen target as impacts of its own");
             foreach (AbilityImpact impact in seen)
                 Assert.AreEqual(ImpactKind.Projectile, impact.Kind, "an added shard arrived as something other than a projectile");
+        }
+
+        [TestMethod]
+        public async Task TheShippedProjectileRecordThrowsMoreJarsAndLaysMorePoison()
+        {
+            // The other half of the owner's rule "a genus tag gets a genus key with a default": the jar
+            // has worn 'projectile' all along, the record fitted it all along, and until CL-3b it bought
+            // nothing. What is asked is the arithmetic the rule promises — one more jar is one more
+            // landing and one more poison stack — and NOT that the landing changed what it is: the jar's
+            // touches are hits by decision, however many jars are thrown.
+            using var rolls = new CombatRandomScope(new HighestRoll());
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            var owner = Fighter();
+            var target = Fighter();
+
+            IAbility bare = registry.CreateAbility(JarId);
+            int jarsBefore = (int)bare[AbilityParameter.ProjectileCount];
+            Assert.AreEqual(1, jarsBefore, "the jar no longer declares the single throw the record multiplies");
+
+            IAbility jar = registry.CreateAbility(JarId);
+            var seen = Riding(jar);
+            jar.SetOwner(owner);
+
+            AbilityAugmentData? record = catalog.Find(ProjectileRecord);
+            IAbilityAugment? upgrade = registry.CreateUpgrade(record!);
+            Assert.IsNotNull(upgrade, $"the registry builds nothing for '{ProjectileRecord}'");
+
+            jar.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_projectiles"] = upgrade });
+            await jar.Execute([target], FieldOf(owner, target));
+
+            Assert.AreEqual(jarsBefore + ExtraShards, (int)jar[AbilityParameter.ProjectileCount],
+                $"'{ProjectileRecord}' did not reach the jar's throw count");
+            Assert.AreEqual(jarsBefore + ExtraShards, seen.Count,
+                "the extra jars were counted but never thrown — the loop does not read the count");
+            Assert.AreEqual(jarsBefore + ExtraShards,
+                target.Effects.GetBy(effect => effect.IsSame("Effect_Damage_Over_Turn_Poison")).Count(),
+                "more jars landed and the poison did not stack with them");
+            foreach (AbilityImpact impact in seen)
+                Assert.AreEqual(ImpactKind.Hit, impact.Kind, "a thrown jar landed as something other than a hit");
         }
 
         [TestMethod]

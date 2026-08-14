@@ -23,23 +23,32 @@ namespace Battle.Source.Abilities.JarOfPoison
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(AbilityParameter.PoisonDuration, 3);
+            // One jar per cast, declared so the count is a thing an augment can raise: the ability wears
+            // the 'projectile' tag, and a tag that promises fitting without a key to move is a purchase
+            // that does nothing.
+            parameters.RegisterDefault(AbilityParameter.ProjectileCount, 1);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new JarOfPoison(Data));
 
-        /// <summary>Each landing applies a poison stack AND fires the impact riders — every touched target gets the L2 debuffs.</summary>
+        /// <summary>One throw per counted jar, each landing on the whole hit sequence: a landing applies a
+        /// poison stack AND fires the impact riders, so more jars are more stacks and more rider work by
+        /// arithmetic. The landings stay HITS however many jars are thrown — that is what the jar's
+        /// touches have always been, and the count is what changed.</summary>
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
-            foreach (IFightable target in HitSequence.GetHitSequence(owner, targets, field))
-            {
-                if (!target.IsAlive) continue;
-                await ApplyPoison(owner, target);
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field)
+            int jars = (int)this[AbilityParameter.ProjectileCount];
+            for (int jar = 0; jar < jars; jar++)
+                foreach (IFightable target in HitSequence.GetHitSequence(owner, targets, field))
                 {
-                    Source = this,
-                    Kind = ImpactKind.Hit
-                });
-            }
+                    if (!target.IsAlive) continue;
+                    await ApplyPoison(owner, target);
+                    await ApplyImpactRiders(new AbilityImpact(owner, target, field)
+                    {
+                        Source = this,
+                        Kind = ImpactKind.Hit
+                    });
+                }
         }
 
         private async Task ApplyPoison(IFightable owner, IFightable target)

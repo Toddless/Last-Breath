@@ -186,7 +186,7 @@
         },
         {
             "id": "Ability_Sacrifice",
-            "tags": [ "cost", "cooldown", "activation", "health", "buff", "empower", "pure", "consume" ],
+            "tags": [ "cost", "cooldown", "activation", "health", "buff", "empowered", "pure", "consume" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -244,7 +244,7 @@
         },
         {
             "id": "Ability_Overload",
-            "tags": [ "cost", "cooldown", "activation", "elemental", "buff", "consume", "empower", "stage", "critical" ],
+            "tags": [ "cost", "cooldown", "activation", "elemental", "buff", "consume", "empowered", "stage", "critical" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 5,
@@ -604,11 +604,7 @@
             "behaviour": "ApplyEffectOnImpact",
             "effectId": "Effect_Clumsiness",
             "impactKind": "Attack",
-            "upgradeProperties": {
-                "value": 0.10,
-                "maxStacks": 3,
-                "duration": 2
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Increasing_Scales",
@@ -714,10 +710,7 @@
             "abilityId": "Ability_Poison_Explosion",
             "behaviour": "DebuffOnCast",
             "effectId": "Effect_Seal_Of_Oblivion",
-            "upgradeProperties": {
-                "duration": 3,
-                "maxStacks": 1
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Ability_Pe_Augment_Execute_Bosses",
@@ -866,11 +859,7 @@
             "behaviour": "BuffOnCast",
             "effectId": "Effect_Incoming_Damage_Reduction",
             "propertyRefs": { "duration": "Duration" },
-            "upgradeProperties": {
-                "reduce": 0.25,
-                "duration": 3,
-                "maxStacks": 1
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Porcupine_Crit_Mitigation",
@@ -883,11 +872,7 @@
             "behaviour": "BuffOnCast",
             "effectId": "Effect_Enhance_Defense",
             "propertyRefs": { "duration": "Duration" },
-            "upgradeProperties": {
-                "value": 0.8,
-                "duration": 3,
-                "maxStacks": 1
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Heal_On_Hit",
@@ -1001,11 +986,7 @@
             "abilityId": "Ability_Head_Butt",
             "behaviour": "ApplyEffectOnImpact",
             "effectId": "Effect_Armor_Reduction",
-            "upgradeProperties": {
-                "reduceBy": 0.25,
-                "duration": 3,
-                "maxStacks": 3
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Heal_From_Empowered_Ability_Damage",
@@ -1028,11 +1009,7 @@
             "fitsAnyAbility": true,
             "behaviour": "BuffOnCast",
             "effectId": "Effect_Incoming_Damage_Reduction",
-            "upgradeProperties": {
-                "reduce": 0.25,
-                "maxStacks": 1,
-                "duration": 3
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Empowered_Ability_Free_Cast",
@@ -1150,11 +1127,7 @@
             "fitsAnyAbility": true,
             "behaviour": "BuffOnCast",
             "effectId": "Effect_Mana_Flow",
-            "upgradeProperties": {
-                "percentRegeneration": 0.15,
-                "duration": 3,
-                "maxStacks": 1
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Next_Cast_Pure",
@@ -1210,11 +1183,7 @@
             "behaviour": "BuffOnCast",
             "effectId": "Effect_Enhance_Defense",
             "propertyRefs": { "duration": "Duration" },
-            "upgradeProperties": {
-                "value": 0.8,
-                "duration": 3,
-                "maxStacks": 1
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Additional_Crit_Damage",
@@ -1288,10 +1257,7 @@
             "abilityId": "Ability_Deep_Freeze",
             "behaviour": "ApplyEffectOnImpact",
             "effectId": "Effect_Next_Ability_Cooldown",
-            "upgradeProperties": {
-                "duration": 3,
-                "amount": 3
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Reduce_All_Cooldowns",

@@ -50,7 +50,10 @@ namespace LastBreathTest.BattleSystemTests
         /// walk asserts these lay nothing at all, so an ability that becomes reachable turns up here
         /// instead of quietly staying unmeasured.
         /// </summary>
-        private static readonly string[] s_beyondTheProbe = ["Ability_Double_Strike"];
+        /// <para>Discharge joined at CL-3b: its only scalable content is the stage-3 barrier refund, and
+        /// the probe casts at the base stage where there is nothing to refund yet. The figure IS an
+        /// <c>EffectValue</c> — <c>BarrierFromDamageEffect</c> — it simply is not laid this early.</para>
+        private static readonly string[] s_beyondTheProbe = ["Ability_Double_Strike", "Ability_Discharge"];
 
         /// <summary>
         /// Where a record is knowingly worth more than it charges: the ability reads one of its moves
@@ -129,8 +132,9 @@ namespace LastBreathTest.BattleSystemTests
 
             // The jar carries "projectile" now (the doc's word for how it travels) and declares no
             // projectile count — a socket that fits and moves nothing until the count generalises.
+            // The jar stopped being inert at CL-3b: it declares a count of one, and its throw loop reads it.
             ("Augment_Additional_Projectiles", AbilityParameter.ProjectileCount,
-                ["Ability_Ice_Shards"], ["Ability_Jar_Of_Poison"]),
+                ["Ability_Ice_Shards", "Ability_Jar_Of_Poison"], []),
 
             // Both effectiveness records stand on one key in one direction, so where they meet they are
             // one offer and the better works. What separates them is which abilities are offered the
@@ -138,15 +142,17 @@ namespace LastBreathTest.BattleSystemTests
             // The re-markup swapped the inert pair: Static Armor lost "buff" and left the row while
             // Overload gained it and arrived (declaring no effectiveness — inert until CL-3).
             ("Augment_Buff_Effectiveness", AbilityParameter.Effectiveness,
+                // Overload stopped being inert at CL-3b: its charge multiplier became an EffectValue.
                 ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
-                 "Ability_Poison_Coating", "Ability_Porcupine"],
-                ["Ability_Overload", "Ability_Sacrifice"]),
+                 "Ability_Overload", "Ability_Poison_Coating", "Ability_Porcupine"],
+                ["Ability_Sacrifice"]),
 
             // Discharge and Static Armor arrived with the doc's "recovery" (their barrier refunds);
             // neither declares effectiveness yet, so both sit inert.
             ("Augment_Recovery_Effectiveness", AbilityParameter.Effectiveness,
-                ["Ability_Ares_Blessing", "Ability_Dark_Shroud"],
-                ["Ability_Discharge", "Ability_Static_Armor"]),
+                // Both stopped being inert at CL-3b: their barrier refunds travel as EffectValues now.
+                ["Ability_Ares_Blessing", "Ability_Dark_Shroud", "Ability_Discharge", "Ability_Static_Armor"],
+                []),
 
             // The record the debuff tag was handed out for: it reaches the four abilities that lay
             // something on their target and read how strongly it lands, and nothing else in the book.
@@ -320,19 +326,30 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>Whether the effect carries at least one figure typed so that it cannot be read
         /// without the multiplier. Fields as well as properties, and private ones too: a primary
         /// constructor's parameter is captured as a private field and is the usual place such a figure
-        /// lives.</summary>
-        private static bool HoldsAScalableFigure(IEffect effect)
-        {
-            for (Type? type = effect.GetType(); type != null; type = type.BaseType)
-            {
-                const BindingFlags Declared = BindingFlags.Public | BindingFlags.NonPublic
-                    | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+        /// lives. One level of nesting is followed: an effect may keep its numbers in a settings record
+        /// of its own (the Static Armor's detonation), and a figure there is as unreadable-by-hand as one on the
+        /// effect itself. Only types from the effect's own assembly are opened, so the walk stops at the
+        /// project's edge instead of crawling the framework.</summary>
+        private static bool HoldsAScalableFigure(IEffect effect) =>
+            HoldsAScalableFigure(effect.GetType(), effect.GetType().Assembly, depth: 1);
 
-                if (type.GetFields(Declared).Any(field => field.FieldType == typeof(EffectValue))) return true;
-                if (type.GetProperties(Declared).Any(property => property.PropertyType == typeof(EffectValue))) return true;
+        private static bool HoldsAScalableFigure(Type held, Assembly own, int depth)
+        {
+            const BindingFlags Declared = BindingFlags.Public | BindingFlags.NonPublic
+                | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
+            List<Type> carried = [];
+            for (Type? type = held; type != null; type = type.BaseType)
+            {
+                carried.AddRange(type.GetFields(Declared).Select(field => field.FieldType));
+                carried.AddRange(type.GetProperties(Declared).Select(property => property.PropertyType));
             }
 
-            return false;
+            if (carried.Contains(typeof(EffectValue))) return true;
+
+            return depth > 0 && carried.Distinct()
+                .Where(type => type != held && type.Assembly == own)
+                .Any(type => HoldsAScalableFigure(type, own, depth - 1));
         }
 
         private static ConditionOwner Fighter()

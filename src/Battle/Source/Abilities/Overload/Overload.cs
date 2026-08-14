@@ -49,6 +49,9 @@ namespace Battle.Source.Abilities.Overload
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            // The ability wears the 'buff' tag; without the key the effectiveness records that fit it
+            // were bought and moved nothing.
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(Parameters.ManaBurnPercent, 0.25f);
             parameters.RegisterDefault(Parameters.DamagePerStep, 0.02f);
             parameters.RegisterDefault(Parameters.ManaPerStep, 3f);
@@ -92,8 +95,7 @@ namespace Battle.Source.Abilities.Overload
 
             float multiplier = plan.DamagePerStep * (absorbed / plan.ManaPerStep);
             if (multiplier > 0)
-                await new OverloadChargeEffect(Id, multiplier)
-                    .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
+                await new OverloadChargeEffect(Id, multiplier).Apply(Laying(owner));
 
             if (plan.ManaRestorePercent > 0)
                 owner.RestoreMana(new ManaRecoveryContext(owner, owner) { Amount = owner.Parameters.MaxMana * plan.ManaRestorePercent });

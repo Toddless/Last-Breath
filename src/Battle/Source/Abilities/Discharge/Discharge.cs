@@ -10,6 +10,7 @@ namespace Battle.Source.Abilities.Discharge
     using Core.Data.AbilityData;
     using Core.Entity;
     using Core.Enums;
+    using Effects;
 
     /// <summary>Cast plan of the Discharge: the barrier-conversion knobs.</summary>
     public class DischargePlan : DamagingCastPlan
@@ -45,6 +46,8 @@ namespace Battle.Source.Abilities.Discharge
         {
             base.RegisterBaseParameters(parameters);
             RegisterDamageParameters(parameters);
+            // The ability wears the 'recovery' tag; the stage-3 refund below is what it now scales.
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(Parameters.BarrierMultiplier, 1.5f);
             parameters.RegisterDefault(Parameters.StageTwoMultiplierBonus, 0.3f);
             parameters.RegisterDefault(Parameters.StageThreeBarrierRestore, 0.45f);
@@ -93,7 +96,7 @@ namespace Battle.Source.Abilities.Discharge
             {
                 var hit = await DealPlanDamage(plan, owner, target);
                 if (plan.BarrierRestorePercent > 0)
-                    owner.CurrentBarrier += hit.Damage * plan.BarrierRestorePercent;
+                    await new BarrierFromDamageEffect(plan.BarrierRestorePercent, hit.Damage).Apply(Laying(owner));
 
                 await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage)
                 {

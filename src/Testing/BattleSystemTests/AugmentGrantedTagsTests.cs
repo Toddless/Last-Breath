@@ -102,14 +102,17 @@ namespace LastBreathTest.BattleSystemTests
             // Overload left the row at the owner's re-markup (it carries "buff" of its own now — a
             // direct fit is not a grant-opened one) and Static Armor arrived (it lost "buff" and is
             // reached through granting donors instead).
+            // Discharge and Static Armor stopped being inert at CL-3b: both declare effectiveness now
+            // and both have content that reads it — their barrier refunds travel as EffectValues.
             ("Augment_Buff_Effectiveness",
-                ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Block", "Ability_Jar_Of_Poison"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
+                ["Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Static_Armor"],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
             // The porcupine reads effectiveness now, so the recovery record stopped being inert on it.
             // Discharge and Static Armor left at the re-markup: both carry "recovery" of their own now.
+            // Overload joined at CL-3b: its charge multiplier became an EffectValue.
             ("Augment_Recovery_Effectiveness",
-                ["Ability_Critical_Calculation", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Sacrifice", "Ability_Series_Of_Attacks"]),
+                ["Ability_Critical_Calculation", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating", "Ability_Porcupine"],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Sacrifice", "Ability_Series_Of_Attacks"]),
             // The jar and the shards left the row in the catalog cleanup: their own debuff donors
             // (the jar's trio of vial debuffs, the shards' fragility) were removed with the catalog.
             // The berserker left at the re-markup: his fury carries "debuff" of its own now.

@@ -18,7 +18,7 @@ namespace Battle.Source.Effects
         float SpellScale,
         int RequiredStacks,
         int ChargeDuration,
-        float BarrierRestorePercent,
+        EffectValue BarrierRestorePercent,
         float SplashPercent,
         bool ApplyOnHitTaken);
 
@@ -77,8 +77,10 @@ namespace Battle.Source.Effects
                            + owner.Parameters.SpellDamage * settings.SpellScale;
 
             float dealt = DealDetonationDamage(owner, victim, damage);
-            if (settings.BarrierRestorePercent > 0)
-                owner.CurrentBarrier += dealt * settings.BarrierRestorePercent;
+            // Through the one point every laid number goes through: this effect carries the
+            // effectiveness of the cast that raised the armour, so the refund is scaled with it.
+            float share = Effective(settings.BarrierRestorePercent);
+            if (share > 0) owner.CurrentBarrier += dealt * share;
 
             if (settings.SplashPercent <= 0) return;
             IFightable? splashTarget = RandomEnemy(owner, except: victim);

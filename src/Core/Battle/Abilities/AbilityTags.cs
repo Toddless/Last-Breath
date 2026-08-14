@@ -40,7 +40,7 @@ namespace Core.Battle.Abilities
         /// <summary>Returns damage to the attacker (Porcupine family).</summary>
         public const string Retaliation = "retaliation";
         /// <summary>Charges the NEXT activated ability (Sacrifice, Overload).</summary>
-        public const string Empower = "empower";
+        public const string Empowered = "empowered";
         public const string Shield = "shield";
         public const string Summon = "summon";
         /// <summary>Authored NPC/boss kit — never reachable by the player.</summary>
@@ -108,7 +108,7 @@ namespace Core.Battle.Abilities
         public static readonly IReadOnlySet<string> All = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             Attack, Spell, Series, Buff, Poison, Cold, Lightning, Fire, Stun, Freeze, Critical, Barrier,
-            Mana, Health, Evasion, Execute, Retaliation, Empower, Shield, Summon, Npc, Projectile,
+            Mana, Health, Evasion, Execute, Retaliation, Empowered, Shield, Summon, Npc, Projectile,
             Accuracy, Armor, Burn, Charge, Control, Cooldown, Cost, Curse, Damage, Debuff, Defence,
             Duration, Effect, Effectiveness, Evadable, Heal, Hit, Leech, Recovery, Restore, Scale,
             Splash, Spread, Stacks, Target, Thorn,

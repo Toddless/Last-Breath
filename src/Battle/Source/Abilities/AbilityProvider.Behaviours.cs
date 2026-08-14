@@ -37,15 +37,15 @@ namespace Battle.Source.Abilities
         {
             ["ApplyEffectOnImpact"] = new(BehaviourField.EffectId | BehaviourField.ImpactKind, (data, effects) =>
                 new AbilityAugmentImpactRider(data.Id, data.Tags, data.Tier, new DataEffectImpactRider(
-                    data.Id, data.EffectId, host => Numbers(data, host), KindOf(data), effects))),
+                    data.Id, data.EffectId, host => EffectNumbers(data, host, effects), KindOf(data), effects))),
 
             ["BuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>
                 new AbilityAugmentCastEffect(data.Id, data.Tags, data.Tier,
-                    host => effects()?.CreateEffect(data.EffectId, Numbers(data, host)))),
+                    host => effects()?.CreateEffect(data.EffectId, EffectNumbers(data, host, effects)))),
 
             ["DebuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>
                 new AbilityAugmentCastDebuff(data.Id, data.Tags, data.Tier,
-                    host => effects()?.CreateEffect(data.EffectId, Numbers(data, host)))),
+                    host => effects()?.CreateEffect(data.EffectId, EffectNumbers(data, host, effects)))),
 
             ["AttackModifier"] = new(BehaviourField.AttackModifier, (data, _) =>
                 new AbilityAugmentAttackModifier(data.Id, data.Tags, data.Tier, s_attackModifiers[data.AttackModifier]())),
@@ -83,9 +83,6 @@ namespace Battle.Source.Abilities
             {
                 if (!s_sharedParameters.Contains(parameter))
                     return $"points property '{property}' at '{parameter}', which is no shared parameter. Known: {string.Join(", ", s_sharedParameters.Order(StringComparer.Ordinal))}";
-
-                if (!data.UpgradeProperties.ContainsKey(property))
-                    return $"points property '{property}' at '{parameter}' and carries no figure for it to fall back to";
             }
 
             if (fields.HasFlag(BehaviourField.AttackModifier) && !s_attackModifiers.ContainsKey(data.AttackModifier))
@@ -96,8 +93,17 @@ namespace Battle.Source.Abilities
             IEffectProvider? effects = _effects();
             if (effects == null) return $"lays effect '{data.EffectId}' and no effect registry is composed to build it";
 
-            return effects.KeysOf(data.EffectId) == null
-                ? $"names effect '{data.EffectId}' the registry cannot build. Known: {string.Join(", ", effects.KnownIds.Order(StringComparer.Ordinal))}"
+            IReadOnlyCollection<string>? keys = effects.KeysOf(data.EffectId);
+            if (keys == null)
+                return $"names effect '{data.EffectId}' the registry cannot build. Known: {string.Join(", ", effects.KnownIds.Order(StringComparer.Ordinal))}";
+
+            // The numbers of an effect are balanced in one file and a record may not restate them: one
+            // record carrying its own figure is all it takes for the balance to start drifting apart
+            // again, and the drift is invisible until somebody reads both. What a record may still carry
+            // is its OWN levers — anything the effect does not read.
+            string[] restated = [.. data.UpgradeProperties.Keys.Intersect(keys, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+            return restated.Length > 0
+                ? $"carries figures of effect '{data.EffectId}' that are balanced in the canon: [{string.Join(", ", restated)}]"
                 : null;
         }
 
@@ -123,18 +129,28 @@ namespace Battle.Source.Abilities
         private static ImpactKind? KindOf(AbilityAugmentData data) =>
             string.IsNullOrWhiteSpace(data.ImpactKind) ? null : EnumParser.ParseEnum<ImpactKind>(data.ImpactKind);
 
-        private static RecordProperties Numbers(AbilityAugmentData data) => new(data.Id, data.UpgradeProperties);
-
-        /// <summary>The record's numbers with its <see cref="AbilityAugmentData.PropertyRefs"/> read off
-        /// the host — decorated and at the moment of use, so an augment moving that key is felt here.
-        /// A key the ability never declared falls back to the record's own figure.</summary>
-        private static RecordProperties Numbers(AbilityAugmentData data, IAbility? host)
+        /// <summary>
+        /// What the effect registry is handed: the record's figures for the keys that effect READS, and
+        /// nothing else. A record may carry levers of its own beside the effect it names — the registry
+        /// judges an unknown key as a typo and refuses the whole effect, so passing them on would turn
+        /// "a record with a lever" into "a record that lays nothing" without a word being said.
+        /// <para><see cref="AbilityAugmentData.PropertyRefs"/> are read off the host here — decorated and
+        /// at the moment of use, so an augment moving that key is felt. A key the ability never declared
+        /// is left OUT rather than written as nothing: the canon fills it, and a zero written here would
+        /// override the canon with a number nobody chose.</para>
+        /// </summary>
+        private static RecordProperties EffectNumbers(AbilityAugmentData data, IAbility? host, Func<IEffectProvider?> effects)
         {
-            if (data.PropertyRefs.Count == 0 || host == null) return Numbers(data);
-
             Dictionary<string, float> values = new(data.UpgradeProperties, StringComparer.Ordinal);
-            foreach ((string property, string parameter) in data.PropertyRefs)
-                values[property] = host.ValueOr(parameter, values.GetValueOrDefault(property));
+
+            if (host != null)
+                foreach ((string property, string parameter) in data.PropertyRefs)
+                    if (host.Declares(parameter)) values[property] = host.ValueOr(parameter, 0f);
+
+            IReadOnlyCollection<string>? keys = effects()?.KeysOf(data.EffectId);
+            if (keys != null)
+                foreach (string stranger in values.Keys.Except(keys, StringComparer.Ordinal).ToList())
+                    values.Remove(stranger);
 
             return new RecordProperties(data.Id, values);
         }

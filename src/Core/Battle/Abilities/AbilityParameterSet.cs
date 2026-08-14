@@ -118,6 +118,9 @@ namespace Core.Battle.Abilities
         public float ValueOr(string parameter, float fallback) =>
             _baseValues.ContainsKey(parameter) ? GetValue(parameter) : fallback;
 
+        /// <summary>Whether the parameter was declared at all — absence told apart from a value of nothing.</summary>
+        public bool Declares(string parameter) => _baseValues.ContainsKey(parameter);
+
         public void AddDecorator(AbilityParameterDecorator newDecorator)
         {
             // A decorator on a key nobody registered would never be read — that is a data/upgrade typo.

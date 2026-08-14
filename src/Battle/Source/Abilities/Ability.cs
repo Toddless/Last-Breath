@@ -67,6 +67,8 @@
 
         public float ValueOr(string parameter, float fallback) => Params.ValueOr(parameter, fallback);
 
+        public bool Declares(string parameter) => Params.Declares(parameter);
+
         /// <summary>
         /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
         /// Damage-dealing descendants stamp it onto their DamageContexts so the BattleDirector
