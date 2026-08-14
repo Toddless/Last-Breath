@@ -40,6 +40,10 @@ namespace Core.Data.GameData
         public const string CraftingMastery = "CraftingMastery";
         public const string MartialArtMastery = "MartialArtMastery";
         public const string ItemEffects = "ItemEffects";
+
+        /// <summary>Canonical numbers and stack ceilings of the temporary effects — the one place their
+        /// balance is written. Separate from ItemEffects, which says which effects an item may GRANT.</summary>
+        public const string Effects = "Effects";
         public const string Resources = "Resources";
         public const string Trade = "Trade";
         public const string Traders = "Traders";

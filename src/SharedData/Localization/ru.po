@@ -2653,7 +2653,7 @@ msgid "Ability_Deep_Freeze"
 msgstr "Глубокая заморозка"
 
 msgid "Ability_Deep_Freeze_Description"
-msgstr "Замораживает цель на {FreezeDuration|turn|turns} и накладывает стак {@Effect_Frostbite} на {FrostbiteDuration|turn|turns}.\nУровень активации 2: снижает сопротивление цели к холоду на {ColdResistanceShred:%}.\nУровень активации 3: снижает эффективность лечения цели на {HealReductionValue:%}.\nУровень активации 4: замораживает всех противников на поле боя."
+msgstr "Наносит {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) урона холодом, замораживает цель на {FreezeDuration|turn|turns} и накладывает стак {@Effect_Frostbite} на {FrostbiteDuration|turn|turns}.\nУровень активации 2: снижает сопротивление цели к холоду на {ColdResistanceShred:%}.\nУровень активации 3: снижает эффективность лечения цели на {HealReductionValue:%}.\nУровень активации 4: замораживает всех противников на поле боя."
 
 msgid "Ability_Discharge"
 msgstr "Разряд"
@@ -3644,3 +3644,24 @@ msgstr ""
 msgid "Dlg_Ronald_TrialPraiseLast_1"
 msgstr ""
 
+
+msgid "Effect_Critical_Chance_Buff"
+msgstr "Взор охотника"
+
+msgid "Effect_Critical_Damage_Buff"
+msgstr "Смертельный расчёт"
+
+msgid "Effect_Damage_Buff"
+msgstr "Боевой дух"
+
+msgid "Effect_Incoming_Damage_Reduction"
+msgstr "Панцирь"
+
+msgid "Effect_Mana_Regeneration"
+msgstr "Эфирный поток"
+
+msgid "Effect_Accuracy_Buff"
+msgstr "Твёрдая рука"
+
+msgid "Effect_Light_Step"
+msgstr "Лёгкий шаг"

@@ -4,7 +4,8 @@ namespace Battle.Source.Effects
     using Core.Enums;
 
     /// <summary>
-    /// Buff that increases the target's accuracy. Counterpart of <see cref="BlindEffect"/>.
+    /// "Твёрдая рука": raises the bearer's accuracy by <c>value</c> (0.15 = +15%) per stack.
+    /// Counterpart of <see cref="BlindEffect"/>.
     /// </summary>
     public class AccuracyBuff(
         int duration,
@@ -18,7 +19,8 @@ namespace Battle.Source.Effects
             parameter: EntityParameter.Accuracy,
             type: OperationType.Multiply,
             priority: Priority.Weak,
-            statusEffect: StatusEffects.None)
+            statusEffect: StatusEffects.None,
+            shape: EffectValueShape.ShareGained)
     {
         public override IEffect Copy() => new AccuracyBuff(Duration, MaxStacks, Authored);
     }

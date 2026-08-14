@@ -997,19 +997,19 @@ msgid "Effect_Armor_Reduction_Description"
 msgstr "{Value} {Parameter} for {Duration|turn|turns}."
 
 msgid "Effect_Damage_Buff"
-msgstr "Empowered"
+msgstr "Battle Spirit"
 
 msgid "Effect_Damage_Buff_Description"
 msgstr "{Value} {Parameter} for {Duration|turn|turns}."
 
 msgid "Effect_Critical_Damage_Buff"
-msgstr "Lethality"
+msgstr "Deadly Calculation"
 
 msgid "Effect_Critical_Damage_Buff_Description"
 msgstr "{Value} {Parameter} for {Duration|turn|turns}."
 
 msgid "Effect_Critical_Chance_Buff"
-msgstr "Keen Eye"
+msgstr "Hunter's Gaze"
 
 msgid "Effect_Critical_Chance_Buff_Description"
 msgstr "{Value} {Parameter} for {Duration|turn|turns}."
@@ -1093,7 +1093,7 @@ msgid "Effect_Percent_Health_Regeneration_Description"
 msgstr "Regenerate a share of maximum health each turn for {Duration|turn|turns}."
 
 msgid "Effect_Incoming_Damage_Reduction"
-msgstr "Protection"
+msgstr "Carapace"
 
 msgid "Effect_Incoming_Damage_Reduction_Description"
 msgstr "Reduces all incoming damage for {Duration|turn|turns}."
@@ -1111,7 +1111,7 @@ msgid "Effect_Light_Step_Description"
 msgstr "{Value} {Parameter} for {Duration|turn|turns}."
 
 msgid "Effect_Mana_Regeneration"
-msgstr "Mana Regeneration"
+msgstr "Aetheric Flow"
 
 msgid "Effect_Mana_Regeneration_Description"
 msgstr "Restore a share of maximum mana each turn for {Duration|turn|turns}."
@@ -3640,7 +3640,7 @@ msgid "Ability_Deep_Freeze"
 msgstr "Deep Freeze"
 
 msgid "Ability_Deep_Freeze_Description"
-msgstr "Freezes the target for {FreezeDuration|turn|turns} and applies a stack of {@Effect_Frostbite} for {FrostbiteDuration|turn|turns}.\nActivation level 2: reduces the target's cold resistance by {ColdResistanceShred:%}.\nActivation level 3: reduces the target's healing by {HealReductionValue:%}.\nActivation level 4: freezes every enemy on the battlefield."
+msgstr "Deals {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) cold damage, freezes the target for {FreezeDuration|turn|turns} and applies a stack of {@Effect_Frostbite} for {FrostbiteDuration|turn|turns}.\nActivation level 2: reduces the target's cold resistance by {ColdResistanceShred:%}.\nActivation level 3: reduces the target's healing by {HealReductionValue:%}.\nActivation level 4: freezes every enemy on the battlefield."
 
 msgid "Ability_Discharge"
 msgstr "Discharge"

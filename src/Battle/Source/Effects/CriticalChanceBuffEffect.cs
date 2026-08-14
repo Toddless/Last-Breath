@@ -3,6 +3,7 @@
     using Core.Battle.Abilities;
     using Core.Enums;
 
+    /// <summary>"Взор охотника": raises the bearer's critical chance by <c>value</c> (0.15 = +15%) per stack.</summary>
     public class CriticalChanceBuffEffect(
         int duration,
         int maxStacks,
@@ -15,7 +16,8 @@
             parameter: EntityParameter.CriticalChance,
             type: OperationType.Multiply,
             priority: Priority.Weak,
-            statusEffect: StatusEffects.None)
+            statusEffect: StatusEffects.None,
+            shape: EffectValueShape.ShareGained)
     {
         public override IEffect Copy() => new CriticalChanceBuffEffect(Duration, MaxStacks, Authored);
     }

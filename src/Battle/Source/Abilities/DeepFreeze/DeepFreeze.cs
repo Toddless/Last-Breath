@@ -8,12 +8,16 @@ namespace Battle.Source.Abilities.DeepFreeze
     using Core.Data;
     using Core.Data.AbilityData;
     using Core.Entity;
+    using Core.Enums;
     using Effects;
 
-    /// <summary>Cast plan of the Deep Freeze: durations plus the optional stage payloads.</summary>
-    public class DeepFreezePlan
+    /// <summary>Cast plan of the Deep Freeze: the cold hit plus the durations and stage payloads.</summary>
+    public class DeepFreezePlan : DamagingCastPlan
     {
-        public List<IFightable> Targets { get; set; } = [];
+        /// <summary>Whom the cold hit lands on. Separate from <c>Targets</c>, which stage 4 widens to the
+        /// whole battlefield: the stage spreads the freeze, not the blow.</summary>
+        public List<IFightable> DamageTargets { get; set; } = [];
+
         public int FreezeDuration { get; set; }
         public int FrostbiteDuration { get; set; }
         public float ColdResistanceShred { get; set; }
@@ -21,9 +25,8 @@ namespace Battle.Source.Abilities.DeepFreeze
     }
 
     /// <summary>
-    /// Freezes the target and applies a Frostbite stack. Stage 2 shreds the target's cold
-    /// resistance, stage 3 cuts its healing, stage 4 freezes every enemy on the battlefield.
-    /// No direct damage — the ability sets up cold follow-ups.
+    /// Hits the target with cold, freezes it and applies a Frostbite stack. Stage 2 shreds the target's
+    /// cold resistance, stage 3 cuts its healing, stage 4 freezes every enemy on the battlefield.
     /// </summary>
     public class DeepFreeze(AbilityBaseData data) : MulticastAbility<DeepFreezePlan>(data)
     {
@@ -44,12 +47,15 @@ namespace Battle.Source.Abilities.DeepFreeze
             public const string ShredDuration = nameof(ShredDuration);
             public const string HealReductionValue = nameof(HealReductionValue);
             public const string HealReductionDuration = nameof(HealReductionDuration);
+            public const string HealReductionStacks = nameof(HealReductionStacks);
+            public const string ShredStacks = nameof(ShredStacks);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
+            RegisterDamageParameters(parameters);
             parameters.RegisterDefault(Parameters.FreezeDuration, 1);
             parameters.RegisterDefault(Parameters.FrostbiteDuration, 3);
             parameters.RegisterDefault(AbilityParameter.Stacks, 8);
@@ -58,6 +64,8 @@ namespace Battle.Source.Abilities.DeepFreeze
             parameters.RegisterDefault(Parameters.ShredDuration, 3);
             parameters.RegisterDefault(Parameters.HealReductionValue, 0.45f);
             parameters.RegisterDefault(Parameters.HealReductionDuration, 3);
+            parameters.RegisterDefault(Parameters.HealReductionStacks, 2);
+            parameters.RegisterDefault(Parameters.ShredStacks, 1);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new DeepFreeze(Data)
@@ -70,6 +78,11 @@ namespace Battle.Source.Abilities.DeepFreeze
             new()
             {
                 Targets = targets,
+                DamageTargets = [.. targets],
+                Damage = this[AbilityParameter.Damage],
+                WeaponDamageScale = this[AbilityParameter.WeaponDamageScale],
+                SpellDamageScale = this[AbilityParameter.SpellDamageScale],
+                DamageType = DamageType.Cold,
                 FreezeDuration = (int)this[Parameters.FreezeDuration],
                 FrostbiteDuration = (int)this[Parameters.FrostbiteDuration]
             };
@@ -99,10 +112,14 @@ namespace Battle.Source.Abilities.DeepFreeze
                     foreach (IEffect effect in target.Effects.GetBy(_ => true).ToList())
                         effect.Extend(1);
 
+                // The blow before the payload: the Frostbite this cast lays must not amplify the very hit
+                // that laid it, and riders reading the impact need the damage that actually landed.
+                ProjectileHit hit = plan.DamageTargets.Any(t => t.IsSame(target.InstanceId))
+                    ? await DealPlanDamage(plan, owner, target)
+                    : new ProjectileHit(target, false, 0);
+
                 await ApplyPayload(plan, owner, target);
-                // A landing that carries no damage is still a landing: the road is the plan's own target
-                // list, the same one every other direct delivery walks.
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, Damage: 0)
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage)
                 {
                     Source = this,
                     Kind = ImpactKind.Hit
@@ -120,11 +137,13 @@ namespace Battle.Source.Abilities.DeepFreeze
                 .Apply(Laying(target));
 
             if (plan.ColdResistanceShred > 0)
-                await new ColdResistanceShredEffect((int)this[Parameters.ShredDuration], maxStacks: 1, plan.ColdResistanceShred)
+                await new ColdResistanceShredEffect(
+                        (int)this[Parameters.ShredDuration], (int)this[Parameters.ShredStacks], plan.ColdResistanceShred)
                     .Apply(Laying(target));
 
             if (plan.HealReduction > 0)
-                await new HealReductionEffect((int)this[Parameters.HealReductionDuration], maxStacks: 1, plan.HealReduction)
+                await new HealReductionEffect(
+                        (int)this[Parameters.HealReductionDuration], (int)this[Parameters.HealReductionStacks], plan.HealReduction)
                     .Apply(Laying(target));
         }
 

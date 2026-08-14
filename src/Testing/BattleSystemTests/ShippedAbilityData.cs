@@ -29,18 +29,35 @@ namespace LastBreathTest.BattleSystemTests
             string root = Directory.CreateTempSubdirectory("augments_").FullName;
             Directory.CreateDirectory(Path.Combine(root, DataCatalog.Abilities));
             File.WriteAllText(Path.Combine(root, DataCatalog.Abilities, "Abilities.json"), json);
+            CopyCatalog(DataCatalog.Effects, root);
 
             AbilityAugmentCatalog catalog = LoadFrom(root).Augments;
             Directory.Delete(root, recursive: true);
             return catalog;
         }
 
+        /// <summary>Puts a shipped catalog beside a catalog a test wrote. The loader reads every catalog
+        /// its participants declare, and a root missing one fails the load rather than skipping it.</summary>
+        private static void CopyCatalog(string catalog, string root)
+        {
+            string source = SharedData.Catalog(catalog);
+            string destination = Path.Combine(root, catalog);
+            Directory.CreateDirectory(destination);
+            foreach (string file in Directory.EnumerateFiles(source, "*.json"))
+                File.Copy(file, Path.Combine(destination, Path.GetFileName(file)));
+        }
+
         /// <summary>The same pair over any data root — for records the shipped files do not declare.</summary>
         internal static (AbilityProvider Abilities, AbilityAugmentCatalog Augments) LoadFrom(string root)
         {
             var augments = new AbilityAugmentCatalog();
-            var abilities = new AbilityProvider(augments, static () => new EffectProvider());
-            var service = new GameDataService(new FileSystemDataSource(root), [abilities, augments]);
+            // The effect registry reads the canonical numbers as a participant of this very load, so a
+            // record reaching an effect through this stand travels the road it travels in the game:
+            // the canon supplies what the record leaves unsaid. An unloaded registry here would leave
+            // every such walk asserting about numbers no shipped composition ever uses.
+            var effects = new EffectProvider();
+            var abilities = new AbilityProvider(augments, () => effects);
+            var service = new GameDataService(new FileSystemDataSource(root), [abilities, augments, effects]);
             List<string> failures = [];
             service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
 

@@ -19,7 +19,8 @@ namespace Battle.Source.Effects
             parameter: EntityParameter.CriticalChance,
             type: OperationType.Multiply,
             priority: Priority.Weak,
-            statusEffect: StatusEffects.None)
+            statusEffect: StatusEffects.None,
+            shape: EffectValueShape.ShareGained)
     {
         public override async Task Apply(EffectApplyingContext context)
         {

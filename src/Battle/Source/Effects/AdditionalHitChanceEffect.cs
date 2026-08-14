@@ -18,7 +18,8 @@ namespace Battle.Source.Effects
             parameter: EntityParameter.AdditionalHitChance,
             type: OperationType.Multiply,
             priority: Priority.Weak,
-            statusEffect: StatusEffects.None)
+            statusEffect: StatusEffects.None,
+            shape: EffectValueShape.ShareGained)
     {
         public override IEffect Copy() => new AdditionalHitChanceEffect(Duration, MaxStacks, Authored);
     }

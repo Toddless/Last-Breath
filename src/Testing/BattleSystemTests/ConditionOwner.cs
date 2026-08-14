@@ -4,6 +4,7 @@ namespace LastBreathTest.BattleSystemTests
     using System.Collections.Generic;
     using System.Reflection;
     using System.Threading.Tasks;
+    using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Context;
@@ -21,6 +22,9 @@ namespace LastBreathTest.BattleSystemTests
     /// every test over predicates — the catalog hands out live conditions and they need a real subject.</summary>
     internal sealed class ConditionOwner : IFightable
     {
+        /// <summary>Seeded so a mitigation roll (suppression) is the same on every run.</summary>
+        private static readonly DefaultRandomNumberGenerator s_rolls = new(seed: 1);
+
         private float _health;
         private float _mana;
         private float _barrier;
@@ -166,7 +170,23 @@ namespace LastBreathTest.BattleSystemTests
             return Task.CompletedTask;
         }
 
-        public Task TakeDamage(IDamageContext context) => Task.CompletedTask;
+        /// <summary>Opt-in: a blow actually runs the target-side pipeline and comes off the health, the
+        /// way a real fighter takes it. Off by default — most walks here only need a fighter to exist,
+        /// and every one of them was written against a <see cref="TakeDamage"/> that did nothing.</summary>
+        public bool TakesDamageForReal { get; set; }
+
+        public Task TakeDamage(IDamageContext context)
+        {
+            if (!TakesDamageForReal) return Task.CompletedTask;
+
+            // The shape a real fighter uses: both modifier pipelines, then mitigation, then health.
+            // No absorption layers — nothing here wears a shield or a barrier.
+            ModifierHandler.Apply(context);
+            context.Source.ModifierHandler.Apply(context);
+            Calculations.CalculateMitigation(context, this, s_rolls);
+            if (context.TotalDamage > 0) CurrentHealth -= context.TotalDamage;
+            return Task.CompletedTask;
+        }
         public void Heal(IHealContext context) => throw new NotSupportedException();
         public void OnTurnStart() => throw new NotSupportedException();
         public void OnTurnEnd() => throw new NotSupportedException();

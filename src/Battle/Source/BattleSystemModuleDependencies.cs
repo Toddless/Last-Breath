@@ -79,7 +79,9 @@
             services.AddSingleton<IAugmentItemMinter, AugmentItemMinter>();
 
             services.AddSingleton<ISkillProvider, PassiveSkillProvider>();
-            services.AddSingleton<IEffectProvider, EffectProvider>();
+            // A data participant since CL-3a: the numbers of every effect are balanced in one catalog,
+            // and the registry that builds them is the one place that reads it.
+            services.AddGameDataParticipant<IEffectProvider, EffectProvider>();
             // The ability registry builds data-declared behaviours out of it; lazy so registration order
             // stays irrelevant and a sandbox without one still mints every other augment.
             services.AddSingleton<Func<IEffectProvider?>>(sp => sp.GetService<IEffectProvider>);

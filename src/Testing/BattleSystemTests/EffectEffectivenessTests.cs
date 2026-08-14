@@ -30,7 +30,7 @@ namespace LastBreathTest.BattleSystemTests
             // Passives, item grants, boss stages: everything that is not a cast has no effectiveness to
             // hand over, and the default has to be the number that changes nothing. A multiplier that
             // started at the struct default would zero every figure of every such effect in the game.
-            var buff = new CritCalculationBuff(duration: 3, maxStacks: 3, value: Authored);
+            var buff = new EnhanceDefenseEffect(duration: 3, maxStacks: 3, value: Authored);
 
             await buff.Apply(Laying(new ConditionOwner()));
 
@@ -41,7 +41,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public async Task ACastThatLandsHarderRaisesTheFigureTheEffectCarries()
         {
-            var buff = new CritCalculationBuff(duration: 3, maxStacks: 3, value: Authored);
+            var buff = new EnhanceDefenseEffect(duration: 3, maxStacks: 3, value: Authored);
 
             await buff.Apply(Laying(new ConditionOwner(), Strong));
 
@@ -159,14 +159,125 @@ namespace LastBreathTest.BattleSystemTests
             // Bonus stacks and transfers are copies, and a copy built from the figure this instance
             // CAME TO would be scaled again the moment it was applied. What a copy carries is what its
             // original was written with.
-            var buff = new CritCalculationBuff(duration: 3, maxStacks: 3, value: Authored);
+            var buff = new EnhanceDefenseEffect(duration: 3, maxStacks: 3, value: Authored);
             await buff.Apply(Laying(new ConditionOwner(), Strong));
 
             IEffect copy = buff.Copy();
             await copy.Apply(Laying(new ConditionOwner(), Strong));
 
-            Assert.AreEqual(buff.Value, ((CritCalculationBuff)copy).Value, 0.0001f,
+            Assert.AreEqual(buff.Value, ((EnhanceDefenseEffect)copy).Value, 0.0001f,
                 "the copy came out at a different figure than the effect it was made of");
+        }
+
+        [TestMethod]
+        public async Task EveryGainingBuffOfTheBookStaysABuffHoweverHardTheCastLands()
+        {
+            // The mirror of the inversion sweep, and it exists because the mirror image of that bug had
+            // been shipping unwatched: a buff authored as "how much the parameter GAINS" reaches a
+            // multiplicative decorator as "what the parameter becomes", and one written without the
+            // shape multiplied by the share instead of by one plus it. Light Step took the bearer's
+            // evade to 15% of itself per stack while its own text promised +15%, and the Critical
+            // Calculation buff did the same to critical chance. Both were green the whole time.
+            foreach (ParameterChangeEffect buff in Gaining())
+            {
+                await buff.Apply(Laying(new ConditionOwner(), Strong));
+
+                Assert.IsTrue(buff.Value > 1f, $"'{buff.Id}' left the parameter below where it found it — it is a debuff, not a buff");
+                Assert.AreEqual(1f + (Authored * Strong), buff.Value, 0.0001f, $"'{buff.Id}' no longer scales the share it was written with");
+                Assert.IsTrue(buff.Value > 1f + Authored, $"a stronger cast left '{buff.Id}' weaker than a plain one");
+            }
+
+            foreach (CompositeParameterChangeEffect buff in GainingComposites())
+            {
+                await buff.Apply(Laying(new ConditionOwner(), Strong));
+
+                foreach (ParameterChange change in buff.Changes)
+                {
+                    Assert.IsTrue(buff.ValueOf(change) > 1f,
+                        $"'{buff.Id}' left {change.Parameter} below where it found it — it is a debuff, not a buff");
+                    Assert.AreEqual(1f + (Authored * Strong), buff.ValueOf(change), 0.0001f,
+                        $"'{buff.Id}' no longer scales the share it was written with");
+                }
+            }
+        }
+
+        [TestMethod]
+        public async Task AFigureThatIsNeitherGainedNorLostIsHandedOverUntouchedApartFromTheCast()
+        {
+            // The third shape. These move a parameter by an amount rather than by a share of it, so
+            // there is nothing to invert and nothing to add one to — and a shape wrongly declared here
+            // would turn an amount into a multiplier.
+            foreach (ParameterChangeEffect effect in Plain())
+            {
+                await effect.Apply(Laying(new ConditionOwner(), Strong));
+
+                Assert.AreEqual(Authored * Strong, effect.Value, 0.0001f,
+                    $"'{effect.Id}' was reshaped on the way out — its figure is an amount, not a share");
+            }
+        }
+
+        [TestMethod]
+        public void EveryParameterChangingEffectOfTheBookIsWalkedInExactlyOneShape()
+        {
+            // What keeps the three sweeps above from being "the effects somebody remembered". A class
+            // written tomorrow belongs to one of the three shapes; until it is named in one of the
+            // lists, this fails and says so. Four classes were sitting outside every list when it was
+            // written, and all four carried the shape bug.
+            HashSet<Type> walked =
+            [
+                .. Inverted().Select(effect => effect.GetType()),
+                .. InvertedComposites().Select(effect => effect.GetType()),
+                .. Gaining().Select(effect => effect.GetType()),
+                .. GainingComposites().Select(effect => effect.GetType()),
+                .. Plain().Select(effect => effect.GetType()),
+            ];
+
+            var declared = typeof(ParameterChangeEffect).Assembly.GetTypes()
+                .Where(type => type is { IsAbstract: false, IsClass: true })
+                .Where(type => typeof(ParameterChangeEffect).IsAssignableFrom(type) || typeof(CompositeParameterChangeEffect).IsAssignableFrom(type))
+                .ToList();
+
+            Assert.IsTrue(declared.Count > 0, "no parameter-changing effects were found at all, so this proves nothing");
+
+            string[] unwalked = [.. declared.Except(walked).Select(type => type.Name).Order(StringComparer.Ordinal)];
+            string[] strangers = [.. walked.Except(declared).Select(type => type.Name).Order(StringComparer.Ordinal)];
+
+            Assert.AreEqual(0, unwalked.Length,
+                $"parameter-changing effects no shape sweep walks — say which shape each is: [{string.Join(", ", unwalked)}]");
+            Assert.AreEqual(0, strangers.Length, $"walked types that are not parameter-changing effects: [{string.Join(", ", strangers)}]");
+        }
+
+        /// <summary>Every buff of the book whose authored figure is what the parameter GAINS, so the
+        /// number the decorator wants is one plus it.</summary>
+        private static IEnumerable<ParameterChangeEffect> Gaining()
+        {
+            yield return new ArmorBuffEffect(duration: 3, maxStacks: 3, value: Authored);
+            yield return new DamageBuffEffect(duration: 3, maxStacks: 3, value: Authored);
+            yield return new SpellSurgeEffect(duration: 3, maxStacks: 3, value: Authored);
+            yield return new GiantsBlessingEffect(duration: 3, maxStacks: 3, value: Authored);
+            yield return new WeakRegenerationEffect(duration: 3, maxStacks: 3, value: Authored);
+            yield return new LightStep(duration: 3, maxStacks: 5, value: Authored);
+            yield return new AccuracyBuff(duration: 3, maxStacks: 3, value: Authored);
+            yield return new CriticalChanceBuffEffect(duration: 3, maxStacks: 3, value: Authored);
+            yield return new CritCalculationBuff(duration: 3, maxStacks: 3, value: Authored);
+            yield return new AttackChanceCalculationBuff(duration: 3, maxStacks: 3, value: Authored);
+            yield return new AdditionalHitChanceEffect(duration: 3, maxStacks: 3, value: Authored);
+        }
+
+        /// <summary>Composite buffs of the book whose changes are shares GAINED.</summary>
+        private static IEnumerable<CompositeParameterChangeEffect> GainingComposites()
+        {
+            yield return new AresBlessingEffect(duration: 3, healthBonus: Authored, recoveryBonus: Authored);
+            yield return new DarkShroudEffect(duration: 3, evadeValue: Authored);
+        }
+
+        /// <summary>Effects that move a parameter by an AMOUNT rather than by a share of it — added to
+        /// it or taken off it, never multiplied — so their figure passes through unreshaped.</summary>
+        private static IEnumerable<ParameterChangeEffect> Plain()
+        {
+            yield return new EnhanceDefenseEffect(duration: 3, maxStacks: 3, value: Authored);
+            yield return new CriticalDamageBuffEffect(duration: 3, maxStacks: 3, value: Authored);
+            yield return new ColdResistanceShredEffect(duration: 3, maxStacks: 1, value: Authored);
         }
 
         /// <summary>Every debuff of the book whose authored figure is what the parameter LOSES, so the
