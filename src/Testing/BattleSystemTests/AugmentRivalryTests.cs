@@ -229,12 +229,12 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>One copy of the cost record as the registry builds it — the record with this copy's
         /// roll written over the declared number.</summary>
-        private static IAbilityUpgrade Built(AbilityProvider registry, AbilityAugmentCatalog catalog, float roll)
+        private static IAbilityAugment Built(AbilityProvider registry, AbilityAugmentCatalog catalog, float roll)
         {
-            AbilityUpgradeData? record = catalog.Find(CostAugment);
+            AbilityAugmentData? record = catalog.Find(CostAugment);
             Assert.IsNotNull(record, $"the shipped data declares no '{CostAugment}'");
 
-            IAbilityUpgrade? upgrade = registry.CreateUpgrade(CostCopy(roll).Applied(record));
+            IAbilityAugment? upgrade = registry.CreateUpgrade(CostCopy(roll).Applied(record));
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{CostAugment}'");
 
             return upgrade;
@@ -242,33 +242,33 @@ namespace LastBreathTest.BattleSystemTests
 
         private static AugmentInstance CostCopy(float roll) => Copy(CostAugment, (CostShareProperty, roll));
 
-        private static IAbilityUpgrade ReduceCooldown() => new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare);
+        private static IAbilityAugment ReduceCooldown() => new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare);
 
-        private static IAbilityUpgrade ReduceCost() => new AbilityUpgradeReduceCost(CostAugment, [], 1, 0.30f);
+        private static IAbilityAugment ReduceCost() => new AbilityAugmentReduceCost(CostAugment, [], 1, 0.30f);
 
-        private static IAbilityUpgrade Surcharge() =>
-            new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare);
+        private static IAbilityAugment Surcharge() =>
+            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare);
 
         /// <summary>A cut deeper than the surcharge record's, standing on the same wait: the rival that
         /// puts the surcharge record's own cut out of work.</summary>
-        private static IAbilityUpgrade DeeperCut() =>
-            new AbilityUpgradeParameterSet("Augment_Deeper_Cut", [], 3, [(AbilityParameter.Cooldown, OperationType.Subtract, 5f)]);
+        private static IAbilityAugment DeeperCut() =>
+            new AbilityAugmentParameterSet("Augment_Deeper_Cut", [], 3, [(AbilityParameter.Cooldown, OperationType.Subtract, 5f)]);
 
         /// <summary>Two records reaching for one number from opposite sides, shaped like the pair the
         /// book ships on a berserker's own burn (Augment_More_Burn and Augment_Less_Burn). Stood in for
         /// on a key of Head Butt's, because which number it is has nothing to do with the question.</summary>
-        private static IAbilityUpgrade MoreAttacks() =>
-            new AbilityUpgradeParameterSet("Augment_More_Attacks", [], 2, [(AbilityParameter.Attacks, OperationType.Add, 2f)]);
+        private static IAbilityAugment MoreAttacks() =>
+            new AbilityAugmentParameterSet("Augment_More_Attacks", [], 2, [(AbilityParameter.Attacks, OperationType.Add, 2f)]);
 
-        private static IAbilityUpgrade FewerAttacks() =>
-            new AbilityUpgradeParameterSet("Augment_Fewer_Attacks", [], 2, [(AbilityParameter.Attacks, OperationType.Subtract, 1f)]);
+        private static IAbilityAugment FewerAttacks() =>
+            new AbilityAugmentParameterSet("Augment_Fewer_Attacks", [], 2, [(AbilityParameter.Attacks, OperationType.Subtract, 1f)]);
 
         /// <summary>Head Butt's own tier-two augment: a longer stun bought with fifty more mana.</summary>
-        private static IAbilityUpgrade StunSurchargeUpgrade() =>
-            new AbilityUpgradeParameterSet(StunSurcharge, [], 2, [(AbilityParameter.CostValue, OperationType.Add, 50f)]);
+        private static IAbilityAugment StunSurchargeUpgrade() =>
+            new AbilityAugmentParameterSet(StunSurcharge, [], 2, [(AbilityParameter.CostValue, OperationType.Add, 50f)]);
 
-        private static IAbilityUpgrade SwapTo(string augmentId, Costs resource) =>
-            new AbilityUpgradeCostTypeOverride(augmentId, [], 2, resource);
+        private static IAbilityAugment SwapTo(string augmentId, Costs resource) =>
+            new AbilityAugmentCostTypeOverride(augmentId, [], 2, resource);
 
         /// <summary>
         /// One character wearing the real thing: the shipped records, a board with two slots on one

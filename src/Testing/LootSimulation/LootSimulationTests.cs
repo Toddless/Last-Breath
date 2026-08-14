@@ -34,7 +34,7 @@
             Assert.IsNotNull(catalog, "the stand composes no augment catalog, so no drop pipeline of its kind could ever see one.");
             Assert.IsTrue(catalog.All.Count > 0, "The augment records reached the stand empty.");
 
-            AbilityUpgradeData first = catalog.All.First();
+            AbilityAugmentData first = catalog.All.First();
             Assert.IsNotNull(catalog.Find(first.Id), $"'{first.Id}' is held by the stand and not found by its own id.");
         }
 

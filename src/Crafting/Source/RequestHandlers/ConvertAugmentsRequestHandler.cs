@@ -50,7 +50,7 @@ namespace Crafting.Source.RequestHandlers
             List<IAugmentItem> held = [.. request.ItemInstanceIds.Select(inventory.GetItem<IAugmentItem>).OfType<IAugmentItem>()];
             if (held.Count != OfferedCount) return Refused(AugmentConversionOutcome.AugmentNotHeld);
 
-            List<AbilityUpgradeData> declared = [.. held.Select(item => catalog.Find(item.Id)).OfType<AbilityUpgradeData>()];
+            List<AbilityAugmentData> declared = [.. held.Select(item => catalog.Find(item.Id)).OfType<AbilityAugmentData>()];
             if (declared.Count != OfferedCount) return Refused(AugmentConversionOutcome.UndeclaredAugment);
 
             if (declared.Any(record => record.Tier != declared[0].Tier))
@@ -78,16 +78,16 @@ namespace Crafting.Source.RequestHandlers
         /// <summary>A fresh copy of one record the conversion may give back, taken evenly among them.
         /// Null when there is no such record — the class the three belong to holds nothing else, and a
         /// conversion with nothing to draw must not be started.</summary>
-        private IAugmentItem? Drawn(IReadOnlyList<AbilityUpgradeData> offered)
+        private IAugmentItem? Drawn(IReadOnlyList<AbilityAugmentData> offered)
         {
-            List<AbilityUpgradeData> candidates = [.. Alternatives(offered)];
+            List<AbilityAugmentData> candidates = [.. Alternatives(offered)];
             return candidates.Count == 0 ? null : minter.Mint(candidates[rnd.RandIntRange(0, candidates.Count - 1)].Id);
         }
 
         /// <summary>Every record of the offered class except the ones offered: the same tier and the
         /// same rarity, so the trade is even, minus the three handed over, so the player is never sold
         /// back what he just gave up.</summary>
-        private IEnumerable<AbilityUpgradeData> Alternatives(IReadOnlyList<AbilityUpgradeData> offered)
+        private IEnumerable<AbilityAugmentData> Alternatives(IReadOnlyList<AbilityAugmentData> offered)
         {
             HashSet<string> given = [.. offered.Select(record => record.Id)];
             return catalog.All.Where(record =>

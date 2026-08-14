@@ -12,7 +12,7 @@ namespace Battle.Source.Abilities
         /// those classes said the same three things in a different order — which parameter key to
         /// stand on, what to do to the value there, and where to read the amount. Said as data, the
         /// record is one line and the code behind all of them is one class
-        /// (<see cref="AbilityUpgradeParameterSet"/>).
+        /// (<see cref="AbilityAugmentParameterSet"/>).
         ///
         /// The table is code and not part of the augment's json record, because the record is a
         /// contract shared with everything that reads augments and it is not the place to say how the

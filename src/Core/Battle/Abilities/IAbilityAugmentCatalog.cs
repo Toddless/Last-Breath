@@ -16,10 +16,10 @@ namespace Core.Battle.Abilities
         /// of judging one already named — an augment says which sockets take it and no index is kept
         /// the other way round, so "what may go into this slot" is answered by putting the whole
         /// section to the rule.</summary>
-        IReadOnlyCollection<AbilityUpgradeData> All { get; }
+        IReadOnlyCollection<AbilityAugmentData> All { get; }
 
         /// <summary>The augment's own record; null when the catalog holds no augment of that id.</summary>
-        AbilityUpgradeData? Find(string augmentId);
+        AbilityAugmentData? Find(string augmentId);
 
         /// <summary>The combat tags of an ability; empty when the catalog does not hold the ability.</summary>
         IReadOnlyCollection<string> TagsOf(string abilityId);

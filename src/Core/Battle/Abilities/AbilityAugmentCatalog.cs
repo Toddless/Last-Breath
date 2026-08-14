@@ -25,20 +25,20 @@ namespace Core.Battle.Abilities
         /// <summary>Every augment record by its own id. They are asked for by id alone: the fit of an
         /// augment nobody owns yet is a question about a record, and the asker knows the id it was
         /// offered, not where it is written.</summary>
-        private readonly Dictionary<string, AbilityUpgradeData> _augments = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, AbilityAugmentData> _augments = new(StringComparer.Ordinal);
 
         private readonly Dictionary<string, string[]> _abilityTags = new(StringComparer.Ordinal);
 
         public IReadOnlyList<string> Catalogs => [DataCatalog.Abilities];
 
-        public IReadOnlyCollection<AbilityUpgradeData> All => _augments.Values;
+        public IReadOnlyCollection<AbilityAugmentData> All => _augments.Values;
 
         public void Apply(string catalog, GameDataFile file)
         {
             var root = JsonConvert.DeserializeObject<AbilityDataRoot>(file.Json)
                        ?? throw new InvalidOperationException($"Failed to deserialize ability data '{file.FileName}'");
 
-            foreach (AbilityUpgradeData augment in root.Augments) _augments[augment.Id] = augment;
+            foreach (AbilityAugmentData augment in root.Augments) _augments[augment.Id] = augment;
 
             foreach (AbilityBaseData ability in root.Abilities) _abilityTags[ability.Id] = ability.Tags;
         }
@@ -46,7 +46,7 @@ namespace Core.Battle.Abilities
         /// <summary>The augment's record exactly as its data declares it. An id no file declares is
         /// answered with null rather than an empty record: nothing says what such an augment is, and
         /// a blank record would read as one declaring nothing — which is a record the rule can judge.</summary>
-        public AbilityUpgradeData? Find(string augmentId) => _augments.GetValueOrDefault(augmentId);
+        public AbilityAugmentData? Find(string augmentId) => _augments.GetValueOrDefault(augmentId);
 
         /// <summary>The combat tags of an ability, empty for an id the data does not declare. Unknown
         /// is not an error here: the catalog answers about ids that arrive from a save file or a drop,

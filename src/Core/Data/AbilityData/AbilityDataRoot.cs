@@ -11,6 +11,6 @@ namespace Core.Data.AbilityData
         /// which sockets take it follows from its own declaration, so a record written inside one
         /// ability's block would state a belonging no rule reads — and an augment declaring itself at
         /// home on every ability has no such block to be written in at all.</summary>
-        [JsonProperty("augments")] public List<AbilityUpgradeData> Augments { get; init; } = [];
+        [JsonProperty("augments")] public List<AbilityAugmentData> Augments { get; init; } = [];
     }
 }

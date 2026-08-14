@@ -63,7 +63,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             // Both halves of a spread: it bounds the draw, and the draw is actually spread. A value
             // that never left the base would pass a bounds check on its own.
-            AbilityUpgradeData record = ShippedRecord(ShareAugment);
+            AbilityAugmentData record = ShippedRecord(ShareAugment);
             float declared = record.UpgradeProperties[ShareProperty];
             AugmentMinter minter = MinterOver(ShippedSpread, new DefaultRandomNumberGenerator(seed: 20260803));
             float low = float.MaxValue;
@@ -87,7 +87,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             // The consequence the whole change exists for: one player's copy is worth more than
             // another's, so nothing that cares WHICH copy may address it by the record's id.
-            AbilityUpgradeData record = ShippedRecord(ShareAugment);
+            AbilityAugmentData record = ShippedRecord(ShareAugment);
             AugmentMinter minter = MinterOver(ShippedSpread, new DefaultRandomNumberGenerator(seed: 7));
 
             AugmentInstance first = minter.Mint(record);
@@ -104,7 +104,7 @@ namespace LastBreathTest.BattleSystemTests
             // The other side of it: the difference is the draw and nothing else. A copy that varied
             // with anything but the generator could not be reproduced, and a seeded run would stop
             // being a run of the same game.
-            AbilityUpgradeData record = ShippedRecord(ShareAugment);
+            AbilityAugmentData record = ShippedRecord(ShareAugment);
 
             AugmentInstance first = MinterOver(ShippedSpread, new DefaultRandomNumberGenerator(seed: 99)).Mint(record);
             AugmentInstance second = MinterOver(ShippedSpread, new DefaultRandomNumberGenerator(seed: 99)).Mint(record);
@@ -123,7 +123,7 @@ namespace LastBreathTest.BattleSystemTests
             List<string> outside = [];
             Dictionary<string, HashSet<Rarity>> seen = [];
 
-            foreach (AbilityUpgradeData record in ShippedAbilityData.Augments().All)
+            foreach (AbilityAugmentData record in ShippedAbilityData.Augments().All)
                 for (int draw = 0; draw < 30; draw++)
                 {
                     Rarity rolled = minter.Mint(record).Rarity;
@@ -166,8 +166,8 @@ namespace LastBreathTest.BattleSystemTests
             // consumes it takes the whole part anyway: left fractional it would be truncated, and the
             // description would go on advertising the fraction the augment never applies.
             AugmentMinter minter = MinterOver(ShippedSpread, new DefaultRandomNumberGenerator(seed: 11));
-            AbilityUpgradeData counts = Record("Augment_Test_Counts", ("duration", 5f));
-            AbilityUpgradeData shares = Record("Augment_Test_Shares", ("chance", 0.5f));
+            AbilityAugmentData counts = Record("Augment_Test_Counts", ("duration", 5f));
+            AbilityAugmentData shares = Record("Augment_Test_Shares", ("chance", 0.5f));
             bool fractionSeen = false;
 
             for (int draw = 0; draw < Draws; draw++)
@@ -210,7 +210,7 @@ namespace LastBreathTest.BattleSystemTests
             // draw never comes out lower — so the two edges of the band bound everything between them,
             // and putting every count of every shipped record through both edges is the whole table of
             // what a count can be worth rather than two thousand attempts at finding a hole in it.
-            IReadOnlyList<(AbilityUpgradeData Record, string Property, float Declared)> counts = ShippedCounts();
+            IReadOnlyList<(AbilityAugmentData Record, string Property, float Declared)> counts = ShippedCounts();
             Assert.IsTrue(counts.Count > 0, "the shipped records carry no counts, so the bounds below are nobody's");
 
             foreach (float spread in s_widths)
@@ -218,7 +218,7 @@ namespace LastBreathTest.BattleSystemTests
                 AugmentMinter bottom = MinterOver(spread, new EdgeRandom(atBottom: true));
                 AugmentMinter top = MinterOver(spread, new EdgeRandom(atBottom: false));
 
-                foreach ((AbilityUpgradeData record, string property, float declared) in counts)
+                foreach ((AbilityAugmentData record, string property, float declared) in counts)
                 {
                     float atBottom = bottom.Mint(record).Values[property];
                     float atTop = top.Mint(record).Values[property];
@@ -241,7 +241,7 @@ namespace LastBreathTest.BattleSystemTests
             // spent on a band of no width would shift every seeded sequence taken after it. The rarity
             // is handed in rather than drawn, so the only draw left to count is the numbers'.
             var rnd = new CountingRandom(new DefaultRandomNumberGenerator(seed: 3));
-            AbilityUpgradeData record = ShippedRecord(ShareAugment);
+            AbilityAugmentData record = ShippedRecord(ShareAugment);
 
             AugmentInstance copy = new AugmentMinter(ShippedAbilityData.Augments(), RulesOf(AugmentValueRules.Fixed), rnd)
                 .Mint(record, record.RarityBand.Worst);
@@ -266,13 +266,13 @@ namespace LastBreathTest.BattleSystemTests
             // How a copy reaches everything built out of a record: the declaration unchanged, the
             // numbers replaced. A property added to the record after the copy was minted keeps its
             // declared base — the copy has nothing to say about a number that did not exist yet.
-            AbilityUpgradeData record = ShippedRecord(ShareAugment) with
+            AbilityAugmentData record = ShippedRecord(ShareAugment) with
             {
                 UpgradeProperties = new Dictionary<string, float> { [ShareProperty] = 0.3f, ["addedLater"] = 7f }
             };
             var copy = new AugmentInstance(record.Id, new Dictionary<string, float> { [ShareProperty] = 0.375f }, Rarity.Common);
 
-            AbilityUpgradeData applied = copy.Applied(record);
+            AbilityAugmentData applied = copy.Applied(record);
 
             Assert.AreEqual(0.375f, applied.UpgradeProperties[ShareProperty], "the record kept its base instead of the copy's number");
             Assert.AreEqual(7f, applied.UpgradeProperties["addedLater"], "a property the copy never rolled came out as nothing");
@@ -287,11 +287,11 @@ namespace LastBreathTest.BattleSystemTests
             // description and the behaviour are built from the same dictionary, so this is also what
             // keeps the two from drifting apart.
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
-            AbilityUpgradeData record = ShippedRecord(ShareAugment);
+            AbilityAugmentData record = ShippedRecord(ShareAugment);
             AugmentInstance copy = new AugmentMinter(catalog, RulesOf(new AugmentValueRules(ShippedSpread)),
                 new DefaultRandomNumberGenerator(seed: 77)).Mint(record);
 
-            IAbilityUpgrade? upgrade = registry.CreateUpgrade(copy);
+            IAbilityAugment? upgrade = registry.CreateUpgrade(copy);
 
             Assert.IsNotNull(upgrade, $"the registry builds nothing for a copy of '{ShareAugment}'");
             Assert.AreNotEqual(record.UpgradeProperties[ShareProperty], copy.Values[ShareProperty],
@@ -311,7 +311,7 @@ namespace LastBreathTest.BattleSystemTests
             AugmentMinter minter = MinterOver(spread, new DefaultRandomNumberGenerator(seed));
             int walked = 0;
 
-            foreach (AbilityUpgradeData record in ShippedAbilityData.Augments().All)
+            foreach (AbilityAugmentData record in ShippedAbilityData.Augments().All)
                 foreach ((string property, float declared) in record.UpgradeProperties)
                 {
                     for (int draw = 0; draw < 200; draw++)
@@ -335,7 +335,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>Every whole number of every shipped record: the counts, which are the numbers a
         /// rounding can take away entirely.</summary>
-        private static IReadOnlyList<(AbilityUpgradeData Record, string Property, float Declared)> ShippedCounts() =>
+        private static IReadOnlyList<(AbilityAugmentData Record, string Property, float Declared)> ShippedCounts() =>
         [
             .. ShippedAbilityData.Augments().All
                 .SelectMany(record => record.UpgradeProperties
@@ -350,16 +350,16 @@ namespace LastBreathTest.BattleSystemTests
         private static ICombatRulesProvider RulesOf(AugmentValueRules values) => new StubCombatRules(values);
 
         /// <summary>One shipped record, read through the loader the game uses.</summary>
-        private static AbilityUpgradeData ShippedRecord(string augmentId)
+        private static AbilityAugmentData ShippedRecord(string augmentId)
         {
-            AbilityUpgradeData? record = ShippedAbilityData.Augments().Find(augmentId);
+            AbilityAugmentData? record = ShippedAbilityData.Augments().Find(augmentId);
             Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
             Assert.IsTrue(record.UpgradeProperties.Count > 0, $"'{augmentId}' carries no numbers to draw around");
             return record;
         }
 
         /// <summary>A record the shipped files do not declare, for the properties a walk needs.</summary>
-        private static AbilityUpgradeData Record(string id, params (string Property, float Value)[] properties) =>
+        private static AbilityAugmentData Record(string id, params (string Property, float Value)[] properties) =>
             new()
             {
                 Id = id,

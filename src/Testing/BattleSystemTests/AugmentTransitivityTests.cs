@@ -154,8 +154,8 @@ namespace LastBreathTest.BattleSystemTests
             // behind went on riding every impact reading a parameter nobody had registered: two
             // not-found reports per hit and a stack of zero turns ticking for zero damage.
             var bench = new Bench();
-            IAbilityUpgrade first = bench.Seat(Applier);
-            IAbilityUpgrade second = bench.Seat(Applier);
+            IAbilityAugment first = bench.Seat(Applier);
+            IAbilityAugment second = bench.Seat(Applier);
             Assert.AreEqual(bench.Turns, bench.Ability[TurnsKey], "two copies of the applier left the ability with turns neither of them declares");
             Assert.AreEqual(bench.Turns, (await bench.PoisonOneSwing(new Brawler(), new Brawler())).Duration, "the pair of copies poisons nothing at all");
 
@@ -180,7 +180,7 @@ namespace LastBreathTest.BattleSystemTests
             // what matters here is that the NUMBERS do not follow the rider out (the walk above), so the
             // day rider identity becomes per-copy nothing else has to move.
             var bench = new Bench();
-            IAbilityUpgrade first = bench.Seat(Applier);
+            IAbilityAugment first = bench.Seat(Applier);
             bench.Seat(Applier);
 
             Assert.AreEqual(1, bench.Ability.ImpactRiders.Count, "the second copy seated a rider of its own");
@@ -200,7 +200,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             private readonly AbilityAugmentCatalog _catalog;
             private readonly AbilityProvider _book;
-            private readonly Dictionary<string, IAbilityUpgrade> _seated = new(StringComparer.Ordinal);
+            private readonly Dictionary<string, IAbilityAugment> _seated = new(StringComparer.Ordinal);
 
             internal Bench()
             {
@@ -221,22 +221,22 @@ namespace LastBreathTest.BattleSystemTests
 
             /// <summary>Seats one copy of a record and hands the copy back — two sockets may hold two
             /// copies of one augment, and then the id names neither of them.</summary>
-            internal IAbilityUpgrade Seat(string augmentId)
+            internal IAbilityAugment Seat(string augmentId)
             {
-                IAbilityUpgrade upgrade = Built(augmentId);
-                upgrade.Apply(Ability);
-                Assert.IsTrue(upgrade.Learned, $"'{augmentId}' refused the ability it was seated on");
-                _seated[augmentId] = upgrade;
-                return upgrade;
+                IAbilityAugment augment = Built(augmentId);
+                augment.Apply(Ability);
+                Assert.IsTrue(augment.Learned, $"'{augmentId}' refused the ability it was seated on");
+                _seated[augmentId] = augment;
+                return augment;
             }
 
             internal void Unseat(string augmentId)
             {
-                Assert.IsTrue(_seated.Remove(augmentId, out IAbilityUpgrade? upgrade), $"'{augmentId}' was never seated");
+                Assert.IsTrue(_seated.Remove(augmentId, out IAbilityAugment? upgrade), $"'{augmentId}' was never seated");
                 Unseat(upgrade!);
             }
 
-            internal void Unseat(IAbilityUpgrade upgrade) => upgrade.Remove(Ability);
+            internal void Unseat(IAbilityAugment augment) => augment.Remove(Ability);
 
             /// <summary>One landing impact of the ability, handed to its riders the way the attack
             /// pipeline hands one over, and the stack it left behind.</summary>
@@ -272,16 +272,16 @@ namespace LastBreathTest.BattleSystemTests
 
             private float Declared(string augmentId, string property) => Record(augmentId).UpgradeProperties[property];
 
-            private IAbilityUpgrade Built(string augmentId)
+            private IAbilityAugment Built(string augmentId)
             {
-                IAbilityUpgrade? upgrade = _book.CreateUpgrade(Record(augmentId));
+                IAbilityAugment? upgrade = _book.CreateUpgrade(Record(augmentId));
                 Assert.IsNotNull(upgrade, $"the registry builds nothing for '{augmentId}'");
                 return upgrade;
             }
 
-            private AbilityUpgradeData Record(string augmentId)
+            private AbilityAugmentData Record(string augmentId)
             {
-                AbilityUpgradeData? record = _catalog.Find(augmentId);
+                AbilityAugmentData? record = _catalog.Find(augmentId);
                 Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
                 return record;
             }

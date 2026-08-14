@@ -70,7 +70,7 @@
             var abilities = book.KnownAbilityIds.ToHashSet(StringComparer.Ordinal);
             int bound = 0;
 
-            foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Bound))
+            foreach ((string id, AbilityAugmentData record) in ShippedRecords(catalog).Where(Bound))
             {
                 Assert.IsTrue(abilities.Contains(record.AbilityId), $"'{id}' binds itself to '{record.AbilityId}', which the book does not declare");
                 bound++;
@@ -90,7 +90,7 @@
             string[] abilities = [.. book.KnownAbilityIds];
             int bound = 0;
 
-            foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Bound))
+            foreach ((string id, AbilityAugmentData record) in ShippedRecords(catalog).Where(Bound))
             {
                 IAbilitySocketBoard board = BoardOver(catalog, abilities, record.Tier);
 
@@ -120,7 +120,7 @@
             string[] abilities = [.. book.KnownAbilityIds];
             int universal = 0;
 
-            foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(Universal))
+            foreach ((string id, AbilityAugmentData record) in ShippedRecords(catalog).Where(Universal))
             {
                 Assert.AreEqual(string.Empty, record.AbilityId,
                     $"'{id}' claims every ability and names one, and the rule refuses a record answering the same question twice");
@@ -149,7 +149,7 @@
             string[] abilities = [.. book.KnownAbilityIds];
             int silent = 0;
 
-            foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog).Where(entry => !Bound(entry) && !Universal(entry)))
+            foreach ((string id, AbilityAugmentData record) in ShippedRecords(catalog).Where(entry => !Bound(entry) && !Universal(entry)))
             {
                 IAbilitySocketBoard board = BoardOver(catalog, abilities, record.Tier);
 
@@ -183,9 +183,9 @@
             List<string> nowhere = [];
             List<string> strangers = [];
 
-            foreach ((string id, AbilityUpgradeData record) in ShippedRecords(catalog))
+            foreach ((string id, AbilityAugmentData record) in ShippedRecords(catalog))
             {
-                IAbilityUpgrade? upgrade = book.CreateUpgrade(record);
+                IAbilityAugment? upgrade = book.CreateUpgrade(record);
                 Assert.IsNotNull(upgrade, $"the registry builds nothing for '{id}'");
                 Type demanded = DemandedAbility(upgrade.GetType());
 
@@ -228,16 +228,16 @@
         private static Type DemandedAbility(Type upgrade)
         {
             for (Type? type = upgrade; type != null; type = type.BaseType)
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(AbilityUpgrade<>))
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(AbilityAugment<>))
                     return type.GetGenericArguments()[0];
 
             return typeof(IAbility);
         }
 
-        private static bool Bound((string Id, AbilityUpgradeData Record) entry) =>
+        private static bool Bound((string Id, AbilityAugmentData Record) entry) =>
             !string.IsNullOrWhiteSpace(entry.Record.AbilityId);
 
-        private static bool Universal((string Id, AbilityUpgradeData Record) entry) =>
+        private static bool Universal((string Id, AbilityAugmentData Record) entry) =>
             entry.Record.FitsAnyAbility;
 
         /// <summary>One slot per ability in the book, all of the same tier, judged by the shipped
@@ -255,13 +255,13 @@
         /// of it. The ids are read off the files rather than taken from the catalog, so a record the
         /// loader dropped on the way shows up here as a missing one instead of never being asked
         /// about.</summary>
-        private static IEnumerable<(string Id, AbilityUpgradeData Record)> ShippedRecords(IAbilityAugmentCatalog catalog)
+        private static IEnumerable<(string Id, AbilityAugmentData Record)> ShippedRecords(IAbilityAugmentCatalog catalog)
         {
             foreach (string path in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Abilities), "*.json", SearchOption.AllDirectories))
                 foreach (JObject augment in Children(JObject.Parse(File.ReadAllText(path)), "augments"))
                 {
                     string id = augment.Value<string>("id") ?? string.Empty;
-                    AbilityUpgradeData? record = catalog.Find(id);
+                    AbilityAugmentData? record = catalog.Find(id);
                     Assert.IsNotNull(record, $"the catalog does not hold '{id}', which the section declares");
 
                     yield return (id, record);

@@ -2,6 +2,7 @@ namespace Core.Battle.Abilities
 {
     using System.Collections.Generic;
     using Data.AbilityData;
+    using Enums;
 
     /// <summary>
     /// One augment as it exists in the world: the record it was made from, and the numbers this copy
@@ -16,7 +17,7 @@ namespace Core.Battle.Abilities
     /// <param name="values">This copy's own number per property the record declares.</param>
     /// <param name="rarity">Where THIS copy landed on the scale — drawn from the record's band at the
     /// mint, exactly like its numbers, and kept for good.</param>
-    public sealed class AugmentInstance(string augmentId, IReadOnlyDictionary<string, float> values, Enums.Rarity rarity)
+    public sealed class AugmentInstance(string augmentId, IReadOnlyDictionary<string, float> values, Rarity rarity)
     {
         public string AugmentId { get; } = augmentId;
 
@@ -24,7 +25,7 @@ namespace Core.Battle.Abilities
 
         /// <summary>What this copy is worth. The copy's own, not the record's: a record rebalanced after
         /// the mint moves neither the numbers nor the rarity of copies already in the world.</summary>
-        public Enums.Rarity Rarity { get; } = rarity;
+        public Rarity Rarity { get; } = rarity;
 
         /// <summary>
         /// The record as this copy rolled it: the declaration unchanged, with the numbers replaced by
@@ -34,7 +35,7 @@ namespace Core.Battle.Abilities
         /// A property the record has gained since the copy was minted keeps its declared base: the copy
         /// says nothing about a number that did not exist when it was rolled.
         /// </summary>
-        public AbilityUpgradeData Applied(AbilityUpgradeData record)
+        public AbilityAugmentData Applied(AbilityAugmentData record)
         {
             Dictionary<string, float> properties = new(record.UpgradeProperties);
             foreach ((string property, float value) in Values) properties[property] = value;

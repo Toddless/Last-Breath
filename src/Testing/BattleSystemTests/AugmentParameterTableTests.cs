@@ -125,18 +125,18 @@ namespace LastBreathTest.BattleSystemTests
         {
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
 
-            foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augment in Translated())
+            foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augmentEntry in Translated())
             {
-                IAbilityUpgrade upgrade = Built(registry, catalog, augment.Key, properties => properties);
+                IAbilityAugment augment = Built(registry, catalog, augmentEntry.Key, properties => properties);
 
                 foreach (float start in s_bases)
                 {
                     ParameterProbe probe = ProbeAt(start);
-                    upgrade.Apply(probe);
+                    augment.Apply(probe);
 
-                    foreach ((_, string parameter, OperationType operation, float amount) in augment)
+                    foreach ((_, string parameter, OperationType operation, float amount) in augmentEntry)
                         Assert.AreEqual(Moved(operation, start, amount), probe.Read(parameter),
-                            $"'{augment.Key}' no longer moves '{parameter}' the way its own class did");
+                            $"'{augmentEntry.Key}' no longer moves '{parameter}' the way its own class did");
                 }
             }
         }
@@ -151,15 +151,15 @@ namespace LastBreathTest.BattleSystemTests
             // what holds them there — the walk builds every record stripped of its numbers.
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
 
-            foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augment in Translated())
+            foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augmentEntry in Translated())
             {
-                IAbilityUpgrade upgrade = Built(registry, catalog, augment.Key, _ => []);
+                IAbilityAugment augment = Built(registry, catalog, augmentEntry.Key, _ => []);
                 ParameterProbe probe = ProbeAt(0f);
-                upgrade.Apply(probe);
+                augment.Apply(probe);
 
-                foreach ((_, string parameter, OperationType operation, float amount) in augment)
+                foreach ((_, string parameter, OperationType operation, float amount) in augmentEntry)
                     Assert.AreEqual(Moved(operation, 0f, amount), probe.Read(parameter),
-                        $"'{augment.Key}' lost the amount it falls back to on '{parameter}' when the record carries no property");
+                        $"'{augmentEntry.Key}' lost the amount it falls back to on '{parameter}' when the record carries no property");
             }
         }
 
@@ -172,16 +172,16 @@ namespace LastBreathTest.BattleSystemTests
             // its fallback and show up here as the figure that did not budge.
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
 
-            foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augment in Translated())
+            foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augmentEntry in Translated())
             {
-                IAbilityUpgrade upgrade = Built(registry, catalog, augment.Key,
+                IAbilityAugment augment = Built(registry, catalog, augmentEntry.Key,
                     properties => properties.ToDictionary(entry => entry.Key, entry => entry.Value * 2f));
                 ParameterProbe probe = ProbeAt(0f);
-                upgrade.Apply(probe);
+                augment.Apply(probe);
 
-                foreach ((_, string parameter, OperationType operation, float amount) in augment)
+                foreach ((_, string parameter, OperationType operation, float amount) in augmentEntry)
                     Assert.AreEqual(Moved(operation, 0f, amount * 2f), probe.Read(parameter),
-                        $"'{augment.Key}' reads '{parameter}' off its fallback instead of off its own record");
+                        $"'{augmentEntry.Key}' reads '{parameter}' off its fallback instead of off its own record");
             }
         }
 
@@ -190,17 +190,17 @@ namespace LastBreathTest.BattleSystemTests
         {
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
 
-            foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augment in Translated())
+            foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augmentEntry in Translated())
             {
-                IAbilityUpgrade upgrade = Built(registry, catalog, augment.Key, properties => properties);
+                IAbilityAugment augment = Built(registry, catalog, augmentEntry.Key, properties => properties);
                 ParameterProbe probe = ProbeAt(8f);
 
-                upgrade.Apply(probe);
-                upgrade.Remove(probe);
+                augment.Apply(probe);
+                augment.Remove(probe);
 
-                foreach ((_, string parameter, _, _) in augment)
+                foreach ((_, string parameter, _, _) in augmentEntry)
                     Assert.AreEqual(8f, probe.Read(parameter),
-                        $"'{augment.Key}' left a decorator on '{parameter}' after it was taken off");
+                        $"'{augmentEntry.Key}' left a decorator on '{parameter}' after it was taken off");
             }
         }
 
@@ -245,16 +245,16 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>The upgrade the registry builds for an augment, out of its shipped record with the
         /// numbers put through the given change.</summary>
-        private static IAbilityUpgrade Built(
+        private static IAbilityAugment Built(
             AbilityProvider registry,
             AbilityAugmentCatalog catalog,
             string augmentId,
             Func<Dictionary<string, float>, Dictionary<string, float>> numbers)
         {
-            AbilityUpgradeData? record = catalog.Find(augmentId);
+            AbilityAugmentData? record = catalog.Find(augmentId);
             Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
 
-            IAbilityUpgrade? upgrade = registry.CreateUpgrade(record with { UpgradeProperties = numbers(record.UpgradeProperties) });
+            IAbilityAugment? upgrade = registry.CreateUpgrade(record with { UpgradeProperties = numbers(record.UpgradeProperties) });
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{augmentId}'");
 
             return upgrade;

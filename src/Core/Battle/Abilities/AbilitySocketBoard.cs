@@ -170,7 +170,7 @@ namespace Core.Battle.Abilities
             if (augments is null) return;
 
             string address = occupant.Slot.Address;
-            AbilityUpgradeData? record = augments.Find(occupant.Augment.AugmentId);
+            AbilityAugmentData? record = augments.Find(occupant.Augment.AugmentId);
             IReadOnlyCollection<string> granted = GrantedTags(occupant.Slot.AbilityId, excludingAddress: address);
             AugmentFitResult? verdict = record is null
                 ? null
@@ -206,7 +206,7 @@ namespace Core.Battle.Abilities
         {
             if (augments is null) return AugmentFitResult.Fits;
 
-            AbilityUpgradeData? augment = augments.Find(occupant.AugmentId);
+            AbilityAugmentData? augment = augments.Find(occupant.AugmentId);
             return augment is null
                 ? null
                 : AugmentFit.Check(

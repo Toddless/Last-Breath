@@ -370,10 +370,10 @@ namespace LastBreath.Helpers
 
         /// <summary>The numbers the upgrade was built with — the seated copy's own, since the copy's
         /// dictionary is what both the behaviour and the description are made from.</summary>
-        private static string AppliedNumbers(IAbilityUpgrade upgrade) =>
-            upgrade.DescriptionValues.Count == 0
+        private static string AppliedNumbers(IAbilityAugment augment) =>
+            augment.DescriptionValues.Count == 0
                 ? "no numbers"
-                : string.Join(", ", upgrade.DescriptionValues
+                : string.Join(", ", augment.DescriptionValues
                     .OrderBy(applied => applied.Key, StringComparer.Ordinal)
                     .Select(applied => $"{applied.Key} {applied.Value}"));
 
@@ -812,7 +812,7 @@ namespace LastBreath.Helpers
         private void PrintAugmentCatalog(string filter)
         {
             var catalog = Service<IAbilityAugmentCatalog>();
-            List<AbilityUpgradeData> matching =
+            List<AbilityAugmentData> matching =
             [
                 .. catalog.All
                     .Where(augment => augment.Id.Contains(filter, StringComparison.OrdinalIgnoreCase))
@@ -1076,7 +1076,7 @@ namespace LastBreath.Helpers
         /// <summary>Where the record says the augment may go, in the words the fitting rule reads it by.
         /// A record answering the binding question twice is shown as it stands: every slot refuses it,
         /// and the author sees why here instead of at the first install.</summary>
-        private static string BindingOf(AbilityUpgradeData augment)
+        private static string BindingOf(AbilityAugmentData augment)
         {
             if (augment.FitsAnyAbility)
                 return augment.AbilityId.Length == 0 ? "any ability" : $"any ability AND {augment.AbilityId} — contradiction";
@@ -1096,7 +1096,7 @@ namespace LastBreath.Helpers
         {
             if (augment.Values.Count == 0) return "no numbers";
 
-            AbilityUpgradeData? record = Service<IAbilityAugmentCatalog>().Find(augment.AugmentId);
+            AbilityAugmentData? record = Service<IAbilityAugmentCatalog>().Find(augment.AugmentId);
             return string.Join(", ", augment.Values
                 .OrderBy(rolled => rolled.Key, StringComparer.Ordinal)
                 .Select(rolled => record != null && record.UpgradeProperties.TryGetValue(rolled.Key, out float declared)

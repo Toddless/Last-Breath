@@ -185,7 +185,7 @@ namespace LastBreathTest.BattleSystemTests
                     new AbilitySocketPlacement(string.Empty, abilityId, DeepestSocket), tags, record, []) == AugmentFitResult.Fits)
                 .Select(record => record.Id);
 
-        private static bool TagJudged(AbilityUpgradeData record) =>
+        private static bool TagJudged(AbilityAugmentData record) =>
             !record.FitsAnyAbility && string.IsNullOrWhiteSpace(record.AbilityId);
     }
 }

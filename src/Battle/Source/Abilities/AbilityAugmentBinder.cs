@@ -40,9 +40,9 @@ namespace Battle.Source.Abilities
         /// What is read is the WORKING occupant: a slot whose node was given back keeps the augment as
         /// the player's property but stops handing it to the ability, otherwise a refund would leave a
         /// paid-for upgrade running for nothing.</summary>
-        private Dictionary<string, IAbilityUpgrade> SeatedOn(string abilityId)
+        private Dictionary<string, IAbilityAugment> SeatedOn(string abilityId)
         {
-            Dictionary<string, IAbilityUpgrade> seated = new(StringComparer.Ordinal);
+            Dictionary<string, IAbilityAugment> seated = new(StringComparer.Ordinal);
 
             foreach (AbilitySocket socket in sockets.SocketsOf(abilityId))
                 if (socket.WorkingAugment is { } augment && abilities.CreateUpgrade(augment) is { } upgrade)

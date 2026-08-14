@@ -208,12 +208,12 @@ namespace LastBreathTest.BattleSystemTests
             var seen = Riding(shards);
             shards.SetOwner(owner);
 
-            AbilityUpgradeData? record = catalog.Find(ProjectileRecord);
+            AbilityAugmentData? record = catalog.Find(ProjectileRecord);
             Assert.IsNotNull(record, $"the shipped data declares no '{ProjectileRecord}'");
-            IAbilityUpgrade? upgrade = registry.CreateUpgrade(record);
+            IAbilityAugment? upgrade = registry.CreateUpgrade(record);
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{ProjectileRecord}'");
 
-            shards.InstallUpgrades(new Dictionary<string, IAbilityUpgrade> { ["socket_projectiles"] = upgrade });
+            shards.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_projectiles"] = upgrade });
             await shards.Execute([target, bystander], FieldOf(owner, target, bystander));
 
             Assert.AreEqual(shardsBefore + ExtraShards, (int)shards[AbilityParameter.ProjectileCount],

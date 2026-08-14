@@ -41,7 +41,7 @@
             foreach (JObject augment in DeclaredAugments())
             {
                 string id = augment.Value<string>("id") ?? string.Empty;
-                AbilityUpgradeData? record = catalog.Find(id);
+                AbilityAugmentData? record = catalog.Find(id);
 
                 Assert.IsNotNull(record, $"the catalog does not hold '{id}', which the section declares");
                 Assert.AreEqual(augment.Value<int>("tier"), record.Tier, $"'{id}' came back carrying another tier");

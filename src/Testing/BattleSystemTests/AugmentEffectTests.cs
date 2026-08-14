@@ -212,13 +212,13 @@ namespace LastBreathTest.BattleSystemTests
             // is not asked here — it is the DoD of A-2 in Docs/PLAN-Augments.md, and today twelve
             // abilities do not call ApplyImpactRiders at all.
             (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
-            AbilityUpgradeData? record = catalog.Find(ExtendPoison);
+            AbilityAugmentData? record = catalog.Find(ExtendPoison);
             Assert.IsNotNull(record, $"the shipped data declares no '{ExtendPoison}'");
             Assert.AreEqual(AugmentFitResult.Fits,
                 AugmentFit.Check(new AbilitySocketPlacement("socket", Attacker, record.Tier), catalog.TagsOf(Attacker), record, []),
                 $"'{ExtendPoison}' stays out of a slot of '{Attacker}', which it was made general for");
 
-            IAbilityUpgrade? upgrade = book.CreateUpgrade(record);
+            IAbilityAugment? upgrade = book.CreateUpgrade(record);
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{ExtendPoison}'");
             var ability = (Ability)book.CreateAbility(Attacker);
             upgrade.Apply(ability);
@@ -388,9 +388,9 @@ namespace LastBreathTest.BattleSystemTests
                 return new AbilityBookComponent(owner.Object);
             }
 
-            private AbilityUpgradeData Record()
+            private AbilityAugmentData Record()
             {
-                AbilityUpgradeData? record = _catalog.Find(Augment);
+                AbilityAugmentData? record = _catalog.Find(Augment);
                 Assert.IsNotNull(record, $"the shipped data declares no '{Augment}'");
                 return record;
             }

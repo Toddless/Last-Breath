@@ -143,7 +143,7 @@
         /// tier the record stands at.</summary>
         private static (string Ability, string Augment, int Tier) ABoundRecord(IAbilityAugmentCatalog catalog)
         {
-            foreach (AbilityUpgradeData record in catalog.All)
+            foreach (AbilityAugmentData record in catalog.All)
                 if (!string.IsNullOrWhiteSpace(record.AbilityId))
                     return (record.AbilityId, record.Id, record.Tier);
 

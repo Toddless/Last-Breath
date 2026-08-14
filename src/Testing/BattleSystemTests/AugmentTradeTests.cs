@@ -154,19 +154,19 @@ namespace LastBreathTest.BattleSystemTests
                 "a record the catalog does not hold must never be priced off its rarity alone");
         }
 
-        private static ItemValuation Valuation(params AbilityUpgradeData[] records) =>
+        private static ItemValuation Valuation(params AbilityAugmentData[] records) =>
             new(Config(), augments: Catalog(records));
 
-        private static IAbilityAugmentCatalog Catalog(params AbilityUpgradeData[] records)
+        private static IAbilityAugmentCatalog Catalog(params AbilityAugmentData[] records)
         {
             var catalog = new Mock<IAbilityAugmentCatalog>();
-            catalog.Setup(source => source.Find(It.IsAny<string>())).Returns((AbilityUpgradeData?)null);
-            foreach (AbilityUpgradeData record in records)
+            catalog.Setup(source => source.Find(It.IsAny<string>())).Returns((AbilityAugmentData?)null);
+            foreach (AbilityAugmentData record in records)
                 catalog.Setup(source => source.Find(record.Id)).Returns(record);
             return catalog.Object;
         }
 
-        private static AbilityUpgradeData Record(string id, int tier, Rarity rarity = Rarity.Common) =>
+        private static AbilityAugmentData Record(string id, int tier, Rarity rarity = Rarity.Common) =>
             new() { Id = id, Tier = tier, Rarity = rarity };
 
         private static IAugmentItem Item(string augmentId, Rarity rarity) =>

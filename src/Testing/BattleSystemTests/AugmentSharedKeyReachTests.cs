@@ -203,7 +203,7 @@ namespace LastBreathTest.BattleSystemTests
 
             foreach ((string augmentId, string parameter, string[] works, string[] inert) in s_reach)
             {
-                AbilityUpgradeData? record = catalog.Find(augmentId);
+                AbilityAugmentData? record = catalog.Find(augmentId);
                 Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
 
                 (List<string> reached, List<string> ignored) = Landing(registry, record, parameter);
@@ -298,7 +298,7 @@ namespace LastBreathTest.BattleSystemTests
         /// slot is given the record's own tier, so the tier never decides the answer — what is asked is
         /// which abilities the record BELONGS to, not which of the player's sockets can hold it.</summary>
         private static (List<string> Works, List<string> Inert) Landing(
-            AbilityProvider registry, AbilityUpgradeData record, string parameter)
+            AbilityProvider registry, AbilityAugmentData record, string parameter)
         {
             List<string> works = [];
             List<string> inert = [];
@@ -322,7 +322,7 @@ namespace LastBreathTest.BattleSystemTests
         private static bool Moves(IAbility ability, string parameter)
         {
             float before = ability[parameter];
-            new AbilityUpgradeParameterSet("Augment_Reach_Probe", [], 3, [(parameter, OperationType.Add, Probe)]).Apply(ability);
+            new AbilityAugmentParameterSet("Augment_Reach_Probe", [], 3, [(parameter, OperationType.Add, Probe)]).Apply(ability);
             return Math.Abs(ability[parameter] - before) > 0.0001f;
         }
 

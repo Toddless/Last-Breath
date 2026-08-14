@@ -274,12 +274,12 @@ namespace LastBreathTest.BattleSystemTests
                 ability.SetupGet(a => a.DisplayName).Returns(abilityId);
                 ability.SetupGet(a => a.Description).Returns($"{abilityId}_Description");
                 ability.SetupGet(a => a.CostType).Returns(Costs.Mana);
-                ability.SetupGet(a => a.InstalledUpgrades).Returns(new Dictionary<string, IAbilityUpgrade>());
+                ability.SetupGet(a => a.InstalledUpgrades).Returns(new Dictionary<string, IAbilityAugment>());
                 ability.Setup(a => a.IsSame(It.IsAny<string>())).Returns((string other) => other == instanceId);
                 return ability.Object;
             }
 
-            public IAbilityUpgrade? CreateUpgrade(AugmentInstance augment) => null;
+            public IAbilityAugment? CreateUpgrade(AugmentInstance augment) => null;
 
             public Stance GetAbilityStance(string abilityId) =>
                 abilityId == StrengthAbility ? Stance.Strength : Stance.Dexterity;

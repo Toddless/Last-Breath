@@ -24,7 +24,7 @@ namespace Core.Battle.Abilities
         /// to roll around, and a copy with no numbers would be an augment that does nothing.</summary>
         public AugmentInstance? Mint(string augmentId)
         {
-            AbilityUpgradeData? record = augments.Find(augmentId);
+            AbilityAugmentData? record = augments.Find(augmentId);
             if (record != null) return Mint(record);
 
             Tracker.TrackNotFound($"Augment record '{augmentId}'", this);
@@ -32,16 +32,16 @@ namespace Core.Battle.Abilities
         }
 
         /// <summary>A copy of a record already in hand, rarity drawn from its own band.</summary>
-        public AugmentInstance Mint(AbilityUpgradeData record) => Mint(record, RollRarity(record));
+        public AugmentInstance Mint(AbilityAugmentData record) => Mint(record, RollRarity(record));
 
         /// <summary>A copy at a rarity somebody else decided — a loot table position that says what the
         /// seat is worth. The numbers are still this copy's own draw.</summary>
-        public AugmentInstance Mint(AbilityUpgradeData record, Enums.Rarity rarity) =>
+        public AugmentInstance Mint(AbilityAugmentData record, Enums.Rarity rarity) =>
             new(record.Id, Rolled(record), rarity);
 
         /// <summary>One draw from the record's band, uniform across the steps it spans. Uniform is a
         /// PLACEHOLDER — the curve is a balance decision (see Docs/PLAN-Augments.md §4e).</summary>
-        public Enums.Rarity RollRarity(AbilityUpgradeData record)
+        public Enums.Rarity RollRarity(AbilityAugmentData record)
         {
             (Enums.Rarity worst, Enums.Rarity best) = record.RarityBand;
             if (worst == best) return worst;
@@ -53,7 +53,7 @@ namespace Core.Battle.Abilities
         }
 
         /// <summary>Every number the record declares, drawn once each.</summary>
-        private Dictionary<string, float> Rolled(AbilityUpgradeData record)
+        private Dictionary<string, float> Rolled(AbilityAugmentData record)
         {
             AugmentValueRules values = rules.AugmentValues;
             Dictionary<string, float> rolled = new(record.UpgradeProperties.Count);

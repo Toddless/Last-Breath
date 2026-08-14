@@ -92,8 +92,8 @@
             var cheap = AbilityWith(cost: 100);
             var dear = AbilityWith(cost: 500);
 
-            new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare).Apply(cheap);
-            new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare).Apply(dear);
+            new AbilityAugmentReduceCost(CostAugment, [], 1, CostShare).Apply(cheap);
+            new AbilityAugmentReduceCost(CostAugment, [], 1, CostShare).Apply(dear);
 
             Assert.AreEqual(70, cheap.CostValue, "the share was not measured against the cheap ability's own price");
             Assert.AreEqual(350, dear.CostValue, "the share was not measured against the dear ability's own price");
@@ -105,8 +105,8 @@
             var quick = AbilityWith(cooldown: 4);
             var slow = AbilityWith(cooldown: 9);
 
-            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(quick);
-            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(slow);
+            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(quick);
+            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(slow);
 
             Assert.AreEqual(3f, quick.Cooldown, "the share was not measured against the quick ability's own wait");
             Assert.AreEqual(7f, slow.Cooldown, "the share was not measured against the slow ability's own wait");
@@ -124,7 +124,7 @@
                 (int wait, int price) = ShippedBaseOf(abilityId);
                 var ability = AbilityWith(cost: price, cooldown: wait);
 
-                new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(ability);
+                new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(ability);
 
                 Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"the share no longer takes {cut} turns off the {wait} '{abilityId}' waits");
                 Assert.AreEqual(price + surcharge, ability.CostValue, $"the share no longer adds {surcharge} to the {price} '{abilityId}' charges");
@@ -189,7 +189,7 @@
             {
                 var ability = AbilityWith(cooldown: wait);
 
-                new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(ability);
+                new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(ability);
 
                 Assert.IsTrue(ability.Cooldown < wait, $"a quarter of {wait} turns rounded down to nothing, and the augment does nothing at all");
                 Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"a quarter of {wait} turns no longer comes to {cut}");
@@ -206,7 +206,7 @@
             {
                 var ability = AbilityWith(cooldown: wait);
 
-                new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(ability);
+                new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(ability);
 
                 Assert.IsTrue(ability.Cooldown < wait, $"the share of {wait} turns rounded down to nothing, and the augment is paid for and does nothing");
                 Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"the share of {wait} turns no longer comes to {cut}");
@@ -239,7 +239,7 @@
             // be told apart.
             var ability = AbilityWith(cost: 1);
 
-            new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare).Apply(ability);
+            new AbilityAugmentReduceCost(CostAugment, [], 1, CostShare).Apply(ability);
 
             Assert.AreEqual(0, ability.CostValue, "a share too small to reach a whole point took nothing at all");
         }
@@ -256,8 +256,8 @@
             var cut = AbilityWith(cooldown: 1);
             var surcharged = AbilityWith(cooldown: 1);
 
-            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(cut);
-            new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
+            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(cut);
+            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
 
             Assert.AreEqual(1f, cut.Cooldown, "the cut took the ability's whole wait instead of stopping at the floor");
             Assert.AreEqual(1f, surcharged.Cooldown, "the surcharge record took the ability's whole wait instead of stopping at the floor");
@@ -272,8 +272,8 @@
             var cut = AbilityWith(cooldown: 3);
             var surcharged = AbilityWith(cooldown: 9);
 
-            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(cut);
-            new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
+            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(cut);
+            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
 
             Assert.AreEqual(2f, cut.Cooldown, "a quarter of three turns no longer comes to one");
             Assert.AreEqual(5f, surcharged.Cooldown, "two fifths of nine turns no longer comes to four");
@@ -290,9 +290,9 @@
             var discounted = AbilityWith(cost: 0, cooldown: 0);
             var surcharged = AbilityWith(cost: 0, cooldown: 0);
 
-            new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare).Apply(discounted);
-            new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(discounted);
-            new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
+            new AbilityAugmentReduceCost(CostAugment, [], 1, CostShare).Apply(discounted);
+            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(discounted);
+            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
 
             Assert.AreEqual(0, discounted.CostValue, "an ability that costs nothing was given a negative price");
             Assert.AreEqual(0f, discounted.Cooldown, "an ability that waits for nothing was given a negative wait");
@@ -310,7 +310,7 @@
 
             foreach ((string id, int tier) in s_collapsedRecords)
             {
-                AbilityUpgradeData? record = catalog.Find(id);
+                AbilityAugmentData? record = catalog.Find(id);
                 Assert.IsNotNull(record, $"the shipped data declares no '{id}'");
                 Assert.AreEqual(tier, record.Tier, $"'{id}' is no longer written at the tier the collapse gave it");
 
@@ -345,8 +345,8 @@
         private static float WaitOf(bool surchargeFirst)
         {
             var ability = AbilityWith(cooldown: 9);
-            IAbilityUpgrade share = new AbilityUpgradeReduceCooldown(CooldownAugment, [], 1, CooldownShare);
-            IAbilityUpgrade surcharge = CooldownSurchargeUpgrade();
+            IAbilityAugment share = new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare);
+            IAbilityAugment surcharge = CooldownSurchargeUpgrade();
 
             ability.InstallUpgrades(surchargeFirst ? InThisOrder(surcharge, share) : InThisOrder(share, surcharge));
 
@@ -358,9 +358,9 @@
         private static (int Cost, float Cooldown) BothOf(bool surchargesFirst)
         {
             var ability = AbilityWith(cost: 150, cooldown: 9);
-            IAbilityUpgrade both = new AbilityUpgradeReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare);
-            IAbilityUpgrade stun = StunSurcharge();
-            IAbilityUpgrade wait = CooldownSurchargeUpgrade();
+            IAbilityAugment both = new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare);
+            IAbilityAugment stun = StunSurcharge();
+            IAbilityAugment wait = CooldownSurchargeUpgrade();
 
             ability.InstallUpgrades(surchargesFirst ? InThisOrder(wait, stun, both) : InThisOrder(both, stun, wait));
 
@@ -372,8 +372,8 @@
         private static HeadButt BuildWithSurcharge(bool surchargeFirst)
         {
             var ability = AbilityWith(cost: 150);
-            IAbilityUpgrade share = CostShareUpgrade();
-            IAbilityUpgrade surcharge = StunSurcharge();
+            IAbilityAugment share = CostShareUpgrade();
+            IAbilityAugment surcharge = StunSurcharge();
 
             ability.InstallUpgrades(surchargeFirst ? InThisOrder(surcharge, share) : InThisOrder(share, surcharge));
 
@@ -381,15 +381,15 @@
         }
 
         /// <summary>Armageddon's shape: three more turns of waiting, flat.</summary>
-        private static IAbilityUpgrade CooldownSurchargeUpgrade() =>
-            new AbilityUpgradeParameterSet(CooldownSurcharge, [], 3, [(AbilityParameter.Cooldown, OperationType.Add, 3f)]);
+        private static IAbilityAugment CooldownSurchargeUpgrade() =>
+            new AbilityAugmentParameterSet(CooldownSurcharge, [], 3, [(AbilityParameter.Cooldown, OperationType.Add, 3f)]);
 
         /// <summary>Head Butt's own tier-two augment: a longer stun bought with fifty more mana.</summary>
-        private static IAbilityUpgrade StunSurcharge() =>
-            new AbilityUpgradeParameterSet(CostSurcharge, [], 2,
+        private static IAbilityAugment StunSurcharge() =>
+            new AbilityAugmentParameterSet(CostSurcharge, [], 2,
                 [(AbilityParameter.StunDuration, OperationType.Add, 1f), (AbilityParameter.CostValue, OperationType.Add, 50f)]);
 
-        private static IAbilityUpgrade CostShareUpgrade() => new AbilityUpgradeReduceCost(CostAugment, [], 1, CostShare);
+        private static IAbilityAugment CostShareUpgrade() => new AbilityAugmentReduceCost(CostAugment, [], 1, CostShare);
 
         /// <summary>The distinct cooldowns the shipped abilities declare, read off the files. Casts
         /// that wait for nothing are left out â€” they are answered by their own walk.</summary>

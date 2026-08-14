@@ -35,7 +35,7 @@ namespace LootGeneration.Source
         {
             // Ordered by id so a seeded run draws the same augment on any machine — the catalog's own
             // order follows the order its files happened to be read in.
-            List<AbilityUpgradeData> members = augments.All
+            List<AbilityAugmentData> members = augments.All
                 .Where(record => record.Tier == group.Tier && Covers(record.RarityBand, group.Rarity))
                 .OrderBy(record => record.Id, StringComparer.Ordinal)
                 .ToList();

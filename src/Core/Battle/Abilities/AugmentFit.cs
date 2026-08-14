@@ -24,12 +24,12 @@ namespace Core.Battle.Abilities
         /// <param name="augment">The augment's own record.</param>
         /// <param name="occupiedExclusionGroups">The exclusion groups already worn by that ability.</param>
         /// <param name="grantedTags">Tags the ability's installed augments grant it (their records'
-        /// <see cref="AbilityUpgradeData.GrantsTags"/>). The effective tags — own ∪ granted — exist
+        /// <see cref="AbilityAugmentData.GrantsTags"/>). The effective tags — own ∪ granted — exist
         /// only inside this rule; extraction never re-judges, so a grantee outlives its donor.</param>
         public static AugmentFitResult Check(
             AbilitySocketPlacement slot,
             IReadOnlyCollection<string> abilityTags,
-            AbilityUpgradeData augment,
+            AbilityAugmentData augment,
             IReadOnlyCollection<string> occupiedExclusionGroups,
             IReadOnlyCollection<string>? grantedTags = null)
         {
@@ -49,7 +49,7 @@ namespace Core.Battle.Abilities
         /// every ability while naming one. Picking either half means discarding the other silently,
         /// and a record nobody can read is refused wherever it is held rather than in the one slot
         /// where the two halves happen to agree.</summary>
-        private static bool ContradictsItself(AbilityUpgradeData augment) =>
+        private static bool ContradictsItself(AbilityAugmentData augment) =>
             augment.FitsAnyAbility && !string.IsNullOrWhiteSpace(augment.AbilityId);
 
         /// <summary>Which ability the augment may go on. Claiming every ability settles it — that is
@@ -63,7 +63,7 @@ namespace Core.Battle.Abilities
         private static AugmentFitResult CheckBinding(
             AbilitySocketPlacement slot,
             IReadOnlyCollection<string> abilityTags,
-            AbilityUpgradeData augment,
+            AbilityAugmentData augment,
             IReadOnlyCollection<string>? grantedTags)
         {
             if (augment.FitsAnyAbility) return AugmentFitResult.Fits;
@@ -81,7 +81,7 @@ namespace Core.Battle.Abilities
 
         /// <summary>Whether the ability already wears the augment's group. An augment belonging to no
         /// group conflicts with nothing, however many of them the ability carries.</summary>
-        private static bool Conflicts(AbilityUpgradeData augment, IReadOnlyCollection<string> occupiedExclusionGroups) =>
+        private static bool Conflicts(AbilityAugmentData augment, IReadOnlyCollection<string> occupiedExclusionGroups) =>
             !string.IsNullOrWhiteSpace(augment.ExclusionGroup)
             && occupiedExclusionGroups.Contains(augment.ExclusionGroup, StringComparer.Ordinal);
     }

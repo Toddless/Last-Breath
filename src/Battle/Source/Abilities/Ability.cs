@@ -96,8 +96,8 @@
         public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
         public Dictionary<string, IActivationRider> ActivationRiders { get; } = [];
         public Dictionary<string, IImpactRider> ImpactRiders { get; } = [];
-        public IReadOnlyDictionary<string, IAbilityUpgrade> InstalledUpgrades => _installedUpgrades;
-        private readonly Dictionary<string, IAbilityUpgrade> _installedUpgrades = new(StringComparer.Ordinal);
+        public IReadOnlyDictionary<string, IAbilityAugment> InstalledUpgrades => _installedUpgrades;
+        private readonly Dictionary<string, IAbilityAugment> _installedUpgrades = new(StringComparer.Ordinal);
         public ITargetingStrategy Targeting { get; set; } = TargetingStrategyFactory.From(data);
         public int CostValue => (int)this[AbilityParameter.CostValue];
         public string Id { get; } = data.Id;
@@ -142,12 +142,12 @@
         /// Cheap enough for that: nothing in a fight rebinds, the passes come from a taken node, a
         /// seated augment, a load or a new playthrough.
         /// </summary>
-        public void InstallUpgrades(IReadOnlyDictionary<string, IAbilityUpgrade> bySocket)
+        public void InstallUpgrades(IReadOnlyDictionary<string, IAbilityAugment> bySocket)
         {
-            foreach (IAbilityUpgrade worn in _installedUpgrades.Values) worn.Remove(this);
+            foreach (IAbilityAugment worn in _installedUpgrades.Values) worn.Remove(this);
             _installedUpgrades.Clear();
 
-            foreach ((string socketId, IAbilityUpgrade upgrade) in bySocket)
+            foreach ((string socketId, IAbilityAugment upgrade) in bySocket)
             {
                 upgrade.Apply(this);
                 _installedUpgrades[socketId] = upgrade;

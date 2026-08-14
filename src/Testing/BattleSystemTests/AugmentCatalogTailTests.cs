@@ -68,7 +68,7 @@ namespace LastBreathTest.BattleSystemTests
             // The rule the data is written for, asked of the rule that actually seats augments.
             foreach ((string group, string[] members) in s_exclusionGroups)
             {
-                AbilityUpgradeData second = Record(members[1]);
+                AbilityAugmentData second = Record(members[1]);
                 var slot = new AbilitySocketPlacement("socket", second.AbilityId, second.Tier);
 
                 // The ability wears the record's own tags, so nothing but the group can refuse it.
@@ -131,9 +131,9 @@ namespace LastBreathTest.BattleSystemTests
 
         private static bool Ordered(Rarity rarity) => rarity is >= Rarity.Legendary and <= Rarity.Common;
 
-        private static AbilityUpgradeData Record(string augmentId)
+        private static AbilityAugmentData Record(string augmentId)
         {
-            AbilityUpgradeData? record = ShippedAbilityData.Augments().Find(augmentId);
+            AbilityAugmentData? record = ShippedAbilityData.Augments().Find(augmentId);
             Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
             return record;
         }

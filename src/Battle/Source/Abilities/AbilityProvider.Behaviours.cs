@@ -17,7 +17,7 @@ namespace Battle.Source.Abilities
         /// <summary>What a behaviour needs from the record besides its numbers, and how it is built.
         /// Declared like the effect registry's keys: a record missing a field or naming an unknown one
         /// is refused with names rather than built half-way.</summary>
-        private sealed record Behaviour(BehaviourField Fields, Func<AbilityUpgradeData, Func<IEffectProvider?>, IAbilityUpgrade?> Build);
+        private sealed record Behaviour(BehaviourField Fields, Func<AbilityAugmentData, Func<IEffectProvider?>, IAbilityAugment?> Build);
 
         [Flags]
         private enum BehaviourField
@@ -36,19 +36,19 @@ namespace Battle.Source.Abilities
         private static readonly Dictionary<string, Behaviour> s_behaviours = new(StringComparer.Ordinal)
         {
             ["ApplyEffectOnImpact"] = new(BehaviourField.EffectId | BehaviourField.ImpactKind, (data, effects) =>
-                new AbilityUpgradeImpactRider(data.Id, data.Tags, data.Tier, new DataEffectImpactRider(
+                new AbilityAugmentImpactRider(data.Id, data.Tags, data.Tier, new DataEffectImpactRider(
                     data.Id, data.EffectId, host => Numbers(data, host), KindOf(data), effects))),
 
             ["BuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>
-                new AbilityUpgradeCastEffect(data.Id, data.Tags, data.Tier,
+                new AbilityAugmentCastEffect(data.Id, data.Tags, data.Tier,
                     host => effects()?.CreateEffect(data.EffectId, Numbers(data, host)))),
 
             ["DebuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>
-                new AbilityUpgradeCastDebuff(data.Id, data.Tags, data.Tier,
+                new AbilityAugmentCastDebuff(data.Id, data.Tags, data.Tier,
                     host => effects()?.CreateEffect(data.EffectId, Numbers(data, host)))),
 
             ["AttackModifier"] = new(BehaviourField.AttackModifier, (data, _) =>
-                new AbilityUpgradeAttackModifier(data.Id, data.Tags, data.Tier, s_attackModifiers[data.AttackModifier]())),
+                new AbilityAugmentAttackModifier(data.Id, data.Tags, data.Tier, s_attackModifiers[data.AttackModifier]())),
         };
 
         /// <summary>Attack modifiers a record may name. One today; it grows by record.</summary>
@@ -62,7 +62,7 @@ namespace Battle.Source.Abilities
 
         /// <summary>The upgrade a record's behaviour builds, or null with a report. Null for a record
         /// that declares no behaviour at all: that one is answered by a factory of its own.</summary>
-        private IAbilityUpgrade? CreateBehaviour(AbilityUpgradeData data)
+        private IAbilityAugment? CreateBehaviour(AbilityAugmentData data)
         {
             if (string.IsNullOrWhiteSpace(data.Behaviour)) return null;
 
@@ -77,7 +77,7 @@ namespace Battle.Source.Abilities
 
         /// <summary>What the record names and the registries cannot make. Asked HERE, at load, because
         /// the alternative is a record that parses, is offered and is seated, and throws on the cast.</summary>
-        private string? Unbuildable(AbilityUpgradeData data, BehaviourField fields)
+        private string? Unbuildable(AbilityAugmentData data, BehaviourField fields)
         {
             foreach ((string property, string parameter) in data.PropertyRefs)
             {
@@ -102,7 +102,7 @@ namespace Battle.Source.Abilities
         }
 
         /// <summary>Fields the behaviour needs and the record did not write.</summary>
-        private static string? Missing(AbilityUpgradeData data, BehaviourField fields)
+        private static string? Missing(AbilityAugmentData data, BehaviourField fields)
         {
             if (fields.HasFlag(BehaviourField.EffectId) && string.IsNullOrWhiteSpace(data.EffectId)) return "declares no effectId";
             if (fields.HasFlag(BehaviourField.AttackModifier) && string.IsNullOrWhiteSpace(data.AttackModifier)) return "declares no attackModifier";
@@ -111,7 +111,7 @@ namespace Battle.Source.Abilities
 
         /// <summary>Fields the record wrote and the behaviour never reads — a line nobody would ever
         /// notice doing nothing.</summary>
-        private static string? Extra(AbilityUpgradeData data, BehaviourField fields)
+        private static string? Extra(AbilityAugmentData data, BehaviourField fields)
         {
             if (!fields.HasFlag(BehaviourField.EffectId) && !string.IsNullOrWhiteSpace(data.EffectId)) return "writes an effectId its behaviour never reads";
             if (!fields.HasFlag(BehaviourField.ImpactKind) && !string.IsNullOrWhiteSpace(data.ImpactKind)) return "writes an impactKind its behaviour never reads";
@@ -120,15 +120,15 @@ namespace Battle.Source.Abilities
         }
 
         /// <summary>Which touches the behaviour works on, or null for every one of them.</summary>
-        private static ImpactKind? KindOf(AbilityUpgradeData data) =>
+        private static ImpactKind? KindOf(AbilityAugmentData data) =>
             string.IsNullOrWhiteSpace(data.ImpactKind) ? null : EnumParser.ParseEnum<ImpactKind>(data.ImpactKind);
 
-        private static RecordProperties Numbers(AbilityUpgradeData data) => new(data.Id, data.UpgradeProperties);
+        private static RecordProperties Numbers(AbilityAugmentData data) => new(data.Id, data.UpgradeProperties);
 
-        /// <summary>The record's numbers with its <see cref="AbilityUpgradeData.PropertyRefs"/> read off
+        /// <summary>The record's numbers with its <see cref="AbilityAugmentData.PropertyRefs"/> read off
         /// the host — decorated and at the moment of use, so an augment moving that key is felt here.
         /// A key the ability never declared falls back to the record's own figure.</summary>
-        private static RecordProperties Numbers(AbilityUpgradeData data, IAbility? host)
+        private static RecordProperties Numbers(AbilityAugmentData data, IAbility? host)
         {
             if (data.PropertyRefs.Count == 0 || host == null) return Numbers(data);
 
@@ -149,7 +149,7 @@ namespace Battle.Source.Abilities
                 .Select(field => (string)field.GetRawConstantValue()!)
         ];
 
-        private static IAbilityUpgrade? Refused(AbilityUpgradeData data, string complaint)
+        private static IAbilityAugment? Refused(AbilityAugmentData data, string complaint)
         {
             Tracker.TrackError($"Augment '{data.Id}' {complaint}");
             return null;

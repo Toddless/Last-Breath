@@ -30,11 +30,11 @@ namespace LastBreathTest.BattleSystemTests
         public void EveryRecordThatDeclaresABehaviourIsBuiltByIt()
         {
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
-            List<AbilityUpgradeData> declaring = [.. catalog.All.Where(record => !string.IsNullOrWhiteSpace(record.Behaviour))];
+            List<AbilityAugmentData> declaring = [.. catalog.All.Where(record => !string.IsNullOrWhiteSpace(record.Behaviour))];
 
             Assert.IsTrue(declaring.Count > 0, "no record declares a behaviour, so the walks prove nothing");
 
-            foreach (AbilityUpgradeData record in declaring)
+            foreach (AbilityAugmentData record in declaring)
             {
                 Assert.IsTrue(AbilityProvider.KnownBehaviours.Contains(record.Behaviour, StringComparer.Ordinal),
                     $"'{record.Id}' names behaviour '{record.Behaviour}' the registry does not know");
@@ -64,7 +64,7 @@ namespace LastBreathTest.BattleSystemTests
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             var written = s_propertyRefs.ToDictionary(row => (row.Record, row.Property), row => (row.Key, row.AbilityId));
 
-            foreach (AbilityUpgradeData record in catalog.All.Where(entry => entry.PropertyRefs.Count > 0))
+            foreach (AbilityAugmentData record in catalog.All.Where(entry => entry.PropertyRefs.Count > 0))
                 foreach ((string property, string key) in record.PropertyRefs)
                 {
                     Assert.IsTrue(written.TryGetValue((record.Id, property), out (string Key, string AbilityId) row),
@@ -220,11 +220,11 @@ namespace LastBreathTest.BattleSystemTests
         private static Ability Seated(AbilityProvider registry, AbilityAugmentCatalog catalog, string abilityId, params string[] augmentIds)
         {
             var ability = (Ability)registry.CreateAbility(abilityId);
-            Dictionary<string, IAbilityUpgrade> seated = [];
+            Dictionary<string, IAbilityAugment> seated = [];
 
             for (int slot = 0; slot < augmentIds.Length; slot++)
             {
-                IAbilityUpgrade? upgrade = registry.CreateUpgrade(Shipped(augmentIds[slot]));
+                IAbilityAugment? upgrade = registry.CreateUpgrade(Shipped(augmentIds[slot]));
                 Assert.IsNotNull(upgrade, $"the registry builds nothing for '{augmentIds[slot]}'");
                 seated[$"socket_{slot}"] = upgrade;
             }
@@ -280,13 +280,13 @@ namespace LastBreathTest.BattleSystemTests
             }
         }
 
-        private static AbilityUpgradeData Shipped(string augmentId)
+        private static AbilityAugmentData Shipped(string augmentId)
         {
-            AbilityUpgradeData? record = ShippedAbilityData.Augments().Find(augmentId);
+            AbilityAugmentData? record = ShippedAbilityData.Augments().Find(augmentId);
             Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
             return record;
         }
 
-        private static IAbilityUpgrade? Built(AbilityUpgradeData record) => ShippedAbilityData.Abilities().CreateUpgrade(record);
+        private static IAbilityAugment? Built(AbilityAugmentData record) => ShippedAbilityData.Abilities().CreateUpgrade(record);
     }
 }

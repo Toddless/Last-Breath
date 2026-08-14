@@ -253,12 +253,12 @@ namespace LastBreathTest.BattleSystemTests
             return ability;
         }
 
-        private static IAbilityUpgrade Built(AbilityProvider registry, AbilityAugmentCatalog catalog, string augmentId)
+        private static IAbilityAugment Built(AbilityProvider registry, AbilityAugmentCatalog catalog, string augmentId)
         {
-            AbilityUpgradeData? record = catalog.Find(augmentId);
+            AbilityAugmentData? record = catalog.Find(augmentId);
             Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
 
-            IAbilityUpgrade? upgrade = registry.CreateUpgrade(record);
+            IAbilityAugment? upgrade = registry.CreateUpgrade(record);
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{augmentId}'");
 
             return upgrade;

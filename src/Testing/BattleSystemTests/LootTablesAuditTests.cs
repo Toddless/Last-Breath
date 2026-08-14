@@ -1,5 +1,6 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using Core.Data.AbilityData;
     using Newtonsoft.Json.Linq;
 
     /// <summary>Every position of the shipped loot tables must resolve to something the game can
@@ -70,7 +71,7 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>An augment record leaving its rarity unstated is the plainest augment there is —
-        /// the same reading <see cref="Core.Data.AbilityData.AbilityUpgradeData"/> gives it.</summary>
+        /// the same reading <see cref="AbilityAugmentData"/> gives it.</summary>
         private const string DefaultRarity = nameof(Core.Enums.Rarity.Common);
 
         /// <summary>The scale runs downward — Legendary is zero — so the best end is the smaller

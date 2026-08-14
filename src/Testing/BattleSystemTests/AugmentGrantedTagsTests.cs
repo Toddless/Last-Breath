@@ -220,7 +220,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void ARecordGrantsNothingUntilItSaysSo()
         {
-            Assert.AreEqual(0, new AbilityUpgradeData().GrantsTags.Length, "an augment grants tags it never declared");
+            Assert.AreEqual(0, new AbilityAugmentData().GrantsTags.Length, "an augment grants tags it never declared");
         }
 
         [TestMethod]
@@ -232,7 +232,7 @@ namespace LastBreathTest.BattleSystemTests
             AbilityAugmentCatalog catalog = ShippedAbilityData.Augments();
             var declared = s_shippedGrants.ToDictionary(entry => entry.Id, entry => entry.Grants, StringComparer.Ordinal);
 
-            foreach (AbilityUpgradeData record in catalog.All)
+            foreach (AbilityAugmentData record in catalog.All)
             {
                 if (record.GrantsTags.Length == 0)
                 {
@@ -285,7 +285,7 @@ namespace LastBreathTest.BattleSystemTests
             (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             List<string> strays = [];
 
-            foreach ((AbilityUpgradeData record, string ability, _) in ComputeGrantReach(book, catalog))
+            foreach ((AbilityAugmentData record, string ability, _) in ComputeGrantReach(book, catalog))
                 if (!s_selfContained.Contains(record.Id) && !s_openedKeys.ContainsKey(record.Id))
                     strays.Add($"'{record.Id}' (carried onto '{ability}')");
 
@@ -303,8 +303,8 @@ namespace LastBreathTest.BattleSystemTests
             // record naming the other. And the mirror: the donor leaves, the amplifier stays worn,
             // and the swing lays nothing — it decorates a number nobody registers any more.
             (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
-            AbilityUpgradeData donor = Record(catalog, ShippedDonor);
-            AbilityUpgradeData amplifier = Record(catalog, ShippedAmplifier);
+            AbilityAugmentData donor = Record(catalog, ShippedDonor);
+            AbilityAugmentData amplifier = Record(catalog, ShippedAmplifier);
             Assert.IsTrue(donor.GrantsTags.Contains(AbilityTags.Poison, StringComparer.OrdinalIgnoreCase),
                 $"'{ShippedDonor}' no longer grants the genus it lays");
 
@@ -316,8 +316,8 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(board.Install(board.At(SlotTwo), Copy(ShippedAmplifier)),
                 "the donor is seated and the amplifier still cannot follow it");
 
-            IAbilityUpgrade? donorUpgrade = book.CreateUpgrade(donor);
-            IAbilityUpgrade? amplifierUpgrade = book.CreateUpgrade(amplifier);
+            IAbilityAugment? donorUpgrade = book.CreateUpgrade(donor);
+            IAbilityAugment? amplifierUpgrade = book.CreateUpgrade(amplifier);
             Assert.IsNotNull(donorUpgrade, $"the registry builds nothing for '{ShippedDonor}'");
             Assert.IsNotNull(amplifierUpgrade, $"the registry builds nothing for '{ShippedAmplifier}'");
             var ability = (Ability)book.CreateAbility(ShippedAbility);
@@ -350,9 +350,9 @@ namespace LastBreathTest.BattleSystemTests
                 Kind = Core.Data.ImpactKind.Attack
             };
 
-        private static AbilityUpgradeData Record(AbilityAugmentCatalog catalog, string id)
+        private static AbilityAugmentData Record(AbilityAugmentCatalog catalog, string id)
         {
-            AbilityUpgradeData? record = catalog.Find(id);
+            AbilityAugmentData? record = catalog.Find(id);
             Assert.IsNotNull(record, $"the shipped data declares no '{id}'");
             return record;
         }
@@ -361,20 +361,20 @@ namespace LastBreathTest.BattleSystemTests
         /// ability, the donors its OWN tags seat and the tags they grant, then every tag-judged record
         /// the bare ability refuses and the granted one takes. The works verdict is probed with the
         /// record's genus donors applied — the state a player's board is actually in.</summary>
-        private static List<(AbilityUpgradeData Record, string Ability, bool Works)> ComputeGrantReach(
+        private static List<(AbilityAugmentData Record, string Ability, bool Works)> ComputeGrantReach(
             AbilityProvider book, AbilityAugmentCatalog catalog)
         {
-            List<(AbilityUpgradeData, string, bool)> reach = [];
+            List<(AbilityAugmentData, string, bool)> reach = [];
 
             foreach (string abilityId in book.KnownAbilityIds.Where(id => !book.IsHidden(id)))
             {
                 IReadOnlyCollection<string> tags = catalog.TagsOf(abilityId);
-                List<AbilityUpgradeData> donors = [.. catalog.All
+                List<AbilityAugmentData> donors = [.. catalog.All
                     .Where(donor => donor.GrantsTags.Length > 0 && Fits(abilityId, tags, donor, granted: null))];
                 string[] granted = [.. donors.SelectMany(donor => donor.GrantsTags).Distinct(StringComparer.OrdinalIgnoreCase)];
                 if (granted.Length == 0) continue;
 
-                foreach (AbilityUpgradeData record in catalog.All.Where(TagJudged))
+                foreach (AbilityAugmentData record in catalog.All.Where(TagJudged))
                 {
                     if (Fits(abilityId, tags, record, granted: null)) continue;
                     if (!Fits(abilityId, tags, record, granted)) continue;
@@ -389,28 +389,28 @@ namespace LastBreathTest.BattleSystemTests
             return reach;
         }
 
-        private static bool TagJudged(AbilityUpgradeData record) =>
+        private static bool TagJudged(AbilityAugmentData record) =>
             !record.FitsAnyAbility && string.IsNullOrWhiteSpace(record.AbilityId) && record.Tags.Length > 0;
 
         private static bool Fits(
-            string abilityId, IReadOnlyCollection<string> tags, AbilityUpgradeData record, IReadOnlyCollection<string>? granted) =>
+            string abilityId, IReadOnlyCollection<string> tags, AbilityAugmentData record, IReadOnlyCollection<string>? granted) =>
             AugmentFit.Check(
                 new AbilitySocketPlacement("socket_grant_probe", abilityId, record.Tier), tags, record, [], granted)
             == AugmentFitResult.Fits;
 
         /// <summary>Whether anything on the ability reads the key once the genus donors are worn — a
         /// move is laid on it and the number is read back, the reach guard's own probe.</summary>
-        private static bool Moves(AbilityProvider book, string abilityId, IEnumerable<AbilityUpgradeData> openers, string parameter)
+        private static bool Moves(AbilityProvider book, string abilityId, IEnumerable<AbilityAugmentData> openers, string parameter)
         {
             IAbility ability = book.CreateAbility(abilityId);
-            foreach (AbilityUpgradeData opener in openers) book.CreateUpgrade(opener)?.Apply(ability);
+            foreach (AbilityAugmentData opener in openers) book.CreateUpgrade(opener)?.Apply(ability);
 
             float before = ability[parameter];
-            new AbilityUpgradeParameterSet("Augment_Grant_Probe", [], 3, [(parameter, Core.Enums.OperationType.Add, 5f)]).Apply(ability);
+            new AbilityAugmentParameterSet("Augment_Grant_Probe", [], 3, [(parameter, Core.Enums.OperationType.Add, 5f)]).Apply(ability);
             return Math.Abs(ability[parameter] - before) > 0.0001f;
         }
 
-        private static List<string> Render(List<(AbilityUpgradeData Record, string Ability, bool Works)> reach) =>
+        private static List<string> Render(List<(AbilityAugmentData Record, string Ability, bool Works)> reach) =>
         [
             .. reach.GroupBy(entry => entry.Record.Id, StringComparer.Ordinal)
                 .OrderBy(group => group.Key, StringComparer.Ordinal)
@@ -446,9 +446,9 @@ namespace LastBreathTest.BattleSystemTests
         {
             var catalog = new AugmentCatalogStub()
                 .WithAbility(Ability, AbilityTags.Attack)
-                .With(new AbilityUpgradeData { Id = Donor, Tier = 2, Tags = [AbilityTags.Attack], GrantsTags = [AbilityTags.Poison] })
-                .With(new AbilityUpgradeData { Id = Amplifier, Tier = 2, Tags = [AbilityTags.Poison] })
-                .With(new AbilityUpgradeData { Id = TaggedAmplifier, Tier = 2, Tags = [AbilityTags.Attack, AbilityTags.Poison] });
+                .With(new AbilityAugmentData { Id = Donor, Tier = 2, Tags = [AbilityTags.Attack], GrantsTags = [AbilityTags.Poison] })
+                .With(new AbilityAugmentData { Id = Amplifier, Tier = 2, Tags = [AbilityTags.Poison] })
+                .With(new AbilityAugmentData { Id = TaggedAmplifier, Tier = 2, Tags = [AbilityTags.Attack, AbilityTags.Poison] });
 
             var board = new AbilitySocketBoard(catalog);
             board.Sync([Slot(SlotOne), Slot(SlotTwo), Slot(SlotThree)]);
@@ -481,10 +481,10 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>Stands in for the data pipeline: the records are already parsed.</summary>
         private sealed class AugmentCatalogStub : IAbilityAugmentCatalog
         {
-            private readonly Dictionary<string, AbilityUpgradeData> _augments = new(StringComparer.Ordinal);
+            private readonly Dictionary<string, AbilityAugmentData> _augments = new(StringComparer.Ordinal);
             private readonly Dictionary<string, string[]> _abilityTags = new(StringComparer.Ordinal);
 
-            public IReadOnlyCollection<AbilityUpgradeData> All => _augments.Values;
+            public IReadOnlyCollection<AbilityAugmentData> All => _augments.Values;
 
             public AugmentCatalogStub WithAbility(string abilityId, params string[] tags)
             {
@@ -492,13 +492,13 @@ namespace LastBreathTest.BattleSystemTests
                 return this;
             }
 
-            public AugmentCatalogStub With(AbilityUpgradeData augment)
+            public AugmentCatalogStub With(AbilityAugmentData augment)
             {
                 _augments[augment.Id] = augment;
                 return this;
             }
 
-            public AbilityUpgradeData? Find(string augmentId) => _augments.GetValueOrDefault(augmentId);
+            public AbilityAugmentData? Find(string augmentId) => _augments.GetValueOrDefault(augmentId);
 
             public IReadOnlyCollection<string> TagsOf(string abilityId) => _abilityTags.GetValueOrDefault(abilityId, []);
         }

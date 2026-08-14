@@ -378,15 +378,15 @@ namespace LastBreathTest.BattleSystemTests
             return npc;
         }
 
-        private static IAbilityAugmentCatalog Catalog(AbilityUpgradeData[] records) =>
+        private static IAbilityAugmentCatalog Catalog(AbilityAugmentData[] records) =>
             Mock.Of<IAbilityAugmentCatalog>(catalog => catalog.All == records);
 
-        private static AbilityUpgradeData Augment(string id, int tier, Rarity rarity) =>
+        private static AbilityAugmentData Augment(string id, int tier, Rarity rarity) =>
             new() { Id = id, Tier = tier, Rarity = rarity };
 
         /// <summary>A record that rolls a range — what every shipped augment is. Worst end first, the
         /// way the field reads.</summary>
-        private static AbilityUpgradeData Band(string id, int tier, Rarity worst, Rarity best) =>
+        private static AbilityAugmentData Band(string id, int tier, Rarity worst, Rarity best) =>
             new() { Id = id, Tier = tier, MinRarity = worst, MaxRarity = best };
 
         /// <summary>The basic table's only tier, read out of a whole document the way the game reads

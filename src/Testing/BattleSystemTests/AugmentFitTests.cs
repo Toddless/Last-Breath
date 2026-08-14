@@ -221,7 +221,7 @@
             // under test is the ability it names and shares its tag, so both readings would seat it
             // â€” which is precisely why the refusal has to come from the contradiction itself. Letting
             // one half win would make the other a comment, and nobody would learn which.
-            AbilityUpgradeData contradictory = Augment(
+            AbilityAugmentData contradictory = Augment(
                 ContradictoryAugment, tier: 1, [AbilityTags.Poison], abilityId: PoisonAbility, fitsAnyAbility: true);
 
             Assert.AreEqual(AugmentFitResult.ContradictoryDeclaration,
@@ -345,13 +345,13 @@
         {
             // The rarity scale is shared with items, and its zero is Legendary: a record that says
             // nothing must not read as the best augment in the game.
-            Assert.AreEqual(Rarity.Common, new AbilityUpgradeData().Rarity);
+            Assert.AreEqual(Rarity.Common, new AbilityAugmentData().Rarity);
         }
 
         [TestMethod]
         public void ARecordCarriesNoBindingAndNoGroupUntilItSaysSo()
         {
-            var declared = new AbilityUpgradeData();
+            var declared = new AbilityAugmentData();
 
             Assert.AreEqual(string.Empty, declared.AbilityId, "an augment is bound to an ability it never named");
             Assert.AreEqual(string.Empty, declared.ExclusionGroup, "an augment conflicts with a group it never named");
@@ -363,7 +363,7 @@
             // Universality is the widest thing a record can claim, and the default has to be the
             // narrow one: an author who says nothing wrote an ordinary augment, not one that reaches
             // across the whole book by omission.
-            Assert.IsFalse(new AbilityUpgradeData().FitsAnyAbility);
+            Assert.IsFalse(new AbilityAugmentData().FitsAnyAbility);
         }
 
         /// <summary>
@@ -415,7 +415,7 @@
             new(socketId, abilityId, tier);
 
         /// <summary>One augment record as its data would declare it.</summary>
-        private static AbilityUpgradeData Augment(
+        private static AbilityAugmentData Augment(
             string id,
             int tier,
             string[] tags,
@@ -446,10 +446,10 @@
         /// <summary>Stands in for the data pipeline: the records are already parsed.</summary>
         private sealed class AugmentCatalogStub : IAbilityAugmentCatalog
         {
-            private readonly Dictionary<string, AbilityUpgradeData> _augments = new(StringComparer.Ordinal);
+            private readonly Dictionary<string, AbilityAugmentData> _augments = new(StringComparer.Ordinal);
             private readonly Dictionary<string, string[]> _abilityTags = new(StringComparer.Ordinal);
 
-            public IReadOnlyCollection<AbilityUpgradeData> All => _augments.Values;
+            public IReadOnlyCollection<AbilityAugmentData> All => _augments.Values;
 
             public AugmentCatalogStub WithAbility(string abilityId, params string[] tags)
             {
@@ -457,13 +457,13 @@
                 return this;
             }
 
-            public AugmentCatalogStub With(AbilityUpgradeData augment)
+            public AugmentCatalogStub With(AbilityAugmentData augment)
             {
                 _augments[augment.Id] = augment;
                 return this;
             }
 
-            public AbilityUpgradeData? Find(string augmentId) => _augments.GetValueOrDefault(augmentId);
+            public AbilityAugmentData? Find(string augmentId) => _augments.GetValueOrDefault(augmentId);
 
             public IReadOnlyCollection<string> TagsOf(string abilityId) => _abilityTags.GetValueOrDefault(abilityId, []);
         }
