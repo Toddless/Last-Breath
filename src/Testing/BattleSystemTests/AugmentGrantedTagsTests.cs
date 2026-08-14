@@ -99,19 +99,24 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Poison_Duration",
                 ["Ability_Series_Of_Attacks"],
                 []),
+            // Overload left the row at the owner's re-markup (it carries "buff" of its own now — a
+            // direct fit is not a grant-opened one) and Static Armor arrived (it lost "buff" and is
+            // reached through granting donors instead).
             ("Augment_Buff_Effectiveness",
                 ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Block", "Ability_Jar_Of_Poison"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
             // The porcupine reads effectiveness now, so the recovery record stopped being inert on it.
+            // Discharge and Static Armor left at the re-markup: both carry "recovery" of their own now.
             ("Augment_Recovery_Effectiveness",
                 ["Ability_Critical_Calculation", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Sacrifice", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Sacrifice", "Ability_Series_Of_Attacks"]),
             // The jar and the shards left the row in the catalog cleanup: their own debuff donors
             // (the jar's trio of vial debuffs, the shards' fragility) were removed with the catalog.
+            // The berserker left at the re-markup: his fury carries "debuff" of its own now.
             ("Augment_Debuff_Effectiveness",
                 ["Ability_Poison_Coating"],
                 // Increasing Pressure joined through the codeless applier: its attacks now grant "debuff".
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
+                ["Ability_Armageddon", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
         ];
 
         /// <summary>The shared key each grant-opened parameter record stands on, for the ledger's

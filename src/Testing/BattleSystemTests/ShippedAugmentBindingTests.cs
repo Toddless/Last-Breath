@@ -27,12 +27,11 @@
         /// Recounted at the owner's catalog cleanup (54 records removed).</summary>
         private const int ShippedRecordCount = 84;
 
-        /// <summary>How many records name an ability. The number is held so that bindings cannot go
-        /// missing in a bulk edit the way they were missing before â€” the failure of a lost binding is
-        /// an augment silently offered to the whole family. Recounted at the catalog cleanup; the
-        /// count includes the binding the naming rule added (an ability's name in the id means the
-        /// record works with that ability alone).</summary>
-        private const int BoundRecords = 57;
+        /// <summary>How many records name an ability — held because a lost binding is an augment
+        /// silently offered to the whole family. Recounted at the catalog cleanup; includes the
+        /// naming-rule binding and Augment_Lucky_Crit, bound at the tag-vocabulary pass by the G-1
+        /// precedent (typed factory, straying tags).</summary>
+        private const int BoundRecords = 58;
 
         /// <summary>How many records claim every ability there is â€” cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
@@ -45,7 +44,7 @@
         /// <summary>How many records name neither an ability nor the whole book, and are judged by
         /// their tags alone. Most of them carry tags now; the number is held because a record losing
         /// its last tag belongs nowhere and says so nowhere.</summary>
-        private const int SilentRecords = 16;
+        private const int SilentRecords = 15;
 
         [TestMethod]
         public void TheSectionDeclaresTheRecordsTheTriageCounted()

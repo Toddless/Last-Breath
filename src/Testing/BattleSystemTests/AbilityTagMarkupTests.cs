@@ -45,6 +45,7 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Jar_Of_Poison", AbilityTags.Poison),
             ("Ability_Jar_Of_Poison", AbilityTags.Stacks),
             ("Ability_Jar_Of_Poison", AbilityTags.Duration),
+            ("Ability_Jar_Of_Poison", AbilityTags.Projectile),
 
             ("Ability_Dark_Shroud", AbilityTags.Health),
             ("Ability_Dark_Shroud", AbilityTags.Stacks),
@@ -52,7 +53,6 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Dark_Shroud", AbilityTags.Buff),
             ("Ability_Dark_Shroud", AbilityTags.Recovery),
 
-            ("Ability_Critical_Calculation", AbilityTags.Crit),
             ("Ability_Critical_Calculation", AbilityTags.Stacks),
             ("Ability_Critical_Calculation", AbilityTags.Duration),
             ("Ability_Critical_Calculation", AbilityTags.Buff),
@@ -72,7 +72,6 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Double_Strike", AbilityTags.Debuff),
 
             ("Ability_Ares_Blessing", AbilityTags.Health),
-            ("Ability_Ares_Blessing", AbilityTags.Stacks),
             ("Ability_Ares_Blessing", AbilityTags.Duration),
             ("Ability_Ares_Blessing", AbilityTags.Buff),
             ("Ability_Ares_Blessing", AbilityTags.Recovery),
@@ -87,17 +86,18 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Berserk_Fury", AbilityTags.Damage),
             ("Ability_Berserk_Fury", AbilityTags.Stacks),
             ("Ability_Berserk_Fury", AbilityTags.Duration),
+            ("Ability_Berserk_Fury", AbilityTags.Debuff),
 
             ("Ability_Head_Butt", AbilityTags.Attack),
             ("Ability_Head_Butt", AbilityTags.Control),
             ("Ability_Head_Butt", AbilityTags.Damage),
 
             ("Ability_Sacrifice", AbilityTags.Health),
-            ("Ability_Sacrifice", AbilityTags.Duration),
             ("Ability_Sacrifice", AbilityTags.Buff),
 
             ("Ability_Armageddon", AbilityTags.Health),
             ("Ability_Armageddon", AbilityTags.Damage),
+            ("Ability_Armageddon", AbilityTags.Control),
 
             ("Ability_Ice_Block", AbilityTags.Control),
             ("Ability_Ice_Block", AbilityTags.Damage),
@@ -114,13 +114,16 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Deep_Freeze", AbilityTags.Stacks),
             ("Ability_Deep_Freeze", AbilityTags.Duration),
             ("Ability_Deep_Freeze", AbilityTags.Debuff),
+            ("Ability_Deep_Freeze", AbilityTags.Damage),
 
             ("Ability_Discharge", AbilityTags.Damage),
+            ("Ability_Discharge", AbilityTags.Recovery),
 
-            ("Ability_Static_Armor", AbilityTags.Stacks),
+            ("Ability_Overload", AbilityTags.Buff),
+
             ("Ability_Static_Armor", AbilityTags.Duration),
             ("Ability_Static_Armor", AbilityTags.Damage),
-            ("Ability_Static_Armor", AbilityTags.Buff),
+            ("Ability_Static_Armor", AbilityTags.Recovery),
 
             ("Ability_Twin_Assist_Attack", AbilityTags.Attack)
         ];

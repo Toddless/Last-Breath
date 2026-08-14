@@ -2,7 +2,7 @@
     "abilities": [
         {
             "id": "Ability_Series_Of_Attacks",
-            "tags": [ "attack", "series", "damage", "scale", "evadable" ],
+            "tags": [ "cost", "cooldown", "attack", "series", "damage", "scale", "evadable", "physical", "critical" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 5,
@@ -19,7 +19,7 @@
         },
         {
             "id": "Ability_Increasing_Pressure",
-            "tags": [ "attack", "series", "damage", "scale", "evadable" ],
+            "tags": [ "cost", "cooldown", "attack", "series", "damage", "scale", "evadable", "physical", "critical" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 7,
@@ -35,7 +35,7 @@
         },
         {
             "id": "Ability_Jar_Of_Poison",
-            "tags": [ "poison", "stacks", "duration", "scale" ],
+            "tags": [ "cost", "cooldown", "poison", "stacks", "duration", "scale", "hit", "projectile" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 3,
@@ -48,7 +48,7 @@
         },
         {
             "id": "Ability_Dark_Shroud",
-            "tags": [ "buff", "evasion", "health", "stacks", "recovery", "duration" ],
+            "tags": [ "cost", "cooldown", "activation", "recovery", "duration", "stacks", "buff", "health" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 5,
@@ -64,7 +64,7 @@
         },
         {
             "id": "Ability_Critical_Calculation",
-            "tags": [ "buff", "crit", "stacks", "duration" ],
+            "tags": [ "cost", "cooldown", "activation", "duration", "stacks", "buff" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 5,
@@ -78,7 +78,7 @@
         },
         {
             "id": "Ability_Poison_Explosion",
-            "tags": [ "poison", "execute", "scale" ],
+            "tags": [ "cost", "cooldown", "activation", "poison", "execute", "scale", "hit" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 7,
@@ -91,7 +91,7 @@
         },
         {
             "id": "Ability_Poison_Coating",
-            "tags": [ "poison", "buff", "stacks", "duration", "scale" ],
+            "tags": [ "cost", "cooldown", "activation", "poison", "stacks", "duration", "buff" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 7,
@@ -105,7 +105,7 @@
         },
         {
             "id": "Ability_Double_Strike",
-            "tags": [ "attack", "damage", "scale", "evadable", "stacks", "duration", "debuff" ],
+            "tags": [ "cost", "cooldown", "attack", "physical", "damage", "scale", "evadable", "stacks", "duration", "debuff", "critical" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 4,
@@ -126,7 +126,7 @@
         },
         {
             "id": "Ability_Ares_Blessing",
-            "tags": [ "buff", "health", "stacks", "duration", "recovery" ],
+            "tags": [ "cost", "cooldown", "activation", "recovery", "health", "buff", "duration" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -140,7 +140,7 @@
         },
         {
             "id": "Ability_Porcupine",
-            "tags": [ "buff", "retaliation", "armor", "stacks", "duration" ],
+            "tags": [ "cost", "cooldown", "activation", "buff", "retaliation", "armor", "stacks", "duration" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -154,7 +154,7 @@
         },
         {
             "id": "Ability_Berserk_Fury",
-            "tags": [ "attack", "series", "health", "damage", "scale", "evadable", "stacks", "duration" ],
+            "tags": [ "cost", "cooldown", "attack", "health", "damage", "physical", "evadable", "fury", "duration", "debuff", "critical", "stacks" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 7,
@@ -170,7 +170,7 @@
         },
         {
             "id": "Ability_Head_Butt",
-            "tags": [ "attack", "stun", "control", "damage", "scale", "evadable" ],
+            "tags": [ "cost", "cooldown", "attack", "physical", "damage", "scale", "evadable", "stun", "control", "critical" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 4,
@@ -186,7 +186,7 @@
         },
         {
             "id": "Ability_Sacrifice",
-            "tags": [ "health", "empower", "buff", "duration" ],
+            "tags": [ "cost", "cooldown", "activation", "health", "buff", "empower", "pure", "consume" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -200,7 +200,7 @@
         },
         {
             "id": "Ability_Armageddon",
-            "tags": [ "spell", "fire", "health", "damage", "scale", "charged" ],
+            "tags": [ "cost", "cooldown", "activation", "elemental", "spell", "fire", "health", "damage", "scale", "charge", "control", "stun", "critical" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 9,
@@ -224,7 +224,7 @@
         },
         {
             "id": "Ability_Ice_Block",
-            "tags": [ "spell", "cold", "stun", "control", "scale", "damage", "hit", "debuff" ],
+            "tags": [ "cost", "cooldown", "activation", "elemental", "spell", "damage", "scale", "cold", "stun", "control", "stage", "hit", "debuff", "critical" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 5,
@@ -244,7 +244,7 @@
         },
         {
             "id": "Ability_Overload",
-            "tags": [ "mana", "empower" ],
+            "tags": [ "cost", "cooldown", "activation", "elemental", "buff", "consume", "empower", "stage", "critical" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 5,
@@ -280,7 +280,7 @@
         },
         {
             "id": "Ability_Ice_Aegis",
-            "tags": [ "buff", "cold", "barrier", "stacks", "duration", "scale", "debuff" ],
+            "tags": [ "cost", "cooldown", "activation", "buff", "cold", "shield", "stacks", "duration", "scale", "stage", "debuff", "freeze", "control" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 9,
@@ -299,7 +299,7 @@
         },
         {
             "id": "Ability_Ice_Shards",
-            "tags": [ "spell", "cold", "scale", "damage", "hit", "projectile" ],
+            "tags": [ "cost", "cooldown", "activation", "elemental", "spell", "cold", "scale", "damage", "hit", "stage", "projectile", "critical" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 4,
@@ -320,7 +320,7 @@
         },
         {
             "id": "Ability_Deep_Freeze",
-            "tags": [ "spell", "cold", "freeze", "control", "stacks", "duration", "debuff" ],
+            "tags": [ "cost", "cooldown", "activation", "elemental", "freeze", "control", "debuff", "duration", "stage", "stacks", "spell", "hit", "cold", "damage", "scale", "critical" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 6,
@@ -339,7 +339,7 @@
         },
         {
             "id": "Ability_Discharge",
-            "tags": [ "spell", "lightning", "barrier", "damage", "scale", "hit" ],
+            "tags": [ "cost", "cooldown", "activation", "elemental", "barrier", "hit", "lightning", "spell", "damage", "scale", "stage", "recovery", "critical" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 6,
@@ -356,7 +356,7 @@
         },
         {
             "id": "Ability_Static_Armor",
-            "tags": [ "buff", "lightning", "stacks", "duration", "damage", "scale", "hit" ],
+            "tags": [ "cost", "cooldown", "activation", "duration", "damage", "scale", "lightning", "stage", "hit", "recovery", "barrier", "critical" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 6,
@@ -669,7 +669,8 @@
             "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 3,
-            "tags": [ "crit" ],
+            "tags": [ "critical" ],
+            "abilityId": "Ability_Critical_Calculation",
             "upgradeProperties": {
                 "duration": 3
             }
@@ -680,7 +681,7 @@
             "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 2,
-            "tags": [ "crit", "health" ],
+            "tags": [ "critical", "health" ],
             "abilityId": "Ability_Critical_Calculation",
             "upgradeProperties": {
                 "amount": 0.15

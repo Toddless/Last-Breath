@@ -28,7 +28,8 @@ namespace Core.Battle.Abilities
         public const string Fire = "fire";
         public const string Stun = "stun";
         public const string Freeze = "freeze";
-        public const string Crit = "crit";
+        /// <summary>Critical chance and critical damage, of the cast itself or granted as a buff.</summary>
+        public const string Critical = "critical";
         public const string Barrier = "barrier";
         /// <summary>Mana-economy mechanics (burn, refund, cost manipulation).</summary>
         public const string Mana = "mana";
@@ -50,7 +51,7 @@ namespace Core.Battle.Abilities
         /// <summary>Burning damage over turns, as opposed to the fire damage of a cast itself.</summary>
         public const string Burn = "burn";
         /// <summary>Cast that climbs through stages, each one costing and hitting more than the last.</summary>
-        public const string Charged = "charged";
+        public const string Charge = "charge";
         /// <summary>Takes the target's turn away (stun, freeze and the rest of the hard control).</summary>
         public const string Control = "control";
         public const string Cooldown = "cooldown";
@@ -89,13 +90,29 @@ namespace Core.Battle.Abilities
         /// <summary>Damage returned by wearing armor rather than by the retaliation family.</summary>
         public const string Thorn = "thorn";
 
+        /// <summary>Cast activated for its effect rather than its delivery (the owner's "Activation" axis).</summary>
+        public const string Activation = "activation";
+        /// <summary>Elemental damage of the cast itself (fire, cold, lightning as a family).</summary>
+        public const string Elemental = "elemental";
+        /// <summary>Weapon-borne physical damage, as opposed to the elemental family.</summary>
+        public const string Physical = "physical";
+        /// <summary>Pure damage — mitigated by nothing.</summary>
+        public const string Pure = "pure";
+        /// <summary>Consumes a resource or an effect as the price or fuel of the cast.</summary>
+        public const string Consume = "consume";
+        /// <summary>The berserker's Fury effect family.</summary>
+        public const string Fury = "fury";
+        /// <summary>Multicast activation levels of the intelligence stance.</summary>
+        public const string Stage = "stage";
+
         public static readonly IReadOnlySet<string> All = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            Attack, Spell, Series, Buff, Poison, Cold, Lightning, Fire, Stun, Freeze, Crit, Barrier,
+            Attack, Spell, Series, Buff, Poison, Cold, Lightning, Fire, Stun, Freeze, Critical, Barrier,
             Mana, Health, Evasion, Execute, Retaliation, Empower, Shield, Summon, Npc, Projectile,
-            Accuracy, Armor, Burn, Charged, Control, Cooldown, Cost, Curse, Damage, Debuff, Defence,
+            Accuracy, Armor, Burn, Charge, Control, Cooldown, Cost, Curse, Damage, Debuff, Defence,
             Duration, Effect, Effectiveness, Evadable, Heal, Hit, Leech, Recovery, Restore, Scale,
             Splash, Spread, Stacks, Target, Thorn,
+            Activation, Elemental, Physical, Pure, Consume, Fury, Stage,
         };
 
         /// <summary>The tag-compatibility rule of the augment system: one shared tag is enough.</summary>

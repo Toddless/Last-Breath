@@ -60,8 +60,10 @@ namespace LastBreathTest.BattleSystemTests
         /// </summary>
         private static readonly Dictionary<string, string[]> s_knowinglyFree = new(StringComparer.Ordinal)
         {
+            // Ares left the list at the owner's re-markup: the blessing lost its "stacks" tag, so the
+            // record does not reach it at all any more.
             ["Augment_Add_Effectiveness_Reduce_Stacks"] =
-                ["Ability_Ares_Blessing", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine"]
+                ["Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine"]
         };
 
         private static IEnumerable<string> Accepted(string augmentId) =>
@@ -96,62 +98,78 @@ namespace LastBreathTest.BattleSystemTests
         /// </summary>
         private static readonly (string Augment, string Parameter, string[] Works, string[] Inert)[] s_reach =
         [
+            // Deep Freeze joined the inert list at the owner's re-markup: its doc hands it "damage"
+            // while the ability itself carries no damage numbers yet (code catches up in CL-3).
             ("Augment_More_Attack_Damage", AbilityParameter.DamageMultiplier,
                 ["Ability_Double_Strike", "Ability_Series_Of_Attacks"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt",
-                 "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Static_Armor"]),
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
+                 "Ability_Static_Armor"]),
 
-            // Nine of the eleven inert abilities are reached through the bare tag "duration" alone.
+            // Most of the inert abilities are reached through the bare tag "duration" alone. Sacrifice
+            // left the list at the re-markup: it lost "duration" and the record stopped reaching it.
             ("Augment_Poison_Duration", AbilityParameter.PoisonDuration,
                 ["Ability_Jar_Of_Poison", "Ability_Poison_Coating"],
                 ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
                  "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Poison_Explosion",
-                 "Ability_Porcupine", "Ability_Sacrifice", "Ability_Static_Armor"]),
+                 "Ability_Porcupine", "Ability_Static_Armor"]),
 
             // The worst record in the catalog and the reason this walk exists: where it is inert it
             // still charges its fifty mana, so every name in the second list is a straight loss the
-            // player cannot see. Armageddon stuns and is NOT reached — its tags carry neither "control"
-            // nor "duration" (a hole for wave E), while Deep Freeze is reached and freezes rather than
-            // stuns. Neither is fixed here: the record's tags are wave C's.
+            // player cannot see. Armageddon reached the works list at the owner's re-markup ("control"
+            // and "stun" arrived with the doc), closing the wave-E hole the old comment named.
             // The aegis joined the inert list at the catalog cleanup: its stun existed only through the
             // removed stun-attackers augment, so the duration key came off the ability with the branch.
+            // Sacrifice left the row at the re-markup: it lost "duration".
             ("Augment_Extend_Stun_Add_Cost", AbilityParameter.StunDuration,
-                ["Ability_Head_Butt", "Ability_Ice_Block"],
+                ["Ability_Armageddon", "Ability_Head_Butt", "Ability_Ice_Block"],
                 ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
                  "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison",
-                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Static_Armor"]),
+                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"]),
 
-            ("Augment_Additional_Projectiles", AbilityParameter.ProjectileCount, ["Ability_Ice_Shards"], []),
+            // The jar carries "projectile" now (the doc's word for how it travels) and declares no
+            // projectile count — a socket that fits and moves nothing until the count generalises.
+            ("Augment_Additional_Projectiles", AbilityParameter.ProjectileCount,
+                ["Ability_Ice_Shards"], ["Ability_Jar_Of_Poison"]),
 
             // Both effectiveness records stand on one key in one direction, so where they meet they are
             // one offer and the better works. What separates them is which abilities are offered the
             // deal — tags, not keys, which is the whole segmentation of the family.
+            // The re-markup swapped the inert pair: Static Armor lost "buff" and left the row while
+            // Overload gained it and arrived (declaring no effectiveness — inert until CL-3).
             ("Augment_Buff_Effectiveness", AbilityParameter.Effectiveness,
                 ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
                  "Ability_Poison_Coating", "Ability_Porcupine"],
-                ["Ability_Sacrifice", "Ability_Static_Armor"]),
+                ["Ability_Overload", "Ability_Sacrifice"]),
 
+            // Discharge and Static Armor arrived with the doc's "recovery" (their barrier refunds);
+            // neither declares effectiveness yet, so both sit inert.
             ("Augment_Recovery_Effectiveness", AbilityParameter.Effectiveness,
-                ["Ability_Ares_Blessing", "Ability_Dark_Shroud"], []),
+                ["Ability_Ares_Blessing", "Ability_Dark_Shroud"],
+                ["Ability_Discharge", "Ability_Static_Armor"]),
 
             // The record the debuff tag was handed out for: it reaches the four abilities that lay
             // something on their target and read how strongly it lands, and nothing else in the book.
+            // The berserker arrived with the doc's "debuff" (his fury burns its own bearer); he does
+            // not declare effectiveness, so the record sits inert on him.
             ("Augment_Debuff_Effectiveness", AbilityParameter.Effectiveness,
-                ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block"], []),
+                ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block"],
+                ["Ability_Berserk_Fury"]),
 
             // Both halves of one bargain, so both lists have to be the SAME list: an ability where the
             // stacks come off and the effectiveness does not is charged for nothing.
+            // Ares and Static Armor left every row of this record at the re-markup: both lost "stacks",
+            // the only tag that carried it onto them.
             ("Augment_Add_Effectiveness_Reduce_Stacks", AbilityParameter.Stacks,
                 ["Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Double_Strike",
                  "Ability_Ice_Aegis"],
-                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
-                 "Ability_Porcupine", "Ability_Static_Armor"]),
+                ["Ability_Berserk_Fury", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine"]),
 
             ("Augment_Add_Effectiveness_Reduce_Stacks", AbilityParameter.Effectiveness,
-                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze",
+                ["Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze",
                  "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
                  "Ability_Porcupine"],
-                ["Ability_Berserk_Fury", "Ability_Static_Armor"]),
+                ["Ability_Berserk_Fury"]),
         ];
 
         [TestMethod]
