@@ -255,7 +255,7 @@ namespace LastBreathTest.BattleSystemTests
             new AbilityAugmentParameterSet("Augment_Deeper_Cut", [], 3, [(AbilityParameter.Cooldown, OperationType.Subtract, 5f)]);
 
         /// <summary>Two records reaching for one number from opposite sides, shaped like the pair the
-        /// book ships on a berserker's own burn (Augment_More_Burn and Augment_Less_Burn). Stood in for
+        /// book ships on a berserker's own burn (Augment_Fury_More_Burn and Augment_Fury_Less_Burn). Stood in for
         /// on a key of Head Butt's, because which number it is has nothing to do with the question.</summary>
         private static IAbilityAugment MoreAttacks() =>
             new AbilityAugmentParameterSet("Augment_More_Attacks", [], 2, [(AbilityParameter.Attacks, OperationType.Add, 2f)]);

@@ -23,17 +23,16 @@
     {
         /// <summary>How many records the section declares. Held because the records no longer sit
         /// inside the abilities: a block that used to go missing took its ability's augments with it
-        /// and left the rest readable, and a section loses them one bulk edit at a time.</summary>
-        private const int ShippedRecordCount = 138;
+        /// and left the rest readable, and a section loses them one bulk edit at a time.
+        /// Recounted at the owner's catalog cleanup (54 records removed).</summary>
+        private const int ShippedRecordCount = 84;
 
-        /// <summary>How many records name an ability. The registry triage
-        /// (<c>Docs/UpgradeRegistryTriage.md</c>) counted them: 58 reaching into the members of one
-        /// ability class, and 25 more that look general and are inert or throw anywhere else. The
-        /// number is held so that bindings cannot go missing in a bulk edit the way they were missing
-        /// before â€” the failure of a lost binding is an augment silently offered to the whole family.
-        /// Three more were bound in the granted-tags pass of 2026-08-10: the recovery rows standing on
-        /// one ability's private key, which a granted tag would otherwise carry onto dead sockets.</summary>
-        private const int BoundRecords = 102;
+        /// <summary>How many records name an ability. The number is held so that bindings cannot go
+        /// missing in a bulk edit the way they were missing before â€” the failure of a lost binding is
+        /// an augment silently offered to the whole family. Recounted at the catalog cleanup; the
+        /// count includes the binding the naming rule added (an ability's name in the id means the
+        /// record works with that ability alone).</summary>
+        private const int BoundRecords = 57;
 
         /// <summary>How many records claim every ability there is â€” cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
@@ -46,7 +45,7 @@
         /// <summary>How many records name neither an ability nor the whole book, and are judged by
         /// their tags alone. Most of them carry tags now; the number is held because a record losing
         /// its last tag belongs nowhere and says so nowhere.</summary>
-        private const int SilentRecords = 25;
+        private const int SilentRecords = 16;
 
         [TestMethod]
         public void TheSectionDeclaresTheRecordsTheTriageCounted()

@@ -19,7 +19,6 @@ namespace LastBreathTest.BattleSystemTests
     using Moq;
     using ChainLightningCast = Battle.Source.Abilities.ChainLightning.ChainLightning;
     using DeepFreezeCast = Battle.Source.Abilities.DeepFreeze.DeepFreeze;
-    using DischargeCast = Battle.Source.Abilities.Discharge.Discharge;
     using IceAegisCast = Battle.Source.Abilities.IceAegis.IceAegis;
     using IceBlocksCast = Battle.Source.Abilities.IceBlock.IceBlocks;
     using IceShardsCast = Battle.Source.Abilities.IceShards.IceShards;
@@ -38,7 +37,6 @@ namespace LastBreathTest.BattleSystemTests
     public class ImpactKindTests
     {
         private const float Health = 100f;
-        private const float Barrier = 1000f;
         private const int ExtraShards = 2;
 
         /// <summary>The shipped ability that counts its projectiles, and the shipped record that sells
@@ -256,32 +254,6 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public async Task TheOverkillOfADischargeLeapsToTheNeighbourAsASplash()
-        {
-            // Whatever exceeded the victim's remaining pool is dealt to somebody who was never aimed at,
-            // and it exists only because the strike had already landed: splash by the letter of the
-            // dictionary. It dealt that damage in silence before this pin.
-            using var rolls = new CombatRandomScope(new HighestRoll());
-            var owner = Fighter();
-            owner.CurrentBarrier = Barrier;
-            Mock<IFightable> victim = Mortal(Health);
-            var bystander = Fighter();
-            var discharge = new DischargeCast(Data()) { OverkillToRandom = true };
-            var seen = Riding(discharge);
-            discharge.SetOwner(owner);
-
-            await discharge.Execute([victim.Object], FieldOf(owner, victim.Object, bystander));
-
-            Assert.IsFalse(victim.Object.IsAlive, "the victim survived, so there was no overkill to leap and the test proves nothing");
-            List<AbilityImpact> splash = seen.FindAll(impact => impact.Kind == ImpactKind.Splash);
-            Assert.AreEqual(1, splash.Count, "the leftover damage leapt to a neighbour without telling a single rider");
-            Assert.AreSame(bystander, splash[0].Target, "the leap was reported on somebody other than the neighbour it hit");
-            Assert.AreSame(discharge, splash[0].Source, "the leap arrived without the ability whose overkill it is");
-            Assert.IsTrue(seen.Exists(impact => impact.Kind == ImpactKind.Hit && ReferenceEquals(impact.Target, victim.Object)),
-                "the strike that caused the overkill never reached the riders itself");
-        }
-
-        [TestMethod]
         public async Task EveryExtraBlockOfTheFinalStageIsAHitOfItsOwn()
         {
             // Stage 4 drops more blocks: its own count, its own share of the damage and — with the L3
@@ -427,27 +399,6 @@ namespace LastBreathTest.BattleSystemTests
                 Damage = Health
             });
 
-        /// <summary>A fighter who actually dies of what he is dealt: <see cref="ConditionOwner"/> swallows
-        /// damage whole, and an overkill leap only exists once somebody's pool has run out.</summary>
-        private static Mock<IFightable> Mortal(float health)
-        {
-            string instanceId = Guid.NewGuid().ToString();
-            float left = health;
-            var mock = new Mock<IFightable>();
-            mock.SetupGet(fighter => fighter.InstanceId).Returns(instanceId);
-            mock.SetupGet(fighter => fighter.CurrentHealth).Returns(() => left);
-            mock.SetupGet(fighter => fighter.CurrentBarrier).Returns(0f);
-            mock.SetupGet(fighter => fighter.IsAlive).Returns(() => left > 0f);
-            mock.Setup(fighter => fighter.IsSame(It.IsAny<string>())).Returns((string other) => instanceId == other);
-            mock.Setup(fighter => fighter.TakeDamage(It.IsAny<IDamageContext>()))
-                .Returns((IDamageContext context) =>
-                {
-                    left -= context.TotalDamage;
-                    return Task.CompletedTask;
-                });
-
-            return mock;
-        }
 
         /// <summary>Seats a rider that only remembers, and hands back what it collected.</summary>
         private static List<AbilityImpact> Riding(IAbility ability)

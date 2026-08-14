@@ -15,22 +15,12 @@ namespace LastBreathTest.BattleSystemTests
     public class AugmentCatalogTailTests
     {
         /// <summary>The groups the shipped data declares, written out. A group is a design decision about
-        /// which two augments may not be worn together, so it is named here rather than counted.</summary>
-        private static readonly Dictionary<string, string[]> s_exclusionGroups = new(StringComparer.Ordinal)
-        {
-            // The single empowered strike replaces the series, so it cannot live beside anything that
-            // buys more attacks. The two counters share the group as a side effect of the mechanic
-            // being per-group rather than pairwise — they are rivals on one key anyway.
-            ["Attack_Count"] =
-            [
-                "Ability_Ip_Augment_Single_Empowered_Attack",
-                "Augment_Additional_Amount_Attacks",
-                "Augment_Additional_Lunges"
-            ],
-
-            // Bounces and "every target" are two answers to the same question: how far the jar reaches.
-            ["Jar_Reach"] = ["Ability_JoP_Augment_Bouncing", "Ability_JoP_Augment_All_Targets"],
-        };
+        /// which two augments may not be worn together, so it is named here rather than counted.
+        ///
+        /// Empty since the catalog cleanup: Jar_Reach lost both residents and Attack_Count all but one
+        /// (a group of one forbids nothing and reads as a typo, so it came off the survivor —
+        /// Ability_Ip_Augment_Single_Empowered_Attack gets it back the day a counting record returns).</summary>
+        private static readonly Dictionary<string, string[]> s_exclusionGroups = new(StringComparer.Ordinal);
 
         [TestMethod]
         public void EveryExclusionGroupTheDataDeclaresIsTheOneWrittenDown()

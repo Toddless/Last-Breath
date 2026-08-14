@@ -27,7 +27,6 @@ namespace Battle.Source.Abilities.PoisonExplosion
         public int ExecutionThreshold => (int)this[Parameters.ExecutionThreshold];
         public float DamageMultiplier => this[AbilityParameter.DamageMultiplier];
 
-        public bool PreserveStacks { get; set; }
         public IPoisonSpreadMode? SpreadMode { get; set; }
         public IExecuteCondition? ExecuteCondition { get; set; }
 
@@ -89,11 +88,8 @@ namespace Battle.Source.Abilities.PoisonExplosion
                     Kind = ImpactKind.Splash
                 });
 
-            if (!PreserveStacks)
-            {
-                foreach (var stack in poisonStacks)
-                    stack.Remove();
-            }
+            foreach (var stack in poisonStacks)
+                stack.Remove();
         }
     }
 }

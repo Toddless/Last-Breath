@@ -20,9 +20,7 @@ namespace Battle.Source.Effects
         int ChargeDuration,
         float BarrierRestorePercent,
         float SplashPercent,
-        bool ApplyOnHitTaken,
-        bool IgnoreResistances,
-        bool OverkillToRandom);
+        bool ApplyOnHitTaken);
 
     /// <summary>
     /// "Статический доспех": while the buff lasts, every landed attack of the bearer puts a Charge
@@ -87,25 +85,15 @@ namespace Battle.Source.Effects
             if (splashTarget != null) DealDetonationDamage(owner, splashTarget, damage * settings.SplashPercent);
         }
 
-        /// <summary>One detonation hit; returns the post-mitigation damage. Overkill (upgrade) jumps
-        /// to a random other enemy at full remainder.</summary>
+        /// <summary>One detonation hit; returns the post-mitigation damage.</summary>
         private float DealDetonationDamage(IFightable owner, IFightable victim, float damage)
         {
-            float healthBefore = victim.CurrentHealth;
-            float barrierBefore = victim.CurrentBarrier;
-
             var context = new DamageContext
             {
-                Source = owner, Cause = DamageCause.Ability, SourceAbilityId = settings.SourceAbilityId, IgnoreResistances = settings.IgnoreResistances
+                Source = owner, Cause = DamageCause.Ability, SourceAbilityId = settings.SourceAbilityId
             };
             context.Add(DamageType.Lightning, damage);
             _ = victim.TakeDamage(context);
-
-            if (!settings.OverkillToRandom || victim.IsAlive) return context.TotalDamage;
-
-            float overkill = context.TotalDamage - (healthBefore + barrierBefore);
-            IFightable? next = RandomEnemy(owner, except: victim);
-            if (overkill > 0 && next != null) DealDetonationDamage(owner, next, overkill);
 
             return context.TotalDamage;
         }

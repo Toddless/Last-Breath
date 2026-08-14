@@ -101,23 +101,6 @@ namespace LastBreathTest.BattleSystemTests
                 ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt",
                  "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Static_Armor"]),
 
-            // The same key from a second record: on either owner the two are one offer and the better
-            // of them works, which is the rivalry rule reading a concept rather than a spelling.
-            ("Augment_Damage_Multiplier", AbilityParameter.DamageMultiplier,
-                ["Ability_Double_Strike", "Ability_Series_Of_Attacks"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt",
-                 "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Static_Armor"]),
-
-            // Series of Attacks and Berserk Fury are inert by DESIGN: their series is a range and a
-            // health roll, not a count, so neither declares the concept (AbilityParameter.Attacks).
-            ("Augment_Additional_Amount_Attacks", AbilityParameter.Attacks,
-                ["Ability_Head_Butt", "Ability_Increasing_Pressure"],
-                ["Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Series_Of_Attacks"]),
-
-            ("Augment_Additional_Lunges", AbilityParameter.Attacks,
-                ["Ability_Head_Butt", "Ability_Increasing_Pressure"],
-                ["Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Series_Of_Attacks"]),
-
             // Nine of the eleven inert abilities are reached through the bare tag "duration" alone.
             ("Augment_Poison_Duration", AbilityParameter.PoisonDuration,
                 ["Ability_Jar_Of_Poison", "Ability_Poison_Coating"],
@@ -130,31 +113,13 @@ namespace LastBreathTest.BattleSystemTests
             // player cannot see. Armageddon stuns and is NOT reached — its tags carry neither "control"
             // nor "duration" (a hole for wave E), while Deep Freeze is reached and freezes rather than
             // stuns. Neither is fixed here: the record's tags are wave C's.
+            // The aegis joined the inert list at the catalog cleanup: its stun existed only through the
+            // removed stun-attackers augment, so the duration key came off the ability with the branch.
             ("Augment_Extend_Stun_Add_Cost", AbilityParameter.StunDuration,
-                ["Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block"],
+                ["Ability_Head_Butt", "Ability_Ice_Block"],
                 ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
-                 "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
-                 "Ability_Porcupine", "Ability_Sacrifice", "Ability_Static_Armor"]),
-
-            // The berserker joined the buff durations: his fury is a buff on his own caster, so "your
-            // buff lasts longer" reaches it and lengthens the health it burns along with it.
-            ("Augment_Buff_Duration", AbilityParameter.Duration,
-                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
-                 "Ability_Ice_Aegis", "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
-                ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Jar_Of_Poison", "Ability_Sacrifice"]),
-
-            ("Augment_Increased_Buff_Duration", AbilityParameter.Duration,
-                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
-                 "Ability_Ice_Aegis", "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
-                ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Jar_Of_Poison", "Ability_Sacrifice"]),
-
-            // A record naming its ability reaches that one and no other, shared key or not.
-            ("Ability_Sa_Augment_Buff_Duration", AbilityParameter.Duration, ["Ability_Static_Armor"], []),
-
-            // The one record in the book that SHORTENS a buff, and the reason it names its ability: a
-            // shorter fury burns less health, and there is no such trade anywhere else — on any other
-            // buff the same move is a loss with nothing bought. Left on its tag it reached eight.
-            ("Augment_Fury_Duration", AbilityParameter.Duration, ["Ability_Berserk_Fury"], []),
+                 "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison",
+                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Static_Armor"]),
 
             ("Augment_Additional_Projectiles", AbilityParameter.ProjectileCount, ["Ability_Ice_Shards"], []),
 
@@ -173,12 +138,6 @@ namespace LastBreathTest.BattleSystemTests
             // something on their target and read how strongly it lands, and nothing else in the book.
             ("Augment_Debuff_Effectiveness", AbilityParameter.Effectiveness,
                 ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block"], []),
-
-            ("Augment_More_Stacks_More_Cost", AbilityParameter.Stacks,
-                ["Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Double_Strike",
-                 "Ability_Ice_Aegis"],
-                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
-                 "Ability_Porcupine", "Ability_Static_Armor"]),
 
             // Both halves of one bargain, so both lists have to be the SAME list: an ability where the
             // stacks come off and the effectiveness does not is charged for nothing.

@@ -54,47 +54,35 @@ namespace LastBreathTest.BattleSystemTests
         [
             ("Augment_Poison_On_Hit", [AbilityTags.Poison, AbilityTags.Debuff]),
 
-            ("Ability_Arm_Augment_Stage3_Burning", [AbilityTags.Burn, AbilityTags.Debuff]),
-            ("Ability_Bf_Augment_Burning_Fury", [AbilityTags.Burn, AbilityTags.Debuff]),
+            ("Augment_Armageddon_Burning", [AbilityTags.Burn, AbilityTags.Debuff]),
+            ("Augment_Burning_Fury", [AbilityTags.Burn, AbilityTags.Debuff]),
 
-            ("Ability_SoA_Augment_Apply_Buff_Critical_Chance", [AbilityTags.Buff]),
-            ("Ability_SoA_Augment_Apply_Buff_Critical_Damage", [AbilityTags.Buff]),
+            ("Augment_Apply_Buff_Critical_Chance", [AbilityTags.Buff]),
+            ("Augment_Apply_Buff_Critical_Damage", [AbilityTags.Buff]),
             ("Augment_Lucky_Crit", [AbilityTags.Buff]),
-            ("Augment_Additional_Crit_Multiplier", [AbilityTags.Buff]),
             ("Augment_Apply_Enhanced_Defence", [AbilityTags.Buff]),
             ("Augment_Leach_On_Crit", [AbilityTags.Buff]),
             ("Augment_Immortality", [AbilityTags.Buff]),
             ("Augment_Incoming_Reduction", [AbilityTags.Buff]),
-            ("Ability_Dst_Augment_Both_Hits_Buff", [AbilityTags.Buff]),
-            ("Ability_Ar_Augment_Incoming_Reduction", [AbilityTags.Buff]),
-            ("Ability_Ar_Augment_Damage_Buff", [AbilityTags.Buff]),
-            ("Ability_Porc_Augment_Armor_Buff", [AbilityTags.Buff]),
-            ("Ability_Porc_Augment_Echo", [AbilityTags.Buff]),
-            ("Ability_Porc_Augment_Incoming_Reduction", [AbilityTags.Buff]),
-            ("Ability_Porc_Augment_Crit_Mitigation", [AbilityTags.Buff]),
-            ("Ability_Ia_Augment_Crit_Mitigation", [AbilityTags.Buff]),
+            ("Augment_Two_Attacks_Apply_Buff", [AbilityTags.Buff]),
+            ("Augment_Porcupine_Echo", [AbilityTags.Buff]),
+            ("Augment_Porcupine_Incoming_Damage_Reduction", [AbilityTags.Buff]),
+            ("Augment_Porcupine_Crit_Mitigation", [AbilityTags.Buff]),
+            ("Augment_Crit_Mitigation_Under_Shield", [AbilityTags.Buff]),
 
-            ("Augment_Free_Cast", [AbilityTags.Buff]),
+            ("Augment_Empowered_Ability_Free_Cast", [AbilityTags.Buff]),
             ("Augment_Next_Cast_Pure", [AbilityTags.Buff]),
 
             ("Augment_Mana_Flow", [AbilityTags.Buff, AbilityTags.Recovery]),
-            ("Ability_Ar_Augment_Turn_End_Heal", [AbilityTags.Buff, AbilityTags.Recovery]),
-            ("Ability_Ds_Augment_Mana_Regen", [AbilityTags.Buff, AbilityTags.Recovery]),
 
-            ("Augment_Restore_On_Hit", [AbilityTags.Recovery]),
+            ("Augment_Restore_Mana_Health_On_Hit", [AbilityTags.Recovery]),
             ("Augment_Heal_On_Hit", [AbilityTags.Recovery]),
 
-            ("Ability_Ia_Augment_Stun_Attackers", [AbilityTags.Stun, AbilityTags.Control]),
-
-            ("Augment_Clumsiness", [AbilityTags.Debuff]),
-            ("Augment_Apply_Blind", [AbilityTags.Debuff]),
-            ("Augment_Apply_Weakness", [AbilityTags.Debuff]),
             ("Augment_Apply_Seal_Of_Oblivion", [AbilityTags.Debuff]),
-            ("Ability_Pc_Augment_Attacks_Reduce_Incoming_Heal", [AbilityTags.Debuff]),
-            ("Ability_Pc_Augment_Attacks_Reduce_Armor", [AbilityTags.Debuff]),
-            ("Ability_Hb_Augment_Armor_Debuff", [AbilityTags.Debuff]),
-            ("Ability_Is_Augment_Apply_Fragility", [AbilityTags.Debuff]),
-            ("Ability_Df_Augment_Enemy_Cooldown", [AbilityTags.Debuff]),
+            ("Augment_Attacks_Reduce_Incoming_Heal", [AbilityTags.Debuff]),
+            ("Augment_Attacks_Reduce_Armor", [AbilityTags.Debuff]),
+            ("Augment_Armor_Debuff_On_Hit", [AbilityTags.Debuff]),
+            ("Augment_Freeze_Increase_Ability_Cooldown", [AbilityTags.Debuff]),
             // Declared by a record and no code at all — the first applier the behaviour registry builds.
             ("Augment_Clumsy_Blows", [AbilityTags.Debuff]),
         ];
@@ -111,12 +99,6 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Poison_Duration",
                 ["Ability_Series_Of_Attacks"],
                 []),
-            ("Augment_Buff_Duration",
-                [],
-                ["Ability_Armageddon", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
-            ("Augment_Increased_Buff_Duration",
-                [],
-                ["Ability_Armageddon", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
             ("Augment_Buff_Effectiveness",
                 ["Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Block", "Ability_Jar_Of_Poison"],
                 ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
@@ -124,10 +106,12 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Recovery_Effectiveness",
                 ["Ability_Critical_Calculation", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine"],
                 ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Poison_Explosion", "Ability_Sacrifice", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
+            // The jar and the shards left the row in the catalog cleanup: their own debuff donors
+            // (the jar's trio of vial debuffs, the shards' fragility) were removed with the catalog.
             ("Augment_Debuff_Effectiveness",
-                ["Ability_Jar_Of_Poison", "Ability_Poison_Coating"],
+                ["Ability_Poison_Coating"],
                 // Increasing Pressure joined through the codeless applier: its attacks now grant "debuff".
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
         ];
 
         /// <summary>The shared key each grant-opened parameter record stands on, for the ledger's
@@ -136,8 +120,6 @@ namespace LastBreathTest.BattleSystemTests
         private static readonly Dictionary<string, string> s_openedKeys = new(StringComparer.Ordinal)
         {
             ["Augment_Poison_Duration"] = AbilityParameter.PoisonDuration,
-            ["Augment_Buff_Duration"] = AbilityParameter.Duration,
-            ["Augment_Increased_Buff_Duration"] = AbilityParameter.Duration,
             ["Augment_Buff_Effectiveness"] = AbilityParameter.Effectiveness,
             ["Augment_Recovery_Effectiveness"] = AbilityParameter.Effectiveness,
             ["Augment_Debuff_Effectiveness"] = AbilityParameter.Effectiveness,

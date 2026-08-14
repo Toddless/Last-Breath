@@ -34,14 +34,12 @@ namespace Battle.Source.Abilities.IceShards
             public const string ShrapnelDamage = nameof(ShrapnelDamage);
             public const string ShrapnelWeaponDamageScale = nameof(ShrapnelWeaponDamageScale);
             public const string ShrapnelSpellDamageScale = nameof(ShrapnelSpellDamageScale);
-            public const string ShrapnelBarrierLeach = nameof(ShrapnelBarrierLeach);
             public const string SecondStageDamage = nameof(SecondStageDamage);
             public const string SecondStageWeaponDamageScale = nameof(SecondStageWeaponDamageScale);
             public const string SecondStageSpellDamageScale = nameof(SecondStageSpellDamageScale);
         }
 
         public int ProjectileCount => (int)this[AbilityParameter.ProjectileCount];
-        public float ShrapnelBarrierLeach => this[Parameters.ShrapnelBarrierLeach];
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
@@ -54,8 +52,6 @@ namespace Battle.Source.Abilities.IceShards
             parameters.RegisterDefault(Parameters.SecondStageDamage, 120f);
             parameters.RegisterDefault(Parameters.SecondStageWeaponDamageScale, 0.35f);
             parameters.RegisterDefault(Parameters.SecondStageSpellDamageScale, 1.2f);
-            // Zero by default; the L3 upgrade raises it with a decorator — the ability knows nothing about the upgrade
-            parameters.RegisterDefault(Parameters.ShrapnelBarrierLeach, 0f);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new IceShards(Data) { CritIgnoresColdResistance = CritIgnoresColdResistance });
@@ -122,22 +118,17 @@ namespace Battle.Source.Abilities.IceShards
                            + owner.Parameters.Damage * this[Parameters.ShrapnelWeaponDamageScale]
                            + owner.Parameters.SpellDamage * this[Parameters.ShrapnelSpellDamageScale];
 
-            float totalDealt = 0;
             foreach (IFightable enemy in field.GetEnemies(owner))
             {
                 var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, CastId = CastId };
                 context.Add(DamageType.Cold, damage);
                 await enemy.TakeDamage(context);
-                totalDealt += context.TotalDamage;
                 await ApplyImpactRiders(new AbilityImpact(owner, enemy, field, Succeeded: true, IsCritical: false, context.TotalDamage)
                 {
                     Source = this,
                     Kind = ImpactKind.Splash
                 });
             }
-
-            if (ShrapnelBarrierLeach > 0)
-                owner.CurrentBarrier += totalDealt * ShrapnelBarrierLeach;
         }
     }
 }

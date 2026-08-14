@@ -52,12 +52,12 @@
         /// <summary>The same on the other parameter â€” Armageddon reaching every target and waiting three
         /// turns longer for it. Stood in for by an upgrade of the same shape (a flat addition to the
         /// wait), because Armageddon itself has nothing to do with the question.</summary>
-        private const string CooldownSurcharge = "Ability_Arm_Augment_All_Targets";
+        private const string CooldownSurcharge = "Augment_Armageddon_All_Targets";
 
         /// <summary>How many augments the game holds after the collapse â€” the same number in the data
         /// and in the registry, because one half without the other is either an offer nothing builds
         /// or code nothing can reach.</summary>
-        private const int ShippedAugmentCount = 138;
+        private const int ShippedAugmentCount = 84;
 
         /// <summary>Every record the collapse of the base-contract families left behind, with the tier
         /// it was written at. All four claim the whole book, which is the widest reach in the system

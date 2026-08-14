@@ -27,43 +27,15 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class AbilityCommonParameterTests
     {
-        /// <summary>Two abilities that both declare <see cref="AbilityParameter.Duration"/> — a blessing
-        /// on the caster and a coating on his weapons. Nothing about the two is alike except the
-        /// concept, which is the point.</summary>
-        private const string BlessingId = "Ability_Ares_Blessing";
-        private const string CoatingId = "Ability_Poison_Coating";
-
-        /// <summary>Two abilities that both declare <see cref="AbilityParameter.Attacks"/>.</summary>
-        private const string LungeId = "Ability_Head_Butt";
-        private const string PressureId = "Ability_Increasing_Pressure";
-
-        /// <summary>A series whose count is a RANGE, so it declares no common count at all: the ability
-        /// an augment of attacks has to leave alone.</summary>
-        private const string SeriesId = "Ability_Series_Of_Attacks";
-
-        /// <summary>A cast that lays nothing on its caster, so it declares no buff duration: the ability
-        /// an augment of buff duration has to leave alone — including the poison duration it does carry,
-        /// which is a different concept under a different key.</summary>
-        private const string JarId = "Ability_Jar_Of_Poison";
-
         private const string ShroudId = "Ability_Dark_Shroud";
 
         /// <summary>The second ability that scales its buff, so the record below has both halves to
         /// deliver on it as well as on the shroud.</summary>
         private const string CalculationId = "Ability_Critical_Calculation";
 
-        private const string LongerBuff = "Augment_Buff_Duration";
-        private const string LongerBuffAgain = "Augment_Increased_Buff_Duration";
-        private const string ExtraLunge = "Augment_Additional_Lunges";
-
         /// <summary>The record that trades stacks for effectiveness — the one that has to arrive whole
         /// or not at all: half of it is a bill (two stacks fewer) and half is what pays for it.</summary>
         private const string StrongerFewer = "Augment_Add_Effectiveness_Reduce_Stacks";
-
-        /// <summary>The berserker, whose fury is a buff on its own caster like any other — and the
-        /// ability's own record, which SHORTENS that same buff.</summary>
-        private const string FuryId = "Ability_Berserk_Fury";
-        private const string ShorterFury = "Augment_Fury_Duration";
 
         /// <summary>The augment that puts Life-Giving Shade on the shroud's caster, and the record that
         /// raises how strongly what the shroud lays lands.</summary>
@@ -86,45 +58,6 @@ namespace LastBreathTest.BattleSystemTests
         private const float RecoveryBonus = 0.35f;
 
         [TestMethod]
-        public void OneRecordOnASharedKeyLengthensTheBuffOfEveryAbilityThatDeclaresIt()
-        {
-            // The claim the whole wave is for. The record was written beside Ares' Blessing and names no
-            // ability; both casts below buff their own caster for three turns and both say so under the
-            // same key, so one record is worth writing instead of one per ability.
-            Assert.AreEqual(4f, Wearing(BlessingId, LongerBuff)[AbilityParameter.Duration],
-                "the buff record stopped working on the ability it was written beside");
-            Assert.AreEqual(4f, Wearing(CoatingId, LongerBuff)[AbilityParameter.Duration],
-                "the buff record does nothing on the second ability that declares the concept");
-        }
-
-        [TestMethod]
-        public void OneRecordOnASharedKeyAddsALungeToEveryAbilityThatCountsItsAttacks()
-        {
-            Assert.AreEqual(2f, Wearing(LungeId, ExtraLunge)[AbilityParameter.Attacks],
-                "the extra-attack record stopped working on the ability it was written beside");
-            Assert.AreEqual(6f, Wearing(PressureId, ExtraLunge)[AbilityParameter.Attacks],
-                "the extra-attack record does nothing on the second ability that declares the concept");
-        }
-
-        [TestMethod]
-        public void ARecordOnASharedKeyLeavesAnAbilityThatNeverDeclaredTheConceptExactlyWhereItWas()
-        {
-            // The other half, and the one that used to go wrong: an augment reaches an ability by its
-            // tags, and a key that is a bare word ("Attacks", "Duration") would be found on an ability
-            // that meant something else by it. Declared rather than spelled, the concept is absent here
-            // and the record is inert — it does not reach into the numbers the ability does carry.
-            IAbility series = Wearing(SeriesId, ExtraLunge);
-
-            Assert.AreEqual(2f, series["MinAttacks"], "the attack record reached into the floor of a series it knows nothing about");
-            Assert.AreEqual(5f, series["MaxAttacks"], "the attack record reached into the ceiling of a series it knows nothing about");
-
-            IAbility jar = Wearing(JarId, LongerBuff);
-
-            Assert.AreEqual(3f, jar[AbilityParameter.PoisonDuration],
-                "the buff record lengthened a poison it was never offered for");
-        }
-
-        [TestMethod]
         public void TheRecordThatTradesStacksForEffectivenessDeliversBothHalvesOnEveryAbilityItReaches()
         {
             // A record made of a bill and what pays for it. Its tags seat it on both abilities that
@@ -141,41 +74,6 @@ namespace LastBreathTest.BattleSystemTests
                 Assert.AreEqual(bare[AbilityParameter.Effectiveness] + 0.35f, traded[AbilityParameter.Effectiveness],
                     $"'{StrongerFewer}' charges '{abilityId}' two stacks and hands back no effectiveness");
             }
-        }
-
-        [TestMethod]
-        public void ARecordThatShortensABuffAndOneThatLengthensItAreBothWorn()
-        {
-            // The berserker's fury is a buff on his own caster, so the book's "your buff lasts longer"
-            // reaches it — and lengthens the health it burns along with the series it grants. His own
-            // record pulls the same number the other way. Reaching for one number is not doing the same
-            // thing: told apart by the direction they leave it in, the two are two effects and the
-            // ability wears both. Read as one, the pair would silently drop whichever rolled lower.
-            IAbility bare = Wearing(FuryId);
-            IAbility longer = Wearing(FuryId, LongerBuff);
-            IAbility shorter = Wearing(FuryId, ShorterFury);
-            IAbility both = Wearing(FuryId, LongerBuff, ShorterFury);
-
-            Assert.AreEqual(bare[AbilityParameter.Duration] + 1f, longer[AbilityParameter.Duration],
-                "the buff record does not reach the fury, so the pair below proves nothing");
-            Assert.AreEqual(bare[AbilityParameter.Duration] - 1f, shorter[AbilityParameter.Duration],
-                "the ability's own record stopped shortening the fury");
-            Assert.AreEqual(bare[AbilityParameter.Duration], both[AbilityParameter.Duration],
-                "one of the two records was read as a weaker copy of the other and dropped");
-        }
-
-        [TestMethod]
-        public void TwoRecordsLengtheningOneBuffAreOneOfferAndOnlyTheBetterIsWorn()
-        {
-            // Two shipped records, written for two different abilities, both offering a longer buff.
-            // On the shared key they are the same offer and the ability wears the better of them — the
-            // rivalry rule reading a concept instead of a coincidence of spelling.
-            IAbility alone = Wearing(ShroudId, LongerBuff);
-            IAbility both = Wearing(ShroudId, LongerBuff, LongerBuffAgain);
-
-            Assert.AreEqual(4f, alone[AbilityParameter.Duration], "one record no longer lengthens the shroud at all");
-            Assert.AreEqual(alone[AbilityParameter.Duration], both[AbilityParameter.Duration],
-                "the two records that offer one longer buff were added up instead of the better one being worn");
         }
 
         [TestMethod]

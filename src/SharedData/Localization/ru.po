@@ -29,7 +29,6 @@ msgstr "Здоровье"
 msgid "CriticalChance"
 msgstr "Шанс критического удара"
 
-
 #. Critical damage multiplier
 msgid "CriticalDamage"
 msgstr "Критический урон"
@@ -37,7 +36,6 @@ msgstr "Критический урон"
 #. Additional hit chance
 msgid "AdditionalHitChance"
 msgstr "Шанс дополнительного удара"
-
 
 #. Dexterity attribute
 msgid "Dexterity"
@@ -59,11 +57,9 @@ msgstr "Броня"
 msgid "Evade"
 msgstr "Уклонение"
 
-
 #. Spell damage stat
 msgid "SpellDamage"
 msgstr "Урон от заклинаний"
-
 
 #. Suppression stat
 msgid "Suppress"
@@ -72,15 +68,9 @@ msgstr "Подавление"
 msgid "SuppressChance"
 msgstr "Шанс подавления"
 
-
 # ------------------------------
 
-
-
-
 # ------------------------------
-
-
 
 # -----------------------------
 # Item stats
@@ -88,28 +78,17 @@ msgstr "Шанс подавления"
 
 # Extra Health
 
-
 # Extra Armor
-
 
 # Extra Energy Barrier
 
-
 # Extra Evade
-
 
 # Extra Damage
 
-
 # Extra Suppress
 
-
 # Extra Spell Damage
-
-
-
-
-
 
 # ------------------------
 # Buttons
@@ -209,14 +188,9 @@ msgstr "Язык"
 msgid "SaveLoadLabel"
 msgstr "Сохранить/Загрузить"
 
-
 # ------------------------------
 # TODO: перевод (ключи добавлены автоматически)
 # ------------------------------
-
-
-
-
 
 msgid "Ability_Fireball"
 msgstr ""
@@ -224,15 +198,11 @@ msgstr ""
 msgid "Ability_Fireball_Description"
 msgstr ""
 
-
-
 msgid "Ability_Mana_Devour"
 msgstr ""
 
 msgid "Ability_Mana_Devour_Description"
 msgstr ""
-
-
 
 msgid "Amulet"
 msgstr ""
@@ -716,7 +686,6 @@ msgstr ""
 
 msgid "Context_Modifier_BleedDamageTakenReduction_Range"
 msgstr ""
-
 
 msgid "UI_Craft_Recipes"
 msgstr ""
@@ -1204,11 +1173,6 @@ msgstr ""
 msgid "Weapon"
 msgstr ""
 
-
-
-
-
-
 msgid "Log_Turn"
 msgstr ""
 
@@ -1301,7 +1265,6 @@ msgstr ""
 
 msgid "ManaRecovery"
 msgstr ""
-
 
 msgid "HealthRecovery"
 msgstr ""
@@ -1971,40 +1934,22 @@ msgstr "Стоимость оплачивается здоровьем вмес�
 # Ability upgrades — Intelligence stance
 # ------------------------------
 
-msgid "Ability_Is_Augment_Additional_Scales"
+msgid "Augment_Additional_Crit_Damage"
 msgstr ""
 
-msgid "Ability_Is_Augment_Additional_Scales_Description"
-msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} к скейлам урона."
-
-msgid "Ability_Is_Augment_Additional_Crit_Damage"
-msgstr ""
-
-msgid "Ability_Is_Augment_Additional_Crit_Damage_Description"
+msgid "Augment_Additional_Crit_Damage_Description"
 msgstr "+{amount:%} критического урона."
 
-msgid "Ability_Is_Augment_Additional_Crit_Chance"
+msgid "Augment_Additional_Crit_Chance"
 msgstr ""
 
-msgid "Ability_Is_Augment_Additional_Crit_Chance_Description"
+msgid "Augment_Additional_Crit_Chance_Description"
 msgstr "+{amount:%} шанса крита."
 
-msgid "Ability_Is_Augment_Barrier_From_Shrapnel"
+msgid "Augment_Overload_Mana_Step"
 msgstr ""
 
-msgid "Ability_Is_Augment_Barrier_From_Shrapnel_Description"
-msgstr "Восстанавливает {leachPercent:%} барьера от урона шрапнелью."
-
-msgid "Ability_Is_Augment_Apply_Fragility"
-msgstr ""
-
-msgid "Ability_Is_Augment_Apply_Fragility_Description"
-msgstr "Накладывает {@Effect_Fragility} ({duration|turn|turns}, до {maxStacks|stack|stacks}, +{critDamageAmp:%} получаемого крит-урона)."
-
-msgid "Ability_Ov_Augment_Mana_Step"
-msgstr ""
-
-msgid "Ability_Ov_Augment_Mana_Step_Description"
+msgid "Augment_Overload_Mana_Step_Description"
 msgstr "Шаг множителя меньше на {amount} маны."
 
 msgid "Augment_Random_Cooldown"
@@ -2013,22 +1958,16 @@ msgstr ""
 msgid "Augment_Random_Cooldown_Description"
 msgstr "Каст снижает перезарядку случайной способности на {amount}."
 
-msgid "Ability_Ov_Augment_Additional_Multiplier"
-msgstr ""
-
-msgid "Ability_Ov_Augment_Additional_Multiplier_Description"
-msgstr "+{amount:%} к множителю за шаг."
-
 msgid "Augment_Mana_Flow"
 msgstr ""
 
 msgid "Augment_Mana_Flow_Description"
 msgstr "Накладывает {@Effect_Mana_Flow} ({percentRegeneration:%} максимальной маны на {duration|turn|turns})."
 
-msgid "Ability_Ov_Augment_Stage4_Resets_Cooldown"
+msgid "Augment_Stage_Four_Resets_Cooldown"
 msgstr ""
 
-msgid "Ability_Ov_Augment_Stage4_Resets_Cooldown_Description"
+msgid "Augment_Stage_Four_Resets_Cooldown_Description"
 msgstr "Активация 4-й стадии сбрасывает перезарядку способности."
 
 msgid "Augment_Next_Cast_Pure"
@@ -2087,23 +2026,17 @@ msgstr ""
 msgid "Augment_Poison_On_Hit_Description"
 msgstr "Атаки накладывают стак яда на {poisonDuration|turn|turns}."
 
-msgid "Ability_SoA_Augment_Apply_Buff_Critical_Chance"
+msgid "Augment_Apply_Buff_Critical_Chance"
 msgstr ""
 
-msgid "Ability_SoA_Augment_Apply_Buff_Critical_Chance_Description"
+msgid "Augment_Apply_Buff_Critical_Chance_Description"
 msgstr "После {amountAttacks} успешных атак — +{criticalChance:%} шанса крита на {duration|turn|turns} (до {maxStacks|stack|stacks})."
 
-msgid "Ability_SoA_Augment_Apply_Buff_Critical_Damage"
+msgid "Augment_Apply_Buff_Critical_Damage"
 msgstr ""
 
-msgid "Ability_SoA_Augment_Apply_Buff_Critical_Damage_Description"
+msgid "Augment_Apply_Buff_Critical_Damage_Description"
 msgstr "После {amountAttacks} успешных атак — +{criticalDamage:%} критического урона на {duration|turn|turns} (до {maxStacks|stack|stacks})."
-
-msgid "Augment_Additional_Max_Attacks"
-msgstr ""
-
-msgid "Augment_Additional_Max_Attacks_Description"
-msgstr "+{maxAdditionalAttacks} к максимуму атак."
 
 msgid "Augment_More_Attack_Damage"
 msgstr ""
@@ -2183,59 +2116,11 @@ msgstr ""
 msgid "Ability_Ip_Augment_Unevadable_Description"
 msgstr "Серия больше не прерывается уклонением."
 
-msgid "Augment_Additional_Amount_Attacks"
-msgstr ""
-
-msgid "Augment_Additional_Amount_Attacks_Description"
-msgstr "+{amountAttacks} атаки."
-
-msgid "Augment_Additional_Damage_Multiplier"
-msgstr ""
-
-msgid "Augment_Additional_Damage_Multiplier_Description"
-msgstr "+{damageMultiplier:%} усиления за успешный удар."
-
-msgid "Ability_JoP_Augment_Bouncing"
-msgstr ""
-
-msgid "Ability_JoP_Augment_Bouncing_Description"
-msgstr "Банка прыгает между целями {bounces} раз."
-
-msgid "Augment_Transfer_Poison_On_Death"
-msgstr ""
-
-msgid "Augment_Transfer_Poison_On_Death_Description"
-msgstr "При смерти цели яд переносится на другого врага."
-
-msgid "Ability_JoP_Augment_All_Targets"
-msgstr ""
-
-msgid "Ability_JoP_Augment_All_Targets_Description"
-msgstr "Накладывает яд на всех врагов."
-
 msgid "Augment_Clumsy_Blows"
 msgstr "Неуклюжие удары"
 
 msgid "Augment_Clumsy_Blows_Description"
 msgstr "Каждая АТАКА накладывает стак {@Effect_Clumsiness} (-{value:%} уклонения, до {maxStacks|stack|stacks}, {duration|turn|turns})."
-
-msgid "Augment_Clumsiness"
-msgstr ""
-
-msgid "Augment_Clumsiness_Description"
-msgstr "Накладывает стак {@Effect_Clumsiness} (-{value:%} уклонения, до {maxStacks|stack|stacks}, {duration|turn|turns})."
-
-msgid "Augment_Apply_Blind"
-msgstr ""
-
-msgid "Augment_Apply_Blind_Description"
-msgstr "Накладывает стак {@Effect_Blind} (-{value:%} точности, до {maxStacks|stack|stacks}, {duration|turn|turns})."
-
-msgid "Augment_Apply_Weakness"
-msgstr ""
-
-msgid "Augment_Apply_Weakness_Description"
-msgstr "Накладывает стак {@Effect_Weakness} (-{value:%} урона, до {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Augment_Increasing_Scales"
 msgstr ""
@@ -2249,29 +2134,11 @@ msgstr ""
 msgid "Augment_Poison_Duration_Description"
 msgstr "+{poisonDuration|turn|turns} длительности яда."
 
-msgid "Ability_Ds_Augment_Additional_Attack_Chance"
-msgstr ""
-
-msgid "Ability_Ds_Augment_Additional_Attack_Chance_Description"
-msgstr "+{amount:%} шанса дополнительной атаки."
-
-msgid "Ability_Ds_Augment_Additional_Accuracy"
-msgstr ""
-
-msgid "Ability_Ds_Augment_Additional_Accuracy_Description"
-msgstr "+{amount:%} точности."
-
 msgid "Augment_Immortality"
 msgstr ""
 
 msgid "Augment_Immortality_Description"
 msgstr "Даёт Бессмертие на {duration|turn|turns} (аналог Эгиды жизни)."
-
-msgid "Ability_Ds_Augment_Mana_Regen"
-msgstr ""
-
-msgid "Ability_Ds_Augment_Mana_Regen_Description"
-msgstr "+{regenAmount:%} восстановления маны."
 
 msgid "Augment_Additional_Health_Regen"
 msgstr ""
@@ -2285,35 +2152,11 @@ msgstr ""
 msgid "Augment_Add_Effectiveness_Reduce_Stacks_Description"
 msgstr "+{additionalEffectiveness:%} эффективности, но -{amountStacks|stack|stacks}."
 
-msgid "Augment_Increased_Buff_Duration"
-msgstr ""
-
-msgid "Augment_Increased_Buff_Duration_Description"
-msgstr "+{duration|turn|turns} длительности бафа."
-
-msgid "Ability_Cc_Augment_Additional_Attack_Chance"
-msgstr ""
-
-msgid "Ability_Cc_Augment_Additional_Attack_Chance_Description"
-msgstr "Даёт шанс дополнительной атаки вместо шанса крита."
-
-msgid "Ability_Cc_Augment_Additional_Crit_Chance"
-msgstr ""
-
-msgid "Ability_Cc_Augment_Additional_Crit_Chance_Description"
-msgstr "+{criticalChance:%} шанса крита."
-
 msgid "Augment_Lucky_Crit"
 msgstr ""
 
 msgid "Augment_Lucky_Crit_Description"
 msgstr "Даёт {@Effect_Lucky_Crit_Chance} на {duration|turn|turns}."
-
-msgid "Augment_Additional_Crit_Multiplier"
-msgstr ""
-
-msgid "Augment_Additional_Crit_Multiplier_Description"
-msgstr "+{multiplier:%} крит-урона, растущего за каждый крит ({duration|turn|turns})."
 
 msgid "Augment_Leach_On_Crit"
 msgstr ""
@@ -2326,12 +2169,6 @@ msgstr ""
 
 msgid "Augment_Apply_Enhanced_Defence_Description"
 msgstr "Накладывает {@Effect_Enhance_Defense} ({duration|turn|turns}, до {stacks|stack|stacks}, {value:%})."
-
-msgid "Augment_More_Stacks_More_Cost"
-msgstr ""
-
-msgid "Augment_More_Stacks_More_Cost_Description"
-msgstr "+{stacks|stack|stacks}, +{cost} к стоимости."
 
 msgid "Augment_Apply_Seal_Of_Oblivion"
 msgstr ""
@@ -2351,98 +2188,68 @@ msgstr ""
 msgid "Ability_Pe_Augment_Spread_Poison_Description"
 msgstr "Распространяет яд на всех врагов."
 
-msgid "Ability_Pe_Augment_Poison_Not_Removed"
+msgid "Augment_Reduce_Execution_Threshold"
 msgstr ""
 
-msgid "Ability_Pe_Augment_Poison_Not_Removed_Description"
-msgstr "Наносит урон, не снимая яд."
-
-msgid "Augment_Reduce_Execution_Trahsold"
-msgstr ""
-
-msgid "Augment_Reduce_Execution_Trahsold_Description"
+msgid "Augment_Reduce_Execution_Threshold_Description"
 msgstr "-{amount} к порогу казни."
 
-msgid "Ability_Pe_Augment_Transfer_Poison_On_Death"
+msgid "Augment_Transfer_Poison_On_Death"
 msgstr ""
 
-msgid "Ability_Pe_Augment_Transfer_Poison_On_Death_Description"
+msgid "Augment_Transfer_Poison_On_Death_Description"
 msgstr "При смерти цели яд переносится на другого врага."
 
-msgid "Ability_Pe_Augment_Total_Damage_Multiplier"
+msgid "Augment_Attacks_Reduce_Incoming_Heal"
 msgstr ""
 
-msgid "Ability_Pe_Augment_Total_Damage_Multiplier_Description"
-msgstr "+{multiplier:%} итогового урона."
-
-msgid "Ability_Pc_Augment_Attacks_Reduce_Incoming_Heal"
-msgstr ""
-
-msgid "Ability_Pc_Augment_Attacks_Reduce_Incoming_Heal_Description"
+msgid "Augment_Attacks_Reduce_Incoming_Heal_Description"
 msgstr "Атаки накладывают -{reduceBy:%} получаемого лечения ({maxStacks|stack|stacks}, {duration|turn|turns})."
 
-msgid "Ability_Pc_Augment_Attacks_Reduce_Armor"
+msgid "Augment_Attacks_Reduce_Armor"
 msgstr ""
 
-msgid "Ability_Pc_Augment_Attacks_Reduce_Armor_Description"
+msgid "Augment_Attacks_Reduce_Armor_Description"
 msgstr "Атаки накладывают -{reduceArmorBy:%} брони (до {maxStacks|stack|stacks}, {duration|turn|turns})."
 
-msgid "Ability_Pc_Augment_Apply_Stack_For_Each_Enemy"
+msgid "Augment_Apply_Poison_For_Each_Enemy"
 msgstr ""
 
-msgid "Ability_Pc_Augment_Apply_Stack_For_Each_Enemy_Description"
+msgid "Augment_Apply_Poison_For_Each_Enemy_Description"
 msgstr "Накладывает стак яда за каждого врага на поле боя."
-
-msgid "Ability_Pc_Augment_Additional_Poison_Stack_Duration"
-msgstr ""
-
-msgid "Ability_Pc_Augment_Additional_Poison_Stack_Duration_Description"
-msgstr "+{additionalDuration|turn|turns} длительности накладываемого стака."
-
-msgid "Ability_Pc_Augment_Additional_Multiplier"
-msgstr ""
-
-msgid "Ability_Pc_Augment_Additional_Multiplier_Description"
-msgstr "+{multiplier:%} множителя яда."
-
-msgid "Ability_Pc_Augment_Increase_Duration"
-msgstr ""
-
-msgid "Ability_Pc_Augment_Increase_Duration_Description"
-msgstr "+{duration|turn|turns} длительности бафа."
 
 # ------------------------------
 # Ability upgrades — Strength stance
 # ------------------------------
 
-msgid "Ability_Arm_Augment_All_Targets"
+msgid "Augment_Armageddon_All_Targets"
 msgstr ""
 
-msgid "Ability_Arm_Augment_All_Targets_Description"
+msgid "Augment_Armageddon_All_Targets_Description"
 msgstr "Бьёт по всем врагам, но +{additionalCooldown} к перезарядке."
 
-msgid "Ability_Arm_Augment_Stage3_Burning"
+msgid "Augment_Armageddon_Burning"
 msgstr ""
 
-msgid "Ability_Arm_Augment_Stage3_Burning_Description"
+msgid "Augment_Armageddon_Burning_Description"
 msgstr "Стадия 3 накладывает {stacks} {stacks|stack|stacks} горения (×{damageMultiplier}, {duration|turn|turns})."
 
-msgid "Ability_Porc_Augment_Echo"
+msgid "Augment_Porcupine_Echo"
 msgstr ""
 
-msgid "Ability_Porc_Augment_Echo_Description"
+msgid "Augment_Porcupine_Echo_Description"
 msgstr "{delayedPercent:%} входящего урона откладывается на {turns|turn|turns}."
 
-msgid "Ability_Porc_Augment_Incoming_Reduction"
+msgid "Augment_Porcupine_Incoming_Damage_Reduction"
 msgstr ""
 
-msgid "Ability_Porc_Augment_Incoming_Reduction_Description"
+msgid "Augment_Porcupine_Incoming_Damage_Reduction_Description"
 msgstr "Весь входящий урон -{reduce:%}."
 
-msgid "Ability_Porc_Augment_Crit_Mitigation"
+msgid "Augment_Porcupine_Crit_Mitigation"
 msgstr ""
 
-msgid "Ability_Porc_Augment_Crit_Mitigation_Description"
+msgid "Augment_Porcupine_Crit_Mitigation_Description"
 msgstr "-{value:%} получаемого крит-урона."
 
 msgid "Augment_Heal_On_Hit"
@@ -2451,17 +2258,11 @@ msgstr ""
 msgid "Augment_Heal_On_Hit_Description"
 msgstr "Лечит на {amount:%} при получении удара."
 
-msgid "Augment_More_Armor_Return"
+msgid "Augment_More_Retaliation"
 msgstr ""
 
-msgid "Augment_More_Armor_Return_Description"
+msgid "Augment_More_Retaliation_Description"
 msgstr "+{amount:%} возврата от брони."
-
-msgid "Augment_More_Damage_Return"
-msgstr ""
-
-msgid "Augment_More_Damage_Return_Description"
-msgstr "+{amount:%} возврата урона."
 
 msgid "Augment_Cooldown_Chance"
 msgstr ""
@@ -2469,16 +2270,10 @@ msgstr ""
 msgid "Augment_Cooldown_Chance_Description"
 msgstr "{chance:%} шанс снизить перезарядку при получении удара."
 
-msgid "Ability_Porc_Augment_Armor_Buff"
+msgid "Augment_Heal_From_Empowered_Ability_Damage"
 msgstr ""
 
-msgid "Ability_Porc_Augment_Armor_Buff_Description"
-msgstr "+{value:%} брони."
-
-msgid "Augment_Heal_From_Damage"
-msgstr ""
-
-msgid "Augment_Heal_From_Damage_Description"
+msgid "Augment_Heal_From_Empowered_Ability_Damage_Description"
 msgstr "Лечит на {amount:%} урона следующей способности."
 
 msgid "Augment_Incoming_Reduction"
@@ -2487,71 +2282,41 @@ msgstr ""
 msgid "Augment_Incoming_Reduction_Description"
 msgstr "-{reduce:%} входящего урона на {duration|turn|turns}."
 
-msgid "Augment_Free_Cast"
+msgid "Augment_Empowered_Ability_Free_Cast"
 msgstr ""
 
-msgid "Augment_Free_Cast_Description"
+msgid "Augment_Empowered_Ability_Free_Cast_Description"
 msgstr "Следующая способность без перезарядки."
 
-msgid "Ability_Bf_Augment_Burning_Fury"
+msgid "Augment_Burning_Fury"
 msgstr ""
 
-msgid "Ability_Bf_Augment_Burning_Fury_Description"
+msgid "Augment_Burning_Fury_Description"
 msgstr "{@Effect_Fury} → {@Effect_Burning_Fury}: сожжённое HP также наносит урон ({burningDuration|turn|turns}, до {burningMaxStacks|stack|stacks})."
 
-msgid "Ability_Bf_Augment_Primal_Fury"
+msgid "Augment_Primal_Fury"
 msgstr ""
 
-msgid "Ability_Bf_Augment_Primal_Fury_Description"
+msgid "Augment_Primal_Fury_Description"
 msgstr "{@Effect_Fury} → Первобытная ярость (×{damageMultiplier} урона)."
 
-msgid "Ability_Bf_Augment_Healing_Fury"
+msgid "Augment_Healing_Fury"
 msgstr ""
 
-msgid "Ability_Bf_Augment_Healing_Fury_Description"
+msgid "Augment_Healing_Fury_Description"
 msgstr "{@Effect_Fury} → {@Effect_Healing_Fury}: лечит на {healAmount:%} сожжённого HP."
 
-msgid "Augment_More_Burn"
+msgid "Augment_Fury_More_Burn"
 msgstr ""
 
-msgid "Augment_More_Burn_Description"
+msgid "Augment_Fury_More_Burn_Description"
 msgstr "Атаки сжигают на {amount:%} больше HP."
 
-msgid "Augment_Less_Burn"
+msgid "Augment_Fury_Less_Burn"
 msgstr ""
 
-msgid "Augment_Less_Burn_Description"
+msgid "Augment_Fury_Less_Burn_Description"
 msgstr "Атаки сжигают на {amount:%} меньше HP."
-
-msgid "Augment_Fury_Duration"
-msgstr ""
-
-msgid "Augment_Fury_Duration_Description"
-msgstr "+{duration|turn|turns} длительности Ярости."
-
-msgid "Ability_Ar_Augment_Incoming_Reduction"
-msgstr ""
-
-msgid "Ability_Ar_Augment_Incoming_Reduction_Description"
-msgstr "-{reduce:%} входящего урона на время бафа."
-
-msgid "Ability_Ar_Augment_Turn_End_Heal"
-msgstr ""
-
-msgid "Ability_Ar_Augment_Turn_End_Heal_Description"
-msgstr "Восстанавливает {percentRegeneration:%} здоровья в конце хода."
-
-msgid "Ability_Ar_Augment_Damage_Buff"
-msgstr ""
-
-msgid "Ability_Ar_Augment_Damage_Buff_Description"
-msgstr "+{value:%} наносимого урона."
-
-msgid "Augment_Recovery_Bonus"
-msgstr ""
-
-msgid "Augment_Recovery_Bonus_Description"
-msgstr "+{recoveryBonus:%} восстановления здоровья."
 
 msgid "Augment_Health_Bonus"
 msgstr ""
@@ -2559,47 +2324,23 @@ msgstr ""
 msgid "Augment_Health_Bonus_Description"
 msgstr "+{healthBonus:%} максимального здоровья."
 
-msgid "Augment_Buff_Duration"
+msgid "Augment_Two_Attacks_Apply_Buff"
 msgstr ""
 
-msgid "Augment_Buff_Duration_Description"
-msgstr "+{duration|turn|turns} длительности бафа."
-
-msgid "Ability_Dst_Augment_Both_Hits_Buff"
-msgstr ""
-
-msgid "Ability_Dst_Augment_Both_Hits_Buff_Description"
+msgid "Augment_Two_Attacks_Apply_Buff_Description"
 msgstr "Обе атаки дают +{amount:%} урона на {duration|turn|turns}."
 
-msgid "Augment_Restore_On_Hit"
+msgid "Augment_Restore_Mana_Health_On_Hit"
 msgstr ""
 
-msgid "Augment_Restore_On_Hit_Description"
+msgid "Augment_Restore_Mana_Health_On_Hit_Description"
 msgstr "Первый удар восстанавливает {healthRestore:%} HP, второй — {manaRestore:%} маны."
 
-msgid "Ability_Dst_Augment_Accuracy"
+msgid "Augment_Accuracy"
 msgstr ""
 
-msgid "Ability_Dst_Augment_Accuracy_Description"
+msgid "Augment_Accuracy_Description"
 msgstr "+{amount:%} точности."
-
-msgid "Augment_Damage_Multiplier"
-msgstr ""
-
-msgid "Augment_Damage_Multiplier_Description"
-msgstr "+{amount:%} урона обеих атак."
-
-msgid "Augment_Additional_Lunges"
-msgstr ""
-
-msgid "Augment_Additional_Lunges_Description"
-msgstr "+{amount|lunge|lunges}."
-
-msgid "Ability_Hb_Augment_Additional_Scales"
-msgstr ""
-
-msgid "Ability_Hb_Augment_Additional_Scales_Description"
-msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} к скейлам."
 
 msgid "Augment_Extend_Stun_Add_Cost"
 msgstr ""
@@ -2607,10 +2348,10 @@ msgstr ""
 msgid "Augment_Extend_Stun_Add_Cost_Description"
 msgstr "+{stunDuration|turn|turns} оглушения, +{additionalCost} к стоимости."
 
-msgid "Ability_Hb_Augment_Armor_Debuff"
+msgid "Augment_Armor_Debuff_On_Hit"
 msgstr ""
 
-msgid "Ability_Hb_Augment_Armor_Debuff_Description"
+msgid "Augment_Armor_Debuff_On_Hit_Description"
 msgstr "Накладывает -{reduceBy:%} брони ({duration|turn|turns}, до {maxStacks|stack|stacks})."
 
 # ------------------------------
@@ -2928,78 +2669,48 @@ msgstr "На {Duration|turn|turns} атаки вешают на цель ста�
 
 # Апгрейды Глыбы льда
 
-msgid "Ability_Ib_Augment_Withering_Value"
+msgid "Augment_Stage_Four_Damage"
 msgstr ""
 
-msgid "Ability_Ib_Augment_Withering_Value_Description"
-msgstr "+{amount:%} к значению Проклятья увядания."
-
-msgid "Ability_Ib_Augment_Withering_Stacks"
-msgstr ""
-
-msgid "Ability_Ib_Augment_Withering_Stacks_Description"
-msgstr "+{amount|stack|stacks} к пределу Проклятья увядания."
-
-msgid "Ability_Ib_Augment_Extra_Block_Damage"
-msgstr ""
-
-msgid "Ability_Ib_Augment_Extra_Block_Damage_Description"
+msgid "Augment_Stage_Four_Damage_Description"
 msgstr "+{amount:%} урона дополнительных глыб."
 
-msgid "Ability_Ib_Augment_Heavy_Blocks"
+msgid "Augment_Reset_Chance"
 msgstr ""
 
-msgid "Ability_Ib_Augment_Heavy_Blocks_Description"
-msgstr "+{damage} базового урона, +{weaponDamageScale:%} / +{spellDamageScale:%} к скейлам."
-
-msgid "Ability_Ib_Augment_Reset_Chance"
-msgstr ""
-
-msgid "Ability_Ib_Augment_Reset_Chance_Description"
+msgid "Augment_Reset_Chance_Description"
 msgstr "{chance:%} шанс сбросить перезарядку."
 
-msgid "Ability_Ib_Augment_Random_Extra_Blocks"
+msgid "Augment_Ice_Blocks_Random_Extra_Blocks"
 msgstr ""
 
-msgid "Ability_Ib_Augment_Random_Extra_Blocks_Description"
+msgid "Augment_Ice_Blocks_Random_Extra_Blocks_Description"
 msgstr "Дополнительные глыбы падают на случайных противников."
 
-msgid "Ability_Ib_Augment_Consume_Stun"
+msgid "Augment_Ice_Blocks_Consume_Stun_Deal_Double_Damage"
 msgstr ""
 
-msgid "Ability_Ib_Augment_Consume_Stun_Description"
+msgid "Augment_Ice_Blocks_Consume_Stun_Deal_Double_Damage_Description"
 msgstr "Поглощает оглушение с цели и наносит двойной урон."
 
 # Апгрейды Глубокой заморозки
 
-msgid "Ability_Df_Augment_Frostbite_Duration"
+msgid "Augment_Spread_Freeze"
 msgstr ""
 
-msgid "Ability_Df_Augment_Frostbite_Duration_Description"
-msgstr "+{amount|turn|turns} длительности Обморожения."
-
-msgid "Ability_Df_Augment_Spread_Freeze"
-msgstr ""
-
-msgid "Ability_Df_Augment_Spread_Freeze_Description"
+msgid "Augment_Spread_Freeze_Description"
 msgstr "{chance:%} шанс заморозить также случайного противника."
 
-msgid "Ability_Df_Augment_Extend_Effects"
+msgid "Augment_Control_Extend_Effects"
 msgstr ""
 
-msgid "Ability_Df_Augment_Extend_Effects_Description"
+msgid "Augment_Control_Extend_Effects_Description"
 msgstr "Продлевает все эффекты на цели на 1 ход."
 
-msgid "Ability_Df_Augment_More_Shred"
+msgid "Augment_Freeze_Increase_Ability_Cooldown"
 msgstr ""
 
-msgid "Ability_Df_Augment_More_Shred_Description"
-msgstr "+{amount:%} к снижению сопротивления холоду."
-
-msgid "Ability_Df_Augment_Enemy_Cooldown"
-msgstr ""
-
-msgid "Ability_Df_Augment_Enemy_Cooldown_Description"
+msgid "Augment_Freeze_Increase_Ability_Cooldown_Description"
 msgstr "Следующая активированная способность цели получает +{amount} перезарядки."
 
 msgid "Augment_Reduce_All_Cooldowns"
@@ -3008,93 +2719,27 @@ msgstr ""
 msgid "Augment_Reduce_All_Cooldowns_Description"
 msgstr "Каст снижает перезарядку всех ваших способностей на {amount}."
 
-msgid "Ability_Df_Augment_Execute"
+msgid "Augment_Freezed_Target_Execute_On_Hit"
 msgstr ""
 
-msgid "Ability_Df_Augment_Execute_Description"
+msgid "Augment_Freezed_Target_Execute_On_Hit_Description"
 msgstr "Казнит цель со здоровьем ниже {threshold:%}."
 
 # Апгрейды Разряда
 
-msgid "Ability_Dis_Augment_Multiplier"
+msgid "Augment_Hits_Ignore_Resistances"
 msgstr ""
 
-msgid "Ability_Dis_Augment_Multiplier_Description"
-msgstr "+{amount} к множителю барьера."
-
-msgid "Ability_Dis_Augment_More_Restore"
-msgstr ""
-
-msgid "Ability_Dis_Augment_More_Restore_Description"
-msgstr "+{amount:%} барьера от нанесённого урона."
-
-msgid "Ability_Dis_Augment_More_Multiplier"
-msgstr ""
-
-msgid "Ability_Dis_Augment_More_Multiplier_Description"
-msgstr "+{amount} к множителю барьера."
-
-msgid "Ability_Dis_Augment_Spell_Scale"
-msgstr ""
-
-msgid "Ability_Dis_Augment_Spell_Scale_Description"
-msgstr "+{amount:%} к скейлу урона способностями."
-
-msgid "Ability_Dis_Augment_Overkill"
-msgstr ""
-
-msgid "Ability_Dis_Augment_Overkill_Description"
-msgstr "Избыточный урон переходит на случайного противника."
-
-msgid "Ability_Dis_Augment_Ignore_Resistances"
-msgstr ""
-
-msgid "Ability_Dis_Augment_Ignore_Resistances_Description"
+msgid "Augment_Hits_Ignore_Resistances_Description"
 msgstr "Удар игнорирует сопротивления цели."
 
-msgid "Ability_Dis_Augment_Consume_Mana"
+msgid "Augment_Consume_Mana"
 msgstr ""
 
-msgid "Ability_Dis_Augment_Consume_Mana_Description"
+msgid "Augment_Consume_Mana_Description"
 msgstr "Поглощает ману вместо барьера."
 
 # Апгрейды Статического доспеха
-
-msgid "Ability_Sa_Augment_Detonation_Scales"
-msgstr ""
-
-msgid "Ability_Sa_Augment_Detonation_Scales_Description"
-msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} к скейлам детонации."
-
-msgid "Ability_Sa_Augment_Buff_Duration"
-msgstr ""
-
-msgid "Ability_Sa_Augment_Buff_Duration_Description"
-msgstr "+{amount|turn|turns} длительности бафа."
-
-msgid "Ability_Sa_Augment_More_Splash"
-msgstr ""
-
-msgid "Ability_Sa_Augment_More_Splash_Description"
-msgstr "+{amount:%} урона по дополнительной цели."
-
-msgid "Ability_Sa_Augment_Less_Stacks"
-msgstr ""
-
-msgid "Ability_Sa_Augment_Less_Stacks_Description"
-msgstr "-{amount} к числу стаков для детонации."
-
-msgid "Ability_Sa_Augment_Overkill"
-msgstr ""
-
-msgid "Ability_Sa_Augment_Overkill_Description"
-msgstr "Избыточный урон детонации переходит на случайного противника."
-
-msgid "Ability_Sa_Augment_Ignore_Resistances"
-msgstr ""
-
-msgid "Ability_Sa_Augment_Ignore_Resistances_Description"
-msgstr "Детонации игнорируют сопротивления цели."
 
 msgid "Augment_Cost_Barrier"
 msgstr ""
@@ -3104,40 +2749,34 @@ msgstr "Способность поглощает барьер вместо ма
 
 # Новые апгрейды Осколков и Эгиды
 
-msgid "Ability_Is_Augment_Multicast"
+msgid "Augment_Multicast"
 msgstr ""
 
-msgid "Ability_Is_Augment_Multicast_Description"
+msgid "Augment_Multicast_Description"
 msgstr "+{amount:%} к шансу мультикаста этой способности."
 
-msgid "Ability_Is_Augment_Crit_Ignores_Cold_Res"
+msgid "Augment_Critical_Hit_Ignores_Cold_Res"
 msgstr ""
 
-msgid "Ability_Is_Augment_Crit_Ignores_Cold_Res_Description"
+msgid "Augment_Critical_Hit_Ignores_Cold_Res_Description"
 msgstr "Критические осколки игнорируют сопротивление цели к холоду."
 
-msgid "Ability_Ia_Augment_Reflect"
+msgid "Augment_Shield_Reflect_Damage"
 msgstr ""
 
-msgid "Ability_Ia_Augment_Reflect_Description"
+msgid "Augment_Shield_Reflect_Damage_Description"
 msgstr "Щит отражает {amount:%} поглощённого урона холодом."
 
-msgid "Ability_Ia_Augment_Stun_Attackers"
+msgid "Augment_Turn_End_Heal_Under_Shield"
 msgstr ""
 
-msgid "Ability_Ia_Augment_Stun_Attackers_Description"
-msgstr "{chance:%} шанс оглушить атакующего вместо Неповоротливости."
-
-msgid "Ability_Ia_Augment_Turn_End_Heal"
-msgstr ""
-
-msgid "Ability_Ia_Augment_Turn_End_Heal_Description"
+msgid "Augment_Turn_End_Heal_Under_Shield_Description"
 msgstr "Пока щит держится, восстанавливает {amount:%} максимального здоровья в конце каждого хода."
 
-msgid "Ability_Ia_Augment_Crit_Mitigation"
+msgid "Augment_Crit_Mitigation_Under_Shield"
 msgstr ""
 
-msgid "Ability_Ia_Augment_Crit_Mitigation_Description"
+msgid "Augment_Crit_Mitigation_Under_Shield_Description"
 msgstr "Получаемый критический урон снижен на {value:%}, пока щит держится."
 
 # ------------------------------
@@ -4004,3 +3643,4 @@ msgstr ""
 
 msgid "Dlg_Ronald_TrialPraiseLast_1"
 msgstr ""
+

@@ -50,7 +50,6 @@ namespace Battle.Source.Abilities.IceAegis
             public const string FreezeDuration = nameof(FreezeDuration);
             public const string ReflectPercent = nameof(ReflectPercent);
             public const string HealPerTurn = nameof(HealPerTurn);
-            public const string StunAttackersChance = nameof(StunAttackersChance);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
@@ -68,8 +67,6 @@ namespace Battle.Source.Abilities.IceAegis
             // Zero by default; upgrades raise them with decorators — the ability knows nothing about the upgrades
             parameters.RegisterDefault(Parameters.ReflectPercent, 0f);
             parameters.RegisterDefault(Parameters.HealPerTurn, 0f);
-            parameters.RegisterDefault(Parameters.StunAttackersChance, 0f);
-            parameters.RegisterDefault(AbilityParameter.StunDuration, 1);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new IceAegis(Data));
@@ -109,16 +106,10 @@ namespace Battle.Source.Abilities.IceAegis
                 .Apply(Laying(owner));
         }
 
-        /// <summary>Stage-3 payload for attackers: Clumsiness, or (with the L3 upgrade) a chance-rolled stun.</summary>
-        private IEffect CreateAttackerEffect()
-        {
-            float stunChance = this[Parameters.StunAttackersChance];
-            if (stunChance > 0 && CombatRandom.Rolls.RandFloat() <= stunChance)
-                return new StunEffect((int)this[AbilityParameter.StunDuration]);
-
-            return new Clumsiness(
+        /// <summary>Stage-3 payload for attackers: Clumsiness.</summary>
+        private IEffect CreateAttackerEffect() =>
+            new Clumsiness(
                 (int)this[Parameters.ClumsinessDuration], (int)this[AbilityParameter.Stacks], this[Parameters.ClumsinessValue]);
-        }
 
         /// <summary>Stage 4: the shattering of the barrier freezes the field. Nobody was aimed at and the
         /// freeze exists only because the aegis broke — splash. The reaction is the effect's, but the

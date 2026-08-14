@@ -49,13 +49,9 @@ namespace LastBreathTest.BattleSystemTests
         /// key the host never declared reads the record's own fallback and says nothing about it.</summary>
         private static readonly (string Record, string Property, string Key, string AbilityId)[] s_propertyRefs =
         [
-            ("Ability_Porc_Augment_Armor_Buff", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
-            ("Ability_Porc_Augment_Incoming_Reduction", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
-            ("Ability_Porc_Augment_Crit_Mitigation", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
-            ("Ability_Ar_Augment_Incoming_Reduction", "duration", AbilityParameter.Duration, "Ability_Ares_Blessing"),
-            ("Ability_Ar_Augment_Turn_End_Heal", "duration", AbilityParameter.Duration, "Ability_Ares_Blessing"),
-            ("Ability_Ar_Augment_Damage_Buff", "duration", AbilityParameter.Duration, "Ability_Ares_Blessing"),
-            ("Ability_Ia_Augment_Crit_Mitigation", "duration", AbilityParameter.Duration, "Ability_Ice_Aegis"),
+            ("Augment_Porcupine_Incoming_Damage_Reduction", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
+            ("Augment_Porcupine_Crit_Mitigation", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
+            ("Augment_Crit_Mitigation_Under_Shield", "duration", AbilityParameter.Duration, "Ability_Ice_Aegis"),
         ];
 
         [TestMethod]
@@ -93,31 +89,35 @@ namespace LastBreathTest.BattleSystemTests
             // the mechanism was measured to fail.
             using var rolls = new CombatRandomScope(new SteadyRoll());
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
-            const string BuffRecord = "Ability_Porc_Augment_Armor_Buff";
+            const string BuffRecord = "Augment_Porcupine_Incoming_Damage_Reduction";
             const string PorcupineId = "Ability_Porcupine";
 
             Ability bare = Seated(registry, catalog, PorcupineId, BuffRecord);
             int hostDuration = (int)bare[AbilityParameter.Duration];
-            Assert.AreEqual(hostDuration, await ArmorBuffTurns(bare),
+            Assert.AreEqual(hostDuration, await ReductionBuffTurns(bare),
                 "the buff was not laid for the host's own duration");
 
             // The other half: a longer buff on the ability has to be a longer buff in what it lays. The
             // record's own figure never moves, so this can only come from reading the decorated key.
-            Ability longer = Seated(registry, catalog, PorcupineId, BuffRecord, "Augment_Buff_Duration");
+            // No shipped record lengthens the shared duration since the catalog cleanup, so the key is
+            // decorated directly — the mechanism under test is the ref, not any particular record.
+            Ability longer = Seated(registry, catalog, PorcupineId, BuffRecord);
+            new AbilityAugmentParameterSet("Augment_Duration_Probe", [], 3,
+                [(AbilityParameter.Duration, OperationType.Add, 1f)]).Apply(longer);
 
-            Assert.AreEqual(hostDuration + 1, await ArmorBuffTurns(longer),
+            Assert.AreEqual(hostDuration + 1, await ReductionBuffTurns(longer),
                 "an augment lengthening the ability's buff was not felt by what the record lays");
         }
 
-        /// <summary>Turns the armor buff the porcupine laid on its caster came out with.</summary>
-        private static async Task<int> ArmorBuffTurns(Ability porcupine)
+        /// <summary>Turns the incoming-damage-reduction buff the porcupine laid on its caster came out with.</summary>
+        private static async Task<int> ReductionBuffTurns(Ability porcupine)
         {
             var owner = Fighter();
             porcupine.SetOwner(owner);
             await porcupine.Execute([owner], FieldOf(owner, Fighter()));
 
-            IEffect? buff = owner.Effects.Effects.FirstOrDefault(effect => effect.Id == "Effect_Armor_Buff");
-            Assert.IsNotNull(buff, "the porcupine laid no armor buff at all, so the turns below prove nothing");
+            IEffect? buff = owner.Effects.Effects.FirstOrDefault(effect => effect.Id == "Effect_Incoming_Damage_Reduction");
+            Assert.IsNotNull(buff, "the porcupine laid no reduction buff at all, so the turns below prove nothing");
 
             return buff.Duration;
         }
@@ -192,26 +192,28 @@ namespace LastBreathTest.BattleSystemTests
         public async Task TwoRecordsLayingOneEffectAreTwoStreamsOfStacks()
         {
             // The axis a rider is deduplicated on is the RECORD, not the effect it lays: two records
-            // that happen to lay the same effect are two purchases and both work. Written down because
-            // the axis changed with the registry and the pair below is the first to feel it.
+            // that happen to lay the same effect are two purchases and both work. The shipped twin of
+            // the codeless record died in the catalog cleanup, so the second purchase is the same
+            // record under a second id — the axis itself is what is measured.
             using var rolls = new CombatRandomScope(new SteadyRoll());
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             var owner = Fighter();
-            var alone = Fighter();
-            var both = Fighter();
+            var target = Fighter();
 
-            Ability one = Seated(registry, catalog, "Ability_Jar_Of_Poison", "Augment_Clumsiness");
-            one.SetOwner(owner);
-            await one.Execute([alone], FieldOf(owner, alone));
+            var ability = (Ability)registry.CreateAbility("Ability_Series_Of_Attacks");
+            IAbilityAugment? first = registry.CreateUpgrade(Shipped(Codeless));
+            IAbilityAugment? second = registry.CreateUpgrade(Shipped(Codeless) with { Id = "Augment_Clumsy_Blows_Twin" });
+            Assert.IsNotNull(first, $"the registry builds nothing for '{Codeless}'");
+            Assert.IsNotNull(second, "the registry builds nothing for the twin of the codeless record");
+            ability.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_0"] = first, ["socket_1"] = second });
+            ability.SetOwner(owner);
 
-            Ability pair = Seated(registry, catalog, "Ability_Jar_Of_Poison", "Augment_Clumsiness", Codeless);
-            pair.SetOwner(owner);
-            await pair.Execute([both], FieldOf(owner, both));
+            Assert.AreEqual(2, ability.ImpactRiders.Count, "two records laying one effect were deduplicated into one rider");
 
-            Assert.IsTrue(Stacks(alone, ClumsinessId) > 0, "the jar's own record laid nothing, so the pair proves nothing");
-            Assert.AreEqual(Stacks(alone, ClumsinessId), Stacks(both, ClumsinessId),
-                "the second record laid a stack on a hit it was never written for");
-            Assert.AreEqual(2, pair.ImpactRiders.Count, "two records laying one effect were deduplicated into one rider");
+            await ability.ApplyImpactRiders(new AbilityImpact(owner, target, FieldOf(owner, target)) { Source = ability, Kind = ImpactKind.Attack });
+
+            Assert.AreEqual(2, Stacks(target, ClumsinessId),
+                "two records laying one effect did not come out as two stacks on one touch");
         }
 
         private const string ClumsinessId = "Effect_Clumsiness";

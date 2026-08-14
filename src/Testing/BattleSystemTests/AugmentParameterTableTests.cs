@@ -26,7 +26,7 @@ namespace LastBreathTest.BattleSystemTests
     public class AugmentParameterTableTests
     {
         /// <summary>How many records the table took over from a class of their own.</summary>
-        private const int TranslatedRecords = 51;
+        private const int TranslatedRecords = 24;
 
         /// <summary>Two bases every move is measured on. One of them has to be something other than
         /// nothing: an override and an addition are the same number on a base of zero, and a walk that
@@ -38,86 +38,48 @@ namespace LastBreathTest.BattleSystemTests
         /// carries and what the augment falls back to when a record carries nothing.</summary>
         private static readonly (string Augment, string Parameter, OperationType Operation, float Amount)[] s_moves =
         [
-            ("Augment_Additional_Max_Attacks", "MaxAttacks", OperationType.Add, 3f),
             ("Augment_More_Attack_Damage", "DamageMultiplier", OperationType.Add, 0.15f),
             ("Augment_Additional_Attacks", "MinAttacks", OperationType.Add, 1f),
             ("Augment_Additional_Attacks", "MaxAttacks", OperationType.Add, 1f),
-
-            ("Augment_Additional_Amount_Attacks", "Attacks", OperationType.Add, 2f),
-            ("Augment_Additional_Damage_Multiplier", "AttackDamageStepMultiplier", OperationType.Add, 0.05f),
 
             ("Augment_Increasing_Scales", "WeaponDamageScale", OperationType.Add, 0.6f),
             ("Augment_Increasing_Scales", "SpellDamageScale", OperationType.Add, 0.85f),
             ("Augment_Poison_Duration", "PoisonDuration", OperationType.Add, 1f),
 
-            ("Ability_Ov_Augment_Mana_Step", "ManaPerStep", OperationType.Subtract, 1.5f),
-            ("Ability_Ov_Augment_Additional_Multiplier", "DamagePerStep", OperationType.Add, 0.02f),
+            ("Augment_Overload_Mana_Step", "ManaPerStep", OperationType.Subtract, 1.5f),
 
             ("Augment_Cooldown_Chance", "CooldownReduceChance", OperationType.Add, 0.15f),
             ("Augment_Heal_On_Hit", "HealOnHit", OperationType.Add, 0.07f),
-            ("Augment_More_Armor_Return", "ArmorReturn", OperationType.Add, 0.15f),
-            ("Augment_More_Damage_Return", "DamageReturn", OperationType.Add, 0.20f),
+            ("Augment_More_Retaliation", "ArmorReturn", OperationType.Add, 0.15f),
 
-            ("Augment_Heal_From_Damage", "HealPercent", OperationType.Add, 0.15f),
+            ("Augment_Heal_From_Empowered_Ability_Damage", "HealPercent", OperationType.Add, 0.15f),
 
-            ("Augment_Fury_Duration", "Duration", OperationType.Subtract, 1f),
-            ("Augment_More_Burn", "FuryHealthPercent", OperationType.Add, 0.035f),
-            ("Augment_Less_Burn", "FuryHealthPercent", OperationType.Subtract, 0.02f),
+            ("Augment_Fury_More_Burn", "FuryHealthPercent", OperationType.Add, 0.035f),
+            ("Augment_Fury_Less_Burn", "FuryHealthPercent", OperationType.Subtract, 0.02f),
 
-            ("Augment_Buff_Duration", "Duration", OperationType.Add, 1f),
-            ("Augment_Recovery_Bonus", "RecoveryBonus", OperationType.Add, 0.15f),
             ("Augment_Health_Bonus", "HealthBonus", OperationType.Add, 0.15f),
 
-            ("Augment_Damage_Multiplier", "DamageMultiplier", OperationType.Add, 0.25f),
-            ("Augment_Restore_On_Hit", "HealthRestore", OperationType.Add, 0.07f),
-            ("Augment_Restore_On_Hit", "ManaRestore", OperationType.Add, 0.07f),
+            ("Augment_Restore_Mana_Health_On_Hit", "HealthRestore", OperationType.Add, 0.07f),
+            ("Augment_Restore_Mana_Health_On_Hit", "ManaRestore", OperationType.Add, 0.07f),
 
-            ("Ability_Hb_Augment_Additional_Scales", "WeaponDamageScale", OperationType.Add, 0.15f),
-            ("Ability_Hb_Augment_Additional_Scales", "SpellDamageScale", OperationType.Add, 0.15f),
             ("Augment_Extend_Stun_Add_Cost", "StunDuration", OperationType.Add, 1f),
             ("Augment_Extend_Stun_Add_Cost", "CostValue", OperationType.Add, 50f),
-            ("Augment_Additional_Lunges", "Attacks", OperationType.Add, 1f),
-
-            ("Augment_More_Stacks_More_Cost", "Stacks", OperationType.Add, 1f),
-            ("Augment_More_Stacks_More_Cost", "CostValue", OperationType.Add, 50f),
 
             ("Augment_Additional_Health_Regen", "HealthRegen", OperationType.Add, 0.025f),
             ("Augment_Add_Effectiveness_Reduce_Stacks", "Effectiveness", OperationType.Add, 0.35f),
             ("Augment_Add_Effectiveness_Reduce_Stacks", "Stacks", OperationType.Subtract, 2f),
-            ("Augment_Increased_Buff_Duration", "Duration", OperationType.Add, 1f),
 
-            ("Augment_Reduce_Execution_Trahsold", "ExecutionThreshold", OperationType.Subtract, 5f),
+            ("Augment_Reduce_Execution_Threshold", "ExecutionThreshold", OperationType.Subtract, 5f),
 
             ("Augment_Additional_Projectiles", "ProjectileCount", OperationType.Add, 2f),
             ("Augment_Buff_Effectiveness", "Effectiveness", OperationType.Add, 0.25f),
             ("Augment_Recovery_Effectiveness", "Effectiveness", OperationType.Add, 0.35f),
             ("Augment_Debuff_Effectiveness", "Effectiveness", OperationType.Add, 0.25f),
 
-            ("Ability_Is_Augment_Additional_Scales", "WeaponDamageScale", OperationType.Add, 0.05f),
-            ("Ability_Is_Augment_Additional_Scales", "SpellDamageScale", OperationType.Add, 0.15f),
-            ("Ability_Is_Augment_Additional_Crit_Damage", "CriticalDamageBonus", OperationType.Add, 0.75f),
-            ("Ability_Is_Augment_Additional_Crit_Chance", "CriticalChanceBonus", OperationType.Add, 0.35f),
+            ("Augment_Additional_Crit_Damage", "CriticalDamageBonus", OperationType.Add, 0.75f),
+            ("Augment_Additional_Crit_Chance", "CriticalChanceBonus", OperationType.Add, 0.35f),
 
-            ("Ability_Ib_Augment_Withering_Value", "WitheringValue", OperationType.Add, 0.05f),
-            ("Ability_Ib_Augment_Withering_Stacks", "Stacks", OperationType.Add, 1f),
-            ("Ability_Ib_Augment_Extra_Block_Damage", "ExtraBlockDamagePercent", OperationType.Add, 0.25f),
-            ("Ability_Ib_Augment_Heavy_Blocks", "Damage", OperationType.Add, 150f),
-            ("Ability_Ib_Augment_Heavy_Blocks", "WeaponDamageScale", OperationType.Add, 0.15f),
-            ("Ability_Ib_Augment_Heavy_Blocks", "SpellDamageScale", OperationType.Add, 0.45f),
-
-            ("Ability_Df_Augment_Frostbite_Duration", "FrostbiteDuration", OperationType.Add, 1f),
-            ("Ability_Df_Augment_More_Shred", "ColdResistanceShred", OperationType.Add, 0.15f),
-
-            ("Ability_Dis_Augment_Multiplier", "BarrierMultiplier", OperationType.Add, 0.5f),
-            ("Ability_Dis_Augment_More_Multiplier", "BarrierMultiplier", OperationType.Add, 1f),
-            ("Ability_Dis_Augment_More_Restore", "StageThreeBarrierRestore", OperationType.Add, 0.25f),
-            ("Ability_Dis_Augment_Spell_Scale", "SpellDamageScale", OperationType.Add, 0.35f),
-
-            ("Ability_Sa_Augment_Detonation_Scales", "DetonationWeaponScale", OperationType.Add, 0.25f),
-            ("Ability_Sa_Augment_Detonation_Scales", "DetonationSpellScale", OperationType.Add, 0.35f),
-            ("Ability_Sa_Augment_Buff_Duration", "Duration", OperationType.Add, 1f),
-            ("Ability_Sa_Augment_More_Splash", "StageThreeSplashDamage", OperationType.Add, 0.5f),
-            ("Ability_Sa_Augment_Less_Stacks", "RequiredStacks", OperationType.Subtract, 1f)
+            ("Augment_Stage_Four_Damage", "ExtraBlockDamagePercent", OperationType.Add, 0.25f)
         ];
 
         [TestMethod]

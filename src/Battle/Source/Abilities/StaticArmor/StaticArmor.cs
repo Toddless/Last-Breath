@@ -29,12 +29,6 @@ namespace Battle.Source.Abilities.StaticArmor
     /// </summary>
     public class StaticArmor(AbilityBaseData data) : MulticastAbility<StaticArmorPlan>(data)
     {
-        /// <summary>L3 upgrade point: detonations ignore elemental resistances.</summary>
-        public bool IgnoreResistances { get; set; }
-
-        /// <summary>L3 upgrade point: detonation overkill jumps to a random other enemy.</summary>
-        public bool OverkillToRandom { get; set; }
-
         public static class Parameters
         {
             public const string DetonationDamage = nameof(DetonationDamage);
@@ -68,11 +62,7 @@ namespace Battle.Source.Abilities.StaticArmor
             parameters.RegisterDefault(Parameters.StageThreeSplashDamage, 0.5f);
         }
 
-        public override IAbility Copy() => CopyUpgradesTo(new StaticArmor(Data)
-        {
-            IgnoreResistances = IgnoreResistances,
-            OverkillToRandom = OverkillToRandom
-        });
+        public override IAbility Copy() => CopyUpgradesTo(new StaticArmor(Data));
 
         protected override StaticArmorPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field) =>
             new()
@@ -112,9 +102,7 @@ namespace Battle.Source.Abilities.StaticArmor
                 ChargeDuration: plan.ChargeDuration,
                 BarrierRestorePercent: plan.BarrierRestorePercent,
                 SplashPercent: plan.SplashPercent,
-                ApplyOnHitTaken: plan.ApplyOnHitTaken,
-                IgnoreResistances: IgnoreResistances,
-                OverkillToRandom: OverkillToRandom);
+                ApplyOnHitTaken: plan.ApplyOnHitTaken);
 
             await new StaticArmorEffect(plan.Duration, settings, field)
                 .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });

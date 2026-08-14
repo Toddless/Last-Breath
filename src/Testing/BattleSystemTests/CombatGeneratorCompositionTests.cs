@@ -364,9 +364,7 @@ namespace LastBreathTest.BattleSystemTests
             ChargeDuration: 2,
             BarrierRestorePercent: 0f,
             SplashPercent: 0.5f,
-            ApplyOnHitTaken: false,
-            IgnoreResistances: false,
-            OverkillToRandom: false);
+            ApplyOnHitTaken: false);
 
         private static AbilityBaseData Data(string id = "Ability_Test_Delivery") => new() { Id = id };
 

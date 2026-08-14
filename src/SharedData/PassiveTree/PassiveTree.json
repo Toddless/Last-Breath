@@ -7641,7 +7641,7 @@
             "abilityId": "Ability_Ares_Blessing"
         },
         {
-            "id": "sockettier2_Armagedonn",
+            "id": "sockettier2_Armageddon",
             "kind": "SocketTier2",
             "stance": "Strength",
             "x": 23.0,
@@ -10220,7 +10220,7 @@
         },
         {
             "from": "small_strength_19",
-            "to": "sockettier2_Armagedonn"
+            "to": "sockettier2_Armageddon"
         },
         {
             "from": "small_strength_2",

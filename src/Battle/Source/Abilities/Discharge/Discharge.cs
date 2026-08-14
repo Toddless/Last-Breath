@@ -28,9 +28,6 @@ namespace Battle.Source.Abilities.Discharge
         /// <summary>L3 upgrade point: the strike ignores elemental resistances.</summary>
         public bool AlwaysIgnoreResistances { get; set; }
 
-        /// <summary>L3 upgrade point: overkill damage jumps to a random other enemy.</summary>
-        public bool OverkillToRandom { get; set; }
-
         /// <summary>L3 upgrade point: the cast consumes MANA instead of barrier.</summary>
         public bool ConsumeManaInstead { get; set; }
 
@@ -56,7 +53,6 @@ namespace Battle.Source.Abilities.Discharge
         public override IAbility Copy() => CopyUpgradesTo(new Discharge(Data)
         {
             AlwaysIgnoreResistances = AlwaysIgnoreResistances,
-            OverkillToRandom = OverkillToRandom,
             ConsumeManaInstead = ConsumeManaInstead
         });
 
@@ -95,13 +91,9 @@ namespace Battle.Source.Abilities.Discharge
 
             foreach (IFightable target in plan.Targets.Where(t => t.IsAlive).ToList())
             {
-                float healthBefore = target.CurrentHealth;
-                float barrierBefore = target.CurrentBarrier;
-
                 var hit = await DealPlanDamage(plan, owner, target);
                 if (plan.BarrierRestorePercent > 0)
                     owner.CurrentBarrier += hit.Damage * plan.BarrierRestorePercent;
-                await TrySplashOverkill(plan, owner, field, target, hit.Damage, healthBefore + barrierBefore);
 
                 await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage)
                 {
@@ -123,35 +115,6 @@ namespace Battle.Source.Abilities.Discharge
             float barrier = owner.CurrentBarrier;
             owner.CurrentBarrier = 0;
             return barrier;
-        }
-
-        /// <summary>L3 upgrade: whatever exceeded the victim's remaining pool jumps to a random other enemy.
-        /// Nobody aimed the leap and it exists only because the strike had already landed — splash by the
-        /// letter of the dictionary, and its victim is a touched target like any other.</summary>
-        private async Task TrySplashOverkill(DischargePlan plan, IFightable owner, IBattleField field, IFightable victim, float dealt, float victimPool)
-        {
-            if (!OverkillToRandom || victim.IsAlive) return;
-            float overkill = dealt - victimPool;
-            if (overkill <= 0) return;
-
-            var others = field.GetEnemies(owner).Where(enemy => enemy.IsAlive && !enemy.IsSame(victim.InstanceId)).ToList();
-            if (others.Count == 0) return;
-
-            var context = new DamageContext
-            {
-                Source = owner,
-                Cause = DamageCause.Ability,
-                CastId = CastId,
-                IgnoreResistances = plan.IgnoreResistances
-            };
-            context.Add(plan.DamageType, overkill);
-            IFightable neighbour = others[CombatRandom.Rolls.RandIntRange(0, others.Count - 1)];
-            await neighbour.TakeDamage(context);
-            await ApplyImpactRiders(new AbilityImpact(owner, neighbour, field, Succeeded: true, IsCritical: false, context.TotalDamage)
-            {
-                Source = this,
-                Kind = ImpactKind.Splash
-            });
         }
     }
 }
