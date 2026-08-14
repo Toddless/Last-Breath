@@ -36,6 +36,20 @@ namespace LastBreathTest.BattleSystemTests
             return catalog;
         }
 
+        /// <summary>The ability registry over a catalog a test wrote, through the real loader — for
+        /// walks that need to build the shipped abilities from DOCTORED data.</summary>
+        internal static AbilityProvider AbilitiesOver(string json)
+        {
+            string root = Directory.CreateTempSubdirectory("abilities_").FullName;
+            Directory.CreateDirectory(Path.Combine(root, DataCatalog.Abilities));
+            File.WriteAllText(Path.Combine(root, DataCatalog.Abilities, "Abilities.json"), json);
+            CopyCatalog(DataCatalog.Effects, root);
+
+            AbilityProvider abilities = LoadFrom(root).Abilities;
+            Directory.Delete(root, recursive: true);
+            return abilities;
+        }
+
         /// <summary>Puts a shipped catalog beside a catalog a test wrote. The loader reads every catalog
         /// its participants declare, and a root missing one fails the load rather than skipping it.</summary>
         private static void CopyCatalog(string catalog, string root)

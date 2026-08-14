@@ -101,6 +101,28 @@ namespace LastBreathTest.BattleSystemTests
         /// </summary>
         private static readonly (string Augment, string Parameter, string[] Works, string[] Inert)[] s_reach =
         [
+            // Generalised at CL-4 from Ares Blessing's private key. It reaches by "health" and "buff",
+            // and Ares is the only ability in the book that raises a health CEILING — the rest of the
+            // reach is legal silence until a second health-buffer declares the key.
+            ("Augment_Health_Bonus", AbilityParameter.HealthBonus,
+                ["Ability_Ares_Blessing"],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
+                 "Ability_Ice_Aegis", "Ability_Overload", "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Sacrifice"]),
+
+            // Generalised at CL-4; the abilityId that used to keep it off strangers came off with it.
+            // Two owners now — the Shroud's per-turn heal and the Aegis's heal-under-shield, which had
+            // been the same concept under two private names.
+            ("Augment_Additional_Health_Regen", AbilityParameter.HealthRegeneration,
+                ["Ability_Dark_Shroud"],
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Discharge",
+                 "Ability_Sacrifice", "Ability_Static_Armor"]),
+
+            // Generalised at CL-4. One owner and no second one in sight: the Deep Freeze execute is a
+            // share of health against a stack COUNT, so it stays on a key of its own.
+            ("Augment_Reduce_Execution_Threshold", AbilityParameter.ExecutionThreshold,
+                ["Ability_Poison_Explosion"],
+                []),
+
             // Deep Freeze joined the inert list at the owner's re-markup: its doc hands it "damage"
             // while the ability itself carries no damage numbers yet (code catches up in CL-3).
             ("Augment_More_Attack_Damage", AbilityParameter.DamageMultiplier,

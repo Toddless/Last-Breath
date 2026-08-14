@@ -94,7 +94,7 @@ namespace Battle.Source.Abilities
             // Ares Blessing
             ["Augment_Health_Bonus"] =
             [
-                new(AresBlessing.AresBlessing.Parameters.HealthBonus, OperationType.Add, "healthBonus", 0.15f)
+                new(AbilityParameter.HealthBonus, OperationType.Add, "healthBonus", 0.15f)
             ],
 
             // Double Strike
@@ -114,7 +114,7 @@ namespace Battle.Source.Abilities
             // Dark Shroud
             ["Augment_Additional_Health_Regen"] =
             [
-                new(DarkShroud.DarkShroud.Parameters.HealthRegen, OperationType.Add, "additionalRegen", 0.025f)
+                new(AbilityParameter.HealthRegeneration, OperationType.Add, "additionalRegen", 0.025f)
             ],
             ["Augment_Add_Effectiveness_Reduce_Stacks"] =
             [
@@ -141,11 +141,6 @@ namespace Battle.Source.Abilities
             ],
 
             // Poison Explosion
-            ["Augment_Reduce_Execution_Threshold"] =
-            [
-                new(PoisonExplosion.PoisonExplosion.Parameters.ExecutionThreshold, OperationType.Subtract, "amount", 5f)
-            ],
-
             // Ice Shards
             ["Augment_Additional_Projectiles"] =
             [

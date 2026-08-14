@@ -2836,7 +2836,7 @@ msgid "Augment_Immortality_Description"
 msgstr "Grants Immortality for {duration|turn|turns} (an analog of Life Aegis)."
 
 msgid "Augment_Additional_Health_Regen"
-msgstr "Additional Health Regen"
+msgstr "Regeneration"
 
 msgid "Augment_Additional_Health_Regen_Description"
 msgstr "+{additionalRegen:%} health regeneration."
@@ -2887,7 +2887,7 @@ msgid "Augment_Reduce_Execution_Threshold"
 msgstr "Reduce Execution Threshold"
 
 msgid "Augment_Reduce_Execution_Threshold_Description"
-msgstr "-{amount} to the execution threshold."
+msgstr "-{share:%} to the execution threshold."
 
 msgid "Augment_Transfer_Poison_On_Death"
 msgstr "Transfer Poison On Death"

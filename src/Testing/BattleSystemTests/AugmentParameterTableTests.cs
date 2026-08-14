@@ -25,8 +25,10 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class AugmentParameterTableTests
     {
-        /// <summary>How many records the table took over from a class of their own.</summary>
-        private const int TranslatedRecords = 24;
+        /// <summary>How many records the table took over from a class of their own. One left at CL-4b:
+        /// the execution threshold became a SHARE of the number it moves, and a share is measured
+        /// against the base rather than written as a figure — which is a factory, not a table row.</summary>
+        private const int TranslatedRecords = 23;
 
         /// <summary>Two bases every move is measured on. One of them has to be something other than
         /// nothing: an override and an addition are the same number on a base of zero, and a walk that
@@ -65,11 +67,10 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Extend_Stun_Add_Cost", "StunDuration", OperationType.Add, 1f),
             ("Augment_Extend_Stun_Add_Cost", "CostValue", OperationType.Add, 50f),
 
-            ("Augment_Additional_Health_Regen", "HealthRegen", OperationType.Add, 0.025f),
+            ("Augment_Additional_Health_Regen", "HealthRegeneration", OperationType.Add, 0.025f),
             ("Augment_Add_Effectiveness_Reduce_Stacks", "Effectiveness", OperationType.Add, 0.35f),
             ("Augment_Add_Effectiveness_Reduce_Stacks", "Stacks", OperationType.Subtract, 2f),
 
-            ("Augment_Reduce_Execution_Threshold", "ExecutionThreshold", OperationType.Subtract, 5f),
 
             ("Augment_Additional_Projectiles", "ProjectileCount", OperationType.Add, 2f),
             ("Augment_Buff_Effectiveness", "Effectiveness", OperationType.Add, 0.25f),

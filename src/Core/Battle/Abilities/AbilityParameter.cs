@@ -73,6 +73,19 @@ namespace Core.Battle.Abilities
         /// barrier.</summary>
         public const string ShieldStrength = nameof(ShieldStrength);
 
+        /// <summary>The share of MAXIMUM HEALTH a cast's buff adds while it stands. A ceiling, not a
+        /// heal: what it moves is how much health the bearer has room for.</summary>
+        public const string HealthBonus = nameof(HealthBonus);
+
+        /// <summary>The share of maximum health what a cast lays gives back each turn. A rate over turns,
+        /// which is what separates it from a one-off restore and from <see cref="HealthBonus"/>.</summary>
+        public const string HealthRegeneration = nameof(HealthRegeneration);
+
+        /// <summary>Where a cast's execute starts killing outright. The UNIT belongs to the ability —
+        /// poison stacks for one, a share of health for another — and one number cannot be both, so an
+        /// ability whose execute is measured differently keeps its own key rather than joining this one.</summary>
+        public const string ExecutionThreshold = nameof(ExecutionThreshold);
+
         /// <summary>The shortest wait a SHARE-shaped cut of the cooldown may leave; flat cuts written into
         /// an ability's own upgrade pass it deliberately. It holds a reduction back and never raises a
         /// number the data did not ask for, so an instant cast stays instant.</summary>

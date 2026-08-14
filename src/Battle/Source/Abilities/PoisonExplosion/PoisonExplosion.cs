@@ -24,22 +24,17 @@ namespace Battle.Source.Abilities.PoisonExplosion
             ExecuteCondition = new PoisonStackExecuteCondition(() => ExecutionThreshold);
         }
 
-        public int ExecutionThreshold => (int)this[Parameters.ExecutionThreshold];
+        public int ExecutionThreshold => (int)this[AbilityParameter.ExecutionThreshold];
         public float DamageMultiplier => this[AbilityParameter.DamageMultiplier];
 
         public IPoisonSpreadMode? SpreadMode { get; set; }
         public IExecuteCondition? ExecuteCondition { get; set; }
 
-        public static class Parameters
-        {
-            public const string ExecutionThreshold = nameof(ExecutionThreshold);
-        }
-
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.DamageMultiplier, 0f);
-            parameters.RegisterDefault(Parameters.ExecutionThreshold, 42);
+            parameters.RegisterDefault(AbilityParameter.ExecutionThreshold, 42);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new PoisonExplosion(Data));

@@ -58,7 +58,7 @@
                 "duration": 3,
                 "effectiveness": 1,
                 "stacks": 4,
-                "healthRegen": 0.05,
+                "healthRegeneration": 0.05,
                 "lightStepValue": 0.15
             }
         },
@@ -403,7 +403,7 @@
             "hidden": true,
             "abilityProperties": {
                 "shieldStrength": 500,
-                "healthRegenPercent": 0.05
+                "healthRegeneration": 0.05
             }
         },
         {
@@ -646,7 +646,6 @@
             "maxRarity": "Legendary",
             "tier": 2,
             "tags": [ "recovery", "health" ],
-            "abilityId": "Ability_Dark_Shroud",
             "upgradeProperties": {
                 "additionalRegen": 0.025
             }
@@ -739,7 +738,7 @@
             "tier": 2,
             "tags": [ "execute" ],
             "upgradeProperties": {
-                "amount": 5
+                "share": 0.25
             }
         },
         {
@@ -830,7 +829,7 @@
             "minRarity": "Uncommon",
             "maxRarity": "Legendary",
             "tier": 2,
-            "tags": [ "health" ],
+            "tags": [ "health", "buff" ],
             "upgradeProperties": {
                 "healthBonus": 0.15
             }
@@ -911,45 +910,38 @@
             "id": "Augment_Burning_Fury",
             "minRarity": "Legendary",
             "maxRarity": "Legendary",
-            "grantsTags": [ "burn", "debuff" ],
+            "grantsTags": [ "burn", "debuff", "fury" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Berserk_Fury",
-            "upgradeProperties": {
-                "healthAsDamageMultiplier": 1,
-                "burningDuration": 3,
-                "burningMaxStacks": 3
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Primal_Fury",
             "minRarity": "Legendary",
             "maxRarity": "Legendary",
+            "grantsTags": [ "fury" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Berserk_Fury",
-            "upgradeProperties": {
-                "damageMultiplier": 1.5
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Healing_Fury",
             "minRarity": "Legendary",
             "maxRarity": "Legendary",
+            "grantsTags": [ "fury" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Berserk_Fury",
-            "upgradeProperties": {
-                "healAmount": 0.5
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Fury_More_Burn",
             "minRarity": "Uncommon",
             "maxRarity": "Legendary",
             "tier": 2,
-            "tags": [ "damage" ],
-            "abilityId": "Ability_Berserk_Fury",
+            "tags": [ "fury", "health" ],
             "upgradeProperties": {
                 "amount": 0.035
             }
@@ -959,8 +951,7 @@
             "minRarity": "Uncommon",
             "maxRarity": "Legendary",
             "tier": 2,
-            "tags": [],
-            "abilityId": "Ability_Berserk_Fury",
+            "tags": [ "fury", "health" ],
             "upgradeProperties": {
                 "amount": 0.02
             }

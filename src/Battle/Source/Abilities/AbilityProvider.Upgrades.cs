@@ -17,6 +17,7 @@
     using PassiveSkills;
     using Riders;
     using SeriesOfAttacks;
+    using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Modifiers.Context;
     using IceAegis;
@@ -31,8 +32,11 @@
         /// that only moves numbers is not written here: it is a row of the parameter table
         /// (<c>AbilityProvider.ParameterAugments.cs</c>) and shares its one class with all the others.
         /// The two halves never name the same augment.
+        /// <para>Built on first use rather than in a field initializer: three of the entries reach the
+        /// effect registry for their canonical numbers, and a field initializer may not touch the
+        /// instance that holds it.</para>
         /// </summary>
-        private readonly Dictionary<string, Func<AbilityAugmentData, IAbilityAugment>> _abilityUpgrades = new()
+        private Dictionary<string, Func<AbilityAugmentData, IAbilityAugment>> AbilityUpgrades => field ??= new()
         {
             // Augments of the base contract every ability honours. They belong to no ability, so they
             // are written once — and those that move a number state it as a share of the number they
@@ -183,34 +187,14 @@
                     data.Tier,
                     ability => new FreeCastEffect(ability.Id)),
             ["Augment_Burning_Fury"] = data =>
-                new BfAugmentFuryVariant(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (duration, healthPercent) => new BurningFuryEffect(duration, maxStacks: 1, healthPercent)
-                    {
-                        BurnDamage = data.UpgradeProperties.GetValueOrDefault("healthAsDamageMultiplier", 1f),
-                        BurningDuration = (int)data.UpgradeProperties.GetValueOrDefault("burningDuration", 3),
-                        BurningMaxStacks = (int)data.UpgradeProperties.GetValueOrDefault("burningMaxStacks", 3)
-                    }),
+                new BfAugmentFuryVariant(data.Id, data.Tags, data.Tier,
+                    (duration, healthPercent) => FuryFromCanon("Effect_Burning_Fury", duration, healthPercent)),
             ["Augment_Primal_Fury"] = data =>
-                new BfAugmentFuryVariant(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (duration, healthPercent) => new PrimalFuryEffect(duration, maxMaxStacks: 1, healthPercent)
-                    {
-                        DamageMultiplier = data.UpgradeProperties.GetValueOrDefault("damageMultiplier", 1.5f)
-                    }),
+                new BfAugmentFuryVariant(data.Id, data.Tags, data.Tier,
+                    (duration, healthPercent) => FuryFromCanon("Effect_Primal_Fury", duration, healthPercent)),
             ["Augment_Healing_Fury"] = data =>
-                new BfAugmentFuryVariant(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (duration, healthPercent) => new HealingFuryEffect(duration, maxStacks: 1, healthPercent)
-                    {
-                        HealAmount = data.UpgradeProperties.GetValueOrDefault("healAmount", 0.5f)
-                    }),
+                new BfAugmentFuryVariant(data.Id, data.Tags, data.Tier,
+                    (duration, healthPercent) => FuryFromCanon("Effect_Healing_Fury", duration, healthPercent)),
             ["Augment_Accuracy"] = data =>
                 new DstAugmentAccuracy(
                     data.Id,
@@ -318,7 +302,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    IceAegis.IceAegis.Parameters.HealPerTurn,
+                    AbilityParameter.HealthRegeneration,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
             ["Augment_Reset_Chance"] = data =>
                 new DelegateAugment<IceBlocks>(
@@ -381,6 +365,13 @@
                     data.Tier,
                     ability => ability.ConsumeManaInstead = true,
                     ability => ability.ConsumeManaInstead = false),
+            ["Augment_Reduce_Execution_Threshold"] = data =>
+                new AbilityAugmentReduceParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    AbilityParameter.ExecutionThreshold,
+                    data.UpgradeProperties.GetValueOrDefault("share", 0.25f)),
             ["Augment_Cost_Barrier"] = data =>
                 new AbilityAugmentCostTypeOverride(
                     data.Id,
@@ -388,5 +379,28 @@
                     data.Tier,
                     Costs.Barrier),
         };
+
+        /// <summary>
+        /// A fury variant built from the canon. The two numbers the ABILITY owns are handed over — the
+        /// duration it was cast with and the share of health it burns, both of them keys an augment can
+        /// move — and everything the VARIANT is about (how much of the burned health becomes damage, how
+        /// long that damage lasts, what the primal multiplier is, what the healing gives back) comes from
+        /// <c>SharedData/Effects</c> like every other effect's balance. These three were the last records
+        /// carrying effect figures of their own: typed factories, so the gate CL-3b put on data-declared
+        /// behaviours never saw them, and their fallbacks had drifted a wave behind the design list.
+        /// <para>Without a registry composed there is nothing to read the canon from, and the plain fury
+        /// is laid instead of the variant — a sandbox answer, never a shipped one.</para>
+        /// </summary>
+        private IEffect FuryFromCanon(string effectId, int duration, float healthPercent)
+        {
+            var owned = new Dictionary<string, float>(StringComparer.Ordinal)
+            {
+                ["duration"] = duration,
+                ["healthPercent"] = healthPercent
+            };
+
+            return _effects()?.CreateEffect(effectId, new RecordProperties(effectId, owned))
+                   ?? new FuryEffect(duration, maxStacks: 1, healthPercent);
+        }
     }
 }

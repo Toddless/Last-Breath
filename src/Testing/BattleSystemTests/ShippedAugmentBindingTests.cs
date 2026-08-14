@@ -30,8 +30,10 @@
         /// <summary>How many records name an ability — held because a lost binding is an augment
         /// silently offered to the whole family. Recounted at the catalog cleanup; includes the
         /// naming-rule binding and Augment_Lucky_Crit, bound at the tag-vocabulary pass by the G-1
-        /// precedent (typed factory, straying tags).</summary>
-        private const int BoundRecords = 58;
+        /// precedent (typed factory, straying tags). Three left at CL-4: the health-regen record's key
+        /// was generalised (the binding was standing in for that), and the two fury-burn records now
+        /// travel by the 'fury' tag the owner's markup gave the ability.</summary>
+        private const int BoundRecords = 55;
 
         /// <summary>How many records claim every ability there is â€” cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
@@ -44,7 +46,7 @@
         /// <summary>How many records name neither an ability nor the whole book, and are judged by
         /// their tags alone. Most of them carry tags now; the number is held because a record losing
         /// its last tag belongs nowhere and says so nowhere.</summary>
-        private const int SilentRecords = 15;
+        private const int SilentRecords = 18;
 
         [TestMethod]
         public void TheSectionDeclaresTheRecordsTheTriageCounted()

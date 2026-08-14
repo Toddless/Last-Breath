@@ -39,7 +39,7 @@
         /// does not name is a record that parses, is minted, is seated and then does nothing at all.</summary>
         public IReadOnlyCollection<string> BuildableAugmentIds =>
         [
-            .. _abilityUpgrades.Keys,
+            .. AbilityUpgrades.Keys,
             .. _parameterAugments.Keys,
             // Records that carry their own behaviour need no line of code naming them.
             .. augments.All.Where(record => !string.IsNullOrWhiteSpace(record.Behaviour)).Select(record => record.Id)
@@ -111,7 +111,7 @@
             // uniqueness of BuildableAugmentIds already refuses loudly. The sets do not overlap.
             if (!string.IsNullOrWhiteSpace(data.Behaviour)) return CreateBehaviour(data);
 
-            if (_abilityUpgrades.TryGetValue(data.Id, out var factory)) return factory(data);
+            if (AbilityUpgrades.TryGetValue(data.Id, out var factory)) return factory(data);
 
             return _parameterAugments.TryGetValue(data.Id, out AugmentParameterMove[]? moves)
                 ? new AbilityAugmentParameterSet(data.Id, data.Tags, data.Tier,

@@ -16,13 +16,13 @@ namespace Battle.Source.Abilities.AresBlessing
     public class AresBlessing(AbilityBaseData data) : Ability(data)
     {
         public int Duration => (int)this[AbilityParameter.Duration];
-        public float HealthBonus => this[Parameters.HealthBonus];
+        public float HealthBonus => this[AbilityParameter.HealthBonus];
         public float RecoveryBonus => this[Parameters.RecoveryBonus];
 
-        /// <summary>The blessing's two bonuses — shares gained, scaled by the cast's effectiveness.</summary>
+        /// <summary>The recovery half of the blessing; the health half stands on the shared
+        /// <see cref="AbilityParameter.HealthBonus"/>.</summary>
         public static class Parameters
         {
-            public const string HealthBonus = nameof(HealthBonus);
             public const string RecoveryBonus = nameof(RecoveryBonus);
         }
 
@@ -31,7 +31,7 @@ namespace Battle.Source.Abilities.AresBlessing
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
-            parameters.RegisterDefault(Parameters.HealthBonus, 0.3f);
+            parameters.RegisterDefault(AbilityParameter.HealthBonus, 0.3f);
             parameters.RegisterDefault(Parameters.RecoveryBonus, 0.3f);
         }
 

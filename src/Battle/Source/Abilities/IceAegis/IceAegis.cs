@@ -49,7 +49,6 @@ namespace Battle.Source.Abilities.IceAegis
             public const string ClumsinessValue = nameof(ClumsinessValue);
             public const string FreezeDuration = nameof(FreezeDuration);
             public const string ReflectPercent = nameof(ReflectPercent);
-            public const string HealPerTurn = nameof(HealPerTurn);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
@@ -66,7 +65,7 @@ namespace Battle.Source.Abilities.IceAegis
             parameters.RegisterDefault(Parameters.FreezeDuration, 1);
             // Zero by default; upgrades raise them with decorators — the ability knows nothing about the upgrades
             parameters.RegisterDefault(Parameters.ReflectPercent, 0f);
-            parameters.RegisterDefault(Parameters.HealPerTurn, 0f);
+            parameters.RegisterDefault(AbilityParameter.HealthRegeneration, 0f);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new IceAegis(Data));
@@ -78,7 +77,7 @@ namespace Battle.Source.Abilities.IceAegis
                 PerIntelligenceScale = PerIntelligenceScale,
                 Duration = Duration,
                 ReflectPercent = this[Parameters.ReflectPercent],
-                HealPerTurnPercent = this[Parameters.HealPerTurn]
+                HealPerTurnPercent = this[AbilityParameter.HealthRegeneration]
             };
 
         protected override void ApplyStage(int stage, AegisPlan plan, IFightable owner, IBattleField field)

@@ -17,11 +17,10 @@ namespace Battle.Source.Abilities.DarkShroud
         public float Duration => this[AbilityParameter.Duration];
         public float Stacks => this[AbilityParameter.Stacks];
         public float LightStepValue => this[Parameters.LightStepValue];
-        public float HealthRegen => this[Parameters.HealthRegen];
+        public float HealthRegen => this[AbilityParameter.HealthRegeneration];
 
         public static class Parameters
         {
-            public const string HealthRegen = nameof(HealthRegen);
             public const string LightStepValue = nameof(LightStepValue);
         }
 
@@ -31,7 +30,7 @@ namespace Battle.Source.Abilities.DarkShroud
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(AbilityParameter.Stacks, 3);
-            parameters.RegisterDefault(Parameters.HealthRegen, 0.05f);
+            parameters.RegisterDefault(AbilityParameter.HealthRegeneration, 0.05f);
             parameters.RegisterDefault(Parameters.LightStepValue, 0.15f);
         }
 

@@ -55,7 +55,10 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Poison_On_Hit", [AbilityTags.Poison, AbilityTags.Debuff]),
 
             ("Augment_Armageddon_Burning", [AbilityTags.Burn, AbilityTags.Debuff]),
-            ("Augment_Burning_Fury", [AbilityTags.Burn, AbilityTags.Debuff]),
+            // The three variants swap the fury the ability lays, so each grants that genus too.
+            ("Augment_Burning_Fury", [AbilityTags.Burn, AbilityTags.Debuff, AbilityTags.Fury]),
+            ("Augment_Primal_Fury", [AbilityTags.Fury]),
+            ("Augment_Healing_Fury", [AbilityTags.Fury]),
 
             ("Augment_Apply_Buff_Critical_Chance", [AbilityTags.Buff]),
             ("Augment_Apply_Buff_Critical_Damage", [AbilityTags.Buff]),
@@ -116,6 +119,16 @@ namespace LastBreathTest.BattleSystemTests
             // The jar and the shards left the row in the catalog cleanup: their own debuff donors
             // (the jar's trio of vial debuffs, the shards' fragility) were removed with the catalog.
             // The berserker left at the re-markup: his fury carries "debuff" of its own now.
+            // Generalised at CL-4. The regen record works on the Ice Aegis, which owns the shared key
+            // too; it reaches nothing else that heals per turn, and sits silent where it lands.
+            ("Augment_Additional_Health_Regen",
+                ["Ability_Ice_Aegis"],
+                ["Ability_Critical_Calculation", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Series_Of_Attacks"]),
+            // The health record owns one ability only (Ares), and Ares is reached by its OWN tags
+            // rather than by a grant — so every grant-opened seating of it is a silent one.
+            ("Augment_Health_Bonus",
+                [],
+                ["Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
             ("Augment_Debuff_Effectiveness",
                 ["Ability_Poison_Coating"],
                 // Increasing Pressure joined through the codeless applier: its attacks now grant "debuff".
@@ -132,6 +145,11 @@ namespace LastBreathTest.BattleSystemTests
             ["Augment_Recovery_Effectiveness"] = AbilityParameter.Effectiveness,
             ["Augment_Debuff_Effectiveness"] = AbilityParameter.Effectiveness,
             ["Augment_Extend_Stun_Add_Cost"] = AbilityParameter.StunDuration,
+            // Generalised at CL-4: both stood on a private key and were kept off strangers by an
+            // abilityId (Health_Regen) or by nobody at all (Health_Bonus). The key being shared is what
+            // makes them probeable, which is the same thing as making them safe to be carried.
+            ["Augment_Additional_Health_Regen"] = AbilityParameter.HealthRegeneration,
+            ["Augment_Health_Bonus"] = AbilityParameter.HealthBonus,
         };
 
         /// <summary>Grant-openable records whose whole behaviour rides in an impact rider and stands
@@ -282,6 +300,34 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0, strays.Count,
                 "a granted tag carries records the ledger cannot probe — a private-key row bound to no ability, or an unregistered rider:\n  "
                 + string.Join("\n  ", strays.Distinct()));
+        }
+
+        [TestMethod]
+        public void TheFuryTagIsWornByOneAbilityWhichIsWhatLetsAPrivateKeyTravelOnIt()
+        {
+            // The two fury-burn records lost their abilityId at CL-4 and are judged by 'fury' instead,
+            // while the number they move is still the berserker's own private key. That is only safe
+            // because 'fury' names one ability and is granted only by records pinned to it — the day a
+            // second ability wears it, both records reach a stranger, seat, charge and move nothing.
+            // The premise is asserted rather than assumed, because it is the whole of the safety.
+            (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+
+            string[] wearing = [.. book.KnownAbilityIds
+                .Where(id => catalog.TagsOf(id).Contains(AbilityTags.Fury, StringComparer.OrdinalIgnoreCase))
+                .OrderBy(id => id, StringComparer.Ordinal)];
+
+            Assert.AreEqual("Ability_Berserk_Fury", string.Join(", ", wearing),
+                "'fury' is worn by something other than the berserker alone — the fury-burn records stand on his "
+                + "PRIVATE key and now travel by this tag, so every extra wearer above is a dead socket");
+
+            string[] granting = [.. catalog.All
+                .Where(record => record.GrantsTags.Contains(AbilityTags.Fury, StringComparer.OrdinalIgnoreCase))
+                .Where(record => !string.Equals(record.AbilityId, "Ability_Berserk_Fury", StringComparison.Ordinal))
+                .Select(record => record.Id)];
+
+            Assert.AreEqual(0, granting.Length,
+                $"records granting 'fury' from outside the berserker would carry his private-key records onto "
+                + $"strangers: [{string.Join(", ", granting)}]");
         }
 
         [TestMethod]

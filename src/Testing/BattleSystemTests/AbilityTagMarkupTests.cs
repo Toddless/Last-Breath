@@ -47,6 +47,8 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Jar_Of_Poison", AbilityTags.Duration),
             ("Ability_Jar_Of_Poison", AbilityTags.Projectile),
 
+            // Load-bearing again since CL-4b: the fury-burn records wear "health" by the owner's markup
+            // and reach every health-wearer through it — silently, but the tag is what carries them.
             ("Ability_Dark_Shroud", AbilityTags.Health),
             ("Ability_Dark_Shroud", AbilityTags.Stacks),
             ("Ability_Dark_Shroud", AbilityTags.Duration),
