@@ -715,13 +715,10 @@
             "maxRarity": "Legendary",
             "grantsTags": [ "buff" ],
             "tier": 2,
-            "tags": [ "buff", "duration" ],
-            "abilityId": "Ability_Critical_Calculation",
-            "upgradeProperties": {
-                "duration": 3,
-                "stacks": 3,
-                "value": 0.15
-            }
+            "tags": [ "buff", "duration", "stacks", "activation" ],
+            "behaviour": "BuffOnCast",
+            "effectId": "Effect_Enhance_Defense",
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Apply_Seal_Of_Oblivion",
@@ -729,8 +726,7 @@
             "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 3,
-            "tags": [],
-            "abilityId": "Ability_Poison_Explosion",
+            "tags": [ "hit" ],
             "behaviour": "DebuffOnCast",
             "effectId": "Effect_Seal_Of_Oblivion",
             "upgradeProperties": {}
@@ -783,13 +779,11 @@
             "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 3,
-            "tags": [],
-            "abilityId": "Ability_Poison_Coating",
-            "upgradeProperties": {
-                "reduceBy": 0.6,
-                "maxStacks": 1,
-                "duration": 3
-            }
+            "tags": [ "attack", "effectiveness", "stacks" ],
+            "behaviour": "ApplyEffectOnImpact",
+            "effectId": "Effect_Rot",
+            "impactKind": "Attack",
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Attacks_Reduce_Armor",
@@ -797,13 +791,11 @@
             "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 3,
-            "tags": [],
-            "abilityId": "Ability_Poison_Coating",
-            "upgradeProperties": {
-                "reduceArmorBy": 0.15,
-                "maxStacks": 4,
-                "duration": 3
-            }
+            "tags": [ "attack", "effectiveness", "stacks" ],
+            "behaviour": "ApplyEffectOnImpact",
+            "effectId": "Effect_Armor_Reduction",
+            "impactKind": "Attack",
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Apply_Poison_For_Each_Enemy",
@@ -1021,8 +1013,7 @@
             "maxRarity": "Legendary",
             "grantsTags": [ "debuff" ],
             "tier": 2,
-            "tags": [],
-            "abilityId": "Ability_Head_Butt",
+            "tags": [ "hit", "debuff", "stacks", "duration" ],
             "behaviour": "ApplyEffectOnImpact",
             "effectId": "Effect_Armor_Reduction",
             "upgradeProperties": {}
@@ -1235,8 +1226,7 @@
             "minRarity": "Uncommon",
             "maxRarity": "Legendary",
             "tier": 2,
-            "tags": [],
-            "abilityId": "Ability_Ice_Shards",
+            "tags": [ "critical" ],
             "upgradeProperties": {
                 "amount": 0.35
             },
@@ -1249,8 +1239,7 @@
             "minRarity": "Uncommon",
             "maxRarity": "Legendary",
             "tier": 2,
-            "tags": [],
-            "abilityId": "Ability_Ice_Shards",
+            "tags": [ "critical" ],
             "upgradeProperties": {
                 "amount": 0.25
             },

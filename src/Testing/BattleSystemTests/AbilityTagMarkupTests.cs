@@ -127,7 +127,35 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Static_Armor", AbilityTags.Damage),
             ("Ability_Static_Armor", AbilityTags.Recovery),
 
-            ("Ability_Twin_Assist_Attack", AbilityTags.Attack)
+            ("Ability_Twin_Assist_Attack", AbilityTags.Attack),
+
+            // Load-bearing since CL-7: the seven records unbound there travel by these tags and by
+            // nothing else — 'critical' carries the two crit-bonus records, 'hit' the two on-hit
+            // debuff appliers, 'activation' the enhanced-defence applier.
+            ("Ability_Armageddon", AbilityTags.Activation),
+            ("Ability_Armageddon", AbilityTags.Critical),
+            ("Ability_Berserk_Fury", AbilityTags.Critical),
+            ("Ability_Deep_Freeze", AbilityTags.Critical),
+            ("Ability_Deep_Freeze", AbilityTags.Hit),
+            ("Ability_Discharge", AbilityTags.Activation),
+            ("Ability_Discharge", AbilityTags.Critical),
+            ("Ability_Discharge", AbilityTags.Hit),
+            ("Ability_Double_Strike", AbilityTags.Critical),
+            ("Ability_Head_Butt", AbilityTags.Critical),
+            ("Ability_Ice_Block", AbilityTags.Activation),
+            ("Ability_Ice_Block", AbilityTags.Critical),
+            ("Ability_Ice_Block", AbilityTags.Hit),
+            ("Ability_Ice_Shards", AbilityTags.Activation),
+            ("Ability_Ice_Shards", AbilityTags.Critical),
+            ("Ability_Ice_Shards", AbilityTags.Hit),
+            ("Ability_Increasing_Pressure", AbilityTags.Critical),
+            ("Ability_Jar_Of_Poison", AbilityTags.Hit),
+            ("Ability_Overload", AbilityTags.Critical),
+            ("Ability_Poison_Explosion", AbilityTags.Activation),
+            ("Ability_Poison_Explosion", AbilityTags.Hit),
+            ("Ability_Series_Of_Attacks", AbilityTags.Critical),
+            ("Ability_Static_Armor", AbilityTags.Critical),
+            ("Ability_Static_Armor", AbilityTags.Hit)
         ];
 
         [TestMethod]

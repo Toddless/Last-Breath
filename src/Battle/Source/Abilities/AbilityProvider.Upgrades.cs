@@ -214,14 +214,6 @@
                     data.Tags,
                     data.Tier,
                     (int)data.UpgradeProperties.GetValueOrDefault("duration", 3)),
-            ["Augment_Apply_Enhanced_Defence"] = data =>
-                new CcAugmentApplyEnhancedDefence(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                    (int)data.UpgradeProperties.GetValueOrDefault("stacks", 3),
-                    data.UpgradeProperties.GetValueOrDefault("value", 0.15f)),
             ["Augment_Leach_On_Crit"] = data =>
                 new CcAugmentLeachOnCrit(
                     data.Id,
@@ -253,24 +245,6 @@
                     data.Id,
                     data.Tags,
                     data.Tier),
-            ["Augment_Attacks_Reduce_Incoming_Heal"] = data =>
-                new PcAugmentApplyDebuffOnHit(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    () => new HealReductionEffect(
-                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                        (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 1),
-                        data.UpgradeProperties.GetValueOrDefault("reduceBy", 0.6f))),
-            ["Augment_Attacks_Reduce_Armor"] = data =>
-                new PcAugmentApplyDebuffOnHit(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    () => new ArmorReductionEffect(
-                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                        (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 4),
-                        data.UpgradeProperties.GetValueOrDefault("reduceArmorBy", 0.15f))),
             ["Augment_Apply_Poison_For_Each_Enemy"] = data =>
                 new PcAugmentMultiStackOnHit(
                     data.Id,

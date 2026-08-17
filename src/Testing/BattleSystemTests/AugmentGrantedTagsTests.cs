@@ -129,10 +129,22 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Health_Bonus",
                 [],
                 ["Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
+            // Widened at CL-7: the two on-hit debuff appliers came off their abilityId and now grant
+            // "debuff" wherever "attack" carries them, which opens this record on five more.
             ("Augment_Debuff_Effectiveness",
-                ["Ability_Poison_Coating"],
-                // Increasing Pressure joined through the codeless applier: its attacks now grant "debuff".
-                ["Ability_Armageddon", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Discharge",
+                 "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
+                ["Ability_Armageddon", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
+                 "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
+
+            // Unbound at CL-7. Both carry a behaviour, so wherever a granted tag seats them they work —
+            // there is no host key to be missing, which is why neither has an inert list at all.
+            ("Augment_Apply_Enhanced_Defence",
+                ["Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
+                []),
+            ("Augment_Armor_Debuff_On_Hit",
+                ["Ability_Armageddon", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
+                []),
         ];
 
         /// <summary>The shared key each grant-opened parameter record stands on, for the ledger's
@@ -157,6 +169,11 @@ namespace LastBreathTest.BattleSystemTests
         private static readonly HashSet<string> s_selfContained = new(StringComparer.Ordinal)
         {
             "Augment_Extend_Poison",
+            // Unbound at CL-7. Both declare a behaviour, so their whole work is a rider or a cast
+            // effect built from the canon — there is no host key for the ledger to probe, and none
+            // needed: they work wherever they land.
+            "Augment_Apply_Enhanced_Defence",
+            "Augment_Armor_Debuff_On_Hit",
         };
 
         [TestMethod]

@@ -101,6 +101,23 @@ namespace LastBreathTest.BattleSystemTests
         /// </summary>
         private static readonly (string Augment, string Parameter, string[] Works, string[] Inert)[] s_reach =
         [
+            // Unbound at CL-7 and written down here for the first time. The crit bonuses are declared by
+            // MulticastAbility alone, so the 'critical' tag seats these two on twice the abilities that
+            // read them: on the other six the decorator is added to a key nobody registered, which is a
+            // TrackNotFound and a purchase that moves nothing. Legal by "a tag promises fitting, not
+            // work" — and exactly the half-arrival this ledger exists to keep written down rather than
+            // discovered. Closing it means the six declaring the keys, which is the owner's fork.
+            ("Augment_Additional_Crit_Damage", AbilityParameter.CriticalDamageBonus,
+                ["Ability_Deep_Freeze", "Ability_Discharge", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Overload", "Ability_Static_Armor"],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Head_Butt",
+                 "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"]),
+            ("Augment_Additional_Crit_Chance", AbilityParameter.CriticalChanceBonus,
+                ["Ability_Deep_Freeze", "Ability_Discharge", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Overload", "Ability_Static_Armor"],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Head_Butt",
+                 "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"]),
+
             // Generalised at CL-4 from Ares Blessing's private key. It reaches by "health" and "buff",
             // and Ares is the only ability in the book that raises a health CEILING — the rest of the
             // reach is legal silence until a second health-buffer declares the key.
