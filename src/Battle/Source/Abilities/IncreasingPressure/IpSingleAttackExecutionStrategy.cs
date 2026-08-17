@@ -20,6 +20,7 @@
                 };
 
                 context.UseCriticalOf(ability);
+                context.UseAccuracyOf(ability);
                 ability.AttackModifiers.ApplyAll(context);
 
                 if (!await window.ResolveAsync(context)) break;

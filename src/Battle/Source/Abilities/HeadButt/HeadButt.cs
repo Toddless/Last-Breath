@@ -23,6 +23,7 @@ namespace Battle.Source.Abilities.HeadButt
         {
             base.RegisterBaseParameters(parameters);
             RegisterCriticalParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.AccuracyBonus, 0f);
             // Owned for what the lunge CARRIES rather than for what it lays itself: the stun is control
             // without a figure, while every debuff an augment hangs on the lunge reads the cast's
             // effectiveness — so the concept is the ability's, and a record on it is felt there.
@@ -50,6 +51,7 @@ namespace Battle.Source.Abilities.HeadButt
                         SourceAbilityId = Id
                     };
                     context.UseCriticalOf(this);
+                    context.UseAccuracyOf(this);
                     context.AddDamage(DamageType.Physical, additionalDamage);
 
                     // Every successful owner lunge stuns its target (extra attacks from reactions included).

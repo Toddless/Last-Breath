@@ -108,7 +108,7 @@ namespace Battle.Source.Abilities.ChainLightning
                 if (strike == totalStrikes - 1) hitDamage *= plan.LastJumpMultiplier;
 
                 bool isCritical = RollCritical(owner);
-                if (isCritical) hitDamage *= owner.Parameters.CriticalDamage + CriticalDamageBonus;
+                if (isCritical) hitDamage *= this.CriticalMultiplierOf(owner);
 
                 var context = new DamageContext
                 {

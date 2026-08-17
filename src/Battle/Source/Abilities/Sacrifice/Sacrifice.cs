@@ -19,7 +19,7 @@ namespace Battle.Source.Abilities.Sacrifice
         public float SacrificePercent => this[Parameters.SacrificePercent];
         public float RatePerHundred => this[Parameters.RatePerHundred];
         public int Charges => (int)this[AbilityParameter.Charges];
-        public float HealPercent => this[AbilityParameter.HealFromEmpoweredDamage];
+        public float HealFromEmpoweredDamage => this[AbilityParameter.HealFromEmpoweredDamage];
 
         public static class Parameters
         {
@@ -44,7 +44,7 @@ namespace Battle.Source.Abilities.Sacrifice
             owner.ConsumeResource(Costs.Health, sacrificed);
 
             float bonus = sacrificed / 100f * RatePerHundred;
-            await new SacrificeChargeEffect(Id, Charges, bonus, HealPercent)
+            await new SacrificeChargeEffect(Id, Charges, bonus, HealFromEmpoweredDamage)
                 .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
         }
     }

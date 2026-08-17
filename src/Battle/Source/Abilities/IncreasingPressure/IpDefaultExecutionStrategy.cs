@@ -27,6 +27,7 @@
                         SourceAbilityId = ability.Id
                     };
                     context.UseCriticalOf(ability);
+                    context.UseAccuracyOf(ability);
                     context.AddDamage(DamageType.Physical, additionalDamage);
 
                     ability.AttackModifiers.ApplyAll(context);

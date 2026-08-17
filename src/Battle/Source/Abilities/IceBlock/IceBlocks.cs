@@ -33,7 +33,7 @@ namespace Battle.Source.Abilities.IceBlock
         public int ExtraBlocks => (int)this[Parameters.ExtraBlocks];
 
         /// <summary>Chance the cast clears its own cooldown when it is done.</summary>
-        public float ResetCooldownChance => this[AbilityParameter.CooldownResetChance];
+        public float CooldownResetChance => this[AbilityParameter.CooldownResetChance];
 
         /// <summary>L3 upgrade point: the stage-4 extra blocks crash on random enemies instead of the target.</summary>
         public bool ExtraBlocksHitRandomTargets { get; set; }
@@ -85,7 +85,7 @@ namespace Battle.Source.Abilities.IceBlock
                 });
             }
 
-            if (ResetCooldownChance > 0 && CombatRandom.Rolls.RandFloat() <= ResetCooldownChance) CooldownLeft = 0;
+            if (CooldownResetChance > 0 && CombatRandom.Rolls.RandFloat() <= CooldownResetChance) CooldownLeft = 0;
         }
 
         protected override IceBlockPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field)

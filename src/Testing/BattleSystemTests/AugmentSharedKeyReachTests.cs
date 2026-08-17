@@ -169,21 +169,19 @@ namespace LastBreathTest.BattleSystemTests
                 []),
             // Unbound at CL-7 and written down here for the first time: the crit bonuses were declared by
             // MulticastAbility alone, so the 'critical' tag seated these two on twice the abilities that
-            // read them. Closed at CL-7c — the five attacking abilities that roll their own attacks now
-            // declare the keys and stamp them on every context they build. Armageddon is the one name
-            // left in the inert column, and for a reason of its own: it deals direct damage and rolls no
-            // crit at all, so there is nothing on it for a crit bonus to raise. Giving it one is a change
-            // to what the ability IS, which is the owner's call and not this pass's.
+            // read them. CL-7c closed eleven of the twelve; CL-7d closed the twelfth, the Armageddon,
+            // which had been the one ability in the book that rolled no crit at all. **Both rows are full
+            // now — the tag reaches twelve and all twelve read it, and an empty inert column is the claim.**
             ("Augment_Additional_Crit_Damage", AbilityParameter.CriticalDamageBonus,
-                ["Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
-                 "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
-                 "Ability_Overload", "Ability_Series_Of_Attacks", "Ability_Static_Armor"],
-                ["Ability_Armageddon"]),
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Series_Of_Attacks", "Ability_Static_Armor"],
+                []),
             ("Augment_Additional_Crit_Chance", AbilityParameter.CriticalChanceBonus,
-                ["Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
-                 "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
-                 "Ability_Overload", "Ability_Series_Of_Attacks", "Ability_Static_Armor"],
-                ["Ability_Armageddon"]),
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Series_Of_Attacks", "Ability_Static_Armor"],
+                []),
 
             // Generalised at CL-4 from Ares Blessing's private key. It reaches by "health" and "buff",
             // and Ares is the only ability in the book that raises a health CEILING — the rest of the
@@ -325,12 +323,15 @@ namespace LastBreathTest.BattleSystemTests
                  "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Shards",
                  "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
 
-            // Two records of the attacking family, each owned by one attacker: accuracy by the double
-            // strike, the splash share by the pressure. Where they are inert the other four attackers
-            // simply never declared the concept.
+            // Accuracy went to the whole attacking family at CL-7d, so this row has no inert column left:
+            // every ability the 'attack' tag carries it onto builds its own attack contexts and stamps the
+            // bonus on them. The Armageddon is not among them and not missing from them — it never fits
+            // this record (no 'attack' tag) and its direct hits are not dodged, so accuracy has no meaning
+            // on it and it declares none.
             ("Augment_Accuracy", AbilityParameter.AccuracyBonus,
-                ["Ability_Double_Strike"],
-                ["Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"]),
+                ["Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Increasing_Pressure",
+                 "Ability_Series_Of_Attacks"],
+                []),
             ("Augment_Attack_Random_Target", AbilityParameter.SplashShare,
                 ["Ability_Increasing_Pressure"],
                 ["Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Series_Of_Attacks"]),

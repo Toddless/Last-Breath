@@ -69,6 +69,7 @@ namespace Battle.Source.Abilities.Armageddon
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            RegisterCriticalParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.StunDuration, 2);
             parameters.RegisterDefault(Parameters.HpCostMultiplier, 1f);
             parameters.RegisterDefault(Parameters.MissingHpRate, 0f);
@@ -99,12 +100,17 @@ namespace Battle.Source.Abilities.Armageddon
                 if (MissingHpRate > 0)
                     total += (target.Parameters.MaxHealth - target.CurrentHealth) / MissingHpStep * MissingHpRate;
 
-                var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, CastId = CastId };
+                // The crit reaches the DAMAGE of the blow and nothing else: the stage-three payload is
+                // control and burning, which are their own axes with their own records.
+                bool isCritical = this.RollsCritical(owner);
+                if (isCritical) total *= this.CriticalMultiplierOf(owner);
+
+                var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, CastId = CastId, IsCrit = isCritical };
                 context.Add(DamageType.Physical, total);
                 await target.TakeDamage(context);
 
                 if (stage >= MaxStage) await ApplyStageThreeEffects(owner, target, context.TotalDamage);
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, context.TotalDamage)
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, isCritical, context.TotalDamage)
                 {
                     Source = this,
                     Kind = ImpactKind.Hit

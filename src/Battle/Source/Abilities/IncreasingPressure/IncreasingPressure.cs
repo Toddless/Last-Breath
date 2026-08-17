@@ -44,6 +44,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
         {
             base.RegisterBaseParameters(parameters);
             RegisterCriticalParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.AccuracyBonus, 0f);
             // Owned for what the series CARRIES: the cast lays nothing itself, and every debuff an
             // augment hangs on its attacks reads the effectiveness of the cast it came out of.
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);

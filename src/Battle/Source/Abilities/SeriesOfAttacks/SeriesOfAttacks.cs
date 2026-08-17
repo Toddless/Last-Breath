@@ -27,6 +27,7 @@
         {
             base.RegisterBaseParameters(parameters);
             RegisterCriticalParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.AccuracyBonus, 0f);
             parameters.RegisterDefault(AbilityParameter.DamageMultiplier, 1.3f);
             parameters.RegisterDefault(Parameters.MinAttacks, 2);
             parameters.RegisterDefault(Parameters.MaxAttacks, 5);

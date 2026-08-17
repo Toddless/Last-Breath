@@ -33,6 +33,7 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
                         SourceAbilityId = ability.Id
                     };
                     context.UseCriticalOf(ability);
+                    context.UseAccuracyOf(ability);
                     context.AddDamage(DamageType.Physical, additionalDamage);
                     // Pre-attack mutators run BEFORE the attack is scheduled so they shape the roll.
                     ability.AttackModifiers.ApplyAll(context);

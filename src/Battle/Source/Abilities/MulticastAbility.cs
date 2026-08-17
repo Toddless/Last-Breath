@@ -27,13 +27,6 @@ namespace Battle.Source.Abilities
         /// <summary>The stance activation roll; the knobs live inside (upgrades/boss phases tune it).</summary>
         public MulticastActivation Activation { get; } = new();
 
-        /// <summary>
-        /// Bonus on top of entity's final critical chance. e.g 45% critical chance * 1.35 (35% bonus critical chance)
-        /// </summary>
-        public float CriticalChanceBonus => this[AbilityParameter.CriticalChanceBonus];
-
-        public float CriticalDamageBonus => this[AbilityParameter.CriticalDamageBonus];
-
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
             int stage = Activation.Roll(owner);
@@ -63,8 +56,7 @@ namespace Battle.Source.Abilities
         {
             float damage = CalculateHitDamage(plan, owner);
             bool isCritical = RollCritical(owner);
-            // Crit damage is a pure additive multiplier by design: bonuses only ever add to it
-            if (isCritical) damage *= owner.Parameters.CriticalDamage + CriticalDamageBonus;
+            if (isCritical) damage *= this.CriticalMultiplierOf(owner);
 
             var context = new DamageContext
             {
@@ -85,9 +77,7 @@ namespace Battle.Source.Abilities
             RegisterCriticalParameters(parameters);
         }
 
-        /// <summary>Ability bonus is a fractional increase over the owner's crit chance (0.35 = +35%).</summary>
-        protected bool RollCritical(IFightable owner) =>
-            CombatRandom.Rolls.RandFloat() <= owner.Parameters.CriticalChance * (1 + CriticalChanceBonus);
+        protected bool RollCritical(IFightable owner) => this.RollsCritical(owner);
 
         protected float CalculateHitDamage(DamagingCastPlan plan, IFightable owner) =>
             plan.Damage

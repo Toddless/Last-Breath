@@ -43,6 +43,7 @@ namespace Battle.Source.Abilities.BerserkFury
         {
             base.RegisterBaseParameters(parameters);
             RegisterCriticalParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.AccuracyBonus, 0f);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.FuryHealthPercent, 0.05f);
         }
@@ -71,6 +72,7 @@ namespace Battle.Source.Abilities.BerserkFury
                         SourceAbilityId = Id
                     };
                     context.UseCriticalOf(this);
+                    context.UseAccuracyOf(this);
                     context.AddDamage(DamageType.Physical, additionalDamage);
                     AttackModifiers.ApplyAll(context);
 
