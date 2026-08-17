@@ -82,6 +82,7 @@
         /// <summary>Effectiveness of the cast that laid this instance; one for anything not laid by a
         /// cast. Descendants that derive numbers BEFORE <c>base.Apply</c> stamp it themselves.</summary>
         public float Effectiveness { get; protected set; } = 1f;
+
         public bool Expired => Duration == 0;
         public string Description => FormatDescription();
         public string DisplayName => Localization.Localize(Id);
@@ -197,8 +198,7 @@
             _ => value.Authored * Effectiveness
         };
 
-        /// <summary>
-        /// Subscribes to a combat event bus;  protected void SubscribeUntilRemoved<T>(ICombatEventBus bus, Action<T> handler)
+        /// <summary> Subscribes to a combat event bus.</summary>
         protected void SubscribeUntilRemoved<T>(ICombatEventBus bus, Action<T> handler)
             where T : ICombatEvent
         {
