@@ -1,9 +1,9 @@
-namespace Battle.Source.World
+namespace Core.Ai.World
 {
     using System;
     using System.Collections.Generic;
-    using Core.Ai.World.Recovery;
-    using Core.Data.GameData;
+    using Recovery;
+    using Data.GameData;
     using Newtonsoft.Json;
 
     /// <summary>Consumes the Recovery catalog; the built-in defaults apply if the JSON is absent.</summary>

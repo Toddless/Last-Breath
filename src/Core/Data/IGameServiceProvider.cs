@@ -16,8 +16,5 @@ namespace Core.Data
         /// without a service asks for it through <see cref="GetService{T}"/> and fails loudly.</summary>
         T? TryGet<T>()
             where T : class => GetServices<T>().FirstOrDefault();
-
-        T GetKeyedService<T>(string key)
-            where T : notnull;
     }
 }

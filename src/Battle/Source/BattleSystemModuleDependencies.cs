@@ -4,15 +4,13 @@
     using System.Collections.Generic;
     using Abilities;
     using CombatRules;
-    using Core.Ai.World.Raids;
+    using Core.Ai.World;
     using Core.Ai.World.Recovery;
-    using Core.Ai.World.Skirmish;
     using Core.Ai.World.SmartPoints;
     using Core.Ai.World.Time;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
-    using Core.Crafting;
     using Core.Data;
     using Core.Data.GameData;
     using Core.Entity;
@@ -22,16 +20,9 @@
     using Core.Items.Grants;
     using Core.MessageBus;
     using Core.MessageBus.Requests;
-    using Core.Narrative.Facts;
-    using Core.Narrative.Influence;
-    using Core.Narrative.Quests;
     using Core.PassiveTree.Allocation;
-    using Core.Reputation;
     using Core.Save;
-    using Core.Save.Participants;
     using Core.Services;
-    using Core.Session;
-    using Core.Trade;
     using Core.Views;
     using Core.Views.UI;
     using Godot;
@@ -41,7 +32,6 @@
     using RequestHandlers;
     using UIElements;
     using UIElements.PassiveWheel;
-    using World;
 
     public static class BattleSystemModuleDependencies
     {
@@ -65,8 +55,7 @@
             // The one road from the board to the abilities. A singleton because a new playthrough
             // resets through it, and registered before the unlock service, which closes every
             // allocation pass with it.
-            services.AddSingleton<AbilityAugmentBinder>();
-            services.AddSingleton<IAbilityAugmentBinder>(sp => sp.GetRequiredService<AbilityAugmentBinder>());
+            services.AddSingleton<IAbilityAugmentBinder, AbilityAugmentBinder>();
             services.AddSingleton<IAbilityUnlockService, AbilityUnlockService>();
             // Shared on purpose: control resistance and arena rules must exist in every project
             // that fights (Main included) — a bootstrap-local registration left Main without them.
@@ -95,28 +84,9 @@
              services.AddSingleton<INpcVisualProvider, NpcVisualProvider>();
              services.AddSingleton<ISpawnPointRegistry, SpawnPointRegistry>();
 
-            // Out-of-combat rest: zones (campfires, spawn points) + participants, ticked by
-            // NpcWorldDirector. Shared on purpose — both projects fight and rest.
-            services.AddGameDataParticipant<IRecoveryConfigProvider, RecoveryConfigProvider>();
-            services.AddSingleton<IRestRecoveryService>(sp =>
-                new RestRecoveryService(
-                    sp.GetRequiredService<IRecoveryConfigProvider>(),
-                    sp.GetService<IWorldClock>()));
-
-            // Smart points: claims die with the claimant — Exit never runs for the dead, so the
-            // registry is released by the death events instead.
-            services.AddSingleton<ISmartPointRegistry>(sp =>
-            {
-                var registry = new SmartPointRegistry();
-                var bus = sp.GetService<IGameEventBus>();
-                bus?.Subscribe<EntityDiedEvent>(evnt => registry.Release(evnt.Entity.InstanceId));
-                bus?.Subscribe<NpcFinalDeathEvent>(evnt => registry.Release(evnt.InstanceId));
-                return registry;
-            });
             // TryAdd: the save system (project-level, AddSaveSystem) also offers the scope — the
             // battle services only CONSUME ILoadScope; whichever registration runs first wins.
-            services.TryAddSingleton<LoadScope>();
-            services.TryAddSingleton<ILoadScope>(sp => sp.GetRequiredService<LoadScope>());
+            services.TryAddSingleton<ILoadScope, LoadScope>();
 
             // The order of checks an install goes through, written once. A singleton because the socket
             // panel reads it straight — the engine asks whether a drop is allowed inside the frame the

@@ -2,7 +2,6 @@ namespace Battle.Source.UIElements
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Entity;
     using Core.Views;
     using Core.Views.UI;
     using Godot;

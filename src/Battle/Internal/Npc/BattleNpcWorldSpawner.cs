@@ -5,7 +5,6 @@ namespace Battle.Internal.Npc
     using Core.Entity;
     using Core.Services;
     using Godot;
-    using GameServiceProvider = Services.GameServiceProvider;
 
     /// <summary>
     /// Battle-side <see cref="INpcWorldSpawner"/>: every world NPC here is the test BaseNpc and

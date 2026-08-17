@@ -6,7 +6,6 @@ namespace Battle.Source
     using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Battle.Skills;
     using Core.Data.EffectsData;
     using Core.Data.GameData;
     using Core.Enums;

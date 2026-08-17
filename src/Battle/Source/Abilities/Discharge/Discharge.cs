@@ -5,7 +5,6 @@ namespace Battle.Source.Abilities.Discharge
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Context;
     using Core.Data;
     using Core.Data.AbilityData;
     using Core.Entity;

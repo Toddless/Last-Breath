@@ -1,9 +1,12 @@
 namespace Battle.Services
 {
+    using Core.Ai.World;
     using Core.Ai.World.Skirmish;
+    using Core.Ai.World.Time;
     using Core.Data;
     using Core.Data.GameData;
     using Core.Entity;
+    using Core.Narrative.Facts;
     using Core.Reputation;
     using Core.Services;
     using Core.Session;
@@ -37,16 +40,16 @@ namespace Battle.Services
                 .AddGameDataParticipant<INpcBuffProvider, NpcBuffProvider>()
                 .AddSingleton<INpcSkirmishService, NpcSkirmishService>()
                 .AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>()
-                .AddGameDataParticipant<Core.Ai.World.Time.IWorldClock, GameWorldClock>()
-                .AddGameDataParticipant<Core.Ai.World.IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>()
+                .AddGameDataParticipant<IWorldClock, GameWorldClock>()
+                .AddGameDataParticipant<IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>()
                 .AddGameDataParticipant<IFactionRelationService, FactionRelationService>()
                 .AddGameDataParticipant<IReputationDeedProcessor, ReputationDeedProcessor>()
                 .AddSingleton<ReputationBroadcaster>()
                 .AddSingleton<IWitnessQuery, WorldWitnessQuery>()
                 .AddGameDataParticipant<IPersonalReputationService, PersonalReputationService>()
                 // World facts: the boss-gate reads them ("the twin is finally dead"); the tracker writes them.
-                .AddSingleton<Core.Narrative.Facts.IWorldFactsService, Core.Narrative.Facts.WorldFactsService>()
-                .AddSingleton<Core.Narrative.Facts.NpcFinalDeathFactTracker>()
+                .AddSingleton<IWorldFactsService, WorldFactsService>()
+                .AddSingleton<NpcFinalDeathFactTracker>()
                 // Project infrastructure (module discipline): the sandbox composes its own session
                 // reset — it no longer rides in the battle module. No save system here on purpose:
                 // saving belongs to the game project alone, the sandbox is for isolated tests.
@@ -54,7 +57,7 @@ namespace Battle.Services
             provider.AddBattleUiElementsFactory();
 
             provider.GetService<IGameDataService>().LoadAll();
-            provider.GetService<Core.Narrative.Facts.NpcFinalDeathFactTracker>(); // eager: lives on bus subscriptions only
+            provider.GetService<NpcFinalDeathFactTracker>(); // eager: lives on bus subscriptions only
             return provider;
         }
     }

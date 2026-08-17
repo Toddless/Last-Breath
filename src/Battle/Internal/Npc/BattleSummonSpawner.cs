@@ -4,7 +4,6 @@ namespace Battle.Internal.Npc
     using Core.Data.NpcData;
     using Core.Entity;
     using Godot;
-    using GameServiceProvider = Services.GameServiceProvider;
 
     /// <summary>
     /// Battle-side <see cref="IBattleNpcSpawner"/>: spawns summon bodies straight into the arena

@@ -2,12 +2,10 @@ namespace Battle.Source.UIElements
 {
     using Abilities;
     using Core.Battle.Abilities;
-    using Core.Inventory;
     using Core.Localization;
     using Core.Views;
     using Core.Views.UI;
     using Godot;
-    using Godot.Collections;
 
     /// <summary>What a cell needs from whoever owns it. One interface rather than four delegates: the
     /// four are one job — the panel's — and a cell handed them separately could be wired with half of

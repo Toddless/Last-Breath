@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using Core.Battle;
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Localization;

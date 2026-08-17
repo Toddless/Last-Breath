@@ -3,6 +3,7 @@ namespace Core.Battle.Abilities
     using System.Collections.Generic;
     using Data.AbilityData;
     using Entity.Components;
+    using Enums;
 
     /// <summary>
     /// Where an augment copy is born. The record says what the augment is worth at each rarity; the
@@ -32,20 +33,20 @@ namespace Core.Battle.Abilities
 
         /// <summary>A copy at a rarity somebody else decided — a loot table position that says what the
         /// seat is worth. The numbers are still this copy's own draw.</summary>
-        public AugmentInstance Mint(AbilityAugmentData record, Enums.Rarity rarity) =>
+        public AugmentInstance Mint(AbilityAugmentData record, Rarity rarity) =>
             new(record.Id, Rolled(record, rarity), rarity);
 
         /// <summary>One draw from the record's band, uniform across the steps it spans. Uniform is a
         /// PLACEHOLDER — the curve is a balance decision (see Docs/PLAN-Augments.md §4e).</summary>
-        public Enums.Rarity RollRarity(AbilityAugmentData record)
+        public Rarity RollRarity(AbilityAugmentData record)
         {
-            (Enums.Rarity worst, Enums.Rarity best) = record.RarityBand;
+            (Rarity worst, Rarity best) = record.RarityBand;
             if (worst == best) return worst;
 
             // The scale runs downward (Legendary is zero), so the band spans from the best value up.
             int from = (int)best;
             int to = (int)worst;
-            return (Enums.Rarity)(from <= to ? rnd.RandIntRange(from, to) : rnd.RandIntRange(to, from));
+            return (Rarity)(from <= to ? rnd.RandIntRange(from, to) : rnd.RandIntRange(to, from));
         }
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace Core.Battle.Abilities
         /// rarity exactly, so two copies of one record at one rarity are the same augment and the only
         /// thing luck decides about a copy is where it landed on the scale.
         /// </summary>
-        private static Dictionary<string, float> Rolled(AbilityAugmentData record, Enums.Rarity rarity)
+        private static Dictionary<string, float> Rolled(AbilityAugmentData record, Rarity rarity)
         {
             Dictionary<string, float> values = new(record.UpgradeProperties.Count);
 

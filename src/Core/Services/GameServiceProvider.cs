@@ -2,6 +2,10 @@ namespace Core.Services
 {
     using System;
     using System.Collections.Generic;
+    using Ai.World;
+    using Ai.World.Recovery;
+    using Ai.World.SmartPoints;
+    using Ai.World.Time;
     using Data;
     using Data.GameData;
     using Entity.Components;
@@ -49,9 +53,6 @@ namespace Core.Services
         public T GetService<T>()
             where T : notnull => _serviceProvider.GetRequiredService<T>();
 
-        public T GetKeyedService<T>(string key)
-            where T : notnull => _serviceProvider.GetRequiredKeyedService<T>(key);
-
         public IEnumerable<T> GetServices<T>() => _serviceProvider.GetServices<T>();
 
         private ServiceProvider BuildProvider(Action<IServiceCollection> configureProject)
@@ -80,7 +81,11 @@ namespace Core.Services
             services.AddSingleton<IUiContextService, UiContextService>();
             services.AddSingleton<IUIWindowPositionStorage, UiWindowPositionStorage>();
             services.AddSingleton<IPlayerAccessor, PlayerAccessor>();
-            services.AddSingleton< NotificationService>();
+            services.AddSingleton<IRestRecoveryService, RestRecoveryService>();
+            services.AddSingleton<ISmartPointRegistry, SmartPointRegistry>();
+            services.AddGameDataParticipant<IRecoveryConfigProvider, RecoveryConfigProvider>();
+
+            services.AddSingleton<NotificationService>();
             // The same instance handles the messages: Setup is called on the singleton by the bootstrap
             services.AddSingleton<IMessageHandler<SendNotificationMessageMessage>>(provider => provider.GetRequiredService<NotificationService>());
             services.AddSingleton(_ => CreateRandomizedGenerator());
