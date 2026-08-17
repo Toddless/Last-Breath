@@ -113,6 +113,10 @@ namespace Core.Battle.Abilities
         /// content the top activation stage brings, not the cast's own hit.</summary>
         public const string StageFourDamage = nameof(StageFourDamage);
 
+        /// <summary>Multiplier on what a cast's CONSUMED resource is worth — the rate at which spent health
+        /// or mana becomes power. Base one, so a record raises the rate rather than replacing it.</summary>
+        public const string ConsumeEffectiveness = nameof(ConsumeEffectiveness);
+
         /// <summary>Share of an impact's damage spilled onto an enemy the cast never aimed at. Nought is
         /// the honest base: an ability owning the concept spills nothing until something raises it.</summary>
         public const string SplashShare = nameof(SplashShare);

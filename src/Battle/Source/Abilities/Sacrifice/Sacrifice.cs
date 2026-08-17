@@ -30,6 +30,7 @@ namespace Battle.Source.Abilities.Sacrifice
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.ConsumeEffectiveness, 1f);
             parameters.RegisterDefault(Parameters.SacrificePercent, 0.15f);
             parameters.RegisterDefault(Parameters.RatePerHundred, 0.01f);
             parameters.RegisterDefault(AbilityParameter.Charges, 1);
@@ -43,7 +44,9 @@ namespace Battle.Source.Abilities.Sacrifice
             float sacrificed = owner.CurrentHealth * SacrificePercent;
             owner.ConsumeResource(Costs.Health, sacrificed);
 
-            float bonus = sacrificed / 100f * RatePerHundred;
+            // What the spent health is WORTH goes through the consumption multiplier; how much is spent
+            // does not — the record buys a better exchange rate, not a bigger sacrifice.
+            float bonus = sacrificed / 100f * RatePerHundred * this[AbilityParameter.ConsumeEffectiveness];
             await new SacrificeChargeEffect(Id, Charges, bonus, HealFromEmpoweredDamage)
                 .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
         }

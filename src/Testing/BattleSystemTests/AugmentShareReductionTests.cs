@@ -35,6 +35,10 @@
         /// price, both stated as shares of the ability's own numbers.</summary>
         private const string SurchargeAugment = "Augment_Reduce_Cooldown_Add_Cost";
 
+        /// <summary>The record that cuts the wait as whole TURNS rather than as a share of it — the design
+        /// list states this one flat, so it is the one that needs a floor of its own.</summary>
+        private const string FlatCutAugment = "Augment_Reduce_Cooldown_And_Cost";
+
         /// <summary>The record that took the place of two: the price paid in health. It moves no
         /// number at all â€” the cost type is categorical â€” so it appears here only where the collapse
         /// is what is being walked.</summary>
@@ -57,7 +61,7 @@
         /// <summary>How many augments the game holds after the collapse â€” the same number in the data
         /// and in the registry, because one half without the other is either an offer nothing builds
         /// or code nothing can reach.</summary>
-        private const int ShippedAugmentCount = 84;
+        private const int ShippedAugmentCount = 95;
 
         /// <summary>Every record the collapse of the base-contract families left behind, with the tier
         /// it was written at. All four claim the whole book, which is the widest reach in the system
@@ -261,6 +265,35 @@
 
             Assert.AreEqual(1f, cut.Cooldown, "the cut took the ability's whole wait instead of stopping at the floor");
             Assert.AreEqual(1f, surcharged.Cooldown, "the surcharge record took the ability's whole wait instead of stopping at the floor");
+        }
+
+        [TestMethod]
+        public void TheFlatCutStopsAtTheFloorAndLeavesAnInstantCastInstant()
+        {
+            // The FLAT cut of the same wait, which arrived with the design list's own wording ("shorter by
+            // one to two turns"). Turns are counted, so this record states them as figures rather than as a
+            // share — and a figure has no rounding to be saved by: two turns off a one-turn wait is minus
+            // one, and a negative wait never counts back down to nought, so the ability could never be cast
+            // again for the rest of the fight. Unreachable on the data shipped today (the shortest wait in
+            // the book is four turns and the record's own cut is one), which is exactly why the arithmetic
+            // is pinned here instead of resting on the guard alone.
+            var shortest = AbilityWith(cooldown: 1);
+            var instant = AbilityWith(cooldown: 0);
+            const float TwoTurns = 2f;
+
+            new AbilityAugmentReduceCooldownAndCost(FlatCutAugment, [], 1, TwoTurns, CostShare).Apply(shortest);
+            new AbilityAugmentReduceCooldownAndCost(FlatCutAugment, [], 1, TwoTurns, CostShare).Apply(instant);
+
+            Assert.AreEqual(1f, shortest.Cooldown, "a flat cut deeper than the wait drove it past the floor");
+            Assert.AreEqual(0f, instant.Cooldown, "an instant cast was handed a wait it was never written with");
+
+            // The floor is what holds it, and nothing else: the same move without one is the negative wait
+            // the record would otherwise ship.
+            Assert.AreEqual(-1f,
+                new SimpleAbilityParameterDecorator(
+                    AbilityParameter.Cooldown, Priority.Weak, OperationType.Subtract, TwoTurns, "probe", FlatCutAugment)
+                    .Decorate(1f),
+                "the flat decorator no longer reaches a negative wait without a floor, so the floor above proves nothing");
         }
 
         [TestMethod]

@@ -52,6 +52,7 @@ namespace Battle.Source.Abilities.Overload
             // The ability wears the 'buff' tag; without the key the effectiveness records that fit it
             // were bought and moved nothing.
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
+            parameters.RegisterDefault(AbilityParameter.ConsumeEffectiveness, 1f);
             parameters.RegisterDefault(Parameters.ManaBurnPercent, 0.25f);
             parameters.RegisterDefault(Parameters.DamagePerStep, 0.02f);
             parameters.RegisterDefault(Parameters.ManaPerStep, 3f);
@@ -93,7 +94,9 @@ namespace Battle.Source.Abilities.Overload
             float absorbed = owner.CurrentMana * plan.ManaBurnPercent;
             owner.CurrentMana -= absorbed;
 
-            float multiplier = plan.DamagePerStep * (absorbed / plan.ManaPerStep);
+            // The absorbed mana's WORTH goes through the consumption multiplier, not how much is absorbed.
+            float multiplier = plan.DamagePerStep * (absorbed / plan.ManaPerStep)
+                               * this[AbilityParameter.ConsumeEffectiveness];
             if (multiplier > 0)
                 await new OverloadChargeEffect(Id, multiplier).Apply(Laying(owner));
 

@@ -174,7 +174,43 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Porcupine", AbilityTags.Activation),
             ("Ability_Sacrifice", AbilityTags.Activation),
             ("Ability_Static_Armor", AbilityTags.Activation),
-            ("Ability_Twin_Assist_Shield", AbilityTags.Shield)
+            ("Ability_Twin_Assist_Shield", AbilityTags.Shield),
+
+            // Load-bearing since E-2a, where the base contract stopped being universal-only: the design
+            // list gives its records tags of their own, so 'scale', 'cost', 'cooldown', 'consume' and
+            // 'empowered' now carry augments onto the families that own those concepts.
+            ("Ability_Ares_Blessing", AbilityTags.Cooldown),
+            ("Ability_Ares_Blessing", AbilityTags.Cost),
+            ("Ability_Armageddon", AbilityTags.Scale),
+            ("Ability_Berserk_Fury", AbilityTags.Cooldown),
+            ("Ability_Berserk_Fury", AbilityTags.Cost),
+            ("Ability_Critical_Calculation", AbilityTags.Cooldown),
+            ("Ability_Critical_Calculation", AbilityTags.Cost),
+            ("Ability_Dark_Shroud", AbilityTags.Cooldown),
+            ("Ability_Dark_Shroud", AbilityTags.Cost),
+            ("Ability_Deep_Freeze", AbilityTags.Scale),
+            ("Ability_Discharge", AbilityTags.Scale),
+            ("Ability_Double_Strike", AbilityTags.Scale),
+            ("Ability_Head_Butt", AbilityTags.Scale),
+            ("Ability_Ice_Aegis", AbilityTags.Scale),
+            ("Ability_Ice_Block", AbilityTags.Scale),
+            ("Ability_Ice_Shards", AbilityTags.Scale),
+            ("Ability_Increasing_Pressure", AbilityTags.Scale),
+            ("Ability_Jar_Of_Poison", AbilityTags.Scale),
+            ("Ability_Overload", AbilityTags.Consume),
+            ("Ability_Overload", AbilityTags.Cooldown),
+            ("Ability_Overload", AbilityTags.Cost),
+            ("Ability_Poison_Coating", AbilityTags.Cooldown),
+            ("Ability_Poison_Coating", AbilityTags.Cost),
+            ("Ability_Poison_Explosion", AbilityTags.Scale),
+            ("Ability_Porcupine", AbilityTags.Cooldown),
+            ("Ability_Porcupine", AbilityTags.Cost),
+            ("Ability_Sacrifice", AbilityTags.Consume),
+            ("Ability_Sacrifice", AbilityTags.Cooldown),
+            ("Ability_Sacrifice", AbilityTags.Cost),
+            ("Ability_Sacrifice", AbilityTags.Empowered),
+            ("Ability_Series_Of_Attacks", AbilityTags.Scale),
+            ("Ability_Static_Armor", AbilityTags.Scale)
         ];
 
         [TestMethod]

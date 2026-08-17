@@ -50,6 +50,8 @@ namespace Core.Battle.Abilities
         public const string Armor = "armor";
         /// <summary>Burning damage over turns, as opposed to the fire damage of a cast itself.</summary>
         public const string Burn = "burn";
+        /// <summary>Bleeding damage over turns — the third of the damaging-over-time genera.</summary>
+        public const string Bleed = "bleed";
         /// <summary>Cast that climbs through stages, each one costing and hitting more than the last.</summary>
         public const string Charge = "charge";
         /// <summary>Takes the target's turn away (stun, freeze and the rest of the hard control).</summary>
@@ -109,7 +111,7 @@ namespace Core.Battle.Abilities
         {
             Attack, Spell, Series, Buff, Poison, Cold, Lightning, Fire, Stun, Freeze, Critical, Barrier,
             Mana, Health, Evasion, Execute, Retaliation, Empowered, Shield, Summon, Npc, Projectile,
-            Accuracy, Armor, Burn, Charge, Control, Cooldown, Cost, Curse, Damage, Debuff, Defence,
+            Accuracy, Armor, Bleed, Burn, Charge, Control, Cooldown, Cost, Curse, Damage, Debuff, Defence,
             Duration, Effect, Effectiveness, Evadable, Heal, Hit, Leech, Recovery, Restore, Scale,
             Splash, Spread, Stacks, Target, Thorn,
             Activation, Elemental, Physical, Pure, Consume, Fury, Stage,

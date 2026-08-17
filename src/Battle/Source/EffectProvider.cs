@@ -203,6 +203,12 @@ namespace Battle.Source
             _pairingReported = false;
         }
 
+        public int? StackCeilingOf(string effectId) =>
+            _canon.TryGetValue(effectId, out IReadOnlyDictionary<string, float>? canon)
+            && canon.TryGetValue("maxStacks", out float ceiling)
+                ? (int)ceiling
+                : null;
+
         public IReadOnlyCollection<string>? KeysOf(string effectId) =>
             s_factories.TryGetValue(effectId, out EffectFactory? factory) ? [.. factory.Keys] : null;
 

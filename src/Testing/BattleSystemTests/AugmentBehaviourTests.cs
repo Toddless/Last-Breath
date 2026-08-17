@@ -26,6 +26,10 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>The record written with no code at all — the whole point of the registry.</summary>
         private const string Codeless = "Augment_Clumsy_Blows";
 
+        /// <summary>Attacks the walks below deal — under every canonical stack cap in play, so what is
+        /// measured is one stack per touch rather than a cap being hit.</summary>
+        private const int SeriesAttacks = 4;
+
         [TestMethod]
         public void EveryRecordThatDeclaresABehaviourIsBuiltByIt()
         {
@@ -189,6 +193,38 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public async Task BothDamageOverTurnSeriesLayOneStackPerAttackAndNothingOnAHit()
+        {
+            // Two legendary records that exist as data and nothing else: the canon and the factory were
+            // already there, so what shipped is a line of json apiece. Nothing about them is visible in
+            // code to read, which is why the promise on the card — "every attack of the ability applies
+            // it" — is measured here on both, from both sides of the kind filter.
+            using var rolls = new CombatRandomScope(new SteadyRoll());
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            var owner = Fighter();
+
+            foreach ((string record, string effect) in s_dotSeries)
+            {
+                var target = Fighter();
+                Ability series = Seated(registry, catalog, "Ability_Series_Of_Attacks", record);
+                series.SetOwner(owner);
+                IBattleField field = FieldOf(owner, target);
+
+                for (int attack = 0; attack < SeriesAttacks; attack++)
+                    await series.ApplyImpactRiders(new AbilityImpact(owner, target, field) { Source = series, Kind = ImpactKind.Attack });
+
+                Assert.AreEqual(SeriesAttacks, Stacks(target, effect),
+                    $"'{record}' left something other than one stack of '{effect}' per attack");
+
+                // The other side of the filter, asked while the target is still below the cap: a stack that
+                // slipped through would show. The record says Attack and a hit is the other road entirely.
+                await series.ApplyImpactRiders(new AbilityImpact(owner, target, field) { Source = series, Kind = ImpactKind.Hit });
+
+                Assert.AreEqual(SeriesAttacks, Stacks(target, effect), $"'{record}' fired on a hit");
+            }
+        }
+
+        [TestMethod]
         public async Task TwoRecordsLayingOneEffectAreTwoStreamsOfStacks()
         {
             // The axis a rider is deduplicated on is the RECORD, not the effect it lays: two records
@@ -248,6 +284,14 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         private const string ClumsinessId = "Effect_Clumsiness";
+
+        /// <summary>The two damage-over-turn series of the design list and the effects they lay: records
+        /// and no code at all, which is exactly why the promise needs measuring rather than inferring.</summary>
+        private static readonly (string Record, string Effect)[] s_dotSeries =
+        [
+            ("Augment_Bleeding_Attack_Series", "Effect_Damage_Over_Turn_Bleed"),
+            ("Augment_Burning_Attack_Series", "Effect_Damage_Over_Turn_Burning")
+        ];
 
         /// <summary>The ability as the game builds it, wearing the named shipped records.</summary>
         private static Ability Seated(AbilityProvider registry, AbilityAugmentCatalog catalog, string abilityId, params string[] augmentIds)

@@ -642,6 +642,159 @@
             }
         },
         {
+            "id": "Augment_Weapon_Scale",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
+            "tier": 1,
+            "tags": [ "scale" ],
+            "upgradeProperties": {
+                "weaponDamageScale": 0.10
+            },
+            "bestRarityProperties": {
+                "weaponDamageScale": 0.35
+            }
+        },
+        {
+            "id": "Augment_Spell_Scale",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
+            "tier": 1,
+            "tags": [ "scale" ],
+            "upgradeProperties": {
+                "spellDamageScale": 0.15
+            },
+            "bestRarityProperties": {
+                "spellDamageScale": 0.45
+            }
+        },
+        {
+            "id": "Augment_Increasing_Scales_Add_Cooldown",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
+            "tier": 1,
+            "tags": [ "scale", "cooldown" ],
+            "upgradeProperties": {
+                "weaponDamageScale": 0.25,
+                "spellDamageScale": 0.25,
+                "cooldownTurns": 1
+            },
+            "bestRarityProperties": {
+                "weaponDamageScale": 0.45,
+                "spellDamageScale": 0.65,
+                "cooldownTurns": 4
+            }
+        },
+        {
+            "id": "Augment_Increasing_Scales_Add_Cost",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
+            "tier": 1,
+            "tags": [ "scale", "cost" ],
+            "upgradeProperties": {
+                "weaponDamageScale": 0.25,
+                "spellDamageScale": 0.25,
+                "costShare": 0.15
+            },
+            "bestRarityProperties": {
+                "weaponDamageScale": 0.45,
+                "spellDamageScale": 0.65,
+                "costShare": 0.45
+            }
+        },
+        {
+            "id": "Augment_Reduce_Cooldown_And_Cost",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
+            "tier": 1,
+            "tags": [ "cost", "cooldown" ],
+            "upgradeProperties": {
+                "cooldownTurns": 1,
+                "costShare": 0.10
+            },
+            "bestRarityProperties": {
+                "cooldownTurns": 2,
+                "costShare": 0.25
+            }
+        },
+        {
+            "id": "Augment_Reduce_Cost_Add_Cooldown",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
+            "tier": 1,
+            "tags": [ "cost", "cooldown" ],
+            "upgradeProperties": {
+                "costShare": 0.25,
+                "cooldownTurns": 1
+            },
+            "bestRarityProperties": {
+                "costShare": 0.60,
+                "cooldownTurns": 4
+            }
+        },
+        {
+            "id": "Augment_Additional_Stacks",
+            "minRarity": "Epic",
+            "maxRarity": "Legendary",
+            "tier": 1,
+            "tags": [ "stacks", "buff", "debuff" ],
+            "upgradeProperties": {
+                "amount": 1
+            },
+            "bestRarityProperties": {
+                "amount": 2
+            }
+        },
+        {
+            "id": "Augment_Additional_Charges",
+            "minRarity": "Epic",
+            "maxRarity": "Legendary",
+            "tier": 1,
+            "tags": [ "empowered" ],
+            "upgradeProperties": {
+                "amount": 1
+            },
+            "bestRarityProperties": {
+                "amount": 2
+            }
+        },
+        {
+            "id": "Augment_Consume_Effectiveness",
+            "minRarity": "Rare",
+            "maxRarity": "Legendary",
+            "tier": 2,
+            "tags": [ "consume" ],
+            "upgradeProperties": {
+                "amount": 0.05
+            },
+            "rarityLadder": {
+                "amount": [ 0.05, 0.10, 0.15 ]
+            }
+        },
+        {
+            "id": "Augment_Bleeding_Attack_Series",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
+            "grantsTags": [ "bleed", "debuff" ],
+            "tier": 3,
+            "tags": [ "attack", "series" ],
+            "behaviour": "ApplyEffectOnImpact",
+            "effectId": "Effect_Damage_Over_Turn_Bleed",
+            "impactKind": "Attack",
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Augment_Burning_Attack_Series",
+            "minRarity": "Legendary",
+            "maxRarity": "Legendary",
+            "grantsTags": [ "burn", "debuff" ],
+            "tier": 3,
+            "tags": [ "attack", "series" ],
+            "behaviour": "ApplyEffectOnImpact",
+            "effectId": "Effect_Damage_Over_Turn_Burning",
+            "impactKind": "Attack",
+            "upgradeProperties": {}
+        },
+        {
             "id": "Augment_Immortality",
             "minRarity": "Legendary",
             "maxRarity": "Legendary",
@@ -649,10 +802,7 @@
             "tier": 3,
             "tags": [ "buff" ],
             "abilityId": "Ability_Dark_Shroud",
-            "upgradeProperties": {
-                "duration": 3,
-                "stacks": 1
-            }
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Additional_Health_Regen",

@@ -88,6 +88,11 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Freeze_Increase_Ability_Cooldown", [AbilityTags.Debuff]),
             // Declared by a record and no code at all — the first applier the behaviour registry builds.
             ("Augment_Clumsy_Blows", [AbilityTags.Debuff]),
+
+            // E-2a: the two remaining damage-over-turn series, both records and no code — the canon and
+            // the factories were already there, so only the vocabulary had to learn 'bleed'.
+            ("Augment_Bleeding_Attack_Series", [AbilityTags.Bleed, AbilityTags.Debuff]),
+            ("Augment_Burning_Attack_Series", [AbilityTags.Burn, AbilityTags.Debuff]),
         ];
 
         /// <summary>
@@ -153,6 +158,16 @@ namespace LastBreathTest.BattleSystemTests
                 ["Ability_Critical_Calculation", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
                  "Ability_Poison_Explosion", "Ability_Porcupine"]),
 
+            // E-2a. The stack record rides in on 'buff' and 'debuff', and every ability a grant carries it
+            // onto is one that lays its payload from the canon rather than from its own Stacks key — so the
+            // whole grant-opened column is silent. The abilities it DOES move are reached by their own
+            // 'stacks' tag, which is the reach ledger's business rather than this one's.
+            ("Augment_Additional_Stacks",
+                [],
+                ["Ability_Armageddon", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"]),
+
             // Unbound at CL-7. Both carry a behaviour, so wherever a granted tag seats them they work —
             // there is no host key to be missing, which is why neither has an inert list at all.
             ("Augment_Apply_Enhanced_Defence",
@@ -183,6 +198,7 @@ namespace LastBreathTest.BattleSystemTests
             // is what makes each of those seatings measurable instead of a dead socket.
             ["Augment_Cooldown_Chance"] = AbilityParameter.CooldownReductionChance,
             ["Augment_Heal_From_Empowered_Ability_Damage"] = AbilityParameter.HealFromEmpoweredDamage,
+            ["Augment_Additional_Stacks"] = AbilityParameter.Stacks,
         };
 
         /// <summary>Grant-openable records whose whole behaviour rides in an impact rider and stands

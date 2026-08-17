@@ -28,7 +28,7 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>How many records the table took over from a class of their own. One left at CL-4b:
         /// the execution threshold became a SHARE of the number it moves, and a share is measured
         /// against the base rather than written as a figure — which is a factory, not a table row.</summary>
-        private const int TranslatedRecords = 26;
+        private const int TranslatedRecords = 32;
 
         /// <summary>Two bases every move is measured on. One of them has to be something other than
         /// nothing: an override and an addition are the same number on a base of zero, and a walk that
@@ -86,7 +86,19 @@ namespace LastBreathTest.BattleSystemTests
             // Three more records arrived at CL-7c with the keys they generalised onto. Their figures are
             // what the shipped record declares, which for a single-rarity band is also its only step.
             ("Augment_Accuracy", "AccuracyBonus", OperationType.Add, 0.15f),
-            ("Augment_Attack_Random_Target", "SplashShare", OperationType.Add, 0.75f)
+            ("Augment_Attack_Random_Target", "SplashShare", OperationType.Add, 0.75f),
+
+            // Six positions of the design list answered at E-2a. The flat halves of the base contract are
+            // rows; the three records that state part of themselves as a SHARE of the ability's own price
+            // stayed factories, which is the same line the cost and cooldown records were drawn on.
+            ("Augment_Weapon_Scale", "WeaponDamageScale", OperationType.Add, 0.10f),
+            ("Augment_Spell_Scale", "SpellDamageScale", OperationType.Add, 0.15f),
+            ("Augment_Increasing_Scales_Add_Cooldown", "WeaponDamageScale", OperationType.Add, 0.25f),
+            ("Augment_Increasing_Scales_Add_Cooldown", "SpellDamageScale", OperationType.Add, 0.25f),
+            ("Augment_Increasing_Scales_Add_Cooldown", "Cooldown", OperationType.Add, 1f),
+            ("Augment_Additional_Stacks", "Stacks", OperationType.Add, 1f),
+            ("Augment_Additional_Charges", "Charges", OperationType.Add, 1f),
+            ("Augment_Consume_Effectiveness", "ConsumeEffectiveness", OperationType.Add, 0.05f)
         ];
 
         [TestMethod]
@@ -233,11 +245,17 @@ namespace LastBreathTest.BattleSystemTests
         private static ParameterProbe ProbeAt(float start) => new(new AbilityBaseData
         {
             Id = "Ability_Parameter_Probe",
+            // Cost and cooldown come from the data FIELDS: the base contract registers them off those
+            // before the property bag is read, and a second registration of a key already registered is
+            // ignored — a probe writing them as properties would sit at nothing and every move measured
+            // against them would be measured against the wrong base.
             CostValue = (int)start,
+            Cooldown = (int)start,
             AbilityProperties = s_moves
                 .Select(move => move.Parameter)
                 .Distinct(StringComparer.Ordinal)
                 .Where(parameter => !string.Equals(parameter, AbilityParameter.CostValue, StringComparison.Ordinal))
+                .Where(parameter => !string.Equals(parameter, AbilityParameter.Cooldown, StringComparison.Ordinal))
                 .ToDictionary(parameter => parameter, _ => start, StringComparer.Ordinal)
         });
 

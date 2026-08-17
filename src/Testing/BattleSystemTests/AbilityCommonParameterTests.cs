@@ -37,7 +37,7 @@ namespace LastBreathTest.BattleSystemTests
         /// or not at all: half of it is a bill (two stacks fewer) and half is what pays for it.</summary>
         private const string StrongerFewer = "Augment_Add_Effectiveness_Reduce_Stacks";
 
-        /// <summary>The augment that puts Life-Giving Shade on the shroud's caster, and the record that
+        /// <summary>The augment that puts the Life Aegis on the shroud's caster, and the record that
         /// raises how strongly what the shroud lays lands.</summary>
         private const string Immortality = "Augment_Immortality";
         private const string StrongerRecovery = "Augment_Recovery_Effectiveness";
@@ -51,10 +51,10 @@ namespace LastBreathTest.BattleSystemTests
         private const string StrongerDebuff = "Augment_Debuff_Effectiveness";
         private const string AegisId = "Ability_Ice_Aegis";
 
-        /// <summary>Share of health the shade restores per evade before effectiveness, and what the
+        /// <summary>Share of health the aegis gives back before effectiveness, and what the
         /// record above is worth — both written out, because a walk that read either off the shipped
         /// files would agree with whatever those files became.</summary>
-        private const float ShadeRestore = 0.35f;
+        private const float AegisRestore = 0.35f;
         /// <summary>The WORST rung of the recovery record since CL-5 — what the record declares before a
         /// copy is minted at a rarity; an un-minted upgrade is built from that end.</summary>
         private const float RecoveryBonus = 0.10f;
@@ -117,20 +117,20 @@ namespace LastBreathTest.BattleSystemTests
         {
             // What effectiveness IS: the multiplier the values of what a cast lays are read through —
             // including the content an augment added, which is where it would be easiest to lose. The
-            // shade is put on the caster by one augment and its restore is raised by another, and
+            // aegis is put on the caster by one augment and what it gives back is raised by another, and
             // neither was written for the other: the applier reads the key at the moment of the cast,
             // so whatever is seated on it by then is already in the number.
-            float alone = await ShadeRestoredBy(Immortality);
-            float raised = await ShadeRestoredBy(Immortality, StrongerRecovery);
+            float alone = await AegisRestoredBy(Immortality);
+            float raised = await AegisRestoredBy(Immortality, StrongerRecovery);
 
-            Assert.AreEqual(ShadeRestore, alone, 0.0001f, "the shade no longer restores what its own record declares");
-            Assert.AreEqual(ShadeRestore * (1f + RecoveryBonus), raised, 0.0001f,
-                "the effectiveness record never reached the shade the shroud lays");
+            Assert.AreEqual(AegisRestore, alone, 0.0001f, "the aegis no longer gives back what the canon declares");
+            Assert.AreEqual(AegisRestore * (1f + RecoveryBonus), raised, 0.0001f,
+                "the effectiveness record never reached the aegis the shroud lays");
         }
 
-        /// <summary>What one evade under the shade gives back, with the named records seated: the shroud
+        /// <summary>What the dodged death gives back, with the named records seated: the shroud
         /// is cast on a real fighter and the effect is read off the one it landed on.</summary>
-        private static async Task<float> ShadeRestoredBy(params string[] augmentIds)
+        private static async Task<float> AegisRestoredBy(params string[] augmentIds)
         {
             var owner = new ConditionOwner();
             IAbility shroud = Wearing(ShroudId, augmentIds);
@@ -138,10 +138,10 @@ namespace LastBreathTest.BattleSystemTests
 
             await shroud.Execute([owner], Mock.Of<IBattleField>());
 
-            IEffect? shade = owner.Effects.Effects.FirstOrDefault(effect => effect.Id == "Effect_Life_Giving_Shade");
-            Assert.IsNotNull(shade, "the shroud never laid the shade at all, so the figure below proves nothing");
+            IEffect? aegis = owner.Effects.Effects.FirstOrDefault(effect => effect.Id == "Effect_Evade_First_Death");
+            Assert.IsNotNull(aegis, "the shroud never laid the aegis at all, so the figure below proves nothing");
 
-            return ((LifeGivingShadeEffect)shade).LifeToRecover;
+            return ((EvadeFirstDeath)aegis).PercentHealthToRecover;
         }
 
         /// <summary>The ability as the game builds it, wearing the named shipped records in the order

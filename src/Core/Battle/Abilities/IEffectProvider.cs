@@ -18,5 +18,10 @@ namespace Core.Battle.Abilities
 
         /// <summary>The effect, or null with a report: unknown id, unknown key or missing key.</summary>
         IEffect? CreateEffect(string id, RecordProperties properties);
+
+        /// <summary>How many stacks of an effect the canon balances it at, or null for an id the canon
+        /// deliberately leaves out — a state of an ability rather than a figure anybody balances (§4f).
+        /// What a cast LAYS is held to this, however high a record drives the ability's own stacks key.</summary>
+        int? StackCeilingOf(string effectId);
     }
 }

@@ -30,6 +30,23 @@
         /// the way through a fight.</summary>
         private int? _extensionBudget;
 
+        /// <summary>
+        /// The ceiling applied to what an instance claims: the smaller of what was asked for and what the
+        /// canon balances the effect at. A cast may drive its own <see cref="AbilityParameter.Stacks"/> as
+        /// high as records take it; what it LAYS stops at the number the effect is balanced for. Asked once,
+        /// at construction, so the stacking rule, the counters and every copy read one number.
+        /// <para>The registry is pulled from the composition at the moment of the question, like
+        /// <see cref="ResolveExtensionBudget"/> and for the same reasons: nothing holds a provider instance
+        /// that may have been discarded, and no order of loading decides the answer. An effect the canon
+        /// leaves out (Docs/PLAN-Augments §4f) and a host that composes no services at all both mean no
+        /// ceiling — the ability's own number stands.</para>
+        /// </summary>
+        private static int Capped(string effectId, int requested)
+        {
+            int? ceiling = GameServiceProvider.TryGet<IEffectProvider>()?.StackCeilingOf(effectId);
+            return ceiling == null ? requested : Math.Min(requested, ceiling.Value);
+        }
+
         protected EffectApplyingContext? Context { get; private set; }
 
         /// <summary>True when the stacking rules actually accepted this instance (see EffectsComponent).</summary>
@@ -65,7 +82,7 @@
             }
         } = duration;
 
-        public int MaxStacks { get; set; } = maxStacks;
+        public int MaxStacks { get; set; } = Capped(id, maxStacks);
 
         /// <summary>
         /// Turns this instance may gain from <see cref="Extend"/> in total, taken from the combat

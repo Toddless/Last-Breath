@@ -104,7 +104,17 @@ namespace LastBreathTest.BattleSystemTests
             ["Augment_Extend_Stun_Add_Cost"] =
                 ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
                  "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison",
-                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"]
+                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
+
+            // E-2a, and the same shape one wave on: the scales-for-turns record carries a tag that reaches
+            // the damaging family and a tag that reaches everything, so on the ten below it adds turns of
+            // waiting and no damage. Not a defect of the record — a consequence of the two tags its design
+            // line gives it, and the narrower alternative (binding it to abilities that declare scales) is
+            // the owner's to pick.
+            ["Augment_Increasing_Scales_Add_Cooldown"] =
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
+                 "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine",
+                 "Ability_Sacrifice", "Ability_Static_Armor"]
         };
 
         private static IEnumerable<string> Accepted(string augmentId) =>
@@ -335,6 +345,72 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Attack_Random_Target", AbilityParameter.SplashShare,
                 ["Ability_Increasing_Pressure"],
                 ["Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Series_Of_Attacks"]),
+
+            // E-2a: the base contract stops being universal-only. Each of these is judged by the tag its
+            // design line gives it, so for the first time the cost/cooldown/scale family has a reach worth
+            // measuring at all — the four older records of that family claim the whole book and never could.
+            // Three of the scale-tagged abilities never declare the coefficients: the aegis and the static
+            // armor carry scales inside their own plans, and the poison explosion's damage IS the stacks
+            // it consumes. They wear the tag and the record sits silent on them.
+            ("Augment_Weapon_Scale", AbilityParameter.WeaponDamageScale,
+                ["Ability_Armageddon", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
+                 "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks"],
+                ["Ability_Ice_Aegis", "Ability_Poison_Explosion", "Ability_Static_Armor"]),
+            ("Augment_Spell_Scale", AbilityParameter.SpellDamageScale,
+                ["Ability_Armageddon", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
+                 "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks"],
+                ["Ability_Ice_Aegis", "Ability_Poison_Explosion", "Ability_Static_Armor"]),
+
+            // The widest half-arrival in the catalog, and it comes straight out of the design line's own
+            // tags: 'scale' reaches the damaging family, 'cooldown' reaches EVERY ability, and the record
+            // carries both. Where only the surcharge lands the player pays turns for nothing — the same
+            // bargain shape the owner sanctioned for the stun record, written out per ability below.
+            // The berserker takes the scales and not the tag: he reaches this record through 'cooldown'.
+            ("Augment_Increasing_Scales_Add_Cooldown", AbilityParameter.WeaponDamageScale,
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks"],
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
+                 "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine",
+                 "Ability_Sacrifice", "Ability_Static_Armor"]),
+            ("Augment_Increasing_Scales_Add_Cooldown", AbilityParameter.SpellDamageScale,
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks"],
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
+                 "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine",
+                 "Ability_Sacrifice", "Ability_Static_Armor"]),
+            ("Augment_Increasing_Scales_Add_Cooldown", AbilityParameter.Cooldown,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
+
+            // Six abilities read their stacks key into what they lay; the rest wear the tag and lay their
+            // payload from the canon, where the ability's number is never consulted. The berserker is the
+            // named case of the second kind: his fury is built with a stack of one, literally.
+            ("Augment_Additional_Stacks", AbilityParameter.Stacks,
+                ["Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Double_Strike",
+                 "Ability_Ice_Aegis", "Ability_Ice_Block"],
+                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Jar_Of_Poison", "Ability_Overload",
+                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Sacrifice"]),
+
+            // The charge is the sacrifice's concept alone; the overload wears 'empowered' for the charge it
+            // ARMS on the next cast rather than for charges of its own.
+            ("Augment_Additional_Charges", AbilityParameter.Charges,
+                ["Ability_Sacrifice"],
+                ["Ability_Overload"]),
+
+            // Both wearers of 'consume' own the concept and read it, so this one has no silent seating at
+            // all: the sacrifice exchanges health for damage, the overload exchanges mana for it.
+            ("Augment_Consume_Effectiveness", AbilityParameter.ConsumeEffectiveness,
+                ["Ability_Overload", "Ability_Sacrifice"],
+                []),
         ];
 
         [TestMethod]

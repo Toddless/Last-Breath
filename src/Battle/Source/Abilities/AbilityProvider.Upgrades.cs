@@ -58,6 +58,31 @@
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("cooldownShare", 0.4f),
                     data.UpgradeProperties.GetValueOrDefault("costShare", 0.4f)),
+            // The three records whose design line mixes the shapes: whole turns or scale points of their
+            // own on one key, a share of the ability's own price on the other. The share is what keeps
+            // them out of the parameter table.
+            ["Augment_Reduce_Cooldown_And_Cost"] = data =>
+                new AbilityAugmentReduceCooldownAndCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cooldownTurns", 1f),
+                    data.UpgradeProperties.GetValueOrDefault("costShare", 0.10f)),
+            ["Augment_Reduce_Cost_Add_Cooldown"] = data =>
+                new AbilityAugmentReduceCostAddCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("costShare", 0.25f),
+                    data.UpgradeProperties.GetValueOrDefault("cooldownTurns", 1f)),
+            ["Augment_Increasing_Scales_Add_Cost"] = data =>
+                new AbilityAugmentRaiseScalesAddCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("weaponDamageScale", 0.25f),
+                    data.UpgradeProperties.GetValueOrDefault("spellDamageScale", 0.25f),
+                    data.UpgradeProperties.GetValueOrDefault("costShare", 0.15f)),
             ["Augment_Cost_Type_Health"] = data =>
                 new AbilityAugmentCostTypeOverride(
                     data.Id,
@@ -212,9 +237,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("lifeToRecover", 0.35f),
-                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                    (int)data.UpgradeProperties.GetValueOrDefault("stacks", 1)),
+                    () => EffectFromCanon("Effect_Evade_First_Death")),
             ["Ability_Pe_Augment_Execute_Bosses"] = data =>
                 new PeAugmentExecuteBosses(
                     data.Id,
@@ -344,6 +367,12 @@
         /// <para>Without a registry composed there is nothing to read the canon from, and the plain fury
         /// is laid instead of the variant — a sandbox answer, never a shipped one.</para>
         /// </summary>
+        /// <summary>An effect built entirely from the canon — every figure it carries is balanced in
+        /// <c>SharedData/Effects</c> and the record adds none of its own. Null without a composed registry,
+        /// which the riders read as "lay nothing" rather than throwing.</summary>
+        private IEffect? EffectFromCanon(string effectId) =>
+            _effects()?.CreateEffect(effectId, RecordProperties.Empty);
+
         private IEffect FuryFromCanon(string effectId, int duration, float healthPercent)
         {
             var owned = new Dictionary<string, float>(StringComparer.Ordinal)

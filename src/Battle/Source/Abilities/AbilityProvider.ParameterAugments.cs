@@ -174,6 +174,37 @@ namespace Battle.Source.Abilities
             [
                 new(AbilityParameter.SplashShare, OperationType.Add, "splashDamage", 0.75f)
             ],
+
+            // The base contract, tag-judged rather than universal: the design list gives each of these a
+            // tag of its own (scale / cooldown / stacks / empowered / consume), so they reach the family
+            // that owns the concept instead of the whole book. Only the flat halves live here — a record
+            // stating part of itself as a share of the ability's own price is a factory (Upgrades.cs).
+            ["Augment_Weapon_Scale"] =
+            [
+                new(AbilityParameter.WeaponDamageScale, OperationType.Add, "weaponDamageScale", 0.10f)
+            ],
+            ["Augment_Spell_Scale"] =
+            [
+                new(AbilityParameter.SpellDamageScale, OperationType.Add, "spellDamageScale", 0.15f)
+            ],
+            ["Augment_Increasing_Scales_Add_Cooldown"] =
+            [
+                new(AbilityParameter.WeaponDamageScale, OperationType.Add, "weaponDamageScale", 0.25f),
+                new(AbilityParameter.SpellDamageScale, OperationType.Add, "spellDamageScale", 0.25f),
+                new(AbilityParameter.Cooldown, OperationType.Add, "cooldownTurns", 1f)
+            ],
+            ["Augment_Additional_Stacks"] =
+            [
+                new(AbilityParameter.Stacks, OperationType.Add, "amount", 1f)
+            ],
+            ["Augment_Additional_Charges"] =
+            [
+                new(AbilityParameter.Charges, OperationType.Add, "amount", 1f)
+            ],
+            ["Augment_Consume_Effectiveness"] =
+            [
+                new(AbilityParameter.ConsumeEffectiveness, OperationType.Add, "amount", 0.05f)
+            ],
         };
     }
 }
