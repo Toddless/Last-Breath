@@ -7,7 +7,6 @@ namespace Core.Data.CombatRulesData
         [JsonProperty("controlResistance")] public ControlResistanceData ControlResistance { get; init; } = new();
         [JsonProperty("arena")] public ArenaData Arena { get; init; } = new();
         [JsonProperty("exhaustion")] public ExhaustionData Exhaustion { get; init; } = new();
-        [JsonProperty("abilityAugments")] public AbilityAugmentsData AbilityAugments { get; init; } = new();
         [JsonProperty("effects")] public EffectsData Effects { get; init; } = new();
     }
 
@@ -16,14 +15,6 @@ namespace Core.Data.CombatRulesData
     {
         /// <summary>Turns one instance may gain from extensions in total. Balance placeholder.</summary>
         [JsonProperty("maxExtendedTurns")] public int MaxExtendedTurns { get; init; } = 3;
-    }
-
-    /// <summary>The "abilityAugments" section: what every augment instance shares (see AugmentValueRules).</summary>
-    public record AbilityAugmentsData
-    {
-        /// <summary>Half-width of the band an augment's numbers roll in, as a share of the base
-        /// (0.25 = plus or minus a quarter). Zero pins every instance to what its record declares.</summary>
-        [JsonProperty("valueSpread")] public float ValueSpread { get; init; }
     }
 
     /// <summary>The "exhaustion" section: per-turn ability-spam limiter (see ExhaustionRules).</summary>

@@ -27,7 +27,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>What the shipped record says the stage refunds, and what the shipped record adds.</summary>
         private const float Refund = 0.45f;
-        private const float AddedEffectiveness = 0.35f;
+        private const float AddedEffectiveness = 0.10f;
 
         private const float Vitals = 100000f;
         private const float Barrier = 1000f;

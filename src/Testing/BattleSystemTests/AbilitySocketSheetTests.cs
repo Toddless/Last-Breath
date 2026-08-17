@@ -213,7 +213,7 @@ namespace LastBreathTest.BattleSystemTests
                 Board = new AbilitySocketBoard(_catalog);
                 Bag = new SlottedBag(BagSlots);
                 _minter = new AugmentItemMinter(_catalog, new AugmentMinter(
-                    _catalog, new StubCombatRules(new AugmentValueRules(Spread)), new DefaultRandomNumberGenerator(Seed)));
+                    _catalog, new DefaultRandomNumberGenerator(Seed)));
                 IPlayerAccessor players = AccessorFor(_book);
                 Gate = new AugmentInstallGate(Board, new Mock<IAbilityAugmentBinder>().Object, Bag);
                 Handler = new AbilitySocketRowsRequestHandler(Board, players, _abilities, _minter, _ => null);

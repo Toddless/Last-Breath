@@ -71,18 +71,17 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void TwoCopiesOfOneRecordAtOneRarityAreWorthTheSameHoweverTheyRolled()
+        public void TwoCopiesOfOneRecordAtOneRarityAreTheSameAugmentAndCostTheSame()
         {
-            // The point of pricing off the record: a copy that rolled the top of its band and one that
-            // rolled the bottom are the same augment. Were the NUMBERS in the price, a player would
-            // sell the good copy and keep the bad one, and every drop would be worth re-reading before
-            // it was worth using. The rarity is the copy's own and does move the price — that is the
-            // whole of the other axis — so it is pinned here rather than left to two draws.
+            // Since the value draw was dropped, two copies of one record at one rarity are identical —
+            // so this is no longer a claim about the price ignoring the numbers, it is the claim that
+            // the copy is its rarity and nothing else. The rarity IS in the price; that axis is pinned
+            // by the case below this one.
             AugmentItemMinter minter = ShippedMinter(seed: 7);
             IAugmentItem first = minter.Mint(ShippedRecord, Rarity.Rare)!;
             IAugmentItem second = minter.Mint(ShippedRecord, Rarity.Rare)!;
-            Assert.AreNotEqual(first.Augment.Values[ShippedProperty], second.Augment.Values[ShippedProperty],
-                "the two draws came out identical, so equal prices would prove nothing");
+            Assert.AreEqual(first.Augment.Values[ShippedProperty], second.Augment.Values[ShippedProperty],
+                "two copies of one record at one rarity came out at different numbers");
 
             var valuation = new ItemValuation(Config(), augments: ShippedAbilityData.Augments());
 
@@ -201,7 +200,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             AbilityAugmentCatalog catalog = ShippedAbilityData.Augments();
             return new AugmentItemMinter(catalog, new AugmentMinter(catalog,
-                new StubCombatRules(new AugmentValueRules(Spread)), new DefaultRandomNumberGenerator(seed)));
+                new DefaultRandomNumberGenerator(seed)));
         }
     }
 }

@@ -37,7 +37,7 @@ namespace LastBreathTest.BattleSystemTests
     public class ImpactKindTests
     {
         private const float Health = 100f;
-        private const int ExtraShards = 2;
+        private const int ExtraShards = 1;
 
         /// <summary>The shipped ability that counts its projectiles, and the shipped record that sells
         /// two more of them — the count the walk above moves by hand.</summary>

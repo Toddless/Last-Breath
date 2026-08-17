@@ -231,7 +231,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             AbilityAugmentCatalog catalog = ShippedAbilityData.Augments();
             return new AugmentItemMinter(catalog, new AugmentMinter(catalog,
-                new StubCombatRules(new AugmentValueRules(Spread)), new DefaultRandomNumberGenerator(seed)));
+                new DefaultRandomNumberGenerator(seed)));
         }
 
         /// <summary>A plain template of the kind the bag is built to pile up.</summary>

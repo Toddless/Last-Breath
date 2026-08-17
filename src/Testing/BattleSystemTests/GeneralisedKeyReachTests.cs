@@ -61,7 +61,7 @@ namespace LastBreathTest.BattleSystemTests
             // Not "the number went down" — that is what the ledger already says, and it stays true with
             // the execute condition reading a constant. What is asked is the only thing the player buys:
             // one victim, a stack count BETWEEN the worn threshold and the bare one, and the kill toggles.
-            const int Stacks = 12; // bare threshold 15 spares him; worn (0.25 off, → 11) executes him.
+            const int Stacks = 14; // bare threshold 15 spares him; worn (a tenth off, → 13) executes him.
 
             Assert.IsFalse(await Explodes(Stacks, wearing: null),
                 $"the bare explosion executed a target on {Stacks} stacks — its threshold is supposed to be above that");

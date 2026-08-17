@@ -72,7 +72,7 @@ namespace LastBreathTest.LootSimulation
             var augmentCatalog = shared.GetRequiredService<Core.Battle.Abilities.IAbilityAugmentCatalog>();
             var itemMinter = new Core.Items.ItemMinter(itemProvider, equipMinter, itemProvider,
                 new Core.Items.AugmentItemMinter(augmentCatalog,
-                    new Core.Battle.Abilities.AugmentMinter(augmentCatalog, combatRules, rnd)));
+                    new Core.Battle.Abilities.AugmentMinter(augmentCatalog, rnd)));
             var itemCreation = new ItemCreationService(itemProvider, rnd, itemMinter, materializer, effectCatalog,
                 new Core.Items.Grants.GrantFactory(() => null, () => null, () => null));
             var draw = new TableRecordDraw(augmentCatalog, rnd);

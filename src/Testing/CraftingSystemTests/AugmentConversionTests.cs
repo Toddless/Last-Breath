@@ -157,7 +157,7 @@ namespace LastBreathTest.CraftingSystemTests
         }
 
         [TestMethod]
-        public async Task TheResultIsRolledAfreshAndCarriesNothingOfWhatWasGiven()
+        public async Task TheResultIsMintedAfreshAndCarriesNothingOfWhatWasGiven()
         {
             // The reason the trade is a loss. The result's numbers come out of its OWN record, drawn
             // once for this copy: inherit the three, or come back at a plain base, and the conversion
@@ -175,8 +175,8 @@ namespace LastBreathTest.CraftingSystemTests
                 Assert.IsTrue(rolled > GivenBase / 2f, "the copies handed in are not worth what the case assumes");
             AssertDrawnAroundItsOwnBase(first.Augment.Values[Property], handedIn);
             AssertDrawnAroundItsOwnBase(second.Augment.Values[Property], handedIn);
-            Assert.AreNotEqual(first.Augment.Values[Property], second.Augment.Values[Property],
-                "two conversions of one class came out at the very same number — the result is not being rolled");
+            Assert.AreEqual(first.Augment.Values[Property], second.Augment.Values[Property],
+                "two conversions of one class came out at different numbers — a copy is its rarity and nothing else");
         }
 
         [TestMethod]
@@ -385,7 +385,7 @@ namespace LastBreathTest.CraftingSystemTests
                 Bag = new SlottedBag(slots);
                 Catalog = ShippedAbilityData.CatalogOver(Records());
                 _augments = new AugmentItemMinter(Catalog,
-                    new AugmentMinter(Catalog, new StubCombatRules(new AugmentValueRules(Spread)), _rnd));
+                    new AugmentMinter(Catalog, _rnd));
             }
 
             internal SlottedBag Bag { get; }

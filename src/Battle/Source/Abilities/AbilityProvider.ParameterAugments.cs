@@ -36,7 +36,7 @@ namespace Battle.Source.Abilities
             // Series of Attacks
             ["Augment_More_Attack_Damage"] =
             [
-                new(AbilityParameter.DamageMultiplier, OperationType.Add, "damageMultiplier", 0.15f)
+                new(AbilityParameter.DamageMultiplier, OperationType.Add, "damageMultiplier", 0.10f)
             ],
             ["Augment_Additional_Attacks"] =
             [
@@ -64,11 +64,11 @@ namespace Battle.Source.Abilities
             // Porcupine
             ["Augment_Cooldown_Chance"] =
             [
-                new(Porcupine.Porcupine.Parameters.CooldownReduceChance, OperationType.Add, "chance", 0.15f)
+                new(Porcupine.Porcupine.Parameters.CooldownReduceChance, OperationType.Add, "chance", 0.05f)
             ],
             ["Augment_Heal_On_Hit"] =
             [
-                new(Porcupine.Porcupine.Parameters.HealOnHit, OperationType.Add, "amount", 0.07f)
+                new(Porcupine.Porcupine.Parameters.HealOnHit, OperationType.Add, "amount", 0.03f)
             ],
             ["Augment_More_Retaliation"] =
             [
@@ -78,23 +78,23 @@ namespace Battle.Source.Abilities
             // Sacrifice
             ["Augment_Heal_From_Empowered_Ability_Damage"] =
             [
-                new(Sacrifice.Sacrifice.Parameters.HealPercent, OperationType.Add, "amount", 0.15f)
+                new(Sacrifice.Sacrifice.Parameters.HealPercent, OperationType.Add, "amount", 0.35f)
             ],
 
             // Berserk Fury
             ["Augment_Fury_More_Burn"] =
             [
-                new(BerserkFury.BerserkFury.Parameters.FuryHealthPercent, OperationType.Add, "amount", 0.035f)
+                new(BerserkFury.BerserkFury.Parameters.FuryHealthPercent, OperationType.Add, "amount", 0.01f)
             ],
             ["Augment_Fury_Less_Burn"] =
             [
-                new(BerserkFury.BerserkFury.Parameters.FuryHealthPercent, OperationType.Subtract, "amount", 0.02f)
+                new(BerserkFury.BerserkFury.Parameters.FuryHealthPercent, OperationType.Subtract, "amount", 0.01f)
             ],
 
             // Ares Blessing
             ["Augment_Health_Bonus"] =
             [
-                new(AbilityParameter.HealthBonus, OperationType.Add, "healthBonus", 0.15f)
+                new(AbilityParameter.HealthBonus, OperationType.Add, "healthBonus", 0.05f)
             ],
 
             // Double Strike
@@ -114,11 +114,11 @@ namespace Battle.Source.Abilities
             // Dark Shroud
             ["Augment_Additional_Health_Regen"] =
             [
-                new(AbilityParameter.HealthRegeneration, OperationType.Add, "additionalRegen", 0.025f)
+                new(AbilityParameter.HealthRegeneration, OperationType.Add, "additionalRegen", 0.01f)
             ],
             ["Augment_Add_Effectiveness_Reduce_Stacks"] =
             [
-                new(AbilityParameter.Effectiveness, OperationType.Add, "additionalEffectiveness", 0.35f),
+                new(AbilityParameter.Effectiveness, OperationType.Add, "additionalEffectiveness", 0.10f),
                 new(AbilityParameter.Stacks, OperationType.Subtract, "amountStacks", 2f)
             ],
 
@@ -129,36 +129,36 @@ namespace Battle.Source.Abilities
             // kind and an owner able to answer "which of my three".
             ["Augment_Buff_Effectiveness"] =
             [
-                new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.25f)
+                new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.15f)
             ],
             ["Augment_Recovery_Effectiveness"] =
             [
-                new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.35f)
+                new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.10f)
             ],
             ["Augment_Debuff_Effectiveness"] =
             [
-                new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.25f)
+                new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.15f)
             ],
 
             // Poison Explosion
             // Ice Shards
             ["Augment_Additional_Projectiles"] =
             [
-                new(AbilityParameter.ProjectileCount, OperationType.Add, "amount", 2f)
+                new(AbilityParameter.ProjectileCount, OperationType.Add, "amount", 1f)
             ],
             ["Augment_Additional_Crit_Damage"] =
             [
-                new(AbilityParameter.CriticalDamageBonus, OperationType.Add, "amount", 0.75f)
+                new(AbilityParameter.CriticalDamageBonus, OperationType.Add, "amount", 0.35f)
             ],
             ["Augment_Additional_Crit_Chance"] =
             [
-                new(AbilityParameter.CriticalChanceBonus, OperationType.Add, "amount", 0.35f)
+                new(AbilityParameter.CriticalChanceBonus, OperationType.Add, "amount", 0.25f)
             ],
 
             // Ice Blocks
             ["Augment_Stage_Four_Damage"] =
             [
-                new(IceBlock.IceBlocks.Parameters.ExtraBlockDamagePercent, OperationType.Add, "amount", 0.25f)
+                new(IceBlock.IceBlocks.Parameters.ExtraBlockDamagePercent, OperationType.Add, "amount", 0.10f)
             ],
         };
     }

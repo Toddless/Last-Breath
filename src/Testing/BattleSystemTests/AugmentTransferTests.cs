@@ -292,7 +292,7 @@ namespace LastBreathTest.BattleSystemTests
                     new AbilitySocketPlacement(ColdSlot, ColdAbility, Tier),
                 ]);
                 Augments = new AugmentItemMinter(_catalog, new AugmentMinter(_catalog,
-                    new StubCombatRules(new AugmentValueRules(Spread)), new DefaultRandomNumberGenerator(Seed)));
+                    new DefaultRandomNumberGenerator(Seed)));
                 Binder = new AbilityAugmentBinder(new PlayerAccessor(), Board, new Mock<IAbilityProvider>().Object);
             }
 

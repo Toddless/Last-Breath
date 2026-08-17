@@ -302,7 +302,7 @@ namespace LastBreathTest.BattleSystemTests
                 _players = AccessorFor(BookOverAFighter());
                 _bag = new SlottedBag(BagSlots);
                 _minter = new AugmentItemMinter(_catalog, new AugmentMinter(
-                    _catalog, new StubCombatRules(AugmentValueRules.Fixed), new DefaultRandomNumberGenerator(seed: 1)));
+                    _catalog, new DefaultRandomNumberGenerator(seed: 1)));
 
                 Board = new AbilitySocketBoard(_catalog);
                 Tree = NewTree();

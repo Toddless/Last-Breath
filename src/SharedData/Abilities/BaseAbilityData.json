@@ -471,7 +471,10 @@
             "tier": 2,
             "tags": [ "damage", "attack" ],
             "upgradeProperties": {
-                "damageMultiplier": 0.15
+                "damageMultiplier": 0.10
+            },
+            "bestRarityProperties": {
+                "damageMultiplier": 0.45
             }
         },
         {
@@ -510,7 +513,7 @@
             "tags": [],
             "abilityId": "Ability_Increasing_Pressure",
             "upgradeProperties": {
-                "splashDamage": 0.45
+                "splashDamage": 0.75
             }
         },
         {
@@ -550,7 +553,10 @@
             "tier": 2,
             "tags": [ "projectile" ],
             "upgradeProperties": {
-                "amount": 2
+                "amount": 1
+            },
+            "rarityLadder": {
+                "amount": [ 1, 2, 3, 4 ]
             }
         },
         {
@@ -560,7 +566,10 @@
             "tier": 1,
             "tags": [ "buff", "effectiveness" ],
             "upgradeProperties": {
-                "effectiveness": 0.25
+                "effectiveness": 0.15
+            },
+            "bestRarityProperties": {
+                "effectiveness": 0.35
             }
         },
         {
@@ -570,6 +579,9 @@
             "tier": 2,
             "tags": [ "recovery", "effectiveness" ],
             "upgradeProperties": {
+                "effectiveness": 0.10
+            },
+            "bestRarityProperties": {
                 "effectiveness": 0.35
             }
         },
@@ -580,7 +592,10 @@
             "tier": 1,
             "tags": [ "debuff", "effectiveness" ],
             "upgradeProperties": {
-                "effectiveness": 0.25
+                "effectiveness": 0.15
+            },
+            "bestRarityProperties": {
+                "effectiveness": 0.35
             }
         },
         {
@@ -647,7 +662,10 @@
             "tier": 2,
             "tags": [ "recovery", "health" ],
             "upgradeProperties": {
-                "additionalRegen": 0.025
+                "additionalRegen": 0.01
+            },
+            "rarityLadder": {
+                "additionalRegen": [ 0.01, 0.02, 0.035, 0.05 ]
             }
         },
         {
@@ -657,8 +675,11 @@
             "tier": 2,
             "tags": [ "stacks" ],
             "upgradeProperties": {
-                "additionalEffectiveness": 0.35,
+                "additionalEffectiveness": 0.10,
                 "amountStacks": 2
+            },
+            "bestRarityProperties": {
+                "additionalEffectiveness": 0.45
             }
         },
         {
@@ -682,7 +703,10 @@
             "tags": [ "critical", "health" ],
             "abilityId": "Ability_Critical_Calculation",
             "upgradeProperties": {
-                "amount": 0.15
+                "amount": 0.05
+            },
+            "bestRarityProperties": {
+                "amount": 0.25
             }
         },
         {
@@ -738,7 +762,10 @@
             "tier": 2,
             "tags": [ "execute" ],
             "upgradeProperties": {
-                "share": 0.25
+                "share": 0.10
+            },
+            "bestRarityProperties": {
+                "share": 0.35
             }
         },
         {
@@ -796,7 +823,7 @@
             "tags": [],
             "abilityId": "Ability_Double_Strike",
             "upgradeProperties": {
-                "amount": 0.25,
+                "amount": 0.45,
                 "duration": 3
             }
         },
@@ -822,6 +849,9 @@
             "abilityId": "Ability_Double_Strike",
             "upgradeProperties": {
                 "amount": 0.15
+            },
+            "bestRarityProperties": {
+                "amount": 0.45
             }
         },
         {
@@ -831,7 +861,10 @@
             "tier": 2,
             "tags": [ "health", "buff" ],
             "upgradeProperties": {
-                "healthBonus": 0.15
+                "healthBonus": 0.05
+            },
+            "rarityLadder": {
+                "healthBonus": [ 0.05, 0.075, 0.10, 0.15 ]
             }
         },
         {
@@ -882,7 +915,10 @@
             "tags": [ "hit" ],
             "abilityId": "Ability_Porcupine",
             "upgradeProperties": {
-                "amount": 0.07
+                "amount": 0.03
+            },
+            "rarityLadder": {
+                "amount": [ 0.03, 0.05, 0.07, 0.10 ]
             }
         },
         {
@@ -893,6 +929,9 @@
             "tags": [ "armor" ],
             "upgradeProperties": {
                 "amount": 0.15
+            },
+            "bestRarityProperties": {
+                "amount": 0.45
             }
         },
         {
@@ -903,7 +942,10 @@
             "tags": [],
             "abilityId": "Ability_Porcupine",
             "upgradeProperties": {
-                "chance": 0.15
+                "chance": 0.05
+            },
+            "rarityLadder": {
+                "chance": [ 0.05, 0.075, 0.10, 0.15 ]
             }
         },
         {
@@ -943,7 +985,10 @@
             "tier": 2,
             "tags": [ "fury", "health" ],
             "upgradeProperties": {
-                "amount": 0.035
+                "amount": 0.01
+            },
+            "rarityLadder": {
+                "amount": [ 0.01, 0.02, 0.035, 0.055 ]
             }
         },
         {
@@ -953,7 +998,10 @@
             "tier": 2,
             "tags": [ "fury", "health" ],
             "upgradeProperties": {
-                "amount": 0.02
+                "amount": 0.01
+            },
+            "rarityLadder": {
+                "amount": [ 0.01, 0.015, 0.025, 0.035 ]
             }
         },
         {
@@ -987,7 +1035,7 @@
             "tags": [ "health", "damage", "recovery" ],
             "abilityId": "Ability_Sacrifice",
             "upgradeProperties": {
-                "amount": 0.15
+                "amount": 0.35
             }
         },
         {
@@ -1045,7 +1093,10 @@
             "tags": [],
             "abilityId": "Ability_Ice_Block",
             "upgradeProperties": {
-                "amount": 0.25
+                "amount": 0.10
+            },
+            "bestRarityProperties": {
+                "amount": 0.45
             }
         },
         {
@@ -1056,7 +1107,7 @@
             "tags": [],
             "abilityId": "Ability_Ice_Block",
             "upgradeProperties": {
-                "chance": 0.25
+                "chance": 0.35
             }
         },
         {
@@ -1150,6 +1201,9 @@
             "abilityId": "Ability_Ice_Aegis",
             "upgradeProperties": {
                 "amount": 0.15
+            },
+            "bestRarityProperties": {
+                "amount": 0.35
             }
         },
         {
@@ -1184,7 +1238,10 @@
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
             "upgradeProperties": {
-                "amount": 0.75
+                "amount": 0.35
+            },
+            "bestRarityProperties": {
+                "amount": 0.90
             }
         },
         {
@@ -1195,7 +1252,10 @@
             "tags": [],
             "abilityId": "Ability_Ice_Shards",
             "upgradeProperties": {
-                "amount": 0.35
+                "amount": 0.25
+            },
+            "bestRarityProperties": {
+                "amount": 0.55
             }
         },
         {
@@ -1207,6 +1267,9 @@
             "abilityId": "Ability_Ice_Shards",
             "upgradeProperties": {
                 "amount": 0.25
+            },
+            "bestRarityProperties": {
+                "amount": 0.90
             }
         },
         {
@@ -1226,7 +1289,10 @@
             "tags": [],
             "abilityId": "Ability_Deep_Freeze",
             "upgradeProperties": {
-                "chance": 0.5
+                "chance": 0.15
+            },
+            "bestRarityProperties": {
+                "chance": 0.50
             }
         },
         {
@@ -1307,7 +1373,10 @@
             "tags": [],
             "fitsAnyAbility": true,
             "upgradeProperties": {
-                "costShare": 0.30
+                "costShare": 0.15
+            },
+            "bestRarityProperties": {
+                "costShare": 0.45
             }
         },
         {

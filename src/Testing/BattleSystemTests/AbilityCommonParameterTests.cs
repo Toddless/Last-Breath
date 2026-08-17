@@ -55,7 +55,13 @@ namespace LastBreathTest.BattleSystemTests
         /// record above is worth — both written out, because a walk that read either off the shipped
         /// files would agree with whatever those files became.</summary>
         private const float ShadeRestore = 0.35f;
-        private const float RecoveryBonus = 0.35f;
+        /// <summary>The WORST rung of the recovery record since CL-5 — what the record declares before a
+        /// copy is minted at a rarity; an un-minted upgrade is built from that end.</summary>
+        private const float RecoveryBonus = 0.10f;
+
+        /// <summary>The better of the two records where they meet — the debuff one, whose worst rung is
+        /// higher than the recovery record's.</summary>
+        private const float StrongerBonus = 0.15f;
 
         [TestMethod]
         public void TheRecordThatTradesStacksForEffectivenessDeliversBothHalvesOnEveryAbilityItReaches()
@@ -71,7 +77,7 @@ namespace LastBreathTest.BattleSystemTests
 
                 Assert.AreEqual(bare[AbilityParameter.Stacks] - 2f, traded[AbilityParameter.Stacks],
                     $"'{StrongerFewer}' no longer takes its two stacks off '{abilityId}'");
-                Assert.AreEqual(bare[AbilityParameter.Effectiveness] + 0.35f, traded[AbilityParameter.Effectiveness],
+                Assert.AreEqual(bare[AbilityParameter.Effectiveness] + 0.10f, traded[AbilityParameter.Effectiveness],
                     $"'{StrongerFewer}' charges '{abilityId}' two stacks and hands back no effectiveness");
             }
         }
@@ -85,7 +91,7 @@ namespace LastBreathTest.BattleSystemTests
             IAbility bare = Wearing(ShroudId);
             IAbility both = Wearing(ShroudId, StrongerBuff, StrongerRecovery);
 
-            Assert.AreEqual(bare[AbilityParameter.Effectiveness] + RecoveryBonus, both[AbilityParameter.Effectiveness],
+            Assert.AreEqual(bare[AbilityParameter.Effectiveness] + StrongerBonus, both[AbilityParameter.Effectiveness],
                 0.0001f, "the two records of one family were added up instead of the better one being worn");
         }
 

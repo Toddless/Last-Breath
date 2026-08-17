@@ -40,7 +40,7 @@ namespace LastBreathTest.BattleSystemTests
         /// carries and what the augment falls back to when a record carries nothing.</summary>
         private static readonly (string Augment, string Parameter, OperationType Operation, float Amount)[] s_moves =
         [
-            ("Augment_More_Attack_Damage", "DamageMultiplier", OperationType.Add, 0.15f),
+            ("Augment_More_Attack_Damage", "DamageMultiplier", OperationType.Add, 0.10f),
             ("Augment_Additional_Attacks", "MinAttacks", OperationType.Add, 1f),
             ("Augment_Additional_Attacks", "MaxAttacks", OperationType.Add, 1f),
 
@@ -50,16 +50,16 @@ namespace LastBreathTest.BattleSystemTests
 
             ("Augment_Overload_Mana_Step", "ManaPerStep", OperationType.Subtract, 1.5f),
 
-            ("Augment_Cooldown_Chance", "CooldownReduceChance", OperationType.Add, 0.15f),
-            ("Augment_Heal_On_Hit", "HealOnHit", OperationType.Add, 0.07f),
+            ("Augment_Cooldown_Chance", "CooldownReduceChance", OperationType.Add, 0.05f),
+            ("Augment_Heal_On_Hit", "HealOnHit", OperationType.Add, 0.03f),
             ("Augment_More_Retaliation", "ArmorReturn", OperationType.Add, 0.15f),
 
-            ("Augment_Heal_From_Empowered_Ability_Damage", "HealPercent", OperationType.Add, 0.15f),
+            ("Augment_Heal_From_Empowered_Ability_Damage", "HealPercent", OperationType.Add, 0.35f),
 
-            ("Augment_Fury_More_Burn", "FuryHealthPercent", OperationType.Add, 0.035f),
-            ("Augment_Fury_Less_Burn", "FuryHealthPercent", OperationType.Subtract, 0.02f),
+            ("Augment_Fury_More_Burn", "FuryHealthPercent", OperationType.Add, 0.01f),
+            ("Augment_Fury_Less_Burn", "FuryHealthPercent", OperationType.Subtract, 0.01f),
 
-            ("Augment_Health_Bonus", "HealthBonus", OperationType.Add, 0.15f),
+            ("Augment_Health_Bonus", "HealthBonus", OperationType.Add, 0.05f),
 
             ("Augment_Restore_Mana_Health_On_Hit", "HealthRestore", OperationType.Add, 0.07f),
             ("Augment_Restore_Mana_Health_On_Hit", "ManaRestore", OperationType.Add, 0.07f),
@@ -67,20 +67,20 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Extend_Stun_Add_Cost", "StunDuration", OperationType.Add, 1f),
             ("Augment_Extend_Stun_Add_Cost", "CostValue", OperationType.Add, 50f),
 
-            ("Augment_Additional_Health_Regen", "HealthRegeneration", OperationType.Add, 0.025f),
-            ("Augment_Add_Effectiveness_Reduce_Stacks", "Effectiveness", OperationType.Add, 0.35f),
+            ("Augment_Additional_Health_Regen", "HealthRegeneration", OperationType.Add, 0.01f),
+            ("Augment_Add_Effectiveness_Reduce_Stacks", "Effectiveness", OperationType.Add, 0.10f),
             ("Augment_Add_Effectiveness_Reduce_Stacks", "Stacks", OperationType.Subtract, 2f),
 
 
-            ("Augment_Additional_Projectiles", "ProjectileCount", OperationType.Add, 2f),
-            ("Augment_Buff_Effectiveness", "Effectiveness", OperationType.Add, 0.25f),
-            ("Augment_Recovery_Effectiveness", "Effectiveness", OperationType.Add, 0.35f),
-            ("Augment_Debuff_Effectiveness", "Effectiveness", OperationType.Add, 0.25f),
+            ("Augment_Additional_Projectiles", "ProjectileCount", OperationType.Add, 1f),
+            ("Augment_Buff_Effectiveness", "Effectiveness", OperationType.Add, 0.15f),
+            ("Augment_Recovery_Effectiveness", "Effectiveness", OperationType.Add, 0.10f),
+            ("Augment_Debuff_Effectiveness", "Effectiveness", OperationType.Add, 0.15f),
 
-            ("Augment_Additional_Crit_Damage", "CriticalDamageBonus", OperationType.Add, 0.75f),
-            ("Augment_Additional_Crit_Chance", "CriticalChanceBonus", OperationType.Add, 0.35f),
+            ("Augment_Additional_Crit_Damage", "CriticalDamageBonus", OperationType.Add, 0.35f),
+            ("Augment_Additional_Crit_Chance", "CriticalChanceBonus", OperationType.Add, 0.25f),
 
-            ("Augment_Stage_Four_Damage", "ExtraBlockDamagePercent", OperationType.Add, 0.25f)
+            ("Augment_Stage_Four_Damage", "ExtraBlockDamagePercent", OperationType.Add, 0.10f)
         ];
 
         [TestMethod]

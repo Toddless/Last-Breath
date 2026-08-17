@@ -82,5 +82,35 @@ namespace Core.Data.AbilityData
         [JsonProperty("propertyRefs")] public Dictionary<string, string> PropertyRefs { get; init; } = [];
 
         [JsonProperty("upgradeProperties")] public Dictionary<string, float> UpgradeProperties { get; init; } = [];
+
+        /// <summary>
+        /// The far end of a design line that states a RANGE: what the property is worth at the BEST
+        /// rarity the record rolls, where <see cref="UpgradeProperties"/> gives it at the worst. A
+        /// record whose line names one number writes nothing here and every rarity is worth the same —
+        /// which is most of the catalog, so the field stays absent rather than repeating the figure.
+        /// Only properties the line puts a range on belong here; durations and stack counts the line
+        /// states flatly are not ladders. See <c>Docs/PLAN-Augments.md §4g</c>.
+        /// </summary>
+        [JsonProperty("bestRarityProperties")] public Dictionary<string, float> BestRarityProperties { get; init; } = [];
+
+        /// <summary>
+        /// The rungs written out by hand, worst rarity first, one per rarity of the band. For lines the
+        /// even interpolation reads badly on — a narrow share ladder rounds two rarities onto one figure
+        /// — the author names every step instead, and nothing is interpolated or rounded. A record
+        /// without one keeps the two-ends path.
+        /// </summary>
+        [JsonProperty("rarityLadder")] public Dictionary<string, float[]> RarityLadder { get; init; } = [];
+
+        /// <summary>What one property is worth at the two ends of the band — the far end when the
+        /// record names one, the same figure twice when it does not.</summary>
+        public (float AtWorst, float AtBest) Ends(string property)
+        {
+            float atWorst = UpgradeProperties.GetValueOrDefault(property);
+            return (atWorst, BestRarityProperties.GetValueOrDefault(property, atWorst));
+        }
+
+        /// <summary>The author's own rungs for a property, or null where there are none.</summary>
+        public IReadOnlyList<float>? AuthoredRungs(string property) =>
+            RarityLadder.TryGetValue(property, out float[]? rungs) && rungs.Length > 0 ? rungs : null;
     }
 }

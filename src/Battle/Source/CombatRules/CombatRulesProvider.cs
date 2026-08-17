@@ -19,8 +19,6 @@ namespace Battle.Source.CombatRules
 
         public ExhaustionRules Exhaustion { get; private set; } = ExhaustionRules.Disabled;
 
-        public AugmentValueRules AugmentValues { get; private set; } = AugmentValueRules.Fixed;
-
         public EffectRules Effects { get; private set; } = EffectRules.Default;
 
         public IReadOnlyList<string> Catalogs => [DataCatalog.CombatRules];
@@ -40,7 +38,6 @@ namespace Battle.Source.CombatRules
                 mask, data.ControlResistance.DurationMultipliers, appliesTo, data.ControlResistance.ResistanceDecayTurns);
             Arena = new ArenaRules(data.Arena.MaxBattleSlots);
             Exhaustion = new ExhaustionRules(data.Exhaustion.CostIncreasePerStack, data.Exhaustion.DecayPerTurn);
-            AugmentValues = new AugmentValueRules(data.AbilityAugments.ValueSpread);
             Effects = new EffectRules(data.Effects.MaxExtendedTurns);
         }
     }
