@@ -107,15 +107,18 @@ namespace LastBreathTest.BattleSystemTests
             // reached through granting donors instead).
             // Discharge and Static Armor stopped being inert at CL-3b: both declare effectiveness now
             // and both have content that reads it — their barrier refunds travel as EffectValues.
+            // The head butt and the pressure arrived at CL-7c: both own effectiveness now — not for
+            // anything they lay themselves, but for what the appliers hang on their attacks — so all
+            // three records of the family stopped being inert on them at once.
             ("Augment_Buff_Effectiveness",
-                ["Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Static_Armor"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
+                ["Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Static_Armor"],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Ice_Shards", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
             // The porcupine reads effectiveness now, so the recovery record stopped being inert on it.
             // Discharge and Static Armor left at the re-markup: both carry "recovery" of their own now.
             // Overload joined at CL-3b: its charge multiplier became an EffectValue.
             ("Augment_Recovery_Effectiveness",
-                ["Ability_Critical_Calculation", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating", "Ability_Porcupine"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Sacrifice", "Ability_Series_Of_Attacks"]),
+                ["Ability_Critical_Calculation", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating", "Ability_Porcupine"],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Ice_Shards", "Ability_Poison_Explosion", "Ability_Sacrifice", "Ability_Series_Of_Attacks"]),
             // The jar and the shards left the row in the catalog cleanup: their own debuff donors
             // (the jar's trio of vial debuffs, the shards' fragility) were removed with the catalog.
             // The berserker left at the re-markup: his fury carries "debuff" of its own now.
@@ -133,9 +136,22 @@ namespace LastBreathTest.BattleSystemTests
             // "debuff" wherever "attack" carries them, which opens this record on five more.
             ("Augment_Debuff_Effectiveness",
                 ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Discharge",
-                 "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
-                ["Ability_Armageddon", "Ability_Head_Butt", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
-                 "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
+                 "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
+                 "Ability_Porcupine", "Ability_Static_Armor"],
+                ["Ability_Armageddon", "Ability_Ice_Shards", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
+
+            // Generalised at CL-7c, and both land the way Health_Bonus does: the one ability that owns the
+            // concept is reached by its OWN tags, so every seating a grant opens for them is a silent one.
+            ("Augment_Cooldown_Chance",
+                [],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Poison_Explosion",
+                 "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
+            ("Augment_Heal_From_Empowered_Ability_Damage",
+                [],
+                ["Ability_Critical_Calculation", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine"]),
 
             // Unbound at CL-7. Both carry a behaviour, so wherever a granted tag seats them they work —
             // there is no host key to be missing, which is why neither has an inert list at all.
@@ -162,6 +178,11 @@ namespace LastBreathTest.BattleSystemTests
             // makes them probeable, which is the same thing as making them safe to be carried.
             ["Augment_Additional_Health_Regen"] = AbilityParameter.HealthRegeneration,
             ["Augment_Health_Bonus"] = AbilityParameter.HealthBonus,
+            // Generalised at CL-7c. Both reach strangers through a granted tag — the pain-driven cooldown
+            // chance through 'buff', the harvest heal through 'recovery' — and being on a key of the book
+            // is what makes each of those seatings measurable instead of a dead socket.
+            ["Augment_Cooldown_Chance"] = AbilityParameter.CooldownReductionChance,
+            ["Augment_Heal_From_Empowered_Ability_Damage"] = AbilityParameter.HealFromEmpoweredDamage,
         };
 
         /// <summary>Grant-openable records whose whole behaviour rides in an impact rider and stands

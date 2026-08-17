@@ -82,8 +82,7 @@ namespace Battle.Source.Abilities
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(AbilityParameter.CriticalChanceBonus, 0f);
-            parameters.RegisterDefault(AbilityParameter.CriticalDamageBonus, 0f);
+            RegisterCriticalParameters(parameters);
         }
 
         /// <summary>Ability bonus is a fractional increase over the owner's crit chance (0.35 = +35%).</summary>

@@ -64,7 +64,7 @@ namespace Battle.Source.Abilities
             // Porcupine
             ["Augment_Cooldown_Chance"] =
             [
-                new(Porcupine.Porcupine.Parameters.CooldownReduceChance, OperationType.Add, "chance", 0.05f)
+                new(AbilityParameter.CooldownReductionChance, OperationType.Add, "chance", 0.05f)
             ],
             ["Augment_Heal_On_Hit"] =
             [
@@ -78,7 +78,7 @@ namespace Battle.Source.Abilities
             // Sacrifice
             ["Augment_Heal_From_Empowered_Ability_Damage"] =
             [
-                new(Sacrifice.Sacrifice.Parameters.HealPercent, OperationType.Add, "amount", 0.35f)
+                new(AbilityParameter.HealFromEmpoweredDamage, OperationType.Add, "amount", 0.35f)
             ],
 
             // Berserk Fury
@@ -100,8 +100,12 @@ namespace Battle.Source.Abilities
             // Double Strike
             ["Augment_Restore_Mana_Health_On_Hit"] =
             [
-                new(DoubleStrike.DoubleStrike.Parameters.HealthRestore, OperationType.Add, "healthRestore", 0.07f),
-                new(DoubleStrike.DoubleStrike.Parameters.ManaRestore, OperationType.Add, "manaRestore", 0.07f)
+                new(AbilityParameter.HealthRestore, OperationType.Add, "healthRestore", 0.07f),
+                new(AbilityParameter.ManaRestore, OperationType.Add, "manaRestore", 0.07f)
+            ],
+            ["Augment_Accuracy"] =
+            [
+                new(AbilityParameter.AccuracyBonus, OperationType.Add, "amount", 0.15f)
             ],
 
             // Head Butt
@@ -158,7 +162,17 @@ namespace Battle.Source.Abilities
             // Ice Blocks
             ["Augment_Stage_Four_Damage"] =
             [
-                new(IceBlock.IceBlocks.Parameters.ExtraBlockDamagePercent, OperationType.Add, "amount", 0.10f)
+                new(AbilityParameter.StageFourDamage, OperationType.Add, "amount", 0.10f)
+            ],
+            ["Augment_Reset_Chance"] =
+            [
+                new(AbilityParameter.CooldownResetChance, OperationType.Add, "chance", 0.35f)
+            ],
+
+            // Increasing Pressure
+            ["Augment_Attack_Random_Target"] =
+            [
+                new(AbilityParameter.SplashShare, OperationType.Add, "splashDamage", 0.75f)
             ],
         };
     }

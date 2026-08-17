@@ -18,14 +18,13 @@ namespace Battle.Source.Abilities.Porcupine
         public float DamageReturn => this[Parameters.DamageReturn];
         public float ArmorReturn => this[Parameters.ArmorReturn];
         public float HealOnHit => this[Parameters.HealOnHit];
-        public float CooldownReduceChance => this[Parameters.CooldownReduceChance];
+        public float CooldownReductionChance => this[AbilityParameter.CooldownReductionChance];
 
         public static class Parameters
         {
             public const string DamageReturn = nameof(DamageReturn);
             public const string ArmorReturn = nameof(ArmorReturn);
             public const string HealOnHit = nameof(HealOnHit);
-            public const string CooldownReduceChance = nameof(CooldownReduceChance);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
@@ -36,13 +35,13 @@ namespace Battle.Source.Abilities.Porcupine
             parameters.RegisterDefault(Parameters.DamageReturn, 0.25f);
             parameters.RegisterDefault(Parameters.ArmorReturn, 0.15f);
             parameters.RegisterDefault(Parameters.HealOnHit, 0f);
-            parameters.RegisterDefault(Parameters.CooldownReduceChance, 0f);
+            parameters.RegisterDefault(AbilityParameter.CooldownReductionChance, 0f);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new Porcupine(Data));
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) =>
-            await new PorcupineBuffEffect(this, Duration, DamageReturn, ArmorReturn, HealOnHit, CooldownReduceChance)
+            await new PorcupineBuffEffect(this, Duration, DamageReturn, ArmorReturn, HealOnHit, CooldownReductionChance)
                 .Apply(Laying(owner));
     }
 }

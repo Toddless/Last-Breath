@@ -112,7 +112,7 @@ namespace LastBreathTest.BattleSystemTests
                 new BerserkFuryCast(Data()),
                 new DoubleStrikeCast(Data()),
                 new HeadButtCast(Data()),
-                new SplashRandomTargetRider(0.5f),
+                new SplashRandomTargetRider(),
                 new ReduceRandomCooldownActivationRider("Rider_Test", 1),
                 new TransferPoisonOnDeathRider(),
                 new PorcupineBuffEffect(new ChainLightningCast(Data()), duration: 2, damageReturn: 0.5f, armorReturn: 0f, healOnHitPercent: 0f, cooldownReduceChance: 1f),
@@ -236,10 +236,12 @@ namespace LastBreathTest.BattleSystemTests
             var caster = Fighter();
             var hit = Fighter();
             var bystander = Fighter();
-            return new SplashRandomTargetRider(0.5f)
+            // The share belongs to the ability now, so the source has to own one: a rider on a cast that
+            // spills nothing returns before it rolls, which is the whole of the nought base.
+            return new SplashRandomTargetRider()
                 .Apply(new AbilityImpact(caster, hit, FieldOf(caster, hit, bystander), Succeeded: true, IsCritical: false, Damage)
                 {
-                    Source = new IncreasingPressureCast(Data()),
+                    Source = new IncreasingPressureCast(Splashing()),
                     Kind = ImpactKind.Attack
                 });
         }
@@ -367,6 +369,13 @@ namespace LastBreathTest.BattleSystemTests
             ApplyOnHitTaken: false);
 
         private static AbilityBaseData Data(string id = "Ability_Test_Delivery") => new() { Id = id };
+
+        /// <summary>Delivery data of an ability that spills a share of every impact it lands.</summary>
+        private static AbilityBaseData Splashing() => new()
+        {
+            Id = "Ability_Test_Delivery",
+            AbilityProperties = new Dictionary<string, float> { ["splashShare"] = 0.5f }
+        };
 
         private static ConditionOwner Fighter()
         {

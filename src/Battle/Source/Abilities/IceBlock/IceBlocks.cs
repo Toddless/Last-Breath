@@ -32,8 +32,8 @@ namespace Battle.Source.Abilities.IceBlock
         public int StunDuration => (int)this[AbilityParameter.StunDuration];
         public int ExtraBlocks => (int)this[Parameters.ExtraBlocks];
 
-        /// <summary>L3 upgrade point: chance to reset the cooldown after the cast.</summary>
-        public float ResetCooldownChance { get; set; }
+        /// <summary>Chance the cast clears its own cooldown when it is done.</summary>
+        public float ResetCooldownChance => this[AbilityParameter.CooldownResetChance];
 
         /// <summary>L3 upgrade point: the stage-4 extra blocks crash on random enemies instead of the target.</summary>
         public bool ExtraBlocksHitRandomTargets { get; set; }
@@ -46,7 +46,6 @@ namespace Battle.Source.Abilities.IceBlock
             public const string WitheringDuration = nameof(WitheringDuration);
             public const string WitheringValue = nameof(WitheringValue);
             public const string ExtraBlocks = nameof(ExtraBlocks);
-            public const string ExtraBlockDamagePercent = nameof(ExtraBlockDamagePercent);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
@@ -59,12 +58,12 @@ namespace Battle.Source.Abilities.IceBlock
             parameters.RegisterDefault(AbilityParameter.Stacks, 3);
             parameters.RegisterDefault(Parameters.WitheringValue, 0.15f);
             parameters.RegisterDefault(Parameters.ExtraBlocks, 3);
-            parameters.RegisterDefault(Parameters.ExtraBlockDamagePercent, 0.5f);
+            parameters.RegisterDefault(AbilityParameter.StageFourDamage, 0.5f);
+            parameters.RegisterDefault(AbilityParameter.CooldownResetChance, 0f);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new IceBlocks(Data)
         {
-            ResetCooldownChance = ResetCooldownChance,
             ExtraBlocksHitRandomTargets = ExtraBlocksHitRandomTargets,
             ConsumeStunForDoubleDamage = ConsumeStunForDoubleDamage
         });
@@ -159,7 +158,7 @@ namespace Battle.Source.Abilities.IceBlock
         /// nobody counts, spilled by an impact rather than aimed by the cast.</summary>
         private async Task DropExtraBlocks(IceBlockPlan plan, IFightable owner, IBattleField field, IFightable target)
         {
-            float blockDamage = CalculateHitDamage(plan, owner) * this[Parameters.ExtraBlockDamagePercent];
+            float blockDamage = CalculateHitDamage(plan, owner) * this[AbilityParameter.StageFourDamage];
             for (int i = 0; i < ExtraBlocks; i++)
             {
                 IFightable? victim = ExtraBlocksHitRandomTargets ? RandomEnemy(owner, field) : target;

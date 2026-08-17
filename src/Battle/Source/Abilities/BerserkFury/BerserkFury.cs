@@ -42,6 +42,7 @@ namespace Battle.Source.Abilities.BerserkFury
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            RegisterCriticalParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.FuryHealthPercent, 0.05f);
         }
@@ -66,11 +67,10 @@ namespace Battle.Source.Abilities.BerserkFury
                     float additionalDamage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
                     var context = new AttackContext(owner, target, owner.Parameters.Damage, CombatRandom.Attacks!, window.Scheduler)
                     {
-                        RawCriticalChance = owner.Parameters.CriticalChance,
-                        RawCriticalDamage = owner.Parameters.CriticalDamage,
                         Index = attackIndex++,
                         SourceAbilityId = Id
                     };
+                    context.UseCriticalOf(this);
                     context.AddDamage(DamageType.Physical, additionalDamage);
                     AttackModifiers.ApplyAll(context);
 

@@ -239,7 +239,7 @@
                 "stacks": 3,
                 "witheringValue": 0.15,
                 "extraBlocks": 3,
-                "extraBlockDamagePercent": 0.5
+                "stageFourDamage": 0.5
             }
         },
         {
@@ -510,8 +510,7 @@
             "minRarity": "Legendary",
             "maxRarity": "Legendary",
             "tier": 3,
-            "tags": [],
-            "abilityId": "Ability_Increasing_Pressure",
+            "tags": [ "attack" ],
             "upgradeProperties": {
                 "splashDamage": 0.75
             }
@@ -825,8 +824,7 @@
             "maxRarity": "Legendary",
             "grantsTags": [ "recovery" ],
             "tier": 3,
-            "tags": [ "hit" ],
-            "abilityId": "Ability_Double_Strike",
+            "tags": [ "attack", "series" ],
             "upgradeProperties": {
                 "healthRestore": 0.07,
                 "manaRestore": 0.07
@@ -837,8 +835,7 @@
             "minRarity": "Uncommon",
             "maxRarity": "Legendary",
             "tier": 2,
-            "tags": [],
-            "abilityId": "Ability_Double_Strike",
+            "tags": [ "attack" ],
             "upgradeProperties": {
                 "amount": 0.15
             },
@@ -931,8 +928,7 @@
             "minRarity": "Uncommon",
             "maxRarity": "Legendary",
             "tier": 1,
-            "tags": [],
-            "abilityId": "Ability_Porcupine",
+            "tags": [ "buff", "shield" ],
             "upgradeProperties": {
                 "chance": 0.05
             },
@@ -1023,8 +1019,7 @@
             "minRarity": "Legendary",
             "maxRarity": "Legendary",
             "tier": 3,
-            "tags": [ "health", "damage", "recovery" ],
-            "abilityId": "Ability_Sacrifice",
+            "tags": [ "health", "recovery", "damage", "empowered" ],
             "upgradeProperties": {
                 "amount": 0.35
             }
@@ -1081,8 +1076,7 @@
             "minRarity": "Uncommon",
             "maxRarity": "Legendary",
             "tier": 2,
-            "tags": [],
-            "abilityId": "Ability_Ice_Block",
+            "tags": [ "spell", "stage", "damage" ],
             "upgradeProperties": {
                 "amount": 0.10
             },
@@ -1095,8 +1089,7 @@
             "minRarity": "Legendary",
             "maxRarity": "Legendary",
             "tier": 3,
-            "tags": [],
-            "abilityId": "Ability_Ice_Block",
+            "tags": [ "activation" ],
             "upgradeProperties": {
                 "chance": 0.35
             }

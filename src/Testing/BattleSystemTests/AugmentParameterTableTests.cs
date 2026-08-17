@@ -28,7 +28,7 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>How many records the table took over from a class of their own. One left at CL-4b:
         /// the execution threshold became a SHARE of the number it moves, and a share is measured
         /// against the base rather than written as a figure — which is a factory, not a table row.</summary>
-        private const int TranslatedRecords = 23;
+        private const int TranslatedRecords = 26;
 
         /// <summary>Two bases every move is measured on. One of them has to be something other than
         /// nothing: an override and an addition are the same number on a base of zero, and a walk that
@@ -50,11 +50,11 @@ namespace LastBreathTest.BattleSystemTests
 
             ("Augment_Overload_Mana_Step", "ManaPerStep", OperationType.Subtract, 1.5f),
 
-            ("Augment_Cooldown_Chance", "CooldownReduceChance", OperationType.Add, 0.05f),
+            ("Augment_Cooldown_Chance", "CooldownReductionChance", OperationType.Add, 0.05f),
             ("Augment_Heal_On_Hit", "HealOnHit", OperationType.Add, 0.03f),
             ("Augment_More_Retaliation", "ArmorReturn", OperationType.Add, 0.15f),
 
-            ("Augment_Heal_From_Empowered_Ability_Damage", "HealPercent", OperationType.Add, 0.35f),
+            ("Augment_Heal_From_Empowered_Ability_Damage", "HealFromEmpoweredDamage", OperationType.Add, 0.35f),
 
             ("Augment_Fury_More_Burn", "FuryHealthPercent", OperationType.Add, 0.01f),
             ("Augment_Fury_Less_Burn", "FuryHealthPercent", OperationType.Subtract, 0.01f),
@@ -80,7 +80,13 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Additional_Crit_Damage", "CriticalDamageBonus", OperationType.Add, 0.35f),
             ("Augment_Additional_Crit_Chance", "CriticalChanceBonus", OperationType.Add, 0.25f),
 
-            ("Augment_Stage_Four_Damage", "ExtraBlockDamagePercent", OperationType.Add, 0.10f)
+            ("Augment_Stage_Four_Damage", "StageFourDamage", OperationType.Add, 0.10f),
+            ("Augment_Reset_Chance", "CooldownResetChance", OperationType.Add, 0.35f),
+
+            // Three more records arrived at CL-7c with the keys they generalised onto. Their figures are
+            // what the shipped record declares, which for a single-rarity band is also its only step.
+            ("Augment_Accuracy", "AccuracyBonus", OperationType.Add, 0.15f),
+            ("Augment_Attack_Random_Target", "SplashShare", OperationType.Add, 0.75f)
         ];
 
         [TestMethod]

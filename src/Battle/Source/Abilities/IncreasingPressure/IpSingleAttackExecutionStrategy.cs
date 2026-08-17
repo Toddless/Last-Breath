@@ -16,10 +16,10 @@
                 var window = new AttackSeriesWindow(ability, owner, field);
                 var context = new AttackContext(owner, target, totalDamage, CombatRandom.Attacks!, window.Scheduler)
                 {
-                    RawCriticalDamage = owner.Parameters.CriticalDamage, RawCriticalChance = owner.Parameters.CriticalChance,
                     SourceAbilityId = ability.Id
                 };
 
+                context.UseCriticalOf(ability);
                 ability.AttackModifiers.ApplyAll(context);
 
                 if (!await window.ResolveAsync(context)) break;

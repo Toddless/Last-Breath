@@ -24,8 +24,8 @@ namespace Battle.Source.Abilities.DoubleStrike
         public float SecondWeaponScale => this[Parameters.SecondWeaponScale];
         public float SecondSpellScale => this[Parameters.SecondSpellScale];
         public float DamageMultiplier => this[AbilityParameter.DamageMultiplier];
-        public float HealthRestore => this[Parameters.HealthRestore];
-        public float ManaRestore => this[Parameters.ManaRestore];
+        public float HealthRestore => this[AbilityParameter.HealthRestore];
+        public float ManaRestore => this[AbilityParameter.ManaRestore];
         public AttackModifierPipeline AttackModifiers { get; } = new();
 
         /// <summary>L3 upgrade point: built when both strikes land, applied to the owner.</summary>
@@ -42,14 +42,13 @@ namespace Battle.Source.Abilities.DoubleStrike
             /// <summary>How long the strikes' debuff holds on the TARGET — not the caster-side
             /// <see cref="AbilityParameter.Duration"/>.</summary>
             public const string DebuffDuration = nameof(DebuffDuration);
-
-            public const string HealthRestore = nameof(HealthRestore);
-            public const string ManaRestore = nameof(ManaRestore);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            RegisterCriticalParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.AccuracyBonus, 0f);
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(Parameters.SecondDamage, 60f);
             parameters.RegisterDefault(Parameters.SecondWeaponScale, 1f);
@@ -59,8 +58,8 @@ namespace Battle.Source.Abilities.DoubleStrike
             parameters.RegisterDefault(Parameters.DebuffDuration, 3);
             parameters.RegisterDefault(AbilityParameter.Stacks, 3);
             parameters.RegisterDefault(AbilityParameter.DamageMultiplier, 1f);
-            parameters.RegisterDefault(Parameters.HealthRestore, 0f);
-            parameters.RegisterDefault(Parameters.ManaRestore, 0f);
+            parameters.RegisterDefault(AbilityParameter.HealthRestore, 0f);
+            parameters.RegisterDefault(AbilityParameter.ManaRestore, 0f);
         }
 
         public void AddAttackModifier(IAttackModifier modifier) => AttackModifiers.Add(modifier);
@@ -80,12 +79,12 @@ namespace Battle.Source.Abilities.DoubleStrike
                     if (!target.IsAlive) break;
                     var context = new AttackContext(owner, target, owner.Parameters.Damage, CombatRandom.Attacks!, window.Scheduler)
                     {
-                        RawCriticalChance = owner.Parameters.CriticalChance,
-                        RawCriticalDamage = owner.Parameters.CriticalDamage,
                         Index = strike,
                         TotalCount = 2,
                         SourceAbilityId = Id
                     };
+                    context.UseCriticalOf(this);
+                    context.UseAccuracyOf(this);
                     context.AddDamage(DamageType.Physical, StrikeDamage(strike, owner));
                     AttackModifiers.ApplyAll(context);
 

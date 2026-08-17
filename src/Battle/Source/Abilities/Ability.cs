@@ -313,6 +313,14 @@
             parameters.Register(AbilityParameter.SpellDamageScale, Data.SpellDamageScale);
         }
 
+        /// <summary>Crit keys of an ability that rolls a crit of its own — declared by whoever stamps them
+        /// on the touches it deals (<see cref="AbilityAttackRolls"/>), never by an ability that cannot crit.</summary>
+        protected void RegisterCriticalParameters(AbilityParameterSet parameters)
+        {
+            parameters.RegisterDefault(AbilityParameter.CriticalChanceBonus, 0f);
+            parameters.RegisterDefault(AbilityParameter.CriticalDamageBonus, 0f);
+        }
+
         /// <summary>Shared tail of every Copy(): a fresh instance from the same data, wearing the same
         /// augments in the same slots. The upgrades are copied one by one and applied to the copy — a
         /// shared instance would leak applied state (Learned, decorators) between the two, and the

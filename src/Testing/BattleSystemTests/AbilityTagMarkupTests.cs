@@ -155,7 +155,26 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Poison_Explosion", AbilityTags.Hit),
             ("Ability_Series_Of_Attacks", AbilityTags.Critical),
             ("Ability_Static_Armor", AbilityTags.Critical),
-            ("Ability_Static_Armor", AbilityTags.Hit)
+            ("Ability_Static_Armor", AbilityTags.Hit),
+
+            // Load-bearing since CL-7c, where the last seven pinned records went out on the tags of
+            // their cards: 'activation' now carries the cooldown reset, 'stage' and 'spell' the stage-four
+            // damage, 'empowered' the harvest heal, 'shield' the pain-driven cooldown chance.
+            ("Ability_Ares_Blessing", AbilityTags.Activation),
+            ("Ability_Chain_Lightning", AbilityTags.Spell),
+            ("Ability_Critical_Calculation", AbilityTags.Activation),
+            ("Ability_Dark_Shroud", AbilityTags.Activation),
+            ("Ability_Deep_Freeze", AbilityTags.Activation),
+            ("Ability_Ice_Aegis", AbilityTags.Activation),
+            ("Ability_Ice_Aegis", AbilityTags.Stage),
+            ("Ability_Overload", AbilityTags.Activation),
+            ("Ability_Overload", AbilityTags.Empowered),
+            ("Ability_Overload", AbilityTags.Stage),
+            ("Ability_Poison_Coating", AbilityTags.Activation),
+            ("Ability_Porcupine", AbilityTags.Activation),
+            ("Ability_Sacrifice", AbilityTags.Activation),
+            ("Ability_Static_Armor", AbilityTags.Activation),
+            ("Ability_Twin_Assist_Shield", AbilityTags.Shield)
         ];
 
         [TestMethod]

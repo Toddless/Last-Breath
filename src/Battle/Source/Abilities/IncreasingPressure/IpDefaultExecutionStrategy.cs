@@ -22,12 +22,11 @@
                     float damage = owner.Parameters.Damage * increase;
                     var context = new AttackContext(owner, target, damage, CombatRandom.Attacks!, window.Scheduler)
                     {
-                        RawCriticalChance = owner.Parameters.CriticalChance,
-                        RawCriticalDamage = owner.Parameters.CriticalDamage,
                         Index = i,
                         TotalCount = (int)ability.Attacks,
                         SourceAbilityId = ability.Id
                     };
+                    context.UseCriticalOf(ability);
                     context.AddDamage(DamageType.Physical, additionalDamage);
 
                     ability.AttackModifiers.ApplyAll(context);

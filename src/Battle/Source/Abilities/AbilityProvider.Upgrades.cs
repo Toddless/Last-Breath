@@ -112,12 +112,6 @@
                     data.Id,
                     data.Tags,
                     data.Tier),
-            ["Augment_Attack_Random_Target"] = data =>
-                new IpAugmentAttackRandomTarget(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("splashDamage", 0.45f)),
             ["Ability_Ip_Augment_Last_Attack_Always_Crit"] = data =>
                 new IpAugmentLastAttackAlwaysCrit(
                     data.Id,
@@ -195,12 +189,6 @@
             ["Augment_Healing_Fury"] = data =>
                 new BfAugmentFuryVariant(data.Id, data.Tags, data.Tier,
                     (duration, healthPercent) => FuryFromCanon("Effect_Healing_Fury", duration, healthPercent)),
-            ["Augment_Accuracy"] = data =>
-                new DstAugmentAccuracy(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
             ["Augment_Two_Attacks_Apply_Buff"] = data =>
                 new DstAugmentBothHitsBuff(
                     data.Id,
@@ -278,13 +266,6 @@
                     data.Tier,
                     AbilityParameter.HealthRegeneration,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
-            ["Augment_Reset_Chance"] = data =>
-                new DelegateAugment<IceBlocks>(
-                    data.Id,
-                    data.Tags,
-                    data.Tier,
-                    ability => ability.ResetCooldownChance = data.UpgradeProperties.GetValueOrDefault("chance", 0.25f),
-                    ability => ability.ResetCooldownChance = 0f),
             ["Augment_Ice_Blocks_Random_Extra_Blocks"] = data =>
                 new DelegateAugment<IceBlocks>(
                     data.Id,

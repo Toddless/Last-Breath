@@ -26,6 +26,7 @@
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            RegisterCriticalParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.DamageMultiplier, 1.3f);
             parameters.RegisterDefault(Parameters.MinAttacks, 2);
             parameters.RegisterDefault(Parameters.MaxAttacks, 5);

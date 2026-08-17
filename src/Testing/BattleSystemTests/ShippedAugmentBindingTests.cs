@@ -34,8 +34,11 @@
         /// was generalised (the binding was standing in for that), and the two fury-burn records now
         /// travel by the 'fury' tag the owner's markup gave the ability.</summary>
         /// <remarks>Seven more left at CL-7: the card list gives them fitting tags, and each stands on a
-        /// shared key or carries its own behaviour, so the binding was the only thing holding them in.</remarks>
-        private const int BoundRecords = 48;
+        /// shared key or carries its own behaviour, so the binding was the only thing holding them in.
+        /// Seven again at CL-7c, the last of the pinned generalisable ones: their number moved off the
+        /// private key of the ability they were written for onto a key of the book, which is what the
+        /// binding had been standing in for.</remarks>
+        private const int BoundRecords = 41;
 
         /// <summary>How many records claim every ability there is â€” cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
@@ -48,7 +51,7 @@
         /// <summary>How many records name neither an ability nor the whole book, and are judged by
         /// their tags alone. Most of them carry tags now; the number is held because a record losing
         /// its last tag belongs nowhere and says so nowhere.</summary>
-        private const int SilentRecords = 25;
+        private const int SilentRecords = 32;
 
         [TestMethod]
         public void TheSectionDeclaresTheRecordsTheTriageCounted()

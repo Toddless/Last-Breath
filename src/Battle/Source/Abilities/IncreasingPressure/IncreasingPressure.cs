@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.Abilities.IncreasingPressure
+namespace Battle.Source.Abilities.IncreasingPressure
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -6,13 +6,23 @@
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Entity;
+    using Riders;
 
-    public class IncreasingPressure(AbilityBaseData data) : DamagingAbility(data), IAttackModifierHost
+    public class IncreasingPressure : DamagingAbility, IAttackModifierHost
     {
         public AttackModifierPipeline AttackModifiers { get; } = new();
         public float Attacks => this[AbilityParameter.Attacks];
         public float AttackDamageMultiplier => this[Parameters.AttackDamageStepMultiplier];
         public IIpExecutionStrategy ExecutionStrategy = new IpDefaultExecutionStrategy();
+
+        /// <summary>The splash is the ability's own, carried by every cast and spilling a share of
+        /// <see cref="AbilityParameter.SplashShare"/> — nought until a record raises it, so the rider
+        /// costs nothing while the concept stays where an augment can reach it.</summary>
+        public IncreasingPressure(AbilityBaseData data) : base(data)
+        {
+            var splash = new SplashRandomTargetRider();
+            ImpactRiders[splash.Id] = splash;
+        }
 
         /// <summary>The ability's bonus damage added on top of the owner's basic attack: flat + weapon- and spell-scaled.</summary>
         public float BonusDamage(IFightable owner) =>
@@ -33,6 +43,11 @@
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            RegisterCriticalParameters(parameters);
+            // Owned for what the series CARRIES: the cast lays nothing itself, and every debuff an
+            // augment hangs on its attacks reads the effectiveness of the cast it came out of.
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
+            parameters.RegisterDefault(AbilityParameter.SplashShare, 0f);
             parameters.RegisterDefault(AbilityParameter.Attacks, 5);
             parameters.RegisterDefault(Parameters.AttackDamageStepMultiplier, 0.15f);
         }

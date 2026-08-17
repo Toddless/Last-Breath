@@ -31,6 +31,9 @@ namespace Core.Battle.Abilities
         /// <summary>Fractional increase of the owner's critical damage for this ability: final = owner and bonus.</summary>
         public const string CriticalDamageBonus = nameof(CriticalDamageBonus);
 
+        /// <summary>Fractional increase of the owner's accuracy for this ability's attacks: final = owner * (1 + bonus).</summary>
+        public const string AccuracyBonus = nameof(AccuracyBonus);
+
         /// <summary>How long the buff a cast lays on its CASTER holds, in turns — not what it leaves on
         /// anybody else.</summary>
         public const string Duration = nameof(Duration);
@@ -85,6 +88,34 @@ namespace Core.Battle.Abilities
         /// poison stacks for one, a share of health for another — and one number cannot be both, so an
         /// ability whose execute is measured differently keeps its own key rather than joining this one.</summary>
         public const string ExecutionThreshold = nameof(ExecutionThreshold);
+
+        /// <summary>Chance that a hit TAKEN by the bearer cuts one turn off the wait of a random ability of
+        /// his. Answered by what the cast leaves standing, so the bearer pays for it in advance.</summary>
+        public const string CooldownReductionChance = nameof(CooldownReductionChance);
+
+        /// <summary>Chance that a finished cast clears its OWN wait entirely. A different concept from
+        /// <see cref="CooldownReductionChance"/>: this one is the caster's own cast paying itself back.</summary>
+        public const string CooldownResetChance = nameof(CooldownResetChance);
+
+        /// <summary>Share of the damage the next EMPOWERED cast deals that comes back to the bearer as
+        /// healing. Measured on the charged cast, not on the one that armed the charge.</summary>
+        public const string HealFromEmpoweredDamage = nameof(HealFromEmpoweredDamage);
+
+        /// <summary>Share of MAXIMUM health one landed touch gives back — a one-off restore, which is what
+        /// separates it from the per-turn <see cref="HealthRegeneration"/>.</summary>
+        public const string HealthRestore = nameof(HealthRestore);
+
+        /// <summary>Share of maximum mana one landed touch gives back. Its own key rather than a second
+        /// axis of <see cref="HealthRestore"/>: an ability may hand back both from one cast.</summary>
+        public const string ManaRestore = nameof(ManaRestore);
+
+        /// <summary>Share of the cast's damage the stage-four addition of a staged cast deals — the extra
+        /// content the top activation stage brings, not the cast's own hit.</summary>
+        public const string StageFourDamage = nameof(StageFourDamage);
+
+        /// <summary>Share of an impact's damage spilled onto an enemy the cast never aimed at. Nought is
+        /// the honest base: an ability owning the concept spills nothing until something raises it.</summary>
+        public const string SplashShare = nameof(SplashShare);
 
         /// <summary>The shortest wait a SHARE-shaped cut of the cooldown may leave; flat cuts written into
         /// an ability's own upgrade pass it deliberately. It holds a reduction back and never raises a

@@ -56,6 +56,19 @@ namespace LastBreathTest.BattleSystemTests
         private static readonly string[] s_beyondTheProbe = ["Ability_Double_Strike", "Ability_Discharge"];
 
         /// <summary>
+        /// Abilities that own effectiveness for what AUGMENTS hang on them rather than for anything they
+        /// lay themselves — the head butt, whose only payload is a stun (control carries no figure and is
+        /// out of the canon by design), and the pressure, which lays nothing at all. Both are reached by
+        /// on-hit debuff appliers through <c>attack</c>, and every debuff those lay reads the effectiveness
+        /// of the cast the impact came out of, so declaring the key is what finishes that chain instead of
+        /// leaving "+debuff effectiveness" seated on a key nobody registered.
+        /// <para>Written out rather than folded into the walk: the claim asserted for them is the mirror of
+        /// the usual one — they must lay nothing scalable of their own, so an ability that grows content
+        /// with a figure in it turns up here instead of quietly staying unmeasured.</para>
+        /// </summary>
+        private static readonly string[] s_declaresForWhatAugmentsLay = ["Ability_Head_Butt", "Ability_Increasing_Pressure"];
+
+        /// <summary>
         /// Where a record is knowingly worth more than it charges: the ability reads one of its moves
         /// and has no concept for the other, and the owner looked at that and let it stand. Written out
         /// per record so a NEW half-arrival still fails — none of these three counts what it lays, so
@@ -154,22 +167,23 @@ namespace LastBreathTest.BattleSystemTests
                  "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
                  "Ability_Porcupine", "Ability_Static_Armor"],
                 []),
-            // Unbound at CL-7 and written down here for the first time. The crit bonuses are declared by
-            // MulticastAbility alone, so the 'critical' tag seats these two on twice the abilities that
-            // read them: on the other six the decorator is added to a key nobody registered, which is a
-            // TrackNotFound and a purchase that moves nothing. Legal by "a tag promises fitting, not
-            // work" — and exactly the half-arrival this ledger exists to keep written down rather than
-            // discovered. Closing it means the six declaring the keys, which is the owner's fork.
+            // Unbound at CL-7 and written down here for the first time: the crit bonuses were declared by
+            // MulticastAbility alone, so the 'critical' tag seated these two on twice the abilities that
+            // read them. Closed at CL-7c — the five attacking abilities that roll their own attacks now
+            // declare the keys and stamp them on every context they build. Armageddon is the one name
+            // left in the inert column, and for a reason of its own: it deals direct damage and rolls no
+            // crit at all, so there is nothing on it for a crit bonus to raise. Giving it one is a change
+            // to what the ability IS, which is the owner's call and not this pass's.
             ("Augment_Additional_Crit_Damage", AbilityParameter.CriticalDamageBonus,
-                ["Ability_Deep_Freeze", "Ability_Discharge", "Ability_Ice_Block", "Ability_Ice_Shards",
-                 "Ability_Overload", "Ability_Static_Armor"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Head_Butt",
-                 "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"]),
+                ["Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
+                 "Ability_Overload", "Ability_Series_Of_Attacks", "Ability_Static_Armor"],
+                ["Ability_Armageddon"]),
             ("Augment_Additional_Crit_Chance", AbilityParameter.CriticalChanceBonus,
-                ["Ability_Deep_Freeze", "Ability_Discharge", "Ability_Ice_Block", "Ability_Ice_Shards",
-                 "Ability_Overload", "Ability_Static_Armor"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Head_Butt",
-                 "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"]),
+                ["Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
+                 "Ability_Overload", "Ability_Series_Of_Attacks", "Ability_Static_Armor"],
+                ["Ability_Armageddon"]),
 
             // Generalised at CL-4 from Ares Blessing's private key. It reaches by "health" and "buff",
             // and Ares is the only ability in the book that raises a health CEILING — the rest of the
@@ -268,6 +282,58 @@ namespace LastBreathTest.BattleSystemTests
                  "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
                  "Ability_Porcupine"],
                 ["Ability_Berserk_Fury"]),
+
+            // The seven records generalised at CL-7c, each off the private key of the one ability it was
+            // written for. Each is judged by the tags of its card now, and every one of them has exactly
+            // ONE owner — so the second column below IS the price of the unpinning, paid in the same coin
+            // CL-4 named: a record that used to be pinned and always worked now fits a family and works in
+            // one place. Legal by "a tag promises fitting, not work", and written out so it stays counted.
+            ("Augment_Cooldown_Chance", AbilityParameter.CooldownReductionChance,
+                ["Ability_Porcupine"],
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
+                 "Ability_Overload", "Ability_Poison_Coating", "Ability_Sacrifice"]),
+
+            // The widest of the seven, and the one whose card tag is the widest: 'activation' is worn by
+            // most of the book, while resetting one's own wait is the ice block's alone.
+            ("Augment_Reset_Chance", AbilityParameter.CooldownResetChance,
+                ["Ability_Ice_Block"],
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
+                 "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Ice_Aegis", "Ability_Ice_Shards",
+                 "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine",
+                 "Ability_Sacrifice", "Ability_Static_Armor"]),
+
+            ("Augment_Heal_From_Empowered_Ability_Damage", AbilityParameter.HealFromEmpoweredDamage,
+                ["Ability_Sacrifice"],
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Dark_Shroud",
+                 "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike", "Ability_Head_Butt",
+                 "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload",
+                 "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
+
+            // Both halves of one record, so both lists are the same list — the double strike declares the
+            // health give-back and the mana one, and an ability with only one of them would be sold half
+            // a bargain.
+            ("Augment_Restore_Mana_Health_On_Hit", AbilityParameter.HealthRestore,
+                ["Ability_Double_Strike"],
+                ["Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"]),
+            ("Augment_Restore_Mana_Health_On_Hit", AbilityParameter.ManaRestore,
+                ["Ability_Double_Strike"],
+                ["Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"]),
+
+            ("Augment_Stage_Four_Damage", AbilityParameter.StageFourDamage,
+                ["Ability_Ice_Block"],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Overload", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
+
+            // Two records of the attacking family, each owned by one attacker: accuracy by the double
+            // strike, the splash share by the pressure. Where they are inert the other four attackers
+            // simply never declared the concept.
+            ("Augment_Accuracy", AbilityParameter.AccuracyBonus,
+                ["Ability_Double_Strike"],
+                ["Ability_Berserk_Fury", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"]),
+            ("Augment_Attack_Random_Target", AbilityParameter.SplashShare,
+                ["Ability_Increasing_Pressure"],
+                ["Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Series_Of_Attacks"]),
         ];
 
         [TestMethod]
@@ -348,6 +414,14 @@ namespace LastBreathTest.BattleSystemTests
             foreach (string abilityId in declaring)
             {
                 List<IEffect> laid = await LaidBy(registry, abilityId);
+
+                if (s_declaresForWhatAugmentsLay.Contains(abilityId, StringComparer.Ordinal))
+                {
+                    Assert.IsFalse(laid.Exists(HoldsAScalableFigure),
+                        $"'{abilityId}' is written off as owning effectiveness for what augments hang on it, and it "
+                        + "lays a scalable figure of its own — take it off the list and let the walk measure it");
+                    continue;
+                }
 
                 if (s_beyondTheProbe.Contains(abilityId, StringComparer.Ordinal))
                 {

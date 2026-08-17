@@ -19,13 +19,12 @@ namespace Battle.Source.Abilities.Sacrifice
         public float SacrificePercent => this[Parameters.SacrificePercent];
         public float RatePerHundred => this[Parameters.RatePerHundred];
         public int Charges => (int)this[AbilityParameter.Charges];
-        public float HealPercent => this[Parameters.HealPercent];
+        public float HealPercent => this[AbilityParameter.HealFromEmpoweredDamage];
 
         public static class Parameters
         {
             public const string SacrificePercent = nameof(SacrificePercent);
             public const string RatePerHundred = nameof(RatePerHundred);
-            public const string HealPercent = nameof(HealPercent);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
@@ -34,7 +33,7 @@ namespace Battle.Source.Abilities.Sacrifice
             parameters.RegisterDefault(Parameters.SacrificePercent, 0.15f);
             parameters.RegisterDefault(Parameters.RatePerHundred, 0.01f);
             parameters.RegisterDefault(AbilityParameter.Charges, 1);
-            parameters.RegisterDefault(Parameters.HealPercent, 0f);
+            parameters.RegisterDefault(AbilityParameter.HealFromEmpoweredDamage, 0f);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new Sacrifice(Data));

@@ -22,6 +22,11 @@ namespace Battle.Source.Abilities.HeadButt
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            RegisterCriticalParameters(parameters);
+            // Owned for what the lunge CARRIES rather than for what it lays itself: the stun is control
+            // without a figure, while every debuff an augment hangs on the lunge reads the cast's
+            // effectiveness — so the concept is the ability's, and a record on it is felt there.
+            parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(AbilityParameter.StunDuration, 1);
             parameters.RegisterDefault(AbilityParameter.Attacks, 1);
         }
@@ -40,12 +45,11 @@ namespace Battle.Source.Abilities.HeadButt
                     float additionalDamage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
                     var context = new AttackContext(owner, target, owner.Parameters.Damage, CombatRandom.Attacks!, window.Scheduler)
                     {
-                        RawCriticalChance = owner.Parameters.CriticalChance,
-                        RawCriticalDamage = owner.Parameters.CriticalDamage,
                         Index = i,
                         TotalCount = Attacks,
                         SourceAbilityId = Id
                     };
+                    context.UseCriticalOf(this);
                     context.AddDamage(DamageType.Physical, additionalDamage);
 
                     // Every successful owner lunge stuns its target (extra attacks from reactions included).
@@ -61,6 +65,6 @@ namespace Battle.Source.Abilities.HeadButt
         }
 
         private async Task ApplyStun(IFightable owner, IFightable target) =>
-            await new StunEffect(StunDuration).Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId });
+            await new StunEffect(StunDuration).Apply(Laying(target));
     }
 }
