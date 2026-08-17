@@ -77,7 +77,9 @@
       ],
       "rewards": {
         "influenceExp": 0,
-        "items": [],
+        "items": [
+          { "itemId": "Ornament_Tier_1", "amount": 1 }
+        ],
         "actions": [
           { "type": "GrantTreePoints", "amount": 2 }
         ]
@@ -160,7 +162,9 @@
       ],
       "rewards": {
         "influenceExp": 0,
-        "items": [],
+        "items": [
+          { "itemId": "Ornament_Tier_2", "amount": 1 }
+        ],
         "actions": [
           { "type": "GrantTreePoints", "amount": 4 }
         ]
@@ -204,7 +208,9 @@
       ],
       "rewards": {
         "influenceExp": 0,
-        "items": [],
+        "items": [
+          { "itemId": "Ornament_Tier_3", "amount": 1 }
+        ],
         "actions": [
           { "type": "GrantTreePoints", "amount": 6 }
         ]

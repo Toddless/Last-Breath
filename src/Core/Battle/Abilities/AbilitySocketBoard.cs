@@ -23,11 +23,18 @@ namespace Core.Battle.Abilities
         /// only keep one of them.</summary>
         private readonly Dictionary<string, AbilitySocket> _sockets = new(StringComparer.Ordinal);
 
+        /// <summary>The ornaments worn, by the ornament's own id. Keyed by the ornament and not by the
+        /// ability because an ornament is a THING and there is one of each in the game: the id is what
+        /// the bag hands over, what the file writes and what the player moves.</summary>
+        private readonly Dictionary<string, AbilityOrnament> _ornaments = new(StringComparer.Ordinal);
+
         public event Action? Changed;
 
         public IReadOnlyList<AbilitySocket> Sockets => [.. _sockets.Values];
 
         public IReadOnlyCollection<AbilitySocketOccupant> Occupants => [.. Installed()];
+
+        public IReadOnlyCollection<AbilityOrnament> Ornaments => [.. _ornaments.Values];
 
         public IReadOnlyList<AbilitySocket> SocketsOf(string abilityId) =>
         [
@@ -64,27 +71,54 @@ namespace Core.Battle.Abilities
             return augment;
         }
 
+        public AbilityOrnament? OrnamentOn(string abilityId)
+        {
+            foreach (AbilityOrnament worn in _ornaments.Values)
+                if (string.Equals(worn.AbilityId, abilityId, StringComparison.Ordinal)) return worn;
+
+            return null;
+        }
+
+        public AbilityOrnament? Attachment(string ornamentId) =>
+            _ornaments.TryGetValue(ornamentId, out AbilityOrnament worn) ? worn : null;
+
+        public bool Attach(AbilityOrnament ornament)
+        {
+            if (_ornaments.ContainsKey(ornament.OrnamentId) || OrnamentOn(ornament.AbilityId) != null) return false;
+
+            _ornaments[ornament.OrnamentId] = ornament;
+            Open(ornament.Slot);
+            Changed?.Invoke();
+            return true;
+        }
+
+        public bool Detach(string ornamentId)
+        {
+            if (!_ornaments.TryGetValue(ornamentId, out AbilityOrnament worn)) return false;
+
+            // Remove-only, exactly as a closed slot is: the augment comes out first, and by its own
+            // road. Otherwise an ornament carried to an ability with other tags would take an augment
+            // with it that the fitting rule never agreed to put there.
+            if (Find(worn.Slot.Address) is { IsEmpty: false }) return false;
+
+            _ornaments.Remove(ornamentId);
+            _sockets.Remove(worn.Slot.Address);
+            Changed?.Invoke();
+            return true;
+        }
+
         public void Sync(IReadOnlyCollection<AbilitySocketPlacement> open)
         {
             bool moved = false;
             HashSet<string> opened = new(StringComparer.Ordinal);
 
-            foreach (AbilitySocketPlacement placement in open)
+            // The ornaments' slots stand beside the allocation's in one set, which is what makes a
+            // respec unable to touch them: retirement is what the set does NOT name, and an ornament
+            // names its own slot on every pass, whatever the tree says that pass.
+            foreach (AbilitySocketPlacement placement in open.Concat(Granted()))
             {
-                string address = placement.Address;
-                opened.Add(address);
-                if (_sockets.TryGetValue(address, out AbilitySocket? standing))
-                {
-                    // The same signature is the same slot: a node bought back is the place the augment
-                    // was sitting in, so the slot wakes up around whatever is still in it.
-                    if (standing.IsOpen) continue;
-                    standing.Reopen();
-                    moved = true;
-                    continue;
-                }
-
-                _sockets[address] = new AbilitySocket(placement.SocketId, placement.AbilityId, placement.Tier);
-                moved = true;
+                opened.Add(placement.Address);
+                moved |= Open(placement);
             }
 
             foreach (string address in _sockets.Keys.Where(address => !opened.Contains(address)).ToList())
@@ -93,14 +127,28 @@ namespace Core.Battle.Abilities
             if (moved) Changed?.Invoke();
         }
 
-        public void Restore(IReadOnlyCollection<AbilitySocketOccupant> saved)
+        public IReadOnlyCollection<AbilityOrnament> Restore(
+            IReadOnlyCollection<AbilitySocketOccupant> saved,
+            IReadOnlyCollection<AbilityOrnament> ornaments)
         {
+            // The ornaments of the playthrough being left behind go with their slots, and before the
+            // purge below rather than after: their slots are OPEN, so nothing else would drop them.
+            foreach (AbilityOrnament worn in _ornaments.Values) _sockets.Remove(worn.Slot.Address);
+            _ornaments.Clear();
+
             // The closed slots of the playthrough being left behind go with it: the board is a
             // singleton, and a slot held open by another character's augment would be written into
             // this one's first save.
             foreach (string address in _sockets.Where(entry => !entry.Value.IsOpen).Select(entry => entry.Key).ToList())
                 _sockets.Remove(address);
             foreach (AbilitySocket socket in _sockets.Values) socket.Extract();
+
+            // Before the occupants, so that an augment written into an ornament's slot lands in a slot
+            // that already exists. Not a guarantee resting on the order: an entry reaching an address
+            // nothing stands at brings its own slot back closed, and the attach behind it REOPENS that
+            // address (see Open), so the augment ends up live either way. The order is which of the two
+            // is the cause — an ornament opens a slot, an entry fills one.
+            IReadOnlyCollection<AbilityOrnament> displaced = Wear(ornaments);
 
             foreach (AbilitySocketOccupant occupant in saved) Seat(occupant);
 
@@ -109,6 +157,7 @@ namespace Core.Battle.Abilities
             foreach (AbilitySocketOccupant occupant in saved) ReportIllFitting(occupant);
 
             Changed?.Invoke();
+            return displaced;
         }
 
         /// <summary>Back to the board of a fresh character: no slots at all. The sockets themselves come
@@ -117,10 +166,72 @@ namespace Core.Battle.Abilities
         /// the file it loaded into the playthrough that follows.</summary>
         public void ResetSession()
         {
-            if (_sockets.Count == 0) return;
+            if (_sockets.Count == 0 && _ornaments.Count == 0) return;
 
             _sockets.Clear();
+            // Ornaments are the board's own, so nothing else would clear them: a fresh character would
+            // otherwise start the game already wearing the previous one's fourth socket.
+            _ornaments.Clear();
             Changed?.Invoke();
+        }
+
+        /// <summary>The slots the worn ornaments grant. Read on every <see cref="Sync"/> beside the
+        /// allocation's, because that is what "a respec does not touch the ornaments" means in one
+        /// place instead of a case inside retirement.</summary>
+        private IEnumerable<AbilitySocketPlacement> Granted() => _ornaments.Values.Select(worn => worn.Slot);
+
+        /// <summary>Makes one placement a live slot: a fresh one where nothing stands, and the same slot
+        /// woken up where something closed does. True when anything changed.</summary>
+        private bool Open(AbilitySocketPlacement placement)
+        {
+            if (!_sockets.TryGetValue(placement.Address, out AbilitySocket? standing))
+            {
+                _sockets[placement.Address] = new AbilitySocket(placement.SocketId, placement.AbilityId, placement.Tier);
+                return true;
+            }
+
+            // The same signature is the same slot: a node bought back is the place the augment was
+            // sitting in, so the slot wakes up around whatever is still in it.
+            if (standing.IsOpen) return false;
+
+            standing.Reopen();
+            return true;
+        }
+
+        /// <summary>
+        /// Puts the saved ornaments back on their abilities and hands back the ones that could not go on
+        /// — DISPLACED artefacts, each of which is now nowhere and is the caller's to put somewhere.
+        /// Handing them back rather than reporting them is the whole point: an ornament comes from one
+        /// unrepeatable quest, so the board must not be the last thing that ever held it.
+        /// <para>
+        /// One case is deliberately NOT handed back: a file naming the same ornament twice. That one IS
+        /// on an ability — the first entry put it there — so nothing was displaced, and returning it
+        /// would mint a second of an artefact there is one of in the game. That is said out loud and
+        /// dropped, which costs the player nothing.
+        /// </para>
+        /// </summary>
+        private IReadOnlyCollection<AbilityOrnament> Wear(IReadOnlyCollection<AbilityOrnament> ornaments)
+        {
+            List<AbilityOrnament> displaced = [];
+
+            foreach (AbilityOrnament ornament in ornaments)
+            {
+                if (Attach(ornament)) continue;
+
+                if (Attachment(ornament.OrnamentId) is { } standing)
+                {
+                    Tracker.TrackError(
+                        $"Saved ornaments name '{ornament.OrnamentId}' twice; it is on '{standing.AbilityId}', " +
+                        $"so the entry putting it on '{ornament.AbilityId}' is dropped rather than handed back — " +
+                        "handing it back would make a second of an artefact there is one of.",
+                        this);
+                    continue;
+                }
+
+                displaced.Add(ornament);
+            }
+
+            return displaced;
         }
 
         /// <summary>What becomes of a slot the allocation no longer opens: an empty one is dropped, one

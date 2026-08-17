@@ -27,6 +27,23 @@ namespace Core.Data.SaveData
         /// would be a file able to disagree with itself.
         /// </summary>
         [JsonProperty("sockets")] public List<SocketSaveData> Sockets { get; init; } = [];
+
+        /// <summary>
+        /// Which ability wears which ornament. Written beside the occupants and not derived from them,
+        /// because an ornament on an ability with nothing in its socket is still a decision the player
+        /// made — and the only record of it. What the ornament GRANTS is not written: that is its
+        /// record's to say, and a file repeating it would be free to disagree with the catalog.
+        /// </summary>
+        [JsonProperty("ornaments")] public List<OrnamentSaveData> Ornaments { get; init; } = [];
+    }
+
+    /// <summary>One ornament and the ability wearing it. Two ids and nothing else: everything else about
+    /// an ornament is its record's, and nothing about this copy was ever rolled.</summary>
+    public class OrnamentSaveData
+    {
+        [JsonProperty("ornament")] public string Ornament { get; init; } = string.Empty;
+
+        [JsonProperty("ability")] public string Ability { get; init; } = string.Empty;
     }
 
     /// <summary>

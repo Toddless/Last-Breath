@@ -373,7 +373,7 @@ namespace LastBreathTest.BattleSystemTests
             // Nothing about an allocation makes the player's augment somebody else's: the slot stays,
             // remove-only, and he decides what becomes of what is in it.
             var board = new AbilitySocketBoard();
-            board.Restore([Occupant(SocketTwo, DexAbility, tier: 2)]);
+            board.Restore([Occupant(SocketTwo, DexAbility, tier: 2)], []);
             Assert.AreEqual(1, board.Occupants.Count, "the entry was never restored, so nothing is being answered");
 
             board.Sync([]);
@@ -389,7 +389,7 @@ namespace LastBreathTest.BattleSystemTests
             // was chosen for. It starts working — a load that survived a broken launch must end with
             // the augment doing something, not merely with it remembered.
             var board = new AbilitySocketBoard();
-            board.Restore([Occupant(SocketTwo, DexAbility, tier: 2)]);
+            board.Restore([Occupant(SocketTwo, DexAbility, tier: 2)], []);
 
             board.Sync([new AbilitySocketPlacement(SocketTwo, DexAbility, Tier: 2)]);
 
@@ -405,7 +405,7 @@ namespace LastBreathTest.BattleSystemTests
             // The case a map keyed by node could not express: one node, two slots, an augment in each.
             // Written under one key, one of the two would be gone from the file for good.
             var board = new AbilitySocketBoard();
-            board.Restore([Occupant(SocketTwo, DexAbility, tier: 2)]);
+            board.Restore([Occupant(SocketTwo, DexAbility, tier: 2)], []);
             board.Sync([new AbilitySocketPlacement(SocketTwo, DexAbilityTwo, Tier: 2)]);
 
             Assert.IsTrue(board.Install(Address(SocketTwo, DexAbilityTwo, 2), Copy(OtherAugment)),
@@ -450,7 +450,7 @@ namespace LastBreathTest.BattleSystemTests
             board.Sync([]);
             Assert.AreEqual(1, board.Sockets.Count, "there is no closed slot to leak");
 
-            board.Restore([]);
+            board.Restore([], []);
 
             Assert.AreEqual(0, board.Sockets.Count, "the previous character's closed slot survived the load");
         }
@@ -568,9 +568,12 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void TheSectionDeclaresTheVersionWhereOneNodeMayCarryTwoSlots()
+        public void TheSectionDeclaresAVersionWhereOneNodeMayCarryTwoSlots()
         {
-            Assert.AreEqual(6, new AbilityBookSaveParticipant(AccessorFor(NewBook())).Version);
+            // Six was where the socket map became a list; seven added the ornaments beside it. The
+            // assertion is a floor rather than an equality — what it is about is the shape of the socket
+            // entries, and that shape has not moved since (OrnamentTests names the current number).
+            Assert.IsTrue(new AbilityBookSaveParticipant(AccessorFor(NewBook())).Version >= 6);
         }
 
         [TestMethod]

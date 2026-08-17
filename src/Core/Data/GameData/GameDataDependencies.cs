@@ -20,6 +20,9 @@ namespace Core.Data.GameData
         {
             services.AddGameDataParticipant<IParameterFormatProvider, ParameterFormatProvider>();
             services.AddGameDataParticipant<IAbilityAugmentCatalog, AbilityAugmentCatalog>();
+            // Shared for the same reason as the augment records: an ornament id turns up in a quest
+            // reward, a bag and a save entry, and those are read by compositions holding no battle module.
+            services.AddGameDataParticipant<IOrnamentCatalog, OrnamentCatalog>();
             return services;
         }
 

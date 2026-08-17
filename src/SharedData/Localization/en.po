@@ -4154,6 +4154,24 @@ msgstr "Put the revenant down"
 msgid "Quest_Trial_Of_The_Grave_Obj_Kill"
 msgstr "Kill the grave revenant on the trial ground"
 
+msgid "Ornament_Tier_1"
+msgstr "Lesser Ornament"
+
+msgid "Ornament_Tier_1_Description"
+msgstr "Grants an ability one more tier 1 socket. An ability wears one ornament at a time; move it freely."
+
+msgid "Ornament_Tier_2"
+msgstr "Greater Ornament"
+
+msgid "Ornament_Tier_2_Description"
+msgstr "Grants an ability one more tier 2 socket. An ability wears one ornament at a time; move it freely."
+
+msgid "Ornament_Tier_3"
+msgstr "Sovereign Ornament"
+
+msgid "Ornament_Tier_3_Description"
+msgstr "Grants an ability one more tier 3 socket. An ability wears one ornament at a time; move it freely."
+
 msgid "Dlg_Ronald_Opt_Trials"
 msgstr "I want a real test. Have you got one?"
 
@@ -4205,3 +4223,69 @@ msgstr "Good. You held ground where I would have expected you to give it. Breath
 msgid "Dlg_Ronald_TrialPraiseLast_1"
 msgstr "Done, and done well. That is the end of what I can set in front of you. Whatever comes next, you will be the one choosing it."
 
+
+msgid "Augment_Weapon_Scale"
+msgstr "Weapon Scaling"
+
+msgid "Augment_Weapon_Scale_Description"
+msgstr "+{weaponDamageScale:%} weapon damage scaling."
+
+msgid "Augment_Spell_Scale"
+msgstr "Spell Scaling"
+
+msgid "Augment_Spell_Scale_Description"
+msgstr "+{spellDamageScale:%} spell damage scaling."
+
+msgid "Augment_Increasing_Scales_Add_Cooldown"
+msgstr "Heavy Scaling"
+
+msgid "Augment_Increasing_Scales_Add_Cooldown_Description"
+msgstr "+{weaponDamageScale:%} weapon and +{spellDamageScale:%} spell damage scaling, but {cooldownTurns|turn|turns} longer cooldown."
+
+msgid "Augment_Increasing_Scales_Add_Cost"
+msgstr "Costly Scaling"
+
+msgid "Augment_Increasing_Scales_Add_Cost_Description"
+msgstr "+{weaponDamageScale:%} weapon and +{spellDamageScale:%} spell damage scaling, but +{costShare:%} activation cost."
+
+msgid "Augment_Reduce_Cooldown_And_Cost"
+msgstr "Efficiency"
+
+msgid "Augment_Reduce_Cooldown_And_Cost_Description"
+msgstr "-{cooldownTurns|turn|turns} cooldown and -{costShare:%} activation cost."
+
+msgid "Augment_Reduce_Cost_Add_Cooldown"
+msgstr "Thrift"
+
+msgid "Augment_Reduce_Cost_Add_Cooldown_Description"
+msgstr "-{costShare:%} activation cost, but {cooldownTurns|turn|turns} longer cooldown."
+
+msgid "Augment_Additional_Stacks"
+msgstr "Additional Stacks"
+
+msgid "Augment_Additional_Stacks_Description"
+msgstr "+{amount} stacks of the buffs and debuffs this ability applies."
+
+msgid "Augment_Additional_Charges"
+msgstr "Additional Charges"
+
+msgid "Augment_Additional_Charges_Description"
+msgstr "+{amount} charges."
+
+msgid "Augment_Consume_Effectiveness"
+msgstr "Absorption Effectiveness"
+
+msgid "Augment_Consume_Effectiveness_Description"
+msgstr "+{amount:%} to what the consumed resource is worth."
+
+msgid "Augment_Bleeding_Attack_Series"
+msgstr "Bleeding Attack Series"
+
+msgid "Augment_Bleeding_Attack_Series_Description"
+msgstr "Every attack of the ability applies {@Effect_Damage_Over_Turn_Bleed}."
+
+msgid "Augment_Burning_Attack_Series"
+msgstr "Burning Attack Series"
+
+msgid "Augment_Burning_Attack_Series_Description"
+msgstr "Every attack of the ability applies {@Effect_Damage_Over_Turn_Burning}."

@@ -1,0 +1,19 @@
+{
+    "ornaments": [
+        {
+            "id": "Ornament_Tier_1",
+            "tier": 1,
+            "rarity": "Unique"
+        },
+        {
+            "id": "Ornament_Tier_2",
+            "tier": 2,
+            "rarity": "Unique"
+        },
+        {
+            "id": "Ornament_Tier_3",
+            "tier": 3,
+            "rarity": "Unique"
+        }
+    ]
+}

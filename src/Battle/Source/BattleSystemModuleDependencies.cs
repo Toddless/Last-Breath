@@ -97,6 +97,14 @@
                 sp.GetRequiredService<IAbilityAugmentBinder>(),
                 sp.GetService<IInventory>()));
 
+            // The other thing that moves between the bag and an ability. No binder: an ornament opens an
+            // empty socket and cannot come off a full one, so what the abilities WEAR never changes here.
+            services.AddSingleton<IOrnamentAttachGate>(sp => new OrnamentAttachGate(
+                sp.GetRequiredService<IAbilitySocketBoard>(),
+                sp.GetRequiredService<IPlayerAccessor>(),
+                sp.GetRequiredService<IOrnamentMinter>(),
+                sp.GetService<IInventory>()));
+
             // The socket sheet and the carried augments beside it: reads, both of them. Everything that
             // MOVES an augment goes through the two request gates below.
             services.AddTransient<IRequestHandler<GetAbilitySocketRowsRequest, IReadOnlyList<AbilitySocketRowView>>, AbilitySocketRowsRequestHandler>();
@@ -106,6 +114,8 @@
             // as one it does not carry.
             services.AddTransient<IRequestHandler<InstallAugmentRequest, AugmentInstallResult>, InstallAugmentRequestHandler>();
             services.AddTransient<IRequestHandler<ExtractAugmentRequest, AugmentExtractResult>, ExtractAugmentRequestHandler>();
+            services.AddTransient<IRequestHandler<AttachOrnamentRequest, OrnamentAttachResult>, AttachOrnamentRequestHandler>();
+            services.AddTransient<IRequestHandler<DetachOrnamentRequest, OrnamentDetachResult>, DetachOrnamentRequestHandler>();
             return services;
         }
 

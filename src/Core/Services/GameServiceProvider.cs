@@ -11,6 +11,7 @@ namespace Core.Services
     using Entity.Components;
     using Events;
     using Godot;
+    using Items;
     using Localization;
     using MessageBus;
     using MessageBus.Messages;
@@ -70,6 +71,9 @@ namespace Core.Services
             services.AddSingleton<IGameMessageBus, GameMessageBus>();
             services.AddSingleton<ILocalizationProvider, GodotLocalizationProvider>();
             services.AddSharedGameDataParticipants();
+            // Beside the catalog it reads: an ornament is handed out by a quest, carried in a bag and
+            // put back by an ability, and none of those three live in one module.
+            services.AddSingleton<IOrnamentMinter, OrnamentMinter>();
             services.AddSingleton<ModifierFormatter>();
             services.AddSingleton<ITextFormatter, ModifierTextFormatter>();
             services.AddSingleton<ContextModifierFormatter>();

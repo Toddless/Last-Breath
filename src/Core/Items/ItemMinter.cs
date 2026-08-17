@@ -27,11 +27,15 @@ namespace Core.Items
     /// <param name="augments">Optional: a composition that does not build augments (a sandbox with
     /// no combat rules to draw their numbers around) holds no such kind, and augment ids fall
     /// through to the plain copy like any other id it cannot make sense of.</param>
+    /// <param name="ornaments">Optional on the same terms. This is the kind a quest reward goes
+    /// through: an ornament is handed out by id, and nothing holding that id knows it names anything
+    /// but an item.</param>
     public sealed class ItemMinter(
         IEquipBlueprintProvider blueprints,
         IEquipItemMinter equipMinter,
         IItemDataProvider items,
-        IAugmentItemMinter? augments = null) : IItemMinter
+        IAugmentItemMinter? augments = null,
+        IOrnamentMinter? ornaments = null) : IItemMinter
     {
         /// <summary>The kinds in the order they are offered the id. Each returns null for an id that
         /// is not its own — asking is how the kind is chosen, so a "no" is an answer and never a
@@ -42,6 +46,9 @@ namespace Core.Items
             // rolls its affix lines — the two are one decision and cannot be made in two places.
             (id, _) => blueprints.GetBlueprint(id) != null ? equipMinter.Mint(id) : null,
             (id, rarity) => augments?.Mint(id, rarity),
+            // No rarity to take: what an ornament is worth is authored on its record, and there is no
+            // loot seat that could have bought one — they come from quests alone.
+            (id, _) => ornaments?.Mint(id),
         ];
 
         // Walked lazily: the kind that claims the id is the last one asked, so an id one kind owns

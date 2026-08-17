@@ -78,7 +78,15 @@ namespace Core.Save
                     sp.GetService<Battle.Abilities.IAbilityAugmentBinder>(),
                     // Optional again, and needed only by files written before a copy carried its
                     // rarity: those are drawn once here, from the band their record declares now.
-                    sp.GetService<Items.IAugmentItemMinter>()));
+                    sp.GetService<Items.IAugmentItemMinter>(),
+                    // What a saved ornament GRANTS: the file names it and the ability, the catalog says
+                    // which tier of socket comes back with it.
+                    sp.GetService<Battle.Abilities.IOrnamentCatalog>(),
+                    // How an ornament this build cannot place gets back to the player. A worn ornament is
+                    // in no bag, so without these two the only other outcome is losing an artefact that
+                    // one unrepeatable quest hands out.
+                    sp.GetService<Items.IOrnamentMinter>(),
+                    sp.GetService<IInventory>()));
                 manager.Register(new PlayerVitalsSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
                 manager.Register(new PlayerPlacementSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
 

@@ -41,6 +41,10 @@ namespace Core.Data.GameData
         public const string MartialArtMastery = "MartialArtMastery";
         public const string ItemEffects = "ItemEffects";
 
+        /// <summary>The ornaments: which tier of socket each grants the ability wearing it. Kept out of
+        /// the Abilities catalog, whose reader parses every file in it as an ability document.</summary>
+        public const string Ornaments = "Ornaments";
+
         /// <summary>Canonical numbers and stack ceilings of the temporary effects — the one place their
         /// balance is written. Separate from ItemEffects, which says which effects an item may GRANT.</summary>
         public const string Effects = "Effects";

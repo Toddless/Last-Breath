@@ -5,6 +5,7 @@ namespace Core.Save.Participants
     using System.Linq;
     using Battle.Abilities;
     using Data.SaveData;
+    using Inventory;
     using Items;
     using Entity.Components;
     using Enums;
@@ -32,10 +33,20 @@ namespace Core.Save.Participants
     /// taken but which the file never placed stays out of the slots — the player's arrangement is his
     /// own, and a load must not rearrange it.
     ///
+    /// The ornaments are the section's other half, and the one part of it that is neither derived from
+    /// the tree nor rolled: which ability wears which ornament is a decision of the player's that nothing
+    /// else in the game can reproduce. They go to the board in ONE call with the occupants — half a
+    /// restored arrangement is a character whose fourth socket quietly went missing — and are laid down
+    /// before the occupants land. An ornament the board will not take back goes to the BAG, and one that
+    /// cannot even be minted stays in the file: a worn ornament exists nowhere else, and each of them comes
+    /// from a quest that runs once, so no reading of the data may end with one gone.
+    ///
     /// Version 2 dropped the learned list, version 3 added the sockets, version 4 made each of them
     /// carry the numbers its augment rolled, version 5 dropped the chosen upgrades (an ability is
     /// upgraded by exactly what stands in its sockets, so the second list had nothing left to say) and
-    /// version 6 turned the socket map into a LIST. The map was keyed by node, and a node repointed
+    /// version 6 turned the socket map into a LIST, and version 7 added the ornaments. A file below 7
+    /// simply names none, which is a character wearing none — the one migration that needs no code.
+    /// The map was keyed by node, and a node repointed
     /// between builds can leave two entries under one id — the augment the player put in the slot it
     /// used to open and the one in the slot it opens now — so a map could only ever keep one of them.
     /// A version 4 or 5 file is still read: it carries every field the list carries, with the node id
@@ -53,11 +64,23 @@ namespace Core.Save.Participants
     /// abilities. A project holding no slots has nothing to carry.</param>
     /// <param name="copies">Optional, and read only for files written before a copy carried a rarity:
     /// those are drawn once at load, from the band their record declares now.</param>
+    /// <param name="ornaments">Optional with the board: what an ornament id GRANTS. The file names the
+    /// ornament and the ability and no tier, so the catalog is what turns an entry back into a socket —
+    /// an ornament whose record left the game cannot be put back on and is reported rather than guessed
+    /// at.</param>
+    /// <param name="ornamentMinter">Optional: how an ornament this build cannot place becomes a thing the
+    /// player can carry again. Without one the entry is kept in the file instead (see
+    /// <see cref="Salvage"/>) — never dropped.</param>
+    /// <param name="inventory">Optional: where a salvaged ornament goes. The bag is asked rather than
+    /// assumed, because this section is also read by compositions that have none.</param>
     public class AbilityBookSaveParticipant(
         IPlayerAccessor playerAccessor,
         IAbilitySocketBoard? sockets = null,
         IAbilityAugmentBinder? augments = null,
-        IAugmentItemMinter? copies = null)
+        IAugmentItemMinter? copies = null,
+        IOrnamentCatalog? ornaments = null,
+        IOrnamentMinter? ornamentMinter = null,
+        IInventory? inventory = null)
         : ISaveParticipant
     {
         /// <summary>The oldest section this build can still dress a character from. Below it the file
@@ -72,8 +95,28 @@ namespace Core.Save.Participants
         /// on the older one instead of migrating it.</summary>
         private const string SocketsProperty = "sockets";
 
+        /// <summary>The property the ornament entries live under. Read straight off the token like the
+        /// sockets, because they have to go back onto the abilities BEFORE the occupants land and the
+        /// body's deserialization is skipped whenever there is no book to lay a layout onto.</summary>
+        private const string OrnamentsProperty = "ornaments";
+
+        /// <summary>
+        /// Ornament entries this build could neither place nor hand over, kept so the next
+        /// <see cref="Capture"/> writes them out again. The last resort of a rule with no exceptions:
+        /// every ornament comes from one unrepeatable quest, so there is no state of the data in which
+        /// forgetting one is the right answer. An id whose record was renamed between builds has no tier
+        /// to grant and no item to mint, and this is the only thing left that does not spend it — the
+        /// build that can read the id again finds it in the file.
+        /// <para>
+        /// Refilled from scratch by every restore and emptied by a file without the section, exactly like
+        /// the board's own contents: this participant outlives the character, and one playthrough's
+        /// unreadable ornament must not turn up in the next one's save.
+        /// </para>
+        /// </summary>
+        private readonly List<OrnamentSaveData> _unplaceable = [];
+
         public string SectionId => "abilityBook";
-        public int Version => 6;
+        public int Version => 7;
         public int RestoreOrder => Save.RestoreOrder.Abilities;
 
         public JToken Capture()
@@ -89,6 +132,7 @@ namespace Core.Save.Participants
                 };
 
             CaptureSockets(data);
+            CaptureOrnaments(data);
             return JToken.FromObject(data);
         }
 
@@ -104,7 +148,7 @@ namespace Core.Save.Participants
             // Before the body and before any guard that could return early: the sockets are the one part
             // of this section that carries the player's property, and a body this build could not make
             // sense of must not leave the board dressed in the playthrough before.
-            sockets?.Restore(SavedOccupants(data));
+            RestoreOrnaments(data);
             RestoreLayout(data);
 
             // After the slots and whether or not there is a book: the binder is what turns the restored
@@ -151,7 +195,8 @@ namespace Core.Save.Participants
         /// </summary>
         public void RestoreWithoutSection()
         {
-            sockets?.Restore([]);
+            _unplaceable.Clear();
+            sockets?.Restore([], []);
             augments?.Bind();
         }
 
@@ -209,6 +254,90 @@ namespace Core.Save.Participants
                     Tier = occupant.Slot.Tier
                 });
         }
+
+        /// <summary>Writes which ability wears which ornament. An ornament with nothing in its socket is
+        /// written like any other — the ornament itself is the property, and a file remembering it only
+        /// while an augment sat in it would put the player's fourth socket back in his bag.</summary>
+        private void CaptureOrnaments(AbilityBookSaveData data)
+        {
+            foreach (AbilityOrnament worn in sockets?.Ornaments ?? [])
+                data.Ornaments.Add(new OrnamentSaveData { Ornament = worn.OrnamentId, Ability = worn.AbilityId });
+
+            // The ones this build could not place and could not hand over. Written beside the worn ones
+            // because the alternative is a save that spends them; none of them is on the board, so no
+            // ornament is written twice.
+            data.Ornaments.AddRange(_unplaceable);
+        }
+
+        /// <summary>
+        /// Puts the ornaments back and makes sure every one of them ends up SOMEWHERE. There are three
+        /// places an ornament can land and no fourth: on the ability the file names, in the bag, or — when
+        /// neither is possible — back into the next save untouched. A worn ornament exists nowhere but in
+        /// this section, and each comes from a quest that runs once, so a road that could drop one is a
+        /// road that deletes content permanently.
+        /// </summary>
+        private void RestoreOrnaments(JToken data)
+        {
+            _unplaceable.Clear();
+
+            List<AbilityOrnament> resolved = [];
+            foreach (OrnamentSaveData entry in SavedOrnamentEntries(data))
+            {
+                if (ornaments?.Find(entry.Ornament) is { } record)
+                {
+                    resolved.Add(new AbilityOrnament(entry.Ornament, entry.Ability, record.Tier));
+                    continue;
+                }
+
+                // No record, so no tier to grant and nothing to mint either — the one case the bag cannot
+                // rescue. Inventing a tier would hand the player a socket nobody authored.
+                Salvage(entry, ornaments == null
+                    ? "this composition reads no ornament catalog"
+                    : $"no record declares it (known: {string.Join(", ", ornaments.All.Select(known => known.Id))})");
+            }
+
+            foreach (AbilityOrnament displaced in sockets?.Restore(SavedOccupants(data), resolved) ?? [])
+                Salvage(
+                    new OrnamentSaveData { Ornament = displaced.OrnamentId, Ability = displaced.AbilityId },
+                    $"'{displaced.AbilityId}' already wears another ornament, and an ability wears one");
+        }
+
+        /// <summary>
+        /// Gets one ornament the board would not take back to the player: minted afresh and put in his
+        /// bag, which is exactly what taking one off an ability does — an ornament rolls nothing, so a new
+        /// copy IS the ornament. Where that cannot be done (no record to mint from, no bag, or no room in
+        /// it) the entry is kept for the next save instead. Loud either way: the player keeps his artefact,
+        /// and whoever moved the data hears which entry stopped fitting.
+        /// </summary>
+        private void Salvage(OrnamentSaveData entry, string reason)
+        {
+            if (ornamentMinter?.Mint(entry.Ornament) is { } item && inventory?.TryAddItem(item) == true)
+            {
+                Tracker.TrackError(
+                    $"Ornament '{entry.Ornament}' cannot go back onto '{entry.Ability}' ({reason}); " +
+                    "it is in the bag instead, to be put wherever the player wants it.",
+                    this);
+                return;
+            }
+
+            _unplaceable.Add(entry);
+            Tracker.TrackError(
+                $"Ornament '{entry.Ornament}' cannot go back onto '{entry.Ability}' ({reason}) and cannot be " +
+                "carried either (nothing to mint it from, or no room for it); the entry is written out again " +
+                "unchanged, so a build that can place it will.",
+                this);
+        }
+
+        /// <summary>The ornament entries the file carries, as written. Read off the raw token like the
+        /// sockets: they are laid down before the body is deserialized, and the body's read is skipped
+        /// whenever there is no book to lay a layout onto.</summary>
+        private static IReadOnlyList<OrnamentSaveData> SavedOrnamentEntries(JToken data) =>
+        [
+            .. (data[OrnamentsProperty] as JArray ?? [])
+                .Select(entry => entry.ToObject<OrnamentSaveData>())
+                .Where(entry => entry != null)
+                .Select(entry => entry!)
+        ];
 
         /// <summary>
         /// The file's occupied slots in the board's own terms, read off the raw token because the shape

@@ -48,6 +48,9 @@ namespace LastBreath.Helpers
         private const string AugmentUsage =
             "aug catalog [filter] | aug bag | aug sockets | aug install <socket> <copy> | aug extract <socket>";
 
+        private const string OrnamentUsage =
+            "orn list | orn attach <ornamentId> <abilityId> | orn detach <ornamentId>";
+
         /// <summary>How many frontier rows one answer prints: the whole frontier of a wide allocation
         /// would scroll the useful lines out of the console.</summary>
         private const int FrontierLimit = 25;
@@ -154,6 +157,7 @@ namespace LastBreath.Helpers
                 case "rep": ExecuteReputation(args); break;
                 case "item": ExecuteItem(args); break;
                 case "aug": ExecuteAugment(args); break;
+                case "orn": ExecuteOrnament(args); break;
                 case "stats": ExecutePlayerStats(args); break;
                 case "heal": ExecuteHeal(args); break;
                 case "trade": ExecuteTrade(args); break;
@@ -804,6 +808,98 @@ namespace LastBreath.Helpers
         }
 
         /// <summary>
+        /// Drives one ornament between the bag and an ability. The only hand on that road until a window
+        /// grows one, and it travels the same bus gates the window will use. An ornament is named by its
+        /// own id rather than by a copy id: there is one of each in the game, so the id names the thing.
+        /// </summary>
+        private void ExecuteOrnament(string[] args)
+        {
+            switch (args.Length > 1 ? args[1].ToLowerInvariant() : "list")
+            {
+                case "list": PrintOrnaments(); break;
+                case "attach" when args.Length > 3: AttachOrnament(args[2], args[3]); break;
+                case "detach" when args.Length > 2: DetachOrnament(args[2]); break;
+                default: Print(OrnamentUsage); break;
+            }
+        }
+
+        /// <summary>Every ornament the data declares and where it currently is. "Where" is the whole
+        /// question about an ornament: it grants a socket to whatever ability wears it, and there is one
+        /// of each in the game.</summary>
+        private void PrintOrnaments()
+        {
+            var catalog = Service<IOrnamentCatalog>();
+            var board = Service<IAbilitySocketBoard>();
+
+            Print($"Ornaments: {catalog.All.Count} declared, {board.Ornaments.Count} worn");
+            if (catalog.All.Count == 0)
+            {
+                Print("None declared: the Ornaments catalog is empty or failed to load");
+                return;
+            }
+
+            PrintTable(
+                ["id", "grants tier", "where", "socket holds"],
+                [
+                    .. catalog.All
+                        .OrderBy(ornament => ornament.Tier)
+                        .Select(ornament => new[]
+                        {
+                            ornament.Id,
+                            Text(ornament.Tier),
+                            WhereaboutsOf(board, ornament.Id),
+                            board.Attachment(ornament.Id) is { } worn
+                            && board.Find(worn.Slot.Address) is { } granted
+                                ? HoldingOf(granted)
+                                : "-",
+                        })
+                ]);
+        }
+
+        /// <summary>Which ability wears it, or which bag it waits in. An ornament in neither has not been
+        /// handed out yet — the trials line is the only road that hands one over.</summary>
+        private static string WhereaboutsOf(IAbilitySocketBoard board, string ornamentId)
+        {
+            if (board.Attachment(ornamentId) is { } worn) return $"on {worn.AbilityId}";
+
+            return Service<IInventory>().GetTotalItemAmount(ornamentId) > 0 ? "in bag" : "not owned";
+        }
+
+        /// <summary>Puts a carried ornament onto an ability through the gate a window will use. The
+        /// ornament is found in the bag by its own id, because that is what the player types.</summary>
+        private void AttachOrnament(string ornamentId, string abilityId)
+        {
+            if (CarriedOrnament(ornamentId) is not { } item)
+            {
+                Print($"[color=red]attach {ornamentId}: not in the bag — item add {ornamentId} mints one (orn list)[/color]");
+                return;
+            }
+
+            SendAndReport<AttachOrnamentRequest, OrnamentAttachResult>(
+                new AttachOrnamentRequest(item.InstanceId, abilityId),
+                result => Print(result == OrnamentAttachResult.Attached
+                    ? $"attach {ornamentId} -> {abilityId}: ok"
+                    : $"[color=red]attach {ornamentId} -> {abilityId}: refused — {result}[/color]"));
+        }
+
+        /// <summary>Takes an ornament off whatever wears it, through the mirror gate.</summary>
+        private void DetachOrnament(string ornamentId)
+        {
+            SendAndReport<DetachOrnamentRequest, OrnamentDetachResult>(
+                new DetachOrnamentRequest(ornamentId),
+                result => Print(result == OrnamentDetachResult.Detached
+                    ? $"detach {ornamentId}: ok"
+                    : $"[color=red]detach {ornamentId}: refused — {result}[/color]"));
+        }
+
+        /// <summary>The bag's copy of one ornament, or nothing while it holds none.</summary>
+        private static IOrnamentItem? CarriedOrnament(string ornamentId) =>
+            Service<IInventory>().GetContents()
+                .Select(entry => entry.Item)
+                .OfType<IOrnamentItem>()
+                .FirstOrDefault(item => string.Equals(item.Id, ornamentId, StringComparison.Ordinal));
+
+        /// <summary>
         /// Every augment the data declares, so a copy can be asked for by id without opening the ability
         /// file. What is shown is the RECORD — the tier, where it may go, the figures its numbers are
         /// drawn around — which is what a slot measures. What a copy came out at is the copy's own and
@@ -1303,6 +1399,7 @@ namespace LastBreath.Helpers
             Print("[b]Abilities:[/b] ability list | ability learn <abilityId> | ability show <abilityId>");
             Print("[b]Items:[/b] item add <itemId> [amount] [rarity] | inv clear");
             Print($"[b]Augments:[/b] {AugmentUsage}");
+            Print($"[b]Ornaments:[/b] {OrnamentUsage}");
             Print("[b]Masteries:[/b] influence [exp <n>] | martial [exp <n>] | craft [exp <n>]");
             Print($"[b]Passive tree:[/b] {PassiveTreeUsage}");
             Print("[b]Reputation:[/b] rep add <faction> <delta> | rep set <faction> <level> | raid");
