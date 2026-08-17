@@ -45,6 +45,19 @@
             .. augments.All.Where(record => !string.IsNullOrWhiteSpace(record.Behaviour)).Select(record => record.Id)
         ];
 
+        /// <summary>
+        /// The parameters a record moves through the numeric table, by the same rule the effect registry
+        /// publishes the keys a factory reads: a ledger that has to GUESS what a record touches guesses
+        /// wrong. Asked from the outside it answered only "which abilities does this fit", which is a
+        /// different question — every ability a record fits declares parameters the record never moves.
+        /// Empty for a record answered by a behaviour or by a factory of its own: those carry their work
+        /// somewhere the table cannot see, and saying nothing is the honest answer.
+        /// </summary>
+        public IReadOnlyCollection<string> ParametersMovedBy(string augmentId) =>
+            _parameterAugments.TryGetValue(augmentId, out AugmentParameterMove[]? moves)
+                ? [.. moves.Select(move => move.Parameter).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)]
+                : [];
+
         public void Apply(string catalog, GameDataFile file)
         {
             var root = JsonConvert.DeserializeObject<AbilityDataRoot>(file.Json)

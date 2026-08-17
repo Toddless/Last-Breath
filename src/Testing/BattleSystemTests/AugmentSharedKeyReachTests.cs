@@ -69,8 +69,36 @@ namespace LastBreathTest.BattleSystemTests
                 ["Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine"]
         };
 
+        /// <summary>
+        /// The mirror of <see cref="s_knowinglyFree"/>: there the record is worth more than it charges,
+        /// here it charges and hands nothing back. SANCTIONED by the owner, 2026-08-15: an ability with no
+        /// stun and no augment laying one simply takes the surcharge, and a bad bargain the player can walk
+        /// into is a possibility the catalog is allowed to offer, not a fault to be repaired.
+        /// Found at CL-7b when the cost half of the stun record first got a row: it moves CostValue on
+        /// fourteen abilities and StunDuration on three, so on the eleven below it is paid for in mana and
+        /// gives no stun.
+        /// <para>What spreads it is <c>duration</c>, the wider of its two tags
+        /// (<c>["control", "duration"]</c>) — there is no <c>cost</c> tag in the vocabulary at all,
+        /// whatever the card's prose says. Kept as a literal count rather than narrowed, because the
+        /// spread is the design.</para>
+        /// <para>An entry here is not permanent: a stun applier seated through a granted tag gives the
+        /// ability a StunDuration to move, and the seating turns from a surcharge into the whole bargain.
+        /// The count survives that — the ability leaves this list and joins the record's works row — which
+        /// is why it is written per ability rather than as one exemption for the record.</para>
+        /// </summary>
+        private static readonly Dictionary<string, string[]> s_costWithoutGoodsByDesign = new(StringComparer.Ordinal)
+        {
+            ["Augment_Extend_Stun_Add_Cost"] =
+                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
+                 "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison",
+                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"]
+        };
+
         private static IEnumerable<string> Accepted(string augmentId) =>
-            s_knowinglyFree.TryGetValue(augmentId, out string[]? abilities) ? abilities : [];
+        [
+            .. s_knowinglyFree.TryGetValue(augmentId, out string[]? free) ? free : [],
+            .. s_costWithoutGoodsByDesign.TryGetValue(augmentId, out string[]? surcharged) ? surcharged : []
+        ];
 
         /// <summary>Every gate open and every stage reached: the walk needs the cast to lay everything
         /// it has, because a payload the dice withheld would read as a payload nothing scales.</summary>
@@ -101,6 +129,31 @@ namespace LastBreathTest.BattleSystemTests
         /// </summary>
         private static readonly (string Augment, string Parameter, string[] Works, string[] Inert)[] s_reach =
         [
+            // Written down for the first time at CL-7b, found by the completeness walk rather than by
+            // anybody noticing: both records are OLDER than the crit pair and had been standing on shared
+            // keys unledgered all along. The scales are declared by every damaging ability through
+            // RegisterDamageParameters, so the pair works almost everywhere it lands; the Static Armor is
+            // the one exception, its detonation carrying scales of its own instead.
+            ("Augment_Increasing_Scales", AbilityParameter.WeaponDamageScale,
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
+                ["Ability_Static_Armor"]),
+            ("Augment_Increasing_Scales", AbilityParameter.SpellDamageScale,
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
+                ["Ability_Static_Armor"]),
+
+            // The cost half of the stun bargain. Cost is a base-contract key every ability registers, so
+            // this half never misses — which is exactly why it needed writing down: the row above it
+            // (StunDuration) is the half that can, and a bargain is only honest when both are measured.
+            ("Augment_Extend_Stun_Add_Cost", AbilityParameter.CostValue,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Head_Butt",
+                 "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
+                 "Ability_Porcupine", "Ability_Static_Armor"],
+                []),
             // Unbound at CL-7 and written down here for the first time. The crit bonuses are declared by
             // MulticastAbility alone, so the 'critical' tag seats these two on twice the abilities that
             // read them: on the other six the decorator is added to a key nobody registered, which is a
@@ -216,6 +269,37 @@ namespace LastBreathTest.BattleSystemTests
                  "Ability_Porcupine"],
                 ["Ability_Berserk_Fury"]),
         ];
+
+        [TestMethod]
+        public void EveryRecordThatMovesASharedKeyHasARowAtAll()
+        {
+            // What the ledger could not say about itself. The walk below reads the table and the table
+            // alone, so a record that never got a row was never asked anything — which is how two
+            // legendary crit records came off their abilityId at CL-7, landed on twelve abilities,
+            // worked on six, and reddened nothing. The source here is the registry's OWN record-to-key
+            // map, not a guess from what a record fits: guessing from fitting reports every parameter
+            // every fitting ability happens to declare, which is a page of noise and no claim.
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            HashSet<string> shared = SharedKeys();
+            var written = s_reach.Select(row => (row.Augment, row.Parameter)).ToHashSet();
+            List<string> unwritten = [];
+
+            foreach (AbilityAugmentData record in catalog.All)
+                foreach (string parameter in registry.ParametersMovedBy(record.Id))
+                    if (shared.Contains(parameter) && !written.Contains((record.Id, parameter)))
+                        unwritten.Add($"{record.Id} moves '{parameter}' and the ledger says nothing about it");
+
+            Assert.AreEqual(0, unwritten.Count,
+                $"records on a shared key with no row in the ledger:\n  {string.Join("\n  ", unwritten)}");
+        }
+
+        /// <summary>Every shared key of the book, read by reflection so the list cannot drift.</summary>
+        private static HashSet<string> SharedKeys() =>
+            [.. typeof(AbilityParameter)
+                .GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Where(field => field.FieldType == typeof(string))
+                .Select(field => field.GetValue(null))
+                .OfType<string>()];
 
         [TestMethod]
         public void EveryRecordOnASharedKeyReachesExactlyTheAbilitiesWrittenDown()
