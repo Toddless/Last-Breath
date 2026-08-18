@@ -8,8 +8,6 @@
         public float Damage => this[AbilityParameter.Damage];
         public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
         public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
-        // True by design: an evade interrupts an attack series; the "unevadable" upgrades set it to false.
-        public bool IsEvadable { get; set; } = true;
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {

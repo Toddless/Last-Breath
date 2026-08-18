@@ -29,6 +29,10 @@ namespace LastBreathTest.BattleSystemTests
 
         private const string ShareProperty = "costShare";
 
+        /// <summary>A shipped record whose effect is drawn rather than named — the second and last thing
+        /// luck decides about a copy.</summary>
+        private const string PoolAugment = "Augment_Apply_Debuff";
+
         [TestMethod]
         public void ACopyIsWorthExactlyTheRungOfItsRarity()
         {
@@ -77,6 +81,17 @@ namespace LastBreathTest.BattleSystemTests
             var drawn = new CountingRandom(new DefaultRandomNumberGenerator(seed: 3));
             new AugmentMinter(ShippedAbilityData.Augments(), drawn).Mint(record);
             Assert.AreEqual(1, drawn.Draws, "minting drew something other than the rarity alone");
+
+            // A pool record has a second thing to decide — which of its effects this copy lays — and
+            // exactly one more draw is what deciding it costs. Both shipped pool records stand on one
+            // rarity, so their band costs nothing and the single draw counted here IS the effect.
+            AbilityAugmentData pooled = ShippedAbilityData.Augments().Find(PoolAugment)!;
+            Assert.IsTrue(pooled.PoolEffects.Count > 1, $"'{PoolAugment}' offers nothing to choose between");
+            Assert.AreEqual(pooled.RarityBand.Worst, pooled.RarityBand.Best, $"'{PoolAugment}' spans rarities, so the count below is two things at once");
+
+            var pooledDrawn = new CountingRandom(new DefaultRandomNumberGenerator(seed: 3));
+            new AugmentMinter(ShippedAbilityData.Augments(), pooledDrawn).Mint(pooled);
+            Assert.AreEqual(1, pooledDrawn.Draws, "a pool copy drew something other than its effect");
         }
 
         [TestMethod]

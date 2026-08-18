@@ -56,14 +56,14 @@ namespace Battle.Source.Abilities.DeepFreeze
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             RegisterDamageParameters(parameters);
-            parameters.RegisterDefault(Parameters.FreezeDuration, 1);
-            parameters.RegisterDefault(Parameters.FrostbiteDuration, 3);
+            parameters.RegisterAppliedDuration(Parameters.FreezeDuration, 1);
+            parameters.RegisterAppliedDuration(Parameters.FrostbiteDuration, 3);
             parameters.RegisterDefault(AbilityParameter.Stacks, 8);
             parameters.RegisterDefault(Parameters.FrostbiteColdAmp, 0.15f);
             parameters.RegisterDefault(Parameters.ColdResistanceShred, 0.25f);
-            parameters.RegisterDefault(Parameters.ShredDuration, 3);
+            parameters.RegisterAppliedDuration(Parameters.ShredDuration, 3);
             parameters.RegisterDefault(Parameters.HealReductionValue, 0.45f);
-            parameters.RegisterDefault(Parameters.HealReductionDuration, 3);
+            parameters.RegisterAppliedDuration(Parameters.HealReductionDuration, 3);
             parameters.RegisterDefault(Parameters.HealReductionStacks, 2);
             parameters.RegisterDefault(Parameters.ShredStacks, 1);
         }

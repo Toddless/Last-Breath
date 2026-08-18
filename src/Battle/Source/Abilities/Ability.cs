@@ -69,6 +69,8 @@
 
         public bool Declares(string parameter) => Params.Declares(parameter);
 
+        public IReadOnlyCollection<string> AppliedDurations => Params.AppliedDurations;
+
         /// <summary>
         /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
         /// Damage-dealing descendants stamp it onto their DamageContexts so the BattleDirector

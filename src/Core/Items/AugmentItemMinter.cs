@@ -23,9 +23,10 @@ namespace Core.Items
         /// rebuilt, and inventing one would be a different augment.</summary>
         IAugmentItem? Restore(AugmentInstance augment);
 
-        /// <summary>The copy a file remembers when the file predates rolled rarity: the numbers come
-        /// back untouched and the rarity is drawn once, here, from the band the record declares now.</summary>
-        AugmentInstance? Remembered(string augmentId, IReadOnlyDictionary<string, float> values, Rarity? rarity);
+        /// <summary>The copy a file remembers, with whatever the file could not tell drawn once, here,
+        /// from what the record declares now: the numbers come back untouched, the rarity is drawn for a
+        /// file predating rolled rarity, and the laid effect is drawn for one predating effect pools.</summary>
+        AugmentInstance? Remembered(string augmentId, IReadOnlyDictionary<string, float> values, Rarity? rarity, string effectId = "");
     }
 
     /// <param name="augments">What an id means. Asked first on both doors: the record is what says
@@ -43,9 +44,15 @@ namespace Core.Items
         public IAugmentItem? Restore(AugmentInstance augment) =>
             augments.Find(augment.AugmentId) is { } ? new AugmentItem(augment) : null;
 
-        public AugmentInstance? Remembered(string augmentId, IReadOnlyDictionary<string, float> values, Rarity? rarity) =>
+        public AugmentInstance? Remembered(string augmentId, IReadOnlyDictionary<string, float> values, Rarity? rarity, string effectId = "") =>
             augments.Find(augmentId) is { } record
-                ? new AugmentInstance(augmentId, values, rarity ?? minter.RollRarity(record))
+                ? new AugmentInstance(
+                    augmentId,
+                    values,
+                    rarity ?? minter.RollRarity(record),
+                    // A written effect the record no longer offers is not this record's copy any more:
+                    // it is re-drawn rather than carried, the way an unwritten one is.
+                    record.EffectPool.ContainsKey(effectId) ? effectId : minter.RollEffect(record))
                 : null;
     }
 }

@@ -53,8 +53,8 @@ namespace Battle.Source.Abilities.IceBlock
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             RegisterDamageParameters(parameters);
-            parameters.RegisterDefault(AbilityParameter.StunDuration, 1);
-            parameters.RegisterDefault(Parameters.WitheringDuration, 3);
+            parameters.RegisterAppliedDuration(AbilityParameter.StunDuration, 1);
+            parameters.RegisterAppliedDuration(Parameters.WitheringDuration, 3);
             parameters.RegisterDefault(AbilityParameter.Stacks, 3);
             parameters.RegisterDefault(Parameters.WitheringValue, 0.15f);
             parameters.RegisterDefault(Parameters.ExtraBlocks, 3);

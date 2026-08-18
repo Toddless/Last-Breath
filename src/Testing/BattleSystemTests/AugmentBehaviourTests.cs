@@ -16,19 +16,79 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Data.AbilityData;
 
     /// <summary>
-    /// Records that carry their own behaviour instead of a factory. Two silences are walked: a record
-    /// naming a behaviour nothing builds, and one writing a field its behaviour never reads — both
-    /// leave an augment that parses, is offered, is seated and does nothing.
+    /// Records that carry their own behaviour instead of a factory. Three silences are walked: a record
+    /// naming a behaviour nothing builds, one writing a field its behaviour never reads, and one whose
+    /// mechanism needs something of the ability that the tag carrying it there never promised — all
+    /// three leave an augment that parses, is offered, is seated and does nothing.
     /// </summary>
     [TestClass]
     public class AugmentBehaviourTests
     {
-        /// <summary>The record written with no code at all — the whole point of the registry.</summary>
-        private const string Codeless = "Augment_Clumsy_Blows";
+        /// <summary>A record written with no code at all — the whole point of the registry. One of a
+        /// family now: whichever is named here, what the walks measure is the registry and not the
+        /// record, so the constant moves whenever the catalog does.</summary>
+        private const string Codeless = "Augment_Attacks_Reduce_Armor";
 
         /// <summary>Attacks the walks below deal — under every canonical stack cap in play, so what is
         /// measured is one stack per touch rather than a cap being hit.</summary>
         private const int SeriesAttacks = 4;
+
+        /// <summary>
+        /// A class of inertness the key ledgers cannot see: a behaviour record has no host key to be
+        /// missing, so <see cref="AugmentSharedKeyReachTests"/> writes it down as self-contained and
+        /// stops — yet its MECHANISM can still need something of the ability that the tag carrying it
+        /// there does not promise. Where that happens the record fits, is bought, is seated and does
+        /// nothing, and no other table in the build would say so.
+        /// <para>Only one mechanism is in that position today: <c>AttackModifier</c> installs a
+        /// pre-attack mutator through <see cref="IAttackModifierHost"/>, which an ability implements
+        /// only if it builds attack contexts of its own. The <c>attack</c> tag is worn more widely than
+        /// that interface is implemented, so the pairs below are the seatings where the two diverge.</para>
+        /// <para>Legal by "a tag promises fitting, not work" and left as it is — narrowing the tag is a
+        /// design decision, not a repair. Written per pair so a NEW divergence still fails.</para>
+        /// </summary>
+        private static readonly (string Record, string[] InertOn, string Reason)[] s_mechanismNeedsAHost =
+        [
+            ("Augment_Attacks_Cannot_Be_Evaded", ["Ability_Head_Butt"],
+                "the head butt strikes without building an attack context of its own, so there is no attack pipeline for a pre-attack mutator to sit in"),
+        ];
+
+        [TestMethod]
+        public void ABehaviourWhoseMechanismNeedsAHostLandsOnlyWhereTheLedgerSaysItIdles()
+        {
+            // Computed against the literal table from both ends: every ability a host-needing record is
+            // carried onto without the interface is a written row, and every written row is a seating
+            // that still happens. A row left behind by a re-markup is as wrong as a missing one — it
+            // would be a warning about a case the catalog no longer has.
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            var written = s_mechanismNeedsAHost.ToDictionary(row => row.Record, row => row.InertOn, StringComparer.Ordinal);
+            Dictionary<string, List<string>> actual = [];
+
+            foreach (AbilityAugmentData record in catalog.All.Where(entry => string.Equals(entry.Behaviour, "AttackModifier", StringComparison.Ordinal)))
+                foreach (string abilityId in registry.KnownAbilityIds.Where(id => !registry.IsHidden(id)).Order(StringComparer.Ordinal))
+                {
+                    if (!Fits(catalog, abilityId, record)) continue;
+                    if (registry.CreateAbility(abilityId) is IAttackModifierHost) continue;
+
+                    if (!actual.TryGetValue(record.Id, out List<string>? inert)) actual[record.Id] = inert = [];
+                    inert.Add(abilityId);
+                }
+
+            Assert.AreEqual(
+                string.Join("\n", written.OrderBy(row => row.Key, StringComparer.Ordinal).Select(row => $"{row.Key}: [{string.Join(", ", row.Value)}]")),
+                string.Join("\n", actual.OrderBy(row => row.Key, StringComparer.Ordinal).Select(row => $"{row.Key}: [{string.Join(", ", row.Value)}]")),
+                "a behaviour whose mechanism needs a host lands somewhere the ledger does not name — rewrite s_mechanismNeedsAHost to the seatings printed above");
+
+            foreach ((string record, _, string reason) in s_mechanismNeedsAHost)
+                Assert.IsFalse(string.IsNullOrWhiteSpace(reason), $"'{record}' is written down as idling with no reason given");
+        }
+
+        private static bool Fits(AbilityAugmentCatalog catalog, string abilityId, AbilityAugmentData record) =>
+            AugmentFit.Check(
+                new AbilitySocketPlacement("socket_host_probe", abilityId, record.Tier),
+                catalog.TagsOf(abilityId),
+                record,
+                [],
+                null) == AugmentFitResult.Fits;
 
         [TestMethod]
         public void EveryRecordThatDeclaresABehaviourIsBuiltByIt()
@@ -56,6 +116,9 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Porcupine_Incoming_Damage_Reduction", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
             ("Augment_Porcupine_Crit_Mitigation", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
             ("Augment_Crit_Mitigation_Under_Shield", "duration", AbilityParameter.Duration, "Ability_Ice_Aegis"),
+            // The mythic reading of the calculation lasts exactly as long as the buff it reads from — the
+            // design line says "while the Calculation holds", and the ref is what makes that literal.
+            ("Augment_Mythic_Calculation", "duration", AbilityParameter.Duration, "Ability_Critical_Calculation"),
         ];
 
         [TestMethod]
@@ -169,7 +232,7 @@ namespace LastBreathTest.BattleSystemTests
             for (int attack = 0; attack < Attacks; attack++)
                 await series.ApplyImpactRiders(new AbilityImpact(owner, target, field) { Source = series, Kind = ImpactKind.Attack });
 
-            Assert.AreEqual(Attacks, Stacks(target, ClumsinessId),
+            Assert.AreEqual(Attacks, Stacks(target, CodelessEffectId),
                 "a series of attacks left something other than one stack per attack");
 
             // Asked here rather than at the end: with the target still BELOW the cap, a stack that slipped
@@ -177,11 +240,11 @@ namespace LastBreathTest.BattleSystemTests
             // pass whatever the filter did.
             await series.ApplyImpactRiders(new AbilityImpact(owner, target, field) { Source = series, Kind = ImpactKind.Splash });
 
-            Assert.AreEqual(Attacks, Stacks(target, ClumsinessId), "a record written for attacks fired on a splash");
+            Assert.AreEqual(Attacks, Stacks(target, CodelessEffectId), "a record written for attacks fired on a splash");
 
             await series.ApplyImpactRiders(new AbilityImpact(owner, target, field) { Source = series, Kind = ImpactKind.Attack });
 
-            Assert.AreEqual(Attacks + 1, Stacks(target, ClumsinessId), "one more attack did not become one more stack");
+            Assert.AreEqual(Attacks + 1, Stacks(target, CodelessEffectId), "one more attack did not become one more stack");
 
             // A hit is not an attack: the jar touches its victim once, by the other road entirely.
             var jarTarget = Fighter();
@@ -189,7 +252,7 @@ namespace LastBreathTest.BattleSystemTests
             jar.SetOwner(owner);
             await jar.Execute([jarTarget], FieldOf(owner, jarTarget));
 
-            Assert.AreEqual(0, Stacks(jarTarget, ClumsinessId), "a record written for attacks fired on a hit");
+            Assert.AreEqual(0, Stacks(jarTarget, CodelessEffectId), "a record written for attacks fired on a hit");
         }
 
         [TestMethod]
@@ -228,9 +291,9 @@ namespace LastBreathTest.BattleSystemTests
         public async Task TwoRecordsLayingOneEffectAreTwoStreamsOfStacks()
         {
             // The axis a rider is deduplicated on is the RECORD, not the effect it lays: two records
-            // that happen to lay the same effect are two purchases and both work. The shipped twin of
-            // the codeless record died in the catalog cleanup, so the second purchase is the same
-            // record under a second id — the axis itself is what is measured.
+            // that happen to lay the same effect are two purchases and both work. The second purchase
+            // is the same record under a second id — a shipped pair laying one effect would prove the
+            // same thing and would tie the walk to a pairing the catalog is free to break.
             using var rolls = new CombatRandomScope(new SteadyRoll());
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             var owner = Fighter();
@@ -238,7 +301,7 @@ namespace LastBreathTest.BattleSystemTests
 
             var ability = (Ability)registry.CreateAbility("Ability_Series_Of_Attacks");
             IAbilityAugment? first = registry.CreateUpgrade(Shipped(Codeless));
-            IAbilityAugment? second = registry.CreateUpgrade(Shipped(Codeless) with { Id = "Augment_Clumsy_Blows_Twin" });
+            IAbilityAugment? second = registry.CreateUpgrade(Shipped(Codeless) with { Id = "Augment_Attacks_Reduce_Armor_Twin" });
             Assert.IsNotNull(first, $"the registry builds nothing for '{Codeless}'");
             Assert.IsNotNull(second, "the registry builds nothing for the twin of the codeless record");
             ability.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_0"] = first, ["socket_1"] = second });
@@ -248,7 +311,7 @@ namespace LastBreathTest.BattleSystemTests
 
             await ability.ApplyImpactRiders(new AbilityImpact(owner, target, FieldOf(owner, target)) { Source = ability, Kind = ImpactKind.Attack });
 
-            Assert.AreEqual(2, Stacks(target, ClumsinessId),
+            Assert.AreEqual(2, Stacks(target, CodelessEffectId),
                 "two records laying one effect did not come out as two stacks on one touch");
         }
 
@@ -277,13 +340,13 @@ namespace LastBreathTest.BattleSystemTests
             ability.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_lever"] = upgrade });
             await ability.ApplyImpactRiders(new AbilityImpact(owner, target, FieldOf(owner, target)) { Source = ability, Kind = ImpactKind.Attack });
 
-            Assert.AreEqual(1, Stacks(target, ClumsinessId),
+            Assert.AreEqual(1, Stacks(target, CodelessEffectId),
                 "a key the effect does not read took the whole effect down with it — the record laid nothing");
             Assert.AreEqual(0.42f, carrying.UpgradeProperties["reviewProbeLever"], 0.0001f,
                 "the lever was filtered off the record itself instead of only off what the registry is handed");
         }
 
-        private const string ClumsinessId = "Effect_Clumsiness";
+        private const string CodelessEffectId = "Effect_Armor_Reduction";
 
         /// <summary>The two damage-over-turn series of the design list and the effects they lay: records
         /// and no code at all, which is exactly why the promise needs measuring rather than inferring.</summary>

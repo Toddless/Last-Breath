@@ -2739,12 +2739,6 @@ msgstr "More Attack Damage"
 msgid "Augment_More_Attack_Damage_Description"
 msgstr "+{damageMultiplier:%} attack damage."
 
-msgid "Ability_SoA_Augment_Attacks_Cannot_Be_Evaded"
-msgstr "Attacks Cannot Be Evaded"
-
-msgid "Ability_SoA_Augment_Attacks_Cannot_Be_Evaded_Description"
-msgstr "The series can no longer be evaded."
-
 msgid "Augment_Additional_Attacks"
 msgstr "Additional Attacks"
 
@@ -2804,18 +2798,6 @@ msgstr "Debuff Effectiveness"
 
 msgid "Augment_Debuff_Effectiveness_Description"
 msgstr "Increases the effectiveness of the debuff by {effectiveness:%}."
-
-msgid "Ability_Ip_Augment_Unevadable"
-msgstr "Unevadable"
-
-msgid "Ability_Ip_Augment_Unevadable_Description"
-msgstr "The series can no longer be evaded."
-
-msgid "Augment_Clumsy_Blows"
-msgstr "Clumsy Blows"
-
-msgid "Augment_Clumsy_Blows_Description"
-msgstr "Every ATTACK applies a stack of {@Effect_Clumsiness} (-{value:%} evade, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Augment_Increasing_Scales"
 msgstr "Increasing Scales"
@@ -3042,12 +3024,6 @@ msgstr "Extend Stun Add Cost"
 
 msgid "Augment_Extend_Stun_Add_Cost_Description"
 msgstr "+{stunDuration|turn|turns} stun, +{additionalCost} cost."
-
-msgid "Augment_Armor_Debuff_On_Hit"
-msgstr "Armor Debuff"
-
-msgid "Augment_Armor_Debuff_On_Hit_Description"
-msgstr "Applies -{reduceBy:%} armor ({duration|turn|turns}, up to {maxStacks|stack|stacks})."
 
 # ------------------------------
 # Passive skills
@@ -4289,3 +4265,45 @@ msgstr "Burning Attack Series"
 
 msgid "Augment_Burning_Attack_Series_Description"
 msgstr "Every attack of the ability applies {@Effect_Damage_Over_Turn_Burning}."
+
+msgid "Augment_Mythic_Calculation"
+msgstr "Mythic Calculation"
+
+msgid "Augment_Mythic_Calculation_Description"
+msgstr "While the Calculation holds, every critical hit gives one more turn to each of your buffs."
+
+msgid "Effect_Mythic_Calculation"
+msgstr "Mythic Calculation"
+
+msgid "Effect_Mythic_Calculation_Description"
+msgstr "Every critical hit extends each of the bearer's buffs by {Duration|turn|turns}."
+
+msgid "Augment_Applied_Duration"
+msgstr "Lasting Effects"
+
+msgid "Augment_Applied_Duration_Description"
+msgstr "Everything this ability applies lasts {turns|turn|turns} longer."
+
+msgid "Augment_Applied_Effectiveness"
+msgstr "Applied Effectiveness"
+
+msgid "Augment_Applied_Effectiveness_Description"
+msgstr "+{effectiveness:%} effectiveness of everything this ability applies."
+
+msgid "Augment_Attacks_Cannot_Be_Evaded"
+msgstr "Inescapable Attacks"
+
+msgid "Augment_Attacks_Cannot_Be_Evaded_Description"
+msgstr "The ability's attacks cannot be evaded."
+
+msgid "Augment_Apply_Buff"
+msgstr "Borrowed Blessing"
+
+msgid "Augment_Apply_Buff_Description"
+msgstr "The ability grants its caster a stack of {effect}."
+
+msgid "Augment_Apply_Debuff"
+msgstr "Borrowed Curse"
+
+msgid "Augment_Apply_Debuff_Description"
+msgstr "Every touch of the ability applies a stack of {effect} to what it touched."

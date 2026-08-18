@@ -22,7 +22,7 @@ namespace Battle.Source.Abilities.JarOfPoison
         {
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
-            parameters.RegisterDefault(AbilityParameter.PoisonDuration, 3);
+            parameters.RegisterAppliedDuration(AbilityParameter.PoisonDuration, 3);
             // One jar per cast, declared so the count is a thing an augment can raise: the ability wears
             // the 'projectile' tag, and a tag that promises fitting without a key to move is a purchase
             // that does nothing.

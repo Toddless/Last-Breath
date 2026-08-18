@@ -70,7 +70,7 @@ namespace Battle.Source.Abilities.Armageddon
         {
             base.RegisterBaseParameters(parameters);
             RegisterCriticalParameters(parameters);
-            parameters.RegisterDefault(AbilityParameter.StunDuration, 2);
+            parameters.RegisterAppliedDuration(AbilityParameter.StunDuration, 2);
             parameters.RegisterDefault(Parameters.HpCostMultiplier, 1f);
             parameters.RegisterDefault(Parameters.MissingHpRate, 0f);
             parameters.RegisterDefault(Parameters.SecondDamage, 600f);

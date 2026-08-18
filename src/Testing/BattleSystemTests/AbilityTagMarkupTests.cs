@@ -210,7 +210,30 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Sacrifice", AbilityTags.Cost),
             ("Ability_Sacrifice", AbilityTags.Empowered),
             ("Ability_Series_Of_Attacks", AbilityTags.Scale),
-            ("Ability_Static_Armor", AbilityTags.Scale)
+            ("Ability_Static_Armor", AbilityTags.Scale),
+
+            // Load-bearing since E-2b: 'effect' was in the vocabulary and worn by nobody until the umbrella
+            // record arrived. It now marks every ability that LAYS something — the appliers, and only them:
+            // the four that lay nothing (both series, the explosion, the shards) do not carry it.
+            ("Ability_Ares_Blessing", AbilityTags.Effect),
+            ("Ability_Armageddon", AbilityTags.Effect),
+            ("Ability_Berserk_Fury", AbilityTags.Effect),
+            ("Ability_Critical_Calculation", AbilityTags.Effect),
+            ("Ability_Dark_Shroud", AbilityTags.Effect),
+            ("Ability_Deep_Freeze", AbilityTags.Effect),
+            ("Ability_Discharge", AbilityTags.Effect),
+            ("Ability_Double_Strike", AbilityTags.Effect),
+            ("Ability_Head_Butt", AbilityTags.Effect),
+            ("Ability_Ice_Aegis", AbilityTags.Effect),
+            ("Ability_Ice_Block", AbilityTags.Effect),
+            ("Ability_Jar_Of_Poison", AbilityTags.Effect),
+            ("Ability_Overload", AbilityTags.Effect),
+            ("Ability_Poison_Coating", AbilityTags.Effect),
+            ("Ability_Porcupine", AbilityTags.Effect),
+            ("Ability_Sacrifice", AbilityTags.Effect),
+            ("Ability_Static_Armor", AbilityTags.Effect),
+            ("Ability_Twin_Assist_Attack", AbilityTags.Effect),
+            ("Ability_Twin_Assist_Shield", AbilityTags.Effect)
         ];
 
         [TestMethod]

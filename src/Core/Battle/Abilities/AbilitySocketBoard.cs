@@ -330,7 +330,9 @@ namespace Core.Battle.Abilities
 
         /// <summary>The tags the ability's installed augments grant it — read off what the ability
         /// WEARS, like <see cref="WornGroups"/>: an augment in a closed slot does nothing and grants
-        /// nothing.</summary>
+        /// nothing. Asked of the COPY and not of its record, which is the one place the two differ:
+        /// a record offering a pool of effects grants the genus of the one THIS copy drew, so two
+        /// copies of it teach the ability different things.</summary>
         private IReadOnlyCollection<string> GrantedTags(string abilityId, string? excludingAddress = null)
         {
             HashSet<string> granted = new(StringComparer.OrdinalIgnoreCase);
@@ -339,9 +341,9 @@ namespace Core.Battle.Abilities
             {
                 if (string.Equals(socket.Address, excludingAddress, StringComparison.Ordinal)) continue;
                 if (socket.WorkingAugment is not { } installed) continue;
+                if (augments?.Find(installed.AugmentId) is not { } record) continue;
 
-                foreach (string tag in augments?.Find(installed.AugmentId)?.GrantsTags ?? [])
-                    granted.Add(tag);
+                foreach (string tag in installed.Applied(record).GrantsTags) granted.Add(tag);
             }
 
             return granted;

@@ -12,31 +12,39 @@
 
     /// <summary>
     /// The four augments that took the place of forty-three. All of them work through the base contract
-    /// every ability honours, so all of them are written once â€” and the three that move a number state
-    /// what they move as a share of it rather than as a number of their own: they go on every ability
-    /// there is â€” prices running from nothing at all to five hundred, waits from no turns to nine â€” and
-    /// one flat figure would be a near-free cast at the cheap end and nothing worth choosing at the
-    /// expensive one.
+    /// every ability honours, so all of them are written once — and the two numbers they move are stated
+    /// in two different ways, which is the whole of what these walks are about.
     ///
-    /// Two things a share has to answer for, and both are walked below. A share of a small base is a
-    /// fraction of a turn, and turns are whole: a cut that rounds down to zero would leave an augment
-    /// chosen, worn, paid for and doing nothing at all â€” the silent refusal this system has already
-    /// been bitten by once on effect durations. And a share is a share OF something: measured against
-    /// whatever the parameter happens to carry when the augment goes in, the same build would be worth
-    /// one price assembled in one order and another price in the other.
+    /// A PRICE is a share of the ability's own. The records go on every ability there is, prices running
+    /// from nothing at all to five hundred, and one flat figure would be a near-free cast at the cheap
+    /// end and nothing worth choosing at the expensive one. A WAIT is whole turns, because the design
+    /// line counts turns: a player reads "two turns sooner" and gets two turns sooner wherever the
+    /// record is worn.
+    ///
+    /// Each form has one thing to answer for, and both are walked below. A share of a small base is a
+    /// fraction of a point, and points are whole: a cut that rounds down to zero would leave an augment
+    /// chosen, worn, paid for and doing nothing at all — the silent refusal this system has already been
+    /// bitten by once on effect durations. A flat cut has no rounding to be saved by and no base to be
+    /// measured against, so what it needs instead is a FLOOR: turns taken off a short wait run past zero
+    /// into a negative one, which never counts back down and leaves the ability uncastable for good.
+    ///
+    /// And the shares are shares OF something: measured against whatever the parameter happens to carry
+    /// when the augment goes in, the same build would be worth one price assembled in one order and
+    /// another price in the other.
     /// </summary>
     [TestClass]
-    public class AugmentShareReductionTests
+    public class AugmentPriceAndCooldownCutTests
     {
         private const string CostAugment = "Augment_Reduce_Cost";
         private const string CooldownAugment = "Augment_Reduce_Cooldown";
 
-        /// <summary>The record that took the place of three: a shorter wait bought with a higher
-        /// price, both stated as shares of the ability's own numbers.</summary>
+        /// <summary>The record that took the place of three: a shorter wait bought with a higher price —
+        /// the turns flat, the price a share of the ability's own.</summary>
         private const string SurchargeAugment = "Augment_Reduce_Cooldown_Add_Cost";
 
-        /// <summary>The record that cuts the wait as whole TURNS rather than as a share of it — the design
-        /// list states this one flat, so it is the one that needs a floor of its own.</summary>
+        /// <summary>The record that cuts the wait AND the price together, and the deepest flat cut of the
+        /// three — deep enough to reach the floor on a wait the book does not ship yet, which is why the
+        /// floor is walked on this one.</summary>
         private const string FlatCutAugment = "Augment_Reduce_Cooldown_And_Cost";
 
         /// <summary>The record that took the place of two: the price paid in health. It moves no
@@ -45,8 +53,9 @@
         private const string HealthCostAugment = "Augment_Cost_Type_Health";
 
         private const float CostShare = 0.3f;
-        private const float CooldownShare = 0.25f;
-        private const float SurchargeShare = 0.4f;
+        private const float CooldownTurns = 1f;
+        private const float SurchargeTurns = 2f;
+        private const float SurchargeCostShare = 0.15f;
 
         /// <summary>The augment of another tier the cost share has to share a parameter with: Head
         /// Butt's longer stun, bought with fifty more mana. The shipped record, built the way the
@@ -61,7 +70,7 @@
         /// <summary>How many augments the game holds after the collapse â€” the same number in the data
         /// and in the registry, because one half without the other is either an offer nothing builds
         /// or code nothing can reach.</summary>
-        private const int ShippedAugmentCount = 95;
+        private const int ShippedAugmentCount = 97;
 
         /// <summary>Every record the collapse of the base-contract families left behind, with the tier
         /// it was written at. All four claim the whole book, which is the widest reach in the system
@@ -71,21 +80,22 @@
             (CostAugment, 1), (CooldownAugment, 1), (SurchargeAugment, 1), (HealthCostAugment, 2)
         ];
 
-        /// <summary>Every cooldown the shipped abilities are written with, and what each share comes to
-        /// on it once it is rounded to whole turns. Held as a table rather than recomputed, so a change
-        /// of the rounding rule shows up as the numbers it moves.</summary>
-        private static readonly (int Base, int QuarterCut, int SurchargeCut)[] s_cooldownTable =
+        /// <summary>Every cooldown the shipped abilities are written with, and the turns each record
+        /// takes off it. Held as a table rather than recomputed: the cut is the same figure everywhere,
+        /// so the column that matters is the wait it LEAVES, and a base that stops being shipped or a
+        /// cut that stops clearing the floor shows up here as the numbers it moves.</summary>
+        private static readonly (int Base, int PlainCut, int SurchargeCut)[] s_cooldownTable =
         [
-            (3, 1, 1), (4, 1, 2), (5, 1, 2), (6, 2, 2), (7, 2, 3), (9, 2, 4)
+            (3, 1, 2), (4, 1, 2), (5, 1, 2), (6, 1, 2), (7, 1, 2), (9, 1, 2)
         ];
 
-        /// <summary>The three abilities whose own cooldown augments the surcharge record absorbed, and
-        /// what the shares come to on the numbers those abilities are written with. The bases are read
-        /// off the files, so an ability repriced after the collapse fails here instead of quietly
-        /// getting another augment than the one that was agreed.</summary>
+        /// <summary>The three abilities whose own cooldown augments the surcharge record absorbed: the
+        /// turns it takes off each, and what its price share comes to on what each of them charges. The
+        /// bases are read off the files, so an ability repriced after the collapse fails here instead of
+        /// quietly getting another augment than the one that was agreed.</summary>
         private static readonly (string AbilityId, int CooldownCut, int CostSurchargeValue)[] s_absorbedAbilities =
         [
-            ("Ability_Porcupine", 2, 40), ("Ability_Ice_Shards", 2, 80), ("Ability_Poison_Explosion", 3, 40)
+            ("Ability_Porcupine", 2, 15), ("Ability_Ice_Shards", 2, 30), ("Ability_Poison_Explosion", 2, 15)
         ];
 
         [TestMethod]
@@ -104,33 +114,36 @@
         }
 
         [TestMethod]
-        public void TheCooldownShareIsTakenOffTheWaitOfTheAbilityItGoesOn()
+        public void TheCooldownCutIsTheSameWholeTurnsWhateverTheAbilityWaits()
         {
+            // The mirror of the case above, and the reason the two parameters are stated differently: a
+            // wait is counted, so the record takes the turns it names off the quick ability and off the
+            // slow one alike. A share here would be worth a fraction of a turn on the short waits.
             var quick = AbilityWith(cooldown: 4);
             var slow = AbilityWith(cooldown: 9);
 
-            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(quick);
-            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(slow);
+            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownTurns).Apply(quick);
+            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownTurns).Apply(slow);
 
-            Assert.AreEqual(3f, quick.Cooldown, "the share was not measured against the quick ability's own wait");
-            Assert.AreEqual(7f, slow.Cooldown, "the share was not measured against the slow ability's own wait");
+            Assert.AreEqual(3f, quick.Cooldown, "the cut no longer takes its whole turn off the quick ability's wait");
+            Assert.AreEqual(8f, slow.Cooldown, "the cut came to something other than the same turn on the slow ability's wait");
         }
 
         [TestMethod]
         public void TheSurchargeAugmentCutsTheWaitAndRaisesThePriceOfTheAbilityItGoesOn()
         {
             // The three records the surcharge augment replaced, each on the ability it used to belong
-            // to: one record now, and what it does to each of them is the ability's own numbers read
-            // twice. Both shares are measured on the same base, so a mistake in either shows up as one
-            // of these two figures and not as a build that merely feels off.
+            // to: one record now, moving the two parameters in the two forms — flat turns off the wait,
+            // a share of the price onto the bill. Both are read off the ability's own base, so a mistake
+            // in either shows up as one of these two figures and not as a build that merely feels off.
             foreach ((string abilityId, int cut, int surcharge) in s_absorbedAbilities)
             {
                 (int wait, int price) = ShippedBaseOf(abilityId);
                 var ability = AbilityWith(cost: price, cooldown: wait);
 
-                new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(ability);
+                new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeTurns, SurchargeCostShare).Apply(ability);
 
-                Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"the share no longer takes {cut} turns off the {wait} '{abilityId}' waits");
+                Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"the cut no longer takes {cut} turns off the {wait} '{abilityId}' waits");
                 Assert.AreEqual(price + surcharge, ability.CostValue, $"the share no longer adds {surcharge} to the {price} '{abilityId}' charges");
             }
         }
@@ -148,25 +161,27 @@
         }
 
         [TestMethod]
-        public void TheCooldownShareIsTheSameWhicheverAugmentTheBuildWasStartedFrom()
+        public void TheCooldownCutIsTheSameWhicheverAugmentTheBuildWasStartedFrom()
         {
-            // The same on the other parameter, where the drift is paid in whole turns. Nine turns less
-            // a quarter is the two the table names, and the three the other augment adds are waited on
-            // top of that; measured against the twelve it made of the wait instead, the quarter comes
-            // to three turns and the build is a turn quicker for having been assembled backwards.
-            Assert.AreEqual(10f, WaitOf(surchargeFirst: true), "the share was measured against a wait the other augment had already lengthened");
-            Assert.AreEqual(10f, WaitOf(surchargeFirst: false), "the same two augments came to another wait in the other order");
+            // The same on the other parameter. A flat cut cannot drift with the base it is read against
+            // — that is the point of stating it flat — but the FLOOR under it is read at the moment the
+            // cut is applied, and an augment lengthening the wait beside it moves what the floor is
+            // measuring. Order-independence is therefore still a claim about this pair rather than a
+            // property the form hands over for free.
+            Assert.AreEqual(11f, WaitOf(surchargeFirst: true), "the cut came out different beside an augment that had already lengthened the wait");
+            Assert.AreEqual(11f, WaitOf(surchargeFirst: false), "the same two augments came to another wait in the other order");
         }
 
         [TestMethod]
         public void TheSurchargeAugmentMovesBothNumbersTheSameWhicheverWayTheBuildWasAssembled()
         {
             // One record moving two parameters at once, with an augment of another tier standing on
-            // each of them: fifty more mana for a longer stun, three more turns of waiting. Both
-            // shares are the ability's own, so what the surcharge augment does is settled before
-            // either of the others is read â€” and stays settled when the slots are filled backwards.
-            Assert.AreEqual((260, 8f), BothOf(surchargesFirst: true), "a share was measured against a number another augment had already moved");
-            Assert.AreEqual((260, 8f), BothOf(surchargesFirst: false), "the same three augments came to another build in the other order");
+            // each of them: fifty more mana for a longer stun, three more turns of waiting. Its cut is
+            // a figure of its own and its bill is a share of the ability's own price, so what the
+            // surcharge augment does is settled before either of the others is read — and stays settled
+            // when the slots are filled backwards.
+            Assert.AreEqual((223, 10f), BothOf(surchargesFirst: true), "a move was measured against a number another augment had already changed");
+            Assert.AreEqual((223, 10f), BothOf(surchargesFirst: false), "the same three augments came to another build in the other order");
         }
 
         [TestMethod]
@@ -193,27 +208,27 @@
             {
                 var ability = AbilityWith(cooldown: wait);
 
-                new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(ability);
+                new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownTurns).Apply(ability);
 
-                Assert.IsTrue(ability.Cooldown < wait, $"a quarter of {wait} turns rounded down to nothing, and the augment does nothing at all");
-                Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"a quarter of {wait} turns no longer comes to {cut}");
+                Assert.IsTrue(ability.Cooldown < wait, $"the floor swallowed the whole cut on a {wait}-turn wait, and the augment does nothing at all");
+                Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"the cut no longer takes {cut} turns off a wait of {wait}");
             }
         }
 
         [TestMethod]
         public void EveryShippedCooldownLosesAWholeTurnToTheSurchargeAndTheOneTheTableNames()
         {
-            // The same walk for the second share on the same parameter. The surcharge augment is paid
-            // for in mana whatever it gives back, so a wait it rounds down to nothing is worse than
-            // inert â€” the player is charged more for a cast that comes round no sooner.
+            // The same walk for the second record cutting the same parameter. The surcharge augment is
+            // paid for in mana whatever it gives back, so a wait its cut fails to shorten is worse than
+            // inert — the player is charged more for a cast that comes round no sooner.
             foreach ((int wait, _, int cut) in s_cooldownTable)
             {
                 var ability = AbilityWith(cooldown: wait);
 
-                new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(ability);
+                new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeTurns, SurchargeCostShare).Apply(ability);
 
-                Assert.IsTrue(ability.Cooldown < wait, $"the share of {wait} turns rounded down to nothing, and the augment is paid for and does nothing");
-                Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"the share of {wait} turns no longer comes to {cut}");
+                Assert.IsTrue(ability.Cooldown < wait, $"the floor swallowed the whole cut on a {wait}-turn wait, and the augment is paid for and does nothing");
+                Assert.AreEqual((float)(wait - cut), ability.Cooldown, $"the cut no longer takes {cut} turns off a wait of {wait}");
             }
         }
 
@@ -252,16 +267,15 @@
         public void ACutDeepEnoughToTakeTheWholeWaitLeavesTheAbilityWaitingATurn()
         {
             // The floor, on the only base small enough to reach it, for both augments that cut a wait.
-            // What these records offer is a shorter cooldown and never the removal of one: rounding the
-            // share up to a whole turn — which a share is worthless without — would otherwise take the
-            // whole of a one-turn wait and hand the caster an ability that comes round every turn.
-            // Nothing the game ships waits a single turn today, so this is the rule stated for the data
-            // that will.
+            // What these records offer is a shorter cooldown and never the removal of one: a whole turn
+            // taken off a one-turn wait would otherwise leave the caster an ability that comes round
+            // every turn. Nothing the game ships waits a single turn today, so this is the rule stated
+            // for the data that will.
             var cut = AbilityWith(cooldown: 1);
             var surcharged = AbilityWith(cooldown: 1);
 
-            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(cut);
-            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
+            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownTurns).Apply(cut);
+            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeTurns, SurchargeCostShare).Apply(surcharged);
 
             Assert.AreEqual(1f, cut.Cooldown, "the cut took the ability's whole wait instead of stopping at the floor");
             Assert.AreEqual(1f, surcharged.Cooldown, "the surcharge record took the ability's whole wait instead of stopping at the floor");
@@ -270,13 +284,12 @@
         [TestMethod]
         public void TheFlatCutStopsAtTheFloorAndLeavesAnInstantCastInstant()
         {
-            // The FLAT cut of the same wait, which arrived with the design list's own wording ("shorter by
-            // one to two turns"). Turns are counted, so this record states them as figures rather than as a
-            // share — and a figure has no rounding to be saved by: two turns off a one-turn wait is minus
-            // one, and a negative wait never counts back down to nought, so the ability could never be cast
-            // again for the rest of the fight. Unreachable on the data shipped today (the shortest wait in
-            // the book is four turns and the record's own cut is one), which is exactly why the arithmetic
-            // is pinned here instead of resting on the guard alone.
+            // The DEEPEST of the three flat cuts, taken past what any wait in the book could absorb. A
+            // figure has no rounding to be saved by: two turns off a one-turn wait is minus one, and a
+            // negative wait never counts back down to nought, so the ability could never be cast again
+            // for the rest of the fight. Unreachable on the data shipped today (the shortest wait in the
+            // book is three turns), which is exactly why the arithmetic is pinned here instead of
+            // resting on the guard alone.
             var shortest = AbilityWith(cooldown: 1);
             var instant = AbilityWith(cooldown: 0);
             const float TwoTurns = 2f;
@@ -299,17 +312,18 @@
         [TestMethod]
         public void TheFloorHoldsBackOnlyTheCutThatWouldBreakThroughIt()
         {
-            // The other half of the rule. A floor that is read before the share is measured would be a
-            // second, quieter nerf to every wait in the book — the augments the players actually wear go
-            // on the numbers the game ships, and those must lose exactly the turns they lost before.
+            // The other half of the rule. A floor that held back every cut rather than the one breaking
+            // through it would be a second, quieter nerf to every wait in the book — the augments the
+            // players actually wear go on the numbers the game ships, and those must lose exactly the
+            // turns the records name.
             var cut = AbilityWith(cooldown: 3);
             var surcharged = AbilityWith(cooldown: 9);
 
-            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(cut);
-            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
+            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownTurns).Apply(cut);
+            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeTurns, SurchargeCostShare).Apply(surcharged);
 
-            Assert.AreEqual(2f, cut.Cooldown, "a quarter of three turns no longer comes to one");
-            Assert.AreEqual(5f, surcharged.Cooldown, "two fifths of nine turns no longer comes to four");
+            Assert.AreEqual(2f, cut.Cooldown, "one turn off a wait of three no longer leaves two");
+            Assert.AreEqual(7f, surcharged.Cooldown, "two turns off a wait of nine no longer leave seven");
         }
 
         [TestMethod]
@@ -324,8 +338,8 @@
             var surcharged = AbilityWith(cost: 0, cooldown: 0);
 
             new AbilityAugmentReduceCost(CostAugment, [], 1, CostShare).Apply(discounted);
-            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare).Apply(discounted);
-            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare).Apply(surcharged);
+            new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownTurns).Apply(discounted);
+            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeTurns, SurchargeCostShare).Apply(surcharged);
 
             Assert.AreEqual(0, discounted.CostValue, "an ability that costs nothing was given a negative price");
             Assert.AreEqual(0f, discounted.Cooldown, "an ability that waits for nothing was given a negative wait");
@@ -378,10 +392,10 @@
         private static float WaitOf(bool surchargeFirst)
         {
             var ability = AbilityWith(cooldown: 9);
-            IAbilityAugment share = new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare);
+            IAbilityAugment cut = new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownTurns);
             IAbilityAugment surcharge = CooldownSurchargeUpgrade();
 
-            ability.InstallUpgrades(surchargeFirst ? InThisOrder(surcharge, share) : InThisOrder(share, surcharge));
+            ability.InstallUpgrades(surchargeFirst ? InThisOrder(surcharge, cut) : InThisOrder(cut, surcharge));
 
             return ability.Cooldown;
         }
@@ -391,7 +405,7 @@
         private static (int Cost, float Cooldown) BothOf(bool surchargesFirst)
         {
             var ability = AbilityWith(cost: 150, cooldown: 9);
-            IAbilityAugment both = new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare);
+            IAbilityAugment both = new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeTurns, SurchargeCostShare);
             IAbilityAugment stun = StunSurcharge();
             IAbilityAugment wait = CooldownSurchargeUpgrade();
 

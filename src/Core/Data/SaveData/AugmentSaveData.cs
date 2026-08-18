@@ -25,5 +25,10 @@ namespace Core.Data.SaveData
         /// <summary>What this copy rolled on the rarity scale. Absent in files written before copies
         /// carried one: those are drawn once on load, from the band their record declares now.</summary>
         [JsonProperty("rarity")] public Enums.Rarity? Rarity { get; init; }
+
+        /// <summary>Which effect of its record's pool this copy lays. Empty for every copy of a record
+        /// that names its own effect, and for files written before pools existed — those are drawn once
+        /// on load, out of the pool the record offers now.</summary>
+        [JsonProperty("effect")] public string Effect { get; init; } = string.Empty;
     }
 }

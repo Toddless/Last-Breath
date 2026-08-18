@@ -30,7 +30,17 @@ namespace Core.Battle.Abilities
         /// </summary>
         private readonly Dictionary<string, int> _lenders = [];
 
+        private readonly HashSet<string> _appliedDurations = new(StringComparer.Ordinal);
+
         public event Action<string>? ParameterChanged;
+
+        /// <summary>
+        /// Keys the ability has declared to be durations of what it APPLIES to somebody — the family a
+        /// record may move without naming any of them. Membership is the ability's own word, because
+        /// only the ability knows which of its numbers is a turn count of its payload and which is the
+        /// length of the buff it keeps on itself (<see cref="AbilityParameter.Duration"/>, never a member).
+        /// </summary>
+        public IReadOnlyCollection<string> AppliedDurations => _appliedDurations;
 
         public IReadOnlyCollection<string> Keys => _baseValues.Keys;
 
@@ -48,6 +58,18 @@ namespace Core.Battle.Abilities
         /// the key is already registered (e.g. auto-registered from abilityProperties). The ability's
         /// own, so it is never counted as lent and no upgrade can take it away.</summary>
         public void RegisterDefault(string parameter, float value) => _baseValues.TryAdd(parameter, () => value);
+
+        /// <summary>
+        /// The same fallback, and a word about what the number IS: a duration of something this cast puts
+        /// on somebody. Said by the ability because nothing else can tell one turn count from another —
+        /// the aggregate record ("everything you apply lasts a turn longer") moves the whole family
+        /// without naming a single key, so a payload whose ability stays silent is simply not in it.
+        /// </summary>
+        public void RegisterAppliedDuration(string parameter, float value)
+        {
+            RegisterDefault(parameter, value);
+            _appliedDurations.Add(parameter);
+        }
 
         /// <summary>
         /// Lends the ability a parameter it does not own — an upgrade arriving with a number of its own,

@@ -28,7 +28,7 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>How many records the table took over from a class of their own. One left at CL-4b:
         /// the execution threshold became a SHARE of the number it moves, and a share is measured
         /// against the base rather than written as a figure — which is a factory, not a table row.</summary>
-        private const int TranslatedRecords = 32;
+        private const int TranslatedRecords = 33;
 
         /// <summary>Two bases every move is measured on. One of them has to be something other than
         /// nothing: an override and an addition are the same number on a base of zero, and a walk that
@@ -44,8 +44,8 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Additional_Attacks", "MinAttacks", OperationType.Add, 1f),
             ("Augment_Additional_Attacks", "MaxAttacks", OperationType.Add, 1f),
 
-            ("Augment_Increasing_Scales", "WeaponDamageScale", OperationType.Add, 0.6f),
-            ("Augment_Increasing_Scales", "SpellDamageScale", OperationType.Add, 0.85f),
+            ("Augment_Increasing_Scales", "WeaponDamageScale", OperationType.Add, 0.05f),
+            ("Augment_Increasing_Scales", "SpellDamageScale", OperationType.Add, 0.10f),
             ("Augment_Poison_Duration", "PoisonDuration", OperationType.Add, 1f),
 
             ("Augment_Overload_Mana_Step", "ManaPerStep", OperationType.Subtract, 1.5f),
@@ -76,6 +76,7 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Buff_Effectiveness", "Effectiveness", OperationType.Add, 0.15f),
             ("Augment_Recovery_Effectiveness", "Effectiveness", OperationType.Add, 0.10f),
             ("Augment_Debuff_Effectiveness", "Effectiveness", OperationType.Add, 0.15f),
+            ("Augment_Applied_Effectiveness", "Effectiveness", OperationType.Add, 0.10f),
 
             ("Augment_Additional_Crit_Damage", "CriticalDamageBonus", OperationType.Add, 0.35f),
             ("Augment_Additional_Crit_Chance", "CriticalChanceBonus", OperationType.Add, 0.25f),

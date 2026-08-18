@@ -96,7 +96,16 @@ namespace Core.Items
         /// the identity is not — a copy handed on is still a separate thing in the bag.</summary>
         public T Copy<T>() => (T)(object)new AugmentItem(Augment);
 
-        private Dictionary<string, object?> Printed() =>
-            Augment.Values.ToDictionary(rolled => rolled.Key, rolled => (object?)rolled.Value);
+        private Dictionary<string, object?> Printed()
+        {
+            Dictionary<string, object?> printed = Augment.Values.ToDictionary(rolled => rolled.Key, rolled => (object?)rolled.Value);
+
+            // The drawn effect, under the same placeholder the seated augment prints it by: which of its
+            // record's pool a copy lays is the copy's own and cannot be read off the record.
+            if (!string.IsNullOrWhiteSpace(Augment.EffectId))
+                printed[Data.AbilityData.AbilityAugmentData.EffectPlaceholder] = new Localization.LocalizedId(Augment.EffectId);
+
+            return printed;
+        }
     }
 }

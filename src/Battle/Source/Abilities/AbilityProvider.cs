@@ -8,6 +8,7 @@
     using Core.Data.AbilityData;
     using Core.Data.GameData;
     using Core.Enums;
+    using Core.Localization;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -111,7 +112,15 @@
             }
 
             // Placeholder = json property name; live upgrade descriptions come for free
-            upgrade.DescriptionValues = data.UpgradeProperties.ToDictionary(entry => entry.Key, object? (entry) => entry.Value);
+            Dictionary<string, object?> printed = data.UpgradeProperties.ToDictionary(entry => entry.Key, object? (entry) => entry.Value);
+
+            // What a record lays, under a placeholder of its own — the line of a pool record cannot be
+            // written without it, since which effect a copy lays is the copy's draw, and a record that
+            // names its effect outright is free to use it or not.
+            if (!string.IsNullOrWhiteSpace(data.LaidEffectId))
+                printed[AbilityAugmentData.EffectPlaceholder] = new LocalizedId(data.LaidEffectId);
+
+            upgrade.DescriptionValues = printed;
             return upgrade;
         }
 

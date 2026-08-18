@@ -32,7 +32,7 @@ namespace Battle.Source.Abilities.TwinAssist
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.BurnDuration, 4);
+            parameters.RegisterAppliedDuration(Parameters.BurnDuration, 4);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new TwinAssistAttack(Data));

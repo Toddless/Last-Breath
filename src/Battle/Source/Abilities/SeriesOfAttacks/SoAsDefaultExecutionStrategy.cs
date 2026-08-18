@@ -38,9 +38,11 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
                     // Pre-attack mutators run BEFORE the attack is scheduled so they shape the roll.
                     ability.AttackModifiers.ApplyAll(context);
 
-                    // An evade past the second hit aborts the rest of the series (unless made unevadable).
+                    // An evade past the second hit aborts the rest of the series. An augment that makes
+                    // the attacks unevadable spares the series by removing the evade itself, on the
+                    // attack context — there is no second switch turning the interruption off.
                     bool resolved = await window.ResolveAsync(context, processed =>
-                        Task.FromResult(processed.Result is not AttackResults.Evaded || !ability.IsEvadable || window.OwnerAttacks < 2));
+                        Task.FromResult(processed.Result is not AttackResults.Evaded || window.OwnerAttacks < 2));
                     if (!resolved) return;
                 }
             }

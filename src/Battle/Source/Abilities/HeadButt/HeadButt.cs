@@ -28,7 +28,7 @@ namespace Battle.Source.Abilities.HeadButt
             // without a figure, while every debuff an augment hangs on the lunge reads the cast's
             // effectiveness — so the concept is the ability's, and a record on it is felt there.
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
-            parameters.RegisterDefault(AbilityParameter.StunDuration, 1);
+            parameters.RegisterAppliedDuration(AbilityParameter.StunDuration, 1);
             parameters.RegisterDefault(AbilityParameter.Attacks, 1);
         }
 

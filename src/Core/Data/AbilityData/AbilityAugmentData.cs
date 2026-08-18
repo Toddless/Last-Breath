@@ -1,6 +1,8 @@
 namespace Core.Data.AbilityData
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Enums;
     using Newtonsoft.Json;
 
@@ -11,6 +13,11 @@ namespace Core.Data.AbilityData
     /// </summary>
     public record AbilityAugmentData
     {
+        /// <summary>The placeholder a pool record's description prints its drawn effect under. Named
+        /// here beside <see cref="EffectPool"/> because it is the one description value that is not a
+        /// property of the record: the bag and the socket must print it under the same word.</summary>
+        public const string EffectPlaceholder = "effect";
+
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
 
         /// <summary>What the augment is about. An unbound augment fits an ability sharing one of them.</summary>
@@ -67,6 +74,32 @@ namespace Core.Data.AbilityData
         /// <summary>Effect the behaviour lays, built by the effect registry from
         /// <see cref="UpgradeProperties"/>. Read by the behaviours that lay one.</summary>
         [JsonProperty("effectId")] public string EffectId { get; init; } = string.Empty;
+
+        /// <summary>
+        /// The effects a copy of this record may turn out to lay, and the genus each one adds to
+        /// <see cref="GrantsTags"/> beyond the umbrella the whole pool shares. One record instead of one
+        /// per effect: which of them a copy lays is drawn at the mint and belongs to the COPY, so
+        /// widening the augment is a line of json rather than a record, an id, a name and a description.
+        /// Written instead of <see cref="EffectId"/> and never beside it — a record naming both says
+        /// twice what it lays, and no reading resolves that.
+        /// </summary>
+        [JsonProperty("effectPool")] public Dictionary<string, string[]> EffectPool { get; init; } = [];
+
+        /// <summary>The pool in the order the draw walks it — ordinal, so which effect an index means is
+        /// decided by the ids themselves and not by where a hand put a line in the file.</summary>
+        public IReadOnlyList<string> PoolEffects => [.. EffectPool.Keys.Order(StringComparer.Ordinal)];
+
+        /// <summary>The effect the record lays when no copy has been drawn — its own, or the first of its
+        /// pool. The same answer the ladder gives an un-minted record: something has to be built from the
+        /// declaration alone, and a representative is what a declaration can offer.</summary>
+        public string LaidEffectId =>
+            !string.IsNullOrWhiteSpace(EffectId) ? EffectId : PoolEffects.FirstOrDefault() ?? string.Empty;
+
+        /// <summary>Every tag a copy of this record MIGHT grant. The copy grants what IT rolled
+        /// (<see cref="Battle.Abilities.AugmentInstance.Applied"/>); this is the union across the pool,
+        /// which is what a ledger of reachable board states has to measure.</summary>
+        public IReadOnlyCollection<string> GrantableTags =>
+            [.. GrantsTags.Concat(EffectPool.Values.SelectMany(tags => tags)).Distinct(StringComparer.OrdinalIgnoreCase)];
 
         /// <summary>Which touches the behaviour works on: "Attack", "Hit", "Projectile", "ChainJump",
         /// "Splash", or empty for every one of them. The design list tells attacks from hits.</summary>

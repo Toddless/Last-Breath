@@ -50,14 +50,14 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cooldownShare", 0.25f)),
+                    data.UpgradeProperties.GetValueOrDefault("cooldownTurns", 1f)),
             ["Augment_Reduce_Cooldown_Add_Cost"] = data =>
                 new AbilityAugmentReduceCooldownAddCost(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("cooldownShare", 0.4f),
-                    data.UpgradeProperties.GetValueOrDefault("costShare", 0.4f)),
+                    data.UpgradeProperties.GetValueOrDefault("cooldownTurns", 2f),
+                    data.UpgradeProperties.GetValueOrDefault("costShare", 0.15f)),
             // The three records whose design line mixes the shapes: whole turns or scale points of their
             // own on one key, a share of the ability's own price on the other. The share is what keeps
             // them out of the parameter table.
@@ -83,6 +83,15 @@
                     data.UpgradeProperties.GetValueOrDefault("weaponDamageScale", 0.25f),
                     data.UpgradeProperties.GetValueOrDefault("spellDamageScale", 0.25f),
                     data.UpgradeProperties.GetValueOrDefault("costShare", 0.15f)),
+            // The only record that moves a FAMILY of keys rather than a named one — which is why it is a
+            // factory and not a table row: the table says which key a record stands on, and this one does
+            // not know until it is seated.
+            ["Augment_Applied_Duration"] = data =>
+                new AbilityAugmentAppliedDuration(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("turns", 1f)),
             ["Augment_Cost_Type_Health"] = data =>
                 new AbilityAugmentCostTypeOverride(
                     data.Id,
@@ -125,11 +134,6 @@
                     data.UpgradeProperties.GetValueOrDefault("criticalDamage", 0.25f),
                     (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                     (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 3)),
-            ["Ability_SoA_Augment_Attacks_Cannot_Be_Evaded"] = data =>
-                new SoAsAugmentUnevadable(
-                    data.Id,
-                    data.Tags,
-                    data.Tier),
             ["Ability_Ip_Augment_Single_Empowered_Attack"] = data =>
                 new IpAugmentSingleEmpoweredAttack(
                     data.Id,

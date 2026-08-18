@@ -34,7 +34,16 @@ namespace Core.Battle.Abilities
         /// <summary>A copy at a rarity somebody else decided — a loot table position that says what the
         /// seat is worth. The numbers are still this copy's own draw.</summary>
         public AugmentInstance Mint(AbilityAugmentData record, Rarity rarity) =>
-            new(record.Id, Rolled(record, rarity), rarity);
+            new(record.Id, Rolled(record, rarity), rarity, RollEffect(record));
+
+        /// <summary>Which effect of the record's pool this copy will lay — the second and last thing luck
+        /// decides about a copy, drawn on the same seam as the rarity. Empty for a record that names its
+        /// effect itself, which is what most of the catalog does.</summary>
+        public string RollEffect(AbilityAugmentData record)
+        {
+            IReadOnlyList<string> pool = record.PoolEffects;
+            return pool.Count == 0 ? string.Empty : pool[rnd.RandIntRange(0, pool.Count - 1)];
+        }
 
         /// <summary>One draw from the record's band, uniform across the steps it spans. Uniform is a
         /// PLACEHOLDER — the curve is a balance decision (see Docs/PLAN-Augments.md §4e).</summary>

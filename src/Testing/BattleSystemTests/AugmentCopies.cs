@@ -24,9 +24,9 @@ namespace LastBreathTest.BattleSystemTests
         {
             var minter = new Mock<IAugmentItemMinter>();
             minter
-                .Setup(mock => mock.Remembered(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, float>>(), It.IsAny<Rarity?>()))
-                .Returns((string id, IReadOnlyDictionary<string, float> values, Rarity? written) =>
-                    new AugmentInstance(id, values, written ?? drawn));
+                .Setup(mock => mock.Remembered(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, float>>(), It.IsAny<Rarity?>(), It.IsAny<string>()))
+                .Returns((string id, IReadOnlyDictionary<string, float> values, Rarity? written, string effectId) =>
+                    new AugmentInstance(id, values, written ?? drawn, effectId));
             return minter.Object;
         }
     }

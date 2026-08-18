@@ -23,7 +23,7 @@ namespace LastBreathTest.BattleSystemTests
             // them is the price of something its own record does, so both are charged. Two records that
             // CUT one parameter are the opposite case and do not add up (AugmentRivalryTests). The two
             // are flat here on purpose: what a share does to a parameter another augment already touched
-            // is its own question, answered in AugmentShareReductionTests.
+            // is its own question, answered in AugmentPriceAndCooldownCutTests.
             var ability = CreateAbility(cost: 100);
 
             new AbilityAugmentParameterSet("Upgrade_A", [], 1, [(AbilityParameter.CostValue, OperationType.Add, 20f)]).Apply(ability);

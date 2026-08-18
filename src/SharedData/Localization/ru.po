@@ -2044,12 +2044,6 @@ msgstr ""
 msgid "Augment_More_Attack_Damage_Description"
 msgstr "+{damageMultiplier:%} урона атак."
 
-msgid "Ability_SoA_Augment_Attacks_Cannot_Be_Evaded"
-msgstr ""
-
-msgid "Ability_SoA_Augment_Attacks_Cannot_Be_Evaded_Description"
-msgstr "Серия больше не прерывается уклонением."
-
 msgid "Augment_Additional_Attacks"
 msgstr ""
 
@@ -2109,18 +2103,6 @@ msgstr "Эффективность дебафа"
 
 msgid "Augment_Debuff_Effectiveness_Description"
 msgstr "Увеличивает эффективность дебафа на {effectiveness:%}."
-
-msgid "Ability_Ip_Augment_Unevadable"
-msgstr ""
-
-msgid "Ability_Ip_Augment_Unevadable_Description"
-msgstr "Серия больше не прерывается уклонением."
-
-msgid "Augment_Clumsy_Blows"
-msgstr "Неуклюжие удары"
-
-msgid "Augment_Clumsy_Blows_Description"
-msgstr "Каждая АТАКА накладывает стак {@Effect_Clumsiness} (-{value:%} уклонения, до {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Augment_Increasing_Scales"
 msgstr ""
@@ -2347,12 +2329,6 @@ msgstr ""
 
 msgid "Augment_Extend_Stun_Add_Cost_Description"
 msgstr "+{stunDuration|turn|turns} оглушения, +{additionalCost} к стоимости."
-
-msgid "Augment_Armor_Debuff_On_Hit"
-msgstr ""
-
-msgid "Augment_Armor_Debuff_On_Hit_Description"
-msgstr "Накладывает -{reduceBy:%} брони ({duration|turn|turns}, до {maxStacks|stack|stacks})."
 
 # ------------------------------
 # Passive skills

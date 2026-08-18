@@ -999,6 +999,20 @@
     ],
     "individual": [
         {
+            "key": "Npc_Boss_Rat_King",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {
+                            "augments": { "tier": 3, "rarity": "Mythic" },
+                            "price": 650
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "key": "npc_id",
             "tiers": [
                 {

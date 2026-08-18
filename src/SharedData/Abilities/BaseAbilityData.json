@@ -35,7 +35,7 @@
         },
         {
             "id": "Ability_Jar_Of_Poison",
-            "tags": [ "cost", "cooldown", "poison", "stacks", "duration", "scale", "hit", "projectile" ],
+            "tags": [ "effect", "cost", "cooldown", "poison", "stacks", "duration", "scale", "hit", "projectile" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 3,
@@ -48,7 +48,7 @@
         },
         {
             "id": "Ability_Dark_Shroud",
-            "tags": [ "cost", "cooldown", "activation", "recovery", "duration", "stacks", "buff", "health" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "recovery", "duration", "stacks", "buff", "health" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 5,
@@ -64,7 +64,7 @@
         },
         {
             "id": "Ability_Critical_Calculation",
-            "tags": [ "cost", "cooldown", "activation", "duration", "stacks", "buff" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "duration", "stacks", "buff" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 5,
@@ -91,7 +91,7 @@
         },
         {
             "id": "Ability_Poison_Coating",
-            "tags": [ "cost", "cooldown", "activation", "poison", "stacks", "duration", "buff" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "poison", "stacks", "duration", "buff" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 7,
@@ -105,7 +105,7 @@
         },
         {
             "id": "Ability_Double_Strike",
-            "tags": [ "cost", "cooldown", "attack", "physical", "damage", "scale", "evadable", "stacks", "duration", "debuff", "critical" ],
+            "tags": [ "effect", "cost", "cooldown", "attack", "physical", "damage", "scale", "evadable", "stacks", "duration", "debuff", "critical" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 4,
@@ -126,7 +126,7 @@
         },
         {
             "id": "Ability_Ares_Blessing",
-            "tags": [ "cost", "cooldown", "activation", "recovery", "health", "buff", "duration" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "recovery", "health", "buff", "duration" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -140,7 +140,7 @@
         },
         {
             "id": "Ability_Porcupine",
-            "tags": [ "cost", "cooldown", "activation", "buff", "retaliation", "armor", "stacks", "duration" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "buff", "retaliation", "armor", "stacks", "duration" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -154,7 +154,7 @@
         },
         {
             "id": "Ability_Berserk_Fury",
-            "tags": [ "cost", "cooldown", "attack", "health", "damage", "physical", "evadable", "fury", "duration", "debuff", "critical", "stacks" ],
+            "tags": [ "effect", "cost", "cooldown", "attack", "health", "damage", "physical", "evadable", "fury", "duration", "debuff", "critical", "stacks" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 7,
@@ -170,7 +170,7 @@
         },
         {
             "id": "Ability_Head_Butt",
-            "tags": [ "cost", "cooldown", "attack", "physical", "damage", "scale", "evadable", "stun", "control", "critical" ],
+            "tags": [ "effect", "cost", "cooldown", "attack", "physical", "damage", "scale", "evadable", "stun", "control", "critical" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 4,
@@ -186,7 +186,7 @@
         },
         {
             "id": "Ability_Sacrifice",
-            "tags": [ "cost", "cooldown", "activation", "health", "buff", "empowered", "pure", "consume" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "health", "buff", "empowered", "pure", "consume" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -200,7 +200,7 @@
         },
         {
             "id": "Ability_Armageddon",
-            "tags": [ "cost", "cooldown", "activation", "elemental", "spell", "fire", "health", "damage", "scale", "charge", "control", "stun", "critical" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "elemental", "spell", "fire", "health", "damage", "scale", "charge", "control", "stun", "critical" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 9,
@@ -224,7 +224,7 @@
         },
         {
             "id": "Ability_Ice_Block",
-            "tags": [ "cost", "cooldown", "activation", "elemental", "spell", "damage", "scale", "cold", "stun", "control", "stage", "hit", "debuff", "critical" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "elemental", "spell", "damage", "scale", "cold", "stun", "control", "stage", "hit", "debuff", "critical" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 5,
@@ -244,7 +244,7 @@
         },
         {
             "id": "Ability_Overload",
-            "tags": [ "cost", "cooldown", "activation", "elemental", "buff", "consume", "empowered", "stage", "critical" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "elemental", "buff", "consume", "empowered", "stage", "critical" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 5,
@@ -280,7 +280,7 @@
         },
         {
             "id": "Ability_Ice_Aegis",
-            "tags": [ "cost", "cooldown", "activation", "buff", "cold", "shield", "stacks", "duration", "scale", "stage", "debuff", "freeze", "control" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "buff", "cold", "shield", "stacks", "duration", "scale", "stage", "debuff", "freeze", "control" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 9,
@@ -320,7 +320,7 @@
         },
         {
             "id": "Ability_Deep_Freeze",
-            "tags": [ "cost", "cooldown", "activation", "elemental", "freeze", "control", "debuff", "duration", "stage", "stacks", "spell", "hit", "cold", "damage", "scale", "critical" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "elemental", "freeze", "control", "debuff", "duration", "stage", "stacks", "spell", "hit", "cold", "damage", "scale", "critical" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 6,
@@ -342,7 +342,7 @@
         },
         {
             "id": "Ability_Discharge",
-            "tags": [ "cost", "cooldown", "activation", "elemental", "barrier", "hit", "lightning", "spell", "damage", "scale", "stage", "recovery", "critical" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "elemental", "barrier", "hit", "lightning", "spell", "damage", "scale", "stage", "recovery", "critical" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 6,
@@ -359,7 +359,7 @@
         },
         {
             "id": "Ability_Static_Armor",
-            "tags": [ "cost", "cooldown", "activation", "duration", "damage", "scale", "lightning", "stage", "hit", "recovery", "barrier", "critical" ],
+            "tags": [ "effect", "cost", "cooldown", "activation", "duration", "damage", "scale", "lightning", "stage", "hit", "recovery", "barrier", "critical" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 6,
@@ -378,7 +378,7 @@
         },
         {
             "id": "Ability_Twin_Assist_Attack",
-            "tags": [ "npc", "attack" ],
+            "tags": [ "effect", "npc", "attack" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 0,
@@ -394,7 +394,7 @@
         },
         {
             "id": "Ability_Twin_Assist_Shield",
-            "tags": [ "npc", "shield" ],
+            "tags": [ "effect", "npc", "shield" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 0,
@@ -476,15 +476,6 @@
             "bestRarityProperties": {
                 "damageMultiplier": 0.45
             }
-        },
-        {
-            "id": "Ability_SoA_Augment_Attacks_Cannot_Be_Evaded",
-            "minRarity": "Epic",
-            "maxRarity": "Epic",
-            "tier": 2,
-            "tags": [],
-            "abilityId": "Ability_Series_Of_Attacks",
-            "upgradeProperties": {}
         },
         {
             "id": "Augment_Additional_Attacks",
@@ -585,6 +576,32 @@
             }
         },
         {
+            "id": "Augment_Applied_Duration",
+            "minRarity": "Epic",
+            "maxRarity": "Legendary",
+            "tier": 1,
+            "tags": [ "effect", "duration" ],
+            "upgradeProperties": {
+                "turns": 1
+            },
+            "bestRarityProperties": {
+                "turns": 2
+            }
+        },
+        {
+            "id": "Augment_Applied_Effectiveness",
+            "minRarity": "Uncommon",
+            "maxRarity": "Legendary",
+            "tier": 1,
+            "tags": [ "effect", "effectiveness" ],
+            "upgradeProperties": {
+                "effectiveness": 0.10
+            },
+            "bestRarityProperties": {
+                "effectiveness": 0.35
+            }
+        },
+        {
             "id": "Augment_Debuff_Effectiveness",
             "minRarity": "Uncommon",
             "maxRarity": "Legendary",
@@ -598,26 +615,71 @@
             }
         },
         {
-            "id": "Ability_Ip_Augment_Unevadable",
+            "id": "Augment_Attacks_Cannot_Be_Evaded",
             "minRarity": "Epic",
             "maxRarity": "Epic",
             "tier": 2,
-            "tags": [],
-            "abilityId": "Ability_Increasing_Pressure",
+            "tags": [ "attack" ],
             "behaviour": "AttackModifier",
             "attackModifier": "Unevadable",
             "upgradeProperties": {}
         },
         {
-            "id": "Augment_Clumsy_Blows",
-            "minRarity": "Uncommon",
-            "maxRarity": "Legendary",
+            "id": "Augment_Apply_Buff",
+            "minRarity": "Epic",
+            "maxRarity": "Epic",
+            "grantsTags": [ "buff" ],
+            "tier": 2,
+            "tags": [ "attack", "hit", "buff", "effect" ],
+            "behaviour": "BuffOnCast",
+            "effectPool": {
+                "Effect_Accuracy_Buff": [],
+                "Effect_Armor_Buff": [],
+                "Effect_Critical_Chance_Buff": [],
+                "Effect_Critical_Damage_Buff": [],
+                "Effect_Damage_Buff": [],
+                "Effect_Enhance_Defense": [],
+                "Effect_Evade_First_Death": [],
+                "Effect_Giants_Blessing": [],
+                "Effect_Incoming_Damage_Reduction": [],
+                "Effect_Light_Step": [],
+                "Effect_Lucky_Crit_Chance": [],
+                "Effect_Mana_Flow": [ "recovery" ],
+                "Effect_Mana_Regeneration": [ "recovery" ],
+                "Effect_Percent_Health_Regeneration": [ "recovery" ],
+                "Effect_Regeneration": [ "recovery" ],
+                "Effect_Sorcery_Gift": [],
+                "Effect_Spell_Surge": [],
+                "Effect_Weak_Regeneration": [ "recovery" ]
+            },
+            "upgradeProperties": {}
+        },
+        {
+            "id": "Augment_Apply_Debuff",
+            "minRarity": "Epic",
+            "maxRarity": "Epic",
             "grantsTags": [ "debuff" ],
             "tier": 2,
-            "tags": [ "attack" ],
+            "tags": [ "attack", "hit", "debuff", "effect" ],
             "behaviour": "ApplyEffectOnImpact",
-            "effectId": "Effect_Clumsiness",
-            "impactKind": "Attack",
+            "effectPool": {
+                "Effect_Armor_Reduction": [],
+                "Effect_Blind": [],
+                "Effect_Clouded_Mind": [],
+                "Effect_Clumsiness": [],
+                "Effect_Curse": [],
+                "Effect_Decay": [],
+                "Effect_Fatigue": [],
+                "Effect_Feebleness": [],
+                "Effect_Fragility": [],
+                "Effect_Frostbite": [],
+                "Effect_Heal_Reduction": [],
+                "Effect_Mind_Drain": [],
+                "Effect_Rot": [],
+                "Effect_Vulnerability": [],
+                "Effect_Weakness": [],
+                "Effect_Withering_Curse": []
+            },
             "upgradeProperties": {}
         },
         {
@@ -627,8 +689,12 @@
             "tier": 1,
             "tags": [ "damage" ],
             "upgradeProperties": {
-                "weaponDamageScale": 0.6,
-                "spellDamageScale": 0.85
+                "weaponDamageScale": 0.05,
+                "spellDamageScale": 0.10
+            },
+            "bestRarityProperties": {
+                "weaponDamageScale": 0.20,
+                "spellDamageScale": 0.25
             }
         },
         {
@@ -830,6 +896,21 @@
             "bestRarityProperties": {
                 "additionalEffectiveness": 0.45
             }
+        },
+        {
+            "id": "Augment_Mythic_Calculation",
+            "minRarity": "Mythic",
+            "maxRarity": "Mythic",
+            "grantsTags": [ "buff" ],
+            "tier": 3,
+            "tags": [ "buff", "duration", "effectiveness", "critical" ],
+            "abilityId": "Ability_Critical_Calculation",
+            "behaviour": "BuffOnCast",
+            "effectId": "Effect_Mythic_Calculation",
+            "propertyRefs": {
+                "duration": "Duration"
+            },
+            "upgradeProperties": {}
         },
         {
             "id": "Augment_Lucky_Crit",
@@ -1152,17 +1233,6 @@
                 "stunDuration": 1,
                 "additionalCost": 50
             }
-        },
-        {
-            "id": "Augment_Armor_Debuff_On_Hit",
-            "minRarity": "Uncommon",
-            "maxRarity": "Legendary",
-            "grantsTags": [ "debuff" ],
-            "tier": 2,
-            "tags": [ "hit", "debuff", "stacks", "duration" ],
-            "behaviour": "ApplyEffectOnImpact",
-            "effectId": "Effect_Armor_Reduction",
-            "upgradeProperties": {}
         },
         {
             "id": "Augment_Heal_From_Empowered_Ability_Damage",
@@ -1519,7 +1589,10 @@
             "tags": [],
             "fitsAnyAbility": true,
             "upgradeProperties": {
-                "cooldownShare": 0.25
+                "cooldownTurns": 1
+            },
+            "bestRarityProperties": {
+                "cooldownTurns": 4
             }
         },
         {
@@ -1530,8 +1603,12 @@
             "tags": [],
             "fitsAnyAbility": true,
             "upgradeProperties": {
-                "cooldownShare": 0.40,
-                "costShare": 0.40
+                "cooldownTurns": 2,
+                "costShare": 0.15
+            },
+            "bestRarityProperties": {
+                "cooldownTurns": 5,
+                "costShare": 0.35
             }
         },
         {

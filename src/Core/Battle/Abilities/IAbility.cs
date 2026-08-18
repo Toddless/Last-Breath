@@ -39,6 +39,11 @@
         /// nothing, and a zero is a number somebody downstream will use.</summary>
         bool Declares(string parameter);
 
+        /// <summary>Keys this ability calls durations of what it APPLIES — the family the aggregate
+        /// record moves. Empty for a cast that puts nothing on anybody; never holds the length of the
+        /// buff the caster keeps on itself.</summary>
+        IReadOnlyCollection<string> AppliedDurations { get; }
+
         /// <summary>False = no backing out once target selection began: the player must pick a
         /// target and the cast fires (charged Armageddon). Default true.</summary>
         bool IsCancellable => true;

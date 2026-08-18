@@ -30,7 +30,7 @@ namespace Battle.Source.Abilities.PoisonCoating
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
-            parameters.RegisterDefault(AbilityParameter.PoisonDuration, 5);
+            parameters.RegisterAppliedDuration(AbilityParameter.PoisonDuration, 5);
             parameters.RegisterDefault(Parameters.PoisonMultiplier, 0.45f);
         }
 

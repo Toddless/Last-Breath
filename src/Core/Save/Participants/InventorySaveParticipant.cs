@@ -65,7 +65,8 @@ namespace Core.Save.Participants
                 {
                     Augment = augment.Augment.AugmentId,
                     Values = new(augment.Augment.Values),
-                    Rarity = augment.Augment.Rarity
+                    Rarity = augment.Augment.Rarity,
+                    Effect = augment.Augment.EffectId
                 }
             },
             _ => new() { Amount = amount, ResourceId = item.Id },
@@ -76,7 +77,7 @@ namespace Core.Save.Participants
         /// said out loud: the numbers were the copy's own and nothing can draw them again.</summary>
         private void RestoreAugment(AugmentSaveData saved)
         {
-            if (augments?.Remembered(saved.Augment, saved.Values, saved.Rarity) is { } copy && augments.Restore(copy) is { } item)
+            if (augments?.Remembered(saved.Augment, saved.Values, saved.Rarity, saved.Effect) is { } copy && augments.Restore(copy) is { } item)
                 inventory.TryAddItem(item);
             else
                 Tracker.TrackNotFound($"Augment record '{saved.Augment}' held in the bag", this);

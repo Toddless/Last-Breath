@@ -37,15 +37,15 @@ namespace Battle.Source.Abilities
         {
             ["ApplyEffectOnImpact"] = new(BehaviourField.EffectId | BehaviourField.ImpactKind, (data, effects) =>
                 new AbilityAugmentImpactRider(data.Id, data.Tags, data.Tier, new DataEffectImpactRider(
-                    data.Id, data.EffectId, host => EffectNumbers(data, host, effects), KindOf(data), effects))),
+                    data.Id, data.LaidEffectId, host => EffectNumbers(data, host, effects), KindOf(data), effects))),
 
             ["BuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>
                 new AbilityAugmentCastEffect(data.Id, data.Tags, data.Tier,
-                    host => effects()?.CreateEffect(data.EffectId, EffectNumbers(data, host, effects)))),
+                    host => effects()?.CreateEffect(data.LaidEffectId, EffectNumbers(data, host, effects)))),
 
             ["DebuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>
                 new AbilityAugmentCastDebuff(data.Id, data.Tags, data.Tier,
-                    host => effects()?.CreateEffect(data.EffectId, EffectNumbers(data, host, effects)))),
+                    host => effects()?.CreateEffect(data.LaidEffectId, EffectNumbers(data, host, effects)))),
 
             ["AttackModifier"] = new(BehaviourField.AttackModifier, (data, _) =>
                 new AbilityAugmentAttackModifier(data.Id, data.Tags, data.Tier, s_attackModifiers[data.AttackModifier]())),
@@ -91,11 +91,24 @@ namespace Battle.Source.Abilities
             if (!fields.HasFlag(BehaviourField.EffectId)) return null;
 
             IEffectProvider? effects = _effects();
-            if (effects == null) return $"lays effect '{data.EffectId}' and no effect registry is composed to build it";
+            if (effects == null) return $"lays effect '{data.LaidEffectId}' and no effect registry is composed to build it";
 
-            IReadOnlyCollection<string>? keys = effects.KeysOf(data.EffectId);
+            // Every effect a copy of the record MIGHT lay, and not only the one an un-minted record
+            // stands for: a pool member the registry cannot build is a copy that lays nothing, and which
+            // copy that is would be decided by a draw rather than by anything anybody could read.
+            foreach (string effectId in data.PoolEffects.Count > 0 ? data.PoolEffects : [data.EffectId])
+                if (Unbuildable(data, effectId, effects) is { } complaint) return complaint;
+
+            return null;
+        }
+
+        /// <summary>What stops one named effect from being laid by this record — unknown to the registry,
+        /// or with its canonical figures restated on the record.</summary>
+        private static string? Unbuildable(AbilityAugmentData data, string effectId, IEffectProvider effects)
+        {
+            IReadOnlyCollection<string>? keys = effects.KeysOf(effectId);
             if (keys == null)
-                return $"names effect '{data.EffectId}' the registry cannot build. Known: {string.Join(", ", effects.KnownIds.Order(StringComparer.Ordinal))}";
+                return $"names effect '{effectId}' the registry cannot build. Known: {string.Join(", ", effects.KnownIds.Order(StringComparer.Ordinal))}";
 
             // The numbers of an effect are balanced in one file and a record may not restate them: one
             // record carrying its own figure is all it takes for the balance to start drifting apart
@@ -103,23 +116,27 @@ namespace Battle.Source.Abilities
             // is its OWN levers — anything the effect does not read.
             string[] restated = [.. data.UpgradeProperties.Keys.Intersect(keys, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
             return restated.Length > 0
-                ? $"carries figures of effect '{data.EffectId}' that are balanced in the canon: [{string.Join(", ", restated)}]"
+                ? $"carries figures of effect '{effectId}' that are balanced in the canon: [{string.Join(", ", restated)}]"
                 : null;
         }
 
         /// <summary>Fields the behaviour needs and the record did not write.</summary>
         private static string? Missing(AbilityAugmentData data, BehaviourField fields)
         {
-            if (fields.HasFlag(BehaviourField.EffectId) && string.IsNullOrWhiteSpace(data.EffectId)) return "declares no effectId";
+            if (fields.HasFlag(BehaviourField.EffectId) && string.IsNullOrWhiteSpace(data.LaidEffectId)) return "declares neither effectId nor effectPool";
             if (fields.HasFlag(BehaviourField.AttackModifier) && string.IsNullOrWhiteSpace(data.AttackModifier)) return "declares no attackModifier";
             return null;
         }
 
         /// <summary>Fields the record wrote and the behaviour never reads — a line nobody would ever
-        /// notice doing nothing.</summary>
+        /// notice doing nothing — and the one pair that contradicts rather than idles.</summary>
         private static string? Extra(AbilityAugmentData data, BehaviourField fields)
         {
-            if (!fields.HasFlag(BehaviourField.EffectId) && !string.IsNullOrWhiteSpace(data.EffectId)) return "writes an effectId its behaviour never reads";
+            // Both is not "more information": one says the effect is fixed and the other says it is
+            // drawn, and whichever the code happened to read would leave the other line silently untrue.
+            if (!string.IsNullOrWhiteSpace(data.EffectId) && data.EffectPool.Count > 0)
+                return "names an effectId AND an effectPool, so what it lays is stated twice";
+            if (!fields.HasFlag(BehaviourField.EffectId) && !string.IsNullOrWhiteSpace(data.LaidEffectId)) return "writes an effectId its behaviour never reads";
             if (!fields.HasFlag(BehaviourField.ImpactKind) && !string.IsNullOrWhiteSpace(data.ImpactKind)) return "writes an impactKind its behaviour never reads";
             if (!fields.HasFlag(BehaviourField.AttackModifier) && !string.IsNullOrWhiteSpace(data.AttackModifier)) return "writes an attackModifier its behaviour never reads";
             return null;
@@ -147,7 +164,7 @@ namespace Battle.Source.Abilities
                 foreach ((string property, string parameter) in data.PropertyRefs)
                     if (host.Declares(parameter)) values[property] = host.ValueOr(parameter, 0f);
 
-            IReadOnlyCollection<string>? keys = effects()?.KeysOf(data.EffectId);
+            IReadOnlyCollection<string>? keys = effects()?.KeysOf(data.LaidEffectId);
             if (keys != null)
                 foreach (string stranger in values.Keys.Except(keys, StringComparer.Ordinal).ToList())
                     values.Remove(stranger);

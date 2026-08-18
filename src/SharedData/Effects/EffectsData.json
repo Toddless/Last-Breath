@@ -177,6 +177,10 @@
             "properties": { "duration": 3, "maxStacks": 1 }
         },
         {
+            "id": "Effect_Mythic_Calculation",
+            "properties": { "duration": 3, "maxStacks": 1 }
+        },
+        {
             "id": "Effect_Damage_Buff",
             "properties": { "duration": 3, "maxStacks": 3, "value": 0.25 }
         },

@@ -250,6 +250,7 @@ namespace Core.Save.Participants
                     Augment = occupant.Augment.AugmentId,
                     Values = new Dictionary<string, float>(occupant.Augment.Values),
                     Rarity = occupant.Augment.Rarity,
+                    Effect = occupant.Augment.EffectId,
                     Ability = occupant.Slot.AbilityId,
                     Tier = occupant.Slot.Tier
                 });
@@ -368,23 +369,31 @@ namespace Core.Save.Participants
                 _ => []
             };
 
-        /// <summary>One entry as the board holds it. A file that says what the copy is worth is put back
-        /// exactly as written; one from before rarity was stored has to be DRAWN, and the draw belongs to
-        /// the minter — the record's band is what it must land in, and nothing here can see a record.
-        /// A legacy entry with no minter to draw it is reported rather than seated at a guessed rarity:
+        /// <summary>One entry as the board holds it. The minter answers first, because it is the only
+        /// thing here that can see a record and so the only thing that can draw what the file could not
+        /// say — a rarity from before rarity was stored, an effect from before pools existed. It answers
+        /// nothing for a record the catalog has dropped, and a file complete enough to stand on its own
+        /// is then seated as written: an augment whose record left the game is still the player's.
+        /// A legacy entry neither road can complete is reported rather than seated at a guessed rarity:
         /// a number invented here would be indistinguishable from one the player rolled.</summary>
         private AbilitySocketOccupant? Occupant(string socketId, SocketSaveData entry)
         {
-            AugmentInstance? copy = entry.Rarity is { } written
-                ? new AugmentInstance(entry.Augment, entry.Values, written)
-                : copies?.Remembered(entry.Augment, entry.Values, null);
+            AugmentInstance? copy = copies?.Remembered(entry.Augment, entry.Values, entry.Rarity, entry.Effect)
+                                    ?? (entry.Rarity is { } written
+                                        // Without a minter there is no record to measure the written
+                                        // effect against, so it is dropped rather than carried: a copy's
+                                        // effect is a member of its record's pool on every road, and a
+                                        // stale id kept here would be the one copy in the game holding
+                                        // an effect nothing ever offered it.
+                                        ? new AugmentInstance(entry.Augment, entry.Values, written)
+                                        : null);
 
             if (copy != null)
                 return new AbilitySocketOccupant(new AbilitySocketPlacement(socketId, entry.Ability, entry.Tier), copy);
 
             Tracker.TrackError(
-                $"Socket '{socketId}' holds '{entry.Augment}' written before copies carried a rarity, and this " +
-                "composition has no augment minter to draw one: the slot comes back empty.",
+                $"Socket '{socketId}' holds '{entry.Augment}' written before copies carried a rarity, and no " +
+                "record is left to draw one from: the slot comes back empty.",
                 this);
             return null;
         }

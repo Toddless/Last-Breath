@@ -63,6 +63,7 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Apply_Buff_Critical_Chance", [AbilityTags.Buff]),
             ("Augment_Apply_Buff_Critical_Damage", [AbilityTags.Buff]),
             ("Augment_Lucky_Crit", [AbilityTags.Buff]),
+            ("Augment_Mythic_Calculation", [AbilityTags.Buff]),
             ("Augment_Apply_Enhanced_Defence", [AbilityTags.Buff]),
             ("Augment_Leach_On_Crit", [AbilityTags.Buff]),
             ("Augment_Immortality", [AbilityTags.Buff]),
@@ -84,10 +85,13 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Apply_Seal_Of_Oblivion", [AbilityTags.Debuff]),
             ("Augment_Attacks_Reduce_Incoming_Heal", [AbilityTags.Debuff]),
             ("Augment_Attacks_Reduce_Armor", [AbilityTags.Debuff]),
-            ("Augment_Armor_Debuff_On_Hit", [AbilityTags.Debuff]),
             ("Augment_Freeze_Increase_Ability_Cooldown", [AbilityTags.Debuff]),
-            // Declared by a record and no code at all — the first applier the behaviour registry builds.
-            ("Augment_Clumsy_Blows", [AbilityTags.Debuff]),
+
+            // E-2b: the two pool records. What they declare is the UMBRELLA their whole pool shares; a
+            // copy adds the genus of the effect it drew on top (AugmentInstance.Applied), and which
+            // effects add what is held literally by AugmentEffectPoolTests.
+            ("Augment_Apply_Buff", [AbilityTags.Buff]),
+            ("Augment_Apply_Debuff", [AbilityTags.Debuff]),
 
             // E-2a: the two remaining damage-over-turn series, both records and no code — the canon and
             // the factories were already there, so only the vocabulary had to learn 'bleed'.
@@ -139,11 +143,14 @@ namespace LastBreathTest.BattleSystemTests
                 ["Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
             // Widened at CL-7: the two on-hit debuff appliers came off their abilityId and now grant
             // "debuff" wherever "attack" carries them, which opens this record on five more.
+            // Widened again at E-2b: the debuff pool rides in on "hit" as well, so the Overload and the
+            // Sacrifice — neither of which any debuff applier reached before — join the column.
             ("Augment_Debuff_Effectiveness",
                 ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Discharge",
-                 "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
-                 "Ability_Porcupine", "Ability_Static_Armor"],
-                ["Ability_Armageddon", "Ability_Ice_Shards", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
+                 "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload",
+                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
+                ["Ability_Armageddon", "Ability_Ice_Shards", "Ability_Poison_Explosion", "Ability_Sacrifice",
+                 "Ability_Series_Of_Attacks"]),
 
             // Generalised at CL-7c, and both land the way Health_Bonus does: the one ability that owns the
             // concept is reached by its OWN tags, so every seating a grant opens for them is a silent one.
@@ -172,9 +179,6 @@ namespace LastBreathTest.BattleSystemTests
             // there is no host key to be missing, which is why neither has an inert list at all.
             ("Augment_Apply_Enhanced_Defence",
                 ["Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
-                []),
-            ("Augment_Armor_Debuff_On_Hit",
-                ["Ability_Armageddon", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
                 []),
         ];
 
@@ -210,7 +214,10 @@ namespace LastBreathTest.BattleSystemTests
             // effect built from the canon — there is no host key for the ledger to probe, and none
             // needed: they work wherever they land.
             "Augment_Apply_Enhanced_Defence",
-            "Augment_Armor_Debuff_On_Hit",
+            // E-2b pool records, the same construction: whichever effect the copy drew is built from
+            // the canon and laid, so landing anywhere is landing where they work.
+            "Augment_Apply_Buff",
+            "Augment_Apply_Debuff",
         };
 
         [TestMethod]
@@ -296,6 +303,11 @@ namespace LastBreathTest.BattleSystemTests
 
             foreach (AbilityAugmentData record in catalog.All)
             {
+                // Everything a copy of the record MIGHT grant, pool sub-gifts included: a tag outside the
+                // vocabulary is as dead written into a pool as it is written into the record itself.
+                foreach (string tag in record.GrantableTags)
+                    Assert.IsTrue(AbilityTags.All.Contains(tag), $"'{record.Id}' grants unknown tag '{tag}'");
+
                 if (record.GrantsTags.Length == 0)
                 {
                     Assert.IsFalse(declared.ContainsKey(record.Id), $"'{record.Id}' is an applier of the roster and grants nothing any more");
@@ -305,9 +317,6 @@ namespace LastBreathTest.BattleSystemTests
                 Assert.IsTrue(declared.TryGetValue(record.Id, out string[]? grants),
                     $"'{record.Id}' grants tags and the roster does not name it — an amplifier quietly turned donor, or a new applier goes unaudited");
                 CollectionAssert.AreEquivalent(grants, record.GrantsTags, $"'{record.Id}' grants something other than the genus it lays");
-
-                foreach (string tag in record.GrantsTags)
-                    Assert.IsTrue(AbilityTags.All.Contains(tag), $"'{record.Id}' grants unknown tag '{tag}'");
             }
         }
 
@@ -459,9 +468,12 @@ namespace LastBreathTest.BattleSystemTests
             foreach (string abilityId in book.KnownAbilityIds.Where(id => !book.IsHidden(id)))
             {
                 IReadOnlyCollection<string> tags = catalog.TagsOf(abilityId);
+                // Grantable and not granted: a pool record teaches its ability the genus of whichever
+                // effect the COPY drew, so the states a board can reach are the union over the pool.
+                // Measuring the record's umbrella alone would leave every sub-gift out of the ledger.
                 List<AbilityAugmentData> donors = [.. catalog.All
-                    .Where(donor => donor.GrantsTags.Length > 0 && Fits(abilityId, tags, donor, granted: null))];
-                string[] granted = [.. donors.SelectMany(donor => donor.GrantsTags).Distinct(StringComparer.OrdinalIgnoreCase)];
+                    .Where(donor => donor.GrantableTags.Count > 0 && Fits(abilityId, tags, donor, granted: null))];
+                string[] granted = [.. donors.SelectMany(donor => donor.GrantableTags).Distinct(StringComparer.OrdinalIgnoreCase)];
                 if (granted.Length == 0) continue;
 
                 foreach (AbilityAugmentData record in catalog.All.Where(TagJudged))
@@ -469,7 +481,7 @@ namespace LastBreathTest.BattleSystemTests
                     if (Fits(abilityId, tags, record, granted: null)) continue;
                     if (!Fits(abilityId, tags, record, granted)) continue;
 
-                    var openers = donors.Where(donor => AbilityTags.SharesAny(donor.GrantsTags, record.Tags));
+                    var openers = donors.Where(donor => AbilityTags.SharesAny([.. donor.GrantableTags], record.Tags));
                     bool works = s_selfContained.Contains(record.Id)
                                  || (s_openedKeys.TryGetValue(record.Id, out string? key) && Moves(book, abilityId, openers, key));
                     reach.Add((record, abilityId, works));

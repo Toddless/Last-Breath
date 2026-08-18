@@ -47,8 +47,8 @@ namespace Battle.Source.Abilities
             // Jar of Poison
             ["Augment_Increasing_Scales"] =
             [
-                new(AbilityParameter.WeaponDamageScale, OperationType.Add, "weaponDamageScale", 0.6f),
-                new(AbilityParameter.SpellDamageScale, OperationType.Add, "spellDamageScale", 0.85f)
+                new(AbilityParameter.WeaponDamageScale, OperationType.Add, "weaponDamageScale", 0.05f),
+                new(AbilityParameter.SpellDamageScale, OperationType.Add, "spellDamageScale", 0.10f)
             ],
             ["Augment_Poison_Duration"] =
             [
@@ -142,6 +142,13 @@ namespace Battle.Source.Abilities
             ["Augment_Debuff_Effectiveness"] =
             [
                 new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.15f)
+            ],
+            // The umbrella over the three above: one key, one direction, so where it meets any of them
+            // they are one offer and the stronger works. What separates it is only the tag it rides —
+            // 'effect', worn by every ability that lays anything at all.
+            ["Augment_Applied_Effectiveness"] =
+            [
+                new(AbilityParameter.Effectiveness, OperationType.Add, "effectiveness", 0.10f)
             ],
 
             // Poison Explosion

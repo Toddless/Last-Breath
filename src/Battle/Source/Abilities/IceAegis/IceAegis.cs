@@ -59,10 +59,10 @@ namespace Battle.Source.Abilities.IceAegis
             parameters.RegisterDefault(Parameters.PerIntelligenceScale, 35f);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.StageTwoScaleBonus, 15f);
-            parameters.RegisterDefault(Parameters.ClumsinessDuration, 3);
+            parameters.RegisterAppliedDuration(Parameters.ClumsinessDuration, 3);
             parameters.RegisterDefault(AbilityParameter.Stacks, 5);
             parameters.RegisterDefault(Parameters.ClumsinessValue, 0.15f);
-            parameters.RegisterDefault(Parameters.FreezeDuration, 1);
+            parameters.RegisterAppliedDuration(Parameters.FreezeDuration, 1);
             // Zero by default; upgrades raise them with decorators — the ability knows nothing about the upgrades
             parameters.RegisterDefault(Parameters.ReflectPercent, 0f);
             parameters.RegisterDefault(AbilityParameter.HealthRegeneration, 0f);

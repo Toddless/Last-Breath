@@ -15,20 +15,19 @@ namespace LastBreathTest.BattleSystemTests
 
     /// <summary>
     /// Two augments that do the same thing do not add up: one of them works, and it is the better one.
-    /// Before this, an ability wearing a quarter off its wait and two fifths off the same wait was
-    /// wearing both — the player bought the same improvement twice and was paid for it twice, and which
-    /// of two rivals survived where they did collide was settled by whichever socket happened to be read
-    /// first.
+    /// Before this, an ability wearing one turn off its wait and two turns off the same wait was wearing
+    /// both — the player bought the same improvement twice and was paid for it twice, and which of two
+    /// rivals survived where they did collide was settled by whichever socket happened to be read first.
     ///
     /// What makes two of them the same thing is what they DO — the parameter they stand on and the way
     /// they move it (<see cref="AbilityEffectIdentity"/>) — and never how much, because how much is
-    /// exactly what tells the winner from the loser. Two records, two copies of one record, a flat cut
-    /// and a cut stated as a share: all of them are one effect if they reach for one parameter the same
-    /// way, and the losers stay in their sockets doing nothing until the winner is pulled.
+    /// exactly what tells the winner from the loser. Two records, two copies of one record, a cut of one
+    /// turn and a cut of two: all of them are one effect if they reach for one parameter the same way,
+    /// and the losers stay in their sockets doing nothing until the winner is pulled.
     ///
     /// The bill an augment sends is the other half of the rule and the one that must NOT collapse: a
-    /// record charging fifty more mana for a longer stun and a record charging four tenths of the price
-    /// for a shorter wait are two deals, and waiving either would hand the player a discount for wearing
+    /// record charging fifty more mana for a longer stun and a record charging a share of the price for
+    /// a shorter wait are two deals, and waiving either would hand the player a discount for wearing
     /// more surcharges.
     /// </summary>
     [TestClass]
@@ -36,8 +35,9 @@ namespace LastBreathTest.BattleSystemTests
     {
         private const string AbilityId = "Ability_Head_Butt";
 
-        /// <summary>Two shipped records that cut the SAME wait — the collision the rule is about, in the
-        /// data as it ships rather than in a pair invented for the case.</summary>
+        /// <summary>Two shipped records that cut the SAME wait, both in whole turns and by different
+        /// amounts — the collision the rule is about, in the data as it ships rather than in a pair
+        /// invented for the case.</summary>
         private const string CooldownAugment = "Augment_Reduce_Cooldown";
         private const string SurchargeAugment = "Augment_Reduce_Cooldown_Add_Cost";
 
@@ -54,8 +54,9 @@ namespace LastBreathTest.BattleSystemTests
 
         private const string CostShareProperty = "costShare";
 
-        private const float CooldownShare = 0.25f;
-        private const float SurchargeShare = 0.40f;
+        private const float CooldownTurns = 1f;
+        private const float SurchargeTurns = 2f;
+        private const float SurchargeCostShare = 0.15f;
 
         /// <summary>The rolls the two copies of one record come out at. Both are real draws around the
         /// declared three tenths, far enough apart that the cut they buy differs by whole points.</summary>
@@ -68,13 +69,13 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void TwoRecordsCuttingTheSameWaitLeaveOnlyTheDeeperCut()
         {
-            // Nine turns, a quarter off from one record and two fifths off from another. Two cuts of one
-            // wait are one improvement bought twice: the deeper of them is what the ability waits.
+            // Nine turns, one off from one record and two off from another. Two cuts of one wait are one
+            // improvement bought twice: the deeper of them is what the ability waits.
             var ability = AbilityWith(cooldown: 9);
 
             ability.InstallUpgrades(InThisOrder(ReduceCooldown(), Surcharge()));
 
-            Assert.AreEqual(5f, ability.Cooldown, "the two cuts were added up instead of the deeper one taking the wait");
+            Assert.AreEqual(7f, ability.Cooldown, "the two cuts were added up instead of the deeper one taking the wait");
         }
 
         [TestMethod]
@@ -90,7 +91,7 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(seatedShallowFirst.Cooldown, seatedDeepFirst.Cooldown,
                 "the same two augments came to two different waits depending on which slot was filled first");
-            Assert.AreEqual(5f, seatedDeepFirst.Cooldown, "the weaker of the two cuts took the wait when it was seated first");
+            Assert.AreEqual(7f, seatedDeepFirst.Cooldown, "the weaker of the two cuts took the wait when it was seated first");
         }
 
         [TestMethod]
@@ -112,7 +113,7 @@ namespace LastBreathTest.BattleSystemTests
             ability.InstallUpgrades(InThisOrder(ReduceCost(), ReduceCooldown()));
 
             Assert.AreEqual(70, ability.CostValue, "the cost augment stopped working next to one that never touches the price");
-            Assert.AreEqual(6f, ability.Cooldown, "the cooldown augment stopped working next to one that never touches the wait");
+            Assert.AreEqual(7f, ability.Cooldown, "the cooldown augment stopped working next to one that never touches the wait");
         }
 
         [TestMethod]
@@ -139,7 +140,7 @@ namespace LastBreathTest.BattleSystemTests
 
             ability.InstallUpgrades(InThisOrder(Surcharge(), StunSurchargeUpgrade()));
 
-            Assert.AreEqual(260, ability.CostValue, "one of the two records had its bill waived by the other");
+            Assert.AreEqual(223, ability.CostValue, "one of the two records had its bill waived by the other");
         }
 
         [TestMethod]
@@ -242,12 +243,12 @@ namespace LastBreathTest.BattleSystemTests
 
         private static AugmentInstance CostCopy(float roll) => Copy(CostAugment, (CostShareProperty, roll));
 
-        private static IAbilityAugment ReduceCooldown() => new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownShare);
+        private static IAbilityAugment ReduceCooldown() => new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownTurns);
 
         private static IAbilityAugment ReduceCost() => new AbilityAugmentReduceCost(CostAugment, [], 1, 0.30f);
 
         private static IAbilityAugment Surcharge() =>
-            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeShare, SurchargeShare);
+            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeTurns, SurchargeCostShare);
 
         /// <summary>A cut deeper than the surcharge record's, standing on the same wait: the rival that
         /// puts the surcharge record's own cut out of work.</summary>

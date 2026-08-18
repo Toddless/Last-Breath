@@ -78,7 +78,12 @@ namespace LastBreathTest.BattleSystemTests
         [
             "Effect_Execution",
             "Effect_Life_Giving_Shade",
-            "Effect_Next_Ability_Cooldown"
+            "Effect_Next_Ability_Cooldown",
+            // The mythic reading of the Critical Calculation. The design list names the AUGMENT and not an
+            // effect, because what the augment grants is not a figure anybody balances — it is a rule about
+            // other effects' turns. Its two canonical numbers are how long the rule holds and that it does
+            // not stack; the extension it hands out is one turn by the augment's own line.
+            "Effect_Mythic_Calculation"
         ];
 
         [TestMethod]

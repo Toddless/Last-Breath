@@ -104,6 +104,9 @@ namespace LastBreathTest.BattleSystemTests
             // than the best, and the draw would silently read them the other way round. Ends off the
             // ordered run — Unique and Mythic sit at 10 and 11, apart from Legendary..Common — make
             // "uniform between them" mean a walk across values that are not rarities of augments.
+            // A band of ONE rarity is neither: there is nothing between its ends to walk, so an
+            // off-scale point is a fixed rarity rather than a broken range. That is how a mythic record
+            // exists at all — it is never rolled, only handed out by a table slot that names its rarity.
             var broken = ShippedAbilityData.Augments().All
                 .Where(record => !RunsDownward(record.RarityBand) || !OnTheOrderedScale(record.RarityBand))
                 .Select(record => $"{record.Id}: {record.RarityBand.Worst}..{record.RarityBand.Best}")
@@ -117,7 +120,7 @@ namespace LastBreathTest.BattleSystemTests
         private static bool RunsDownward((Rarity Worst, Rarity Best) band) => (int)band.Best <= (int)band.Worst;
 
         private static bool OnTheOrderedScale((Rarity Worst, Rarity Best) band) =>
-            Ordered(band.Worst) && Ordered(band.Best);
+            band.Worst == band.Best || (Ordered(band.Worst) && Ordered(band.Best));
 
         private static bool Ordered(Rarity rarity) => rarity is >= Rarity.Legendary and <= Rarity.Common;
 

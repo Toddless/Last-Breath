@@ -36,6 +36,17 @@ namespace Core.Data
         /// shrapnel over the field, overkill leaping to a neighbour, a splash share of a landed blow.
         /// It is nobody's primary delivery — it exists only because another impact already happened —
         /// so it must not be counted as one of them, and it never spawns further impacts.</summary>
-        Splash
+        Splash,
+
+        /// <summary>
+        /// A touch the bearer did not aim: the porcupine's returned damage, the aegis's reflection, an
+        /// answer struck back at whoever attacked. Declared here because the vocabulary is the owner's
+        /// decision and a genus half-named is worse than one named early.
+        /// <para>NOTHING PRODUCES IT YET. The three points that will are all in the effect layer, which
+        /// reports no impacts at all today — teaching it to is the wave that gives effects a source
+        /// ability, not a line here. Until then this is a word the data may not use: a record filtered to
+        /// it would fit, be paid for and never fire.</para>
+        /// </summary>
+        Reaction
     }
 }

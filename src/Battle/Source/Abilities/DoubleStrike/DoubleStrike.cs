@@ -55,7 +55,7 @@ namespace Battle.Source.Abilities.DoubleStrike
             parameters.RegisterDefault(Parameters.SecondSpellScale, 0.25f);
             parameters.RegisterDefault(Parameters.ArmorReduce, 0.15f);
             parameters.RegisterDefault(Parameters.EvadeReduce, 0.15f);
-            parameters.RegisterDefault(Parameters.DebuffDuration, 3);
+            parameters.RegisterAppliedDuration(Parameters.DebuffDuration, 3);
             parameters.RegisterDefault(AbilityParameter.Stacks, 3);
             parameters.RegisterDefault(AbilityParameter.DamageMultiplier, 1f);
             parameters.RegisterDefault(AbilityParameter.HealthRestore, 0f);

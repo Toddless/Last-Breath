@@ -352,6 +352,19 @@ namespace LastBreathTest.BattleSystemTests
             // Three of the scale-tagged abilities never declare the coefficients: the aegis and the static
             // armor carry scales inside their own plans, and the poison explosion's damage IS the stacks
             // it consumes. They wear the tag and the record sits silent on them.
+            // E-2b: the umbrella of the effectiveness family. It rides 'effect' — worn by every applier —
+            // so it is the widest of the four, and where it meets any of the three segmented records they
+            // are one offer on one key in one direction and only the stronger works.
+            // Three appliers lay something and never declared the key: Armageddon's stun and the
+            // berserker's fury are content the ability builds with plain numbers, and the sacrifice's
+            // charge is a bill on the NEXT cast rather than a figure of this one.
+            ("Augment_Applied_Effectiveness", AbilityParameter.Effectiveness,
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze",
+                 "Ability_Discharge", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Aegis",
+                 "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Porcupine", "Ability_Static_Armor"],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Sacrifice"]),
+
             ("Augment_Weapon_Scale", AbilityParameter.WeaponDamageScale,
                 ["Ability_Armageddon", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
                  "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure",

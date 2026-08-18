@@ -25,7 +25,7 @@
         /// inside the abilities: a block that used to go missing took its ability's augments with it
         /// and left the rest readable, and a section loses them one bulk edit at a time.
         /// Recounted at the owner's catalog cleanup (54 records removed).</summary>
-        private const int ShippedRecordCount = 95;
+        private const int ShippedRecordCount = 97;
 
         /// <summary>How many records name an ability — held because a lost binding is an augment
         /// silently offered to the whole family. Recounted at the catalog cleanup; includes the
@@ -38,7 +38,7 @@
         /// Seven again at CL-7c, the last of the pinned generalisable ones: their number moved off the
         /// private key of the ability they were written for onto a key of the book, which is what the
         /// binding had been standing in for.</remarks>
-        private const int BoundRecords = 41;
+        private const int BoundRecords = 40;
 
         /// <summary>How many records claim every ability there is â€” cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
@@ -51,7 +51,7 @@
         /// <summary>How many records name neither an ability nor the whole book, and are judged by
         /// their tags alone. Most of them carry tags now; the number is held because a record losing
         /// its last tag belongs nowhere and says so nowhere.</summary>
-        private const int SilentRecords = 43;
+        private const int SilentRecords = 46;
 
         [TestMethod]
         public void TheSectionDeclaresTheRecordsTheTriageCounted()

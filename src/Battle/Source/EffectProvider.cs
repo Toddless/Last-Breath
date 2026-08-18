@@ -149,6 +149,9 @@ namespace Battle.Source
                 new CriticalDamageBuffEffect(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("value"))),
             ["Effect_Lucky_Crit_Chance"] = new(["duration", "maxStacks"], p =>
                 new LuckyCritChanceEffect(p.GetInt("duration"), p.GetInt("maxStacks"))),
+
+            ["Effect_Mythic_Calculation"] = new(["duration", "maxStacks"], p =>
+                new MythicCalculationEffect(p.GetInt("duration"), p.GetInt("maxStacks"))),
         };
 
         /// <summary>Canonical numbers per effect id, as loaded from SharedData/Effects.</summary>
