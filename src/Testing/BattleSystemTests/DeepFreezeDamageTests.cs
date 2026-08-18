@@ -255,6 +255,8 @@ namespace LastBreathTest.BattleSystemTests
             fighter.SetMaximum(EntityParameter.SpellDamage, SpellDamage);
             // A crit that multiplied by nothing would make the crit walk pass for the wrong reason.
             fighter.SetMaximum(EntityParameter.CriticalDamage, 2f);
+            // A chance the scripted draws can win and lose: a fighter without one crits on nothing at all.
+            fighter.SetMaximum(EntityParameter.CriticalChance, 0.5f);
             fighter.TakesDamageForReal = true;
             fighter.CurrentHealth = Health;
             fighter.CurrentMana = Health;

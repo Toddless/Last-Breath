@@ -576,7 +576,7 @@ namespace Battle.Internal.Npc
             {
                 try
                 {
-                    Calculations.CalculateSucceeded(context);
+                    context.Result = Calculations.ResolveAttackOutcome(context);
                     switch (context.Result)
                     {
                         case AttackResults.Succeed:
@@ -613,7 +613,7 @@ namespace Battle.Internal.Npc
         {
             // BeforeAttack reactions may mutate RawCriticalChance, so the crit roll happens after them
             CombatEvents.Publish(new BeforeAttackEvent(context));
-            context.IsCritical = context.Rnd.Randf() <= context.RawCriticalChance;
+            context.IsCritical = ChanceRoll.Roll(context.RawCriticalChance, context.Rnd, context.Attacker.Parameters.GetChanceLuck(EntityParameter.CriticalChance));
             return Task.CompletedTask;
         }
 

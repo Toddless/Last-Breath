@@ -1,6 +1,7 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using System.Collections.Generic;
+    using Core;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
     using Core.Entity;
@@ -49,7 +50,7 @@
         {
             if (Owner == null || obj.Context.Result is not AttackResults.Succeed) return;
             if (obj.Context.Target is not IFightableNpc { Fraction: Fractions.Undead }) return;
-            if (obj.Context.Rnd.Randf() > SilenceSealChance) return;
+            if (!ChanceRoll.Roll(SilenceSealChance, obj.Context.Rnd)) return;
 
             _ = new SilenceSeal().Apply(new EffectApplyingContext { Target = obj.Context.Target, Source = InstanceId, Caster = Owner });
         }

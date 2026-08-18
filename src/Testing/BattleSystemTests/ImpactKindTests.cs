@@ -457,6 +457,8 @@ namespace LastBreathTest.BattleSystemTests
             var fighter = new ConditionOwner();
             fighter.SetMaximum(EntityParameter.Health, Health);
             fighter.SetMaximum(EntityParameter.Mana, Health);
+            // A chance the scripted draws can win and lose: a fighter without one crits on nothing at all.
+            fighter.SetMaximum(EntityParameter.CriticalChance, 0.5f);
             fighter.CurrentHealth = Health;
             fighter.CurrentMana = Health;
 

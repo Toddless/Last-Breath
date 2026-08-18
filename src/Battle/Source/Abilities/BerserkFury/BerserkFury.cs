@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.BerserkFury
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Context;
@@ -80,7 +81,7 @@ namespace Battle.Source.Abilities.BerserkFury
 
                     // Lower health — lower chance to keep swinging (fury burns health, so the series ends itself).
                     float chance = Mathf.Clamp(owner.CurrentHealth / owner.Parameters.MaxHealth, MinContinueChance, MaxContinueChance);
-                    if (CombatRandom.Rolls.RandFloat() > chance) break;
+                    if (!ChanceRoll.Roll(chance, CombatRandom.Rolls)) break;
                 }
             }
         }

@@ -1,9 +1,11 @@
 namespace Battle.Source.Abilities
 {
+    using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data;
     using Core.Entity;
+    using Core.Enums;
 
     /// <summary>
     /// What an ABILITY contributes to the rolls of a touch it deals. The attack pipeline rolls on the
@@ -19,8 +21,8 @@ namespace Battle.Source.Abilities
         /// <summary>Whether a DIRECT touch of the ability crits: the attacker's chance raised by a
         /// fraction of itself, for deliveries with no attack context of their own.</summary>
         public static bool RollsCritical(this IAbility ability, IFightable owner) =>
-            CombatRandom.Rolls.RandFloat()
-            <= owner.Parameters.CriticalChance * (1 + ability.ValueOr(AbilityParameter.CriticalChanceBonus, 0f));
+            ChanceRoll.Roll(owner.Parameters.CriticalChance * (1 + ability.ValueOr(AbilityParameter.CriticalChanceBonus, 0f)),
+                CombatRandom.Rolls, owner.Parameters.GetChanceLuck(EntityParameter.CriticalChance));
 
         /// <summary>What a crit of the ability multiplies a direct touch by: additive by design, so a
         /// bonus only ever adds to the attacker's own multiplier.</summary>

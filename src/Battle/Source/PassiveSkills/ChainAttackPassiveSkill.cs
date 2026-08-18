@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using Core;
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Enums;
@@ -19,7 +20,8 @@
             if (Owner == null) return;
             // Обязательно прерываем серию при уклонении.
             // Неизбежные атаки только через модификацию контекста атаки
-            if (@event.Context.Rnd.Randf() > Owner.Parameters.AdditionalHit || @event.Context.Result is not AttackResults.Succeed) return;
+            if (@event.Context.Result is not AttackResults.Succeed) return;
+            if (!ChanceRoll.Roll(Owner.Parameters.AdditionalHit, @event.Context.Rnd, Owner.Parameters.GetChanceLuck(EntityParameter.AdditionalHitChance))) return;
             @event.Context.CreateReaction(Owner, @event.Context.Target,
                 Owner.Parameters.Damage * @event.Context.Rnd.RandfRange(0.9f, 1.1f)).Schedule();
         }

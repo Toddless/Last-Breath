@@ -4,6 +4,7 @@ namespace Battle.Source.Abilities.IceBlock
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Context;
@@ -85,7 +86,7 @@ namespace Battle.Source.Abilities.IceBlock
                 });
             }
 
-            if (CooldownResetChance > 0 && CombatRandom.Rolls.RandFloat() <= CooldownResetChance) CooldownLeft = 0;
+            if (CooldownResetChance > 0 && ChanceRoll.Roll(CooldownResetChance, CombatRandom.Rolls)) CooldownLeft = 0;
         }
 
         protected override IceBlockPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field)

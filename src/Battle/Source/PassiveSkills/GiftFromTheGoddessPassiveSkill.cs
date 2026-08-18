@@ -1,6 +1,7 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using System.Collections.Generic;
+    using Core;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
     using Core.Entity;
@@ -28,7 +29,7 @@
         private void OnAfterAttack(AfterAttackEvent evnt)
         {
             var rnd = evnt.Context.Rnd;
-            if (rnd.Randf() > Chance) return;
+            if (!ChanceRoll.Roll(Chance, rnd)) return;
 
             int number = rnd.RandiRange(0, _effects.Count - 1);
             var effect = _effects[number].Copy();

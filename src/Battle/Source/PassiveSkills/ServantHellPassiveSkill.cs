@@ -1,6 +1,7 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using System.Collections.Generic;
+    using Core;
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Events;
@@ -35,7 +36,7 @@
         {
             var context = evnt.Context;
             // TODO: I need to check for target type.Chances for bosses should be lower
-            if (context.Rnd.Randf() < Chance) context.Target.Kill();
+            if (ChanceRoll.Roll(Chance, context.Rnd)) context.Target.Kill();
         }
 
         public override ISkill Copy() => new ServantHellPassiveSkill( Chance);

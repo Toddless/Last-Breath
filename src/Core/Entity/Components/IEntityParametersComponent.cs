@@ -35,6 +35,14 @@
         void Initialize(Func<EntityParameter, IReadOnlyList<IModifier>> getModifiers);
         void AddModuleDecorator(EntityParameterModuleDecorator decorator);
         void RemoveModuleDecorator(string id, EntityParameter param);
+
+        /// <summary>Marks the owner's rolls on <paramref name="parameter"/> lucky or unlucky while the source lasts.
+        /// Sources stack by count and opposite kinds cancel, so a fighter both blessed and cursed rolls once, fairly.</summary>
+        void AddChanceLuck(EntityParameter parameter, ChanceLuck luck);
+        void RemoveChanceLuck(EntityParameter parameter, ChanceLuck luck);
+
+        /// <summary>How rolls on <paramref name="parameter"/> settle right now — what <see cref="ChanceRoll"/> asks for.</summary>
+        ChanceLuck GetChanceLuck(EntityParameter parameter);
         float CalculateForBase(EntityParameter parameter, float baseValue);
         void SetBaseValueForParameter(EntityParameter parameter, float baseValue);
         void OnParameterModifiersChange(object? sender, IModifiersChangedEventArgs args);

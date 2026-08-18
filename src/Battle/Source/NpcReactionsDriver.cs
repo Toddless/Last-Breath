@@ -119,7 +119,7 @@ namespace Battle.Source
             if (!MatchesTrigger(entry.Config.Trigger, evt)) return false;
             if (entry.FiredThisTurn >= entry.Config.MaxPerTurn) return false;
             if (IsBlockedByFinalDeath(entry.Config)) return false;
-            return _rnd.RandFloat() <= entry.Config.Chance;
+            return ChanceRoll.Roll(entry.Config.Chance, _rnd);
         }
 
         private bool IsBlockedByFinalDeath(NpcReactionConfig config) =>

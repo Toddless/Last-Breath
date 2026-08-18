@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using Core;
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Events;
@@ -35,7 +36,7 @@
             {
                 ArgumentNullException.ThrowIfNull(Owner);
                 if (evnt.Context.Target.InstanceId != Owner.InstanceId) return;
-                if (evnt.Context.Rnd.Randf() > Chance) return;
+                if (!ChanceRoll.Roll(Chance, evnt.Context.Rnd)) return;
                 evnt.Context.CreateReaction(Owner, evnt.Context.Attacker, Owner.GetDamage()).Schedule();
             }
             catch (Exception e)

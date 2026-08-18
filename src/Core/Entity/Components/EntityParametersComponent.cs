@@ -35,6 +35,11 @@
         };
 
         private readonly Dictionary<EntityParameter, (float Base, float Current)> _parameterValues = Enum.GetValues<EntityParameter>().ToDictionary(key => key, key => (0f, 0f));
+
+        /// <summary>Luck sources per parameter, counted signed: lucky and unlucky sources coexist and cancel
+        /// one another, so the roll asks for a single verdict instead of the list.</summary>
+        private readonly Dictionary<EntityParameter, int> _chanceLuck = new();
+
         private readonly IModuleManager<EntityParameter, IParameterModule<EntityParameter>, EntityParameterModuleDecorator> _moduleManager;
         private float this[EntityParameter type] => ApplyBounds(type, _moduleManager.GetModule(type).GetValue());
         private Func<EntityParameter, IReadOnlyList<IModifier>>? _getModifiersForParameter;
@@ -82,6 +87,12 @@
         public void AddModuleDecorator(EntityParameterModuleDecorator decorator) => _moduleManager.AddDecorator(decorator);
         public void RemoveModuleDecorator(string id, EntityParameter param) => _moduleManager.RemoveDecorator(id, param);
 
+        public void AddChanceLuck(EntityParameter parameter, ChanceLuck luck) => ShiftChanceLuck(parameter, (int)luck);
+
+        public void RemoveChanceLuck(EntityParameter parameter, ChanceLuck luck) => ShiftChanceLuck(parameter, -(int)luck);
+
+        public ChanceLuck GetChanceLuck(EntityParameter parameter) => (ChanceLuck)Math.Sign(_chanceLuck.GetValueOrDefault(parameter));
+
         public float CalculateForBase(EntityParameter parameter, float baseValue)
         {
             var modifiers = _getModifiersForParameter?.Invoke(parameter) ?? [];
@@ -107,6 +118,8 @@
             _parameterValues[parameter] = value;
             RaiseParameterChanges(parameter);
         }
+
+        private void ShiftChanceLuck(EntityParameter parameter, int delta) => _chanceLuck[parameter] = _chanceLuck.GetValueOrDefault(parameter) + delta;
 
         private void RaiseParameterChanges(EntityParameter args) =>
             ParameterChanged?.Invoke(args, this[args]);

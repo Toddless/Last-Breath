@@ -1,6 +1,7 @@
 namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
+    using Core;
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Enums;
@@ -46,7 +47,7 @@ namespace Battle.Source.Effects
 
             if (Effective(healOnHitPercent) > 0)
                 Target.Heal(new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * Effective(healOnHitPercent) });
-            if (cooldownReduceChance > 0 && sourceAbility.CooldownLeft > 0 && CombatRandom.Rolls.RandFloat() <= cooldownReduceChance)
+            if (cooldownReduceChance > 0 && sourceAbility.CooldownLeft > 0 && ChanceRoll.Roll(cooldownReduceChance, CombatRandom.Rolls))
                 sourceAbility.CooldownLeft--;
 
             float returned = (context.TotalDamage * damageReturn) + (Target.Parameters.Armor * armorReturn);

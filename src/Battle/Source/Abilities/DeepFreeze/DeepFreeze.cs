@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.DeepFreeze
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data;
@@ -153,7 +154,7 @@ namespace Battle.Source.Abilities.DeepFreeze
         /// because the cast landed on somebody else.</summary>
         private async Task TrySpreadFreeze(DeepFreezePlan plan, IFightable owner, IBattleField field)
         {
-            if (SpreadFreezeChance <= 0 || CombatRandom.Rolls.RandFloat() > SpreadFreezeChance) return;
+            if (SpreadFreezeChance <= 0 || !ChanceRoll.Roll(SpreadFreezeChance, CombatRandom.Rolls)) return;
 
             var untouched = field.GetEnemies(owner)
                 .Where(enemy => enemy.IsAlive && plan.Targets.All(t => !t.IsSame(enemy.InstanceId)))

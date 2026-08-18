@@ -2,6 +2,7 @@ namespace Battle.Source
 {
     using System;
     using System.Collections.Generic;
+    using Core;
     using Core.Battle.Abilities;
     using Core.Data.NpcData;
     using Core.Entity;
@@ -181,7 +182,7 @@ namespace Battle.Source
 
             foreach (var config in entry.CurrentStage.AttackEffects)
             {
-                if (_rnd.RandFloat() > config.Chance) continue;
+                if (!ChanceRoll.Roll(config.Chance, _rnd)) continue;
                 _ = CreateAttackEffect(config).Apply(new EffectApplyingContext
                 {
                     Caster = entry.Owner,

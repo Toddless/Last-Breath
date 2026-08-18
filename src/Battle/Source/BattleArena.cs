@@ -216,7 +216,7 @@
 
             float chance = EscapeChanceCalculator.For(
                 _fighters.Where(fighter => IsPresent(fighter) && !AreAllies(_player, fighter)).OfType<IFightableNpc>());
-            bool succeeded = _rnd.Randf() <= chance;
+            bool succeeded = ChanceRoll.Roll(chance, _rnd);
             _battleEventBus?.Publish(new PlayerFleeResolvedEvent(succeeded, chance));
 
             if (succeeded) EndBattle(new BattleOutcome(BattleResults.PlayerFled));

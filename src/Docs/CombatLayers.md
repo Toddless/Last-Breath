@@ -33,7 +33,7 @@
 
 ### 1.3 `AttackResults` — `Core/Enums/AttackResults.cs:3-8`
 `Evaded = 0`, `Blocked = 1`, `Succeed = 2`.
-**Дефолт — `Evaded`** (`AttackContext.Result:30`, автосвойство без инициализатора). До `CalculateSucceeded` контекст выглядит как «уклонились».
+**Дефолт — `Evaded`** (`AttackContext.Result:30`, автосвойство без инициализатора). До `ResolveAttackOutcome` контекст выглядит как «уклонились».
 
 ### 1.4 `Costs` — `Core/Enums/Costs.cs:5-11`
 `[Flags] : byte` — `Mana = 1`, `Health = 2`, `Barrier = 4`. **Члена `None`/`0` нет.** Списание — `Player:272-287` (`switch` без `default`), проверка — `Ability:216-222` (`_ => false`). Нулевой `CostType` из данных = способность вечно недоступна, стоимость молча не списывается.
@@ -134,19 +134,19 @@
 2. Сид компонентов (`AttackContext:77-87`): `Physical = baseDamage`, плюс флэт `FireDamage`/`ColdDamage`/`LightningDamage` атакующего, если `> 0`.
 3. `AttackContextScheduler.RunQueue:34-60` — предохранители `MaxReactionDepth = 25`, `MaxAttacksPerDrain = 256`.
 4. `Attacker.Attack:346-352` — `BeforeAttackEvent`, затем **бросок крита**.
-5. `Target.ReceiveAttack:315-344` — `CalculateSucceeded` → `CalculateInitialAttackDamage` → `ComposeAttackDamage` → `TakeDamage`.
+5. `Target.ReceiveAttack:315-344` — `ResolveAttackOutcome` → `CalculateInitialAttackDamage` → `ComposeAttackDamage` → `TakeDamage`.
 
 Ability-scoped мутаторы атаки идут отдельным списком (`AttackModifierPipeline.ApplyAll:20-24`), **до** планирования.
 
-### 3.2 Попадание — `Calculations.CalculateSucceeded:139-156`
-Уклонение и блок — **два независимых броска** одного `Rnd`.
+### 3.2 Попадание — `Calculations.ResolveAttackOutcome`
+Уклонение и блок — **два независимых броска** одного `Rnd`, оба через `ChanceRoll.Roll` (см. 3.5).
 ```
 advantage = max(0, evade − accuracy)
 шанс уклонения = advantage / (advantage + 10000)
 ```
 `EvasionScalingFactor = 10000f`. **Точность ≥ уклонения → уклонения нет вовсе.** Блок — плоский шанс, точность не учитывает, кап 0.9.
 
-Подписчик `TargetEvadedAttackEvent`/`TargetBlockedAttackEvent` может отменить исход — проверка `if (context.Result is …) return` стоит после публикации.
+Вердикт возвращается значением; отменяющих событий исхода нет (`TargetEvadedAttackEvent`/`TargetBlockedAttackEvent` снесены — подписчиков не было). «Нельзя уклониться/блокировать» — флаги контекста `IsUnevadable`/`IsUnblockable`.
 
 ### 3.3 Крит
 `RawCriticalChance` — от `CriticalChance` (кап 0..1). `RawCriticalDamage` — от `CriticalDamage` (**без капа**). Применение — `CalculateInitialAttackDamage:32-40`: `ScaleDamage(RawCriticalDamage * (1 − CriticalDamageMitigation))`, множит **все** компоненты.
@@ -155,6 +155,10 @@ advantage = max(0, evade − accuracy)
 
 ### 3.4 Мост «атака → урон» — `ComposeAttackDamage:44-53`
 Единственная точка. Переносит компоненты как есть, ставит `Cause = Attack`, `IsCrit`, **`SourceAbilityId`**.
+
+### 3.5 Броски шанса — `Core/ChanceRoll.cs`
+Единая точка всех «получилось/не получилось» боевого свода (уклон, блок, подавление, крит, доп. атака, контратака, шансы пассивок/аугментов/стадий босса): правило `бросок <= шанс`, нулевой шанс не проходит никогда, бросок берётся всегда (гард «не жечь стрим» ставит вызывающий — подавление, `SpreadFreezeChance`, `IceBlocks.CooldownResetChance`, откат перезарядки `PorcupineBuffEffect`).
+**Удача — адресное состояние сущности**: реестр `параметр → счётчик` (`IEntityParametersComponent.AddChanceLuck/RemoveChanceLuck/GetChanceLuck`), удачливый бросок = два броска и лучший, неудачливый = худший, источники разных знаков гасятся. Вне точки осознанно: лестница стадий мультикаста (кумулятивная семантика), не-булевы броски и всё вне боя (лут, крафт, торговля, нарратив, мировой AI).
 
 ---
 

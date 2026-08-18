@@ -9,7 +9,6 @@
     using Entity.Components;
     using Entity.NpcModifiers;
     using Enums;
-    using Events;
     using Interfaces;
     using Modifiers;
     using Godot;
@@ -101,7 +100,7 @@
             float suppression = target.Parameters.GetValueForParameter(EntityParameter.Suppress);
             if (chance <= 0 || suppression <= 0 || context.TotalDamage <= 0) return;
 
-            if (!ChanceSuccessful(chance, rnd.RandFloat())) return;
+            if (!ChanceRoll.Roll(chance, rnd, target.Parameters.GetChanceLuck(EntityParameter.SuppressChance))) return;
 
             // Snapshot: Set() mutates the collection we are iterating
             foreach ((DamageType type, float damage) in context.DamageComponents.ToArray())
@@ -143,23 +142,27 @@
         }
 
 
-        public static void CalculateSucceeded(IAttackContext context)
+        /// <summary>How the attack lands, rolled on the attack's own stream.</summary>
+        public static AttackResults ResolveAttackOutcome(IAttackContext context) => ResolveAttackOutcome(context, context.Rnd.Randf);
+
+        /// <summary>
+        /// The landing rule: evasion is rolled first, block second, and a hit marked unevadable/unblockable
+        /// skips the branch that would stop it. Both rolls answer to the defender's luck on the parameter
+        /// behind them. <paramref name="draw"/> is named rather than taken from the context because the
+        /// generator an attack carries is an engine object no sandbox can build.
+        /// </summary>
+        public static AttackResults ResolveAttackOutcome(IAttackContext context, Func<float> draw)
         {
-            if (!context.IsUnevadable && ChanceSuccessful(CalculateEvasionChance(context.Target.Parameters.Evade, context.RawAccuracy), context.Rnd.Randf()))
-            {
-                context.Result = AttackResults.Evaded;
-                context.Attacker.CombatEvents.Publish<TargetEvadedAttackEvent>(new(context));
-                if (context.Result is AttackResults.Evaded) return;
-            }
+            var defender = context.Target.Parameters;
 
-            if (!context.IsUnblockable && ChanceSuccessful(context.Target.Parameters.BlockChance, context.Rnd.Randf()))
-            {
-                context.Result = AttackResults.Blocked;
-                context.Attacker.CombatEvents.Publish<TargetBlockedAttackEvent>(new(context));
-                if (context.Result is AttackResults.Blocked) return;
-            }
+            if (!context.IsUnevadable && ChanceRoll.Roll(CalculateEvasionChance(defender.Evade, context.RawAccuracy), draw,
+                    defender.GetChanceLuck(EntityParameter.Evade)))
+                return AttackResults.Evaded;
 
-            context.Result = AttackResults.Succeed;
+            if (!context.IsUnblockable && ChanceRoll.Roll(defender.BlockChance, draw, defender.GetChanceLuck(EntityParameter.BlockChance)))
+                return AttackResults.Blocked;
+
+            return AttackResults.Succeed;
         }
 
         public static float[] CalculateChances<TModifier>(IReadOnlyList<INpcModifier> modifiers, float[] chances)
@@ -217,8 +220,6 @@
             for (int i = 0; i < tierChances.Length; i++)
                 tierChances[i] /= sum;
         }
-
-        private static bool ChanceSuccessful(float chance, float randomNumber) => randomNumber <= chance;
 
         /// <summary>Armor-style curve: accuracy at or above evasion guarantees a hit; only the excess of evasion over accuracy grants evade chance.</summary>
         private static float CalculateEvasionChance(float evasion, float accuracy)

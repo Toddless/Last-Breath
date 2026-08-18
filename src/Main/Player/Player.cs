@@ -378,7 +378,7 @@ namespace LastBreath.Player
             {
                 try
                 {
-                    Calculations.CalculateSucceeded(context);
+                    context.Result = Calculations.ResolveAttackOutcome(context);
                     switch (context.Result)
                     {
                         case AttackResults.Succeed:
@@ -418,7 +418,7 @@ namespace LastBreath.Player
         {
             // BeforeAttack reactions may mutate RawCriticalChance, so the crit roll happens after them
             CombatEvents.Publish(new BeforeAttackEvent(context));
-            context.IsCritical = context.Rnd.Randf() <= context.RawCriticalChance;
+            context.IsCritical = ChanceRoll.Roll(context.RawCriticalChance, context.Rnd, context.Attacker.Parameters.GetChanceLuck(EntityParameter.CriticalChance));
             return Task.CompletedTask;
         }
 
