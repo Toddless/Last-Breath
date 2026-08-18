@@ -466,7 +466,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>One swing of the ability, as its own delivery would hand it to the riders.</summary>
         private static Core.Data.AbilityImpact Swing(IAbility source, Fighter caster, Fighter victim) =>
-            new(caster.Object, victim.Object, Mock.Of<IBattleField>(), Damage: 100f)
+            new(caster.Object, victim.Object, Mock.Of<IBattleField>(), Damage: Core.Context.DamageSnapshot.Of(Core.Enums.DamageType.Physical, 100f))
             {
                 Source = source,
                 Kind = Core.Data.ImpactKind.Attack

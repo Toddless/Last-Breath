@@ -34,7 +34,7 @@ namespace Battle.Source.PassiveSkills
         private void OnAfterAttack(AfterAttackEvent evt)
         {
             if (Owner == null || !evt.Context.IsCritical || evt.Context.Result is not AttackResults.Succeed) return;
-            Owner.Heal(new HealContext(Owner, Owner) { Amount = evt.Context.FinalDamage * Percent, Cause = RecoveryCause.Leech });
+            Owner.Heal(new HealContext(Owner, Owner) { Amount = evt.Context.FinalDamage.Total * Percent, Cause = RecoveryCause.Leech });
         }
 
         public override void Detach(IFightable owner)

@@ -4,6 +4,7 @@ namespace Battle.Source.PassiveSkills
     using System.Linq;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
+    using Core.Context;
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
@@ -53,7 +54,7 @@ namespace Battle.Source.PassiveSkills
             {
                 Caster = Owner,
                 Target = context.Target,
-                Damage = context.BaseDamage, // weapon-side damage, before crits and reductions
+                Damage = DamageSnapshot.Of(DamageType.Fire, context.BaseDamage), // weapon-side damage, before crits and reductions
                 Source = InstanceId
             });
 

@@ -418,7 +418,7 @@ namespace LastBreathTest.BattleSystemTests
                 var context = new Mock<IAttackContext>();
                 context.Setup(c => c.Result).Returns(result);
                 context.Setup(c => c.Target).Returns(victim.Object);
-                context.Setup(c => c.FinalDamage).Returns(100f);
+                context.Setup(c => c.FinalDamage).Returns(DamageSnapshot.Of(DamageType.Physical, 100f));
                 context.Setup(c => c.IsCritical).Returns(false);
                 _combatEvents.Publish(new AfterAttackEvent(context.Object));
             }

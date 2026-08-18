@@ -857,6 +857,7 @@
             "behaviour": "ApplyEffectOnImpact",
             "effectId": "Effect_Damage_Over_Turn_Burning",
             "impactKind": "Attack",
+            "poolFromWholeHit": true,
             "upgradeProperties": {}
         },
         {

@@ -37,7 +37,7 @@ namespace Battle.Source.Abilities
         {
             ["ApplyEffectOnImpact"] = new(BehaviourField.EffectId | BehaviourField.ImpactKind, (data, effects) =>
                 new AbilityAugmentImpactRider(data.Id, data.Tags, data.Tier, new DataEffectImpactRider(
-                    data.Id, data.LaidEffectId, host => EffectNumbers(data, host, effects), KindOf(data), effects))),
+                    data.Id, data.LaidEffectId, host => EffectNumbers(data, host, effects), KindOf(data), data.PoolFromWholeHit, effects))),
 
             ["BuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>
                 new AbilityAugmentCastEffect(data.Id, data.Tags, data.Tier,
@@ -139,6 +139,8 @@ namespace Battle.Source.Abilities
             if (!fields.HasFlag(BehaviourField.EffectId) && !string.IsNullOrWhiteSpace(data.LaidEffectId)) return "writes an effectId its behaviour never reads";
             if (!fields.HasFlag(BehaviourField.ImpactKind) && !string.IsNullOrWhiteSpace(data.ImpactKind)) return "writes an impactKind its behaviour never reads";
             if (!fields.HasFlag(BehaviourField.AttackModifier) && !string.IsNullOrWhiteSpace(data.AttackModifier)) return "writes an attackModifier its behaviour never reads";
+            // The pool lever travels on the applying context, which only the impact road builds.
+            if (!fields.HasFlag(BehaviourField.ImpactKind) && data.PoolFromWholeHit) return "writes poolFromWholeHit its behaviour never reads";
             return null;
         }
 

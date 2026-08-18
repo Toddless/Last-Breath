@@ -44,7 +44,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
             var context = obj.Context;
             if (context.Result != AttackResults.Succeed) return;
 
-            float splashDamage = context.FinalDamage * splashDamagePercent;
+            float splashDamage = context.FinalDamage.Total * splashDamagePercent;
 
             // Get a random enemy from the owner's group; fall back to main target
             // TODO: Replace with full battlefield enemy list via IEntityGroup or IBattle
@@ -64,7 +64,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
             // touched target owed an impact like every other. What is reported is what the context ended
             // up carrying, like every other delivery — the mitigated number, not the one asked for.
             // The handler is the event bus's and cannot wait, so the riders start the way the damage does.
-            _ = _ability.ApplyImpactRiders(new AbilityImpact(_owner, randomTarget, _field, Succeeded: true, IsCritical: false, damageContext.TotalDamage)
+            _ = _ability.ApplyImpactRiders(new AbilityImpact(_owner, randomTarget, _field, Succeeded: true, IsCritical: false, DamageSnapshot.From(damageContext))
             {
                 Source = _ability,
                 Kind = ImpactKind.Splash

@@ -34,7 +34,7 @@ namespace Battle.Source.PassiveSkills
         private void OnAfterAttack(AfterAttackEvent evnt)
         {
             if (Owner == null) return;
-            float leeched = evnt.Context.FinalDamage * LeachPercent;
+            float leeched = evnt.Context.FinalDamage.Total * LeachPercent;
             Owner.Heal(new HealContext(Owner, Owner) { Amount = leeched });
         }
 

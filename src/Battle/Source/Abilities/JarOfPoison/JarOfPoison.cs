@@ -4,6 +4,7 @@ namespace Battle.Source.Abilities.JarOfPoison
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Data;
     using Core.Data.AbilityData;
     using Core.Entity;
@@ -55,7 +56,8 @@ namespace Battle.Source.Abilities.JarOfPoison
         {
             float damage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
 
-            EffectApplyingContext context = Laying(target) with { Damage = damage };
+            // The jar deals no blow of its own: the poison feeds on the figure the ability authors.
+            EffectApplyingContext context = Laying(target) with { Damage = DamageSnapshot.Of(DamageType.Poison, damage) };
             var poison = new DamageOverTurnEffect(PoisonDuration, StatusEffects.Poison);
             await poison.Apply(context);
         }

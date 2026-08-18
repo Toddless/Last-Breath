@@ -166,7 +166,7 @@ namespace Battle.Source.Abilities.IceBlock
                 var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, CastId = CastId };
                 context.Add(DamageType.Cold, blockDamage);
                 await victim.TakeDamage(context);
-                await ApplyImpactRiders(new AbilityImpact(owner, victim, field, Succeeded: true, IsCritical: false, context.TotalDamage)
+                await ApplyImpactRiders(new AbilityImpact(owner, victim, field, Succeeded: true, IsCritical: false, DamageSnapshot.From(context))
                 {
                     Source = this,
                     Kind = ImpactKind.Hit

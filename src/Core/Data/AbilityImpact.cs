@@ -2,6 +2,7 @@ namespace Core.Data
 {
     using Battle;
     using Battle.Abilities;
+    using Context;
     using Entity;
 
     /// <summary>
@@ -19,7 +20,7 @@ namespace Core.Data
         IBattleField Field,
         bool Succeeded = true,
         bool IsCritical = false,
-        float Damage = 0)
+        DamageSnapshot Damage = default)
     {
         /// <summary>
         /// The ability instance this impact came out of — the channel between a rider and the cast that

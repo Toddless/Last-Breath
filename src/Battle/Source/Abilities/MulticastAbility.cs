@@ -68,7 +68,7 @@ namespace Battle.Source.Abilities
             };
             context.Add(plan.DamageType, damage);
             await target.TakeDamage(context);
-            return new ProjectileHit(target, isCritical, context.TotalDamage);
+            return new ProjectileHit(target, isCritical, DamageSnapshot.From(context));
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)

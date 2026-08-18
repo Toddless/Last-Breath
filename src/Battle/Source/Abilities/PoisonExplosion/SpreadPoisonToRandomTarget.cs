@@ -30,7 +30,7 @@
             foreach (DamageOverTurnEffect stack in originalStacks)
             {
                 var copy = (DamageOverTurnEffect)stack.Copy();
-                copy.Apply(new EffectApplyingContext { Caster = owner, Target = newTarget, Source = source, Damage = stack.DamagePerTick });
+                copy.Apply(new EffectApplyingContext { Caster = owner, Target = newTarget, Source = source });
             }
 
             return [newTarget];

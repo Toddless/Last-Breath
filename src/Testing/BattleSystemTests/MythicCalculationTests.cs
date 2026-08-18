@@ -139,7 +139,7 @@ namespace LastBreathTest.BattleSystemTests
                 Caster = bearer,
                 Target = bearer,
                 Source = "Test_Mythic_Calculation",
-                Damage = 0f
+                Damage = default
             });
 
         /// <summary>A cast of the bearer's, with nothing in it the rider does not read.</summary>

@@ -51,7 +51,7 @@ namespace Battle.Source.Abilities.TwinAssist
                 await ApplyBurning(owner, target, damage);
                 // Direct hits by design (the class doc): the assist must not chain reactions, so it never
                 // enters the attack pipeline and its touches are hits rather than attacks.
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, context.TotalDamage)
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, DamageSnapshot.From(context))
                 {
                     Source = this,
                     Kind = ImpactKind.Hit
@@ -61,7 +61,8 @@ namespace Battle.Source.Abilities.TwinAssist
 
         private async Task ApplyBurning(IFightable owner, IFightable target, float hitDamage)
         {
-            var context = new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId, Damage = hitDamage };
+            // The assist authors its burn off its own blow, which carries no fire component of its own.
+            var context = new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId, Damage = DamageSnapshot.Of(DamageType.Fire, hitDamage) };
             await new DamageOverTurnEffect(BurnDuration, StatusEffects.Burning).Apply(context);
         }
     }

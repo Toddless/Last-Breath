@@ -51,7 +51,7 @@
         {
             if (Owner == null || obj.Context.Result is not AttackResults.Succeed) return;
             var context = obj.Context;
-            float damage = context.FinalDamage;
+            var damage = context.FinalDamage;
             var target = context.Target;
             var bleed = _damageOverTurnEffect.Copy();
             var applyContext = new EffectApplyingContext { Caster = Owner, Target = target, Damage = damage, Source = InstanceId };

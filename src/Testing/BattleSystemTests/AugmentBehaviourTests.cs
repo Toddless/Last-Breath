@@ -7,6 +7,7 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source;
     using Battle.Source.Abilities;
     using Core.Battle;
+    using Core.Context;
     using Core.Entity;
     using Core.Entity.Components;
     using Core.Data;
@@ -273,15 +274,17 @@ namespace LastBreathTest.BattleSystemTests
                 series.SetOwner(owner);
                 IBattleField field = FieldOf(owner, target);
 
+                // The attacks land a real blow: a damaging effect with nothing to tick with is not laid
+                // at all, so impacts reporting no damage would prove the records silent rather than working.
                 for (int attack = 0; attack < SeriesAttacks; attack++)
-                    await series.ApplyImpactRiders(new AbilityImpact(owner, target, field) { Source = series, Kind = ImpactKind.Attack });
+                    await series.ApplyImpactRiders(new AbilityImpact(owner, target, field, Damage: Blow) { Source = series, Kind = ImpactKind.Attack });
 
                 Assert.AreEqual(SeriesAttacks, Stacks(target, effect),
                     $"'{record}' left something other than one stack of '{effect}' per attack");
 
                 // The other side of the filter, asked while the target is still below the cap: a stack that
                 // slipped through would show. The record says Attack and a hit is the other road entirely.
-                await series.ApplyImpactRiders(new AbilityImpact(owner, target, field) { Source = series, Kind = ImpactKind.Hit });
+                await series.ApplyImpactRiders(new AbilityImpact(owner, target, field, Damage: Blow) { Source = series, Kind = ImpactKind.Hit });
 
                 Assert.AreEqual(SeriesAttacks, Stacks(target, effect), $"'{record}' fired on a hit");
             }
@@ -347,6 +350,11 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         private const string CodelessEffectId = "Effect_Armor_Reduction";
+
+        /// <summary>A landed physical swing — what a series of attacks reports to its riders. Physical
+        /// alone on purpose: the bleeding record feeds on that component, and the burning one says it
+        /// pools the whole hit, so one blow measures both records the way a weapon without fire would.</summary>
+        private static readonly DamageSnapshot Blow = DamageSnapshot.Of(DamageType.Physical, 100f);
 
         /// <summary>The two damage-over-turn series of the design list and the effects they lay: records
         /// and no code at all, which is exactly why the promise needs measuring rather than inferring.</summary>

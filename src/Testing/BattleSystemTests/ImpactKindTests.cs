@@ -438,7 +438,7 @@ namespace LastBreathTest.BattleSystemTests
                 Caster = caster,
                 Target = victim,
                 Source = "Test_Poison",
-                Damage = Health
+                Damage = DamageSnapshot.Of(DamageType.Physical, Health)
             });
 
 

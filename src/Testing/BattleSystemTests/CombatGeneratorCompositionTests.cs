@@ -239,7 +239,7 @@ namespace LastBreathTest.BattleSystemTests
             // The share belongs to the ability now, so the source has to own one: a rider on a cast that
             // spills nothing returns before it rolls, which is the whole of the nought base.
             return new SplashRandomTargetRider()
-                .Apply(new AbilityImpact(caster, hit, FieldOf(caster, hit, bystander), Succeeded: true, IsCritical: false, Damage)
+                .Apply(new AbilityImpact(caster, hit, FieldOf(caster, hit, bystander), Succeeded: true, IsCritical: false, DamageSnapshot.Of(DamageType.Physical, Damage))
                 {
                     Source = new IncreasingPressureCast(Splashing()),
                     Kind = ImpactKind.Attack
@@ -317,7 +317,7 @@ namespace LastBreathTest.BattleSystemTests
             owner.CombatEvents.Subscribe<BeforeAttackEvent>(joined =>
             {
                 joined.Context.Result = AttackResults.Succeed;
-                joined.Context.FinalDamage = Damage;
+                joined.Context.FinalDamage = DamageSnapshot.Of(DamageType.Physical, Damage);
             });
 
             return new IpDamageRandomTargetStrategy(0.5f)
@@ -330,7 +330,7 @@ namespace LastBreathTest.BattleSystemTests
             var dying = Fighter();
             var heir = Fighter();
             var poison = new DamageOverTurnEffect(duration: 3, StatusEffects.Poison);
-            await poison.Apply(new EffectApplyingContext { Caster = owner, Target = dying, Source = nameof(ThePoisonHeir), Damage = Damage });
+            await poison.Apply(new EffectApplyingContext { Caster = owner, Target = dying, Source = nameof(ThePoisonHeir), Damage = DamageSnapshot.Of(DamageType.Physical, Damage) });
             await new TransferPoisonOnDeathRider().Apply(new AbilityImpact(owner, dying, FieldOf(owner, dying, heir))
             {
                 Source = new ChainLightningCast(Data()),

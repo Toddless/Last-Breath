@@ -34,7 +34,7 @@ namespace Battle.Source.PassiveSkills
         private void OnAfterAttack(AfterAttackEvent evt)
         {
             if (Owner == null || !evt.Context.IsCritical || evt.Context.Result is not AttackResults.Succeed) return;
-            Owner.RestoreMana(new ManaRecoveryContext(Owner, Owner) { Amount = evt.Context.FinalDamage * Percent });
+            Owner.RestoreMana(new ManaRecoveryContext(Owner, Owner) { Amount = evt.Context.FinalDamage.Total * Percent });
         }
 
         public override void Detach(IFightable owner)

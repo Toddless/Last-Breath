@@ -57,8 +57,7 @@ namespace Battle.Source.Abilities.Riders
                 {
                     Caster = owner,
                     Target = newTarget,
-                    Source = dead.InstanceId,
-                    Damage = stack.DamagePerTick
+                    Source = dead.InstanceId
                 });
             }
         }

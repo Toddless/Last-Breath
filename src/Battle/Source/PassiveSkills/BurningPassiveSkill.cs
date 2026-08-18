@@ -47,10 +47,18 @@
         {
             if (Owner == null || obj.Context.Result is not AttackResults.Succeed) return;
             var context = obj.Context;
-            float damage = context.FinalDamage;
             var target = context.Target;
             var burning = _damageOverTurnEffect.Copy();
-            var applyContext = new EffectApplyingContext { Caster = Owner, Target = target, Damage = damage, Source = InstanceId };
+            // A rolled item effect rather than a fire spell: it burns for a share of the WHOLE blow,
+            // whatever the blow was made of, and the hit itself is left the kind it was.
+            var applyContext = new EffectApplyingContext
+            {
+                Caster = Owner,
+                Target = target,
+                Damage = context.FinalDamage,
+                PoolFromWholeHit = true,
+                Source = InstanceId
+            };
             burning.Apply(applyContext);
         }
 

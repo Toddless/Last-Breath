@@ -95,7 +95,7 @@ namespace Battle.Source.Abilities.Discharge
             {
                 var hit = await DealPlanDamage(plan, owner, target);
                 if (plan.BarrierRestorePercent > 0)
-                    await new BarrierFromDamageEffect(plan.BarrierRestorePercent, hit.Damage).Apply(Laying(owner));
+                    await new BarrierFromDamageEffect(plan.BarrierRestorePercent, hit.Damage.Total).Apply(Laying(owner));
 
                 await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage)
                 {

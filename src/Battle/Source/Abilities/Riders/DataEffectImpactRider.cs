@@ -14,6 +14,7 @@ namespace Battle.Source.Abilities.Riders
         string effectId,
         Func<IAbility, RecordProperties> numbers,
         ImpactKind? kind,
+        bool poolFromWholeHit,
         Func<IEffectProvider?> providerAccessor) : IImpactRider
     {
         public string Id => $"Ability_Behaviour_{augmentId}_On_Impact";
@@ -34,6 +35,7 @@ namespace Battle.Source.Abilities.Riders
                 Target = impact.Target,
                 Source = InstanceId,
                 Damage = impact.Damage,
+                PoolFromWholeHit = poolFromWholeHit,
                 IsCritical = impact.IsCritical,
                 Effectiveness = impact.Source.Effectiveness
             });

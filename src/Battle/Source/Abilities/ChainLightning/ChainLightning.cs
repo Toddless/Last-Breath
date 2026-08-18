@@ -123,7 +123,7 @@ namespace Battle.Source.Abilities.ChainLightning
                 // The first strike lands on the chosen target like any other direct hit; everything after
                 // it is the chain hopping, and a jump is not a hit — its damage is the falloff's and its
                 // target is the pick's, so a rider bought for hits must not read it as one.
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, isCritical, context.TotalDamage)
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, isCritical, DamageSnapshot.From(context))
                 {
                     Source = this,
                     Kind = strike == 0 ? ImpactKind.Hit : ImpactKind.ChainJump

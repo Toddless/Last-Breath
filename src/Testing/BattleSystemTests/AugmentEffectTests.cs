@@ -232,7 +232,7 @@ namespace LastBreathTest.BattleSystemTests
                 Caster = caster.Object,
                 Target = victim.Object,
                 Source = "Test_Poison",
-                Damage = 100f
+                Damage = DamageSnapshot.Of(DamageType.Physical, 100f)
             });
             Assert.AreEqual(PoisonTurns, poison.Duration, "the poison never landed, so the extension below proves nothing");
 

@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Enums;
     using Core.Events;
 
@@ -39,7 +40,8 @@
             {
                 Target = evt.Context.Target,
                 Caster = Target,
-                Damage = HealthBurned,
+                // The burn feeds on the health the fury spent, not on a blow.
+                Damage = DamageSnapshot.Of(DamageType.Fire, HealthBurned),
                 Source = InstanceId,
                 IsCritical = false
             });

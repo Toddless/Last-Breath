@@ -123,7 +123,7 @@ namespace Battle.Source.Abilities.IceShards
                 var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, CastId = CastId };
                 context.Add(DamageType.Cold, damage);
                 await enemy.TakeDamage(context);
-                await ApplyImpactRiders(new AbilityImpact(owner, enemy, field, Succeeded: true, IsCritical: false, context.TotalDamage)
+                await ApplyImpactRiders(new AbilityImpact(owner, enemy, field, Succeeded: true, IsCritical: false, DamageSnapshot.From(context))
                 {
                     Source = this,
                     Kind = ImpactKind.Splash

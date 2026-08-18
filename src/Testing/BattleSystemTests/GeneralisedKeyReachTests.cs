@@ -116,7 +116,7 @@ namespace LastBreathTest.BattleSystemTests
 
             for (int stack = 0; stack < stacks; stack++)
                 await new DamageOverTurnEffect(duration: 3, StatusEffects.Poison, maxStacks: 999, percentFromDamage: 0.35f)
-                    .Apply(new EffectApplyingContext { Caster = owner, Target = victim.Object, Source = $"stack_{stack}", Damage = 10f });
+                    .Apply(new EffectApplyingContext { Caster = owner, Target = victim.Object, Source = $"stack_{stack}", Damage = DamageSnapshot.Of(DamageType.Physical, 10f) });
 
             Assert.AreEqual(stacks, effects.GetBy(effect => effect.Status == StatusEffects.Poison).Count(),
                 "the victim did not end up carrying the stacks the case is about");

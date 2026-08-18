@@ -31,6 +31,18 @@
         private const string PoisonAugment = "Augment_Test_Poison_Tier_Two";
 
         [TestMethod]
+        public void TheBurningSeriesAugmentKeepsSayingItPoolsTheWholeHit()
+        {
+            // The record burns off ATTACKS, which carry whatever the weapon is made of, so it says its
+            // pool is the whole blow. Lose the line and the augment quietly stops working on every
+            // fighter without fire on his weapon — a burn that ticks for nothing is no longer even laid.
+            AbilityAugmentData? record = ShippedCatalog().Find("Augment_Burning_Attack_Series");
+
+            Assert.IsNotNull(record, "the shipped catalog no longer declares the burning series augment");
+            Assert.IsTrue(record.PoolFromWholeHit, "the augment lost the lever that lets it burn off a fireless blow");
+        }
+
+        [TestMethod]
         public void EveryAugmentTheShippedDataDeclaresIsFoundByItsOwnId()
         {
             // The records are declared on their own and asked for by id alone: a drop, a conversion

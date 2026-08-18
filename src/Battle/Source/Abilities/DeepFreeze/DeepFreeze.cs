@@ -116,7 +116,7 @@ namespace Battle.Source.Abilities.DeepFreeze
                 // that laid it, and riders reading the impact need the damage that actually landed.
                 ProjectileHit hit = plan.DamageTargets.Any(t => t.IsSame(target.InstanceId))
                     ? await DealPlanDamage(plan, owner, target)
-                    : new ProjectileHit(target, false, 0);
+                    : new ProjectileHit(target, false, default);
 
                 await ApplyPayload(plan, owner, target);
                 await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage)
@@ -163,7 +163,7 @@ namespace Battle.Source.Abilities.DeepFreeze
             IFightable lucky = untouched[CombatRandom.Rolls.RandIntRange(0, untouched.Count - 1)];
             await new FreezeEffect(plan.FreezeDuration)
                 .Apply(Laying(lucky));
-            await ApplyImpactRiders(new AbilityImpact(owner, lucky, field, Succeeded: true, IsCritical: false, Damage: 0)
+            await ApplyImpactRiders(new AbilityImpact(owner, lucky, field, Succeeded: true, IsCritical: false)
             {
                 Source = this,
                 Kind = ImpactKind.Splash

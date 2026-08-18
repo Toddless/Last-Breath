@@ -364,7 +364,7 @@ namespace Battle.Internal.Player
                             Calculations.CalculateInitialAttackDamage(context);
                             var damageContext = Calculations.ComposeAttackDamage(context);
                             await TakeDamage(damageContext);
-                            context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
+                            context.FinalDamage = DamageSnapshot.From(damageContext); // actual damage dealt to target, split by type (barrier-absorbed included)
                             break;
                         case AttackResults.Blocked:
                             CombatEvents.Publish<AttackBlockedEvent>(new(context));

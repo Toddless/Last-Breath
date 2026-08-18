@@ -106,11 +106,12 @@ namespace Battle.Source.Abilities.Armageddon
                 if (isCritical) total *= this.CriticalMultiplierOf(owner);
 
                 var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, CastId = CastId, IsCrit = isCritical };
-                context.Add(DamageType.Physical, total);
+                context.Add(DamageType.Fire, total);
                 await target.TakeDamage(context);
 
-                if (stage >= MaxStage) await ApplyStageThreeEffects(owner, target, context.TotalDamage);
-                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, isCritical, context.TotalDamage)
+                var blow = DamageSnapshot.From(context);
+                if (stage >= MaxStage) await ApplyStageThreeEffects(owner, target, blow);
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, isCritical, blow)
                 {
                     Source = this,
                     Kind = ImpactKind.Hit
@@ -118,7 +119,7 @@ namespace Battle.Source.Abilities.Armageddon
             }
         }
 
-        private async Task ApplyStageThreeEffects(IFightable owner, IFightable target, float damageDealt)
+        private async Task ApplyStageThreeEffects(IFightable owner, IFightable target, DamageSnapshot damageDealt)
         {
             await new StunEffect(StunDuration).Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId });
             if (Stage3EffectFactory == null) return;

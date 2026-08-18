@@ -2,6 +2,7 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
     using Core.Battle;
+    using Core.Context;
     using Core.Entity;
     using Core.Enums;
     using Godot;
@@ -139,7 +140,7 @@ namespace LastBreathTest.BattleSystemTests
             public float RawCriticalChance { get; set; }
             public float RawCriticalDamage { get; set; }
             public float RawAccuracy { get; set; }
-            public float FinalDamage { get; set; }
+            public DamageSnapshot FinalDamage { get; set; }
             public bool IsCritical { get; set; }
             public bool ForceCriticalAttack { get; set; }
             public bool IsUnevadable { get; set; }

@@ -7,6 +7,7 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source.Abilities;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Data;
     using Core.Data.AbilityData;
     using Core.Entity;
@@ -259,7 +260,7 @@ namespace LastBreathTest.BattleSystemTests
             victim.SetMaximum(EntityParameter.Health, 10000f);
             victim.CurrentHealth = 10000f;
 
-            ability.ApplyImpactRiders(new AbilityImpact(caster, victim, Mock.Of<IBattleField>(), Damage: 100f)
+            ability.ApplyImpactRiders(new AbilityImpact(caster, victim, Mock.Of<IBattleField>(), Damage: DamageSnapshot.Of(DamageType.Physical, 100f))
             {
                 Source = ability,
                 Kind = ImpactKind.Attack

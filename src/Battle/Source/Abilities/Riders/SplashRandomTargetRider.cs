@@ -31,7 +31,7 @@ namespace Battle.Source.Abilities.Riders
 
             var splashTarget = enemies[CombatRandom.Rolls.RandIntRange(0, enemies.Count - 1)];
             var damageContext = new DamageContext { Source = impact.Caster, Cause = DamageCause.Ability };
-            damageContext.Add(DamageType.Physical, impact.Damage * share);
+            damageContext.Add(DamageType.Physical, impact.Damage.Total * share);
             await splashTarget.TakeDamage(damageContext);
         }
     }

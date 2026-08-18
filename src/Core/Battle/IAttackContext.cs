@@ -1,6 +1,7 @@
 namespace Core.Battle
 {
     using System.Collections.Generic;
+    using Context;
     using Enums;
     using Entity;
     using Godot;
@@ -31,11 +32,12 @@ namespace Core.Battle
         float RawAccuracy { get; set; }
 
         /// <summary>
-        ///  <c>TakeDamage</c>: overwritten with the damage actually dealt to the target
+        ///  <c>TakeDamage</c>: overwritten with the damage actually dealt to the target, split by type
         /// (post incoming-mitigation, barrier-absorbed portion included). Post-attack reactions
-        /// (leech, damage-scaled DoTs, splash) should read it after the hit is applied.
+        /// (leech, damage-scaled DoTs, splash) should read it after the hit is applied — the whole blow
+        /// through <see cref="DamageSnapshot.Total"/>, one kind of it through the indexer.
         /// </summary>
-        float FinalDamage { get; set; }
+        DamageSnapshot FinalDamage { get; set; }
 
         bool IsCritical { get; set; }
         bool ForceCriticalAttack { get; set; }

@@ -242,7 +242,7 @@ namespace LastBreathTest.BattleSystemTests
             /// pipeline hands one over, and the stack it left behind.</summary>
             internal async Task<IEffect> PoisonOneSwing(Brawler caster, Brawler victim)
             {
-                await Ability.ApplyImpactRiders(new AbilityImpact(caster.Object, victim.Object, Mock.Of<IBattleField>(), Damage: Blow)
+                await Ability.ApplyImpactRiders(new AbilityImpact(caster.Object, victim.Object, Mock.Of<IBattleField>(), Damage: DamageSnapshot.Of(DamageType.Physical, Blow))
                 {
                     Source = Ability,
                     Kind = ImpactKind.Attack
@@ -317,7 +317,7 @@ namespace LastBreathTest.BattleSystemTests
                     .Returns((IAttackContext context) =>
                     {
                         context.Result = AttackResults.Succeed;
-                        context.FinalDamage = context.TotalDamage;
+                        context.FinalDamage = DamageSnapshot.From(context.DamageComponents);
                         context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
                         return Task.CompletedTask;
                     });

@@ -108,6 +108,11 @@ namespace Core.Data.AbilityData
         /// <summary>Attack modifier the behaviour installs, named out of the modifier registry.</summary>
         [JsonProperty("attackModifier")] public string AttackModifier { get; init; } = string.Empty;
 
+        /// <summary>Says the damage-over-time effect this record lays pools the WHOLE blow instead of the
+        /// component its kind feeds on — what a record declares when it burns for a share of any hit rather
+        /// than for a share of the fire in one. Absent, the effect's own kind decides, as it does everywhere.</summary>
+        [JsonProperty("poolFromWholeHit")] public bool PoolFromWholeHit { get; init; }
+
         /// <summary>Properties whose value is taken from the HOST ability instead of the record: property
         /// key to a shared <see cref="Battle.Abilities.AbilityParameter"/> name, read decorated at the
         /// moment of use. The record still carries a number for each — what the ability does not own it

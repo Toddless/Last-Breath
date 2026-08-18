@@ -34,7 +34,7 @@ namespace Core.Context
         // forgot the damage, leaving it 0 — every crit from them dealt FinalDamage × 0 = 0.
         public float RawCriticalDamage { get; set; } = attacker.Parameters.CriticalDamage;
         public float RawAccuracy { get; set; } = attacker.Parameters.Accuracy;
-        public float FinalDamage { get; set; }
+        public DamageSnapshot FinalDamage { get; set; }
         public bool IsCritical { get; set; }
         // Необходимо как-то убедиться, что единожды выставленный чек не будет впоследствии изменен.
         public bool ForceCriticalAttack { get; set; }

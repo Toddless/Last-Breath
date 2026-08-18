@@ -20,7 +20,7 @@
                 foreach (var stack in originalStacks)
                 {
                     var clone = (DamageOverTurnEffect)stack.Copy();
-                    clone.Apply(new EffectApplyingContext { Caster = owner, Target = enemy, Source = source, Damage = stack.DamagePerTick });
+                    clone.Apply(new EffectApplyingContext { Caster = owner, Target = enemy, Source = source });
                 }
             }
 

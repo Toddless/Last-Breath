@@ -7,6 +7,7 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source.Effects;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Data.CombatRulesData;
     using Core.Data.GameData;
     using Core.Entity;
@@ -76,7 +77,7 @@ namespace LastBreathTest.BattleSystemTests
                 Caster = caster.Object,
                 Target = bearer.Object,
                 Source = "Test_Buff",
-                Damage = 0f
+                Damage = default
             });
             Assert.AreEqual(BuffTurns, buff.Duration, "the buff never landed, so the crits below prove nothing");
             int budget = buff.ExtensionBudget;
@@ -167,7 +168,7 @@ namespace LastBreathTest.BattleSystemTests
                 Caster = (caster ?? new Fighter()).Object,
                 Target = (victim ?? new Fighter()).Object,
                 Source = "Test_Poison",
-                Damage = 100f
+                Damage = DamageSnapshot.Of(DamageType.Physical, 100f)
             });
 
             Assert.AreEqual(PoisonTurns, poison.Duration, "the poison never landed, so the extensions below prove nothing");

@@ -130,7 +130,7 @@ namespace LastBreathTest.BattleSystemTests
             AbilityImpact? hit = seen.Find(impact => impact.Kind == ImpactKind.Hit);
             Assert.IsNotNull(hit, "the cast's target was never reported to the riders");
             Assert.IsTrue(hit.IsCritical, "a critical blow reached the riders as a plain one");
-            Assert.AreEqual(Health - target.CurrentHealth, hit.Damage, 0.0001f,
+            Assert.AreEqual(Health - target.CurrentHealth, hit.Damage.Total, 0.0001f,
                 "the impact reported a different number than the target actually lost");
         }
 

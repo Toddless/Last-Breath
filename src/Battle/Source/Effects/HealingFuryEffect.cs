@@ -19,7 +19,7 @@
         {
             if (evt.Context.Result is not AttackResults.Succeed) return;
 
-            _damageDealt += evt.Context.FinalDamage;
+            _damageDealt += evt.Context.FinalDamage.Total;
         }
 
         public override void Remove()

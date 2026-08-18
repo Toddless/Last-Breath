@@ -120,7 +120,7 @@ namespace Battle.Source.Abilities.IceAegis
             {
                 _ = new FreezeEffect((int)this[Parameters.FreezeDuration])
                     .Apply(Laying(enemy));
-                _ = ApplyImpactRiders(new AbilityImpact(owner, enemy, field, Succeeded: true, IsCritical: false, Damage: 0)
+                _ = ApplyImpactRiders(new AbilityImpact(owner, enemy, field, Succeeded: true, IsCritical: false)
                 {
                     Source = this,
                     Kind = ImpactKind.Splash

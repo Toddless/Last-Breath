@@ -68,7 +68,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
             // The cast reached a target of its own list and set his poison off on him — the same road
             // every other direct delivery walks, so the same kind. It carried the whole burst and could
             // even execute him, and until this call it was the one delivery that told no rider anything.
-            await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, context.TotalDamage)
+            await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, IsCritical: false, DamageSnapshot.From(context))
             {
                 Source = this,
                 Kind = ImpactKind.Hit
@@ -77,7 +77,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
             foreach (IFightable caught in SpreadMode?.SpreadPoison(poisonStacks, target, owner, field, InstanceId) ?? [])
                 // Nobody aimed at him: he caught the poison only because somebody else's stacks went off,
                 // which is what splash is for. No damage of its own — a landing does not need one.
-                await ApplyImpactRiders(new AbilityImpact(owner, caught, field, Succeeded: true, IsCritical: false, Damage: 0)
+                await ApplyImpactRiders(new AbilityImpact(owner, caught, field, Succeeded: true, IsCritical: false)
                 {
                     Source = this,
                     Kind = ImpactKind.Splash
