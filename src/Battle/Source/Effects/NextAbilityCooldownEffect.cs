@@ -15,6 +15,8 @@ namespace Battle.Source.Effects
     {
         private OneShotCooldownIncrease? _modifier;
 
+        public override bool IsHarmful => true;
+
         public float Amount => amount;
 
         public override async Task Apply(EffectApplyingContext context)

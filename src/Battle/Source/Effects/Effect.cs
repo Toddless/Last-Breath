@@ -47,6 +47,12 @@
             return ceiling == null ? requested : Math.Min(requested, ceiling.Value);
         }
 
+        /// <summary>The strength the canon gives this id, read the same way and for the same reasons as
+        /// <see cref="Capped"/>: at construction, so every copy of every stack answers one number, and out
+        /// of the composition, so an effect built where no canon was loaded is simply weak.</summary>
+        private static EffectPower PowerOf(string effectId) =>
+            GameServiceProvider.TryGet<IEffectProvider>()?.PowerOf(effectId) ?? EffectPower.Weak;
+
         protected EffectApplyingContext? Context { get; private set; }
 
         /// <summary>True when the stacking rules actually accepted this instance (see EffectsComponent).</summary>
@@ -58,6 +64,9 @@
 
         /// <summary>Buff/debuff split for the UI counters; debuff classes override to true.</summary>
         public virtual bool IsHarmful => false;
+
+        /// <summary>What strength of dispel takes this effect off, as the canon names it.</summary>
+        public virtual EffectPower Power { get; } = PowerOf(id);
 
         public Texture2D? Icon
         {

@@ -70,7 +70,13 @@
         public void RemoveEffectBySource(string source)
         {
             _effectsBySource.TryGetValue(source, out List<IEffect>? effects);
-            foreach (var effect in effects ?? [])
+            foreach (var effect in effects?.ToList() ?? [])
+                effect.Remove();
+        }
+
+        public void Dispel(EffectPower strength, DispelScope scope)
+        {
+            foreach (var effect in _orderedEffects.Where(effect => IsDispelled(effect, strength, scope)).ToList())
                 effect.Remove();
         }
 
@@ -107,6 +113,17 @@
         }
 
         private List<IEffect> GetEffects() => [.. _orderedEffects];
+
+        /// <summary>A dispel takes an effect no stronger than itself and never an absolute one, and only
+        /// within the half of the list it was aimed at.</summary>
+        private static bool IsDispelled(IEffect effect, EffectPower strength, DispelScope scope) =>
+            effect.Power != EffectPower.Absolute
+            && effect.Power <= strength
+            && (scope == DispelScope.Target) == IsBuff(effect);
+
+        /// <summary>Buffs are what neither harms nor damages: an effect ticking damage belongs with the
+        /// debuffs whether or not it was flagged harmful, and anything unflagged is a buff.</summary>
+        private static bool IsBuff(IEffect effect) => !effect.IsHarmful && effect is not IDamageOverTurnEffect;
 
         private async Task ApplyDotDamage()
         {

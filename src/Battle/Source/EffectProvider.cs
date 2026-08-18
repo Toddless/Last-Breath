@@ -6,6 +6,7 @@ namespace Battle.Source
     using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Data;
     using Core.Data.EffectsData;
     using Core.Data.GameData;
     using Core.Enums;
@@ -157,6 +158,9 @@ namespace Battle.Source
         /// <summary>Canonical numbers per effect id, as loaded from SharedData/Effects.</summary>
         private readonly Dictionary<string, IReadOnlyDictionary<string, float>> _canon = new(StringComparer.Ordinal);
 
+        /// <summary>Canonical strength per effect id; ids absent from here are weak, as most effects are.</summary>
+        private readonly Dictionary<string, EffectPower> _powers = new(StringComparer.Ordinal);
+
         /// <summary>The pairing of registry and canon is reported once, on first use: loading walks file
         /// by file, and a catalog of several files would be judged half-read at the end of the first.</summary>
         private bool _pairingReported;
@@ -199,7 +203,10 @@ namespace Battle.Source
                     continue;
                 }
 
+                if (!TryReadPower(definition, out EffectPower power)) continue;
+
                 _canon[definition.Id] = new Dictionary<string, float>(definition.Properties, StringComparer.Ordinal);
+                _powers[definition.Id] = power;
             }
 
             // A second file may complete the pairing, so the verdict is postponed until first use.
@@ -211,6 +218,8 @@ namespace Battle.Source
             && canon.TryGetValue("maxStacks", out float ceiling)
                 ? (int)ceiling
                 : null;
+
+        public EffectPower PowerOf(string effectId) => _powers.GetValueOrDefault(effectId, EffectPower.Weak);
 
         public IReadOnlyCollection<string>? KeysOf(string effectId) =>
             s_factories.TryGetValue(effectId, out EffectFactory? factory) ? [.. factory.Keys] : null;
@@ -239,6 +248,23 @@ namespace Battle.Source
             }
 
             return factory.Build(new RecordProperties(id, numbers));
+        }
+
+        /// <summary>The strength the row names, or Weak when it names none. A name that parses into nothing
+        /// refuses the whole row: an unreadable strength must not pass for the default one.</summary>
+        private static bool TryReadPower(EffectDefinitionData definition, out EffectPower power)
+        {
+            try
+            {
+                power = EnumParser.ParseEnumOrDefault<EffectPower>(definition.Power);
+                return true;
+            }
+            catch (FormatException exception)
+            {
+                Tracker.TrackError($"Canonical row '{definition.Id}' not taken: {exception.Message}");
+                power = EffectPower.Weak;
+                return false;
+            }
         }
 
         /// <summary>

@@ -18,22 +18,27 @@
         },
         {
             "id": "Effect_Seal_Of_Slowness",
-            "properties": { "duration": 3, "maxStacks": 3, "amount": 1 }
+            "power": "Absolute",
+            "properties": { "duration": 3, "maxStacks": 1, "amount": 1 }
         },
         {
             "id": "Effect_Seal_Of_Silence",
+            "power": "Absolute",
             "properties": { "duration": 3, "maxStacks": 1 }
         },
         {
             "id": "Effect_Seal_Of_Oblivion",
+            "power": "Absolute",
             "properties": { "duration": 3, "maxStacks": 1 }
         },
         {
             "id": "Effect_Seal_Of_Blood",
+            "power": "Absolute",
             "properties": { "duration": 3, "maxStacks": 1 }
         },
         {
             "id": "Effect_Seal_Of_Spirit",
+            "power": "Absolute",
             "properties": { "duration": 3, "maxStacks": 1 }
         },
         {

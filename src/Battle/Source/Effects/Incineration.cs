@@ -9,6 +9,8 @@ namespace Battle.Source.Effects
     public class Incineration(int duration)
         : Effect(id: "Effect_Incineration", duration, maxStacks: 1, statusEffect: StatusEffects.Cursed)
     {
+        public override bool IsHarmful => true;
+
         public override async Task Apply(EffectApplyingContext context)
         {
             await base.Apply(context);

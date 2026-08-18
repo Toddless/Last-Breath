@@ -27,7 +27,8 @@ namespace LastBreathTest.BattleSystemTests
             ["Effect_Burning_Fury"] = (3, 1, [("healthPercent", 0.05f), ("burnDamage", 0.75f), ("burningDuration", 3f), ("burningMaxStacks", 999f)]),
             ["Effect_Primal_Fury"] = (3, 1, [("healthPercent", 0.05f), ("damageMultiplier", 1.35f)]),
             ["Effect_Healing_Fury"] = (3, 1, [("healthPercent", 0.05f), ("healAmount", 0.15f)]),
-            ["Effect_Seal_Of_Slowness"] = (3, 3, [("amount", 1f)]),
+            // One stack, like every other seal: a seal changes a rule rather than piling up.
+            ["Effect_Seal_Of_Slowness"] = (3, 1, [("amount", 1f)]),
             ["Effect_Seal_Of_Silence"] = (3, 1, []),
             ["Effect_Seal_Of_Oblivion"] = (3, 1, []),
             ["Effect_Seal_Of_Blood"] = (3, 1, []),
@@ -160,6 +161,32 @@ namespace LastBreathTest.BattleSystemTests
                 canon["Effect_Burning_Fury"]["burnDamage"],
                 "the Burning Fury's share of burned health now equals the Burning tick's share of dealt "
                 + "damage — check they were not merged: they measure different things");
+        }
+
+        [TestMethod]
+        public void EveryRowTheFileCarriesIsActuallyTakenByTheProvider()
+        {
+            // The walks above read the file straight, which is the point of them — but it also means a row
+            // the provider REFUSED as it read (a key nothing reads, a strength that parses into nothing,
+            // "Strogn") still counts as canon to them, while the effect it balances quietly falls back on
+            // whatever a record happens to carry. This is the same file seen from the other side: what was
+            // actually taken, named row by row.
+            var provider = Loaded();
+            List<string> dropped = [];
+
+            foreach ((string id, IReadOnlyDictionary<string, float> figures) in Canon())
+            {
+                if (provider.CreateEffect(id, RecordProperties.Empty) == null)
+                {
+                    dropped.Add($"{id}: the file carries a row, the provider builds nothing from it");
+                    continue;
+                }
+
+                if (figures.TryGetValue("maxStacks", out float stacks) && provider.StackCeilingOf(id) != (int)stacks)
+                    dropped.Add($"{id}: the provider answers a stack ceiling the file does not carry");
+            }
+
+            Assert.AreEqual(0, dropped.Count, $"canonical rows lost between the file and the provider:\n  {string.Join("\n  ", dropped)}");
         }
 
         [TestMethod]

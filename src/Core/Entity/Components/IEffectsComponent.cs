@@ -31,5 +31,10 @@
         void RemoveEffectByStatus(StatusEffects status);
         void RemoveAllEffects();
         void RemoveEffectBySource(string source);
+
+        /// <summary>Strips the effects a dispel of this strength reaches: it takes everything at or below
+        /// its own <see cref="EffectPower"/> and never an absolute effect. <see cref="DispelScope.Self"/>
+        /// takes damaging effects and debuffs, <see cref="DispelScope.Target"/> takes buffs.</summary>
+        void Dispel(EffectPower strength, DispelScope scope);
     }
 }

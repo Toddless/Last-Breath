@@ -22,6 +22,10 @@
         /// override. Unclassified effects count as buffs until the design pass says otherwise.</summary>
         bool IsHarmful => false;
 
+        /// <summary>What strength of dispel can take this effect off. Weak unless the canon names the
+        /// effect stronger; seals are absolute and no dispel takes them.</summary>
+        EffectPower Power => EffectPower.Weak;
+
         event Action<int>? DurationChanged;
 
         Task Apply(EffectApplyingContext context);

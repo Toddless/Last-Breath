@@ -23,5 +23,9 @@ namespace Core.Battle.Abilities
         /// deliberately leaves out — a state of an ability rather than a figure anybody balances (§4f).
         /// What a cast LAYS is held to this, however high a record drives the ability's own stacks key.</summary>
         int? StackCeilingOf(string effectId);
+
+        /// <summary>The strength the canon gives an effect; Weak for an id it carries no row for, which
+        /// is also what every effect is until a row names it otherwise.</summary>
+        EffectPower PowerOf(string effectId);
     }
 }

@@ -15,6 +15,10 @@ namespace Core.Data.EffectsData
     {
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
 
+        /// <summary>Optional strength against dispelling (<c>EffectPower</c>); absent means Weak.
+        /// A string beside the numbers rather than among them: the properties are figures a factory reads.</summary>
+        [JsonProperty("power")] public string? Power { get; init; }
+
         [JsonProperty("properties")] public IReadOnlyDictionary<string, float> Properties { get; init; } =
             new Dictionary<string, float>();
     }
