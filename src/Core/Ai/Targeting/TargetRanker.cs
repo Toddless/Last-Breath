@@ -29,8 +29,8 @@ namespace Core.Ai.Targeting
 
         private static float ScoreEnemy(IFightable enemy, IReadOnlyList<IFightable> all)
         {
-            float maxDamage = all.Max(candidate => candidate.Parameters.Damage);
-            float threat = maxDamage <= 0 ? 0f : enemy.Parameters.Damage / maxDamage;
+            float maxDamage = all.Max(candidate => candidate.Parameters.PhysicalDamage);
+            float threat = maxDamage <= 0 ? 0f : enemy.Parameters.PhysicalDamage / maxDamage;
             return (1f - CombatBlackboard.HealthRatio(enemy)) * MissingHealthWeight + threat * ThreatWeight;
         }
     }

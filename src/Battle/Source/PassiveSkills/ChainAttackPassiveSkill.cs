@@ -23,7 +23,7 @@
             if (@event.Context.Result is not AttackResults.Succeed) return;
             if (!ChanceRoll.Roll(Owner.Parameters.AdditionalHit, @event.Context.Rnd, Owner.Parameters.GetChanceLuck(EntityParameter.AdditionalHitChance))) return;
             @event.Context.CreateReaction(Owner, @event.Context.Target,
-                Owner.Parameters.Damage * @event.Context.Rnd.RandfRange(0.9f, 1.1f)).Schedule();
+                Owner.Parameters.PhysicalDamage * @event.Context.Rnd.RandfRange(0.9f, 1.1f)).Schedule();
         }
 
         public override void Detach(IFightable owner) => owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);

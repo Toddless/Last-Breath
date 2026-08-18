@@ -25,8 +25,8 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
                 // silently swallowed the bought attack-count upgrades.
                 for (int i = 0; i < attacks; i++)
                 {
-                    float additionalDamage = ability.Damage + ((owner.Parameters.Damage * ability.WeaponDamageScale) + (owner.Parameters.SpellDamage * ability.SpellDamageScale));
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, CombatRandom.Attacks!, window.Scheduler)
+                    float additionalDamage = ability.Damage + ((owner.Parameters.PhysicalDamage * ability.WeaponDamageScale) + (owner.Parameters.SpellDamage * ability.SpellDamageScale));
+                    var context = new AttackContext(owner, target, owner.Parameters.PhysicalDamage, CombatRandom.Attacks!, window.Scheduler)
                     {
                         Index = i,
                         TotalCount = attacks, // the rolled series length — "last hit" logic keys off it

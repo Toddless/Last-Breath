@@ -289,7 +289,7 @@ namespace Battle.Internal.Player
         {
         }
 
-        public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.Damage;
+        public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.PhysicalDamage;
 
         public void SetupBattleEventBus(IBattleEventBus bus)
         {

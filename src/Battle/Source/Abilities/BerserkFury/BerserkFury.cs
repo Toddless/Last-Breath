@@ -66,8 +66,8 @@ namespace Battle.Source.Abilities.BerserkFury
                 int attackIndex = 0;
                 while (owner.CurrentHealth > 1 && target.IsAlive)
                 {
-                    float additionalDamage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, CombatRandom.Attacks!, window.Scheduler)
+                    float additionalDamage = Damage + (owner.Parameters.PhysicalDamage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
+                    var context = new AttackContext(owner, target, owner.Parameters.PhysicalDamage, CombatRandom.Attacks!, window.Scheduler)
                     {
                         Index = attackIndex++,
                         SourceAbilityId = Id

@@ -54,7 +54,7 @@ namespace Battle.Source.Abilities.JarOfPoison
 
         private async Task ApplyPoison(IFightable owner, IFightable target)
         {
-            float damage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
+            float damage = Damage + (owner.Parameters.PhysicalDamage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
 
             // The jar deals no blow of its own: the poison feeds on the figure the ability authors.
             EffectApplyingContext context = Laying(target) with { Damage = DamageSnapshot.Of(DamageType.Poison, damage) };

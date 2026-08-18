@@ -103,8 +103,8 @@
             "id": "abilityunlock_Dark_Shroud_1",
             "kind": "AbilityUnlock",
             "stance": "Dexterity",
-            "x": -148.0,
-            "y": 18.0,
+            "x": -153.0,
+            "y": 3.0,
             "title": "Dark Shroud",
             "description": "Цель: на себя. \nСтоимость: 100 маны. \nПерезарядка: 5.\nАктивация накладывает 5 стаков Лёгкого шага. В течении трех ходов восстанавливает 5% здоровья в начале хода.",
             "abilityId": "Ability_Dark_Shroud"
@@ -747,8 +747,8 @@
             "id": "notable_crit_chance_9",
             "kind": "Notable",
             "stance": "Dexterity",
-            "x": -236.0,
-            "y": 47.0,
+            "x": -209.0,
+            "y": 43.0,
             "title": "Critical Chance",
             "modifiers": [
                 {
@@ -874,8 +874,8 @@
             "id": "notable_evade_suppress_1",
             "kind": "Notable",
             "stance": "Dexterity",
-            "x": -150.0,
-            "y": 97.0,
+            "x": -111.0,
+            "y": 130.0,
             "title": "Evade|Suppress",
             "modifiers": [
                 {
@@ -966,8 +966,8 @@
             "id": "notable_health_2",
             "kind": "Notable",
             "stance": "Dexterity",
-            "x": -52.0,
-            "y": 84.0,
+            "x": -30.0,
+            "y": 86.0,
             "title": "Health",
             "modifiers": [
                 {
@@ -1144,8 +1144,8 @@
             "kind": "Notable",
             "stance": "Dexterity",
             "hybridStance": "Intelligence",
-            "x": -53.0,
-            "y": 153.0,
+            "x": -40.0,
+            "y": 145.0,
             "title": "Mana|Health",
             "modifiers": [
                 {
@@ -3356,8 +3356,8 @@
             "id": "small_crit_chance_28",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -228.0,
-            "y": 20.0,
+            "x": -191.0,
+            "y": 14.0,
             "title": "Critical Chance",
             "modifiers": [
                 {
@@ -3371,8 +3371,8 @@
             "id": "small_crit_chance_29",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -241.0,
-            "y": 31.0,
+            "x": -207.0,
+            "y": 19.0,
             "title": "Critical Chance",
             "modifiers": [
                 {
@@ -3386,8 +3386,8 @@
             "id": "small_crit_chance_30",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -224.0,
-            "y": 36.0,
+            "x": -191.0,
+            "y": 34.0,
             "title": "Critical Chance",
             "modifiers": [
                 {
@@ -3401,7 +3401,7 @@
             "id": "small_crit_chance_31",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -220.0,
+            "x": -190.0,
             "y": 51.0,
             "title": "Critical Chance",
             "modifiers": [
@@ -3416,8 +3416,8 @@
             "id": "small_crit_chance_32",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -208.0,
-            "y": 39.0,
+            "x": -173.0,
+            "y": 44.0,
             "title": "Critical Chance",
             "modifiers": [
                 {
@@ -4199,8 +4199,8 @@
             "id": "small_dexterity_2",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -117.0,
-            "y": 47.0,
+            "x": -133.0,
+            "y": 77.0,
             "title": "Attribute",
             "modifiers": [
                 {
@@ -4229,8 +4229,8 @@
             "id": "small_dexterity_3",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -118.0,
-            "y": 86.0,
+            "x": -92.0,
+            "y": 110.0,
             "title": "Attribute",
             "modifiers": [
                 {
@@ -4244,8 +4244,8 @@
             "id": "small_dexterity_4",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -183.0,
-            "y": 29.0,
+            "x": -166.0,
+            "y": 22.0,
             "title": "Attribute",
             "modifiers": [
                 {
@@ -4384,8 +4384,8 @@
             "id": "small_evade_5",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -155.0,
-            "y": 83.0,
+            "x": -116.0,
+            "y": 116.0,
             "title": "Evade",
             "modifiers": [
                 {
@@ -4525,8 +4525,8 @@
             "id": "small_evade_suppress_1",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -142.0,
-            "y": 87.0,
+            "x": -103.0,
+            "y": 120.0,
             "title": "Evade|Suppress",
             "modifiers": [
                 {
@@ -4545,8 +4545,8 @@
             "id": "small_evasion_6",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -166.0,
-            "y": 90.0,
+            "x": -127.0,
+            "y": 123.0,
             "title": "Evade",
             "modifiers": [
                 {
@@ -4560,8 +4560,8 @@
             "id": "small_evasion_7",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -165.0,
-            "y": 107.0,
+            "x": -126.0,
+            "y": 140.0,
             "title": "Evade",
             "modifiers": [
                 {
@@ -4832,8 +4832,8 @@
             "id": "small_health_12",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -71.0,
-            "y": 52.0,
+            "x": -49.0,
+            "y": 54.0,
             "title": "Health",
             "modifiers": [
                 {
@@ -4852,8 +4852,8 @@
             "id": "small_health_13",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -87.0,
-            "y": 78.0,
+            "x": -65.0,
+            "y": 80.0,
             "title": "Health",
             "modifiers": [
                 {
@@ -4932,8 +4932,8 @@
             "id": "small_health_6",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -72.0,
-            "y": 91.0,
+            "x": -50.0,
+            "y": 93.0,
             "title": "Health",
             "modifiers": [
                 {
@@ -4952,8 +4952,8 @@
             "id": "small_health_7",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -80.0,
-            "y": 63.0,
+            "x": -58.0,
+            "y": 65.0,
             "title": "Health",
             "modifiers": [
                 {
@@ -4972,8 +4972,8 @@
             "id": "small_health_8",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -56.0,
-            "y": 60.0,
+            "x": -34.0,
+            "y": 62.0,
             "title": "Health",
             "modifiers": [
                 {
@@ -6015,8 +6015,8 @@
             "kind": "Small",
             "stance": "Dexterity",
             "hybridStance": "Intelligence",
-            "x": -28.0,
-            "y": 173.0,
+            "x": -15.0,
+            "y": 165.0,
             "title": "Mana|Health",
             "modifiers": [
                 {
@@ -6036,8 +6036,8 @@
             "kind": "Small",
             "stance": "Dexterity",
             "hybridStance": "Intelligence",
-            "x": -60.0,
-            "y": 175.0,
+            "x": -47.0,
+            "y": 167.0,
             "title": "Mana|Health",
             "modifiers": [
                 {
@@ -6057,8 +6057,8 @@
             "kind": "Small",
             "stance": "Dexterity",
             "hybridStance": "Intelligence",
-            "x": -59.0,
-            "y": 163.0,
+            "x": -46.0,
+            "y": 155.0,
             "title": "Mana|Health",
             "modifiers": [
                 {
@@ -6078,8 +6078,8 @@
             "kind": "Small",
             "stance": "Dexterity",
             "hybridStance": "Intelligence",
-            "x": -76.0,
-            "y": 166.0,
+            "x": -63.0,
+            "y": 158.0,
             "title": "Mana|Health",
             "modifiers": [
                 {
@@ -6099,8 +6099,8 @@
             "kind": "Small",
             "stance": "Dexterity",
             "hybridStance": "Intelligence",
-            "x": -75.0,
-            "y": 140.0,
+            "x": -62.0,
+            "y": 132.0,
             "title": "Mana|Health",
             "modifiers": [
                 {
@@ -7481,8 +7481,8 @@
             "id": "small_suppress_1",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -132.0,
-            "y": 98.0,
+            "x": -93.0,
+            "y": 131.0,
             "title": "Suppress",
             "modifiers": [
                 {
@@ -7496,8 +7496,8 @@
             "id": "small_suppress_2",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -136.0,
-            "y": 110.0,
+            "x": -97.0,
+            "y": 143.0,
             "title": "Suppress",
             "modifiers": [
                 {
@@ -7611,8 +7611,8 @@
             "id": "small_suppress_3",
             "kind": "Small",
             "stance": "Dexterity",
-            "x": -154.0,
-            "y": 114.0,
+            "x": -115.0,
+            "y": 147.0,
             "title": "Suppress",
             "modifiers": [
                 {
@@ -7797,8 +7797,8 @@
             "id": "sockettier2_Series_of_Attacks_1",
             "kind": "SocketTier2",
             "stance": "Dexterity",
-            "x": -121.0,
-            "y": 126.0,
+            "x": -98.0,
+            "y": 80.0,
             "title": "Augmentation Slot (T2)",
             "abilityId": "Ability_Series_Of_Attacks"
         },
@@ -9151,12 +9151,12 @@
             "to": "small_crit_chance_32"
         },
         {
-            "from": "small_crit_chance_31",
-            "to": "small_crit_chance_32"
+            "from": "small_crit_chance_30",
+            "to": "small_dexterity_4"
         },
         {
-            "from": "small_crit_chance_32",
-            "to": "small_dexterity_4"
+            "from": "small_crit_chance_31",
+            "to": "small_crit_chance_32"
         },
         {
             "from": "small_critical_chance_1",
@@ -9367,6 +9367,10 @@
             "to": "small_evade_1"
         },
         {
+            "from": "small_dexterity_1",
+            "to": "small_health_7"
+        },
+        {
             "from": "small_dexterity_10",
             "to": "small_dexterity_11"
         },
@@ -9436,7 +9440,11 @@
         },
         {
             "from": "small_dexterity_2",
-            "to": "small_health_7"
+            "to": "small_dexterity_4"
+        },
+        {
+            "from": "small_dexterity_2",
+            "to": "small_dexterity_5"
         },
         {
             "from": "small_dexterity_21",
@@ -9445,10 +9453,6 @@
         {
             "from": "small_dexterity_21",
             "to": "sockettier3_Poison_Explosion_1"
-        },
-        {
-            "from": "small_dexterity_3",
-            "to": "small_dexterity_4"
         },
         {
             "from": "small_dexterity_3",
@@ -9461,10 +9465,6 @@
         {
             "from": "small_dexterity_3",
             "to": "sockettier2_Series_of_Attacks_1"
-        },
-        {
-            "from": "small_dexterity_4",
-            "to": "small_dexterity_5"
         },
         {
             "from": "small_dexterity_5",

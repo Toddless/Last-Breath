@@ -81,7 +81,7 @@ namespace Battle.Source.Abilities
 
         protected float CalculateHitDamage(DamagingCastPlan plan, IFightable owner) =>
             plan.Damage
-            + owner.Parameters.Damage * plan.WeaponDamageScale
+            + owner.Parameters.PhysicalDamage * plan.WeaponDamageScale
             + owner.Parameters.SpellDamage * plan.SpellDamageScale;
 
     }

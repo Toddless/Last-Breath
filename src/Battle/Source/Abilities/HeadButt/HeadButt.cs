@@ -43,8 +43,8 @@ namespace Battle.Source.Abilities.HeadButt
                 for (int i = 0; i < Attacks; i++)
                 {
                     if (!target.IsAlive) break;
-                    float additionalDamage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, CombatRandom.Attacks!, window.Scheduler)
+                    float additionalDamage = Damage + (owner.Parameters.PhysicalDamage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
+                    var context = new AttackContext(owner, target, owner.Parameters.PhysicalDamage, CombatRandom.Attacks!, window.Scheduler)
                     {
                         Index = i,
                         TotalCount = Attacks,

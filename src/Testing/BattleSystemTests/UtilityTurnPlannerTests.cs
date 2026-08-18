@@ -188,7 +188,7 @@ namespace LastBreathTest.BattleSystemTests
             var parameters = new Mock<IEntityParametersComponent>();
             parameters.SetupGet(p => p.MaxHealth).Returns(maxHealth);
             parameters.SetupGet(p => p.MaxMana).Returns(500f);
-            parameters.SetupGet(p => p.Damage).Returns(damage);
+            parameters.SetupGet(p => p.PhysicalDamage).Returns(damage);
 
             var fighter = new Mock<IFightable>();
             fighter.SetupGet(f => f.Parameters).Returns(parameters.Object);

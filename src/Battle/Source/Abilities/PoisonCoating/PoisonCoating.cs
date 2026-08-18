@@ -28,6 +28,8 @@ namespace Battle.Source.Abilities.PoisonCoating
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
+            // TODO:
+            // Вынести магические цифры в статичный класс с константами для дефолтных значений
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterAppliedDuration(AbilityParameter.PoisonDuration, 5);
@@ -45,9 +47,7 @@ namespace Battle.Source.Abilities.PoisonCoating
                 poisonDuration: PoisonDuration,
                 poisonDamagePercent: PoisonDamagePercent);
 
-            coatingBuff.Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
-
-            return Task.CompletedTask;
+            return coatingBuff.Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
         }
     }
 }

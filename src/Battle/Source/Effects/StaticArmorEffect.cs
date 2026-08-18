@@ -73,7 +73,7 @@ namespace Battle.Source.Effects
             if (owner == null || !victim.IsAlive) return;
 
             float damage = settings.Damage
-                           + owner.Parameters.Damage * settings.WeaponScale
+                           + owner.Parameters.PhysicalDamage * settings.WeaponScale
                            + owner.Parameters.SpellDamage * settings.SpellScale;
 
             float dealt = DealDetonationDamage(owner, victim, damage);

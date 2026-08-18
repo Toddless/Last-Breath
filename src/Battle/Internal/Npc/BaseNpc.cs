@@ -677,7 +677,7 @@ namespace Battle.Internal.Npc
             _gameEventBus?.Publish(new TurnEndEvent());
         }
 
-        public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.Damage;
+        public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.PhysicalDamage;
 
         public void SetupBattleEventBus(IBattleEventBus bus)
         {

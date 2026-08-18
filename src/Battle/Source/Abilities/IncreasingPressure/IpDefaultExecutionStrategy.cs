@@ -19,7 +19,7 @@
                 {
                     if (!target.IsAlive) break;
                     float additionalDamage = ability.BonusDamage(owner) * increase;
-                    float damage = owner.Parameters.Damage * increase;
+                    float damage = owner.Parameters.PhysicalDamage * increase;
                     var context = new AttackContext(owner, target, damage, CombatRandom.Attacks!, window.Scheduler)
                     {
                         Index = i,

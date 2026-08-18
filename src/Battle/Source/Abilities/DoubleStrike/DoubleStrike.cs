@@ -77,7 +77,7 @@ namespace Battle.Source.Abilities.DoubleStrike
                 for (int strike = 0; strike < 2; strike++)
                 {
                     if (!target.IsAlive) break;
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, CombatRandom.Attacks!, window.Scheduler)
+                    var context = new AttackContext(owner, target, owner.Parameters.PhysicalDamage, CombatRandom.Attacks!, window.Scheduler)
                     {
                         Index = strike,
                         TotalCount = 2,
@@ -113,8 +113,8 @@ namespace Battle.Source.Abilities.DoubleStrike
         private float StrikeDamage(int strike, IFightable owner)
         {
             float abilityDamage = strike == 0
-                ? Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale)
-                : SecondDamage + (owner.Parameters.Damage * SecondWeaponScale) + (owner.Parameters.SpellDamage * SecondSpellScale);
+                ? Damage + (owner.Parameters.PhysicalDamage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale)
+                : SecondDamage + (owner.Parameters.PhysicalDamage * SecondWeaponScale) + (owner.Parameters.SpellDamage * SecondSpellScale);
             return abilityDamage * DamageMultiplier;
         }
 

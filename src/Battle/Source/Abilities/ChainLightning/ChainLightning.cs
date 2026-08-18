@@ -96,7 +96,7 @@ namespace Battle.Source.Abilities.ChainLightning
             var initial = plan.Targets.FirstOrDefault(t => t.IsAlive);
             if (initial == null) return;
 
-            float strikeDamage = plan.Damage + (owner.Parameters.Damage * plan.WeaponDamageScale) + (owner.Parameters.SpellDamage * plan.SpellDamageScale);
+            float strikeDamage = plan.Damage + (owner.Parameters.PhysicalDamage * plan.WeaponDamageScale) + (owner.Parameters.SpellDamage * plan.SpellDamageScale);
             IFightable? previous = null;
             int totalStrikes = 1 + plan.Jumps;
             for (int strike = 0; strike < totalStrikes; strike++)

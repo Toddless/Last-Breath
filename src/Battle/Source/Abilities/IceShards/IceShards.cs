@@ -115,7 +115,7 @@ namespace Battle.Source.Abilities.IceShards
             if (!hit.IsCritical) return;
 
             float damage = this[Parameters.ShrapnelDamage]
-                           + owner.Parameters.Damage * this[Parameters.ShrapnelWeaponDamageScale]
+                           + owner.Parameters.PhysicalDamage * this[Parameters.ShrapnelWeaponDamageScale]
                            + owner.Parameters.SpellDamage * this[Parameters.ShrapnelSpellDamageScale];
 
             foreach (IFightable enemy in field.GetEnemies(owner))

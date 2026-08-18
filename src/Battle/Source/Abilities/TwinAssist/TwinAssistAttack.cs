@@ -39,7 +39,7 @@ namespace Battle.Source.Abilities.TwinAssist
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
-            float damage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
+            float damage = Damage + (owner.Parameters.PhysicalDamage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
             foreach (IFightable target in HitSequence.GetHitSequence(owner, targets, field))
             {
                 if (!target.IsAlive) continue;

@@ -8,9 +8,7 @@
 
     public interface IEntityParametersComponent
     {
-        // TODO:
-        // Слишком абстрактно. Какой это урон? Оружия? Общий? решить позднее
-        float Damage { get; }
+        float PhysicalDamage { get; }
         float BlockChance { get; }
         float CriticalChance { get; }
         float AdditionalHit { get; }

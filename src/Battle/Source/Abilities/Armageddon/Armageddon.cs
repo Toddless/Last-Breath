@@ -139,9 +139,9 @@ namespace Battle.Source.Abilities.Armageddon
 
         private float StageDamage(int stage, IFightable owner) => stage switch
         {
-            1 => Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale),
-            2 => this[Parameters.SecondDamage] + (owner.Parameters.Damage * this[Parameters.SecondWeaponScale]) + (owner.Parameters.SpellDamage * this[Parameters.SecondSpellScale]),
-            _ => this[Parameters.ThirdDamage] + (owner.Parameters.Damage * this[Parameters.ThirdWeaponScale]) + (owner.Parameters.SpellDamage * this[Parameters.ThirdSpellScale])
+            1 => Damage + (owner.Parameters.PhysicalDamage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale),
+            2 => this[Parameters.SecondDamage] + (owner.Parameters.PhysicalDamage * this[Parameters.SecondWeaponScale]) + (owner.Parameters.SpellDamage * this[Parameters.SecondSpellScale]),
+            _ => this[Parameters.ThirdDamage] + (owner.Parameters.PhysicalDamage * this[Parameters.ThirdWeaponScale]) + (owner.Parameters.SpellDamage * this[Parameters.ThirdSpellScale])
         };
     }
 }

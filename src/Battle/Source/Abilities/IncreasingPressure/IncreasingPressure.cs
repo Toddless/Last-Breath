@@ -26,12 +26,12 @@ namespace Battle.Source.Abilities.IncreasingPressure
 
         /// <summary>The ability's bonus damage added on top of the owner's basic attack: flat + weapon- and spell-scaled.</summary>
         public float BonusDamage(IFightable owner) =>
-            Damage + owner.Parameters.Damage * WeaponDamageScale + owner.Parameters.SpellDamage * SpellDamageScale;
+            Damage + owner.Parameters.PhysicalDamage * WeaponDamageScale + owner.Parameters.SpellDamage * SpellDamageScale;
 
         /// <summary>Full damage of a single hit at the given escalation multiplier — the owner's basic weapon attack plus
         /// <see cref="BonusDamage"/>. Single source of truth for every execution strategy.</summary>
         public float PerHitDamage(IFightable owner, float increase) =>
-            (owner.Parameters.Damage + BonusDamage(owner)) * increase;
+            (owner.Parameters.PhysicalDamage + BonusDamage(owner)) * increase;
 
         public static class Parameters
         {
