@@ -6,6 +6,7 @@ namespace Core.Items
     using Data;
     using Entity.Components;
     using Enums;
+    using Grants;
     using Modifiers;
 
     public interface IEquipItemMinter
@@ -21,7 +22,7 @@ namespace Core.Items
     public sealed class EquipItemMinter(
         IEquipBlueprintProvider blueprints,
         IItemGameDataFactory factory,
-        Grants.IGrantFactory grants,
+        IGrantFactory grants,
         IModifierMaterializer materializer,
         IRandomNumberGenerator rnd) : IEquipItemMinter
     {
