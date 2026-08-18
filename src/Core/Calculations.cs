@@ -58,7 +58,7 @@
         /// Rules: Physical and Bleed — armor scaled by the source's armor penetration; Fire/Cold/Lightning —
         /// the matching resistance (fraction 0..1) scaled by the source's resistance penetration; Burning — fire
         /// resistance the same way (but the "attacks ignore resistances" flag never covers it — that mark is
-        /// attack-side); Pure and Poison pass through untouched.
+        /// attack-side); Sacred, Blight and Poison pass through untouched, each by its own named rule.
         /// Mitigated values are written back per component (<see cref="IDamageContext.Set"/>),
         /// so UI and statistics see the real post-mitigation damage split.
         /// <paramref name="rnd"/> is the stream the suppression roll burns. It is required rather than
@@ -124,8 +124,19 @@
             {
                 DamageType.Burning => ApplyResistance(damage, context.Source, target, s_resistanceByType[DamageType.Fire]),
                 DamageType.Physical or DamageType.Bleed => ApplyArmor(damage, context.Source, target),
-                _ => damage // Pure and Poison are unmitigated by design
+                // Sacred ignores armor and resistances; Blight damages health directly and neither cuts it;
+                // Poison is unmitigated by design (its counter-knobs are context modifiers).
+                DamageType.Sacred or DamageType.Blight or DamageType.Poison => damage,
+                _ => Unruled(type, damage)
             };
+        }
+
+        /// <summary>A type no rule names passes through and says so: staying silent would hand a typo
+        /// or a freshly added member the "reduced by nothing" of the sacred.</summary>
+        private static float Unruled(DamageType type, float damage)
+        {
+            Tracker.TrackNotFound($"Mitigation rule for damage type '{type}'");
+            return damage;
         }
 
         private static float ApplyResistance(float damage, IFightable source, IFightable target, (EntityParameter Resistance, EntityParameter Penetration) elemental)

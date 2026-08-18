@@ -624,7 +624,7 @@ namespace LastBreath.Npc
             Calculations.CalculateMitigation(context, this, CombatRolls);
 
             // Post-mitigation absorption layers (shield → barrier → stage guard); the leftover hits health.
-            float remaining = _damageChain.Apply(context, this, context.TotalDamage);
+            float remaining = _damageChain.Apply(context, this);
 
             // The damage event must precede the death event in the timeline: the director drops
             // "posthumous" beats, so a death recorded first swallowed its own killing hit

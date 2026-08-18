@@ -11,7 +11,7 @@ namespace LastBreathTest.BattleSystemTests
     /// <summary>Attack damage as a component dictionary (Physical seed + weapon elementals, crit per
     /// component) and the mitigation rules per damage type: elementals — resistance × source penetration;
     /// Physical and Bleed — armor; Burning — fire resistance regardless of the ignore-resists flag;
-    /// Pure and Poison pass untouched.</summary>
+    /// Sacred, Blight and Poison pass untouched — while type-agnostic reductions still cut them all.</summary>
     [TestClass]
     public class AttackDamageCompositionTests
     {
@@ -126,6 +126,35 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(100f, context.DamageComponents[DamageType.Poison]);
             Assert.AreEqual(100f, context.DamageComponents[DamageType.Sacred]);
+        }
+
+        [TestMethod]
+        public void Mitigation_SacredAndBlightAreCutByNeitherArmorNorResistances()
+        {
+            var target = Fighter(
+                (EntityParameter.Armor, ArmorScalingFactor),
+                (EntityParameter.FireResistance, 0.8f));
+            var context = Damage(Fighter(), DamageType.Sacred, 100f);
+            context.Add(DamageType.Blight, 100f);
+
+            Calculations.CalculateMitigation(context, target.Object, NoRolls);
+
+            Assert.AreEqual(100f, context.DamageComponents[DamageType.Sacred], 0.001f, "the sacred is reduced by nothing");
+            Assert.AreEqual(100f, context.DamageComponents[DamageType.Blight], 0.001f, "blight damages health directly");
+        }
+
+        [TestMethod]
+        public void Blight_IsStillCutByTypeAgnosticReductions()
+        {
+            // Carapace and its kin reduce whatever a hit carries, before mitigation ever names a type.
+            var owner = Fighter();
+            owner.SetupGet(f => f.InstanceId).Returns("owner");
+            var modifier = new IncomingDamageReductionContextModifier(owner.Object, 0.25f);
+            var context = Damage(Fighter(), DamageType.Blight, 100f);
+
+            modifier.Apply(context);
+
+            Assert.AreEqual(75f, context.DamageComponents[DamageType.Blight], 0.001f);
         }
 
         [TestMethod]

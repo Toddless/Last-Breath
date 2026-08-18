@@ -84,7 +84,7 @@
 
 Шаг 3 — точка, где сидит `EchoPassiveSkill`: он снимает свою долю **до** митигации.
 
-### 2.2 Митигация по типам — `Calculations.MitigateComponent:112-123`
+### 2.2 Митигация по типам — `Calculations.MitigateComponent:118-139`
 
 | Тип | Чем митигируется | Уважает `IgnoreResistances` |
 |---|---|---|
@@ -93,18 +93,23 @@
 | `Physical` | броня × (1 − `ArmorPenetration`) | н/п |
 | `Bleed` | **броня**, вместе с Physical | н/п |
 | `Sacred` | ничем | н/п |
+| `Blight` | ничем (и мимо щита/барьера — см. 2.3) | н/п |
 | `Poison` | ничем | н/п |
+
+Ветки Sacred/Blight/Poison — **явные**; тип без своей ветки проходит насквозь с записью в Tracker (`Unruled:136`), а не наследует «не режется ничем» молча.
 
 Формулы: `resist = target[R] * (1 − source[P])`, затем `damage * (1 − resist)`. Броня: `damage * (1 − A/(A+10000))`, `ArmorScalingFactor = 10000f` (`Calculations:20`) — асимптотика, верхнего капа у параметра нет.
 
-### 2.3 Цепочка поглощения — `Core/Battle/DamageResolution/DamageResolutionChain.cs:23-36`
-Порядок: **щит → барьер → страж стадии**. Ранний выход при `remaining <= 0`.
+### 2.3 Цепочка поглощения — `Core/Battle/DamageResolution/DamageResolutionChain.cs:30-41`
+Порядок: **щит → барьер → страж стадии**. Ранний выход при `Total <= 0`.
+
+Цепочка берёт удар **из контекста** и сама режет его надвое (`AbsorptionSplit.Of`): `Absorbable` — то, что поглощают слои по дороге к здоровью, `Bypassing` — типы, бьющие в здоровье напрямую (сейчас только `Blight`). Скаляра в `Apply` нет — разложка и число не могут разойтись.
 
 | Слой | Съедает | Обход |
 |---|---|---|
-| `ShieldAbsorptionLayer:11-19` | до `IShieldEffect.Strength` первого щита | **флага обхода нет** |
-| `BarrierAbsorptionLayer:10-19` | `min(CurrentBarrier, remaining)` | уважает `IgnoreBarrier` |
-| `StageGuardLayer:16-26` | не поглощает, а **отменяет оверкилл** до `FloorHealth` | — |
+| `ShieldAbsorptionLayer:12-23` | до `IShieldEffect.Strength` первого щита, из `Absorbable` | **флага обхода нет**; чистый `Bypassing`-удар щита не касается вовсе |
+| `BarrierAbsorptionLayer:12-22` | `min(CurrentBarrier, Absorbable)` | уважает `IgnoreBarrier` (весь удар мимо ОДНОГО слоя) |
+| `StageGuardLayer:18-28` | не поглощает, а **отменяет оверкилл** до `FloorHealth` | читает `Total` — пол держит и Скверну |
 
 ### 2.4 Подавление — `Calculations.ApplySuppression:80-120`
 
@@ -312,7 +317,7 @@ sumMultiplicative = 1
 Мёртвое следствие: ручки `HealthOnHit` и `ManaOnHit` прописаны в данных предметов и **не дают эффекта**. Классы `Accuracy`, `FirstAttackCrit`, `LastAttackAlwaysCrit`, `LeechOnCrit`, `UnblockableAttack`, `UnevadableAttack` работают **только** через ability-scoped `AttackModifierPipeline`; с предметов и эффектов — не работают.
 
 ### 9.3 Прочее
-`DamageCause.Item` и `Environment` — ноль производителей, ручек снижения под них тоже нет. Щит нельзя обойти ничем — аналога `IgnoreBarrier` у него нет.
+`DamageCause.Item` и `Environment` — ноль производителей, ручек снижения под них тоже нет. Флага обхода щита нет — аналога `IgnoreBarrier` у него не существует; мимо щита проходит только тип (`Blight`).
 
 ---
 

@@ -37,6 +37,18 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void FullChance_CutsBlightLikeAnyOtherComponent()
+        {
+            var target = Defender((EntityParameter.SuppressChance, 1f), (EntityParameter.Suppress, 0.25f));
+            var context = Damage(DamageCause.Ability, (DamageType.Blight, 100f));
+
+            Calculations.CalculateMitigation(context, target.Object, new ScriptedRandom(0f));
+
+            Assert.AreEqual(75f, context.DamageComponents[DamageType.Blight], 0.001f,
+                "blight skips armor, resistances and absorptions — not the type-agnostic layer");
+        }
+
+        [TestMethod]
         public void ZeroChance_LeavesDamageUntouchedAndBurnsNoRoll()
         {
             var target = Defender((EntityParameter.SuppressChance, 0f), (EntityParameter.Suppress, 0.5f));
@@ -205,7 +217,7 @@ namespace LastBreathTest.BattleSystemTests
             Calculations.CalculateMitigation(context, target.Object, new ScriptedRandom(0f));
             Assert.AreEqual(50f, context.TotalDamage, 0.001f, "armor then suppression");
 
-            float remaining = DamageResolutionChain.CreateDefault().Apply(context, target.Object, context.TotalDamage);
+            float remaining = DamageResolutionChain.CreateDefault().Apply(context, target.Object);
 
             Assert.AreEqual(50f, context.AbsorbedByBarrier, 0.001f, "the barrier soaks the SUPPRESSED number");
             Assert.AreEqual(0f, remaining, 0.001f);
