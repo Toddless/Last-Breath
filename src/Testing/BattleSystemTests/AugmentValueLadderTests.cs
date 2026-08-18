@@ -46,6 +46,35 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void TheTwoLaddersOfTheNamingPassMintTheFiguresTheDesignListNames()
+        {
+            // Both records came off an abilityId onto the tags their design line gives them, and both
+            // lines name a range the record was not carrying: "additional 70–180% crit damage" on the
+            // first attack, "5–25% of the damage dealt back as health" on a crit. Minted rather than
+            // computed, so the ENDS in the shipped file are pinned here beside the arithmetic — a record
+            // whose ends drift keeps interpolating perfectly and stops being the design.
+            AugmentMinter minter = new(ShippedAbilityData.Augments(), new DefaultRandomNumberGenerator(seed: 1));
+
+            (string Augment, string Property, float[] Rungs)[] expected =
+            [
+                // Interpolates to 106.67 and 143.33, which land on 105 and 145.
+                ("Augment_First_Attack_Crit_Damage", "critDamageBonus", [0.70f, 1.05f, 1.45f, 1.80f]),
+                // Interpolates to 11.67 and 18.33, which land on 10 and 20.
+                ("Augment_Leach_On_Crit", "amount", [0.05f, 0.10f, 0.20f, 0.25f]),
+            ];
+
+            foreach ((string augmentId, string property, float[] rungs) in expected)
+            {
+                AbilityAugmentData? record = ShippedAbilityData.Augments().Find(augmentId);
+                Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
+
+                for (int rung = 0; rung < rungs.Length; rung++)
+                    Assert.AreEqual(rungs[rung], minter.Mint(record, s_fourRungOrder[rung]).Values[property], 0.0001f,
+                        $"{augmentId}.{property} at {s_fourRungOrder[rung]} is not what the design list names");
+            }
+        }
+
+        [TestMethod]
         public void TheEndsAreTheAuthorsAndAreNeverRounded()
         {
             // A range whose ends are nowhere near a five still ends exactly where it was written: the

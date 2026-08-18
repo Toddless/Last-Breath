@@ -39,7 +39,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>The augment that puts the Life Aegis on the shroud's caster, and the record that
         /// raises how strongly what the shroud lays lands.</summary>
-        private const string Immortality = "Augment_Immortality";
+        private const string Immortality = "Augment_Dark_Shroud_Immortality";
         private const string StrongerRecovery = "Augment_Recovery_Effectiveness";
 
         /// <summary>The family's other record — the weaker of the two where they meet.</summary>

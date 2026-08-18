@@ -29,7 +29,7 @@
 
         /// <summary>How many records name an ability — held because a lost binding is an augment
         /// silently offered to the whole family. Recounted at the catalog cleanup; includes the
-        /// naming-rule binding and Augment_Lucky_Crit, bound at the tag-vocabulary pass by the G-1
+        /// naming-rule binding and Augment_Critical_Calculation_Lucky_Crit, bound at the tag-vocabulary pass by the G-1
         /// precedent (typed factory, straying tags). Three left at CL-4: the health-regen record's key
         /// was generalised (the binding was standing in for that), and the two fury-burn records now
         /// travel by the 'fury' tag the owner's markup gave the ability.</summary>
@@ -38,7 +38,13 @@
         /// Seven again at CL-7c, the last of the pinned generalisable ones: their number moved off the
         /// private key of the ability they were written for onto a key of the book, which is what the
         /// binding had been standing in for.</remarks>
-        private const int BoundRecords = 40;
+        /// <remarks>Six more left in the naming pass: the owner's design list gives each of them tags of
+        /// its own, so the six that were pinned to Series of Attacks, Increasing Pressure, Critical
+        /// Calculation and the Porcupine now travel by those. Every one of the six also had to stop
+        /// reaching into the members of the class it was written for — three moved onto generic riders,
+        /// one onto the generic attack modifier and one off a private parameter key — because a record
+        /// judged by tags and implemented for one ability is the dead-socket class by construction.</remarks>
+        private const int BoundRecords = 34;
 
         /// <summary>How many records claim every ability there is â€” cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
@@ -51,7 +57,7 @@
         /// <summary>How many records name neither an ability nor the whole book, and are judged by
         /// their tags alone. Most of them carry tags now; the number is held because a record losing
         /// its last tag belongs nowhere and says so nowhere.</summary>
-        private const int SilentRecords = 46;
+        private const int SilentRecords = 52;
 
         [TestMethod]
         public void TheSectionDeclaresTheRecordsTheTriageCounted()

@@ -39,7 +39,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>The shipped donor of the flagship combo — "a landing impact poisons what it
         /// touched" — and the shipped amplifier that reaches the poison it lays.</summary>
-        private const string ShippedDonor = "Augment_Poison_On_Hit";
+        private const string ShippedDonor = "Augment_Poison_Attack_Series";
         private const string ShippedAmplifier = "Augment_Poison_Duration";
         private const string ShippedAbility = "Ability_Series_Of_Attacks";
         private const string DurationProperty = "poisonDuration";
@@ -52,27 +52,27 @@ namespace LastBreathTest.BattleSystemTests
         /// </summary>
         private static readonly (string Id, string[] Grants)[] s_shippedGrants =
         [
-            ("Augment_Poison_On_Hit", [AbilityTags.Poison, AbilityTags.Debuff]),
+            ("Augment_Poison_Attack_Series", [AbilityTags.Poison, AbilityTags.Debuff]),
 
             ("Augment_Armageddon_Burning", [AbilityTags.Burn, AbilityTags.Debuff]),
             // The three variants swap the fury the ability lays, so each grants that genus too.
-            ("Augment_Burning_Fury", [AbilityTags.Burn, AbilityTags.Debuff, AbilityTags.Fury]),
-            ("Augment_Primal_Fury", [AbilityTags.Fury]),
-            ("Augment_Healing_Fury", [AbilityTags.Fury]),
+            ("Augment_Berserk_Fury_Burning", [AbilityTags.Burn, AbilityTags.Debuff, AbilityTags.Fury]),
+            ("Augment_Berserk_Fury_Primal", [AbilityTags.Fury]),
+            ("Augment_Berserk_Fury_Healing", [AbilityTags.Fury]),
 
             ("Augment_Apply_Buff_Critical_Chance", [AbilityTags.Buff]),
             ("Augment_Apply_Buff_Critical_Damage", [AbilityTags.Buff]),
-            ("Augment_Lucky_Crit", [AbilityTags.Buff]),
-            ("Augment_Mythic_Calculation", [AbilityTags.Buff]),
+            ("Augment_Critical_Calculation_Lucky_Crit", [AbilityTags.Buff]),
+            ("Augment_Critical_Calculation_Mythic", [AbilityTags.Buff]),
             ("Augment_Apply_Enhanced_Defence", [AbilityTags.Buff]),
             ("Augment_Leach_On_Crit", [AbilityTags.Buff]),
-            ("Augment_Immortality", [AbilityTags.Buff]),
+            ("Augment_Dark_Shroud_Immortality", [AbilityTags.Buff]),
             ("Augment_Incoming_Reduction", [AbilityTags.Buff]),
-            ("Augment_Two_Attacks_Apply_Buff", [AbilityTags.Buff]),
+            ("Augment_Double_Strike_Two_Attacks_Apply_Buff", [AbilityTags.Buff]),
             ("Augment_Porcupine_Echo", [AbilityTags.Buff]),
             ("Augment_Porcupine_Incoming_Damage_Reduction", [AbilityTags.Buff]),
             ("Augment_Porcupine_Crit_Mitigation", [AbilityTags.Buff]),
-            ("Augment_Crit_Mitigation_Under_Shield", [AbilityTags.Buff]),
+            ("Augment_Ice_Aegis_Crit_Mitigation_Under_Shield", [AbilityTags.Buff]),
 
             ("Augment_Empowered_Ability_Free_Cast", [AbilityTags.Buff]),
             ("Augment_Next_Cast_Pure", [AbilityTags.Buff]),
@@ -85,7 +85,7 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Apply_Seal_Of_Oblivion", [AbilityTags.Debuff]),
             ("Augment_Attacks_Reduce_Incoming_Heal", [AbilityTags.Debuff]),
             ("Augment_Attacks_Reduce_Armor", [AbilityTags.Debuff]),
-            ("Augment_Freeze_Increase_Ability_Cooldown", [AbilityTags.Debuff]),
+            ("Augment_Deep_Freeze_Increase_Ability_Cooldown", [AbilityTags.Debuff]),
 
             // E-2b: the two pool records. What they declare is the UMBRELLA their whole pool shares; a
             // copy adds the genus of the effect it drew on top (AugmentInstance.Applied), and which
@@ -108,8 +108,10 @@ namespace LastBreathTest.BattleSystemTests
         /// </summary>
         private static readonly (string Record, string[] WorksOn, string[] InertOn)[] s_grantReach =
         [
+            // The head butt and the pressure joined when the poison applier came off its abilityId onto
+            // ["attack", "series"]: it grants its genus to every attacker now, and the amplifier follows.
             ("Augment_Poison_Duration",
-                ["Ability_Series_Of_Attacks"],
+                ["Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
                 []),
             // Overload left the row at the owner's re-markup (it carries "buff" of its own now — a
             // direct fit is not a grant-opened one) and Static Armor arrived (it lost "buff" and is
@@ -180,6 +182,21 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Apply_Enhanced_Defence",
                 ["Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
                 []),
+
+            // Both unbound onto their design-line tags, and the two halves of one shape. The leech carries
+            // its work in an activation rider, so every grant-opened seating works; the on-hit heal moved
+            // onto the shared key but only the Porcupine registers it, and the Porcupine is reached by its
+            // own 'buff' — so every seating a grant opens for it is a silent one.
+            ("Augment_Leach_On_Crit",
+                ["Ability_Critical_Calculation", "Ability_Ice_Aegis", "Ability_Poison_Coating",
+                 "Ability_Porcupine", "Ability_Sacrifice"],
+                []),
+            ("Augment_Heal_On_Hit",
+                [],
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Poison_Explosion",
+                 "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
         ];
 
         /// <summary>The shared key each grant-opened parameter record stands on, for the ledger's
@@ -203,6 +220,9 @@ namespace LastBreathTest.BattleSystemTests
             ["Augment_Cooldown_Chance"] = AbilityParameter.CooldownReductionChance,
             ["Augment_Heal_From_Empowered_Ability_Damage"] = AbilityParameter.HealFromEmpoweredDamage,
             ["Augment_Additional_Stacks"] = AbilityParameter.Stacks,
+            // Unbound onto its design-line tags, and its number moved off the Porcupine's private key
+            // onto the book's at the same time — a tag-judged record on a private key is unprobeable.
+            ["Augment_Heal_On_Hit"] = AbilityParameter.HealOnHit,
         };
 
         /// <summary>Grant-openable records whose whole behaviour rides in an impact rider and stands
@@ -218,6 +238,9 @@ namespace LastBreathTest.BattleSystemTests
             // the canon and laid, so landing anywhere is landing where they work.
             "Augment_Apply_Buff",
             "Augment_Apply_Debuff",
+            // Unbound and rebuilt on the generic activation rider: the buff comes from the rider
+            // dictionary every ability has, so there is no host key to be missing.
+            "Augment_Leach_On_Crit",
         };
 
         [TestMethod]

@@ -19,7 +19,7 @@ namespace LastBreathTest.BattleSystemTests
         ///
         /// Empty since the catalog cleanup: Jar_Reach lost both residents and Attack_Count all but one
         /// (a group of one forbids nothing and reads as a typo, so it came off the survivor —
-        /// Ability_Ip_Augment_Single_Empowered_Attack gets it back the day a counting record returns).</summary>
+        /// Augment_Increasing_Pressure_Single_Empowered_Attack gets it back the day a counting record returns).</summary>
         private static readonly Dictionary<string, string[]> s_exclusionGroups = new(StringComparer.Ordinal);
 
         [TestMethod]

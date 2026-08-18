@@ -78,7 +78,7 @@ namespace LastBreathTest.BattleSystemTests
             // lay now is the canon — and the two numbers the ABILITY owns still arrive from the ability.
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             var fury = (BerserkFuryCast)registry.CreateAbility("Ability_Berserk_Fury");
-            fury.InstallUpgrades(Seat(registry, catalog, "Augment_Burning_Fury"));
+            fury.InstallUpgrades(Seat(registry, catalog, "Augment_Berserk_Fury_Burning"));
 
             var laid = fury.FuryFactory(4, 0.07f) as BurningFuryEffect;
 

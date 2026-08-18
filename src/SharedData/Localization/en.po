@@ -2611,10 +2611,10 @@ msgstr "Mana Flow"
 msgid "Augment_Mana_Flow_Description"
 msgstr "Applies {@Effect_Mana_Flow} ({percentRegeneration:%} of maximum mana for {duration|turn|turns})."
 
-msgid "Augment_Stage_Four_Resets_Cooldown"
+msgid "Augment_Overload_Stage_Four_Resets_Cooldown"
 msgstr "Stage4 Resets Cooldown"
 
-msgid "Augment_Stage_Four_Resets_Cooldown_Description"
+msgid "Augment_Overload_Stage_Four_Resets_Cooldown_Description"
 msgstr "Rolling activation level 4 resets this ability's cooldown."
 
 msgid "Augment_Next_Cast_Pure"
@@ -2623,10 +2623,10 @@ msgstr "Next Cast Pure"
 msgid "Augment_Next_Cast_Pure_Description"
 msgstr "The next activated ability deals {fraction:%} of its damage as pure."
 
-msgid "Ability_Cl_Augment_Ignore_Resistances"
+msgid "Augment_Chain_Lightning_Ignore_Resistances"
 msgstr "Ignore Resistances"
 
-msgid "Ability_Cl_Augment_Ignore_Resistances_Description"
+msgid "Augment_Chain_Lightning_Ignore_Resistances_Description"
 msgstr "Lightning ignores resistances."
 
 # ------------------------------
@@ -2715,10 +2715,10 @@ msgstr "The odds are calculated twice, and the best outcome is selected."
 # Ability upgrades — Dexterity stance
 # ------------------------------
 
-msgid "Augment_Poison_On_Hit"
+msgid "Augment_Poison_Attack_Series"
 msgstr "Poison On Hit"
 
-msgid "Augment_Poison_On_Hit_Description"
+msgid "Augment_Poison_Attack_Series_Description"
 msgstr "Attacks apply a stack of poison for {poisonDuration|turn|turns}."
 
 msgid "Augment_Apply_Buff_Critical_Chance"
@@ -2745,10 +2745,10 @@ msgstr "Additional Attacks"
 msgid "Augment_Additional_Attacks_Description"
 msgstr "+{amountAttacks} attack."
 
-msgid "Ability_Ip_Augment_Single_Empowered_Attack"
+msgid "Augment_Increasing_Pressure_Single_Empowered_Attack"
 msgstr "Single Empowered Attack"
 
-msgid "Ability_Ip_Augment_Single_Empowered_Attack_Description"
+msgid "Augment_Increasing_Pressure_Single_Empowered_Attack_Description"
 msgstr "Replaces the series with a single empowered strike."
 
 msgid "Augment_Attack_Random_Target"
@@ -2757,16 +2757,16 @@ msgstr "Attack Random Target"
 msgid "Augment_Attack_Random_Target_Description"
 msgstr "Attacks strike a random target ({splashDamage:%} splash)."
 
-msgid "Ability_Ip_Augment_Last_Attack_Always_Crit"
+msgid "Augment_Increasing_Pressure_Last_Attack_Always_Crit"
 msgstr "Last Attack Always Crit"
 
-msgid "Ability_Ip_Augment_Last_Attack_Always_Crit_Description"
+msgid "Augment_Increasing_Pressure_Last_Attack_Always_Crit_Description"
 msgstr "The last attack is always critical."
 
-msgid "Ability_Ip_Augment_First_Attack_Crit_Damage"
+msgid "Augment_First_Attack_Crit_Damage"
 msgstr "First Attack Crit Damage"
 
-msgid "Ability_Ip_Augment_First_Attack_Crit_Damage_Description"
+msgid "Augment_First_Attack_Crit_Damage_Description"
 msgstr "The first attack deals +{critDamageBonus:%} critical damage."
 
 msgid "Augment_Extend_Poison"
@@ -2811,10 +2811,10 @@ msgstr "Poison Duration"
 msgid "Augment_Poison_Duration_Description"
 msgstr "+{poisonDuration|turn|turns} poison duration."
 
-msgid "Augment_Immortality"
+msgid "Augment_Dark_Shroud_Immortality"
 msgstr "Immortality"
 
-msgid "Augment_Immortality_Description"
+msgid "Augment_Dark_Shroud_Immortality_Description"
 msgstr "Grants Immortality for {duration|turn|turns} (an analog of Life Aegis)."
 
 msgid "Augment_Additional_Health_Regen"
@@ -2829,10 +2829,10 @@ msgstr "Add Effectiveness Reduce Stacks"
 msgid "Augment_Add_Effectiveness_Reduce_Stacks_Description"
 msgstr "+{additionalEffectiveness:%} effectiveness, but -{amountStacks|stack|stacks}."
 
-msgid "Augment_Lucky_Crit"
+msgid "Augment_Critical_Calculation_Lucky_Crit"
 msgstr "Lucky Crit"
 
-msgid "Augment_Lucky_Crit_Description"
+msgid "Augment_Critical_Calculation_Lucky_Crit_Description"
 msgstr "Grants {@Effect_Lucky_Crit_Chance} for {duration|turn|turns}."
 
 msgid "Augment_Leach_On_Crit"
@@ -2853,16 +2853,16 @@ msgstr "Apply Seal Of Oblivion"
 msgid "Augment_Apply_Seal_Of_Oblivion_Description"
 msgstr "Applies {@Effect_Seal_Of_Oblivion} for {duration|turn|turns}."
 
-msgid "Ability_Pe_Augment_Execute_Bosses"
+msgid "Augment_Poison_Explosion_Execute_Bosses"
 msgstr "Execute Bosses"
 
-msgid "Ability_Pe_Augment_Execute_Bosses_Description"
+msgid "Augment_Poison_Explosion_Execute_Bosses_Description"
 msgstr "Can execute bosses (×{stacksMultiplier} stack threshold)."
 
-msgid "Ability_Pe_Augment_Spread_Poison"
+msgid "Augment_Poison_Explosion_Spread_Poison"
 msgstr "Spread Poison"
 
-msgid "Ability_Pe_Augment_Spread_Poison_Description"
+msgid "Augment_Poison_Explosion_Spread_Poison_Description"
 msgstr "Spreads the poison to every enemy."
 
 msgid "Augment_Reduce_Execution_Threshold"
@@ -2871,10 +2871,10 @@ msgstr "Reduce Execution Threshold"
 msgid "Augment_Reduce_Execution_Threshold_Description"
 msgstr "-{share:%} to the execution threshold."
 
-msgid "Augment_Transfer_Poison_On_Death"
+msgid "Augment_Poison_Explosion_Transfer_Poison_On_Death"
 msgstr "Transfer Poison On Death"
 
-msgid "Augment_Transfer_Poison_On_Death_Description"
+msgid "Augment_Poison_Explosion_Transfer_Poison_On_Death_Description"
 msgstr "On the target's death, the poison transfers to another enemy."
 
 msgid "Augment_Attacks_Reduce_Incoming_Heal"
@@ -2889,10 +2889,10 @@ msgstr "Attacks Reduce Armor"
 msgid "Augment_Attacks_Reduce_Armor_Description"
 msgstr "Attacks apply -{reduceArmorBy:%} armor (up to {maxStacks|stack|stacks}, {duration|turn|turns})."
 
-msgid "Augment_Apply_Poison_For_Each_Enemy"
+msgid "Augment_Poison_Coating_Apply_Poison_For_Each_Enemy"
 msgstr "Apply Stack For Each Enemy"
 
-msgid "Augment_Apply_Poison_For_Each_Enemy_Description"
+msgid "Augment_Poison_Coating_Apply_Poison_For_Each_Enemy_Description"
 msgstr "Applies a poison stack for each enemy on the battlefield."
 
 # ------------------------------
@@ -2965,22 +2965,22 @@ msgstr "Free Cast"
 msgid "Augment_Empowered_Ability_Free_Cast_Description"
 msgstr "The next ability is cast without a cooldown."
 
-msgid "Augment_Burning_Fury"
+msgid "Augment_Berserk_Fury_Burning"
 msgstr "Burning Fury"
 
-msgid "Augment_Burning_Fury_Description"
+msgid "Augment_Berserk_Fury_Burning_Description"
 msgstr "{@Effect_Fury} becomes {@Effect_Burning_Fury}: the burned health also deals damage ({burningDuration|turn|turns}, up to {burningMaxStacks|stack|stacks})."
 
-msgid "Augment_Primal_Fury"
+msgid "Augment_Berserk_Fury_Primal"
 msgstr "Primal Fury"
 
-msgid "Augment_Primal_Fury_Description"
+msgid "Augment_Berserk_Fury_Primal_Description"
 msgstr "{@Effect_Fury} becomes Primal Fury (×{damageMultiplier} damage)."
 
-msgid "Augment_Healing_Fury"
+msgid "Augment_Berserk_Fury_Healing"
 msgstr "Healing Fury"
 
-msgid "Augment_Healing_Fury_Description"
+msgid "Augment_Berserk_Fury_Healing_Description"
 msgstr "{@Effect_Fury} becomes {@Effect_Healing_Fury}: heals for {healAmount:%} of the burned health."
 
 msgid "Augment_Fury_More_Burn"
@@ -3001,10 +3001,10 @@ msgstr "Health Bonus"
 msgid "Augment_Health_Bonus_Description"
 msgstr "+{healthBonus:%} maximum health."
 
-msgid "Augment_Two_Attacks_Apply_Buff"
+msgid "Augment_Double_Strike_Two_Attacks_Apply_Buff"
 msgstr "Both Hits Buff"
 
-msgid "Augment_Two_Attacks_Apply_Buff_Description"
+msgid "Augment_Double_Strike_Two_Attacks_Apply_Buff_Description"
 msgstr "Both attacks grant +{amount:%} damage for {duration|turn|turns}."
 
 msgid "Augment_Restore_Mana_Health_On_Hit"
@@ -3644,36 +3644,36 @@ msgstr "Reset Chance"
 msgid "Augment_Reset_Chance_Description"
 msgstr "{chance:%} chance to reset the cooldown."
 
-msgid "Augment_Ice_Blocks_Random_Extra_Blocks"
+msgid "Augment_Ice_Block_Random_Extra_Blocks"
 msgstr "Random Extra Blocks"
 
-msgid "Augment_Ice_Blocks_Random_Extra_Blocks_Description"
+msgid "Augment_Ice_Block_Random_Extra_Blocks_Description"
 msgstr "The extra blocks crash down on random enemies."
 
-msgid "Augment_Ice_Blocks_Consume_Stun_Deal_Double_Damage"
+msgid "Augment_Ice_Block_Consume_Stun_Deal_Double_Damage"
 msgstr "Consume Stun"
 
-msgid "Augment_Ice_Blocks_Consume_Stun_Deal_Double_Damage_Description"
+msgid "Augment_Ice_Block_Consume_Stun_Deal_Double_Damage_Description"
 msgstr "Consumes the target's stun and deals double damage."
 
 # Deep Freeze upgrades
 
-msgid "Augment_Spread_Freeze"
+msgid "Augment_Deep_Freeze_Spread"
 msgstr "Spread Freeze"
 
-msgid "Augment_Spread_Freeze_Description"
+msgid "Augment_Deep_Freeze_Spread_Description"
 msgstr "{chance:%} chance to also freeze a random enemy."
 
-msgid "Augment_Control_Extend_Effects"
+msgid "Augment_Deep_Freeze_Control_Extend_Effects"
 msgstr "Extend Effects"
 
-msgid "Augment_Control_Extend_Effects_Description"
+msgid "Augment_Deep_Freeze_Control_Extend_Effects_Description"
 msgstr "Extends every effect on the target by 1 turn."
 
-msgid "Augment_Freeze_Increase_Ability_Cooldown"
+msgid "Augment_Deep_Freeze_Increase_Ability_Cooldown"
 msgstr "Enemy Cooldown"
 
-msgid "Augment_Freeze_Increase_Ability_Cooldown_Description"
+msgid "Augment_Deep_Freeze_Increase_Ability_Cooldown_Description"
 msgstr "The target's next activated ability starts with +{amount} cooldown."
 
 msgid "Augment_Reduce_All_Cooldowns"
@@ -3682,24 +3682,24 @@ msgstr "Reduce All Cooldowns"
 msgid "Augment_Reduce_All_Cooldowns_Description"
 msgstr "The cast reduces the cooldown of all your abilities by {amount}."
 
-msgid "Augment_Freezed_Target_Execute_On_Hit"
+msgid "Augment_Deep_Freeze_Execute_Frozen_On_Hit"
 msgstr "Execute"
 
-msgid "Augment_Freezed_Target_Execute_On_Hit_Description"
+msgid "Augment_Deep_Freeze_Execute_Frozen_On_Hit_Description"
 msgstr "Executes the target below {threshold:%} health."
 
 # Discharge upgrades
 
-msgid "Augment_Hits_Ignore_Resistances"
+msgid "Augment_Discharge_Hits_Ignore_Resistances"
 msgstr "Ignore Resistances"
 
-msgid "Augment_Hits_Ignore_Resistances_Description"
+msgid "Augment_Discharge_Hits_Ignore_Resistances_Description"
 msgstr "The strike ignores the target's resistances."
 
-msgid "Augment_Consume_Mana"
+msgid "Augment_Discharge_Consume_Mana"
 msgstr "Consume Mana"
 
-msgid "Augment_Consume_Mana_Description"
+msgid "Augment_Discharge_Consume_Mana_Description"
 msgstr "Consumes mana instead of barrier."
 
 # Static Armor upgrades
@@ -3712,34 +3712,34 @@ msgstr "The ability consumes barrier instead of mana."
 
 # Ice Shards / Ice Aegis new upgrades
 
-msgid "Augment_Multicast"
+msgid "Augment_Ice_Shards_Multicast"
 msgstr "Multicast"
 
-msgid "Augment_Multicast_Description"
+msgid "Augment_Ice_Shards_Multicast_Description"
 msgstr "+{amount:%} multicast chance for this ability."
 
-msgid "Augment_Critical_Hit_Ignores_Cold_Res"
+msgid "Augment_Ice_Shards_Critical_Hit_Ignores_Cold_Res"
 msgstr "Crit Ignores Cold Res"
 
-msgid "Augment_Critical_Hit_Ignores_Cold_Res_Description"
+msgid "Augment_Ice_Shards_Critical_Hit_Ignores_Cold_Res_Description"
 msgstr "Critical shards ignore the target's cold resistance."
 
-msgid "Augment_Shield_Reflect_Damage"
+msgid "Augment_Ice_Aegis_Shield_Reflect_Damage"
 msgstr "Reflect"
 
-msgid "Augment_Shield_Reflect_Damage_Description"
+msgid "Augment_Ice_Aegis_Shield_Reflect_Damage_Description"
 msgstr "The shield reflects {amount:%} of absorbed damage as cold."
 
-msgid "Augment_Turn_End_Heal_Under_Shield"
+msgid "Augment_Ice_Aegis_Turn_End_Heal_Under_Shield"
 msgstr "Turn End Heal"
 
-msgid "Augment_Turn_End_Heal_Under_Shield_Description"
+msgid "Augment_Ice_Aegis_Turn_End_Heal_Under_Shield_Description"
 msgstr "While the shield holds, restores {amount:%} of maximum health at the end of each turn."
 
-msgid "Augment_Crit_Mitigation_Under_Shield"
+msgid "Augment_Ice_Aegis_Crit_Mitigation_Under_Shield"
 msgstr "Crit Mitigation"
 
-msgid "Augment_Crit_Mitigation_Under_Shield_Description"
+msgid "Augment_Ice_Aegis_Crit_Mitigation_Under_Shield_Description"
 msgstr "Critical damage taken is reduced by {value:%} while the shield holds."
 
 # ------------------------------
@@ -4266,10 +4266,10 @@ msgstr "Burning Attack Series"
 msgid "Augment_Burning_Attack_Series_Description"
 msgstr "Every attack of the ability applies {@Effect_Damage_Over_Turn_Burning}."
 
-msgid "Augment_Mythic_Calculation"
+msgid "Augment_Critical_Calculation_Mythic"
 msgstr "Mythic Calculation"
 
-msgid "Augment_Mythic_Calculation_Description"
+msgid "Augment_Critical_Calculation_Mythic_Description"
 msgstr "While the Calculation holds, every critical hit gives one more turn to each of your buffs."
 
 msgid "Effect_Mythic_Calculation"

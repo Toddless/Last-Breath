@@ -310,6 +310,13 @@ namespace LastBreathTest.BattleSystemTests
                  "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine",
                  "Ability_Sacrifice", "Ability_Static_Armor"]),
 
+            // Unbound onto its design-line tags and moved onto the book's key in the same pass. One owner,
+            // so the second column is the price of the unpinning, as with the seven of CL-7c.
+            ("Augment_Heal_On_Hit", AbilityParameter.HealOnHit,
+                ["Ability_Porcupine"],
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
+                 "Ability_Overload", "Ability_Poison_Coating", "Ability_Sacrifice"]),
+
             ("Augment_Heal_From_Empowered_Ability_Damage", AbilityParameter.HealFromEmpoweredDamage,
                 ["Ability_Sacrifice"],
                 ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Dark_Shroud",

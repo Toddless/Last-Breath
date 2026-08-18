@@ -45,7 +45,7 @@ namespace LastBreathTest.BattleSystemTests
         private const string Attacker = "Ability_Series_Of_Attacks";
 
         /// <summary>The applier: every successful impact puts a stack on its target.</summary>
-        private const string Applier = "Augment_Poison_On_Hit";
+        private const string Applier = "Augment_Poison_Attack_Series";
 
         /// <summary>The amplifier: poison lasts longer. Written for no applier in particular.</summary>
         private const string Amplifier = "Augment_Poison_Duration";

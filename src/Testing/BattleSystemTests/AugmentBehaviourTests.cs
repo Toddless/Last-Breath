@@ -115,10 +115,10 @@ namespace LastBreathTest.BattleSystemTests
         [
             ("Augment_Porcupine_Incoming_Damage_Reduction", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
             ("Augment_Porcupine_Crit_Mitigation", "duration", AbilityParameter.Duration, "Ability_Porcupine"),
-            ("Augment_Crit_Mitigation_Under_Shield", "duration", AbilityParameter.Duration, "Ability_Ice_Aegis"),
+            ("Augment_Ice_Aegis_Crit_Mitigation_Under_Shield", "duration", AbilityParameter.Duration, "Ability_Ice_Aegis"),
             // The mythic reading of the calculation lasts exactly as long as the buff it reads from — the
             // design line says "while the Calculation holds", and the ref is what makes that literal.
-            ("Augment_Mythic_Calculation", "duration", AbilityParameter.Duration, "Ability_Critical_Calculation"),
+            ("Augment_Critical_Calculation_Mythic", "duration", AbilityParameter.Duration, "Ability_Critical_Calculation"),
         ];
 
         [TestMethod]
@@ -206,7 +206,7 @@ namespace LastBreathTest.BattleSystemTests
 
         [TestMethod]
         public void ARecordWithoutABehaviourStillGoesToItsOwnFactory() =>
-            Assert.IsNotNull(Built(Shipped("Augment_Poison_On_Hit")),
+            Assert.IsNotNull(Built(Shipped("Augment_Poison_Attack_Series")),
                 "a named augment stopped being answered by the factory written for it");
 
         [TestMethod]

@@ -20,7 +20,7 @@ namespace LastBreathTest.BattleSystemTests
     /// the catalogue pass of 2026-08-09, which named an ability on every record whose upgrade type names
     /// one ability AND whose tags carried it to a stranger or to nowhere — not on every record written
     /// for one ability's members. The ones whose tags happened to land right were left judged by their
-    /// tags, and they are only as safe as that accident: 'Augment_Lucky_Crit' still travels by 'crit'
+    /// tags, and they are only as safe as that accident: 'Augment_Critical_Calculation_Lucky_Crit' still travels by 'crit'
     /// because 'crit' is today worn by Critical Calculation alone, and the day a second ability claims
     /// it the augment throws on arrival there. So an augment that used to reach a stranger through
     /// 'buff', 'hit' or 'evasion' now goes where it works, those three tags carry nothing of their own

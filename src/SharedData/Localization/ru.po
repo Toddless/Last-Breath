@@ -1964,10 +1964,10 @@ msgstr ""
 msgid "Augment_Mana_Flow_Description"
 msgstr "Накладывает {@Effect_Mana_Flow} ({percentRegeneration:%} максимальной маны на {duration|turn|turns})."
 
-msgid "Augment_Stage_Four_Resets_Cooldown"
+msgid "Augment_Overload_Stage_Four_Resets_Cooldown"
 msgstr ""
 
-msgid "Augment_Stage_Four_Resets_Cooldown_Description"
+msgid "Augment_Overload_Stage_Four_Resets_Cooldown_Description"
 msgstr "Активация 4-й стадии сбрасывает перезарядку способности."
 
 msgid "Augment_Next_Cast_Pure"
@@ -1976,10 +1976,10 @@ msgstr ""
 msgid "Augment_Next_Cast_Pure_Description"
 msgstr "Следующая активированная способность наносит {fraction:%} урона чистым."
 
-msgid "Ability_Cl_Augment_Ignore_Resistances"
+msgid "Augment_Chain_Lightning_Ignore_Resistances"
 msgstr ""
 
-msgid "Ability_Cl_Augment_Ignore_Resistances_Description"
+msgid "Augment_Chain_Lightning_Ignore_Resistances_Description"
 msgstr "Молнии игнорируют сопротивления."
 
 # ------------------------------
@@ -2020,10 +2020,10 @@ msgstr "Запечатанную цель нельзя лечить."
 # Ability upgrades — Dexterity stance
 # ------------------------------
 
-msgid "Augment_Poison_On_Hit"
+msgid "Augment_Poison_Attack_Series"
 msgstr ""
 
-msgid "Augment_Poison_On_Hit_Description"
+msgid "Augment_Poison_Attack_Series_Description"
 msgstr "Атаки накладывают стак яда на {poisonDuration|turn|turns}."
 
 msgid "Augment_Apply_Buff_Critical_Chance"
@@ -2050,10 +2050,10 @@ msgstr ""
 msgid "Augment_Additional_Attacks_Description"
 msgstr "+{amountAttacks} атака."
 
-msgid "Ability_Ip_Augment_Single_Empowered_Attack"
+msgid "Augment_Increasing_Pressure_Single_Empowered_Attack"
 msgstr ""
 
-msgid "Ability_Ip_Augment_Single_Empowered_Attack_Description"
+msgid "Augment_Increasing_Pressure_Single_Empowered_Attack_Description"
 msgstr "Заменяет серию одним усиленным ударом."
 
 msgid "Augment_Attack_Random_Target"
@@ -2062,16 +2062,16 @@ msgstr ""
 msgid "Augment_Attack_Random_Target_Description"
 msgstr "Атаки бьют случайную цель ({splashDamage:%} сплеша)."
 
-msgid "Ability_Ip_Augment_Last_Attack_Always_Crit"
+msgid "Augment_Increasing_Pressure_Last_Attack_Always_Crit"
 msgstr ""
 
-msgid "Ability_Ip_Augment_Last_Attack_Always_Crit_Description"
+msgid "Augment_Increasing_Pressure_Last_Attack_Always_Crit_Description"
 msgstr "Последняя атака всегда критическая."
 
-msgid "Ability_Ip_Augment_First_Attack_Crit_Damage"
+msgid "Augment_First_Attack_Crit_Damage"
 msgstr ""
 
-msgid "Ability_Ip_Augment_First_Attack_Crit_Damage_Description"
+msgid "Augment_First_Attack_Crit_Damage_Description"
 msgstr "Первая атака наносит +{critDamageBonus:%} критического урона."
 
 msgid "Augment_Extend_Poison"
@@ -2116,10 +2116,10 @@ msgstr ""
 msgid "Augment_Poison_Duration_Description"
 msgstr "+{poisonDuration|turn|turns} длительности яда."
 
-msgid "Augment_Immortality"
+msgid "Augment_Dark_Shroud_Immortality"
 msgstr ""
 
-msgid "Augment_Immortality_Description"
+msgid "Augment_Dark_Shroud_Immortality_Description"
 msgstr "Даёт Бессмертие на {duration|turn|turns} (аналог Эгиды жизни)."
 
 msgid "Augment_Additional_Health_Regen"
@@ -2134,10 +2134,10 @@ msgstr ""
 msgid "Augment_Add_Effectiveness_Reduce_Stacks_Description"
 msgstr "+{additionalEffectiveness:%} эффективности, но -{amountStacks|stack|stacks}."
 
-msgid "Augment_Lucky_Crit"
+msgid "Augment_Critical_Calculation_Lucky_Crit"
 msgstr ""
 
-msgid "Augment_Lucky_Crit_Description"
+msgid "Augment_Critical_Calculation_Lucky_Crit_Description"
 msgstr "Даёт {@Effect_Lucky_Crit_Chance} на {duration|turn|turns}."
 
 msgid "Augment_Leach_On_Crit"
@@ -2158,16 +2158,16 @@ msgstr ""
 msgid "Augment_Apply_Seal_Of_Oblivion_Description"
 msgstr "Накладывает {@Effect_Seal_Of_Oblivion} на {duration|turn|turns}."
 
-msgid "Ability_Pe_Augment_Execute_Bosses"
+msgid "Augment_Poison_Explosion_Execute_Bosses"
 msgstr ""
 
-msgid "Ability_Pe_Augment_Execute_Bosses_Description"
+msgid "Augment_Poison_Explosion_Execute_Bosses_Description"
 msgstr "Может казнить боссов (×{stacksMultiplier} к порогу стаков)."
 
-msgid "Ability_Pe_Augment_Spread_Poison"
+msgid "Augment_Poison_Explosion_Spread_Poison"
 msgstr ""
 
-msgid "Ability_Pe_Augment_Spread_Poison_Description"
+msgid "Augment_Poison_Explosion_Spread_Poison_Description"
 msgstr "Распространяет яд на всех врагов."
 
 msgid "Augment_Reduce_Execution_Threshold"
@@ -2176,10 +2176,10 @@ msgstr ""
 msgid "Augment_Reduce_Execution_Threshold_Description"
 msgstr "-{share:%} к порогу казни."
 
-msgid "Augment_Transfer_Poison_On_Death"
+msgid "Augment_Poison_Explosion_Transfer_Poison_On_Death"
 msgstr ""
 
-msgid "Augment_Transfer_Poison_On_Death_Description"
+msgid "Augment_Poison_Explosion_Transfer_Poison_On_Death_Description"
 msgstr "При смерти цели яд переносится на другого врага."
 
 msgid "Augment_Attacks_Reduce_Incoming_Heal"
@@ -2194,10 +2194,10 @@ msgstr ""
 msgid "Augment_Attacks_Reduce_Armor_Description"
 msgstr "Атаки накладывают -{reduceArmorBy:%} брони (до {maxStacks|stack|stacks}, {duration|turn|turns})."
 
-msgid "Augment_Apply_Poison_For_Each_Enemy"
+msgid "Augment_Poison_Coating_Apply_Poison_For_Each_Enemy"
 msgstr ""
 
-msgid "Augment_Apply_Poison_For_Each_Enemy_Description"
+msgid "Augment_Poison_Coating_Apply_Poison_For_Each_Enemy_Description"
 msgstr "Накладывает стак яда за каждого врага на поле боя."
 
 # ------------------------------
@@ -2270,22 +2270,22 @@ msgstr ""
 msgid "Augment_Empowered_Ability_Free_Cast_Description"
 msgstr "Следующая способность без перезарядки."
 
-msgid "Augment_Burning_Fury"
+msgid "Augment_Berserk_Fury_Burning"
 msgstr ""
 
-msgid "Augment_Burning_Fury_Description"
+msgid "Augment_Berserk_Fury_Burning_Description"
 msgstr "{@Effect_Fury} → {@Effect_Burning_Fury}: сожжённое HP также наносит урон ({burningDuration|turn|turns}, до {burningMaxStacks|stack|stacks})."
 
-msgid "Augment_Primal_Fury"
+msgid "Augment_Berserk_Fury_Primal"
 msgstr ""
 
-msgid "Augment_Primal_Fury_Description"
+msgid "Augment_Berserk_Fury_Primal_Description"
 msgstr "{@Effect_Fury} → Первобытная ярость (×{damageMultiplier} урона)."
 
-msgid "Augment_Healing_Fury"
+msgid "Augment_Berserk_Fury_Healing"
 msgstr ""
 
-msgid "Augment_Healing_Fury_Description"
+msgid "Augment_Berserk_Fury_Healing_Description"
 msgstr "{@Effect_Fury} → {@Effect_Healing_Fury}: лечит на {healAmount:%} сожжённого HP."
 
 msgid "Augment_Fury_More_Burn"
@@ -2306,10 +2306,10 @@ msgstr ""
 msgid "Augment_Health_Bonus_Description"
 msgstr "+{healthBonus:%} максимального здоровья."
 
-msgid "Augment_Two_Attacks_Apply_Buff"
+msgid "Augment_Double_Strike_Two_Attacks_Apply_Buff"
 msgstr ""
 
-msgid "Augment_Two_Attacks_Apply_Buff_Description"
+msgid "Augment_Double_Strike_Two_Attacks_Apply_Buff_Description"
 msgstr "Обе атаки дают +{amount:%} урона на {duration|turn|turns}."
 
 msgid "Augment_Restore_Mana_Health_On_Hit"
@@ -2657,36 +2657,36 @@ msgstr ""
 msgid "Augment_Reset_Chance_Description"
 msgstr "{chance:%} шанс сбросить перезарядку."
 
-msgid "Augment_Ice_Blocks_Random_Extra_Blocks"
+msgid "Augment_Ice_Block_Random_Extra_Blocks"
 msgstr ""
 
-msgid "Augment_Ice_Blocks_Random_Extra_Blocks_Description"
+msgid "Augment_Ice_Block_Random_Extra_Blocks_Description"
 msgstr "Дополнительные глыбы падают на случайных противников."
 
-msgid "Augment_Ice_Blocks_Consume_Stun_Deal_Double_Damage"
+msgid "Augment_Ice_Block_Consume_Stun_Deal_Double_Damage"
 msgstr ""
 
-msgid "Augment_Ice_Blocks_Consume_Stun_Deal_Double_Damage_Description"
+msgid "Augment_Ice_Block_Consume_Stun_Deal_Double_Damage_Description"
 msgstr "Поглощает оглушение с цели и наносит двойной урон."
 
 # Апгрейды Глубокой заморозки
 
-msgid "Augment_Spread_Freeze"
+msgid "Augment_Deep_Freeze_Spread"
 msgstr ""
 
-msgid "Augment_Spread_Freeze_Description"
+msgid "Augment_Deep_Freeze_Spread_Description"
 msgstr "{chance:%} шанс заморозить также случайного противника."
 
-msgid "Augment_Control_Extend_Effects"
+msgid "Augment_Deep_Freeze_Control_Extend_Effects"
 msgstr ""
 
-msgid "Augment_Control_Extend_Effects_Description"
+msgid "Augment_Deep_Freeze_Control_Extend_Effects_Description"
 msgstr "Продлевает все эффекты на цели на 1 ход."
 
-msgid "Augment_Freeze_Increase_Ability_Cooldown"
+msgid "Augment_Deep_Freeze_Increase_Ability_Cooldown"
 msgstr ""
 
-msgid "Augment_Freeze_Increase_Ability_Cooldown_Description"
+msgid "Augment_Deep_Freeze_Increase_Ability_Cooldown_Description"
 msgstr "Следующая активированная способность цели получает +{amount} перезарядки."
 
 msgid "Augment_Reduce_All_Cooldowns"
@@ -2695,24 +2695,24 @@ msgstr ""
 msgid "Augment_Reduce_All_Cooldowns_Description"
 msgstr "Каст снижает перезарядку всех ваших способностей на {amount}."
 
-msgid "Augment_Freezed_Target_Execute_On_Hit"
+msgid "Augment_Deep_Freeze_Execute_Frozen_On_Hit"
 msgstr ""
 
-msgid "Augment_Freezed_Target_Execute_On_Hit_Description"
+msgid "Augment_Deep_Freeze_Execute_Frozen_On_Hit_Description"
 msgstr "Казнит цель со здоровьем ниже {threshold:%}."
 
 # Апгрейды Разряда
 
-msgid "Augment_Hits_Ignore_Resistances"
+msgid "Augment_Discharge_Hits_Ignore_Resistances"
 msgstr ""
 
-msgid "Augment_Hits_Ignore_Resistances_Description"
+msgid "Augment_Discharge_Hits_Ignore_Resistances_Description"
 msgstr "Удар игнорирует сопротивления цели."
 
-msgid "Augment_Consume_Mana"
+msgid "Augment_Discharge_Consume_Mana"
 msgstr ""
 
-msgid "Augment_Consume_Mana_Description"
+msgid "Augment_Discharge_Consume_Mana_Description"
 msgstr "Поглощает ману вместо барьера."
 
 # Апгрейды Статического доспеха
@@ -2725,34 +2725,34 @@ msgstr "Способность поглощает барьер вместо ма
 
 # Новые апгрейды Осколков и Эгиды
 
-msgid "Augment_Multicast"
+msgid "Augment_Ice_Shards_Multicast"
 msgstr ""
 
-msgid "Augment_Multicast_Description"
+msgid "Augment_Ice_Shards_Multicast_Description"
 msgstr "+{amount:%} к шансу мультикаста этой способности."
 
-msgid "Augment_Critical_Hit_Ignores_Cold_Res"
+msgid "Augment_Ice_Shards_Critical_Hit_Ignores_Cold_Res"
 msgstr ""
 
-msgid "Augment_Critical_Hit_Ignores_Cold_Res_Description"
+msgid "Augment_Ice_Shards_Critical_Hit_Ignores_Cold_Res_Description"
 msgstr "Критические осколки игнорируют сопротивление цели к холоду."
 
-msgid "Augment_Shield_Reflect_Damage"
+msgid "Augment_Ice_Aegis_Shield_Reflect_Damage"
 msgstr ""
 
-msgid "Augment_Shield_Reflect_Damage_Description"
+msgid "Augment_Ice_Aegis_Shield_Reflect_Damage_Description"
 msgstr "Щит отражает {amount:%} поглощённого урона холодом."
 
-msgid "Augment_Turn_End_Heal_Under_Shield"
+msgid "Augment_Ice_Aegis_Turn_End_Heal_Under_Shield"
 msgstr ""
 
-msgid "Augment_Turn_End_Heal_Under_Shield_Description"
+msgid "Augment_Ice_Aegis_Turn_End_Heal_Under_Shield_Description"
 msgstr "Пока щит держится, восстанавливает {amount:%} максимального здоровья в конце каждого хода."
 
-msgid "Augment_Crit_Mitigation_Under_Shield"
+msgid "Augment_Ice_Aegis_Crit_Mitigation_Under_Shield"
 msgstr ""
 
-msgid "Augment_Crit_Mitigation_Under_Shield_Description"
+msgid "Augment_Ice_Aegis_Crit_Mitigation_Under_Shield_Description"
 msgstr "Получаемый критический урон снижен на {value:%}, пока щит держится."
 
 # ------------------------------

@@ -68,7 +68,7 @@ namespace Battle.Source.Abilities
             ],
             ["Augment_Heal_On_Hit"] =
             [
-                new(Porcupine.Porcupine.Parameters.HealOnHit, OperationType.Add, "amount", 0.03f)
+                new(AbilityParameter.HealOnHit, OperationType.Add, "amount", 0.03f)
             ],
             ["Augment_More_Retaliation"] =
             [

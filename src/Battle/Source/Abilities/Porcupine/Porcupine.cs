@@ -17,14 +17,13 @@ namespace Battle.Source.Abilities.Porcupine
         public int Duration => (int)this[AbilityParameter.Duration];
         public float DamageReturn => this[Parameters.DamageReturn];
         public float ArmorReturn => this[Parameters.ArmorReturn];
-        public float HealOnHit => this[Parameters.HealOnHit];
+        public float HealOnHit => this[AbilityParameter.HealOnHit];
         public float CooldownReductionChance => this[AbilityParameter.CooldownReductionChance];
 
         public static class Parameters
         {
             public const string DamageReturn = nameof(DamageReturn);
             public const string ArmorReturn = nameof(ArmorReturn);
-            public const string HealOnHit = nameof(HealOnHit);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
@@ -34,7 +33,7 @@ namespace Battle.Source.Abilities.Porcupine
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.DamageReturn, 0.25f);
             parameters.RegisterDefault(Parameters.ArmorReturn, 0.15f);
-            parameters.RegisterDefault(Parameters.HealOnHit, 0f);
+            parameters.RegisterDefault(AbilityParameter.HealOnHit, 0f);
             parameters.RegisterDefault(AbilityParameter.CooldownReductionChance, 0f);
         }
 

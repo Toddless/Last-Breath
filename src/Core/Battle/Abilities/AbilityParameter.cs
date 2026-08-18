@@ -109,6 +109,10 @@ namespace Core.Battle.Abilities
         /// axis of <see cref="HealthRestore"/>: an ability may hand back both from one cast.</summary>
         public const string ManaRestore = nameof(ManaRestore);
 
+        /// <summary>Share of MAXIMUM health a hit TAKEN by the bearer gives back, while what the cast laid
+        /// stands. The mirror of <see cref="HealthRestore"/>, which is paid on a touch the bearer LANDS.</summary>
+        public const string HealOnHit = nameof(HealOnHit);
+
         /// <summary>Share of the cast's damage the stage-four addition of a staged cast deals — the extra
         /// content the top activation stage brings, not the cast's own hit.</summary>
         public const string StageFourDamage = nameof(StageFourDamage);
