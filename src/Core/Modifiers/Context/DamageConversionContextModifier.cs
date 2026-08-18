@@ -27,8 +27,8 @@ namespace Core.Modifiers.Context
 
             foreach ((DamageType type, float damage) in context.DamageComponents.ToArray())
             {
-                if (type is DamageType.Pure || damage <= 0) continue;
-                context.Convert(type, DamageType.Pure, fraction());
+                if (type is DamageType.Sacred || damage <= 0) continue;
+                context.Convert(type, DamageType.Sacred, fraction());
             }
         }
     }

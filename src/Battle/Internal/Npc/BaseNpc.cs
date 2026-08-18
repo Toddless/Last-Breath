@@ -650,7 +650,7 @@ namespace Battle.Internal.Npc
             if (context.ConvertToDamage)
             {
                 var damageContext = new DamageContext { Source = context.Source, Cause = DamageCause.Passive };
-                damageContext.Add(DamageType.Pure, context.Amount);
+                damageContext.Add(DamageType.Sacred, context.Amount);
                 _ = TakeDamage(damageContext);
                 return;
             }
@@ -749,7 +749,7 @@ namespace Battle.Internal.Npc
             }
 
             var lethal = new DamageContext { Source = this, Cause = DamageCause.Ability };
-            lethal.Add(DamageType.Pure, CurrentHealth);
+            lethal.Add(DamageType.Sacred, CurrentHealth);
             _ = TakeDamage(lethal);
         }
 

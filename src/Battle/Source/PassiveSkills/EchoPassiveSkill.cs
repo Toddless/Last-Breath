@@ -96,7 +96,7 @@
 
             if (totalDamage <= 0) return;
             var context = new DamageContext { Source = Owner, Cause = DamageCause.Passive, IsCrit = false };
-            context.Add(DamageType.Pure, totalDamage);
+            context.Add(DamageType.Sacred, totalDamage);
             Owner.TakeDamage(context);
         }
     }

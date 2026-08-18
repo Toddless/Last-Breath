@@ -58,7 +58,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
             var randomTarget = enemies[idx];
 
             var damageContext = new DamageContext { Source = _owner, Cause = DamageCause.Ability };
-            damageContext.Add(DamageType.Pure, splashDamage);
+            damageContext.Add(DamageType.Sacred, splashDamage);
             _ = randomTarget.TakeDamage(damageContext);
             // A share of a landed attack, thrown at somebody the attack never aimed at: splash, and a
             // touched target owed an impact like every other. What is reported is what the context ended

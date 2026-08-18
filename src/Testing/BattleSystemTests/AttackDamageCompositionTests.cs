@@ -120,12 +120,12 @@ namespace LastBreathTest.BattleSystemTests
                 (EntityParameter.Armor, ArmorScalingFactor),
                 (EntityParameter.FireResistance, 0.8f));
             var context = Damage(Fighter(), DamageType.Poison, 100f);
-            context.Add(DamageType.Pure, 100f);
+            context.Add(DamageType.Sacred, 100f);
 
             Calculations.CalculateMitigation(context, target.Object, NoRolls);
 
             Assert.AreEqual(100f, context.DamageComponents[DamageType.Poison]);
-            Assert.AreEqual(100f, context.DamageComponents[DamageType.Pure]);
+            Assert.AreEqual(100f, context.DamageComponents[DamageType.Sacred]);
         }
 
         [TestMethod]

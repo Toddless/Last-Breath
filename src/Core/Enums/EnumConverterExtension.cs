@@ -38,7 +38,7 @@
             StatusEffects.Bleed => DamageType.Bleed,
             StatusEffects.Burning => DamageType.Burning,
             StatusEffects.Poison => DamageType.Poison,
-            _ => DamageType.Pure
+            _ => DamageType.Sacred
         };
 
         public static float ConvertEntityTypeToThresholdPenalty(this EntityType type) => type switch

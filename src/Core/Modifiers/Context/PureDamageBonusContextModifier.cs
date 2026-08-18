@@ -23,7 +23,7 @@ namespace Core.Modifiers.Context
             float bonusDamage = context.TotalDamage * bonus;
             if (bonusDamage <= 0) return;
             DamageSeen += context.TotalDamage;
-            context.Add(DamageType.Pure, bonusDamage);
+            context.Add(DamageType.Sacred, bonusDamage);
         }
     }
 }

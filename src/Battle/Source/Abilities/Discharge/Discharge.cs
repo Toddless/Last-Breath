@@ -81,7 +81,7 @@ namespace Battle.Source.Abilities.Discharge
                     plan.BarrierRestorePercent = this[Parameters.StageThreeBarrierRestore];
                     break;
                 case 4:
-                    plan.DamageType = DamageType.Pure;
+                    plan.DamageType = DamageType.Sacred;
                     break;
             }
         }

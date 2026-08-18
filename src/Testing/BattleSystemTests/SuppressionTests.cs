@@ -64,7 +64,7 @@ namespace LastBreathTest.BattleSystemTests
         public void OneRollPerHit_NotPerComponent()
         {
             var target = Defender((EntityParameter.SuppressChance, 0.5f), (EntityParameter.Suppress, 0.5f));
-            var context = Damage(DamageCause.Ability, (DamageType.Physical, 100f), (DamageType.Pure, 100f), (DamageType.Poison, 100f));
+            var context = Damage(DamageCause.Ability, (DamageType.Physical, 100f), (DamageType.Sacred, 100f), (DamageType.Poison, 100f));
             // A per-component roll would succeed on the first draw and fail on the next two.
             var rnd = new ScriptedRandom(0f, 0.99f, 0.99f);
 
@@ -72,7 +72,7 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(1, rnd.Draws, "a hit is either suppressed or it is not");
             Assert.AreEqual(50f, context.DamageComponents[DamageType.Physical], 0.001f);
-            Assert.AreEqual(50f, context.DamageComponents[DamageType.Pure], 0.001f);
+            Assert.AreEqual(50f, context.DamageComponents[DamageType.Sacred], 0.001f);
             Assert.AreEqual(50f, context.DamageComponents[DamageType.Poison], 0.001f);
         }
 

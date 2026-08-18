@@ -28,9 +28,13 @@
         FireResistance,
         ColdResistance,
         LightningResistance,
+        PoisonResistance,
         FireDamage,
         ColdDamage,
         LightningDamage,
+        PoisonDamageMultiplier,
+        BurningDamageMultiplier,
+        BleedDamageMultiplier,
 
         /// <summary>Fraction (0..1) of the target's matching resistance the owner's damage ignores —
         /// the elemental mirror of <see cref="ArmorPenetration"/>.</summary>
@@ -46,7 +50,11 @@
         AllDefence,
         AllResistancePenetration,
 
+        /// <summary>
+        /// All elemental damage: cold, light, fire
+        /// </summary>
         AllElementalDamage,
+
         /// <summary>
         /// All damage at once: phys, elemental, spell
         /// </summary>

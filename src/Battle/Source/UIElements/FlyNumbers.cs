@@ -51,7 +51,7 @@
                     DamageType.Fire => Colors.Orange,
                     DamageType.Cold => Colors.LightSkyBlue,
                     DamageType.Lightning => Colors.Blue,
-                    DamageType.Pure => Colors.Gold,
+                    DamageType.Sacred => Colors.Gold,
                     _ => Colors.White // Physical
                 };
         }

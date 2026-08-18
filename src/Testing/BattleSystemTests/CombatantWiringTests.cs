@@ -195,13 +195,13 @@ namespace LastBreathTest.BattleSystemTests
             parameters.SetBaseValueForParameter(EntityParameter.Suppress, 0.5f);
             target.Setup(t => t.Parameters).Returns(parameters);
             var context = new DamageContext { Source = target.Object, Cause = DamageCause.Ability };
-            context.Add(DamageType.Pure, 100f);
+            context.Add(DamageType.Sacred, 100f);
             var stream = new CountingRandom();
 
             Calculations.CalculateMitigation(context, target.Object, stream);
 
             Assert.AreEqual(1, stream.Draws, "the roll came from somewhere other than the stream the fighter owns");
-            Assert.AreEqual(50f, context.DamageComponents[DamageType.Pure], 0.001f);
+            Assert.AreEqual(50f, context.DamageComponents[DamageType.Sacred], 0.001f);
         }
 
         [TestMethod]

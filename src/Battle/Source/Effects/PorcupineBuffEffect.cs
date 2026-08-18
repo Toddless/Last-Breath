@@ -52,7 +52,7 @@ namespace Battle.Source.Effects
             float returned = (context.TotalDamage * damageReturn) + (Target.Parameters.Armor * armorReturn);
             if (returned <= 0) return;
             var retaliation = new DamageContext { Source = Target, Cause = DamageCause.Effect };
-            retaliation.Add(DamageType.Pure, returned);
+            retaliation.Add(DamageType.Sacred, returned);
             attacker.TakeDamage(retaliation);
         }
     }

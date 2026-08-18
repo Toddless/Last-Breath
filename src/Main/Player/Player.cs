@@ -458,7 +458,7 @@ namespace LastBreath.Player
             if (context.ConvertToDamage)
             {
                 var damageContext = new DamageContext { Source = context.Source, Cause = DamageCause.Passive };
-                damageContext.Add(DamageType.Pure, context.Amount);
+                damageContext.Add(DamageType.Sacred, context.Amount);
                 _ = TakeDamage(damageContext);
                 return;
             }

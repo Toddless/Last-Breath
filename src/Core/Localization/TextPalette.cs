@@ -33,7 +33,7 @@ namespace Core.Localization
 
         private static readonly Dictionary<DamageType, string> s_damageColors = new()
         {
-            [DamageType.Pure] = "#F5B64C",
+            [DamageType.Sacred] = "#F5B64C",
             [DamageType.Physical] = "#B5AEAE",
             [DamageType.Fire] = "#E3562B",
             [DamageType.Cold] = "#43A4E5",
