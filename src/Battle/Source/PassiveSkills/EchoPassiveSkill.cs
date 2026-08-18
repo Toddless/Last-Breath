@@ -64,7 +64,7 @@
 
         private void OnBeforeDamageTaken(BeforeDamageTakenEvent evnt)
         {
-            // Only echo real attack damage — not our own deferred hit (Passive/Pure) or DoTs,
+            // Only echo real attack damage — not our own deferred hit (Passive/Sacred) or DoTs,
             // otherwise the event now firing inside TakeDamage would re-process them endlessly.
             if (evnt.Context.Cause is not DamageCause.Attack) return;
             var context = evnt.Context;

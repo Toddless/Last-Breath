@@ -21,7 +21,7 @@ namespace Battle.Source.Abilities.Discharge
     /// <summary>
     /// Consumes the caster's ENTIRE current barrier and converts it into one lightning strike:
     /// barrier × multiplier + spell-damage scaling. Stage 2 raises the multiplier, stage 3 refunds
-    /// part of the dealt damage as barrier, stage 4 turns the damage pure.
+    /// part of the dealt damage as barrier, stage 4 turns the damage sacred.
     /// </summary>
     public class Discharge(AbilityBaseData data) : MulticastAbility<DischargePlan>(data)
     {

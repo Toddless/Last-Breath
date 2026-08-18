@@ -48,8 +48,8 @@ namespace Core.Enums
         AddedColdDamage,
         AddedLightningDamage,
 
-        /// <summary>Converts a share of the owner's ATTACK damage into Pure.</summary>
-        AttackPureConversion,
+        /// <summary>Converts a share of the owner's ATTACK damage into Sacred.</summary>
+        AttackSacredConversion,
 
         /// <summary>Chance that an activation leaves no cooldown behind.</summary>
         CooldownResetChance,

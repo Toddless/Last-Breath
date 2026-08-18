@@ -12,10 +12,12 @@
 		{ "parameter": "FireResistance", "unit": "Percent" },
 		{ "parameter": "ColdResistance", "unit": "Percent" },
 		{ "parameter": "LightningResistance", "unit": "Percent" },
+		{ "parameter": "PoisonResistance", "unit": "Percent" },
 		{ "parameter": "AllResistance", "unit": "Percent" },
 		{ "parameter": "FireResistancePenetration", "unit": "Percent" },
 		{ "parameter": "ColdResistancePenetration", "unit": "Percent" },
 		{ "parameter": "LightningResistancePenetration", "unit": "Percent" },
+		{ "parameter": "PoisonResistancePenetration", "unit": "Percent" },
 		{ "parameter": "AllResistancePenetration", "unit": "Percent" }
 	]
 }

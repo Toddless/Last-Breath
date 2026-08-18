@@ -13,7 +13,9 @@ namespace Battle.Source.Abilities
         public float Damage { get; set; }
         public float WeaponDamageScale { get; set; }
         public float SpellDamageScale { get; set; }
-        public DamageType DamageType { get; set; }
+        /// <summary>Bucket every hit of the plan lands in. Required rather than defaulted: a plan that
+        /// forgot to name its type would pool damage into <c>(DamageType)0</c>, which no rule mitigates.</summary>
+        public required DamageType DamageType { get; set; }
         public List<IFightable> Targets { get; set; } = [];
 
         /// <summary>Every hit of the plan skips elemental resistances.</summary>

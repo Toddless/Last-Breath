@@ -7,7 +7,7 @@ namespace Battle.Source.Effects
     using Core.Modifiers.Context;
 
     /// <summary>
-    /// The Sacrifice charge: the next <c>charges</c> activated abilities deal extra PURE damage equal to
+    /// The Sacrifice charge: the next <c>charges</c> activated abilities deal extra SACRED damage equal to
     /// <c>bonusPercent</c> of their damage. Lives by activations, not turns — the boost attaches on
     /// AbilityActivated and detaches on AbilityExecuted (the cast window). Recasting Sacrifice itself
     /// does not consume a charge. With <c>healPercent</c> &gt; 0 the caster heals for a share of the
@@ -17,7 +17,7 @@ namespace Battle.Source.Effects
         : Effect(id: "Effect_Sacrifice_Charge", duration: 0, maxStacks: 1)
     {
         private int _chargesLeft = charges;
-        private PureDamageBonusContextModifier? _modifier;
+        private SacredDamageBonusContextModifier? _modifier;
         private string _boostedCastId = string.Empty;
 
         public float BonusPercent => bonusPercent;
@@ -51,7 +51,7 @@ namespace Battle.Source.Effects
             if (Target == null || _modifier != null) return;
             if (evt.Ability.Id == sourceAbilityId) return; // recasting Sacrifice refreshes, never consumes
 
-            _modifier = new PureDamageBonusContextModifier(Target, bonusPercent);
+            _modifier = new SacredDamageBonusContextModifier(Target, bonusPercent);
             Target.ModifierHandler.Add(_modifier);
             _boostedCastId = evt.CastId;
         }

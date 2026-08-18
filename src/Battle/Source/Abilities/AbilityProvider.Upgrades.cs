@@ -166,12 +166,12 @@
                     data.Tags,
                     data.Tier,
                     new ReduceRandomCooldownActivationRider(data.Id, (int)data.UpgradeProperties.GetValueOrDefault("amount", 1))),
-            ["Augment_Next_Cast_Pure"] = data =>
+            ["Augment_Next_Cast_Sacred"] = data =>
                 new AbilityAugmentCastEffect(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ability => new NextCastPureConversionEffect(ability.Id,
+                    ability => new NextCastSacredConversionEffect(ability.Id,
                         data.UpgradeProperties.GetValueOrDefault("fraction", 0.3f))),
             ["Augment_Overload_Stage_Four_Resets_Cooldown"] = data =>
                 new DelegateAugment<Overload.Overload>(

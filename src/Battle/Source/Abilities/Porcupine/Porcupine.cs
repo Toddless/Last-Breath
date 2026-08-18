@@ -9,7 +9,7 @@ namespace Battle.Source.Abilities.Porcupine
     using Effects;
 
     /// <summary>
-    /// Self-buff: for a few turns every enemy hit is answered with pure damage — a share of the taken
+    /// Self-buff: for a few turns every enemy hit is answered with sacred damage — a share of the taken
     /// damage plus a share of the bearer's armor. The activatable sibling of PorcupinePassiveSkill.
     /// </summary>
     public class Porcupine(AbilityBaseData data) : Ability(data)

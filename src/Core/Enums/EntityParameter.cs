@@ -41,6 +41,7 @@
         FireResistancePenetration,
         ColdResistancePenetration,
         LightningResistancePenetration,
+        PoisonResistancePenetration,
 
         // Aggregate ("all X") parameters: bucket-only members standing for a whole family. Never read as a
         // value — ParameterModifiersComponent folds their modifiers into each family member and fans change

@@ -9,11 +9,11 @@ namespace Battle.Source.Effects
 
     /// <summary>
     /// The Overload L3 upgrade payload: the NEXT activated ability deals <c>fraction</c> (0.3 = 30%)
-    /// of its damage as Pure (converted, not added). Same cast-window mechanics as the other
+    /// of its damage as Sacred (converted, not added). Same cast-window mechanics as the other
     /// "next ability" charges; recasting the source ability never consumes it.
     /// </summary>
-    public class NextCastPureConversionEffect(string sourceAbilityId, float fraction)
-        : Effect(id: "Effect_Pure_Conversion_Charge", duration: 0, maxStacks: 1)
+    public class NextCastSacredConversionEffect(string sourceAbilityId, float fraction)
+        : Effect(id: "Effect_Sacred_Conversion_Charge", duration: 0, maxStacks: 1)
     {
         private IDamageModifier? _modifier;
         private string _boostedCastId = string.Empty;
@@ -40,9 +40,9 @@ namespace Battle.Source.Effects
         }
 
         public override bool IsStronger(IEffect otherEffect) =>
-            otherEffect is NextCastPureConversionEffect other && fraction > other.Fraction;
+            otherEffect is NextCastSacredConversionEffect other && fraction > other.Fraction;
 
-        public override IEffect Copy() => new NextCastPureConversionEffect(sourceAbilityId, fraction);
+        public override IEffect Copy() => new NextCastSacredConversionEffect(sourceAbilityId, fraction);
 
         private void OnAbilityActivated(AbilityActivatedEvent evt)
         {

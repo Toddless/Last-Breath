@@ -33,12 +33,14 @@
         public static Rarity ApplyRarityFloor(this Rarity rolled, Rarity? minRarity) =>
             minRarity == null ? rolled : (Rarity)Math.Min((byte)rolled, (byte)minRarity.Value);
 
+        /// <summary>Damage bucket a status ticks in. Anything without a bucket of its own falls back to
+        /// Physical: an unnamed DoT must answer to armor rather than tick as unmitigable sacred damage.</summary>
         public static DamageType GetDamageType(this StatusEffects effect) => effect switch
         {
             StatusEffects.Bleed => DamageType.Bleed,
             StatusEffects.Burning => DamageType.Burning,
             StatusEffects.Poison => DamageType.Poison,
-            _ => DamageType.Sacred
+            _ => DamageType.Physical
         };
 
         public static float ConvertEntityTypeToThresholdPenalty(this EntityType type) => type switch

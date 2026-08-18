@@ -19,9 +19,32 @@ namespace LastBreathTest.BattleSystemTests
 
             component.AddModifier(allResistances);
 
-            foreach (var member in new[] { EntityParameter.FireResistance, EntityParameter.ColdResistance, EntityParameter.LightningResistance })
+            foreach (var member in new[]
+                     {
+                         EntityParameter.FireResistance, EntityParameter.ColdResistance,
+                         EntityParameter.LightningResistance, EntityParameter.PoisonResistance
+                     })
                 Assert.IsTrue(component.GetModifiers(member).Any(modifier => modifier.InstanceId == allResistances.InstanceId),
                     $"{member} should fold in the AllResistance bucket");
+        }
+
+        /// <summary>"All resistances" covers poison too — it is a resistance like the elemental three,
+        /// so neither the bucket nor its penetration sibling may quietly skip it.</summary>
+        [TestMethod]
+        public void GetModifiers_AllResistancePenetration_CoversPoison()
+        {
+            var component = new ParameterModifiersComponent();
+            var allPenetration = new SimpleModifier(EntityParameter.AllResistancePenetration, ModifierValueType.Flat, 0.2f, "test");
+
+            component.AddModifier(allPenetration);
+
+            foreach (var member in new[]
+                     {
+                         EntityParameter.FireResistancePenetration, EntityParameter.ColdResistancePenetration,
+                         EntityParameter.LightningResistancePenetration, EntityParameter.PoisonResistancePenetration
+                     })
+                Assert.IsTrue(component.GetModifiers(member).Any(modifier => modifier.InstanceId == allPenetration.InstanceId),
+                    $"{member} should fold in the AllResistancePenetration bucket");
         }
 
         [TestMethod]

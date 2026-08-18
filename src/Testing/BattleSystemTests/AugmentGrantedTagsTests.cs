@@ -81,7 +81,7 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Ice_Aegis_Crit_Mitigation_Under_Shield", [AbilityTags.Buff, AbilityTags.Effect]),
 
             ("Augment_Empowered_Ability_Free_Cast", [AbilityTags.Buff, AbilityTags.Effect]),
-            ("Augment_Next_Cast_Pure", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Next_Cast_Sacred", [AbilityTags.Buff, AbilityTags.Effect]),
 
             ("Augment_Mana_Flow", [AbilityTags.Buff, AbilityTags.Recovery, AbilityTags.Effect]),
 

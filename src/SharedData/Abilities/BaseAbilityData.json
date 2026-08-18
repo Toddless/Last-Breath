@@ -186,7 +186,7 @@
         },
         {
             "id": "Ability_Sacrifice",
-            "tags": [ "cost", "cooldown", "activation", "health", "buff", "empowered", "pure", "consume" ],
+            "tags": [ "cost", "cooldown", "activation", "health", "buff", "empowered", "sacred", "consume" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -1374,7 +1374,7 @@
             "upgradeProperties": {}
         },
         {
-            "id": "Augment_Next_Cast_Pure",
+            "id": "Augment_Next_Cast_Sacred",
             "minRarity": "Legendary",
             "maxRarity": "Legendary",
             "grantsTags": [ "buff", "effect" ],

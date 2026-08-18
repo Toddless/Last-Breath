@@ -8,7 +8,7 @@ namespace Battle.Source.Effects
     using Core.Events;
 
     /// <summary>
-    /// The Porcupine buff: every real enemy hit is answered with pure damage — a share of the damage
+    /// The Porcupine buff: every real enemy hit is answered with sacred damage — a share of the damage
     /// taken plus a share of the bearer's armor. Optional hooks (upgrades): heal on being hit and a
     /// chance to shave a turn off the source ability's cooldown.
     /// </summary>

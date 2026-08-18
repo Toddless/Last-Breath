@@ -10,7 +10,7 @@ namespace Battle.Source.Abilities.Sacrifice
     using Effects;
 
     /// <summary>
-    /// Sacrifices a share of CURRENT health; the next activated abilities (charges) deal extra PURE
+    /// Sacrifices a share of CURRENT health; the next activated abilities (charges) deal extra SACRED
     /// damage — every 100 health lost gives <c>RatePerHundred</c> of the cast's damage as the bonus.
     /// Cross-stance by design: the charge is an entity effect.
     /// </summary>

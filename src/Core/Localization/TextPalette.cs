@@ -41,6 +41,7 @@ namespace Core.Localization
             [DamageType.Poison] = "#55D458",
             [DamageType.Burning] = "#E35924",
             [DamageType.Bleed] = "#E82E2E",
+            [DamageType.Blight] = "#7A4B78",
         };
 
         private static readonly Dictionary<Rarity, string> s_rarityColors = new()
@@ -54,6 +55,9 @@ namespace Core.Localization
             [Rarity.Mythic] = "#F056D6",
         };
 
+        /// <summary>Battle-log tint of a damage component. White is the deliberate fallback: it is what
+        /// plain Physical would read as, so an unlisted type shows up as an untinted number rather than
+        /// borrowing another type's colour.</summary>
         public static string DamageColor(DamageType type) => s_damageColors.GetValueOrDefault(type, "#ffffff");
 
         /// <summary>Item rarity accent: tooltip titles, slot frames and anything else that color-codes rarity.</summary>

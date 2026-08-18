@@ -1,6 +1,7 @@
 ﻿namespace Battle.Source.UIElements
 {
     using Core.Enums;
+    using Core.Localization;
     using Core.Views.UI;
     using Godot;
 
@@ -52,7 +53,11 @@
                     DamageType.Cold => Colors.LightSkyBlue,
                     DamageType.Lightning => Colors.Blue,
                     DamageType.Sacred => Colors.Gold,
-                    _ => Colors.White // Physical
+                    // No named colour sits near the blight; it borrows the log palette's swamp purple.
+                    DamageType.Blight => Color.FromHtml(TextPalette.DamageColor(DamageType.Blight)),
+                    // Physical, and anything a rule forgets: white is what plain Physical reads as, so an
+                    // unlisted type shows an untinted number instead of borrowing another type's colour.
+                    _ => Colors.White
                 };
         }
     }

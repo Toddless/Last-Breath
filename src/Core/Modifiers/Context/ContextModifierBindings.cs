@@ -64,7 +64,7 @@
             ContextParameter.AddedFireDamage => AddedElemental(entry, views, DamageType.Fire),
             ContextParameter.AddedColdDamage => AddedElemental(entry, views, DamageType.Cold),
             ContextParameter.AddedLightningDamage => AddedElemental(entry, views, DamageType.Lightning),
-            ContextParameter.AttackPureConversion =>
+            ContextParameter.AttackSacredConversion =>
                 Damage(entry, views, (owner, value) => new DamageConversionContextModifier(owner, value, DamageCause.Attack)),
             ContextParameter.CooldownResetChance =>
                 new ActivationBinding(new ChanceCooldownResetActivationContextModifier(views.Of(entry))),

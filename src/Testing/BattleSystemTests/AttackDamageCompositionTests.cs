@@ -1,5 +1,6 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using System;
     using Core;
     using Core.Context;
     using Core.Entity;
@@ -10,8 +11,9 @@ namespace LastBreathTest.BattleSystemTests
 
     /// <summary>Attack damage as a component dictionary (Physical seed + weapon elementals, crit per
     /// component) and the mitigation rules per damage type: elementals — resistance × source penetration;
-    /// Physical and Bleed — armor; Burning — fire resistance regardless of the ignore-resists flag;
-    /// Sacred, Blight and Poison pass untouched — while type-agnostic reductions still cut them all.</summary>
+    /// Physical and Bleed — armor; Burning — fire resistance and Poison — poison resistance, both regardless of
+    /// the ignore-resists flag; Sacred and Blight pass untouched — while type-agnostic reductions still cut
+    /// them all.</summary>
     [TestClass]
     public class AttackDamageCompositionTests
     {
@@ -114,18 +116,43 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void Mitigation_PoisonAndPurePassUntouched()
+        public void Mitigation_PoisonUsesPoisonResistance_AndIgnoresTheIgnoreResistancesFlag()
         {
             var target = Fighter(
-                (EntityParameter.Armor, ArmorScalingFactor),
-                (EntityParameter.FireResistance, 0.8f));
+                (EntityParameter.PoisonResistance, 0.5f),
+                (EntityParameter.FireResistance, 0.5f));
             var context = Damage(Fighter(), DamageType.Poison, 100f);
-            context.Add(DamageType.Sacred, 100f);
+            context.Add(DamageType.Fire, 100f);
+            context.IgnoreResistances = true;
 
             Calculations.CalculateMitigation(context, target.Object, NoRolls);
 
-            Assert.AreEqual(100f, context.DamageComponents[DamageType.Poison]);
-            Assert.AreEqual(100f, context.DamageComponents[DamageType.Sacred]);
+            Assert.AreEqual(100f, context.DamageComponents[DamageType.Fire], 0.001f, "the flag skips elemental resistances");
+            Assert.AreEqual(50f, context.DamageComponents[DamageType.Poison], 0.001f, "poison ticks are resisted regardless — the flag is an attack-side mark");
+        }
+
+        [TestMethod]
+        public void Mitigation_PoisonResistanceIsScaledBySourcePenetration()
+        {
+            var source = Fighter((EntityParameter.PoisonResistancePenetration, 0.5f));
+            var target = Fighter((EntityParameter.PoisonResistance, 0.8f));
+            var context = Damage(source, DamageType.Poison, 100f);
+
+            Calculations.CalculateMitigation(context, target.Object, NoRolls);
+
+            // 0.8 resistance × (1 − 0.5 penetration) = 0.4 → 60 damage through
+            Assert.AreEqual(60f, context.DamageComponents[DamageType.Poison], 0.001f);
+        }
+
+        [TestMethod]
+        public void Mitigation_PoisonIsUntouchedByArmor()
+        {
+            var target = Fighter((EntityParameter.Armor, ArmorScalingFactor));
+            var context = Damage(Fighter(), DamageType.Poison, 100f);
+
+            Calculations.CalculateMitigation(context, target.Object, NoRolls);
+
+            Assert.AreEqual(100f, context.DamageComponents[DamageType.Poison], 0.001f, "poison answers to its own resistance, never to armor");
         }
 
         [TestMethod]
@@ -170,6 +197,34 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(50f, context.DamageComponents[DamageType.Burning]);
             Assert.AreEqual(100f, context.DamageComponents[DamageType.Bleed], "a burning-only knob must not touch bleed");
+        }
+
+        /// <summary>A DoT whose status names no bucket of its own ticks as Physical, not as Sacred:
+        /// an unnamed status must answer to armor rather than deal unmitigable damage.</summary>
+        [TestMethod]
+        public void UnnamedStatus_TicksAsPhysical()
+        {
+            Assert.AreEqual(DamageType.Bleed, StatusEffects.Bleed.GetDamageType());
+            Assert.AreEqual(DamageType.Burning, StatusEffects.Burning.GetDamageType());
+            Assert.AreEqual(DamageType.Poison, StatusEffects.Poison.GetDamageType());
+
+            foreach (var unnamed in new[] { StatusEffects.Stun, StatusEffects.Freeze, StatusEffects.Regeneration })
+                Assert.AreEqual(DamageType.Physical, unnamed.GetDamageType(),
+                    $"{unnamed} has no bucket of its own and must fall back to Physical");
+        }
+
+        /// <summary>The plan's damage bucket stays `required`, so a cast that forgets to name its type is a
+        /// compile error. Without it the bucket would be `(DamageType)0` — a value no enum member holds.</summary>
+        [TestMethod]
+        public void DamagingCastPlan_DamageType_IsRequired()
+        {
+            var property = typeof(Battle.Source.Abilities.DamagingCastPlan).GetProperty(nameof(Battle.Source.Abilities.DamagingCastPlan.DamageType));
+
+            Assert.IsNotNull(property);
+            Assert.IsTrue(property!.GetCustomAttributes(typeof(System.Runtime.CompilerServices.RequiredMemberAttribute), false).Length > 0,
+                "DamageType must stay required — a forgotten assignment would pool damage into an unruled bucket");
+            Assert.IsFalse(Enum.IsDefined(typeof(DamageType), (DamageType)0),
+                "no damage type may sit on 0, or a forgotten assignment would silently pick it up");
         }
 
         private static DamageContext Damage(Mock<IFightable> source, DamageType type, float amount)

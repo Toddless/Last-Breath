@@ -95,8 +95,8 @@ namespace Core.Battle.Abilities
         public const string Elemental = "elemental";
         /// <summary>Weapon-borne physical damage, as opposed to the elemental family.</summary>
         public const string Physical = "physical";
-        /// <summary>Pure damage — mitigated by nothing.</summary>
-        public const string Pure = "pure";
+        /// <summary>Sacred damage — mitigated by nothing.</summary>
+        public const string Sacred = "sacred";
         /// <summary>Consumes a resource or an effect as the price or fuel of the cast.</summary>
         public const string Consume = "consume";
         /// <summary>The berserker's Fury effect family.</summary>
@@ -111,7 +111,7 @@ namespace Core.Battle.Abilities
             Accuracy, Armor, Bleed, Burn, Charge, Control, Cooldown, Cost, Curse, Damage, Debuff, Defence,
             Effect, Evadable, Heal, Hit, Leech, Recovery, Restore, Scale,
             Splash, Spread, Target, Thorn,
-            Activation, Elemental, Physical, Pure, Consume, Fury, Stage,
+            Activation, Elemental, Physical, Sacred, Consume, Fury, Stage,
         };
 
         /// <summary>

@@ -26,10 +26,10 @@
 
 **Причина ≠ происхождение.** Способность, бьющая через атаку, получает `Cause = Attack` и штамп `SourceAbilityId`. Гейт «только способности» обязан смотреть на оба признака — см. 2.4.
 
-### 1.2 `DamageType` — `Core/Enums/DamageType.cs:5-16`
-`[Flags]`, но используется как одиночный ключ словаря: `Sacred = 0`, `Burning = 1`, `Poison = 2`, `Bleed = 4`, `Physical = 8`, `Fire = 16`, `Cold = 32`, `Lightning = 64`.
+### 1.2 `DamageType` — `Core/Enums/DamageType.cs:6-18`
+`[Flags]`, но используется как одиночный ключ словаря: `Sacred = 1`, `Blight = 2`, `Burning = 4`, `Poison = 8`, `Bleed = 16`, `Physical = 32`, `Fire = 64`, `Cold = 128`, `Lightning = 256`.
 
-**Капкан:** `Sacred = 0` — нулевая маска. Любая проверка `(type & mask) != 0` для `Sacred` всегда ложна (`DotDamageTakenReductionContextModifier:22`).
+**Капкан снят:** у `Sacred` теперь свой бит (`1 << 0`), поэтому маски `(type & mask) != 0` работают для всех членов. Нулевого члена нет вовсе — `(DamageType)0` не тип, а забытое присваивание, и митигация кричит о нём через `Unruled`.
 
 ### 1.3 `AttackResults` — `Core/Enums/AttackResults.cs:3-8`
 `Evaded = 0`, `Blocked = 1`, `Succeed = 2`.
@@ -84,7 +84,7 @@
 
 Шаг 3 — точка, где сидит `EchoPassiveSkill`: он снимает свою долю **до** митигации.
 
-### 2.2 Митигация по типам — `Calculations.MitigateComponent:118-139`
+### 2.2 Митигация по типам — `Calculations.MitigateComponent:124-138`
 
 | Тип | Чем митигируется | Уважает `IgnoreResistances` |
 |---|---|---|
@@ -92,11 +92,11 @@
 | `Burning` | **fire**-сопротивление | **нет** — ветка минует проверку флага |
 | `Physical` | броня × (1 − `ArmorPenetration`) | н/п |
 | `Bleed` | **броня**, вместе с Physical | н/п |
+| `Poison` | **poison**-сопротивление × (1 − пробитие источника) | **нет** — ветка минует проверку флага |
 | `Sacred` | ничем | н/п |
 | `Blight` | ничем (и мимо щита/барьера — см. 2.3) | н/п |
-| `Poison` | ничем | н/п |
 
-Ветки Sacred/Blight/Poison — **явные**; тип без своей ветки проходит насквозь с записью в Tracker (`Unruled:136`), а не наследует «не режется ничем» молча.
+Ветки Sacred/Blight/Poison — **явные**; тип без своей ветки проходит насквозь с записью в Tracker (`Unruled`), а не наследует «не режется ничем» молча. Пара «сопротивление яда + пробитие» намеренно лежит ОТДЕЛЬНО от `s_resistanceByType`: снимает эту таблицу именно флаг `IgnoreResistances`, а тик ДоТа — не атака.
 
 Формулы: `resist = target[R] * (1 − source[P])`, затем `damage * (1 − resist)`. Броня: `damage * (1 − A/(A+10000))`, `ArmorScalingFactor = 10000f` (`Calculations:20`) — асимптотика, верхнего капа у параметра нет.
 
@@ -191,7 +191,7 @@ advantage = max(0, evade − accuracy)
 - `MaxStacks` считается **глобально по цели**, по всем источникам (`:46`).
 - Многостаковые: при переполнении вытесняется глобально самый старый одноимённый (`:150`).
 - Одностаковые (`:158-178`): новый сильнее → замена; иначе **рефреш длительности** `max(existing, new)`, новый инстанс выбрасывается. База `Effect.IsStronger` — `false`, то есть по умолчанию только рефреш.
-- Тики DoT: группировка по статусу и кастеру, мёртвый кастер пропускается, суммарный урон одним контекстом `Cause = Effect`. Тип — `status.GetDamageType()`, всё кроме Bleed/Burning/Poison → `Sacred`.
+- Тики DoT: группировка по статусу и кастеру, мёртвый кастер пропускается, суммарный урон одним контекстом `Cause = Effect`. Тип — `status.GetDamageType()`, всё кроме Bleed/Burning/Poison → `Physical` (безымянный ДоТ отвечает броне, а не тикает неснижаемым).
 - `TurnEnd`: `if (Expired) Remove(); Duration--;` — снятие на ход **позже** обнуления, `Duration` уходит в −1.
 
 ---
@@ -258,7 +258,7 @@ advantage = max(0, evade − accuracy)
 | Ручка | Фильтр |
 |---|---|
 | `PhysicalToFire/Cold/Lightning` | `Source == owner`; **причина не фильтруется** — ловит и способности, и эффекты, и пассивки |
-| `AttacksIgnoreResistances`, `AddedFire/Cold/LightningDamage`, `AttackPureConversion` | `Source == owner` + `Cause == Attack` |
+| `AttacksIgnoreResistances`, `AddedFire/Cold/LightningDamage`, `AttackSacredConversion` | `Source == owner` + `Cause == Attack` |
 | `DamageTakenReductionFrom{Attack,Ability,Effect,Passive}` | `Source != owner` + своя причина; значение читается **один раз на удар** |
 | `DotDamageTakenReduction` и три пер-статусных | `Source != owner`, маска статуса; **причина не проверяется**; значение читается **на каждый компонент** |
 
@@ -268,7 +268,7 @@ advantage = max(0, evade − accuracy)
 `BleedDuration`, `BurningStacks`, `BurningDamageTakenReduction`, `PoisonDamageTakenReduction`, `BleedDamageTakenReduction` — код есть, данных нет.
 
 ### 7.3 Модификаторы только из кода, без `ContextParameter`
-`IDamageContext`: `BarrierBypass` (гейт `Attack or Ability`), `CritDamageTaken`, `DamageTypeTaken`, `HitDamageDealt` (**только `Ability`**), `PureDamageBonus` (**исключает `Effect`**).
+`IDamageContext`: `BarrierBypass` (гейт `Attack or Ability`), `CritDamageTaken`, `DamageTypeTaken`, `HitDamageDealt` (**только `Ability`**), `SacredDamageBonus` (**исключает `Effect`**).
 `IAttackContext`: `Accuracy`, `FirstAttackCrit`, `LastAttackAlwaysCrit` (Late), `LeechOnCrit`, `UnblockableAttack` (Absolute), `UnevadableAttack` (Absolute), `PoisonAttack`.
 `IHealContext`: `HealReduction`, `HealthRecovery`.
 `IAbilityActivationContext`: `Exhaustion`, `FlatCost` (Early), `CostScale`, `CostType` (Absolute), `CooldownIncrease`, `NoCooldown`.

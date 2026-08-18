@@ -13,10 +13,10 @@ namespace Core.Enums
         private static readonly IReadOnlyDictionary<EntityParameter, EntityParameter[]> s_families =
             new Dictionary<EntityParameter, EntityParameter[]>
             {
-                [EntityParameter.AllResistance] = [EntityParameter.FireResistance, EntityParameter.ColdResistance, EntityParameter.LightningResistance],
+                [EntityParameter.AllResistance] = [EntityParameter.FireResistance, EntityParameter.ColdResistance, EntityParameter.LightningResistance, EntityParameter.PoisonResistance],
                 [EntityParameter.AllAttribute] = [EntityParameter.Strength, EntityParameter.Dexterity, EntityParameter.Intelligence],
                 [EntityParameter.AllDefence] = [EntityParameter.Evade, EntityParameter.Armor],
-                [EntityParameter.AllResistancePenetration] = [EntityParameter.FireResistancePenetration, EntityParameter.ColdResistancePenetration, EntityParameter.LightningResistancePenetration],
+                [EntityParameter.AllResistancePenetration] = [EntityParameter.FireResistancePenetration, EntityParameter.ColdResistancePenetration, EntityParameter.LightningResistancePenetration, EntityParameter.PoisonResistancePenetration],
             };
 
         // Reverse index (concrete member -> aggregates that include it), built once for the resolution-time fold.

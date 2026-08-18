@@ -1021,6 +1021,13 @@
                     "affix": "Suffix"
                 },
                 {
+                    "parameter": "PoisonResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1, "max": 0.2 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
                     "parameter": "ManaRecovery",
                     "modifierType": "flat",
                     "value": { "min": 15, "max": 35 },
@@ -1520,6 +1527,13 @@
                     "affix": "Suffix"
                 },
                 {
+                    "parameter": "PoisonResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.05, "max": 0.15 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
                     "parameter": "MoveSpeed",
                     "modifierType": "flat",
                     "value": { "min": 35, "max": 50 },
@@ -2011,6 +2025,13 @@
                     "affix": "Suffix"
                 },
                 {
+                    "parameter": "PoisonResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1, "max": 0.2 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
                     "parameter": "HealthRecovery",
                     "modifierType": "flat",
                     "value": { "min": 35, "max": 55 },
@@ -2170,6 +2191,13 @@
                 },
                 {
                     "parameter": "ColdResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.05, "max": 0.15 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "PoisonResistance",
                     "modifierType": "flat",
                     "value": { "min": 0.05, "max": 0.15 },
                     "weight": 30,
@@ -2690,6 +2718,13 @@
                 },
                 {
                     "parameter": "ColdResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.05, "max": 0.15 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "PoisonResistance",
                     "modifierType": "flat",
                     "value": { "min": 0.05, "max": 0.15 },
                     "weight": 30,

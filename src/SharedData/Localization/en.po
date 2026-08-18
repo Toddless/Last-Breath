@@ -1126,7 +1126,7 @@ msgid "Effect_Porcupine"
 msgstr "Porcupine"
 
 msgid "Effect_Porcupine_Description"
-msgstr "Retaliate against every attacker with pure damage based on the hit taken and your armor, for {Duration|turn|turns}."
+msgstr "Retaliate against every attacker with sacred damage based on the hit taken and your armor, for {Duration|turn|turns}."
 
 msgid "Effect_Poison_Coating"
 msgstr "Poison Coating"
@@ -1138,7 +1138,7 @@ msgid "Effect_Sacrifice_Charge"
 msgstr "Sacrifice"
 
 msgid "Effect_Sacrifice_Charge_Description"
-msgstr "The next activated abilities deal additional pure damage."
+msgstr "The next activated abilities deal additional sacred damage."
 
 msgid "Effect_Shield"
 msgstr "Shield"
@@ -1280,11 +1280,11 @@ msgstr "Overload Charge"
 msgid "Effect_Overload_Charge_Description"
 msgstr "The next activated ability deals increased damage."
 
-msgid "Effect_Pure_Conversion_Charge"
-msgstr "Pure Current"
+msgid "Effect_Sacred_Conversion_Charge"
+msgstr "Sacred Current"
 
-msgid "Effect_Pure_Conversion_Charge_Description"
-msgstr "The next activated ability deals part of its damage as pure."
+msgid "Effect_Sacred_Conversion_Charge_Description"
+msgstr "The next activated ability deals part of its damage as sacred."
 
 msgid "Effect_Next_Ability_Cooldown"
 msgstr "Chilled Mind"
@@ -1488,11 +1488,11 @@ msgstr "Adds {value} of attack damage as lightning"
 msgid "Context_Modifier_AddedLightningDamage_Range"
 msgstr "Adds {min}–{max} of attack damage as lightning"
 
-msgid "Context_Modifier_AttackPureConversion"
-msgstr "Converts {value} of attack damage to pure"
+msgid "Context_Modifier_AttackSacredConversion"
+msgstr "Converts {value} of attack damage to sacred"
 
-msgid "Context_Modifier_AttackPureConversion_Range"
-msgstr "Converts {min}–{max} of attack damage to pure"
+msgid "Context_Modifier_AttackSacredConversion_Range"
+msgstr "Converts {min}–{max} of attack damage to sacred"
 
 msgid "Context_Modifier_CooldownResetChance"
 msgstr "{value} chance to reset the cooldown of an activated ability"
@@ -2258,8 +2258,8 @@ msgstr "Player"
 msgid "Log_Enemy"
 msgstr "Enemy"
 
-msgid "DamageType_Pure"
-msgstr "Pure"
+msgid "DamageType_Sacred"
+msgstr "Sacred"
 
 msgid "DamageType_Physical"
 msgstr "Phys."
@@ -2281,6 +2281,9 @@ msgstr "Burning"
 
 msgid "DamageType_Bleed"
 msgstr "Bleed"
+
+msgid "DamageType_Blight"
+msgstr "Blight"
 
 # ------------------------------
 # Parameters (EntityParameter enum — держать в синхроне)
@@ -2367,6 +2370,9 @@ msgstr "Cold Resistance"
 msgid "LightningResistance"
 msgstr "Lightning Resistance"
 
+msgid "PoisonResistance"
+msgstr "Poison Resistance"
+
 msgid "AllResistance"
 msgstr "All Resistances"
 
@@ -2378,6 +2384,9 @@ msgstr "Cold Resistance Penetration"
 
 msgid "LightningResistancePenetration"
 msgstr "Lightning Resistance Penetration"
+
+msgid "PoisonResistancePenetration"
+msgstr "Poison Resistance Penetration"
 
 msgid "AllResistancePenetration"
 msgstr "All Resistance Penetration"
@@ -2517,7 +2526,7 @@ msgid "Ability_Ares_Blessing_Description"
 msgstr "Increases maximum health by {HealthBonus:%} and health recovery by {RecoveryBonus:%} for {Duration|turn|turns}."
 
 msgid "Ability_Sacrifice_Description"
-msgstr "Sacrifices {SacrificePercent:%} of current health. For every 100 health lost, the next activated ability gains {RatePerHundred:%} as pure damage. Charges: {Charges}."
+msgstr "Sacrifices {SacrificePercent:%} of current health. For every 100 health lost, the next activated ability gains {RatePerHundred:%} as sacred damage. Charges: {Charges}."
 
 msgid "Ability_Ice_Shards"
 msgstr "Ice Shards"
@@ -2617,11 +2626,11 @@ msgstr "Stage4 Resets Cooldown"
 msgid "Augment_Overload_Stage_Four_Resets_Cooldown_Description"
 msgstr "Rolling activation level 4 resets this ability's cooldown."
 
-msgid "Augment_Next_Cast_Pure"
-msgstr "Next Cast Pure"
+msgid "Augment_Next_Cast_Sacred"
+msgstr "Next Cast Sacred"
 
-msgid "Augment_Next_Cast_Pure_Description"
-msgstr "The next activated ability deals {fraction:%} of its damage as pure."
+msgid "Augment_Next_Cast_Sacred_Description"
+msgstr "The next activated ability deals {fraction:%} of its damage as sacred."
 
 msgid "Augment_Chain_Lightning_Ignore_Resistances"
 msgstr "Ignore Resistances"
@@ -3622,7 +3631,7 @@ msgid "Ability_Discharge"
 msgstr "Discharge"
 
 msgid "Ability_Discharge_Description"
-msgstr "Consumes the caster's entire barrier and strikes with lightning: absorbed barrier × {BarrierMultiplier} + {SpellDamageScale:%} spell damage.\nActivation level 2: the multiplier is increased by {StageTwoMultiplierBonus}.\nActivation level 3: restores {StageThreeBarrierRestore:%} of the damage dealt as barrier.\nActivation level 4: the damage becomes pure."
+msgstr "Consumes the caster's entire barrier and strikes with lightning: absorbed barrier × {BarrierMultiplier} + {SpellDamageScale:%} spell damage.\nActivation level 2: the multiplier is increased by {StageTwoMultiplierBonus}.\nActivation level 3: restores {StageThreeBarrierRestore:%} of the damage dealt as barrier.\nActivation level 4: the damage becomes sacred."
 
 msgid "Ability_Static_Armor"
 msgstr "Static Armor"

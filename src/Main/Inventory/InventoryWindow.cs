@@ -43,7 +43,10 @@ namespace LastBreath.Inventory
         ];
 
         private static readonly EntityParameter[] s_resistParameters =
-            [EntityParameter.FireResistance, EntityParameter.ColdResistance, EntityParameter.LightningResistance];
+        [
+            EntityParameter.FireResistance, EntityParameter.ColdResistance, EntityParameter.LightningResistance,
+            EntityParameter.PoisonResistance
+        ];
 
         [Export] private Button? _craftingButton, _allStatsButton, _sortButton, _destroyButton;
         [Export] private GridContainer? _inventoryGrid;

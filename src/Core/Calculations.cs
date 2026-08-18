@@ -25,6 +25,11 @@
             [DamageType.Lightning] = (EntityParameter.LightningResistance, EntityParameter.LightningResistancePenetration),
         };
 
+        /// <summary>Poison's resistance pair, deliberately kept OUT of <see cref="s_resistanceByType"/>: that table is
+        /// exactly what the attack-side "ignore resistances" mark strips, and a damage-over-turn tick is not an attack.</summary>
+        private static readonly (EntityParameter Resistance, EntityParameter Penetration) s_poisonResistance =
+            (EntityParameter.PoisonResistance, EntityParameter.PoisonResistancePenetration);
+
         public static float CalculateFloatValue(IReadOnlyList<IModifier> modifiers, float baseValue = 0)
             => Math.Max(0, CalculateModifiers(modifiers, baseValue));
 
@@ -57,8 +62,9 @@
         /// -> suppression -> shield -> barrier -> stage guard -> health.
         /// Rules: Physical and Bleed — armor scaled by the source's armor penetration; Fire/Cold/Lightning —
         /// the matching resistance (fraction 0..1) scaled by the source's resistance penetration; Burning — fire
-        /// resistance the same way (but the "attacks ignore resistances" flag never covers it — that mark is
-        /// attack-side); Sacred, Blight and Poison pass through untouched, each by its own named rule.
+        /// resistance and Poison — poison resistance the same way (the "attacks ignore resistances" flag covers
+        /// neither: that mark is attack-side and a damage-over-turn tick is not an attack); Sacred and Blight
+        /// pass through untouched, each by its own named rule.
         /// Mitigated values are written back per component (<see cref="IDamageContext.Set"/>),
         /// so UI and statistics see the real post-mitigation damage split.
         /// <paramref name="rnd"/> is the stream the suppression roll burns. It is required rather than
@@ -123,10 +129,10 @@
             return type switch
             {
                 DamageType.Burning => ApplyResistance(damage, context.Source, target, s_resistanceByType[DamageType.Fire]),
+                DamageType.Poison => ApplyResistance(damage, context.Source, target, s_poisonResistance),
                 DamageType.Physical or DamageType.Bleed => ApplyArmor(damage, context.Source, target),
-                // Sacred ignores armor and resistances; Blight damages health directly and neither cuts it;
-                // Poison is unmitigated by design (its counter-knobs are context modifiers).
-                DamageType.Sacred or DamageType.Blight or DamageType.Poison => damage,
+                // Sacred ignores armor and resistances by design; Blight damages health directly and neither cuts it.
+                DamageType.Sacred or DamageType.Blight => damage,
                 _ => Unruled(type, damage)
             };
         }
@@ -141,7 +147,7 @@
 
         private static float ApplyResistance(float damage, IFightable source, IFightable target, (EntityParameter Resistance, EntityParameter Penetration) elemental)
         {
-            // The 0..0.8 resistance cap lives in EntityParametersComponent's bounds table; penetration is capped 0..1 there too.
+            // Resistance and penetration caps both live in EntityParametersComponent's bounds table.
             float resist = target.Parameters.GetValueForParameter(elemental.Resistance) * (1 - source.Parameters.GetValueForParameter(elemental.Penetration));
             return damage * (1 - resist);
         }

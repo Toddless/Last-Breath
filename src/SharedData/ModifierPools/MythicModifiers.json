@@ -112,7 +112,7 @@
                     "affix": "Mythic"
                 },
                 {
-                    "parameter": "AttackPureConversion",
+                    "parameter": "AttackSacredConversion",
                     "modifierType": "inc",
                     "value": {
                         "min": 0.3,

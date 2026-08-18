@@ -32,7 +32,7 @@ namespace LastBreath.UI
             [
                 EntityParameter.Armor, EntityParameter.Evade, EntityParameter.BlockChance, EntityParameter.Barrier,
                 EntityParameter.Suppress, EntityParameter.CriticalDamageMitigation, EntityParameter.FireResistance,
-                EntityParameter.ColdResistance, EntityParameter.LightningResistance,
+                EntityParameter.ColdResistance, EntityParameter.LightningResistance, EntityParameter.PoisonResistance,
             ]),
             ("UI_Char_Misc", [EntityParameter.MoveSpeed, EntityParameter.HealthRecovery, EntityParameter.ManaRecovery]),
         ];

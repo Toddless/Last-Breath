@@ -609,10 +609,10 @@ msgstr ""
 msgid "Context_Modifier_AddedLightningDamage_Range"
 msgstr ""
 
-msgid "Context_Modifier_AttackPureConversion"
+msgid "Context_Modifier_AttackSacredConversion"
 msgstr ""
 
-msgid "Context_Modifier_AttackPureConversion_Range"
+msgid "Context_Modifier_AttackSacredConversion_Range"
 msgstr ""
 
 msgid "Context_Modifier_CooldownResetChance"
@@ -1221,7 +1221,7 @@ msgstr ""
 msgid "Log_Enemy"
 msgstr ""
 
-msgid "DamageType_Pure"
+msgid "DamageType_Sacred"
 msgstr ""
 
 msgid "DamageType_Physical"
@@ -1243,6 +1243,9 @@ msgid "DamageType_Burning"
 msgstr ""
 
 msgid "DamageType_Bleed"
+msgstr ""
+
+msgid "DamageType_Blight"
 msgstr ""
 
 msgid "Effect_Ares_Blessing"
@@ -1281,6 +1284,9 @@ msgstr ""
 msgid "LightningResistance"
 msgstr ""
 
+msgid "PoisonResistance"
+msgstr ""
+
 msgid "AllResistance"
 msgstr ""
 
@@ -1291,6 +1297,9 @@ msgid "ColdResistancePenetration"
 msgstr ""
 
 msgid "LightningResistancePenetration"
+msgstr ""
+
+msgid "PoisonResistancePenetration"
 msgstr ""
 
 msgid "AllResistancePenetration"
@@ -1421,7 +1430,7 @@ msgid "Ability_Sacrifice"
 msgstr "Жертва"
 
 msgid "Ability_Sacrifice_Description"
-msgstr "Жертвует {SacrificePercent:%} текущего здоровья. За каждые 100 потерянного здоровья следующая активированная способность получает {RatePerHundred:%} чистого урона. Зарядов: {Charges}."
+msgstr "Жертвует {SacrificePercent:%} текущего здоровья. За каждые 100 потерянного здоровья следующая активированная способность получает {RatePerHundred:%} священного урона. Зарядов: {Charges}."
 
 msgid "Ability_Ice_Shards"
 msgstr "Ледяные осколки"
@@ -1970,11 +1979,11 @@ msgstr ""
 msgid "Augment_Overload_Stage_Four_Resets_Cooldown_Description"
 msgstr "Активация 4-й стадии сбрасывает перезарядку способности."
 
-msgid "Augment_Next_Cast_Pure"
+msgid "Augment_Next_Cast_Sacred"
 msgstr ""
 
-msgid "Augment_Next_Cast_Pure_Description"
-msgstr "Следующая активированная способность наносит {fraction:%} урона чистым."
+msgid "Augment_Next_Cast_Sacred_Description"
+msgstr "Следующая активированная способность наносит {fraction:%} урона священным."
 
 msgid "Augment_Chain_Lightning_Ignore_Resistances"
 msgstr ""
@@ -2635,7 +2644,7 @@ msgid "Ability_Discharge"
 msgstr "Разряд"
 
 msgid "Ability_Discharge_Description"
-msgstr "Поглощает весь текущий барьер и бьёт молнией: поглощённый барьер × {BarrierMultiplier} + {SpellDamageScale:%} урона способностями.\nУровень активации 2: множитель увеличен на {StageTwoMultiplierBonus}.\nУровень активации 3: восстанавливает {StageThreeBarrierRestore:%} нанесённого урона в виде барьера.\nУровень активации 4: урон становится чистым."
+msgstr "Поглощает весь текущий барьер и бьёт молнией: поглощённый барьер × {BarrierMultiplier} + {SpellDamageScale:%} урона способностями.\nУровень активации 2: множитель увеличен на {StageTwoMultiplierBonus}.\nУровень активации 3: восстанавливает {StageThreeBarrierRestore:%} нанесённого урона в виде барьера.\nУровень активации 4: урон становится священным."
 
 msgid "Ability_Static_Armor"
 msgstr "Статический доспех"
@@ -2789,11 +2798,11 @@ msgstr "Заряд перегрузки"
 msgid "Effect_Overload_Charge_Description"
 msgstr "Следующая активированная способность наносит увеличенный урон."
 
-msgid "Effect_Pure_Conversion_Charge"
-msgstr "Чистый поток"
+msgid "Effect_Sacred_Conversion_Charge"
+msgstr "Священный поток"
 
-msgid "Effect_Pure_Conversion_Charge_Description"
-msgstr "Следующая активированная способность наносит часть урона чистым."
+msgid "Effect_Sacred_Conversion_Charge_Description"
+msgstr "Следующая активированная способность наносит часть урона священным."
 
 msgid "Effect_Next_Ability_Cooldown"
 msgstr "Скованный разум"

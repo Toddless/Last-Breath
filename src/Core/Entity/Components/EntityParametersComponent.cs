@@ -25,13 +25,15 @@
             [EntityParameter.ArmorPenetration] = (0f, 1f),
             [EntityParameter.Suppress] = (0f, 0.75f),
             [EntityParameter.CriticalDamageMitigation] = (0f, 1f),
-            [EntityParameter.LightningResistance] = (0f, 0.8f),
-            [EntityParameter.FireResistance] = (0f, 0.8f),
-            [EntityParameter.ColdResistance] = (0f, 0.8f),
+            [EntityParameter.LightningResistance] = (0f, 0.85f),
+            [EntityParameter.FireResistance] = (0f, 0.85f),
+            [EntityParameter.ColdResistance] = (0f, 0.85f),
+            [EntityParameter.PoisonResistance] = (0f, 0.85f),
             [EntityParameter.SuppressChance] = (0f, 1f),
             [EntityParameter.FireResistancePenetration] = (0f, 1f),
             [EntityParameter.ColdResistancePenetration] = (0f, 1f),
-            [EntityParameter.LightningResistancePenetration] = (0f, 1f)
+            [EntityParameter.LightningResistancePenetration] = (0f, 1f),
+            [EntityParameter.PoisonResistancePenetration] = (0f, 1f)
         };
 
         private readonly Dictionary<EntityParameter, (float Base, float Current)> _parameterValues = Enum.GetValues<EntityParameter>().ToDictionary(key => key, key => (0f, 0f));
@@ -46,7 +48,10 @@
 
         public float MaxHealth => this[EntityParameter.Health];
         public float HealthRecovery => this[EntityParameter.HealthRecovery];
-        public float Damage => this[EntityParameter.PhysicalDamage];
+        public float PhysicalDamage => this[EntityParameter.PhysicalDamage];
+        public float ColdDamage => this[EntityParameter.ColdDamage];
+        public float LightningDamage => this[EntityParameter.LightningDamage];
+        public float FireDamage => this[EntityParameter.FireDamage];
         public float BlockChance => this[EntityParameter.BlockChance];
         public float CriticalDamage => this[EntityParameter.CriticalDamage];
         public float CriticalChance => this[EntityParameter.CriticalChance];
@@ -67,6 +72,7 @@
         public float LightningResistance => this[EntityParameter.LightningResistance];
         public float FireResistance => this[EntityParameter.FireResistance];
         public float ColdResistance => this[EntityParameter.ColdResistance];
+        public float PoisonResistance => this[EntityParameter.PoisonResistance];
 
         public event Action<EntityParameter, float>? ParameterChanged;
 

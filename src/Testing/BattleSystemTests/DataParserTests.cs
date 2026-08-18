@@ -423,8 +423,8 @@ namespace LastBreathTest.BattleSystemTests
                     {
                         "id": "Test_Pool",
                         "modifiersPool": [
-                            { "parameter": "AttackPureConversion, AttacksIgnoreResistances", "modifierType": "inc", "value": 0.35, "weight": 40, "affix": "Suffix" },
-                            { "parameter": "AttackPureConversion", "modifierType": "inc", "value": 0.35, "weight": 40, "affix": "Suffix" }
+                            { "parameter": "AttackSacredConversion, AttacksIgnoreResistances", "modifierType": "inc", "value": 0.35, "weight": 40, "affix": "Suffix" },
+                            { "parameter": "AttackSacredConversion", "modifierType": "inc", "value": 0.35, "weight": 40, "affix": "Suffix" }
                         ]
                     }
                 ]
@@ -439,7 +439,7 @@ namespace LastBreathTest.BattleSystemTests
             // exist — an ordinary data file minting a member with no binding, which throws not here but on
             // equip. Only the knob's own refusal stops it; nothing downstream would.
             var line = (ContextDescriptor)pool.Single();
-            Assert.AreEqual(Core.Enums.ContextParameter.AttackPureConversion, line.Parameter);
+            Assert.AreEqual(Core.Enums.ContextParameter.AttackSacredConversion, line.Parameter);
         }
 
         [TestMethod]
