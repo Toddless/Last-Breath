@@ -43,51 +43,36 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Increasing_Pressure", AbilityTags.Damage),
 
             ("Ability_Jar_Of_Poison", AbilityTags.Poison),
-            ("Ability_Jar_Of_Poison", AbilityTags.Stacks),
-            ("Ability_Jar_Of_Poison", AbilityTags.Duration),
             ("Ability_Jar_Of_Poison", AbilityTags.Projectile),
 
             // Load-bearing again since CL-4b: the fury-burn records wear "health" by the owner's markup
             // and reach every health-wearer through it — silently, but the tag is what carries them.
             ("Ability_Dark_Shroud", AbilityTags.Health),
-            ("Ability_Dark_Shroud", AbilityTags.Stacks),
-            ("Ability_Dark_Shroud", AbilityTags.Duration),
             ("Ability_Dark_Shroud", AbilityTags.Buff),
             ("Ability_Dark_Shroud", AbilityTags.Recovery),
 
-            ("Ability_Critical_Calculation", AbilityTags.Stacks),
-            ("Ability_Critical_Calculation", AbilityTags.Duration),
             ("Ability_Critical_Calculation", AbilityTags.Buff),
 
             ("Ability_Poison_Explosion", AbilityTags.Poison),
             ("Ability_Poison_Explosion", AbilityTags.Execute),
 
             ("Ability_Poison_Coating", AbilityTags.Poison),
-            ("Ability_Poison_Coating", AbilityTags.Stacks),
-            ("Ability_Poison_Coating", AbilityTags.Duration),
             ("Ability_Poison_Coating", AbilityTags.Buff),
 
             ("Ability_Double_Strike", AbilityTags.Attack),
             ("Ability_Double_Strike", AbilityTags.Damage),
-            ("Ability_Double_Strike", AbilityTags.Stacks),
-            ("Ability_Double_Strike", AbilityTags.Duration),
             ("Ability_Double_Strike", AbilityTags.Debuff),
 
             ("Ability_Ares_Blessing", AbilityTags.Health),
-            ("Ability_Ares_Blessing", AbilityTags.Duration),
             ("Ability_Ares_Blessing", AbilityTags.Buff),
             ("Ability_Ares_Blessing", AbilityTags.Recovery),
 
             ("Ability_Porcupine", AbilityTags.Armor),
-            ("Ability_Porcupine", AbilityTags.Stacks),
-            ("Ability_Porcupine", AbilityTags.Duration),
             ("Ability_Porcupine", AbilityTags.Buff),
 
             ("Ability_Berserk_Fury", AbilityTags.Attack),
             ("Ability_Berserk_Fury", AbilityTags.Health),
             ("Ability_Berserk_Fury", AbilityTags.Damage),
-            ("Ability_Berserk_Fury", AbilityTags.Stacks),
-            ("Ability_Berserk_Fury", AbilityTags.Duration),
             ("Ability_Berserk_Fury", AbilityTags.Debuff),
 
             ("Ability_Head_Butt", AbilityTags.Attack),
@@ -105,16 +90,12 @@ namespace LastBreathTest.BattleSystemTests
             ("Ability_Ice_Block", AbilityTags.Damage),
             ("Ability_Ice_Block", AbilityTags.Debuff),
 
-            ("Ability_Ice_Aegis", AbilityTags.Stacks),
-            ("Ability_Ice_Aegis", AbilityTags.Duration),
             ("Ability_Ice_Aegis", AbilityTags.Buff),
             ("Ability_Ice_Aegis", AbilityTags.Debuff),
 
             ("Ability_Ice_Shards", AbilityTags.Damage),
             ("Ability_Ice_Shards", AbilityTags.Projectile),
 
-            ("Ability_Deep_Freeze", AbilityTags.Stacks),
-            ("Ability_Deep_Freeze", AbilityTags.Duration),
             ("Ability_Deep_Freeze", AbilityTags.Debuff),
             ("Ability_Deep_Freeze", AbilityTags.Damage),
 
@@ -123,7 +104,6 @@ namespace LastBreathTest.BattleSystemTests
 
             ("Ability_Overload", AbilityTags.Buff),
 
-            ("Ability_Static_Armor", AbilityTags.Duration),
             ("Ability_Static_Armor", AbilityTags.Damage),
             ("Ability_Static_Armor", AbilityTags.Recovery),
 
@@ -216,24 +196,25 @@ namespace LastBreathTest.BattleSystemTests
             // record arrived. It now marks every ability that LAYS something — the appliers, and only them:
             // the four that lay nothing (both series, the explosion, the shards) do not carry it.
             ("Ability_Ares_Blessing", AbilityTags.Effect),
-            ("Ability_Armageddon", AbilityTags.Effect),
             ("Ability_Berserk_Fury", AbilityTags.Effect),
             ("Ability_Critical_Calculation", AbilityTags.Effect),
             ("Ability_Dark_Shroud", AbilityTags.Effect),
             ("Ability_Deep_Freeze", AbilityTags.Effect),
-            ("Ability_Discharge", AbilityTags.Effect),
             ("Ability_Double_Strike", AbilityTags.Effect),
-            ("Ability_Head_Butt", AbilityTags.Effect),
             ("Ability_Ice_Aegis", AbilityTags.Effect),
             ("Ability_Ice_Block", AbilityTags.Effect),
             ("Ability_Jar_Of_Poison", AbilityTags.Effect),
-            ("Ability_Overload", AbilityTags.Effect),
             ("Ability_Poison_Coating", AbilityTags.Effect),
             ("Ability_Porcupine", AbilityTags.Effect),
-            ("Ability_Sacrifice", AbilityTags.Effect),
             ("Ability_Static_Armor", AbilityTags.Effect),
             ("Ability_Twin_Assist_Attack", AbilityTags.Effect),
-            ("Ability_Twin_Assist_Shield", AbilityTags.Effect)
+            ("Ability_Twin_Assist_Shield", AbilityTags.Effect),
+
+            // Load-bearing since the tag generalisation of 2026-08-18. The stun-for-cost record carried
+            // ["control", "duration"] and reached these two by both, so neither tag alone was carrying
+            // it; with the axis retired 'control' is the only road onto them and the pair means something.
+            ("Ability_Deep_Freeze", AbilityTags.Control),
+            ("Ability_Ice_Aegis", AbilityTags.Control)
         ];
 
         [TestMethod]

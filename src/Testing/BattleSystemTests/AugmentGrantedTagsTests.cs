@@ -49,54 +49,62 @@ namespace LastBreathTest.BattleSystemTests
         /// they lay. Held literally because the discipline is one-way: an amplifier that started
         /// granting would bootstrap its family without any applier installed, and that failure seats
         /// augments silently instead of failing a build.
+        /// <para>Since the tag generalisation of 2026-08-18 every genus travels with the umbrella
+        /// <c>effect</c> beside it: what the record teaches is not only "poison" but "this ability lays
+        /// something", which is what the generalised records ("duration of what this lays") ride. The
+        /// pair is a rule rather than a habit, held by AbilityTagsTests against the data itself.</para>
         /// </summary>
         private static readonly (string Id, string[] Grants)[] s_shippedGrants =
         [
-            ("Augment_Poison_Attack_Series", [AbilityTags.Poison, AbilityTags.Debuff]),
+            ("Augment_Poison_Attack_Series", [AbilityTags.Poison, AbilityTags.Debuff, AbilityTags.Effect]),
 
-            ("Augment_Armageddon_Burning", [AbilityTags.Burn, AbilityTags.Debuff]),
-            // The three variants swap the fury the ability lays, so each grants that genus too.
-            ("Augment_Berserk_Fury_Burning", [AbilityTags.Burn, AbilityTags.Debuff, AbilityTags.Fury]),
+            ("Augment_Armageddon_Burning", [AbilityTags.Burn, AbilityTags.Debuff, AbilityTags.Effect]),
+            // The three variants swap the fury the ability lays, so each grants that genus too. Fury is
+            // not a genus of the umbrella rule — the two that grant it alone swap what the berserker
+            // ALREADY lays, and he wears 'effect' of his own.
+            ("Augment_Berserk_Fury_Burning", [AbilityTags.Burn, AbilityTags.Debuff, AbilityTags.Fury, AbilityTags.Effect]),
             ("Augment_Berserk_Fury_Primal", [AbilityTags.Fury]),
             ("Augment_Berserk_Fury_Healing", [AbilityTags.Fury]),
 
-            ("Augment_Apply_Buff_Critical_Chance", [AbilityTags.Buff]),
-            ("Augment_Apply_Buff_Critical_Damage", [AbilityTags.Buff]),
-            ("Augment_Critical_Calculation_Lucky_Crit", [AbilityTags.Buff]),
-            ("Augment_Critical_Calculation_Mythic", [AbilityTags.Buff]),
-            ("Augment_Apply_Enhanced_Defence", [AbilityTags.Buff]),
-            ("Augment_Leach_On_Crit", [AbilityTags.Buff]),
-            ("Augment_Dark_Shroud_Immortality", [AbilityTags.Buff]),
-            ("Augment_Incoming_Reduction", [AbilityTags.Buff]),
-            ("Augment_Double_Strike_Two_Attacks_Apply_Buff", [AbilityTags.Buff]),
-            ("Augment_Porcupine_Echo", [AbilityTags.Buff]),
-            ("Augment_Porcupine_Incoming_Damage_Reduction", [AbilityTags.Buff]),
-            ("Augment_Porcupine_Crit_Mitigation", [AbilityTags.Buff]),
-            ("Augment_Ice_Aegis_Crit_Mitigation_Under_Shield", [AbilityTags.Buff]),
+            ("Augment_Apply_Buff_Critical_Chance", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Apply_Buff_Critical_Damage", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Critical_Calculation_Lucky_Crit", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Critical_Calculation_Mythic", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Apply_Enhanced_Defence", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Leach_On_Crit", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Dark_Shroud_Immortality", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Incoming_Reduction", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Double_Strike_Two_Attacks_Apply_Buff", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Porcupine_Echo", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Porcupine_Incoming_Damage_Reduction", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Porcupine_Crit_Mitigation", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Ice_Aegis_Crit_Mitigation_Under_Shield", [AbilityTags.Buff, AbilityTags.Effect]),
 
-            ("Augment_Empowered_Ability_Free_Cast", [AbilityTags.Buff]),
-            ("Augment_Next_Cast_Pure", [AbilityTags.Buff]),
+            ("Augment_Empowered_Ability_Free_Cast", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Next_Cast_Pure", [AbilityTags.Buff, AbilityTags.Effect]),
 
-            ("Augment_Mana_Flow", [AbilityTags.Buff, AbilityTags.Recovery]),
+            ("Augment_Mana_Flow", [AbilityTags.Buff, AbilityTags.Recovery, AbilityTags.Effect]),
 
+            // Instant give-backs on impact: recovery is what they hand over, not a genus they lay, so
+            // neither teaches its ability that it lays anything.
             ("Augment_Restore_Mana_Health_On_Hit", [AbilityTags.Recovery]),
             ("Augment_Heal_On_Hit", [AbilityTags.Recovery]),
 
-            ("Augment_Apply_Seal_Of_Oblivion", [AbilityTags.Debuff]),
-            ("Augment_Attacks_Reduce_Incoming_Heal", [AbilityTags.Debuff]),
-            ("Augment_Attacks_Reduce_Armor", [AbilityTags.Debuff]),
-            ("Augment_Deep_Freeze_Increase_Ability_Cooldown", [AbilityTags.Debuff]),
+            ("Augment_Apply_Seal_Of_Oblivion", [AbilityTags.Debuff, AbilityTags.Effect]),
+            ("Augment_Attacks_Reduce_Incoming_Heal", [AbilityTags.Debuff, AbilityTags.Effect]),
+            ("Augment_Attacks_Reduce_Armor", [AbilityTags.Debuff, AbilityTags.Effect]),
+            ("Augment_Deep_Freeze_Increase_Ability_Cooldown", [AbilityTags.Debuff, AbilityTags.Effect]),
 
             // E-2b: the two pool records. What they declare is the UMBRELLA their whole pool shares; a
             // copy adds the genus of the effect it drew on top (AugmentInstance.Applied), and which
             // effects add what is held literally by AugmentEffectPoolTests.
-            ("Augment_Apply_Buff", [AbilityTags.Buff]),
-            ("Augment_Apply_Debuff", [AbilityTags.Debuff]),
+            ("Augment_Apply_Buff", [AbilityTags.Buff, AbilityTags.Effect]),
+            ("Augment_Apply_Debuff", [AbilityTags.Debuff, AbilityTags.Effect]),
 
             // E-2a: the two remaining damage-over-turn series, both records and no code — the canon and
             // the factories were already there, so only the vocabulary had to learn 'bleed'.
-            ("Augment_Bleeding_Attack_Series", [AbilityTags.Bleed, AbilityTags.Debuff]),
-            ("Augment_Burning_Attack_Series", [AbilityTags.Burn, AbilityTags.Debuff]),
+            ("Augment_Bleeding_Attack_Series", [AbilityTags.Bleed, AbilityTags.Debuff, AbilityTags.Effect]),
+            ("Augment_Burning_Attack_Series", [AbilityTags.Burn, AbilityTags.Debuff, AbilityTags.Effect]),
         ];
 
         /// <summary>
@@ -110,8 +118,11 @@ namespace LastBreathTest.BattleSystemTests
         [
             // The head butt and the pressure joined when the poison applier came off its abilityId onto
             // ["attack", "series"]: it grants its genus to every attacker now, and the amplifier follows.
+            // The berserker and the double strike joined at the tag generalisation of 2026-08-18: both
+            // used to reach the record directly through the retired word "duration".
             ("Augment_Poison_Duration",
-                ["Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
+                ["Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Increasing_Pressure",
+                 "Ability_Series_Of_Attacks"],
                 []),
             // Overload left the row at the owner's re-markup (it carries "buff" of its own now — a
             // direct fit is not a grant-opened one) and Static Armor arrived (it lost "buff" and is
@@ -147,12 +158,13 @@ namespace LastBreathTest.BattleSystemTests
             // "debuff" wherever "attack" carries them, which opens this record on five more.
             // Widened again at E-2b: the debuff pool rides in on "hit" as well, so the Overload and the
             // Sacrifice — neither of which any debuff applier reached before — join the column.
+            // Both left again at the generalisation of 2026-08-18: the two attack-borne debuff appliers
+            // lost the tags that carried them onto the pair, so nothing grants "debuff" there any more.
             ("Augment_Debuff_Effectiveness",
                 ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Discharge",
-                 "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload",
+                 "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison",
                  "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
-                ["Ability_Armageddon", "Ability_Ice_Shards", "Ability_Poison_Explosion", "Ability_Sacrifice",
-                 "Ability_Series_Of_Attacks"]),
+                ["Ability_Armageddon", "Ability_Ice_Shards", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks"]),
 
             // Generalised at CL-7c, and both land the way Health_Bonus does: the one ability that owns the
             // concept is reached by its OWN tags, so every seating a grant opens for them is a silent one.
@@ -170,17 +182,22 @@ namespace LastBreathTest.BattleSystemTests
             // E-2a. The stack record rides in on 'buff' and 'debuff', and every ability a grant carries it
             // onto is one that lays its payload from the canon rather than from its own Stacks key — so the
             // whole grant-opened column is silent. The abilities it DOES move are reached by their own
-            // 'stacks' tag, which is the reach ledger's business rather than this one's.
+            // tags, which is the reach ledger's business rather than this one's.
+            // The jar joined at the generalisation of 2026-08-18: it used to fit the record by its own
+            // "stacks" and is now reached only through a granted genus.
             ("Augment_Additional_Stacks",
                 [],
                 ["Ability_Armageddon", "Ability_Discharge", "Ability_Head_Butt", "Ability_Ice_Shards",
-                 "Ability_Increasing_Pressure", "Ability_Poison_Explosion", "Ability_Series_Of_Attacks",
-                 "Ability_Static_Armor"]),
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Poison_Explosion",
+                 "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
 
             // Unbound at CL-7. Both carry a behaviour, so wherever a granted tag seats them they work —
             // there is no host key to be missing, which is why neither has an inert list at all.
+            // Three more joined the defence applier at the generalisation of 2026-08-18: the berserker,
+            // the double strike and the jar reached it by the retired "duration"/"stacks" before.
             ("Augment_Apply_Enhanced_Defence",
-                ["Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
+                ["Ability_Berserk_Fury", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Increasing_Pressure",
+                 "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks"],
                 []),
 
             // Both unbound onto their design-line tags, and the two halves of one shape. The leech carries
@@ -197,6 +214,35 @@ namespace LastBreathTest.BattleSystemTests
                  "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
                  "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Poison_Explosion",
                  "Ability_Series_Of_Attacks", "Ability_Static_Armor"]),
+
+            // The five rows the tag generalisation of 2026-08-18 created, and the point of the whole
+            // pass: 'effect' is granted by every applier now, so the generalised records reach the
+            // ability an augment TAUGHT to lay exactly as they reach one that lays natively. This is
+            // the dearer half of the trade — the five abilities that lay nothing themselves lost the
+            // umbrella from their own markup and take these records through a donor or not at all.
+            ("Augment_Applied_Duration",
+                ["Ability_Armageddon", "Ability_Head_Butt"],
+                ["Ability_Discharge", "Ability_Ice_Shards", "Ability_Increasing_Pressure", "Ability_Overload",
+                 "Ability_Poison_Explosion", "Ability_Sacrifice", "Ability_Series_Of_Attacks"]),
+            ("Augment_Applied_Effectiveness",
+                ["Ability_Discharge", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Overload"],
+                ["Ability_Armageddon", "Ability_Ice_Shards", "Ability_Poison_Explosion", "Ability_Sacrifice",
+                 "Ability_Series_Of_Attacks"]),
+            // The stack bargain landed on the umbrella when its own axis retired, so it now travels the
+            // same road as the two above and lands on the same abilities.
+            ("Augment_Add_Effectiveness_Reduce_Stacks",
+                ["Ability_Discharge", "Ability_Head_Butt", "Ability_Increasing_Pressure", "Ability_Overload"],
+                ["Ability_Armageddon", "Ability_Ice_Shards", "Ability_Poison_Explosion", "Ability_Sacrifice",
+                 "Ability_Series_Of_Attacks"]),
+            // The two pool records became grant-openable in the same move: both carry 'effect' among the
+            // tags they fit by, so a donor's umbrella seats an applier beside an applier. Both build what
+            // they lay from the canon, so there is no host key to be missing anywhere they land.
+            ("Augment_Apply_Buff",
+                ["Ability_Armageddon"],
+                []),
+            ("Augment_Apply_Debuff",
+                ["Ability_Armageddon", "Ability_Overload", "Ability_Sacrifice"],
+                []),
         ];
 
         /// <summary>The shared key each grant-opened parameter record stands on, for the ledger's
@@ -223,6 +269,25 @@ namespace LastBreathTest.BattleSystemTests
             // Unbound onto its design-line tags, and its number moved off the Porcupine's private key
             // onto the book's at the same time — a tag-judged record on a private key is unprobeable.
             ["Augment_Heal_On_Hit"] = AbilityParameter.HealOnHit,
+            // Grant-openable for the first time since the tag generalisation of 2026-08-18: both ride
+            // 'effect', which appliers now grant, so the ability an augment TAUGHT to lay is reached by
+            // the generalised records exactly like one that lays natively.
+            ["Augment_Applied_Effectiveness"] = AbilityParameter.Effectiveness,
+            // Two keys, one bargain, and the probe asks about the half the record SELLS: an ability
+            // reading effectiveness gets the goods, and where the stacks half misses it is the other
+            // ledger's business (AugmentSharedKeyReachTests holds both rows against each other).
+            ["Augment_Add_Effectiveness_Reduce_Stacks"] = AbilityParameter.Effectiveness,
+        };
+
+        /// <summary>
+        /// Grant-openable records that decorate the FAMILY of keys the HOST declares rather than a key
+        /// of their own — they ask the ability which of its numbers they move, so they can never land
+        /// on a stranger's private key and the dead-socket class cannot reach them. What is probed for
+        /// them is whether the host declares such a family at all; an empty one is ordinary silence.
+        /// </summary>
+        private static readonly HashSet<string> s_hostDeclaredFamily = new(StringComparer.Ordinal)
+        {
+            "Augment_Applied_Duration",
         };
 
         /// <summary>Grant-openable records whose whole behaviour rides in an impact rider and stands
@@ -380,7 +445,8 @@ namespace LastBreathTest.BattleSystemTests
             List<string> strays = [];
 
             foreach ((AbilityAugmentData record, string ability, _) in ComputeGrantReach(book, catalog))
-                if (!s_selfContained.Contains(record.Id) && !s_openedKeys.ContainsKey(record.Id))
+                if (!s_selfContained.Contains(record.Id) && !s_hostDeclaredFamily.Contains(record.Id)
+                    && !s_openedKeys.ContainsKey(record.Id))
                     strays.Add($"'{record.Id}' (carried onto '{ability}')");
 
             Assert.AreEqual(0, strays.Count,
@@ -506,6 +572,7 @@ namespace LastBreathTest.BattleSystemTests
 
                     var openers = donors.Where(donor => AbilityTags.SharesAny([.. donor.GrantableTags], record.Tags));
                     bool works = s_selfContained.Contains(record.Id)
+                                 || (s_hostDeclaredFamily.Contains(record.Id) && book.CreateAbility(abilityId).AppliedDurations.Count > 0)
                                  || (s_openedKeys.TryGetValue(record.Id, out string? key) && Moves(book, abilityId, openers, key));
                     reach.Add((record, abilityId, works));
                 }

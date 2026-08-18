@@ -76,10 +76,13 @@ namespace LastBreathTest.BattleSystemTests
         /// </summary>
         private static readonly Dictionary<string, string[]> s_knowinglyFree = new(StringComparer.Ordinal)
         {
-            // Ares left the list at the owner's re-markup: the blessing lost its "stacks" tag, so the
-            // record does not reach it at all any more.
+            // Ares and the static armor came BACK at the tag generalisation of 2026-08-18. The record
+            // used to travel by 'stacks' and now travels by 'effect', so it reaches every applier
+            // instead of every ability that happened to say the word — and five of them read the
+            // effectiveness it sells while counting no stacks it could take.
             ["Augment_Add_Effectiveness_Reduce_Stacks"] =
-                ["Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine"]
+                ["Ability_Ares_Blessing", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine",
+                 "Ability_Static_Armor"]
         };
 
         /// <summary>
@@ -90,10 +93,11 @@ namespace LastBreathTest.BattleSystemTests
         /// Found at CL-7b when the cost half of the stun record first got a row: it moves CostValue on
         /// fourteen abilities and StunDuration on three, so on the eleven below it is paid for in mana and
         /// gives no stun.
-        /// <para>What spreads it is <c>duration</c>, the wider of its two tags
-        /// (<c>["control", "duration"]</c>) — there is no <c>cost</c> tag in the vocabulary at all,
-        /// whatever the card's prose says. Kept as a literal count rather than narrowed, because the
-        /// spread is the design.</para>
+        /// <para>Eleven names until the tag generalisation of 2026-08-18, and two after it. What used to
+        /// spread the record was <c>duration</c>, the wider of its two tags — a word nine abilities said
+        /// about content of their own and none of them about a stun. With the axis retired the record
+        /// travels by <c>control</c> alone, which is what its bargain is actually about, and the
+        /// surcharge now lands only where an ability controls without a stun of its own to extend.</para>
         /// <para>An entry here is not permanent: a stun applier seated through a granted tag gives the
         /// ability a StunDuration to move, and the seating turns from a surcharge into the whole bargain.
         /// The count survives that — the ability leaves this list and joins the record's works row — which
@@ -101,10 +105,7 @@ namespace LastBreathTest.BattleSystemTests
         /// </summary>
         private static readonly Dictionary<string, string[]> s_costWithoutGoodsByDesign = new(StringComparer.Ordinal)
         {
-            ["Augment_Extend_Stun_Add_Cost"] =
-                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
-                 "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison",
-                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
+            ["Augment_Extend_Stun_Add_Cost"] = ["Ability_Deep_Freeze", "Ability_Ice_Aegis"],
 
             // E-2a, and the same shape one wave on: the scales-for-turns record carries a tag that reaches
             // the damaging family and a tag that reaches everything, so on the ten below it adds turns of
@@ -172,10 +173,7 @@ namespace LastBreathTest.BattleSystemTests
             // this half never misses — which is exactly why it needed writing down: the row above it
             // (StunDuration) is the half that can, and a bargain is only honest when both are measured.
             ("Augment_Extend_Stun_Add_Cost", AbilityParameter.CostValue,
-                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
-                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Head_Butt",
-                 "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
-                 "Ability_Porcupine", "Ability_Static_Armor"],
+                ["Ability_Armageddon", "Ability_Deep_Freeze", "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block"],
                 []),
             // Unbound at CL-7 and written down here for the first time: the crit bonuses were declared by
             // MulticastAbility alone, so the 'critical' tag seated these two on twice the abilities that
@@ -223,26 +221,23 @@ namespace LastBreathTest.BattleSystemTests
                  "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
                  "Ability_Static_Armor"]),
 
-            // Most of the inert abilities are reached through the bare tag "duration" alone. Sacrifice
-            // left the list at the re-markup: it lost "duration" and the record stopped reaching it.
+            // Ten inert names until the tag generalisation of 2026-08-18, and one after it: every one of
+            // them was reached through the bare word "duration" and none of them through poison. What
+            // is left is the explosion, which wears the genus for the stacks it CONSUMES.
             ("Augment_Poison_Duration", AbilityParameter.PoisonDuration,
                 ["Ability_Jar_Of_Poison", "Ability_Poison_Coating"],
-                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
-                 "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Poison_Explosion",
-                 "Ability_Porcupine", "Ability_Static_Armor"]),
+                ["Ability_Poison_Explosion"]),
 
             // The worst record in the catalog and the reason this walk exists: where it is inert it
             // still charges its fifty mana, so every name in the second list is a straight loss the
             // player cannot see. Armageddon reached the works list at the owner's re-markup ("control"
             // and "stun" arrived with the doc), closing the wave-E hole the old comment named.
-            // The aegis joined the inert list at the catalog cleanup: its stun existed only through the
-            // removed stun-attackers augment, so the duration key came off the ability with the branch.
-            // Sacrifice left the row at the re-markup: it lost "duration".
+            // Nine of the eleven inert names left at the tag generalisation of 2026-08-18: they were
+            // reached by "duration" and had no stun to extend. The two that stay are the two that
+            // control without stunning — the aegis freezes and the deep freeze freezes.
             ("Augment_Extend_Stun_Add_Cost", AbilityParameter.StunDuration,
                 ["Ability_Armageddon", "Ability_Head_Butt", "Ability_Ice_Block"],
-                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation", "Ability_Dark_Shroud",
-                 "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison",
-                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"]),
+                ["Ability_Deep_Freeze", "Ability_Ice_Aegis"]),
 
             // The jar carries "projectile" now (the doc's word for how it travels) and declares no
             // projectile count — a socket that fits and moves nothing until the count generalises.
@@ -278,17 +273,20 @@ namespace LastBreathTest.BattleSystemTests
 
             // Both halves of one bargain, so both lists have to be the SAME list: an ability where the
             // stacks come off and the effectiveness does not is charged for nothing.
-            // Ares and Static Armor left every row of this record at the re-markup: both lost "stacks",
-            // the only tag that carried it onto them.
+            // The record travelled by "stacks" until the generalisation of 2026-08-18 and travels by
+            // "effect" now, so it is offered to the appliers rather than to the stack-counters: Ares and
+            // the static armor came back, the ice block arrived, and the five where only the goods half
+            // lands are written out in s_knowinglyFree.
             ("Augment_Add_Effectiveness_Reduce_Stacks", AbilityParameter.Stacks,
                 ["Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Double_Strike",
-                 "Ability_Ice_Aegis"],
-                ["Ability_Berserk_Fury", "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine"]),
+                 "Ability_Ice_Aegis", "Ability_Ice_Block"],
+                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
+                 "Ability_Porcupine", "Ability_Static_Armor"]),
 
             ("Augment_Add_Effectiveness_Reduce_Stacks", AbilityParameter.Effectiveness,
-                ["Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze",
-                 "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Jar_Of_Poison", "Ability_Poison_Coating",
-                 "Ability_Porcupine"],
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze",
+                 "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison",
+                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
                 ["Ability_Berserk_Fury"]),
 
             // The seven records generalised at CL-7c, each off the private key of the one ability it was
@@ -362,15 +360,15 @@ namespace LastBreathTest.BattleSystemTests
             // E-2b: the umbrella of the effectiveness family. It rides 'effect' — worn by every applier —
             // so it is the widest of the four, and where it meets any of the three segmented records they
             // are one offer on one key in one direction and only the stronger works.
-            // Three appliers lay something and never declared the key: Armageddon's stun and the
-            // berserker's fury are content the ability builds with plain numbers, and the sacrifice's
-            // charge is a bill on the NEXT cast rather than a figure of this one.
+            // The five that lay nothing natively lost 'effect' at the generalisation of 2026-08-18, so
+            // the umbrella stopped being offered to them: the head butt, the discharge and the overload
+            // left the works column, the Armageddon and the sacrifice left the inert one. The berserker
+            // stays inert — his fury is content the ability builds with plain numbers.
             ("Augment_Applied_Effectiveness", AbilityParameter.Effectiveness,
                 ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze",
-                 "Ability_Discharge", "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Aegis",
-                 "Ability_Ice_Block", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
-                 "Ability_Porcupine", "Ability_Static_Armor"],
-                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Sacrifice"]),
+                 "Ability_Double_Strike", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Jar_Of_Poison",
+                 "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
+                ["Ability_Berserk_Fury"]),
 
             ("Augment_Weapon_Scale", AbilityParameter.WeaponDamageScale,
                 ["Ability_Armageddon", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
@@ -414,10 +412,12 @@ namespace LastBreathTest.BattleSystemTests
             // Six abilities read their stacks key into what they lay; the rest wear the tag and lay their
             // payload from the canon, where the ability's number is never consulted. The berserker is the
             // named case of the second kind: his fury is built with a stack of one, literally.
+            // The jar left the inert column at the generalisation of 2026-08-18: the record travels by
+            // 'buff' and 'debuff' now, and the jar carries neither — it was reached by 'stacks' alone.
             ("Augment_Additional_Stacks", AbilityParameter.Stacks,
                 ["Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Double_Strike",
                  "Ability_Ice_Aegis", "Ability_Ice_Block"],
-                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Jar_Of_Poison", "Ability_Overload",
+                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Overload",
                  "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Sacrifice"]),
 
             // The charge is the sacrifice's concept alone; the overload wears 'empowered' for the charge it

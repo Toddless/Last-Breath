@@ -115,8 +115,9 @@ namespace LastBreathTest.BattleSystemTests
                     record.PoolEffects.ToArray(),
                     $"'{record.Id}' offers a different set of effects than the ledger names");
 
-                CollectionAssert.AreEquivalent(new[] { row.Umbrella }, record.GrantsTags,
-                    $"'{record.Id}' declares an umbrella other than the genus its whole pool shares");
+                CollectionAssert.AreEquivalent(new[] { row.Umbrella, AbilityTags.Effect }, record.GrantsTags,
+                    $"'{record.Id}' declares an umbrella other than the genus its whole pool shares, beside the "
+                    + "'effect' every applier grants");
 
                 foreach ((string effect, string[] genus) in row.Pool)
                     CollectionAssert.AreEquivalent(genus, record.EffectPool[effect],
@@ -168,12 +169,12 @@ namespace LastBreathTest.BattleSystemTests
             AbilityAugmentData record = Record(catalog, BuffPool);
 
             CollectionAssert.AreEquivalent(
-                new[] { AbilityTags.Buff, AbilityTags.Recovery },
+                new[] { AbilityTags.Buff, AbilityTags.Effect, AbilityTags.Recovery },
                 Copy(record, RecoveryMember).Applied(record).GrantsTags,
                 "a copy that lays a regeneration does not teach its ability recovery");
 
             CollectionAssert.AreEquivalent(
-                new[] { AbilityTags.Buff },
+                new[] { AbilityTags.Buff, AbilityTags.Effect },
                 Copy(record, PlainBuffMember).Applied(record).GrantsTags,
                 "a copy that lays a plain buff teaches recovery it does not give");
         }

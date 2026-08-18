@@ -65,11 +65,9 @@ namespace Core.Battle.Abilities
         public const string Debuff = "debuff";
         /// <summary>Mitigation the owner gains from the cast itself, apart from armor and barriers.</summary>
         public const string Defence = "defence";
-        public const string Duration = "duration";
-        /// <summary>Works on the effects a cast leaves behind rather than on the cast.</summary>
+        /// <summary>Works on the effects a cast leaves behind rather than on the cast. Worn by the
+        /// abilities that LAY something and granted by the augments that teach one to.</summary>
         public const string Effect = "effect";
-        /// <summary>The strength one stack of a stacking effect is worth.</summary>
-        public const string Effectiveness = "effectiveness";
         /// <summary>Delivery the target may dodge — the attacks of a series and the strikes beside them.</summary>
         public const string Evadable = "evadable";
         /// <summary>Restores health to the owner as a cast of its own.</summary>
@@ -86,7 +84,6 @@ namespace Core.Battle.Abilities
         public const string Splash = "splash";
         /// <summary>Carries what sits on one target over to the others.</summary>
         public const string Spread = "spread";
-        public const string Stacks = "stacks";
         /// <summary>Who the cast reaches: how many targets and how they are picked.</summary>
         public const string Target = "target";
         /// <summary>Damage returned by wearing armor rather than by the retaliation family.</summary>
@@ -112,9 +109,20 @@ namespace Core.Battle.Abilities
             Attack, Spell, Series, Buff, Poison, Cold, Lightning, Fire, Stun, Freeze, Critical, Barrier,
             Mana, Health, Evasion, Execute, Retaliation, Empowered, Shield, Summon, Npc, Projectile,
             Accuracy, Armor, Bleed, Burn, Charge, Control, Cooldown, Cost, Curse, Damage, Debuff, Defence,
-            Duration, Effect, Effectiveness, Evadable, Heal, Hit, Leech, Recovery, Restore, Scale,
-            Splash, Spread, Stacks, Target, Thorn,
+            Effect, Evadable, Heal, Hit, Leech, Recovery, Restore, Scale,
+            Splash, Spread, Target, Thorn,
             Activation, Elemental, Physical, Pure, Consume, Fury, Stage,
+        };
+
+        /// <summary>
+        /// The genera of applied content, and the whole of them: what a cast LAYS is one of these, and
+        /// the umbrella <see cref="Effect"/> rides beside it — an ability wearing a genus carries
+        /// 'effect' too, and an augment granting a genus grants 'effect' too. Control, stun and freeze
+        /// are not here: they name what an effect does to a turn, not a kind of thing an ability lays.
+        /// </summary>
+        public static readonly IReadOnlySet<string> EffectGenera = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            Buff, Debuff, Poison, Bleed, Burn, Curse,
         };
 
         /// <summary>The tag-compatibility rule of the augment system: one shared tag is enough.</summary>
