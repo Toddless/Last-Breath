@@ -218,7 +218,7 @@ namespace LastBreathTest.BattleSystemTests
                 AugmentFit.Check(new AbilitySocketPlacement("socket", Attacker, record.Tier), catalog.TagsOf(Attacker), record, []),
                 $"'{ExtendPoison}' stays out of a slot of '{Attacker}', which it was made general for");
 
-            IAbilityAugment? upgrade = book.CreateUpgrade(record);
+            IAugment? upgrade = book.CreateUpgrade(record);
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{ExtendPoison}'");
             var ability = (Ability)book.CreateAbility(Attacker);
             upgrade.Apply(ability);

@@ -9,9 +9,9 @@ namespace Battle.Source.Abilities
     /// in the book does — while the surcharge is a share, because a flat one would rewrite a cheap
     /// ability and go unnoticed on an expensive one.
     /// </summary>
-    public class AbilityAugmentRaiseScalesAddCost(
+    public class AugmentRaiseScalesAddCost(
         string id, string[] tags, int tier, float weaponScale, float spellScale, float costShare)
-        : AbilityAugment<Ability>(id, tags, tier)
+        : Augment<Ability>(id, tags, tier)
     {
         private string WeaponDecoratorId => $"Ability_Parameter_Decorator_{Id}_Weapon";
         private string SpellDecoratorId => $"Ability_Parameter_Decorator_{Id}_Spell";
@@ -34,7 +34,7 @@ namespace Battle.Source.Abilities
             ability.RemoveParameterDecorator(CostDecoratorId, AbilityParameter.CostValue);
         }
 
-        public override IAbilityAugment Copy() =>
-            new AbilityAugmentRaiseScalesAddCost(Id, Tags, Tier, weaponScale, spellScale, costShare);
+        public override IAugment Copy() =>
+            new AugmentRaiseScalesAddCost(Id, Tags, Tier, weaponScale, spellScale, costShare);
     }
 }

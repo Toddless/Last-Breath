@@ -14,8 +14,8 @@ namespace Battle.Source.Abilities
     /// at least <see cref="AbilityParameter.MinimumCooldown"/> — the same floor the plain cut honours,
     /// and the same reason: the record charges for a shorter cooldown, not for the removal of one.
     /// </summary>
-    public class AbilityAugmentReduceCooldownAddCost(string id, string[] tags, int tier, float cooldownTurns, float costShare)
-        : AbilityAugment<Ability>(id, tags, tier)
+    public class AugmentReduceCooldownAddCost(string id, string[] tags, int tier, float cooldownTurns, float costShare)
+        : Augment<Ability>(id, tags, tier)
     {
         private string CooldownDecoratorId => $"Ability_Parameter_Decorator_{Id}_Cooldown";
         private string CostDecoratorId => $"Ability_Parameter_Decorator_{Id}_Cost";
@@ -35,6 +35,6 @@ namespace Battle.Source.Abilities
             ability.RemoveParameterDecorator(CostDecoratorId, AbilityParameter.CostValue);
         }
 
-        public override IAbilityAugment Copy() => new AbilityAugmentReduceCooldownAddCost(Id, Tags, Tier, cooldownTurns, costShare);
+        public override IAugment Copy() => new AugmentReduceCooldownAddCost(Id, Tags, Tier, cooldownTurns, costShare);
     }
 }

@@ -78,7 +78,7 @@
         /// arrangement could only hold one of them.
         /// Each entry was built from the COPY that was seated, so its numbers are that copy's own.
         /// </summary>
-        IReadOnlyDictionary<string, IAbilityAugment> InstalledUpgrades { get; }
+        IReadOnlyDictionary<string, IAugment> InstalledUpgrades { get; }
 
         /// <summary>
         /// How much of the augment in that socket is running — the answer behind the dormant mark on a
@@ -100,7 +100,7 @@
         /// that could be told about one slot at a time is an ability whose build can drift away from them.
         /// </summary>
         /// <param name="bySocket">Socket id → the upgrade the augment in that socket installs.</param>
-        void InstallUpgrades(IReadOnlyDictionary<string, IAbilityAugment> bySocket);
+        void InstallUpgrades(IReadOnlyDictionary<string, IAugment> bySocket);
         Task Execute(List<IFightable> targets, IBattleField field);
         void AddParameterDecorator(AbilityParameterDecorator decorator);
         void RemoveParameterDecorator(string decoratorId, string parameter);

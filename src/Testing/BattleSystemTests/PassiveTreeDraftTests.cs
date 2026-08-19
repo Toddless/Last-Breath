@@ -373,7 +373,7 @@ namespace LastBreathTest.BattleSystemTests
             public IAbility CreateAbility(string abilityId) =>
                 throw new NotSupportedException("no player in this walk, so nothing is ever learned");
 
-            public IAbilityAugment? CreateUpgrade(AugmentInstance augment) => null;
+            public IAugment? CreateUpgrade(AugmentInstance augment) => null;
 
             public Stance GetAbilityStance(string abilityId) => Stance.Dexterity;
 

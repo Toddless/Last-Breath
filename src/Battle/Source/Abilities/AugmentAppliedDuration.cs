@@ -18,8 +18,8 @@ namespace Battle.Source.Abilities
     /// An ability that puts nothing on anybody has an empty family, so the record fits it by tag and
     /// moves nothing. That is the ordinary silence of the catalog and is written down in the ledger.
     /// </summary>
-    public class AbilityAugmentAppliedDuration(string id, string[] tags, int tier, float turns)
-        : AbilityAugment<Ability>(id, tags, tier)
+    public class AugmentAppliedDuration(string id, string[] tags, int tier, float turns)
+        : Augment<Ability>(id, tags, tier)
     {
         public override void ApplyUpgrade(Ability ability)
         {
@@ -34,7 +34,7 @@ namespace Battle.Source.Abilities
                 ability.RemoveParameterDecorator(DecoratorId(parameter), parameter);
         }
 
-        public override IAbilityAugment Copy() => new AbilityAugmentAppliedDuration(Id, Tags, Tier, turns);
+        public override IAugment Copy() => new AugmentAppliedDuration(Id, Tags, Tier, turns);
 
         private string DecoratorId(string parameter) => $"Ability_Parameter_Decorator_{Id}_{parameter}";
     }

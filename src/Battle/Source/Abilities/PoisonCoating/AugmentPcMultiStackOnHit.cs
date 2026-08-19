@@ -10,7 +10,7 @@ namespace Battle.Source.Abilities.PoisonCoating
     /// L3 upgrade: the number of poison stacks applied per attack equals the number of
     /// living enemies on the battlefield (instead of a fixed 1 stack).
     /// </summary>
-    public class PcAugmentMultiStackOnHit(string id, string[] tags, int tier)
+    public class AugmentPcMultiStackOnHit(string id, string[] tags, int tier)
         : Augment<PoisonCoating>(id, tags, tier)
     {
         private PoisonCoating? _ability;
@@ -58,6 +58,6 @@ namespace Battle.Source.Abilities.PoisonCoating
             }
         }
 
-        public override IAugment Copy() => new PcAugmentMultiStackOnHit(Id, Tags, Tier);
+        public override IAugment Copy() => new AugmentPcMultiStackOnHit(Id, Tags, Tier);
     }
 }

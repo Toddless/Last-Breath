@@ -9,8 +9,8 @@ namespace Battle.Source.Abilities
     /// book's prices run from nothing to five hundred, a wait is counted because turns are whole.
     /// The added turns need no floor: nothing here reduces the wait.
     /// </summary>
-    public class AbilityAugmentReduceCostAddCooldown(string id, string[] tags, int tier, float costShare, float cooldownTurns)
-        : AbilityAugment<Ability>(id, tags, tier)
+    public class AugmentReduceCostAddCooldown(string id, string[] tags, int tier, float costShare, float cooldownTurns)
+        : Augment<Ability>(id, tags, tier)
     {
         private string CostDecoratorId => $"Ability_Parameter_Decorator_{Id}_Cost";
         private string CooldownDecoratorId => $"Ability_Parameter_Decorator_{Id}_Cooldown";
@@ -29,7 +29,7 @@ namespace Battle.Source.Abilities
             ability.RemoveParameterDecorator(CooldownDecoratorId, AbilityParameter.Cooldown);
         }
 
-        public override IAbilityAugment Copy() =>
-            new AbilityAugmentReduceCostAddCooldown(Id, Tags, Tier, costShare, cooldownTurns);
+        public override IAugment Copy() =>
+            new AugmentReduceCostAddCooldown(Id, Tags, Tier, costShare, cooldownTurns);
     }
 }

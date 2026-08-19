@@ -22,7 +22,7 @@ namespace Battle.Source.Abilities
     /// and taking the augment off must not strip a number the ability was born with.
     /// </summary>
     public class AugmentPoisonOnHit(string id, string[] tags, int tier, float poisonDuration, float poisonPotency)
-        : AbilityAugmentImpactRider(id, tags, tier, () => new PoisonOnHitRider())
+        : AugmentImpactRider(id, tags, tier, () => new PoisonOnHitRider())
     {
         private readonly List<string> _lent = [];
 
@@ -40,7 +40,7 @@ namespace Battle.Source.Abilities
             _lent.Clear();
         }
 
-        public override IAbilityAugment Copy() => new AugmentPoisonOnHit(Id, Tags, Tier, poisonDuration, poisonPotency);
+        public override IAugment Copy() => new AugmentPoisonOnHit(Id, Tags, Tier, poisonDuration, poisonPotency);
 
         private void Lend(Ability ability, string parameter, float value)
         {

@@ -8,8 +8,8 @@ namespace Battle.Source.Abilities
     /// number in the modules, so the swap is an <see cref="OperationType.Override"/> decorator with
     /// absolute priority — nothing may stack on top of a categorical value.
     /// </summary>
-    public class AbilityAugmentCostTypeOverride(string id, string[] tags, int tier, Costs costType)
-        : AbilityAugment<Ability>(id, tags, tier)
+    public class AugmentCostTypeOverride(string id, string[] tags, int tier, Costs costType)
+        : Augment<Ability>(id, tags, tier)
     {
         private string DecoratorId => $"Ability_Parameter_Decorator_{Id}";
 
@@ -21,6 +21,6 @@ namespace Battle.Source.Abilities
         public override void RemoveUpgrade(Ability ability) =>
             ability.RemoveParameterDecorator(DecoratorId, AbilityParameter.CostType);
 
-        public override IAbilityAugment Copy() => new AbilityAugmentCostTypeOverride(Id, Tags, Tier, costType);
+        public override IAugment Copy() => new AugmentCostTypeOverride(Id, Tags, Tier, costType);
     }
 }

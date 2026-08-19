@@ -599,7 +599,7 @@ namespace LastBreathTest.BattleSystemTests
         private static bool Moves(IAbility ability, string parameter)
         {
             float before = ability[parameter];
-            new AbilityAugmentParameterSet("Augment_Reach_Probe", [], 3, [(parameter, OperationType.Add, Probe)]).Apply(ability);
+            new AugmentParameterSet("Augment_Reach_Probe", [], 3, [(parameter, OperationType.Add, Probe)]).Apply(ability);
             return Math.Abs(ability[parameter] - before) > 0.0001f;
         }
 

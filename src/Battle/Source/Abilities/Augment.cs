@@ -7,7 +7,7 @@
     using Core.Localization;
     using Godot;
 
-    public abstract class AbilityAugment<T>(string id, string[] tags, int tier) : IAbilityAugmentWrap<T>
+    public abstract class Augment<T>(string id, string[] tags, int tier) : IAugmentWrap<T>
         where T : IAbility
     {
         public string Id { get; } = id;
@@ -54,6 +54,6 @@
 
         public abstract void RemoveUpgrade(T ability);
 
-        public abstract IAbilityAugment Copy();
+        public abstract IAugment Copy();
     }
 }

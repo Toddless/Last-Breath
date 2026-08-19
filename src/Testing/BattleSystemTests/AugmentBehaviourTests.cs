@@ -170,7 +170,7 @@ namespace LastBreathTest.BattleSystemTests
             // No shipped record lengthens the shared duration since the catalog cleanup, so the key is
             // decorated directly — the mechanism under test is the ref, not any particular record.
             Ability longer = Seated(registry, catalog, PorcupineId, BuffRecord);
-            new AbilityAugmentParameterSet("Augment_Duration_Probe", [], 3,
+            new AugmentParameterSet("Augment_Duration_Probe", [], 3,
                 [(AbilityParameter.Duration, OperationType.Add, 1f)]).Apply(longer);
 
             Assert.AreEqual(hostDuration + 1, await ReductionBuffTurns(longer),
@@ -303,11 +303,11 @@ namespace LastBreathTest.BattleSystemTests
             var target = Fighter();
 
             var ability = (Ability)registry.CreateAbility("Ability_Series_Of_Attacks");
-            IAbilityAugment? first = registry.CreateUpgrade(Shipped(Codeless));
-            IAbilityAugment? second = registry.CreateUpgrade(Shipped(Codeless) with { Id = "Augment_Attacks_Reduce_Armor_Twin" });
+            IAugment? first = registry.CreateUpgrade(Shipped(Codeless));
+            IAugment? second = registry.CreateUpgrade(Shipped(Codeless) with { Id = "Augment_Attacks_Reduce_Armor_Twin" });
             Assert.IsNotNull(first, $"the registry builds nothing for '{Codeless}'");
             Assert.IsNotNull(second, "the registry builds nothing for the twin of the codeless record");
-            ability.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_0"] = first, ["socket_1"] = second });
+            ability.InstallUpgrades(new Dictionary<string, IAugment> { ["socket_0"] = first, ["socket_1"] = second });
             ability.SetOwner(owner);
 
             Assert.AreEqual(2, ability.ImpactRiders.Count, "two records laying one effect were deduplicated into one rider");
@@ -336,11 +336,11 @@ namespace LastBreathTest.BattleSystemTests
                 UpgradeProperties = new Dictionary<string, float>(StringComparer.Ordinal) { ["reviewProbeLever"] = 0.42f }
             };
 
-            IAbilityAugment? upgrade = registry.CreateUpgrade(carrying);
+            IAugment? upgrade = registry.CreateUpgrade(carrying);
             Assert.IsNotNull(upgrade, "a record carrying a lever of its own was refused outright");
 
             var ability = (Ability)registry.CreateAbility("Ability_Series_Of_Attacks");
-            ability.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_lever"] = upgrade });
+            ability.InstallUpgrades(new Dictionary<string, IAugment> { ["socket_lever"] = upgrade });
             await ability.ApplyImpactRiders(new AbilityImpact(owner, target, FieldOf(owner, target)) { Source = ability, Kind = ImpactKind.Attack });
 
             Assert.AreEqual(1, Stacks(target, CodelessEffectId),
@@ -368,11 +368,11 @@ namespace LastBreathTest.BattleSystemTests
         private static Ability Seated(AbilityProvider registry, AbilityAugmentCatalog catalog, string abilityId, params string[] augmentIds)
         {
             var ability = (Ability)registry.CreateAbility(abilityId);
-            Dictionary<string, IAbilityAugment> seated = [];
+            Dictionary<string, IAugment> seated = [];
 
             for (int slot = 0; slot < augmentIds.Length; slot++)
             {
-                IAbilityAugment? upgrade = registry.CreateUpgrade(Shipped(augmentIds[slot]));
+                IAugment? upgrade = registry.CreateUpgrade(Shipped(augmentIds[slot]));
                 Assert.IsNotNull(upgrade, $"the registry builds nothing for '{augmentIds[slot]}'");
                 seated[$"socket_{slot}"] = upgrade;
             }
@@ -435,6 +435,6 @@ namespace LastBreathTest.BattleSystemTests
             return record;
         }
 
-        private static IAbilityAugment? Built(AbilityAugmentData record) => ShippedAbilityData.Abilities().CreateUpgrade(record);
+        private static IAugment? Built(AbilityAugmentData record) => ShippedAbilityData.Abilities().CreateUpgrade(record);
     }
 }

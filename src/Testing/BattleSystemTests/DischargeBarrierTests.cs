@@ -71,9 +71,9 @@ namespace LastBreathTest.BattleSystemTests
             {
                 AbilityAugmentData? record = catalog.Find(wearing);
                 Assert.IsNotNull(record, $"the shipped data declares no '{wearing}'");
-                IAbilityAugment? upgrade = registry.CreateUpgrade(record);
+                IAugment? upgrade = registry.CreateUpgrade(record);
                 Assert.IsNotNull(upgrade, $"the registry builds nothing for '{wearing}'");
-                discharge.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_recovery"] = upgrade });
+                discharge.InstallUpgrades(new Dictionary<string, IAugment> { ["socket_recovery"] = upgrade });
             }
 
             discharge.SetOwner(owner);

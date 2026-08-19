@@ -12,8 +12,8 @@ namespace Battle.Source.Abilities
     /// <para>The cooldown has a class of its own because it also carries a floor; anything else that
     /// only needs the share belongs here rather than in a class per record.</para>
     /// </summary>
-    public class AbilityAugmentReduceParameter(string id, string[] tags, int tier, string parameter, float share)
-        : AbilityAugment<Ability>(id, tags, tier)
+    public class AugmentReduceParameter(string id, string[] tags, int tier, string parameter, float share)
+        : Augment<Ability>(id, tags, tier)
     {
         private string DecoratorId => $"Ability_Parameter_Decorator_{Id}";
 
@@ -22,6 +22,6 @@ namespace Battle.Source.Abilities
 
         public override void RemoveUpgrade(Ability ability) => ability.RemoveParameterDecorator(DecoratorId, parameter);
 
-        public override IAbilityAugment Copy() => new AbilityAugmentReduceParameter(Id, Tags, Tier, parameter, share);
+        public override IAugment Copy() => new AugmentReduceParameter(Id, Tags, Tier, parameter, share);
     }
 }

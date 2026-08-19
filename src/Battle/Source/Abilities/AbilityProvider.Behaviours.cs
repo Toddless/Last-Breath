@@ -17,7 +17,7 @@ namespace Battle.Source.Abilities
         /// <summary>What a behaviour needs from the record besides its numbers, and how it is built.
         /// Declared like the effect registry's keys: a record missing a field or naming an unknown one
         /// is refused with names rather than built half-way.</summary>
-        private sealed record Behaviour(BehaviourField Fields, Func<AbilityAugmentData, Func<IEffectProvider?>, IAbilityAugment?> Build);
+        private sealed record Behaviour(BehaviourField Fields, Func<AbilityAugmentData, Func<IEffectProvider?>, IAugment?> Build);
 
         [Flags]
         private enum BehaviourField
@@ -36,19 +36,19 @@ namespace Battle.Source.Abilities
         private static readonly Dictionary<string, Behaviour> s_behaviours = new(StringComparer.Ordinal)
         {
             ["ApplyEffectOnImpact"] = new(BehaviourField.EffectId | BehaviourField.ImpactKind, (data, effects) =>
-                new AbilityAugmentImpactRider(data.Id, data.Tags, data.Tier, () => new DataEffectImpactRider(
+                new AugmentImpactRider(data.Id, data.Tags, data.Tier, () => new DataEffectImpactRider(
                     data.Id, data.LaidEffectId, host => EffectNumbers(data, host, effects), KindOf(data), data.PoolFromWholeHit, effects))),
 
             ["BuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>
-                new AbilityAugmentCastEffect(data.Id, data.Tags, data.Tier,
+                new AugmentCastEffect(data.Id, data.Tags, data.Tier,
                     host => effects()?.CreateEffect(data.LaidEffectId, EffectNumbers(data, host, effects)))),
 
             ["DebuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>
-                new AbilityAugmentCastDebuff(data.Id, data.Tags, data.Tier,
+                new AugmentCastDebuff(data.Id, data.Tags, data.Tier,
                     host => effects()?.CreateEffect(data.LaidEffectId, EffectNumbers(data, host, effects)))),
 
             ["AttackModifier"] = new(BehaviourField.AttackModifier, (data, _) =>
-                new AbilityAugmentAttackModifier(data.Id, data.Tags, data.Tier, s_attackModifiers[data.AttackModifier]())),
+                new AugmentAttackModifier(data.Id, data.Tags, data.Tier, s_attackModifiers[data.AttackModifier]())),
         };
 
         /// <summary>Attack modifiers a record may name. One today; it grows by record.</summary>
@@ -62,7 +62,7 @@ namespace Battle.Source.Abilities
 
         /// <summary>The upgrade a record's behaviour builds, or null with a report. Null for a record
         /// that declares no behaviour at all: that one is answered by a factory of its own.</summary>
-        private IAbilityAugment? CreateBehaviour(AbilityAugmentData data)
+        private IAugment? CreateBehaviour(AbilityAugmentData data)
         {
             if (string.IsNullOrWhiteSpace(data.Behaviour)) return null;
 
@@ -184,7 +184,7 @@ namespace Battle.Source.Abilities
                 .Select(field => (string)field.GetRawConstantValue()!)
         ];
 
-        private static IAbilityAugment? Refused(AbilityAugmentData data, string complaint)
+        private static IAugment? Refused(AbilityAugmentData data, string complaint)
         {
             Tracker.TrackError($"Augment '{data.Id}' {complaint}");
             return null;

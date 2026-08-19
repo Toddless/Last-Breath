@@ -1,6 +1,6 @@
 ﻿namespace Core.Battle.Abilities
 {
-    public interface IAbilityAugmentWrap<in T> : IAbilityAugment
+    public interface IAugmentWrap<in T> : IAugment
         where T : IAbility
     {
         void RemoveUpgrade(T ability);

@@ -27,9 +27,9 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>An arrangement whose slots are applied in exactly the order written. The socket ids
         /// are made up and sorted, because what these walks vary is the order the augments go on in and
         /// nothing about the slots themselves — the claim is that the order changes nothing.</summary>
-        internal static IReadOnlyDictionary<string, IAbilityAugment> InThisOrder(params IAbilityAugment[] upgrades)
+        internal static IReadOnlyDictionary<string, IAugment> InThisOrder(params IAugment[] upgrades)
         {
-            SortedDictionary<string, IAbilityAugment> seated = new(StringComparer.Ordinal);
+            SortedDictionary<string, IAugment> seated = new(StringComparer.Ordinal);
             for (int slot = 0; slot < upgrades.Length; slot++) seated[$"socket_{slot}"] = upgrades[slot];
             return seated;
         }

@@ -137,7 +137,7 @@
             ability.SetupGet(a => a.Id).Returns(id);
             ability.SetupGet(a => a.InstanceId).Returns(instanceId);
             ability.Setup(a => a.IsSame(It.IsAny<string>())).Returns((string other) => other == instanceId);
-            ability.SetupGet(a => a.InstalledUpgrades).Returns(new Dictionary<string, IAbilityAugment>());
+            ability.SetupGet(a => a.InstalledUpgrades).Returns(new Dictionary<string, IAugment>());
             return ability;
         }
     }

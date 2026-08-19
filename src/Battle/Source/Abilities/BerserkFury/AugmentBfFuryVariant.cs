@@ -4,8 +4,8 @@ namespace Battle.Source.Abilities.BerserkFury
     using Core.Battle.Abilities;
 
     /// <summary>L3 upgrades: replace the plain Fury with a variant (Burning / Primal / Healing).</summary>
-    public class BfAugmentFuryVariant(string id, string[] tags, int tier, Func<int, float, IEffect> factory)
-        : AbilityAugment<BerserkFury>(id, tags, tier)
+    public class AugmentBfFuryVariant(string id, string[] tags, int tier, Func<int, float, IEffect> factory)
+        : Augment<BerserkFury>(id, tags, tier)
     {
         private Func<int, float, IEffect>? _previous;
 
@@ -22,6 +22,6 @@ namespace Battle.Source.Abilities.BerserkFury
             _previous = null;
         }
 
-        public override IAbilityAugment Copy() => new BfAugmentFuryVariant(Id, Tags, Tier, factory);
+        public override IAugment Copy() => new AugmentBfFuryVariant(Id, Tags, Tier, factory);
     }
 }

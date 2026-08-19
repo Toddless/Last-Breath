@@ -92,7 +92,7 @@ namespace LastBreathTest.BattleSystemTests
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             AbilityAugmentData? record = catalog.Find(StackRecord);
             Assert.IsNotNull(record, $"the shipped data declares no '{StackRecord}'");
-            IAbilityAugment? upgrade = registry.CreateUpgrade(record);
+            IAugment? upgrade = registry.CreateUpgrade(record);
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{StackRecord}'");
 
             var block = (Ability)registry.CreateAbility("Ability_Ice_Block");

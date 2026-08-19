@@ -36,7 +36,7 @@ namespace Battle.Source.Abilities
             ability.RemoveParameterDecorator(CostDecoratorId, AbilityParameter.CostValue);
         }
 
-        public override IAbilityAugment Copy() =>
+        public override IAugment Copy() =>
             new AugmentReduceCooldownAndCost(Id, Tags, Tier, cooldownTurns, costShare);
     }
 }

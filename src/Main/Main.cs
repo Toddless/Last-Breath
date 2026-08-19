@@ -7,8 +7,10 @@
     using Battle.Source.UIElements;
     using Battle.Source.UIElements.PassiveWheel;
     using Core;
+    using Core.Battle.Abilities;
     using Core.Constants;
     using Core.Data;
+    using Core.Data.AbilityData;
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
@@ -59,14 +61,16 @@
             _gameEventBus.Subscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
             _gameEventBus.Subscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
             _uiElementProvider.ChangeHud(typeof(PlayerHud));
-           AddTestItems();
+            AddTestItems();
         }
 
         private void AddTestItems()
         {
             var inventory = _provider.GetService<IInventory>();
             var itemCreation = _provider.GetService<IItemCreationService>();
-            List<string> effects = [];
+            var augmentCatalog = _provider.GetService<IAbilityAugmentCatalog>();
+            var augments = augmentCatalog.All.ToList();
+            var itemMinter = _provider.GetService<IItemMinter>();
             float chance = 0.3f;
             float multiplier = 1f;
             inventory.TryAddItem(itemCreation.CreateItem("Gloves_Hunters_Dream", [], Rarity.Legendary, chance, multiplier));
@@ -76,7 +80,7 @@
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Legendary, chance, multiplier));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Dagger", [], Rarity.Legendary, chance, multiplier));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Axe", [], Rarity.Legendary, chance, multiplier));
-            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Bloodthirsty", [], Rarity.Unique,chance, multiplier));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Bloodthirsty", [], Rarity.Unique, chance, multiplier));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Uncommon, chance, multiplier));
             inventory.TryAddItem(itemCreation.CreateItem("Amulet_Recovery_Source", [], Rarity.Legendary, chance, multiplier));
             inventory.TryAddItem(itemCreation.CreateItem("Belt_Leather", [], Rarity.Legendary, chance, multiplier));
@@ -88,6 +92,10 @@
             var resources = _provider.GetService<IItemDataProvider>().GetAllResources();
             foreach (IItem item in resources.ToList())
                 inventory.TryAddItem(item.Copy<IItem>(), 999);
+            foreach (AbilityAugmentData abilityAugmentData in augments)
+            {
+                inventory.TryAddItem(itemMinter.MintItem(abilityAugmentData.Id));
+            }
         }
 
         public override void _ExitTree()
@@ -108,6 +116,7 @@
 
         /// <summary>The safety net against a hung battle: quitting late is still better than never.</summary>
         private const ulong QuitTimeoutMsec = 5000;
+
         private bool _quitting;
 
         /// <summary>Winds an active battle down before quitting (tracker #66/#130): the abort locks

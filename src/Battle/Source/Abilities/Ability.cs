@@ -105,8 +105,8 @@
         public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
         public IReadOnlyDictionary<string, IActivationRider> ActivationRiders => _activationRiders;
         public IReadOnlyDictionary<string, IImpactRider> ImpactRiders => _impactRiders;
-        public IReadOnlyDictionary<string, IAbilityAugment> InstalledUpgrades => _installedUpgrades;
-        private readonly Dictionary<string, IAbilityAugment> _installedUpgrades = new(StringComparer.Ordinal);
+        public IReadOnlyDictionary<string, IAugment> InstalledUpgrades => _installedUpgrades;
+        private readonly Dictionary<string, IAugment> _installedUpgrades = new(StringComparer.Ordinal);
         private readonly Dictionary<string, IActivationRider> _activationRiders = new(StringComparer.Ordinal);
         private readonly Dictionary<string, IImpactRider> _impactRiders = new(StringComparer.Ordinal);
         public ITargetingStrategy Targeting { get; set; } = TargetingStrategyFactory.From(data);
@@ -153,12 +153,12 @@
         /// Cheap enough for that: nothing in a fight rebinds, the passes come from a taken node, a
         /// seated augment, a load or a new playthrough.
         /// </summary>
-        public void InstallUpgrades(IReadOnlyDictionary<string, IAbilityAugment> bySocket)
+        public void InstallUpgrades(IReadOnlyDictionary<string, IAugment> bySocket)
         {
-            foreach (IAbilityAugment worn in _installedUpgrades.Values) worn.Remove(this);
+            foreach (IAugment worn in _installedUpgrades.Values) worn.Remove(this);
             _installedUpgrades.Clear();
 
-            foreach ((string socketId, IAbilityAugment upgrade) in bySocket)
+            foreach ((string socketId, IAugment upgrade) in bySocket)
             {
                 upgrade.Apply(this);
                 _installedUpgrades[socketId] = upgrade;
@@ -237,7 +237,7 @@
         /// </summary>
         public AugmentActivity ActivityOf(string socketAddress)
         {
-            if (!_installedUpgrades.TryGetValue(socketAddress, out IAbilityAugment? worn)) return AugmentActivity.Working;
+            if (!_installedUpgrades.TryGetValue(socketAddress, out IAugment? worn)) return AugmentActivity.Working;
 
             (int seated, int running) = Params.MovesOf(worn.Id);
             int riders = RidersOf(worn.InstanceId);

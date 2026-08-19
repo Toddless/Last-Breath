@@ -11,8 +11,8 @@ namespace Battle.Source.Abilities
     /// (<see cref="IImpactRider.Detach"/>), so two augments sharing one would mean the rebuild of one
     /// ability tearing down a subscription the other ability's rider is still using.</para>
     /// </summary>
-    public class AbilityAugmentImpactRider(string id, string[] tags, int tier, Func<IImpactRider> riderFactory)
-        : AbilityAugment<Ability>(id, tags, tier)
+    public class AugmentImpactRider(string id, string[] tags, int tier, Func<IImpactRider> riderFactory)
+        : Augment<Ability>(id, tags, tier)
     {
         private IImpactRider? _rider;
 
@@ -24,6 +24,6 @@ namespace Battle.Source.Abilities
 
         public override void RemoveUpgrade(Ability ability) => ability.RemoveImpactRider(RiderKey(Rider.Id));
 
-        public override IAbilityAugment Copy() => new AbilityAugmentImpactRider(Id, Tags, Tier, riderFactory);
+        public override IAugment Copy() => new AugmentImpactRider(Id, Tags, Tier, riderFactory);
     }
 }

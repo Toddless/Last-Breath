@@ -6,7 +6,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
     /// L3 upgrade: replaces the series with one empowered strike that deals
     /// the total damage to the full series (with incremental scaling applied).
     /// </summary>
-    public class IpAugmentSingleEmpoweredAttack(string id, string[] tags, int tier)
+    public class AugmentIpSingleEmpoweredAttack(string id, string[] tags, int tier)
         : Augment<IncreasingPressure>(id, tags, tier)
     {
         private IIpExecutionStrategy? _previousStrategy;
@@ -25,6 +25,6 @@ namespace Battle.Source.Abilities.IncreasingPressure
         }
 
         public override IAugmentWrap<IncreasingPressure> Copy() =>
-            new IpAugmentSingleEmpoweredAttack(Id, Tags, Tier);
+            new AugmentIpSingleEmpoweredAttack(Id, Tags, Tier);
     }
 }

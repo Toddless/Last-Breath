@@ -157,13 +157,13 @@ namespace LastBreathTest.BattleSystemTests
             return laid.PercentRegeneration;
         }
 
-        private static Dictionary<string, IAbilityAugment> Seat(AbilityProvider registry, AbilityAugmentCatalog catalog, string augmentId)
+        private static Dictionary<string, IAugment> Seat(AbilityProvider registry, AbilityAugmentCatalog catalog, string augmentId)
         {
             AbilityAugmentData? record = catalog.Find(augmentId);
             Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
-            IAbilityAugment? upgrade = registry.CreateUpgrade(record);
+            IAugment? upgrade = registry.CreateUpgrade(record);
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{augmentId}'");
-            return new Dictionary<string, IAbilityAugment> { ["socket_key"] = upgrade };
+            return new Dictionary<string, IAugment> { ["socket_key"] = upgrade };
         }
 
         private static ConditionOwner Fighter()

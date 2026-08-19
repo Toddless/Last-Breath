@@ -5,7 +5,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
     /// <summary>
     /// L3 upgrade: instead of exploding, spreads all poison stacks from the target to all other enemies.
     /// </summary>
-    public class PeAugmentSpreadPoison(string id, string[] tags, int tier)
+    public class AugmentPeSpreadPoison(string id, string[] tags, int tier)
         : Augment<PoisonExplosion>(id, tags, tier)
     {
         private IPoisonSpreadMode? _previousMode;
@@ -19,6 +19,6 @@ namespace Battle.Source.Abilities.PoisonExplosion
         public override void RemoveUpgrade(PoisonExplosion ability) => ability.SpreadMode = _previousMode;
 
         public override IAugmentWrap<PoisonExplosion> Copy() =>
-            new PeAugmentSpreadPoison(Id, Tags, Tier);
+            new AugmentPeSpreadPoison(Id, Tags, Tier);
     }
 }

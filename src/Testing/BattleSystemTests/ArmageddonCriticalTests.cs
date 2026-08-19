@@ -197,7 +197,7 @@ namespace LastBreathTest.BattleSystemTests
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             AbilityAugmentData? record = catalog.Find(augmentId);
             Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
-            IAbilityAugment? upgrade = registry.CreateUpgrade(record);
+            IAugment? upgrade = registry.CreateUpgrade(record);
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{augmentId}'");
             upgrade.Apply(cast);
         }

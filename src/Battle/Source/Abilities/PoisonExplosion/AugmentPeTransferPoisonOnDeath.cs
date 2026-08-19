@@ -5,7 +5,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
     /// <summary>
     /// L2 upgrade: when the target dies, its remaining poison stacks transfer to a random enemy.
     /// </summary>
-    public class PeAugmentTransferPoisonOnDeath(string id, string[] tags, int tier)
+    public class AugmentPeTransferPoisonOnDeath(string id, string[] tags, int tier)
         : Augment<PoisonExplosion>(id, tags, tier)
     {
         private IPoisonSpreadMode? _previousMode;
@@ -19,6 +19,6 @@ namespace Battle.Source.Abilities.PoisonExplosion
         public override void RemoveUpgrade(PoisonExplosion ability) => ability.SpreadMode = _previousMode;
 
         public override IAugmentWrap<PoisonExplosion> Copy() =>
-            new PeAugmentTransferPoisonOnDeath(Id, Tags, Tier);
+            new AugmentPeTransferPoisonOnDeath(Id, Tags, Tier);
     }
 }

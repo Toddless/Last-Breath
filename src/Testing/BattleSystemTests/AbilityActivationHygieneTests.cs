@@ -26,8 +26,8 @@ namespace LastBreathTest.BattleSystemTests
             // is its own question, answered in AugmentPriceAndCooldownCutTests.
             var ability = CreateAbility(cost: 100);
 
-            new AbilityAugmentParameterSet("Upgrade_A", [], 1, [(AbilityParameter.CostValue, OperationType.Add, 20f)]).Apply(ability);
-            new AbilityAugmentParameterSet("Upgrade_B", [], 2, [(AbilityParameter.CostValue, OperationType.Add, 30f)]).Apply(ability);
+            new AugmentParameterSet("Upgrade_A", [], 1, [(AbilityParameter.CostValue, OperationType.Add, 20f)]).Apply(ability);
+            new AugmentParameterSet("Upgrade_B", [], 2, [(AbilityParameter.CostValue, OperationType.Add, 30f)]).Apply(ability);
 
             Assert.AreEqual(150, ability.CostValue, "one of the two records had its bill waived by the other");
         }
@@ -37,8 +37,8 @@ namespace LastBreathTest.BattleSystemTests
         {
             var ability = CreateAbility(cooldown: 10);
 
-            new AbilityAugmentParameterSet("Upgrade_A", [], 1, [(AbilityParameter.Cooldown, OperationType.Add, 2f)]).Apply(ability);
-            new AbilityAugmentParameterSet("Upgrade_B", [], 2, [(AbilityParameter.Cooldown, OperationType.Add, 3f)]).Apply(ability);
+            new AugmentParameterSet("Upgrade_A", [], 1, [(AbilityParameter.Cooldown, OperationType.Add, 2f)]).Apply(ability);
+            new AugmentParameterSet("Upgrade_B", [], 2, [(AbilityParameter.Cooldown, OperationType.Add, 3f)]).Apply(ability);
 
             Assert.AreEqual(15f, ability.Cooldown, "one of the two records had its longer wait waived by the other");
         }
@@ -118,15 +118,15 @@ namespace LastBreathTest.BattleSystemTests
             // own: they carry applied state (Learned, the decorators they laid on), and one shared
             // between the two would come off the original the next time the copy's slots were rebuilt.
             var ability = CreateAbility(cost: 100);
-            var upgrade = new AbilityAugmentReduceCost("Upgrade_A", [], 1, 0.2f);
-            ability.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_one"] = upgrade });
+            var upgrade = new AugmentReduceCost("Upgrade_A", [], 1, 0.2f);
+            ability.InstallUpgrades(new Dictionary<string, IAugment> { ["socket_one"] = upgrade });
 
             var copy = (Ability)ability.Copy();
 
             Assert.AreEqual(80, copy.CostValue, "the copy is not wearing what the original wears");
             Assert.IsFalse(ReferenceEquals(upgrade, copy.InstalledUpgrades["socket_one"]));
 
-            copy.InstallUpgrades(new Dictionary<string, IAbilityAugment>());
+            copy.InstallUpgrades(new Dictionary<string, IAugment>());
 
             Assert.AreEqual(100, copy.CostValue, "the copy kept the augment it was told to take off");
             Assert.IsTrue(upgrade.Learned, "emptying the copy's slot took the original's augment off with it");

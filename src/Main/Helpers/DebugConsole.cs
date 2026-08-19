@@ -374,7 +374,7 @@ namespace LastBreath.Helpers
 
         /// <summary>The numbers the upgrade was built with — the seated copy's own, since the copy's
         /// dictionary is what both the behaviour and the description are made from.</summary>
-        private static string AppliedNumbers(IAbilityAugment augment) =>
+        private static string AppliedNumbers(IAugment augment) =>
             augment.DescriptionValues.Count == 0
                 ? "no numbers"
                 : string.Join(", ", augment.DescriptionValues

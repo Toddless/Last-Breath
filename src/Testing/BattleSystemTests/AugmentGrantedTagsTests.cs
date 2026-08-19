@@ -504,8 +504,8 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(board.Install(board.At(SlotTwo), Copy(ShippedAmplifier)),
                 "the donor is seated and the amplifier still cannot follow it");
 
-            IAbilityAugment? donorUpgrade = book.CreateUpgrade(donor);
-            IAbilityAugment? amplifierUpgrade = book.CreateUpgrade(amplifier);
+            IAugment? donorUpgrade = book.CreateUpgrade(donor);
+            IAugment? amplifierUpgrade = book.CreateUpgrade(amplifier);
             Assert.IsNotNull(donorUpgrade, $"the registry builds nothing for '{ShippedDonor}'");
             Assert.IsNotNull(amplifierUpgrade, $"the registry builds nothing for '{ShippedAmplifier}'");
             var ability = (Ability)book.CreateAbility(ShippedAbility);
@@ -598,7 +598,7 @@ namespace LastBreathTest.BattleSystemTests
             foreach (AbilityAugmentData opener in openers) book.CreateUpgrade(opener)?.Apply(ability);
 
             float before = ability[parameter];
-            new AbilityAugmentParameterSet("Augment_Grant_Probe", [], 3, [(parameter, Core.Enums.OperationType.Add, 5f)]).Apply(ability);
+            new AugmentParameterSet("Augment_Grant_Probe", [], 3, [(parameter, Core.Enums.OperationType.Add, 5f)]).Apply(ability);
             return Math.Abs(ability[parameter] - before) > 0.0001f;
         }
 

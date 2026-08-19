@@ -715,14 +715,14 @@ namespace LastBreathTest.BattleSystemTests
                 var ability = new Mock<IAbility>();
                 ability.SetupGet(a => a.Id).Returns(abilityId);
                 ability.SetupGet(a => a.InstanceId).Returns(instanceId);
-                ability.SetupGet(a => a.InstalledUpgrades).Returns(new Dictionary<string, IAbilityAugment>());
+                ability.SetupGet(a => a.InstalledUpgrades).Returns(new Dictionary<string, IAugment>());
                 ability.Setup(a => a.IsSame(It.IsAny<string>())).Returns((string other) => other == instanceId);
                 return ability.Object;
             }
 
             /// <summary>These walks are about the slots and the file, never about behaviour: nothing
             /// here asks what an augment does.</summary>
-            public IAbilityAugment? CreateUpgrade(AugmentInstance augment) => null;
+            public IAugment? CreateUpgrade(AugmentInstance augment) => null;
 
             public Stance GetAbilityStance(string abilityId) => Stance.Dexterity;
 

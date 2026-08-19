@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using Interfaces;
 
-    public interface IAbilityAugment : IDisplayable, IIdentifiable
+    public interface IAugment : IDisplayable, IIdentifiable
     {
         int Tier { get; }
         bool Learned { get; }
@@ -26,6 +26,6 @@
 
         /// <summary>Fresh unapplied instance with the same configuration — ability copies must not
         /// share upgrade objects (applied state would leak between owners).</summary>
-        IAbilityAugment Copy();
+        IAugment Copy();
     }
 }

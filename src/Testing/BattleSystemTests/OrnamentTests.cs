@@ -667,7 +667,7 @@ namespace LastBreathTest.BattleSystemTests
             var ability = new Mock<IAbility>();
             ability.SetupGet(mock => mock.Id).Returns(abilityId);
             ability.SetupGet(mock => mock.InstanceId).Returns(instanceId);
-            ability.SetupGet(mock => mock.InstalledUpgrades).Returns(new Dictionary<string, IAbilityAugment>());
+            ability.SetupGet(mock => mock.InstalledUpgrades).Returns(new Dictionary<string, IAugment>());
             ability.Setup(mock => mock.IsSame(It.IsAny<string>())).Returns((string other) => other == instanceId);
             return ability.Object;
         }
@@ -756,7 +756,7 @@ namespace LastBreathTest.BattleSystemTests
             public IAbility CreateAbility(string abilityId) => NewAbility(abilityId);
 
             /// <summary>These walks are about the slots and the file, never about behaviour.</summary>
-            public IAbilityAugment? CreateUpgrade(AugmentInstance augment) => null;
+            public IAugment? CreateUpgrade(AugmentInstance augment) => null;
 
             public Stance GetAbilityStance(string abilityId) => Stance.Dexterity;
 

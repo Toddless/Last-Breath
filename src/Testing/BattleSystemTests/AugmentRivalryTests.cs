@@ -346,12 +346,12 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>One copy of the cost record as the registry builds it — the record with this copy's
         /// roll written over the declared number.</summary>
-        private static IAbilityAugment Built(AbilityProvider registry, AbilityAugmentCatalog catalog, float roll)
+        private static IAugment Built(AbilityProvider registry, AbilityAugmentCatalog catalog, float roll)
         {
             AbilityAugmentData? record = catalog.Find(CostAugment);
             Assert.IsNotNull(record, $"the shipped data declares no '{CostAugment}'");
 
-            IAbilityAugment? upgrade = registry.CreateUpgrade(CostCopy(roll).Applied(record));
+            IAugment? upgrade = registry.CreateUpgrade(CostCopy(roll).Applied(record));
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{CostAugment}'");
 
             return upgrade;
@@ -359,47 +359,47 @@ namespace LastBreathTest.BattleSystemTests
 
         private static AugmentInstance CostCopy(float roll) => Copy(CostAugment, (CostShareProperty, roll));
 
-        private static IAbilityAugment ReduceCooldown() => new AbilityAugmentReduceCooldown(CooldownAugment, [], 1, CooldownTurns);
+        private static IAugment ReduceCooldown() => new AugmentReduceCooldown(CooldownAugment, [], 1, CooldownTurns);
 
-        private static IAbilityAugment ReduceCost() => new AbilityAugmentReduceCost(CostAugment, [], 1, 0.30f);
+        private static IAugment ReduceCost() => new AugmentReduceCost(CostAugment, [], 1, 0.30f);
 
-        private static IAbilityAugment Surcharge() =>
-            new AbilityAugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeTurns, SurchargeCostShare);
+        private static IAugment Surcharge() =>
+            new AugmentReduceCooldownAddCost(SurchargeAugment, [], 1, SurchargeTurns, SurchargeCostShare);
 
         /// <summary>A cut deeper than the surcharge record's, standing on the same wait: the rival that
         /// puts the surcharge record's own cut out of work.</summary>
-        private static IAbilityAugment DeeperCut() =>
-            new AbilityAugmentParameterSet("Augment_Deeper_Cut", [], 3, [(AbilityParameter.Cooldown, OperationType.Subtract, 5f)]);
+        private static IAugment DeeperCut() =>
+            new AugmentParameterSet("Augment_Deeper_Cut", [], 3, [(AbilityParameter.Cooldown, OperationType.Subtract, 5f)]);
 
         /// <summary>Two records reaching for one number from opposite sides, shaped like the pair the
         /// book ships on a berserker's own burn (Augment_Fury_More_Burn and Augment_Fury_Less_Burn). Stood in for
         /// on a key of Head Butt's, because which number it is has nothing to do with the question.</summary>
-        private static IAbilityAugment MoreAttacks() =>
-            new AbilityAugmentParameterSet("Augment_More_Attacks", [], 2, [(AbilityParameter.Attacks, OperationType.Add, 2f)]);
+        private static IAugment MoreAttacks() =>
+            new AugmentParameterSet("Augment_More_Attacks", [], 2, [(AbilityParameter.Attacks, OperationType.Add, 2f)]);
 
-        private static IAbilityAugment FewerAttacks() =>
-            new AbilityAugmentParameterSet("Augment_Fewer_Attacks", [], 2, [(AbilityParameter.Attacks, OperationType.Subtract, 1f)]);
+        private static IAugment FewerAttacks() =>
+            new AugmentParameterSet("Augment_Fewer_Attacks", [], 2, [(AbilityParameter.Attacks, OperationType.Subtract, 1f)]);
 
         /// <summary>Head Butt's own tier-two augment: a longer stun bought with fifty more mana.</summary>
-        private static IAbilityAugment StunSurchargeUpgrade() =>
-            new AbilityAugmentParameterSet(StunSurcharge, [], 2, [(AbilityParameter.CostValue, OperationType.Add, 50f)]);
+        private static IAugment StunSurchargeUpgrade() =>
+            new AugmentParameterSet(StunSurcharge, [], 2, [(AbilityParameter.CostValue, OperationType.Add, 50f)]);
 
         /// <summary>A record that rides every impact AND cuts the wait — the shape the shipped book puts
         /// on an applier that also carries a number of its own. Its cut is outdone below.</summary>
-        private static IAbilityAugment CutAndRide() => new RidingCut("Augment_Riding_Cut", tier: 2, turns: 1f);
+        private static IAugment CutAndRide() => new RidingCut("Augment_Riding_Cut", tier: 2, turns: 1f);
 
         /// <summary>A record that is nothing but a rider: no number of its own anywhere.</summary>
-        private static IAbilityAugment JustARider() =>
-            new AbilityAugmentImpactRider("Augment_Just_A_Rider", [], 2, () => new ProbeRider());
+        private static IAugment JustARider() =>
+            new AugmentImpactRider("Augment_Just_A_Rider", [], 2, () => new ProbeRider());
 
         /// <summary>A record that moves two numbers, one of which is outdone below: the case for an
         /// augment that is neither working nor asleep.</summary>
-        private static IAbilityAugment CutAndCheapen() =>
-            new AbilityAugmentParameterSet("Augment_Cut_And_Cheapen", [], 2,
+        private static IAugment CutAndCheapen() =>
+            new AugmentParameterSet("Augment_Cut_And_Cheapen", [], 2,
                 [(AbilityParameter.Cooldown, OperationType.Subtract, 1f), (AbilityParameter.CostValue, OperationType.Subtract, 20f)]);
 
-        private static IAbilityAugment SwapTo(string augmentId, Costs resource, int tier = 2) =>
-            new AbilityAugmentCostTypeOverride(augmentId, [], tier, resource);
+        private static IAugment SwapTo(string augmentId, Costs resource, int tier = 2) =>
+            new AugmentCostTypeOverride(augmentId, [], tier, resource);
 
         /// <summary>An impact rider that does nothing: what these walks need of one is that it EXISTS on
         /// the ability, because existing is the whole of what makes a rider a working move.</summary>
@@ -417,7 +417,7 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>An augment that both rides and moves a number — the two halves whose verdicts have to
         /// be added up rather than one of them answering for the record.</summary>
         private sealed class RidingCut(string id, int tier, float turns)
-            : AbilityAugmentImpactRider(id, [], tier, () => new ProbeRider())
+            : AugmentImpactRider(id, [], tier, () => new ProbeRider())
         {
             public override void ApplyUpgrade(Ability ability)
             {
@@ -432,7 +432,7 @@ namespace LastBreathTest.BattleSystemTests
                 ability.RemoveParameterDecorator(DecoratorId, AbilityParameter.Cooldown);
             }
 
-            public override IAbilityAugment Copy() => new RidingCut(Id, Tier, turns);
+            public override IAugment Copy() => new RidingCut(Id, Tier, turns);
 
             private string DecoratorId => $"Ability_Parameter_Decorator_{Id}_{AbilityParameter.Cooldown}";
         }

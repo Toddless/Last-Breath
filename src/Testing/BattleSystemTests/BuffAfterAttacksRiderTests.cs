@@ -184,7 +184,7 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(afterFirst, owner.ListenersOf<BattleEndEvent>(),
                 "five rebuilds left five listeners on the caster — the riders they replaced never let go");
 
-            series.InstallUpgrades(new Dictionary<string, IAbilityAugment>());
+            series.InstallUpgrades(new Dictionary<string, IAugment>());
 
             Assert.AreEqual(0, owner.ListenersOf<BattleEndEvent>(), "the augment came off the ability and its listener stayed on the fighter");
         }
@@ -194,19 +194,19 @@ namespace LastBreathTest.BattleSystemTests
         private static void Reseat(Ability series)
         {
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
-            IAbilityAugment? upgrade = registry.CreateUpgrade(Shipped(catalog));
+            IAugment? upgrade = registry.CreateUpgrade(Shipped(catalog));
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{Record}'");
-            series.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_0"] = upgrade });
+            series.InstallUpgrades(new Dictionary<string, IAugment> { ["socket_0"] = upgrade });
         }
 
         private static (Ability Series, IBattleField Field) SeatedOn(ConditionOwner owner)
         {
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             var ability = (Ability)registry.CreateAbility(Carrier);
-            IAbilityAugment? upgrade = registry.CreateUpgrade(Shipped(catalog));
+            IAugment? upgrade = registry.CreateUpgrade(Shipped(catalog));
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{Record}'");
 
-            ability.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_0"] = upgrade });
+            ability.InstallUpgrades(new Dictionary<string, IAugment> { ["socket_0"] = upgrade });
             ability.SetOwner(owner);
 
             return (ability, FieldOf(owner));
@@ -228,10 +228,10 @@ namespace LastBreathTest.BattleSystemTests
         {
             (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             var ability = (Ability)registry.CreateAbility(Carrier);
-            IAbilityAugment? upgrade = registry.CreateUpgrade(Shipped(catalog));
+            IAugment? upgrade = registry.CreateUpgrade(Shipped(catalog));
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{Record}'");
 
-            ability.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_0"] = upgrade });
+            ability.InstallUpgrades(new Dictionary<string, IAugment> { ["socket_0"] = upgrade });
             var owner = Fighter();
             ability.SetOwner(owner);
 

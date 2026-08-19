@@ -250,11 +250,11 @@ namespace LastBreathTest.BattleSystemTests
         /// door every seated augment comes through.</summary>
         private static string? LaidBy(AbilityProvider registry, AugmentInstance copy)
         {
-            IAbilityAugment? upgrade = registry.CreateUpgrade(copy);
+            IAugment? upgrade = registry.CreateUpgrade(copy);
             Assert.IsNotNull(upgrade, $"the registry builds nothing for a copy of '{copy.AugmentId}'");
 
             var ability = (Ability)registry.CreateAbility("Ability_Series_Of_Attacks");
-            ability.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_pool"] = upgrade });
+            ability.InstallUpgrades(new Dictionary<string, IAugment> { ["socket_pool"] = upgrade });
 
             var caster = new ConditionOwner();
             var victim = new ConditionOwner();

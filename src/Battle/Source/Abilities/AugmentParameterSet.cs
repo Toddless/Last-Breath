@@ -37,7 +37,7 @@ namespace Battle.Source.Abilities
                 ability.RemoveParameterDecorator(DecoratorId(parameter), parameter);
         }
 
-        public override IAbilityAugment Copy() => new AugmentParameterSet(Id, Tags, Tier, moves);
+        public override IAugment Copy() => new AugmentParameterSet(Id, Tags, Tier, moves);
 
         private string DecoratorId(string parameter) => $"Ability_Parameter_Decorator_{Id}_{parameter}";
     }

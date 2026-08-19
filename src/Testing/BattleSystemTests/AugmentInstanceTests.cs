@@ -229,7 +229,7 @@ namespace LastBreathTest.BattleSystemTests
             AugmentInstance copy = new AugmentMinter(catalog, new DefaultRandomNumberGenerator(seed: 77))
                 .Mint(record, Rarity.Legendary);
 
-            IAbilityAugment? upgrade = registry.CreateUpgrade(copy);
+            IAugment? upgrade = registry.CreateUpgrade(copy);
 
             Assert.IsNotNull(upgrade, $"the registry builds nothing for a copy of '{ShareAugment}'");
             Assert.AreNotEqual(record.UpgradeProperties[ShareProperty], copy.Values[ShareProperty],

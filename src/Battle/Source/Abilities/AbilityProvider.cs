@@ -89,7 +89,7 @@
         /// rolled, and not the average the record declares.
         /// Null for a copy of a record the catalog does not hold — nothing says what to build.
         /// </summary>
-        public IAbilityAugment? CreateUpgrade(AugmentInstance instance)
+        public IAugment? CreateUpgrade(AugmentInstance instance)
         {
             AbilityAugmentData? record = augments.Find(instance.AugmentId);
             if (record != null) return CreateUpgrade(instance.Applied(record));
@@ -102,9 +102,9 @@
         /// as the data declares it, before any copy of it is minted. Null for an id neither half of the
         /// registry answers: the record parses and is mintable, and this is where that silence is
         /// reported.</summary>
-        public IAbilityAugment? CreateUpgrade(AbilityAugmentData data)
+        public IAugment? CreateUpgrade(AbilityAugmentData data)
         {
-            IAbilityAugment? upgrade = Build(data);
+            IAugment? upgrade = Build(data);
             if (upgrade == null)
             {
                 Tracker.TrackNotFound($"Upgrade factory '{data.Id}'", this);
@@ -127,7 +127,7 @@
         /// <summary>The three halves of the registry, asked in order: a record that DECLARES a behaviour
         /// is built from its own data, an augment reaching into the members of an ability has a factory
         /// written for it, and one that only moves numbers is a row of the parameter table.</summary>
-        private IAbilityAugment? Build(AbilityAugmentData data)
+        private IAugment? Build(AbilityAugmentData data)
         {
             // Not a priority: a record with both a behaviour and a factory is a duplicate id, which the
             // uniqueness of BuildableAugmentIds already refuses loudly. The sets do not overlap.
@@ -136,7 +136,7 @@
             if (AbilityUpgrades.TryGetValue(data.Id, out var factory)) return factory(data);
 
             return _parameterAugments.TryGetValue(data.Id, out AugmentParameterMove[]? moves)
-                ? new AbilityAugmentParameterSet(data.Id, data.Tags, data.Tier,
+                ? new AugmentParameterSet(data.Id, data.Tags, data.Tier,
                     [.. moves.Select(move => (move.Parameter, move.Operation, move.AmountIn(data.UpgradeProperties)))])
                 : null;
         }

@@ -5,8 +5,8 @@ namespace Battle.Source.Abilities
 
     /// <summary>Generic upgrade: installs an attack context modifier on any ability that owns an attack
     /// pipeline. Seated on one that does not, it is inert — a tag promises a fit, not a result.</summary>
-    public class AbilityAugmentAttackModifier(string id, string[] tags, int tier, IAttackModifier modifier)
-        : AbilityAugment<Ability>(id, tags, tier)
+    public class AugmentAttackModifier(string id, string[] tags, int tier, IAttackModifier modifier)
+        : Augment<Ability>(id, tags, tier)
     {
         public override void ApplyUpgrade(Ability ability)
         {
@@ -18,6 +18,6 @@ namespace Battle.Source.Abilities
             if (ability is IAttackModifierHost host) host.RemoveAttackModifier(modifier.Id);
         }
 
-        public override IAbilityAugment Copy() => new AbilityAugmentAttackModifier(Id, Tags, Tier, modifier);
+        public override IAugment Copy() => new AugmentAttackModifier(Id, Tags, Tier, modifier);
     }
 }

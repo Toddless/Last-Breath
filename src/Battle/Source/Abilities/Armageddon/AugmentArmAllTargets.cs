@@ -5,7 +5,7 @@ namespace Battle.Source.Abilities.Armageddon
     using HitDelivery;
 
     /// <summary>L3 upgrade: hits every enemy on the field at the price of a longer cooldown.</summary>
-    public class ArmAugmentAllTargets(string id, string[] tags, int tier, float additionalCooldown)
+    public class AugmentArmAllTargets(string id, string[] tags, int tier, float additionalCooldown)
         : Augment<Armageddon>(id, tags, tier)
     {
         private const string CooldownDecoratorId = "Ability_Parameter_Decorator_Arm_AoE_Cooldown";
@@ -30,6 +30,6 @@ namespace Battle.Source.Abilities.Armageddon
             ability.RemoveParameterDecorator(CooldownDecoratorId, AbilityParameter.Cooldown);
         }
 
-        public override IAugment Copy() => new ArmAugmentAllTargets(Id, Tags, Tier, additionalCooldown);
+        public override IAugment Copy() => new AugmentArmAllTargets(Id, Tags, Tier, additionalCooldown);
     }
 }

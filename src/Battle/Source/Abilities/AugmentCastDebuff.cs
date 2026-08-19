@@ -14,6 +14,6 @@ namespace Battle.Source.Abilities
 
         public override void RemoveUpgrade(Ability ability) => ability.RemoveActivationRider(RiderKey(Id));
 
-        public override IAbilityAugment Copy() => new AugmentCastDebuff(Id, Tags, Tier, effectFactory);
+        public override IAugment Copy() => new AugmentCastDebuff(Id, Tags, Tier, effectFactory);
     }
 }

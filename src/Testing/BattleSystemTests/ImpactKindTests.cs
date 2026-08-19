@@ -211,10 +211,10 @@ namespace LastBreathTest.BattleSystemTests
             jar.SetOwner(owner);
 
             AbilityAugmentData? record = catalog.Find(ProjectileRecord);
-            IAbilityAugment? upgrade = registry.CreateUpgrade(record!);
+            IAugment? upgrade = registry.CreateUpgrade(record!);
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{ProjectileRecord}'");
 
-            jar.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_projectiles"] = upgrade });
+            jar.InstallUpgrades(new Dictionary<string, IAugment> { ["socket_projectiles"] = upgrade });
             await jar.Execute([target], FieldOf(owner, target));
 
             Assert.AreEqual(jarsBefore + ExtraShards, (int)jar[AbilityParameter.ProjectileCount],
@@ -250,10 +250,10 @@ namespace LastBreathTest.BattleSystemTests
 
             AbilityAugmentData? record = catalog.Find(ProjectileRecord);
             Assert.IsNotNull(record, $"the shipped data declares no '{ProjectileRecord}'");
-            IAbilityAugment? upgrade = registry.CreateUpgrade(record);
+            IAugment? upgrade = registry.CreateUpgrade(record);
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{ProjectileRecord}'");
 
-            shards.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_projectiles"] = upgrade });
+            shards.InstallUpgrades(new Dictionary<string, IAugment> { ["socket_projectiles"] = upgrade });
             await shards.Execute([target, bystander], FieldOf(owner, target, bystander));
 
             Assert.AreEqual(shardsBefore + ExtraShards, (int)shards[AbilityParameter.ProjectileCount],

@@ -30,6 +30,6 @@ namespace Battle.Source.Abilities
         public override void RemoveUpgrade(Ability ability) =>
             ability.RemoveParameterDecorator(DecoratorId, AbilityParameter.Cooldown);
 
-        public override IAbilityAugment Copy() => new AugmentReduceCooldown(Id, Tags, Tier, cooldownTurns);
+        public override IAugment Copy() => new AugmentReduceCooldown(Id, Tags, Tier, cooldownTurns);
     }
 }

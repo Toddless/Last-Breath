@@ -7,7 +7,7 @@ namespace Battle.Source.Abilities.DarkShroud
     /// <summary>L3 "Immortality": the shroud puts the Life Aegis on its caster — the dodge of a first
     /// death. Built per cast, so the effect reads the ability's effectiveness instead of a figure the
     /// augment was seated with, and its numbers come from the canon rather than from the record.</summary>
-    public class DsAugmentImmortality(string id, string[] tags, int tier, Func<IEffect?> effect)
+    public class AugmentDsImmortality(string id, string[] tags, int tier, Func<IEffect?> effect)
         : Augment<DarkShroud>(id, tags, tier)
     {
         /// <summary>What the shroud files this rider under — the name AbilityBuffActivationRider would
@@ -19,6 +19,6 @@ namespace Battle.Source.Abilities.DarkShroud
 
         public override void RemoveUpgrade(DarkShroud ability) => ability.RemoveActivationRider(RiderKey(RiderId));
 
-        public override IAugment Copy() => new DsAugmentImmortality(Id, Tags, Tier, effect);
+        public override IAugment Copy() => new AugmentDsImmortality(Id, Tags, Tier, effect);
     }
 }

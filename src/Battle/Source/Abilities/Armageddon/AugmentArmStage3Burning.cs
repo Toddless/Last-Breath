@@ -5,7 +5,7 @@ namespace Battle.Source.Abilities.Armageddon
     using Effects;
 
     /// <summary>L2 upgrade: stage 3 additionally puts burning stacks on every hit target.</summary>
-    public class ArmAugmentStage3Burning(string id, string[] tags, int tier, int stacks, int duration, float damageMultiplier)
+    public class AugmentArmStage3Burning(string id, string[] tags, int tier, int stacks, int duration, float damageMultiplier)
         : Augment<Armageddon>(id, tags, tier)
     {
         public override void ApplyUpgrade(Armageddon ability)
@@ -20,6 +20,6 @@ namespace Battle.Source.Abilities.Armageddon
             ability.Stage3EffectStacks = 1;
         }
 
-        public override IAugment Copy() => new ArmAugmentStage3Burning(Id, Tags, Tier, stacks, duration, damageMultiplier);
+        public override IAugment Copy() => new AugmentArmStage3Burning(Id, Tags, Tier, stacks, duration, damageMultiplier);
     }
 }

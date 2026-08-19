@@ -109,7 +109,7 @@ namespace LastBreathTest.BattleSystemTests
 
             foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augmentEntry in Translated())
             {
-                IAbilityAugment augment = Built(registry, catalog, augmentEntry.Key, properties => properties);
+                IAugment augment = Built(registry, catalog, augmentEntry.Key, properties => properties);
 
                 foreach (float start in s_bases)
                 {
@@ -135,7 +135,7 @@ namespace LastBreathTest.BattleSystemTests
 
             foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augmentEntry in Translated())
             {
-                IAbilityAugment augment = Built(registry, catalog, augmentEntry.Key, _ => []);
+                IAugment augment = Built(registry, catalog, augmentEntry.Key, _ => []);
                 ParameterProbe probe = ProbeAt(0f);
                 augment.Apply(probe);
 
@@ -156,7 +156,7 @@ namespace LastBreathTest.BattleSystemTests
 
             foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augmentEntry in Translated())
             {
-                IAbilityAugment augment = Built(registry, catalog, augmentEntry.Key,
+                IAugment augment = Built(registry, catalog, augmentEntry.Key,
                     properties => properties.ToDictionary(entry => entry.Key, entry => entry.Value * 2f));
                 ParameterProbe probe = ProbeAt(0f);
                 augment.Apply(probe);
@@ -174,7 +174,7 @@ namespace LastBreathTest.BattleSystemTests
 
             foreach (IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)> augmentEntry in Translated())
             {
-                IAbilityAugment augment = Built(registry, catalog, augmentEntry.Key, properties => properties);
+                IAugment augment = Built(registry, catalog, augmentEntry.Key, properties => properties);
                 ParameterProbe probe = ProbeAt(8f);
 
                 augment.Apply(probe);
@@ -227,7 +227,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>The upgrade the registry builds for an augment, out of its shipped record with the
         /// numbers put through the given change.</summary>
-        private static IAbilityAugment Built(
+        private static IAugment Built(
             AbilityProvider registry,
             AbilityAugmentCatalog catalog,
             string augmentId,
@@ -236,7 +236,7 @@ namespace LastBreathTest.BattleSystemTests
             AbilityAugmentData? record = catalog.Find(augmentId);
             Assert.IsNotNull(record, $"the shipped data declares no '{augmentId}'");
 
-            IAbilityAugment? upgrade = registry.CreateUpgrade(record with { UpgradeProperties = numbers(record.UpgradeProperties) });
+            IAugment? upgrade = registry.CreateUpgrade(record with { UpgradeProperties = numbers(record.UpgradeProperties) });
             Assert.IsNotNull(upgrade, $"the registry builds nothing for '{augmentId}'");
 
             return upgrade;

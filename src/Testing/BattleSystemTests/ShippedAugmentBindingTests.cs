@@ -196,7 +196,7 @@
 
             foreach ((string id, AbilityAugmentData record) in ShippedRecords(catalog))
             {
-                IAbilityAugment? upgrade = book.CreateUpgrade(record);
+                IAugment? upgrade = book.CreateUpgrade(record);
                 Assert.IsNotNull(upgrade, $"the registry builds nothing for '{id}'");
                 Type demanded = DemandedAbility(upgrade.GetType());
 
@@ -239,7 +239,7 @@
         private static Type DemandedAbility(Type upgrade)
         {
             for (Type? type = upgrade; type != null; type = type.BaseType)
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(AbilityAugment<>))
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Augment<>))
                     return type.GetGenericArguments()[0];
 
             return typeof(IAbility);

@@ -33,25 +33,25 @@
         /// effect registry for their canonical numbers, and a field initializer may not touch the
         /// instance that holds it.</para>
         /// </summary>
-        private Dictionary<string, Func<AbilityAugmentData, IAbilityAugment>> AbilityUpgrades => field ??= new()
+        private Dictionary<string, Func<AbilityAugmentData, IAugment>> AbilityUpgrades => field ??= new()
         {
             // Augments of the base contract every ability honours. They belong to no ability, so they
             // are written once — and those that move a number state it as a share of the number they
             // move, the only figure that means the same thing on a free cast and on a five-hundred one.
             ["Augment_Reduce_Cost"] = data =>
-                new AbilityAugmentReduceCost(
+                new AugmentReduceCost(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("costShare", 0.3f)),
             ["Augment_Reduce_Cooldown"] = data =>
-                new AbilityAugmentReduceCooldown(
+                new AugmentReduceCooldown(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("cooldownTurns", 1f)),
             ["Augment_Reduce_Cooldown_Add_Cost"] = data =>
-                new AbilityAugmentReduceCooldownAddCost(
+                new AugmentReduceCooldownAddCost(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -61,21 +61,21 @@
             // own on one key, a share of the ability's own price on the other. The share is what keeps
             // them out of the parameter table.
             ["Augment_Reduce_Cooldown_And_Cost"] = data =>
-                new AbilityAugmentReduceCooldownAndCost(
+                new AugmentReduceCooldownAndCost(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("cooldownTurns", 1f),
                     data.UpgradeProperties.GetValueOrDefault("costShare", 0.10f)),
             ["Augment_Reduce_Cost_Add_Cooldown"] = data =>
-                new AbilityAugmentReduceCostAddCooldown(
+                new AugmentReduceCostAddCooldown(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("costShare", 0.25f),
                     data.UpgradeProperties.GetValueOrDefault("cooldownTurns", 1f)),
             ["Augment_Increasing_Scales_Add_Cost"] = data =>
-                new AbilityAugmentRaiseScalesAddCost(
+                new AugmentRaiseScalesAddCost(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -86,13 +86,13 @@
             // factory and not a table row: the table says which key a record stands on, and this one does
             // not know until it is seated.
             ["Augment_Applied_Duration"] = data =>
-                new AbilityAugmentAppliedDuration(
+                new AugmentAppliedDuration(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("turns", 1f)),
             ["Augment_Cost_Type_Health"] = data =>
-                new AbilityAugmentCostTypeOverride(
+                new AugmentCostTypeOverride(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -118,7 +118,7 @@
             // Both tally the caster's successful attacks, which every attacking ability has — hence the
             // generic impact rider rather than the Series of Attacks execution strategy they used to be.
             ["Augment_Apply_Buff_Critical_Chance"] = data =>
-                new AbilityAugmentImpactRider(
+                new AugmentImpactRider(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -130,7 +130,7 @@
                             (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 3),
                             data.UpgradeProperties.GetValueOrDefault("criticalChance", 0.15f)))),
             ["Augment_Apply_Buff_Critical_Damage"] = data =>
-                new AbilityAugmentImpactRider(
+                new AugmentImpactRider(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -142,12 +142,12 @@
                             (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 3),
                             data.UpgradeProperties.GetValueOrDefault("criticalDamage", 0.25f)))),
             ["Augment_Increasing_Pressure_Single_Empowered_Attack"] = data =>
-                new IpAugmentSingleEmpoweredAttack(
+                new AugmentIpSingleEmpoweredAttack(
                     data.Id,
                     data.Tags,
                     data.Tier),
             ["Augment_Increasing_Pressure_Last_Attack_Always_Crit"] = data =>
-                new IpAugmentLastAttackAlwaysCrit(
+                new AugmentIpLastAttackAlwaysCrit(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -155,19 +155,19 @@
             // The modifier already asks the context whether the attack is the first one, so the record
             // needs the generic attack-modifier upgrade rather than Increasing Pressure's own.
             ["Augment_First_Attack_Crit_Damage"] = data =>
-                new AbilityAugmentAttackModifier(
+                new AugmentAttackModifier(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     new FirstAttackCritContextModifier(data.UpgradeProperties.GetValueOrDefault("critDamageBonus", 0.70f))),
             ["Augment_Random_Cooldown"] = data =>
-                new AbilityAugmentActivationRider(
+                new AugmentActivationRider(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     () => new ReduceRandomCooldownActivationRider(data.Id, (int)data.UpgradeProperties.GetValueOrDefault("amount", 1))),
             ["Augment_Next_Cast_Sacred"] = data =>
-                new AbilityAugmentCastEffect(
+                new AugmentCastEffect(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -188,7 +188,7 @@
                     ability => ability.IgnoreResistances = true,
                     ability => ability.IgnoreResistances = false),
             ["Augment_Armageddon_Burning"] = data =>
-                new ArmAugmentStage3Burning(
+                new AugmentArmStage3Burning(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -196,13 +196,13 @@
                     (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
                     data.UpgradeProperties.GetValueOrDefault("damageMultiplier", 0.7f)),
             ["Augment_Armageddon_All_Targets"] = data =>
-                new ArmAugmentAllTargets(
+                new AugmentArmAllTargets(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("additionalCooldown", 3)),
             ["Augment_Porcupine_Echo"] = data =>
-                new AbilityAugmentCastEffect(
+                new AugmentCastEffect(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -211,29 +211,29 @@
                             data.UpgradeProperties.GetValueOrDefault("delayedPercent", 0.3f),
                             (int)data.UpgradeProperties.GetValueOrDefault("turns", 2)))),
             ["Augment_Empowered_Ability_Free_Cast"] = data =>
-                new AbilityAugmentCastEffect(
+                new AugmentCastEffect(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     ability => new FreeCastEffect(ability.Id)),
             ["Augment_Berserk_Fury_Burning"] = data =>
-                new BfAugmentFuryVariant(data.Id, data.Tags, data.Tier,
+                new AugmentBfFuryVariant(data.Id, data.Tags, data.Tier,
                     (duration, healthPercent) => FuryFromCanon("Effect_Burning_Fury", duration, healthPercent)),
             ["Augment_Berserk_Fury_Primal"] = data =>
-                new BfAugmentFuryVariant(data.Id, data.Tags, data.Tier,
+                new AugmentBfFuryVariant(data.Id, data.Tags, data.Tier,
                     (duration, healthPercent) => FuryFromCanon("Effect_Primal_Fury", duration, healthPercent)),
             ["Augment_Berserk_Fury_Healing"] = data =>
-                new BfAugmentFuryVariant(data.Id, data.Tags, data.Tier,
+                new AugmentBfFuryVariant(data.Id, data.Tags, data.Tier,
                     (duration, healthPercent) => FuryFromCanon("Effect_Healing_Fury", duration, healthPercent)),
             ["Augment_Double_Strike_Two_Attacks_Apply_Buff"] = data =>
-                new DstAugmentBothHitsBuff(
+                new AugmentDsBothHitsBuff(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.25f),
                     (int)data.UpgradeProperties.GetValueOrDefault("duration", 3)),
             ["Augment_Critical_Calculation_Lucky_Crit"] = data =>
-                new CcAugmentLuckyCrit(
+                new AugmentCcLuckyCrit(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -241,7 +241,7 @@
             // A buff laid on the caster after the cast is what an activation rider is; no member of
             // Critical Calculation was ever touched, only the rider dictionary every ability has.
             ["Augment_Leach_On_Crit"] = data =>
-                new AbilityAugmentActivationRider(
+                new AugmentActivationRider(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -250,29 +250,29 @@
                         maxStacks: 1,
                         data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)))),
             ["Augment_Dark_Shroud_Immortality"] = data =>
-                new DsAugmentImmortality(
+                new AugmentDsImmortality(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     () => EffectFromCanon("Effect_Evade_First_Death")),
             ["Augment_Poison_Explosion_Execute_Bosses"] = data =>
-                new PeAugmentExecuteBosses(
+                new AugmentPeExecuteBosses(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("stacksMultiplier", 2)),
             ["Augment_Poison_Explosion_Spread_Poison"] = data =>
-                new PeAugmentSpreadPoison(
+                new AugmentPeSpreadPoison(
                     data.Id,
                     data.Tags,
                     data.Tier),
             ["Augment_Poison_Explosion_Transfer_Poison_On_Death"] = data =>
-                new PeAugmentTransferPoisonOnDeath(
+                new AugmentPeTransferPoisonOnDeath(
                     data.Id,
                     data.Tags,
                     data.Tier),
             ["Augment_Poison_Coating_Apply_Poison_For_Each_Enemy"] = data =>
-                new PcAugmentMultiStackOnHit(
+                new AugmentPcMultiStackOnHit(
                     data.Id,
                     data.Tags,
                     data.Tier),
@@ -291,14 +291,14 @@
                     ability => ability.CritIgnoresColdResistance = true,
                     ability => ability.CritIgnoresColdResistance = false),
             ["Augment_Ice_Aegis_Shield_Reflect_Damage"] = data =>
-                new IaAugmentParameter(
+                new AugmentIaParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     IceAegis.IceAegis.Parameters.ReflectPercent,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
             ["Augment_Ice_Aegis_Turn_End_Heal_Under_Shield"] = data =>
-                new IaAugmentParameter(
+                new AugmentIaParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -333,13 +333,13 @@
                     ability => ability.ExtendTargetEffects = true,
                     ability => ability.ExtendTargetEffects = false),
             ["Augment_Reduce_All_Cooldowns"] = data =>
-                new AbilityAugmentActivationRider(
+                new AugmentActivationRider(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     () => new ReduceAllCooldownsActivationRider(data.Id, (int)data.UpgradeProperties.GetValueOrDefault("amount", 2))),
             ["Augment_Deep_Freeze_Execute_Frozen_On_Hit"] = data =>
-                new AbilityAugmentImpactRider(
+                new AugmentImpactRider(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -359,14 +359,14 @@
                     ability => ability.ConsumeManaInstead = true,
                     ability => ability.ConsumeManaInstead = false),
             ["Augment_Reduce_Execution_Threshold"] = data =>
-                new AbilityAugmentReduceParameter(
+                new AugmentReduceParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     AbilityParameter.ExecutionThreshold,
                     data.UpgradeProperties.GetValueOrDefault("share", 0.25f)),
             ["Augment_Cost_Barrier"] = data =>
-                new AbilityAugmentCostTypeOverride(
+                new AugmentCostTypeOverride(
                     data.Id,
                     data.Tags,
                     data.Tier,

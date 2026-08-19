@@ -11,8 +11,8 @@ namespace Battle.Source.Abilities
     /// rounded there — see <see cref="AbilityParameterShare"/> — so what the augment takes off is
     /// the same number whatever else is worn beside it.
     /// </summary>
-    public class AbilityAugmentReduceCost(string id, string[] tags, int tier, float costShare)
-        : AbilityAugment<Ability>(id, tags, tier)
+    public class AugmentReduceCost(string id, string[] tags, int tier, float costShare)
+        : Augment<Ability>(id, tags, tier)
     {
         private string DecoratorId => $"Ability_Parameter_Decorator_{Id}";
 
@@ -27,6 +27,6 @@ namespace Battle.Source.Abilities
         public override void RemoveUpgrade(Ability ability) =>
             ability.RemoveParameterDecorator(DecoratorId, AbilityParameter.CostValue);
 
-        public override IAbilityAugment Copy() => new AbilityAugmentReduceCost(Id, Tags, Tier, costShare);
+        public override IAugment Copy() => new AugmentReduceCost(Id, Tags, Tier, costShare);
     }
 }

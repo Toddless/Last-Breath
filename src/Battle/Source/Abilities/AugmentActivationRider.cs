@@ -4,10 +4,10 @@ namespace Battle.Source.Abilities
     using Core.Battle.Abilities;
 
     /// <summary>Generic upgrade: attaches an activation rider to the ability — it fires once per cast.
-    /// Counterpart of <see cref="AbilityAugmentImpactRider"/>, factory and all, for the same reason: a
+    /// Counterpart of <see cref="AugmentImpactRider"/>, factory and all, for the same reason: a
     /// copy needs a rider of its own now that a rider can be told to let go of what it hooked.</summary>
-    public class AbilityAugmentActivationRider(string id, string[] tags, int tier, Func<IActivationRider> riderFactory)
-        : AbilityAugment<Ability>(id, tags, tier)
+    public class AugmentActivationRider(string id, string[] tags, int tier, Func<IActivationRider> riderFactory)
+        : Augment<Ability>(id, tags, tier)
     {
         private IActivationRider? _rider;
 
@@ -17,6 +17,6 @@ namespace Battle.Source.Abilities
 
         public override void RemoveUpgrade(Ability ability) => ability.RemoveActivationRider(RiderKey(Rider.Id));
 
-        public override IAbilityAugment Copy() => new AbilityAugmentActivationRider(Id, Tags, Tier, riderFactory);
+        public override IAugment Copy() => new AugmentActivationRider(Id, Tags, Tier, riderFactory);
     }
 }

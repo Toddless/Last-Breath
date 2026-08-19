@@ -154,8 +154,8 @@ namespace LastBreathTest.BattleSystemTests
             // behind went on riding every impact reading a parameter nobody had registered: two
             // not-found reports per hit and a stack of zero turns ticking for zero damage.
             var bench = new Bench();
-            IAbilityAugment first = bench.Seat(Applier);
-            IAbilityAugment second = bench.Seat(Applier);
+            IAugment first = bench.Seat(Applier);
+            IAugment second = bench.Seat(Applier);
             Assert.AreEqual(bench.Turns, bench.Ability[TurnsKey], "two copies of the applier left the ability with turns neither of them declares");
             Assert.AreEqual(bench.Turns, (await bench.PoisonSwing(new Brawler(), new Brawler(), expected: 2)).Duration,
                 "the pair of copies poisons nothing at all");
@@ -180,7 +180,7 @@ namespace LastBreathTest.BattleSystemTests
             // nothing at all and the first to leave took the only one with it — the player paid twice
             // for one rider and lost it by unseating either half.
             var bench = new Bench();
-            IAbilityAugment first = bench.Seat(Applier);
+            IAugment first = bench.Seat(Applier);
             bench.Seat(Applier);
 
             Assert.AreEqual(2, bench.Ability.ImpactRiders.Count, "the second copy rode along on the first one's rider");
@@ -203,7 +203,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             private readonly AbilityAugmentCatalog _catalog;
             private readonly AbilityProvider _book;
-            private readonly Dictionary<string, IAbilityAugment> _seated = new(StringComparer.Ordinal);
+            private readonly Dictionary<string, IAugment> _seated = new(StringComparer.Ordinal);
 
             internal Bench()
             {
@@ -224,9 +224,9 @@ namespace LastBreathTest.BattleSystemTests
 
             /// <summary>Seats one copy of a record and hands the copy back — two sockets may hold two
             /// copies of one augment, and then the id names neither of them.</summary>
-            internal IAbilityAugment Seat(string augmentId)
+            internal IAugment Seat(string augmentId)
             {
-                IAbilityAugment augment = Built(augmentId);
+                IAugment augment = Built(augmentId);
                 augment.Apply(Ability);
                 Assert.IsTrue(augment.Learned, $"'{augmentId}' refused the ability it was seated on");
                 _seated[augmentId] = augment;
@@ -235,11 +235,11 @@ namespace LastBreathTest.BattleSystemTests
 
             internal void Unseat(string augmentId)
             {
-                Assert.IsTrue(_seated.Remove(augmentId, out IAbilityAugment? upgrade), $"'{augmentId}' was never seated");
+                Assert.IsTrue(_seated.Remove(augmentId, out IAugment? upgrade), $"'{augmentId}' was never seated");
                 Unseat(upgrade!);
             }
 
-            internal void Unseat(IAbilityAugment augment) => augment.Remove(Ability);
+            internal void Unseat(IAugment augment) => augment.Remove(Ability);
 
             /// <summary>One landing impact of the ability, handed to its riders the way the attack
             /// pipeline hands one over, and the stack it left behind.</summary>
@@ -275,9 +275,9 @@ namespace LastBreathTest.BattleSystemTests
 
             private float Declared(string augmentId, string property) => Record(augmentId).UpgradeProperties[property];
 
-            private IAbilityAugment Built(string augmentId)
+            private IAugment Built(string augmentId)
             {
-                IAbilityAugment? upgrade = _book.CreateUpgrade(Record(augmentId));
+                IAugment? upgrade = _book.CreateUpgrade(Record(augmentId));
                 Assert.IsNotNull(upgrade, $"the registry builds nothing for '{augmentId}'");
                 return upgrade;
             }
