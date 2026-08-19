@@ -93,12 +93,16 @@
             }
         }
 
-        public virtual void ClearSlot(bool itemDeleted = false)
+        /// <summary>Empties the slot, then says the item was removed. Listeners answer that by asking
+        /// which slots still hold the instance, so the slot must already be out of that count.</summary>
+        public virtual void ClearSlot(bool isDeleted = false)
         {
-            if (CurrentItem != null && itemDeleted)
-                ItemRemovedFromSlot?.Invoke(CurrentItem.InstanceId);
+            string? removed = isDeleted ? CurrentItem?.InstanceId : null;
+
             CurrentItem = null;
             Quantity = 0;
+
+            if (removed != null) ItemRemovedFromSlot?.Invoke(removed);
         }
 
         public virtual void SetItem(ItemInstance instance, int amount = 1)

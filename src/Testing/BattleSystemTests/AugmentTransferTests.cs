@@ -60,6 +60,10 @@ namespace LastBreathTest.BattleSystemTests
         private const int BagSlots = 8;
         private const int Seed = 17;
 
+        /// <summary>How many times the same augment goes in and comes back out. More than two, because
+        /// a road that mints one copy per pass and a road that mints one ever read the same at two.</summary>
+        private const int Passes = 5;
+
         /// <summary>The band the copies are drawn over. Named here rather than read off the shipped
         /// rules: a balance pass closing it must not turn these walks into claims about a file.</summary>
         private const float Spread = 0.25f;
@@ -96,6 +100,61 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(AugmentInstallOutcome.AugmentNotHeld, again.Outcome);
             Assert.IsTrue(bench.Board.Find(bench.Board.At(SecondPoisonSlot))?.IsEmpty, "one copy of the augment ended up in two slots at once");
+        }
+
+        [TestMethod]
+        public async Task TwoCopiesOfARecordFillTwoSlotsWhereOneCopyOnlyEverFillsOne()
+        {
+            // The pair the rule has to tell apart, walked in one go so neither half can be read as the
+            // other's accident: what a slot takes is a COPY, and the player owning two of a record is
+            // entitled to wear both. Only the copy already seated is refused — refusing the record
+            // would charge him for owning two, and letting the copy through twice is the duplication.
+            var bench = new Bench();
+            IAugmentItem first = bench.Held(Sharpened);
+            IAugmentItem second = bench.Held(Sharpened);
+            Assert.AreNotEqual(first.InstanceId, second.InstanceId, "the bag handed out one copy twice, so nothing below is about two");
+
+            Assert.IsTrue((await bench.Install(PoisonSlot, first.InstanceId)).Installed, "the first copy never reached its slot");
+            AugmentInstallResult sameAgain = await bench.Install(SecondPoisonSlot, first.InstanceId);
+            Assert.IsTrue((await bench.Install(SecondPoisonSlot, second.InstanceId)).Installed, "the second copy was refused the free slot");
+
+            Assert.AreEqual(AugmentInstallOutcome.AugmentNotHeld, sameAgain.Outcome, "the seated copy was offered a second slot and taken");
+            Assert.AreSame(first.Augment, bench.Board.Find(bench.Board.At(PoisonSlot))?.Augment, "the first slot holds something other than the first copy");
+            Assert.AreSame(second.Augment, bench.Board.Find(bench.Board.At(SecondPoisonSlot))?.Augment, "the second slot holds something other than the second copy");
+            Assert.AreEqual(0, bench.Bag.GetContents().Count, "a copy is worn and carried at once");
+        }
+
+        [TestMethod]
+        public async Task SeatingAndTakingBackTheSameAugmentOverAndOverLeavesThePlayerOwningOneOfIt()
+        {
+            // The property the two roads are worth nothing without, and the one a window driving them
+            // breaks first: an augment is a THING, so the number of them the player owns is the same
+            // after a hundred passes as before the first. A seating that leaves the copy in the bag,
+            // or an extraction that mints beside what is already carried, shows up here as a count and
+            // not as a wrong number — which is what makes it visible at all.
+            var bench = new Bench();
+            IAugmentItem held = bench.Held(Sharpened);
+            float rolled = held.Augment.Values[Property];
+
+            for (int pass = 0; pass < Passes; pass++)
+            {
+                // Read afresh every pass: the copy comes home in a new wrapper, and a walk holding on
+                // to the first id would be asking about a passage that ended rather than about a thing.
+                string carried = TheOnlyAugmentIn(bench.Bag).InstanceId;
+
+                Assert.IsTrue((await bench.Install(PoisonSlot, carried)).Installed, $"pass {pass}: the augment never reached the slot");
+                Assert.AreEqual(0, bench.Bag.GetContents().Count, $"pass {pass}: the seated copy is lying in the bag as well");
+                // Asked of the bag the way the gate asks it — by the copy's own key. A bag answering
+                // here for something no slot of it holds is a bag that will hand the copy to the next
+                // socket too, which is the whole of the duplication.
+                Assert.IsNull(bench.Bag.GetItem<IAugmentItem>(carried), $"pass {pass}: the bag still answers for the copy it gave up");
+                Assert.AreEqual(AugmentExtractResult.Extracted, await bench.Extract(PoisonSlot), $"pass {pass}: the augment never left the slot");
+            }
+
+            IAugmentItem ended = TheOnlyAugmentIn(bench.Bag);
+            Assert.AreEqual(Sharpened, ended.Id, "what the player is left holding is another augment");
+            Assert.AreEqual(rolled, ended.Augment.Values[Property], "the copy came back at another number than it was drawn at");
+            Assert.IsTrue(bench.Board.Sockets.All(socket => socket.IsEmpty), "a slot kept an augment the player took back");
         }
 
         [TestMethod]

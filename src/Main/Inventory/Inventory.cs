@@ -232,7 +232,9 @@
 
             int remainToDelete = amount;
 
-            var slotsWithItem = Slots.Where(x => x.CurrentItem?.ItemId == itemId).OrderBy(x => x.Quantity);
+            // Fixed before the first slot is touched: the announcement at the end reaches listeners that
+            // add and take items of their own, and the set being emptied must not shift under them.
+            var slotsWithItem = Slots.Where(x => x.CurrentItem?.ItemId == itemId).OrderBy(x => x.Quantity).ToList();
 
             foreach (var slot in slotsWithItem)
             {
@@ -252,9 +254,15 @@
         {
             if (string.IsNullOrWhiteSpace(instanceId)) return;
 
-            var slots = Slots.Where(x => x.CurrentItem?.InstanceId == instanceId);
-            foreach (var slot in slots)
+            // Read before the slots go: the count is announced under the ITEM's id, and the instance is
+            // forgotten on the way. Fixed before the first slot is cleared for the same reason the other
+            // removal fixes its set — listeners add and take items of their own.
+            string? itemId = _itemInstances.GetValueOrDefault(instanceId)?.Id;
+
+            foreach (var slot in Slots.Where(x => x.CurrentItem?.InstanceId == instanceId).ToList())
                 slot.ClearSlot(isDeleted: true);
+
+            if (itemId != null) ItemAmountChanges?.Invoke(itemId, GetTotalItemAmount(itemId));
         }
 
         public void Clear()
@@ -266,20 +274,22 @@
         /// <summary>The slot nodes are service-owned for the whole process — a new session empties them, not replaces them.</summary>
         public void ResetSession() => Clear();
 
-        protected void OnDeleteRequested(string itemId)
+        /// <summary>A slot gave its item up. The register holds the instance while any slot still does —
+        /// a stack lies across several — and drops it with the last. The count is announced by the
+        /// removal that emptied the slot, once it has finished walking them.</summary>
+        protected void OnDeleteRequested(string instanceId)
         {
-            if (string.IsNullOrWhiteSpace(itemId)) return;
-            if (!_itemInstances.TryGetValue(itemId, out var toRemove))
+            if (string.IsNullOrWhiteSpace(instanceId)) return;
+            if (!_itemInstances.TryGetValue(instanceId, out var toRemove))
             {
-                Tracker.TrackNotFound($"Item with id: {itemId}", this);
+                Tracker.TrackNotFound($"Item with id: {instanceId}", this);
                 return;
             }
 
-            if (Slots.Any(x => x.CurrentItem?.InstanceId == itemId))
+            if (Slots.Any(x => x.CurrentItem?.InstanceId == instanceId))
                 return;
 
             _itemInstances.Remove(toRemove.InstanceId);
-            ItemAmountChanges?.Invoke(toRemove.Id, GetTotalItemAmount(itemId));
         }
 
         private Texture2D? GetItemIcon(string instanceId) => _itemInstances[instanceId].Icon;
