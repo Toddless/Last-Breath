@@ -5,7 +5,7 @@ namespace Battle.Source.Effects
 
     /// <summary>"Благословение гигантов": increases the target's maximum health by <c>value</c> (0.15 = +15%)
     /// per stack. Mirror of <see cref="WitheringCurseEffect"/>.</summary>
-    public class GiantsBlessingEffect(int duration, int maxStacks, float value)
+    public class GiantsBlessingEffect(int duration, int maxStacks, EffectValue value)
         : ParameterChangeEffect(id: "Effect_Giants_Blessing",
             duration,
             maxStacks,

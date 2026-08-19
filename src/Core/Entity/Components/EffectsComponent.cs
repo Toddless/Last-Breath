@@ -15,7 +15,8 @@
     public class EffectsComponent(IFightable owner) : IEffectsComponent
     {
         private readonly Dictionary<string, List<IEffect>> _effectsBySource = [];
-        // Global application order across all sources: stacking limits and "oldest stack" eviction use this list.
+        // Global application order across all sources: stacking limits and the standing stack a capped
+        // re-application refreshes are both read off this list.
         private readonly List<IEffect> _orderedEffects = [];
         private readonly List<DotTick> _dotTicks = [];
         public IReadOnlyList<IEffect> Effects => _orderedEffects;
@@ -163,13 +164,14 @@
                 return true;
             }
 
-            // Evict the globally oldest stack, regardless of which source applied it
-            var oldEffect = _orderedEffects.FirstOrDefault(effect => effect.Id == newEffect.Id);
-            if (oldEffect == null) return false;
-
-            oldEffect.Remove();
-            AddNewEffectAndNotify(sourceEffects, newEffect);
-            return true;
+            // At the ceiling the re-application buys time and nothing else: the pile keeps the stacks it
+            // has. Evicting the oldest instead let a freshly laid weak stack knock out a standing strong
+            // one — the newcomer is not compared to anybody, so the trade was never in the bearer's favour.
+            // The time goes to the stack CLOSEST TO GOING OUT rather than the oldest one laid: an old
+            // stack somebody extended can already outlast the newcomer, and refreshing that one would
+            // spend the application on nothing while the short stack burned down beside it.
+            Refresh(globalOnTarget.MinBy(effect => effect.Duration)!, newEffect);
+            return false;
         }
 
         private bool HandleSingleStack(List<IEffect> sourceEffects, List<IEffect> globalOnTarget, IEffect newEffect)
@@ -190,8 +192,20 @@
                 return true;
             }
 
-            existingEffect.Duration = Math.Max(existingEffect.Duration, newEffect.Duration);
+            Refresh(existingEffect, newEffect);
             return false;
+        }
+
+        /// <summary>A re-application that lays no stack still refreshes the standing one, to the LONGER of
+        /// what it has and the full duration the newcomer arrived with — an effect somebody extended is not
+        /// cut back down by a plain re-application.</summary>
+        private void Refresh(IEffect standing, IEffect incoming)
+        {
+            int refreshed = Math.Max(standing.Duration, incoming.Duration);
+            if (refreshed == standing.Duration) return;
+
+            standing.Duration = refreshed;
+            EffectsChanged?.Invoke();
         }
 
         private void AddNewEffectAndNotify(List<IEffect> sourceEffects, IEffect newEffect)

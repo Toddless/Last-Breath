@@ -1,6 +1,8 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
+    using Battle.Source.Abilities;
+    using Battle.Source.Abilities.StaticArmor;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data.GameData;
@@ -25,7 +27,10 @@ namespace LastBreathTest.BattleSystemTests
             // "the same as that one" and inventing one for four rows would cost more than it saves.
             ["Effect_Fury"] = (3, 1, [("healthPercent", 0.05f)]),
             ["Effect_Burning_Fury"] = (3, 1, [("healthPercent", 0.05f), ("burnDamage", 0.75f), ("burningDuration", 3f), ("burningMaxStacks", 999f)]),
-            ["Effect_Primal_Fury"] = (3, 1, [("healthPercent", 0.05f), ("damageMultiplier", 1.35f)]),
+            // The list says "увеличивает урон атак на 35%", so 0.35 is what it says: the canon records the
+            // share GAINED and the effect adds the one. It used to carry the finished factor 1.35, which
+            // read the same at effectiveness one and refused to move at any other.
+            ["Effect_Primal_Fury"] = (3, 1, [("healthPercent", 0.05f), ("damageMultiplier", 0.35f)]),
             ["Effect_Healing_Fury"] = (3, 1, [("healthPercent", 0.05f), ("healAmount", 0.15f)]),
             // One stack, like every other seal: a seal changes a rule rather than piling up.
             ["Effect_Seal_Of_Slowness"] = (3, 1, [("amount", 1f)]),
@@ -36,6 +41,11 @@ namespace LastBreathTest.BattleSystemTests
             ["Effect_Damage_Over_Turn_Burning"] = (3, 999, [("percentFromDamage", 0.45f)]),
             ["Effect_Damage_Over_Turn_Poison"] = (4, 999, [("percentFromDamage", 0.35f)]),
             ["Effect_Damage_Over_Turn_Bleed"] = (3, 999, [("percentFromDamage", 0.8f)]),
+            // The list gives the Charge its turns and its ceiling and then describes the detonation
+            // ("250 + (85% + 75%) молнией"), which is not the effect's figure to carry: the mark counts and
+            // pops, the payload belongs to whoever laid it. Those three numbers are walked separately, on
+            // the ability that hands them in — see TheChargeDetonatesForWhatTheListSays.
+            ["Effect_Charge"] = (3, 3, []),
             ["Effect_Evade_First_Death"] = (3, 1, [("percentHealthToRecover", 0.35f)]),
             ["Effect_Fragility"] = (3, 3, [("critDamageAmp", 0.35f)]),
             ["Effect_Armor_Reduction"] = (3, 5, [("reduceBy", 0.15f)]),
@@ -161,6 +171,21 @@ namespace LastBreathTest.BattleSystemTests
                 canon["Effect_Burning_Fury"]["burnDamage"],
                 "the Burning Fury's share of burned health now equals the Burning tick's share of dealt "
                 + "damage — check they were not merged: they measure different things");
+        }
+
+        [TestMethod]
+        public void TheChargeDetonatesForWhatTheListSays()
+        {
+            // The Charge is the one entry of the list whose figures are not its own: the effect carries
+            // turns and a ceiling, the detonation is handed in by the Static Armour that laid it. So the
+            // list's "250 + (85% + 75%) молнией при накоплении максимума стаков" is asked of the ability.
+            (AbilityProvider registry, _) = ShippedAbilityData.Load();
+            var armor = (Ability)registry.CreateAbility("Ability_Static_Armor");
+
+            Assert.AreEqual(250f, armor[StaticArmor.Parameters.DetonationDamage], 0.0001f, "the detonation's flat damage left the list");
+            Assert.AreEqual(0.85f, armor[StaticArmor.Parameters.DetonationWeaponScale], 0.0001f, "the detonation's weapon scale left the list");
+            Assert.AreEqual(0.75f, armor[StaticArmor.Parameters.DetonationSpellScale], 0.0001f, "the detonation's spell scale left the list");
+            Assert.AreEqual(3, (int)armor[StaticArmor.Parameters.ChargeDuration], "the charge is laid for a different number of turns than the list gives it");
         }
 
         [TestMethod]

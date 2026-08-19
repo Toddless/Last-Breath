@@ -12,13 +12,13 @@ namespace Battle.Source.Effects
     /// of its damage as Sacred (converted, not added). Same cast-window mechanics as the other
     /// "next ability" charges; recasting the source ability never consumes it.
     /// </summary>
-    public class NextCastSacredConversionEffect(string sourceAbilityId, float fraction)
+    public class NextCastSacredConversionEffect(string sourceAbilityId, EffectValue fraction)
         : Effect(id: "Effect_Sacred_Conversion_Charge", duration: 0, maxStacks: 1)
     {
         private IDamageModifier? _modifier;
         private string _boostedCastId = string.Empty;
 
-        public float Fraction => fraction;
+        public float Fraction => Effective(fraction);
 
         public override async Task Apply(EffectApplyingContext context)
         {
@@ -40,7 +40,7 @@ namespace Battle.Source.Effects
         }
 
         public override bool IsStronger(IEffect otherEffect) =>
-            otherEffect is NextCastSacredConversionEffect other && fraction > other.Fraction;
+            otherEffect is NextCastSacredConversionEffect other && Fraction > other.Fraction;
 
         public override IEffect Copy() => new NextCastSacredConversionEffect(sourceAbilityId, fraction);
 
@@ -49,7 +49,7 @@ namespace Battle.Source.Effects
             if (Target == null || _modifier != null) return;
             if (evt.Ability.Id == sourceAbilityId) return;
 
-            _modifier = new DamageConversionContextModifier(Target, fraction, DamageCause.Ability);
+            _modifier = new DamageConversionContextModifier(Target, Fraction, DamageCause.Ability);
             Target.ModifierHandler.Add(_modifier);
             _boostedCastId = evt.CastId;
         }

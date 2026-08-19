@@ -106,6 +106,29 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0, victim.Standing().Count, "an effect of the removed source stayed on the victim");
         }
 
+        [TestMethod]
+        public void TheFuriesAreBuffsAndTheChargeIsNot()
+        {
+            // Which side of the list an effect falls on is decided by one virtual and nothing else, so a
+            // whole family can drift onto the wrong half without a single line changing. The four Furies
+            // are the bearer's own doing however much health they eat — a dispel aimed at a TARGET's buffs
+            // takes them off, not one aimed at his own troubles. The Charge is the opposite case: it sits
+            // on a victim waiting to go off, and the default for anything unflagged is "a buff".
+            IEffect[] furies =
+            [
+                new FuryEffect(duration: 3, maxStacks: 1, healthPercent: 0.05f),
+                new BurningFuryEffect(duration: 3, maxStacks: 1, healthPercent: 0.05f),
+                new PrimalFuryEffect(duration: 3, maxMaxStacks: 1, healthPercent: 0.05f),
+                new HealingFuryEffect(duration: 3, maxStacks: 1, healthPercent: 0.05f)
+            ];
+
+            string[] harmful = [.. furies.Where(fury => fury.IsHarmful).Select(fury => fury.Id)];
+
+            Assert.AreEqual(0, harmful.Length, $"furies a dispel would have to take off the BEARER: [{string.Join(", ", harmful)}]");
+            Assert.IsTrue(new ChargeEffect(duration: 3, maxStacks: 3).IsHarmful,
+                "the charge counts as a buff, so clearing a target's buffs would defuse it and clearing one's own troubles would not");
+        }
+
         /// <summary>An effect that has actually gone through the application pipeline: removal reaches the
         /// component through the effect itself, so a bare instance in the list would not answer a dispel.</summary>
         private static async Task<IEffect> Landed(Fighter victim, IEffect effect)

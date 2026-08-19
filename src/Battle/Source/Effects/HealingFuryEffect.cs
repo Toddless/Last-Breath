@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.Effects
+namespace Battle.Source.Effects
 {
     using Core.Battle.Abilities;
     using Core.Context;
@@ -8,12 +8,16 @@
     public class HealingFuryEffect(
         int duration,
         int maxStacks,
-        float healthPercent,
+        EffectValue healthPercent,
         StatusEffects statusEffect = StatusEffects.Fury)
         : FuryEffect(duration, maxStacks, healthPercent, statusEffect, id: "Effect_Healing_Fury")
     {
         private float _damageDealt;
-        public float HealAmount { get; set; }
+
+        /// <summary>Share of the damage dealt under the fury that comes back as health when it ends.</summary>
+        public EffectValue HealAmount { get; set; }
+
+        public float HealShare => Effective(HealAmount);
 
         protected override void OnAfterAttack(AfterAttackEvent evt)
         {
@@ -24,8 +28,8 @@
 
         public override void Remove()
         {
-            float toHeal = _damageDealt * HealAmount;
-            Target?.Heal(new HealContext(Target, Target){Amount = toHeal});
+            float toHeal = _damageDealt * HealShare;
+            Target?.Heal(new HealContext(Target, Target) { Amount = toHeal });
             base.Remove();
         }
 
@@ -33,9 +37,9 @@
         {
             if (otherEffect is not HealingFuryEffect healing) return false;
 
-            return HealAmount > healing.HealAmount;
+            return HealShare > healing.HealShare;
         }
 
-        public override IEffect Copy() => new HealingFuryEffect(Duration, MaxStacks, HealthPercent, Status) { HealAmount = HealAmount };
+        public override IEffect Copy() => new HealingFuryEffect(Duration, MaxStacks, AuthoredHealthPercent, Status) { HealAmount = HealAmount };
     }
 }

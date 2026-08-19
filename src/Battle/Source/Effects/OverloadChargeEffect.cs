@@ -19,9 +19,11 @@ namespace Battle.Source.Effects
         private CastDamageScale? _modifier;
         private string _boostedCastId = string.Empty;
 
-        /// <summary>What the boosted cast is actually scaled by — the authored figure through the
-        /// effectiveness of the cast that laid the charge.</summary>
-        public float Multiplier => Effective(multiplier);
+        /// <summary>What the boosted cast is actually scaled by. The authored figure is the share GAINED
+        /// (0.5 = +50%), so the factor is one plus it — read here in ONE shape, because the same figure
+        /// read plainly for the stacking comparison and gained for the mutator is one figure with two
+        /// meanings, and the next reader of either would be right to believe the wrong one.</summary>
+        public float Multiplier => Effective(multiplier, EffectValueShape.ShareGained);
 
         public override async Task Apply(EffectApplyingContext context)
         {
@@ -52,7 +54,7 @@ namespace Battle.Source.Effects
             if (Target == null || _modifier != null) return;
             if (evt.Ability.Id == sourceAbilityId) return; // recasting Overload refreshes, never consumes
 
-            _modifier = new CastDamageScale(Target, Effective(multiplier, EffectValueShape.ShareGained));
+            _modifier = new CastDamageScale(Target, Multiplier);
             Target.ModifierHandler.Add(_modifier);
             _boostedCastId = evt.CastId;
         }

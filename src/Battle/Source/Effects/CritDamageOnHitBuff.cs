@@ -14,35 +14,41 @@ namespace Battle.Source.Effects
     /// Used by CriticalCalculation L3 upgrade.
     /// </summary>
     public class CritDamageOnHitBuff(
-        float critDamageBonus,
+        EffectValue critDamageBonus,
         int duration,
-        float critDamagePerHit,
+        EffectValue critDamagePerHit,
         int maxStacks = 1,
         StatusEffects statusEffect = StatusEffects.None)
         : Effect(id: "Effect_Crit_Damage_On_Hit_Buff", duration, maxStacks, statusEffect)
     {
-        private readonly EntityParameterDecorator _critDamageDecorator = new("Effect_Crit_Dmg_Buff_Decorator",
-            critDamageBonus,
-            OperationType.Add,
-            EntityParameter.CriticalDamage,
-            Priority.Weak);
+        private const string DecoratorId = "Effect_Crit_Dmg_Buff_Decorator";
+
+        private EntityParameterDecorator? _critDamageDecorator;
+
+        public float CritDamageBonus => Effective(critDamageBonus);
+
+        public float CritDamagePerHit => Effective(critDamagePerHit);
 
         protected override Dictionary<string, object?> DescriptionValues
         {
             get
             {
                 var values = base.DescriptionValues;
-                values[nameof(critDamageBonus)] = critDamageBonus;
-                values[nameof(critDamagePerHit)] = critDamagePerHit;
+                values[nameof(critDamageBonus)] = CritDamageBonus;
+                values[nameof(critDamagePerHit)] = CritDamagePerHit;
                 return values;
             }
         }
 
         public override async Task Apply(EffectApplyingContext context)
         {
-            context.Target.Parameters.AddModuleDecorator(_critDamageDecorator);
             await base.Apply(context);
-            if (Target == null) return;
+            if (!IsApplied || Target == null) return; // a rejected stack must not decorate anything
+
+            // Built here and not in a field initializer: a field runs at construction, before the laying
+            // cast's effectiveness is stamped, so the decorator carried the unscaled figure for good.
+            _critDamageDecorator = new EntityParameterDecorator(DecoratorId, CritDamageBonus, OperationType.Add, EntityParameter.CriticalDamage, Priority.Weak);
+            Target.Parameters.AddModuleDecorator(_critDamageDecorator);
             SubscribeUntilRemoved<AfterAttackEvent>(Target.CombatEvents, OnAfterAttack);
         }
 
@@ -52,13 +58,13 @@ namespace Battle.Source.Effects
             if (evt.Context.Result != AttackResults.Succeed && !evt.Context.IsCritical) return;
 
             // Flat increase to crit damage on each successful critical attack
-            var modifier = new SimpleModifier(EntityParameter.PhysicalDamage, ModifierValueType.Flat, critDamagePerHit, $"CC_CritChance_OnHit_{InstanceId}");
+            var modifier = new SimpleModifier(EntityParameter.PhysicalDamage, ModifierValueType.Flat, CritDamagePerHit, $"CC_CritChance_OnHit_{InstanceId}");
             modifier.ApplyTo(Target);
         }
 
         public override void Remove()
         {
-            Target?.Parameters.RemoveModuleDecorator(_critDamageDecorator.Id, EntityParameter.CriticalDamage);
+            if (_critDamageDecorator != null) Target?.Parameters.RemoveModuleDecorator(_critDamageDecorator.Id, EntityParameter.CriticalDamage);
             Target?.ParameterModifiers.RemoveModifierBySource($"CC_CritChance_OnHit_{InstanceId}");
             base.Remove();
         }

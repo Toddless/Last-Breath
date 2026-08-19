@@ -11,7 +11,7 @@ namespace Battle.Source.Effects
     public class FuryEffect(
         int duration,
         int maxStacks,
-        float healthPercent,
+        EffectValue healthPercent,
         StatusEffects statusEffect = StatusEffects.Fury,
         string id = "Effect_Fury")
         : Effect(id, duration, maxStacks, statusEffect)
@@ -27,7 +27,15 @@ namespace Battle.Source.Effects
                 return values;
             }
         }
-        public float HealthPercent { get; } = healthPercent;
+
+        /// <summary>Share of maximum health every attack eats. Deliberately NOT read through
+        /// <c>Effective</c>: this is the fury's PRICE, and strengthening a buff must not turn on its
+        /// bearer. It also keeps the Burning Fury linear — the burn it lays is a share of the health
+        /// burned here, so scaling both ends would square the effectiveness.</summary>
+        public float HealthPercent => healthPercent.Authored;
+
+        /// <summary>What the variants hand on to their own copies.</summary>
+        protected EffectValue AuthoredHealthPercent => healthPercent;
 
         public override async Task Apply(EffectApplyingContext context)
         {
@@ -54,6 +62,6 @@ namespace Battle.Source.Effects
         {
         }
 
-        public override IEffect Copy() => new FuryEffect(Duration, MaxStacks, HealthPercent, Status);
+        public override IEffect Copy() => new FuryEffect(Duration, MaxStacks, healthPercent, Status);
     }
 }

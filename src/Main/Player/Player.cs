@@ -92,9 +92,9 @@ namespace LastBreath.Player
         // Never-assigned auto-property left the battle log with nameless player entries.
         public string DisplayName => Core.Localization.Localization.Localize("Player");
         public string[] Tags { get; } = [];
+        public IAnimationsComponent Animations => _animationsComponent;
         public IEntityParametersComponent Parameters { get; private set; }
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
-        public IAnimationsComponent Animations => _animationsComponent;
         public IModifierHandlerComponent ModifierHandler { get; private set; }
         public IAbilityBookComponent AbilityBook { get; private set; }
         public IEquipmentComponent Equipment { get; private set; }

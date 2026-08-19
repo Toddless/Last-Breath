@@ -6,7 +6,7 @@
     public class BlindEffect(
         int duration,
         int maxStacks,
-        float value)
+        EffectValue value)
         : ParameterChangeEffect(
             id: "Effect_Blind",
             duration,

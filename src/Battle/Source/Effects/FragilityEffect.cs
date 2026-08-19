@@ -9,7 +9,7 @@ namespace Battle.Source.Effects
     /// "Хрупкость": the target takes <c>critDamageAmp</c> more damage from critical hits per stack.
     /// Each stack carries its own incoming-damage modifier, so stacks multiply.
     /// </summary>
-    public class FragilityEffect(int duration, int maxStacks, float critDamageAmp)
+    public class FragilityEffect(int duration, int maxStacks, EffectValue critDamageAmp)
         : Effect(id: "Effect_Fragility", duration, maxStacks)
     {
         public override bool IsHarmful => true;
@@ -21,7 +21,8 @@ namespace Battle.Source.Effects
             await base.Apply(context);
             if (!IsApplied) return; // a rejected stack must not amplify anything
 
-            _modifier = new CritDamageTakenContextModifier(critDamageAmp);
+            // The modifier adds one to the share itself, so what it wants is the share and not the factor.
+            _modifier = new CritDamageTakenContextModifier(Effective(critDamageAmp));
             Target?.ModifierHandler.Add(_modifier);
         }
 

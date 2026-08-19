@@ -9,7 +9,7 @@
     public class ExecutionEffect(
         int duration,
         int maxStacks,
-        float percentage,
+        EffectValue percentage,
         StatusEffects statusEffect = StatusEffects.None)
         : Effect(id: "Effect_Execution", duration, maxStacks, statusEffect)
     {
@@ -25,7 +25,8 @@
             }
         }
 
-        public float Percentage { get; } = percentage;
+        /// <summary>Share of maximum health at or below which the blow finishes the target.</summary>
+        public float Percentage => Effective(percentage);
 
         public override async Task Apply(EffectApplyingContext context)
         {
@@ -42,7 +43,9 @@
             if (healthAsPercentLeft <= Percentage) target.Kill();
         }
 
-        public override IEffect Copy() => new ExecutionEffect(Duration, MaxStacks, Percentage, Status);
+        // The AUTHORED share, never the effective one: a copy scaled again would execute at a threshold
+        // its original never had.
+        public override IEffect Copy() => new ExecutionEffect(Duration, MaxStacks, percentage, Status);
 
         public override bool IsStronger(IEffect otherEffect)
         {

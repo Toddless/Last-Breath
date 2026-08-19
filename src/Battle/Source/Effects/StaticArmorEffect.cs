@@ -63,7 +63,7 @@ namespace Battle.Source.Effects
         private void ApplyCharge(IFightable victim)
         {
             if (Target == null || !victim.IsAlive) return;
-            _ = new ChargeEffect(settings.ChargeDuration, settings.RequiredStacks, settings.RequiredStacks, Detonate)
+            _ = new ChargeEffect(settings.ChargeDuration, settings.RequiredStacks, Detonate)
                 .Apply(new EffectApplyingContext { Caster = Target, Target = victim, Source = InstanceId });
         }
 

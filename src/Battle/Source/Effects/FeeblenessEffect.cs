@@ -5,7 +5,7 @@ namespace Battle.Source.Effects
 
     /// <summary>"Немощный": reduces the target's ATTACK damage by <c>value</c> (0.15 = −15%) per stack.
     /// The hit-damage counterpart is <see cref="Weakness"/>.</summary>
-    public class FeeblenessEffect(int duration, int maxStacks, float value)
+    public class FeeblenessEffect(int duration, int maxStacks, EffectValue value)
         : ParameterChangeEffect(id: "Effect_Feebleness",
             duration,
             maxStacks,

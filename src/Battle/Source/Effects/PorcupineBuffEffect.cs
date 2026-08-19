@@ -15,13 +15,23 @@ namespace Battle.Source.Effects
     public class PorcupineBuffEffect(
         IAbility sourceAbility,
         int duration,
-        float damageReturn,
-        float armorReturn,
+        EffectValue damageReturn,
+        EffectValue armorReturn,
         EffectValue healOnHitPercent,
-        float cooldownReduceChance)
+        EffectValue cooldownReduceChance)
         : Effect(id: "Effect_Porcupine", duration, maxStacks: 1)
     {
-        public float DamageReturn => damageReturn;
+        /// <summary>Share of the damage taken that goes back at the attacker.</summary>
+        public float DamageReturn => Effective(damageReturn);
+
+        /// <summary>Share of the bearer's armor added to the answer.</summary>
+        public float ArmorReturn => Effective(armorReturn);
+
+        /// <summary>Share of maximum health the bearer gets back on being hit.</summary>
+        public float HealOnHitPercent => Effective(healOnHitPercent);
+
+        /// <summary>Odds of shaving a turn off the source ability's cooldown.</summary>
+        public float CooldownReduceChance => Effective(cooldownReduceChance);
 
         public override async Task Apply(EffectApplyingContext context)
         {
@@ -31,7 +41,7 @@ namespace Battle.Source.Effects
         }
 
         public override bool IsStronger(IEffect otherEffect) =>
-            otherEffect is PorcupineBuffEffect other && damageReturn > other.DamageReturn;
+            otherEffect is PorcupineBuffEffect other && DamageReturn > other.DamageReturn;
 
         public override IEffect Copy() =>
             new PorcupineBuffEffect(sourceAbility, Duration, damageReturn, armorReturn, healOnHitPercent, cooldownReduceChance);
@@ -45,12 +55,12 @@ namespace Battle.Source.Effects
             var attacker = context.Source;
             if (attacker.IsSame(Target.InstanceId) || !attacker.IsAlive) return;
 
-            if (Effective(healOnHitPercent) > 0)
-                Target.Heal(new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * Effective(healOnHitPercent) });
-            if (cooldownReduceChance > 0 && sourceAbility.CooldownLeft > 0 && ChanceRoll.Roll(cooldownReduceChance, CombatRandom.Rolls))
+            if (HealOnHitPercent > 0)
+                Target.Heal(new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * HealOnHitPercent });
+            if (CooldownReduceChance > 0 && sourceAbility.CooldownLeft > 0 && ChanceRoll.Roll(CooldownReduceChance, CombatRandom.Rolls))
                 sourceAbility.CooldownLeft--;
 
-            float returned = (context.TotalDamage * damageReturn) + (Target.Parameters.Armor * armorReturn);
+            float returned = (context.TotalDamage * DamageReturn) + (Target.Parameters.Armor * ArmorReturn);
             if (returned <= 0) return;
             var retaliation = new DamageContext { Source = Target, Cause = DamageCause.Effect };
             retaliation.Add(DamageType.Sacred, returned);

@@ -10,7 +10,7 @@
         },
         {
             "id": "Effect_Primal_Fury",
-            "properties": { "duration": 3, "maxStacks": 1, "healthPercent": 0.05, "damageMultiplier": 1.35 }
+            "properties": { "duration": 3, "maxStacks": 1, "healthPercent": 0.05, "damageMultiplier": 0.35 }
         },
         {
             "id": "Effect_Healing_Fury",
@@ -52,6 +52,10 @@
         {
             "id": "Effect_Damage_Over_Turn_Bleed",
             "properties": { "duration": 3, "maxStacks": 999, "percentFromDamage": 0.8 }
+        },
+        {
+            "id": "Effect_Charge",
+            "properties": { "duration": 3, "maxStacks": 3 }
         },
         {
             "id": "Effect_Evade_First_Death",

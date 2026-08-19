@@ -8,7 +8,7 @@
     using Godot;
 
     public class RegenerationEffect(
-        float amount,
+        EffectValue amount,
         int duration,
         int maxStacks,
         bool isPercent = false,
@@ -28,7 +28,10 @@
         }
 
         public bool IsPercent => isPercent;
-        public float Amount { get; } = amount;
+
+        /// <summary>Health one turn gives back — a share of the maximum when <see cref="IsPercent"/>,
+        /// a flat figure otherwise.</summary>
+        public float Amount => Effective(amount);
 
         public override void TurnEnd()
         {
@@ -37,6 +40,8 @@
         }
 
 
-        public override IEffect Copy() => new RegenerationEffect(Amount, Duration, MaxStacks, IsPercent, Status);
+        // The AUTHORED figure, never the effective one: a copy built from what this instance came to
+        // would be scaled a second time the moment it landed.
+        public override IEffect Copy() => new RegenerationEffect(amount, Duration, MaxStacks, IsPercent, Status);
     }
 }

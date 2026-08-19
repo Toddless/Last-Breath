@@ -68,6 +68,10 @@ namespace Battle.Source
                 new DamageOverTurnEffect(p.GetInt("duration"), StatusEffects.Poison, p.GetInt("maxStacks"), p.Get("percentFromDamage"))),
             ["Effect_Damage_Over_Turn_Bleed"] = new(["duration", "maxStacks", "percentFromDamage"], p =>
                 new DamageOverTurnEffect(p.GetInt("duration"), StatusEffects.Bleed, p.GetInt("maxStacks"), p.Get("percentFromDamage"))),
+            // The mark counts and pops; what the pop DOES belongs to whoever laid it (the Static Armour
+            // hands its detonation in), so the canon balances how many stacks and how long, and no more.
+            ["Effect_Charge"] = new(["duration", "maxStacks"], p =>
+                new ChargeEffect(p.GetInt("duration"), p.GetInt("maxStacks"))),
 
             // ---- Recovery and survival.
             ["Effect_Evade_First_Death"] = new(["duration", "maxStacks", "percentHealthToRecover"], p =>

@@ -2,6 +2,7 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
     using Battle.Source.Abilities;
+    using Battle.Source.Abilities.StaticArmor;
     using Battle.Source.Effects;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
@@ -103,6 +104,24 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(WitheringCeiling,
                 new WitheringCurseEffect(duration: 3, maxStacks: (int)block[AbilityParameter.Stacks], value: 0.15f).MaxStacks,
                 "the raised key carried the laid curse past the ceiling the canon balances it at");
+        }
+
+        [TestMethod]
+        public void TheChargeGoesOffWhenItsPileIsFullAndNotAtSomeThresholdOfItsOwn()
+        {
+            // The one effect whose ceiling is also a rule about when it fires. The ability names how many
+            // stacks it wants and the canon holds that number down; if the threshold were a figure of its
+            // own it could be raised past the ceiling, and the charge would then count towards a number the
+            // pile can never reach and never detonate at all.
+            (AbilityProvider registry, _) = ShippedAbilityData.Load();
+            var armor = (Ability)registry.CreateAbility("Ability_Static_Armor");
+            int? ceiling = GameServiceProvider.TryGet<IEffectProvider>()?.StackCeilingOf("Effect_Charge");
+
+            Assert.IsNotNull(ceiling, "the canon carries no ceiling for the charge, so nothing below is measured");
+            Assert.IsTrue((int)armor[StaticArmor.Parameters.RequiredStacks] <= ceiling,
+                "the armour asks for more charge stacks than the canon lets one pile hold — the pile would never fill");
+            Assert.AreEqual(ceiling, new ChargeEffect(duration: 3, maxStacks: ceiling.Value + 2).DetonationStacks,
+                "a charge built past the ceiling kept a detonation threshold the ceiling will not let it reach");
         }
 
         /// <summary>An effect wearing an id the canon carries no row for.</summary>

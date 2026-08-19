@@ -83,7 +83,7 @@ namespace LastBreathTest.BattleSystemTests
             var laid = fury.FuryFactory(4, 0.07f) as BurningFuryEffect;
 
             Assert.IsNotNull(laid, "the variant record no longer swaps in the burning fury at all");
-            Assert.AreEqual(0.75f, laid.BurnDamage, 0.0001f,
+            Assert.AreEqual(0.75f, laid.BurnShare, 0.0001f,
                 "the burning fury is back on its own figure for the share of burned health it deals (canon says 0.75)");
             Assert.AreEqual(999, laid.BurningMaxStacks,
                 "the burning it lays is capped by a figure of the augment's own instead of the canon's");

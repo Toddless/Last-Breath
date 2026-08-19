@@ -4,7 +4,7 @@ namespace Battle.Source.Effects
     using Core.Enums;
 
     /// <summary>"Слабая регенерация": increases the target's health recovery by <c>value</c> (0.15 = +15%) per stack.</summary>
-    public class WeakRegenerationEffect(int duration, int maxStacks, float value)
+    public class WeakRegenerationEffect(int duration, int maxStacks, EffectValue value)
         : ParameterChangeEffect(id: "Effect_Weak_Regeneration",
             duration,
             maxStacks,

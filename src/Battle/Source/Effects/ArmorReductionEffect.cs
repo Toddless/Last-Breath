@@ -7,7 +7,7 @@ namespace Battle.Source.Effects
     /// Debuff: reduces the target's armor by <c>reduceBy</c> (0..1) per stack.
     /// Stacks multiplicatively: n stacks => armor * (1 - reduceBy)^n.
     /// </summary>
-    public class ArmorReductionEffect(int duration, int maxStacks, float reduceBy)
+    public class ArmorReductionEffect(int duration, int maxStacks, EffectValue reduceBy)
         : ParameterChangeEffect(id: "Effect_Armor_Reduction",
             duration,
             maxStacks,

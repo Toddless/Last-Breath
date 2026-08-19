@@ -79,9 +79,9 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public async Task ABurnWithNothingToFeedOnIsNotLaidAtAll()
         {
-            // A stack that would tick for nothing is refused outright. It is not a cosmetic question:
-            // an empty stack holds a place under the ceiling, and the ceiling evicts the OLDEST stack of
-            // the kind — so a fireless blow could put out a burn somebody else's fire was still doing.
+            // A stack that would tick for nothing is refused outright. It is not a cosmetic question: an
+            // empty stack holds a place under the ceiling, and a pile at its ceiling takes no more stacks
+            // at all — so a fireless blow would keep a working burn out for as long as it lasted.
             var caster = new ConditionOwner();
             var victim = new ConditionOwner();
             var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, percentFromDamage: Share);
@@ -94,29 +94,27 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public async Task ALivingStackIsNotEvictedByOneWithNothingToTickWith()
+        public async Task AnEmptyStackDoesNotHoldAPlaceALivingBurnNeeds()
         {
-            // The consequence the refusal exists for, walked on the road it actually happens on: a
-            // MULTI-stack effect at its ceiling evicts the oldest stack unconditionally — no comparison
-            // of strength stands between them — so a fireless blow could put out a burn that was working.
+            // The consequence the refusal exists for, walked on the road it actually happens on. A pile
+            // at its ceiling takes no more stacks — the re-application only buys time — so a stack with
+            // nothing to tick with is not a harmless nuisance: whatever room it occupies is room a burn
+            // that works cannot have until it expires. Laid FIRST, which is where it does the damage.
             var caster = new ConditionOwner();
             var victim = new ConditionOwner();
-            var eldest = new DamageOverTurnEffect(Turns, StatusEffects.Burning, maxStacks: 2, percentFromDamage: Share);
-            var younger = new DamageOverTurnEffect(Turns, StatusEffects.Burning, maxStacks: 2, percentFromDamage: Share);
             var starved = new DamageOverTurnEffect(Turns, StatusEffects.Burning, maxStacks: 2, percentFromDamage: Share);
+            var first = new DamageOverTurnEffect(Turns, StatusEffects.Burning, maxStacks: 2, percentFromDamage: Share);
+            var second = new DamageOverTurnEffect(Turns, StatusEffects.Burning, maxStacks: 2, percentFromDamage: Share);
 
-            // The road is chosen by the ceiling: at one stack the eviction never happens and a strength
-            // comparison guards the standing burn instead, which is not what is asked here.
             Assert.AreEqual(2, starved.MaxStacks, "the canon caps this burn lower than the walk needs");
 
-            await eldest.Apply(Blow(caster, victim, (DamageType.Fire, Fire)));
-            await younger.Apply(Blow(caster, victim, (DamageType.Fire, Fire)));
             await starved.Apply(Blow(caster, victim, (DamageType.Physical, Physical)));
+            await first.Apply(Blow(caster, victim, (DamageType.Fire, Fire)));
+            await second.Apply(Blow(caster, victim, (DamageType.Fire, Fire)));
 
             List<IEffect> burns = [.. victim.Effects.GetBy(effect => effect.Status == StatusEffects.Burning)];
-            Assert.AreEqual(2, burns.Count, "the ceiling holds two burns and the victim carries a different number");
-            Assert.IsTrue(burns.Contains(eldest), "an empty stack evicted the oldest living burn");
-            Assert.IsTrue(burns.Contains(younger), "the younger living burn is gone");
+            CollectionAssert.AreEquivalent(new[] { first, second }, burns.ToArray(),
+                "the victim is not carrying exactly the two burns that had fire behind them");
         }
 
         [TestMethod]
