@@ -48,7 +48,7 @@ namespace Battle.Source.Abilities.Sacrifice
             // does not — the record buys a better exchange rate, not a bigger sacrifice.
             float bonus = sacrificed / 100f * RatePerHundred * this[AbilityParameter.ConsumeEffectiveness];
             await new SacrificeChargeEffect(Id, Charges, bonus, HealFromEmpoweredDamage)
-                .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
+                .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId, Trace = Trace });
         }
     }
 }

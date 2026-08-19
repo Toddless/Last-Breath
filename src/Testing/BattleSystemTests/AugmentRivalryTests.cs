@@ -1,8 +1,11 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using System;
+    using System.Threading.Tasks;
     using Battle.Source;
     using Battle.Source.Abilities;
     using Core.Battle.Abilities;
+    using Core.Data;
     using Core.Data.AbilityData;
     using Core.Entity;
     using Core.Entity.Components;
@@ -181,16 +184,129 @@ namespace LastBreathTest.BattleSystemTests
         public void TheResourceSwapIsSettledTheSameWayInEitherOrder()
         {
             // Two records that replace the resource a cast is paid in. Nothing is more of health than it
-            // is of barrier, so which of them wins is arbitrary — what is not arbitrary is that it is
-            // the same one whichever slot was filled first.
+            // is of barrier, so there is no strength to measure — what must not depend on anything is
+            // that it comes out the same whichever slot was filled first.
             var healthFirst = AbilityWith();
             var barrierFirst = AbilityWith();
 
-            healthFirst.InstallUpgrades(InThisOrder(SwapTo(HealthCostAugment, Costs.Health), SwapTo(BarrierCostAugment, Costs.Barrier)));
-            barrierFirst.InstallUpgrades(InThisOrder(SwapTo(BarrierCostAugment, Costs.Barrier), SwapTo(HealthCostAugment, Costs.Health)));
+            healthFirst.InstallUpgrades(InThisOrder(SwapTo(HealthCostAugment, Costs.Health, tier: 2), SwapTo(BarrierCostAugment, Costs.Barrier, tier: 3)));
+            barrierFirst.InstallUpgrades(InThisOrder(SwapTo(BarrierCostAugment, Costs.Barrier, tier: 3), SwapTo(HealthCostAugment, Costs.Health, tier: 2)));
 
             Assert.AreEqual(healthFirst.CostType, barrierFirst.CostType,
                 "the ability is paid for out of two different pools depending on which swap was seated first");
+        }
+
+        [TestMethod]
+        public void TheDeeperTierTakesASwapThatCannotBeWeighed()
+        {
+            // What settles a swap now that it is settled by something the player can see. A replacement
+            // has no distance from the base to measure, and the id it happens to sort under says nothing
+            // to anyone; the tier says what the record cost him, and the deeper tier takes the swap.
+            // The ids below sort AGAINST the answer on purpose — under the old rule the tier-one record
+            // would take the cast, and a tier-three purchase would sit there doing nothing.
+            var deepSecond = AbilityWith();
+            var deepFirst = AbilityWith();
+
+            deepSecond.InstallUpgrades(InThisOrder(SwapTo("Augment_A_Shallow", Costs.Health, tier: 1), SwapTo("Augment_Z_Deep", Costs.Barrier, tier: 3)));
+            deepFirst.InstallUpgrades(InThisOrder(SwapTo("Augment_Z_Deep", Costs.Barrier, tier: 3), SwapTo("Augment_A_Shallow", Costs.Health, tier: 1)));
+
+            Assert.AreEqual(Costs.Barrier, deepSecond.CostType, "the shallower record's swap took a cast a tier-three record was paid to swap");
+            Assert.AreEqual(deepSecond.CostType, deepFirst.CostType, "the same pair came to two answers in the two orders");
+        }
+
+        [TestMethod]
+        public void TheAbilitySaysWhichSocketIsAsleep()
+        {
+            // The data behind the mark on a cell. Two records cutting one wait: the deeper cut works and
+            // the shallower one sits there, and the ability is the only thing that knows which is which —
+            // both are seated, both are saved, both are drawn, and nothing about the socket says a word.
+            var ability = AbilityWith(cost: 150, cooldown: 9);
+
+            ability.InstallUpgrades(InThisOrder(Surcharge(), DeeperCut()));
+
+            Assert.AreEqual(AugmentActivity.Dormant, ability.ActivityOf("socket_0"),
+                "the record whose only cut was outdone reads as working");
+            Assert.AreEqual(AugmentActivity.Working, ability.ActivityOf("socket_1"), "the record taking the wait reads as asleep");
+            Assert.AreEqual(AugmentActivity.Working, ability.ActivityOf("socket_9"), "an address holding nothing reported a sleeper");
+        }
+
+        [TestMethod]
+        public void ARecordAsleepOnOneNumberIsOnlyPartlyAsleep()
+        {
+            // The middle answer, and why the enum has three. A record that moves two numbers and loses
+            // one of them is not dormant: the other half is still being paid out, and a mark saying
+            // otherwise would tell the player to pull something that is working for him.
+            var ability = AbilityWith(cost: 150, cooldown: 9);
+
+            ability.InstallUpgrades(InThisOrder(CutAndCheapen(), DeeperCut()));
+
+            Assert.AreEqual(AugmentActivity.Partly, ability.ActivityOf("socket_0"),
+                "a record that lost one of its two moves reads as all or nothing");
+        }
+
+        [TestMethod]
+        public void TheBillOfASleepingRecordIsNoPartOfWhetherItIsAwake()
+        {
+            // The other half of "the loser still pays". A surcharge record goes on charging when its
+            // gift has lost, and counting that bill as a move that still runs would report it half-awake
+            // — hiding the bad deal the mark exists to show. The price is still charged; see
+            // TheRecordWhoseCutLostStillPaysForIt for that half.
+            var ability = AbilityWith(cost: 150, cooldown: 9);
+
+            ability.InstallUpgrades(InThisOrder(Surcharge(), DeeperCut()));
+
+            // A hundred and fifty and the surcharge record's share of it, rounded: the bill is unchanged
+            // by the cut having lost.
+            Assert.AreEqual(173, ability.CostValue, "the sleeping record stopped charging for the cut it no longer makes");
+            Assert.AreEqual(AugmentActivity.Dormant, ability.ActivityOf("socket_0"),
+                "the bill it goes on charging was counted as one of its moves still working");
+        }
+
+        [TestMethod]
+        public void ARecordWhoseRiderStillFiresIsNotAsleep()
+        {
+            // A rider has no rival: nothing on the ability can put one out of work, so it is running for
+            // as long as it is seated (owner's word, 2026-08-19). A record that rides AND moves a number
+            // therefore never sleeps outright — losing the number leaves it half-awake, and a mark saying
+            // "dormant" would tell the player to pull something that is still doing its main job.
+            var ability = AbilityWith(cooldown: 9);
+
+            ability.InstallUpgrades(InThisOrder(CutAndRide(), DeeperCut()));
+
+            Assert.AreEqual(4f, ability.Cooldown, "the deeper cut did not take the wait, so the loser below is not a loser");
+            Assert.AreEqual(AugmentActivity.Partly, ability.ActivityOf("socket_0"),
+                "the record's cut lost and its rider was buried with it");
+        }
+
+        [TestMethod]
+        public void ARecordThatIsNothingButARiderAlwaysWorks()
+        {
+            // The other end of the same rule. Such a record moves no number at all, so there is nothing
+            // it could ever lose — and reporting it by its numbers alone would have it answer for a
+            // ledger it never wrote in.
+            var ability = AbilityWith(cooldown: 9);
+
+            ability.InstallUpgrades(InThisOrder(JustARider(), DeeperCut()));
+
+            Assert.AreEqual(AugmentActivity.Working, ability.ActivityOf("socket_0"),
+                "a record that only rides was judged on numbers it never moved");
+        }
+
+        [TestMethod]
+        public void TwoCopiesOfOneRecordAnswerAsOne()
+        {
+            // Stated so it is a law and not a surprise. A move is filed under the RECORD that laid it —
+            // it has to be, because a price belongs to the deal one record offers and two copies of one
+            // record are one deal. So the two sockets share one answer, and it is the answer for the
+            // pair: one of the two cuts is running.
+            var ability = AbilityWith(cost: 150);
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+
+            ability.InstallUpgrades(InThisOrder(Built(registry, catalog, PoorRoll), Built(registry, catalog, LuckyRoll)));
+
+            Assert.AreEqual(AugmentActivity.Partly, ability.ActivityOf("socket_0"), "the pair of copies reported something other than half-working");
+            Assert.AreEqual(ability.ActivityOf("socket_0"), ability.ActivityOf("socket_1"),
+                "two copies of one record came to two different answers, which the record they share cannot support");
         }
 
         [TestMethod]
@@ -268,8 +384,58 @@ namespace LastBreathTest.BattleSystemTests
         private static IAbilityAugment StunSurchargeUpgrade() =>
             new AbilityAugmentParameterSet(StunSurcharge, [], 2, [(AbilityParameter.CostValue, OperationType.Add, 50f)]);
 
-        private static IAbilityAugment SwapTo(string augmentId, Costs resource) =>
-            new AbilityAugmentCostTypeOverride(augmentId, [], 2, resource);
+        /// <summary>A record that rides every impact AND cuts the wait — the shape the shipped book puts
+        /// on an applier that also carries a number of its own. Its cut is outdone below.</summary>
+        private static IAbilityAugment CutAndRide() => new RidingCut("Augment_Riding_Cut", tier: 2, turns: 1f);
+
+        /// <summary>A record that is nothing but a rider: no number of its own anywhere.</summary>
+        private static IAbilityAugment JustARider() =>
+            new AbilityAugmentImpactRider("Augment_Just_A_Rider", [], 2, () => new ProbeRider());
+
+        /// <summary>A record that moves two numbers, one of which is outdone below: the case for an
+        /// augment that is neither working nor asleep.</summary>
+        private static IAbilityAugment CutAndCheapen() =>
+            new AbilityAugmentParameterSet("Augment_Cut_And_Cheapen", [], 2,
+                [(AbilityParameter.Cooldown, OperationType.Subtract, 1f), (AbilityParameter.CostValue, OperationType.Subtract, 20f)]);
+
+        private static IAbilityAugment SwapTo(string augmentId, Costs resource, int tier = 2) =>
+            new AbilityAugmentCostTypeOverride(augmentId, [], tier, resource);
+
+        /// <summary>An impact rider that does nothing: what these walks need of one is that it EXISTS on
+        /// the ability, because existing is the whole of what makes a rider a working move.</summary>
+        private sealed class ProbeRider : IImpactRider
+        {
+            public string Id => "Rider_Probe";
+
+            public string InstanceId { get; } = Guid.NewGuid().ToString();
+
+            public bool IsSame(string otherId) => Id.Equals(otherId, StringComparison.Ordinal);
+
+            public Task Apply(AbilityImpact impact) => Task.CompletedTask;
+        }
+
+        /// <summary>An augment that both rides and moves a number — the two halves whose verdicts have to
+        /// be added up rather than one of them answering for the record.</summary>
+        private sealed class RidingCut(string id, int tier, float turns)
+            : AbilityAugmentImpactRider(id, [], tier, () => new ProbeRider())
+        {
+            public override void ApplyUpgrade(Ability ability)
+            {
+                base.ApplyUpgrade(ability);
+                ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
+                    AbilityParameter.Cooldown, Priority.Weak, OperationType.Subtract, turns, DecoratorId, Id, rank: Tier));
+            }
+
+            public override void RemoveUpgrade(Ability ability)
+            {
+                base.RemoveUpgrade(ability);
+                ability.RemoveParameterDecorator(DecoratorId, AbilityParameter.Cooldown);
+            }
+
+            public override IAbilityAugment Copy() => new RidingCut(Id, Tier, turns);
+
+            private string DecoratorId => $"Ability_Parameter_Decorator_{Id}_{AbilityParameter.Cooldown}";
+        }
 
         /// <summary>
         /// One character wearing the real thing: the shipped records, a board with two slots on one

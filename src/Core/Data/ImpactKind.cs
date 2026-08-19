@@ -39,13 +39,13 @@ namespace Core.Data
         Splash,
 
         /// <summary>
-        /// A touch the bearer did not aim: the porcupine's returned damage, the aegis's reflection, an
-        /// answer struck back at whoever attacked. Declared here because the vocabulary is the owner's
-        /// decision and a genus half-named is worse than one named early.
-        /// <para>NOTHING PRODUCES IT YET. The three points that will are all in the effect layer, which
-        /// reports no impacts at all today — teaching it to is the wave that gives effects a source
-        /// ability, not a line here. Until then this is a word the data may not use: a record filtered to
-        /// it would fit, be paid for and never fire.</para>
+        /// A touch the bearer did not aim: a swing struck back at whoever swung last, or the answer a
+        /// broken guard gives the one who broke it. Never a swing of the attacker's own series — an extra
+        /// hit off the chain passive continues his aggression and stays an <see cref="Attack"/>.
+        /// <para>Two roads carry it: a counter resolved through the attack pipeline
+        /// (<c>IAttackContext.IsAnswer</c>) and the aegis shattering. The porcupine's returned damage and
+        /// the aegis's reflection are still outside it — both live in the effect layer, which holds no
+        /// battlefield and so can build no impact at all.</para>
         /// </summary>
         Reaction
     }

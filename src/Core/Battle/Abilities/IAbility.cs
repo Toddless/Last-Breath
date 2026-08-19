@@ -30,6 +30,12 @@
         /// <see cref="AbilityParameter.Effectiveness"/>, and ONE for an ability that never declared it.</summary>
         float Effectiveness { get; }
 
+        /// <summary>What this ability stamps on everything it lays on somebody, so a record offering to
+        /// prolong or strengthen its own payload can tell it from anybody else's. Carries the CURRENT
+        /// cast, so a reader outliving the cast (a rider waiting on a death) must capture it, not the
+        /// ability.</summary>
+        AbilityTrace Trace { get; }
+
         /// <summary>The parameter's decorated value, or the given figure when the ability never declared
         /// it — for readers where absence is an answer rather than a typo.</summary>
         float ValueOr(string parameter, float fallback);
@@ -50,10 +56,21 @@
         Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; }
 
         /// <summary>Riders fired once per cast, after execution (self-buffs, cast-scoped debuffs).</summary>
-        Dictionary<string, IActivationRider> ActivationRiders { get; }
+        IReadOnlyDictionary<string, IActivationRider> ActivationRiders { get; }
 
         /// <summary>Riders fired on every delivery impact (per hit / bounce / attack of a series).</summary>
-        Dictionary<string, IImpactRider> ImpactRiders { get; }
+        IReadOnlyDictionary<string, IImpactRider> ImpactRiders { get; }
+
+        /// <summary>Seats a rider under a name the caller owns and is answerable for taking off again.</summary>
+        void AddImpactRider(string key, IImpactRider rider);
+
+        /// <summary>Takes a rider off and tells it to let go of what it hooked (<see cref="IImpactRider.Detach"/>).
+        /// Riders leave only through here, so a subscription cannot outlive the augment that bought it.</summary>
+        void RemoveImpactRider(string key);
+
+        void AddActivationRider(string key, IActivationRider rider);
+
+        void RemoveActivationRider(string key);
         /// <summary>
         /// The augments the ability is wearing, keyed by the ADDRESS of the socket each of them sits in
         /// (<see cref="AbilitySocketPlacement.Address"/>). A socket and not a tier: two nodes of one tier
@@ -62,6 +79,15 @@
         /// Each entry was built from the COPY that was seated, so its numbers are that copy's own.
         /// </summary>
         IReadOnlyDictionary<string, IAbilityAugment> InstalledUpgrades { get; }
+
+        /// <summary>
+        /// How much of the augment in that socket is running — the answer behind the dormant mark on a
+        /// cell. An address holding nothing, or holding a record that moves no number, is
+        /// <see cref="AugmentActivity.Working"/>: there is nothing there to have lost.
+        /// <para>Two copies of one record are one deal on the numbers side, so they get one answer
+        /// between them, which is the same answer either socket would give.</para>
+        /// </summary>
+        AugmentActivity ActivityOf(string socketAddress);
 
         event Action<string>? OnParameterChanged;
         event Action<IAbility, bool>? AbilityResourceChanges;

@@ -62,7 +62,7 @@ namespace Battle.Source.Abilities.TwinAssist
         private async Task ApplyBurning(IFightable owner, IFightable target, float hitDamage)
         {
             // The assist authors its burn off its own blow, which carries no fire component of its own.
-            var context = new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId, Damage = DamageSnapshot.Of(DamageType.Fire, hitDamage) };
+            var context = new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId, Damage = DamageSnapshot.Of(DamageType.Fire, hitDamage), Trace = Trace };
             await new DamageOverTurnEffect(BurnDuration, StatusEffects.Burning).Apply(context);
         }
     }

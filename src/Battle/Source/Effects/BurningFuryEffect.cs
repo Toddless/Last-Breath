@@ -52,6 +52,7 @@ namespace Battle.Source.Effects
                 Damage = DamageSnapshot.Of(DamageType.Fire, HealthBurned),
                 Source = InstanceId,
                 Effectiveness = Effectiveness,
+                Trace = Trace,
                 IsCritical = false
             });
         }

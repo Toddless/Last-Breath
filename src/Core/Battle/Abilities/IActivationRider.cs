@@ -10,5 +10,11 @@ namespace Core.Battle.Abilities
     public interface IActivationRider : IIdentifiable
     {
         Task Apply(IAbilityActivationContext context);
+
+        /// <summary>Lets go of everything the rider hooked while it worked — see
+        /// <see cref="IImpactRider.Detach"/>, same contract on the once-per-cast side.</summary>
+        void Detach()
+        {
+        }
     }
 }

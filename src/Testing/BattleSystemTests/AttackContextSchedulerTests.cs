@@ -152,6 +152,7 @@ namespace LastBreathTest.BattleSystemTests
             public bool IsFirst => Index == 0;
             public bool IsLast => Index == TotalCount - 1;
             public int ReactionDepth { get; init; }
+            public bool IsAnswer { get; init; }
 
             public void AddDamage(DamageType type, float amount) => _damageComponents[type] = _damageComponents.GetValueOrDefault(type, 0f) + amount;
 

@@ -122,7 +122,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new BuffAfterAttacksImpactRider(
+                    () => new BuffAfterAttacksImpactRider(
                         data.Id,
                         (int)data.UpgradeProperties.GetValueOrDefault("amountAttacks", 6),
                         new CriticalChanceBuffEffect(
@@ -134,7 +134,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new BuffAfterAttacksImpactRider(
+                    () => new BuffAfterAttacksImpactRider(
                         data.Id,
                         (int)data.UpgradeProperties.GetValueOrDefault("amountAttacks", 9),
                         new CriticalDamageBuffEffect(
@@ -165,7 +165,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new ReduceRandomCooldownActivationRider(data.Id, (int)data.UpgradeProperties.GetValueOrDefault("amount", 1))),
+                    () => new ReduceRandomCooldownActivationRider(data.Id, (int)data.UpgradeProperties.GetValueOrDefault("amount", 1))),
             ["Augment_Next_Cast_Sacred"] = data =>
                 new AbilityAugmentCastEffect(
                     data.Id,
@@ -245,7 +245,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new AbilityBuffActivationRider(new CritLeechEffect(
+                    () => new AbilityBuffActivationRider(new CritLeechEffect(
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
                         maxStacks: 1,
                         data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)))),
@@ -337,13 +337,13 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new ReduceAllCooldownsActivationRider(data.Id, (int)data.UpgradeProperties.GetValueOrDefault("amount", 2))),
+                    () => new ReduceAllCooldownsActivationRider(data.Id, (int)data.UpgradeProperties.GetValueOrDefault("amount", 2))),
             ["Augment_Deep_Freeze_Execute_Frozen_On_Hit"] = data =>
                 new AbilityAugmentImpactRider(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new ExecuteImpactRider(data.Id, data.UpgradeProperties.GetValueOrDefault("threshold", 0.30f))),
+                    () => new ExecuteImpactRider(data.Id, data.UpgradeProperties.GetValueOrDefault("threshold", 0.30f))),
             ["Augment_Discharge_Hits_Ignore_Resistances"] = data =>
                 new DelegateAugment<Discharge.Discharge>(
                     data.Id,

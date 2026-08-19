@@ -25,6 +25,6 @@ namespace Battle.Source.Abilities.Riders
         private async Task ApplyEffect(AbilityImpact impact) =>
             await effect
                 .Copy()
-                .Apply(new EffectApplyingContext { Caster = impact.Caster, Source = InstanceId, Target = impact.Target, Effectiveness = impact.Source.Effectiveness });
+                .Apply(new EffectApplyingContext { Caster = impact.Caster, Source = InstanceId, Target = impact.Target, Effectiveness = impact.Source.Effectiveness, Trace = impact.Source.Trace });
     }
 }

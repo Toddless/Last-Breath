@@ -13,9 +13,9 @@ namespace Battle.Source.Abilities.CriticalCalculation
         private readonly IActivationRider _modifier =
             new AbilityBuffActivationRider(new LuckyCritChanceEffect(duration, 1));
 
-        public override void ApplyUpgrade(CriticalCalculation ability) => ability.ActivationRiders.TryAdd(_modifier.Id, _modifier);
+        public override void ApplyUpgrade(CriticalCalculation ability) => ability.AddActivationRider(RiderKey(_modifier.Id), _modifier);
 
-        public override void RemoveUpgrade(CriticalCalculation ability) => ability.ActivationRiders.Remove(_modifier.Id);
+        public override void RemoveUpgrade(CriticalCalculation ability) => ability.RemoveActivationRider(RiderKey(_modifier.Id));
 
         public override IAbilityAugment Copy() => new CcAugmentLuckyCrit(Id, Tags, Tier, duration);
     }

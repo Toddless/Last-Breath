@@ -29,7 +29,7 @@ namespace Battle.Source.Abilities.TwinAssist
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
-            var context = new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId };
+            var context = new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId, Trace = Trace };
             await new ShieldEffect(ShieldStrength, HealthRegenPercent).Apply(context);
         }
     }

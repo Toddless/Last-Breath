@@ -402,9 +402,10 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public async Task TheShatteringOfTheAegisFreezesTheFieldAsSplashes()
+        public async Task TheShatteringOfTheAegisFreezesTheFieldAsReactions()
         {
-            // Stage 4's reaction lives in the barrier effect but the closure is the ability's own and
+            // The answer a broken guard gives whoever broke it — a reaction and not a share of a blow
+            // spilling onto a bystander. It lives in the barrier effect, but the closure is the ability's own and
             // holds it, so nothing here has to wait for the ability's trail to reach effects. The
             // shattering is reproduced the way a fight does it: the bearer's barrier runs out.
             using var rolls = new CombatRandomScope(new LowestRoll());
@@ -423,7 +424,7 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(2, seen.Count, "the field was frozen by the shattering and no rider heard of it");
             foreach (AbilityImpact impact in seen)
             {
-                Assert.AreEqual(ImpactKind.Splash, impact.Kind, "a freeze from the shattering arrived as an aimed delivery");
+                Assert.AreEqual(ImpactKind.Reaction, impact.Kind, "the answer to a shattered guard did not arrive as a reaction");
                 Assert.AreSame(aegis, impact.Source, "the freeze arrived without the ability whose barrier broke");
             }
 
@@ -446,7 +447,7 @@ namespace LastBreathTest.BattleSystemTests
         private static List<AbilityImpact> Riding(IAbility ability)
         {
             var capture = new CaptureRider();
-            ability.ImpactRiders[capture.Id] = capture;
+            ability.AddImpactRider(capture.Id, capture);
             return capture.Impacts;
         }
 

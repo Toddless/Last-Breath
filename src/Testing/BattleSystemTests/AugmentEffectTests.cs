@@ -224,16 +224,11 @@ namespace LastBreathTest.BattleSystemTests
             upgrade.Apply(ability);
             Assert.IsTrue(upgrade.Learned, $"'{ExtendPoison}' refused '{Attacker}' — it is written for one ability after all");
 
+            // Whoever laid it. The record is domain — it reads "the poison on the target" and means it
+            // (owner's word, 2026-08-19), so a stack no cast of this ability put there is held up too.
             var caster = new Fighter();
             var victim = new Fighter();
-            var poison = new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison);
-            await poison.Apply(new EffectApplyingContext
-            {
-                Caster = caster.Object,
-                Target = victim.Object,
-                Source = "Test_Poison",
-                Damage = DamageSnapshot.Of(DamageType.Physical, 100f)
-            });
+            IEffect poison = await Poisoned(caster, victim);
             Assert.AreEqual(PoisonTurns, poison.Duration, "the poison never landed, so the extension below proves nothing");
 
             await ability.ApplyImpactRiders(Swing(ability, caster, victim));
@@ -246,6 +241,22 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(PoisonTurns + Extension, poison.Duration,
                 "the augment came off and the ability goes on extending poison");
+        }
+
+        /// <summary>One poison stack on the victim, laid by nothing in particular — no cast is behind it,
+        /// which is exactly what the domain reading above has to reach.</summary>
+        private static async Task<IEffect> Poisoned(Fighter caster, Fighter victim)
+        {
+            var poison = new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison);
+            await poison.Apply(new EffectApplyingContext
+            {
+                Caster = caster.Object,
+                Target = victim.Object,
+                Source = "Test_Poison",
+                Damage = DamageSnapshot.Of(DamageType.Physical, 100f)
+            });
+
+            return poison;
         }
 
         /// <summary>One swing of the attacking ability under test, as its own delivery would hand it to

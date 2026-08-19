@@ -30,7 +30,7 @@ namespace Battle.Source.Abilities.Riders
                 IEffect? onCaster = effectFactory();
                 if (onCaster == null) return;
 
-                await onCaster.Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster, Effectiveness = context.Ability.Effectiveness });
+                await onCaster.Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster, Effectiveness = context.Ability.Effectiveness, Trace = context.Ability.Trace });
             }
 
             if (!applyOnTargets) return;
@@ -40,7 +40,7 @@ namespace Battle.Source.Abilities.Riders
                 IEffect? onTarget = effectFactory();
                 if (onTarget == null) return;
 
-                await onTarget.Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = target, Effectiveness = context.Ability.Effectiveness });
+                await onTarget.Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = target, Effectiveness = context.Ability.Effectiveness, Trace = context.Ability.Trace });
             }
         }
     }

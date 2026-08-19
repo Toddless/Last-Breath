@@ -18,6 +18,13 @@
         /// anything not laid by a cast. Multiplies every number of the effect except duration and stacks.</summary>
         float Effectiveness { get; }
 
+        /// <summary>The cast that laid this instance; nothing at all for a passive, an item grant or a
+        /// boss stage. What a rule reading "only what is MINE" would be decided on.
+        /// <para>Declared without a default on purpose, exactly like <see cref="Effectiveness"/>: an
+        /// implementor that never answers it would quietly belong to nobody, and "nobody" is a real
+        /// answer here rather than an absent one.</para></summary>
+        AbilityTrace Trace { get; }
+
         /// <summary>Buff/debuff split for the UI counters. Default false (a buff); debuff classes
         /// override. Unclassified effects count as buffs until the design pass says otherwise.</summary>
         bool IsHarmful => false;

@@ -68,10 +68,11 @@ namespace Battle.Source.RequestHandlers
                 ["Value"] = Mathf.RoundToInt(ability.Cooldown),
             });
 
-        /// <summary>How much of the seated augment is running. The ability is where the winner of two
-        /// augments reaching for one parameter is decided, so until it reports that per socket every
-        /// seated augment reads as working — the cell then simply draws no mark.</summary>
-        private static AugmentActivity ActivityOf(AbilitySocket socket) => AugmentActivity.Working;
+        /// <summary>How much of the seated augment is running, asked of the live instance — the one place
+        /// the winner of two augments reaching for one parameter is decided. A row without an instance
+        /// prints no numbers at all, so it has no dormancy to report either.</summary>
+        private static AugmentActivity ActivityOf(IAbility? owned, AbilitySocket socket) =>
+            owned?.ActivityOf(socket.Address) ?? AugmentActivity.Working;
 
         /// <summary>
         /// Which abilities get a row: every one holding a slot of any kind — a live one or a closed one
@@ -115,13 +116,13 @@ namespace Battle.Source.RequestHandlers
                 _art(abilityId),
                 abilities.GetAbilityStance(abilityId),
                 owned != null,
-                [.. sockets.SocketsOf(abilityId).Select(ToCell)]);
+                [.. sockets.SocketsOf(abilityId).Select(socket => ToCell(owned, socket))]);
 
         /// <summary>One cell. An augment whose record the catalog no longer declares cannot be turned
         /// back into a thing — the minter says so by handing back nothing — and the cell then shows the
         /// slot as filled with an unnamed occupant rather than as free, because free is exactly what it
         /// is not: something is in there, and the player can still take it out.</summary>
-        private AugmentCellView ToCell(AbilitySocket socket)
+        private AugmentCellView ToCell(IAbility? owned, AbilitySocket socket)
         {
             if (socket.Augment is not { } augment)
                 return new AugmentCellView(
@@ -138,7 +139,7 @@ namespace Battle.Source.RequestHandlers
                 carried?.Description ?? string.Empty,
                 _art(augment.AugmentId),
                 carried?.Rarity ?? Rarity.Common,
-                ActivityOf(socket));
+                ActivityOf(owned, socket));
         }
     }
 }

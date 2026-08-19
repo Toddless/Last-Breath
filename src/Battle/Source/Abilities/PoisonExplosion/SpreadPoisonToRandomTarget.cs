@@ -10,7 +10,7 @@
     public class SpreadPoisonToRandomTarget : IPoisonSpreadMode
     {
         public IReadOnlyList<IFightable> SpreadPoison(
-            List<DamageOverTurnEffect> originalStacks, IFightable originalTarget, IFightable owner, IBattleField field, string source)
+            List<DamageOverTurnEffect> originalStacks, IFightable originalTarget, IFightable owner, IBattleField field, string source, AbilityTrace trace)
         {
             // The arena answers GetRandomEntity with ANY living fighter and ignores what it is handed:
             // the caster, his allies and the target that has just exploded were all fair game for the
@@ -30,7 +30,7 @@
             foreach (DamageOverTurnEffect stack in originalStacks)
             {
                 var copy = (DamageOverTurnEffect)stack.Copy();
-                copy.Apply(new EffectApplyingContext { Caster = owner, Target = newTarget, Source = source });
+                copy.Apply(new EffectApplyingContext { Caster = owner, Target = newTarget, Source = source, Trace = trace });
             }
 
             return [newTarget];

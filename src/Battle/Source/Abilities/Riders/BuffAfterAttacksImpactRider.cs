@@ -35,8 +35,19 @@ namespace Battle.Source.Abilities.Riders
                     Caster = impact.Caster,
                     Target = impact.Caster,
                     Source = InstanceId,
-                    Effectiveness = impact.Source.Effectiveness
+                    Effectiveness = impact.Source.Effectiveness,
+                    Trace = impact.Source.Trace
                 });
+        }
+
+        /// <summary>Gives the fighter back his bus. Without it the rider stays a listener on a caster it
+        /// no longer rides for, and a rebuild of the binder — which builds a fresh rider every pass —
+        /// leaves one more of them behind each time.</summary>
+        public void Detach()
+        {
+            _counted?.CombatEvents.Unsubscribe<BattleEndEvent>(OnBattleEnd);
+            _counted = null;
+            _succeeded = 0;
         }
 
         /// <summary>Listens for the end of the battle on whoever is being counted, and starts the count

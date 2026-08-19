@@ -36,7 +36,7 @@ namespace Battle.Source.Abilities
         private static readonly Dictionary<string, Behaviour> s_behaviours = new(StringComparer.Ordinal)
         {
             ["ApplyEffectOnImpact"] = new(BehaviourField.EffectId | BehaviourField.ImpactKind, (data, effects) =>
-                new AbilityAugmentImpactRider(data.Id, data.Tags, data.Tier, new DataEffectImpactRider(
+                new AbilityAugmentImpactRider(data.Id, data.Tags, data.Tier, () => new DataEffectImpactRider(
                     data.Id, data.LaidEffectId, host => EffectNumbers(data, host, effects), KindOf(data), data.PoolFromWholeHit, effects))),
 
             ["BuffOnCast"] = new(BehaviourField.EffectId, (data, effects) =>

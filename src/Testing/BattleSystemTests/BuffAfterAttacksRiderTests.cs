@@ -61,7 +61,14 @@ namespace LastBreathTest.BattleSystemTests
             (Ability series, ConditionOwner owner, IBattleField field) = Seated();
             await Land(series, owner, field, Threshold - 1);
 
-            foreach (ImpactKind kind in new[] { ImpactKind.Hit, ImpactKind.Projectile, ImpactKind.Splash, ImpactKind.ChainJump })
+            foreach (ImpactKind kind in new[]
+                     {
+                         ImpactKind.Hit, ImpactKind.Projectile, ImpactKind.Splash, ImpactKind.ChainJump,
+                         // A swing thrown back at whoever swung last. It is the owner attacking and it
+                         // lands, so nothing but the genus keeps it out of a tally bought for a series —
+                         // and a series of attacks is what the player aimed, not what he was provoked into.
+                         ImpactKind.Reaction
+                     })
                 await series.ApplyImpactRiders(Impact(series, owner, field, kind));
 
             Assert.AreEqual(0, Stacks(owner), "a touch that is not an attack was counted towards the threshold");
@@ -151,6 +158,58 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsNotNull(laid, "the rider laid nothing at all");
             Assert.AreEqual(2.5f, laid.Effectiveness, 0.0001f,
                 "the buff went out at the default multiplier — the cast's own effectiveness was dropped on the way");
+        }
+
+        [TestMethod]
+        public async Task RebuildingTheBuildLeavesNoOrphanedListener()
+        {
+            // Every rebuild of the binder builds a brand-new rider even for a socket nothing happened to,
+            // and this rider listens on its caster for the end of the battle. Without a way to tell the
+            // old one to let go, each rebuild left one more dead listener on the fighter, all of them
+            // holding riders nothing else pointed at. The contract's detach is what closes it, and the
+            // count of live subscriptions is what proves it closed.
+            ConditionOwner owner = Fighter();
+            (Ability series, IBattleField field) = SeatedOn(owner);
+            await series.ApplyImpactRiders(Attack(series, owner, field));
+
+            int afterFirst = owner.ListenersOf<BattleEndEvent>();
+            Assert.AreEqual(1, afterFirst, "the rider never subscribed at all, so the rebuilds below prove nothing");
+
+            for (int rebuild = 0; rebuild < 5; rebuild++)
+            {
+                Reseat(series);
+                await series.ApplyImpactRiders(Attack(series, owner, field));
+            }
+
+            Assert.AreEqual(afterFirst, owner.ListenersOf<BattleEndEvent>(),
+                "five rebuilds left five listeners on the caster — the riders they replaced never let go");
+
+            series.InstallUpgrades(new Dictionary<string, IAbilityAugment>());
+
+            Assert.AreEqual(0, owner.ListenersOf<BattleEndEvent>(), "the augment came off the ability and its listener stayed on the fighter");
+        }
+
+        /// <summary>The same total rebuild the binder does: everything worn comes off, everything seated
+        /// goes back on, and the upgrade is built fresh exactly as <c>AbilityAugmentBinder</c> builds it.</summary>
+        private static void Reseat(Ability series)
+        {
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            IAbilityAugment? upgrade = registry.CreateUpgrade(Shipped(catalog));
+            Assert.IsNotNull(upgrade, $"the registry builds nothing for '{Record}'");
+            series.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_0"] = upgrade });
+        }
+
+        private static (Ability Series, IBattleField Field) SeatedOn(ConditionOwner owner)
+        {
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            var ability = (Ability)registry.CreateAbility(Carrier);
+            IAbilityAugment? upgrade = registry.CreateUpgrade(Shipped(catalog));
+            Assert.IsNotNull(upgrade, $"the registry builds nothing for '{Record}'");
+
+            ability.InstallUpgrades(new Dictionary<string, IAbilityAugment> { ["socket_0"] = upgrade });
+            ability.SetOwner(owner);
+
+            return (ability, FieldOf(owner));
         }
 
         private static async Task Land(Ability series, ConditionOwner owner, IBattleField field, int attacks)

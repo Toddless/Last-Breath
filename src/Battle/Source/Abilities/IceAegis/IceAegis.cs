@@ -110,10 +110,10 @@ namespace Battle.Source.Abilities.IceAegis
             new Clumsiness(
                 (int)this[Parameters.ClumsinessDuration], (int)this[AbilityParameter.Stacks], this[Parameters.ClumsinessValue]);
 
-        /// <summary>Stage 4: the shattering of the barrier freezes the field. Nobody was aimed at and the
-        /// freeze exists only because the aegis broke — splash. The reaction is the effect's, but the
-        /// closure is the ability's own and holds it, so there is nothing here to wait for a later wave:
-        /// a frozen enemy is a touched target and reports as one.</summary>
+        /// <summary>Stage 4: the shattering of the barrier freezes the field. Nobody was aimed at and it
+        /// happens only because somebody broke the aegis — the answer the shield gives back, so the touch
+        /// is a reaction rather than a share of a blow spilling onto a bystander. The closure is the
+        /// ability's own and holds it, so a frozen enemy is a touched target and reports as one.</summary>
         private void FreezeAllEnemies(IFightable owner, IBattleField field)
         {
             foreach (IFightable enemy in field.GetEnemies(owner).Where(e => e.IsAlive))
@@ -123,7 +123,7 @@ namespace Battle.Source.Abilities.IceAegis
                 _ = ApplyImpactRiders(new AbilityImpact(owner, enemy, field, Succeeded: true, IsCritical: false)
                 {
                     Source = this,
-                    Kind = ImpactKind.Splash
+                    Kind = ImpactKind.Reaction
                 });
             }
         }

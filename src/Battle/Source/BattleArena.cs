@@ -497,7 +497,7 @@
                     }
                 }
 
-                _currentFighter.OnTurnEnd();
+                await _currentFighter.OnTurnEnd();
 
                 // Turn gate: the whole turn resolved instantly above; the next fighter
                 // doesn't start until the director has shown everything recorded so far.

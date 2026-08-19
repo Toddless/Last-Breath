@@ -26,6 +26,11 @@
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
 
+        /// <summary>The name THIS COPY's rider is seated under — see <see cref="RiderKeys"/>. Keyed by
+        /// record the two copies were one: the first to arrive installed the only rider and the first to
+        /// leave took it away from the other.</summary>
+        protected string RiderKey(string riderId) => RiderKeys.Of(riderId, InstanceId);
+
         /// <summary>Non-generic dispatch (see IAbilityUpgrade): the compatibility check lives here, once.</summary>
         public void Apply(IAbility ability)
         {

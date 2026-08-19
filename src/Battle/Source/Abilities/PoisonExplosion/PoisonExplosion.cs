@@ -74,7 +74,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
                 Kind = ImpactKind.Hit
             });
 
-            foreach (IFightable caught in SpreadMode?.SpreadPoison(poisonStacks, target, owner, field, InstanceId) ?? [])
+            foreach (IFightable caught in SpreadMode?.SpreadPoison(poisonStacks, target, owner, field, InstanceId, Trace) ?? [])
                 // Nobody aimed at him: he caught the poison only because somebody else's stacks went off,
                 // which is what splash is for. No damage of its own — a landing does not need one.
                 await ApplyImpactRiders(new AbilityImpact(owner, caught, field, Succeeded: true, IsCritical: false)

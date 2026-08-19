@@ -91,7 +91,16 @@
             _dotTicks.Clear();
         }
 
-        public async void TriggerTurnEnd()
+        /// <summary>
+        /// The bearer's end of turn, in the one order it may happen in: every effect counts itself down
+        /// and banks whatever it means to tick, and only then is the whole tick dealt. A damage-over-time
+        /// effect books its tick before it spends the turn, so the last turn of a poison still poisons.
+        ///
+        /// <para>Awaitable, and it must be awaited: the tick can kill, and a death landing after the turn
+        /// has been declared over is a death the turn loop already stepped past — the corpse keeps
+        /// playing and the beat is drawn out of order.</para>
+        /// </summary>
+        public async Task TriggerTurnEnd()
         {
             try
             {
@@ -102,7 +111,9 @@
             }
             catch (Exception exception)
             {
-                GD.Print($"Exception: {exception.Message}");
+                // With the stack: a swallowed message names what broke and never where, and this catch
+                // stands over the whole of the bearer's end of turn.
+                Tracker.TrackException($"End of turn of '{owner.InstanceId}'", exception, this);
             }
         }
 

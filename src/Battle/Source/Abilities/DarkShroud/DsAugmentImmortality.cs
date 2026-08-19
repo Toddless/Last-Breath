@@ -15,9 +15,9 @@ namespace Battle.Source.Abilities.DarkShroud
         private const string RiderId = "Ability_Apply_Effect_Evade_First_Death_Activation_Rider";
 
         public override void ApplyUpgrade(DarkShroud ability) =>
-            ability.ActivationRiders.TryAdd(RiderId, new DeferredEffectActivationRider(RiderId, effect));
+            ability.AddActivationRider(RiderKey(RiderId), new DeferredEffectActivationRider(RiderId, effect));
 
-        public override void RemoveUpgrade(DarkShroud ability) => ability.ActivationRiders.Remove(RiderId);
+        public override void RemoveUpgrade(DarkShroud ability) => ability.RemoveActivationRider(RiderKey(RiderId));
 
         public override IAbilityAugment Copy() => new DsAugmentImmortality(Id, Tags, Tier, effect);
     }

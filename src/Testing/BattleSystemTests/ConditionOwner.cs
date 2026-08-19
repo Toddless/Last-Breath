@@ -47,6 +47,10 @@ namespace LastBreathTest.BattleSystemTests
         public IEntityParametersComponent Parameters { get; } = new EntityParametersComponent();
         public IModifierHandlerComponent ModifierHandler { get; } = new ModifierHandlerComponent();
         public ICombatEventBus CombatEvents { get; } = new ConditionBus();
+
+        /// <summary>How many handlers of one event kind are still on this fighter's bus.</summary>
+        internal int ListenersOf<T>()
+            where T : notnull, ICombatEvent => ((ConditionBus)CombatEvents).CountOf(typeof(T));
         public StatusEffects StatusEffects { get; private set; } = StatusEffects.None;
 
         /// <summary>Everything still subscribed to this fighter, across every channel a condition uses.</summary>
@@ -189,7 +193,7 @@ namespace LastBreathTest.BattleSystemTests
         }
         public void Heal(IHealContext context) => throw new NotSupportedException();
         public void OnTurnStart() => throw new NotSupportedException();
-        public void OnTurnEnd() => throw new NotSupportedException();
+        public Task OnTurnEnd() => throw new NotSupportedException();
         public void AddItemToInventory(IItem item) => throw new NotSupportedException();
         public void InjectServices(IGameServiceProvider provider) => throw new NotSupportedException();
 
@@ -213,6 +217,10 @@ namespace LastBreathTest.BattleSystemTests
             private readonly List<(Type Event, object Handler)> _handlers = [];
 
             public int HandlerCount => _handlers.Count;
+
+            /// <summary>How many are still listening for ONE kind of event — what an orphaned
+            /// subscription is counted in, where the total would drown it in the fighter's own wiring.</summary>
+            public int CountOf(Type evnt) => _handlers.Count(entry => entry.Event == evnt);
 
             public void Publish<T>(T evnt)
                 where T : notnull, ICombatEvent
@@ -245,6 +253,7 @@ namespace LastBreathTest.BattleSystemTests
         public int MaxStacks { get; set; } = 99;
         public string Source => "test";
         public float Effectiveness => 1f;
+        public AbilityTrace Trace => AbilityTrace.None;
         public bool IsHarmful => isHarmful;
         public string Id => id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();

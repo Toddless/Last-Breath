@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Battle.Abilities;
     using Data;
     using Enums;
@@ -23,7 +24,9 @@
         public IEnumerable<IEffect> GetBySource(string source);
         void RegisterDotTick(DotTick tick);
         void RemoveEffect(IEffect effect);
-        void TriggerTurnEnd();
+        /// <summary>The bearer's end of turn: durations first, then the damage they booked. Awaitable
+        /// because the damage can kill, and the turn may not be called over before it has.</summary>
+        Task TriggerTurnEnd();
         void TriggerTurnStart();
         /// <summary>Returns whether the stacking rules accepted THIS instance (a rejected single-stack
         /// re-application only refreshes the existing effect and returns false).</summary>

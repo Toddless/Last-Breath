@@ -163,7 +163,7 @@ namespace LootGeneration.Internal
 
         public void SetupBattleEventBus(IBattleEventBus bus) => throw new NotImplementedException();
 
-        public void OnTurnEnd() => throw new NotImplementedException();
+        public Task OnTurnEnd() => throw new NotImplementedException();
 
         public void OnTurnStart() => throw new NotImplementedException();
 

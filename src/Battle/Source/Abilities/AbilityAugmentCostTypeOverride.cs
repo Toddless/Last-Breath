@@ -15,7 +15,8 @@ namespace Battle.Source.Abilities
 
         public override void ApplyUpgrade(Ability ability) =>
             ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
-                AbilityParameter.CostType, Priority.Absolute, OperationType.Override, (float)costType, DecoratorId, Id));
+                AbilityParameter.CostType, Priority.Absolute, OperationType.Override, (float)costType,
+                DecoratorId, Id, rank: Tier));
 
         public override void RemoveUpgrade(Ability ability) =>
             ability.RemoveParameterDecorator(DecoratorId, AbilityParameter.CostType);

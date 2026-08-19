@@ -10,9 +10,9 @@ namespace Battle.Source.Abilities
         : AbilityAugment<Ability>(id, tags, tier)
     {
         public override void ApplyUpgrade(Ability ability) =>
-            ability.ActivationRiders.TryAdd(Id, new DeferredEffectActivationRider(Id, () => effectFactory(ability), applyOnCaster: false, applyOnTargets: true));
+            ability.AddActivationRider(RiderKey(Id), new DeferredEffectActivationRider(Id, () => effectFactory(ability), applyOnCaster: false, applyOnTargets: true));
 
-        public override void RemoveUpgrade(Ability ability) => ability.ActivationRiders.Remove(Id);
+        public override void RemoveUpgrade(Ability ability) => ability.RemoveActivationRider(RiderKey(Id));
 
         public override IAbilityAugment Copy() => new AbilityAugmentCastDebuff(Id, Tags, Tier, effectFactory);
     }

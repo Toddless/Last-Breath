@@ -22,7 +22,7 @@ namespace Battle.Source.Abilities
     /// and taking the augment off must not strip a number the ability was born with.
     /// </summary>
     public class AugmentPoisonOnHit(string id, string[] tags, int tier, float poisonDuration, float poisonPotency)
-        : AbilityAugmentImpactRider(id, tags, tier, new PoisonOnHitRider())
+        : AbilityAugmentImpactRider(id, tags, tier, () => new PoisonOnHitRider())
     {
         private readonly List<string> _lent = [];
 

@@ -108,7 +108,10 @@ namespace Battle.Source.Abilities.DeepFreeze
         {
             foreach (IFightable target in plan.Targets.Where(t => t.IsAlive).ToList())
             {
-                // The extension counts only effects present BEFORE this cast lands its own payload
+                // The extension counts only effects present BEFORE this cast lands its own payload. Which
+                // of them it counts is EVERY one on the target, whoever laid it — the record is domain
+                // (owner's word, 2026-08-19), and the card says the hold on the target rather than the
+                // hold this cast has on him.
                 if (ExtendTargetEffects)
                     foreach (IEffect effect in target.Effects.GetBy(_ => true).ToList())
                         effect.Extend(1);

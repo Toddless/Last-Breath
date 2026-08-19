@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using Core.Battle;
+    using Core.Battle.Abilities;
     using Core.Entity;
     using Effects;
 
@@ -13,6 +14,6 @@
         /// nobody reports is a touch no impact rider will ever see.
         /// </summary>
         public IReadOnlyList<IFightable> SpreadPoison(
-            List<DamageOverTurnEffect> originalStacks, IFightable originalTarget, IFightable owner, IBattleField field, string source);
+            List<DamageOverTurnEffect> originalStacks, IFightable originalTarget, IFightable owner, IBattleField field, string source, AbilityTrace trace);
     }
 }

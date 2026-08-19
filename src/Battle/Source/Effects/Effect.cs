@@ -109,6 +109,11 @@
         /// cast. Descendants that derive numbers BEFORE <c>base.Apply</c> stamp it themselves.</summary>
         public float Effectiveness { get; protected set; } = 1f;
 
+        /// <summary>The cast that laid this instance; nothing at all when a passive, a grant or a stage
+        /// did. Stamped beside <see cref="Effectiveness"/> and read by the records that prolong or
+        /// strengthen only what their own ability put there.</summary>
+        public AbilityTrace Trace { get; protected set; }
+
         public bool Expired => Duration == 0;
         public string Description => FormatDescription();
         public string DisplayName => Localization.Localize(Id);
@@ -120,6 +125,7 @@
             // Stamped before anything reads a number off this instance — including the mutator
             // pipelines below, which see the effect as it will actually land.
             Effectiveness = context.Effectiveness;
+            Trace = context.Trace;
 
             // Caster-side application pipeline: item/passive mutators tune the instance
             // (duration, DoT tick) before the stacking rules see it. Descendants have already

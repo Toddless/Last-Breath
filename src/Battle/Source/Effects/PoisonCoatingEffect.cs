@@ -46,8 +46,10 @@ namespace Battle.Source.Effects
                 Source = InstanceId,
                 Damage = evt.Context.FinalDamage,
                 IsCritical = evt.Context.IsCritical,
-                // The coating lays the poison, so it lands as hard as the cast that put the coating on.
-                Effectiveness = Effectiveness
+                // The coating lays the poison, so the poison lands as hard as the cast that put the
+                // coating on — and belongs to that cast, which may therefore go on prolonging it.
+                Effectiveness = Effectiveness,
+                Trace = Trace
             };
             poison.Apply(applyContext);
         }

@@ -1,5 +1,6 @@
 namespace Core.Views
 {
+    using Battle.Abilities;
     using Enums;
     using Godot;
 
@@ -16,21 +17,6 @@ namespace Core.Views
         /// and nothing can be put in. There is no empty <c>Held</c> — such a slot ceases to exist the
         /// moment it is emptied.</summary>
         Held
-    }
-
-    /// <summary>How much of what a seated augment offers is actually running. Read only for a
-    /// <see cref="AugmentCellKind.Filled"/> cell — an augment in a closed slot does nothing at all, and
-    /// that is a different thing said by the kind.</summary>
-    public enum AugmentActivity
-    {
-        /// <summary>Everything it moves, it moves.</summary>
-        Working,
-
-        /// <summary>Some of its moves lost to a stronger augment on the same parameter, the rest run.</summary>
-        Partly,
-
-        /// <summary>Nothing it moves gets through: every one of its moves lost.</summary>
-        Dormant
     }
 
     /// <summary>

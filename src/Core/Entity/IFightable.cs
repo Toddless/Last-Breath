@@ -82,6 +82,8 @@ namespace Core.Entity
             CombatEvents.Publish(new ManaRestoredEvent(this, gained, Data.VitalsSnapshot.From(this)));
         }
         void OnTurnStart();
-        void OnTurnEnd();
+        /// <summary>Closes the fighter's turn. Awaitable because the end of turn deals damage that can
+        /// kill, and the turn loop may not move on before that has landed.</summary>
+        Task OnTurnEnd();
     }
 }

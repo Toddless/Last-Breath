@@ -78,6 +78,11 @@
         /// </summary>
         protected string CastId { get; private set; } = string.Empty;
 
+        /// <summary>Who this cast is, for everything it leaves behind on somebody. The instance id is
+        /// the half that makes it MINE rather than merely this ability's: two fighters carrying the same
+        /// ability carry two instances of it.</summary>
+        public AbilityTrace Trace => new(Id, CastId, InstanceId);
+
         /// <summary>
         /// Named values for the description template: placeholder = parameter key ({Cooldown},
         /// {Damage}, {StunDuration}...). Every registered parameter is exposed, decorated values —
@@ -98,10 +103,12 @@
         public Costs CostType => (Costs)this[AbilityParameter.CostType];
         public Stance Stance { get; set; } = data.Stance;
         public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
-        public Dictionary<string, IActivationRider> ActivationRiders { get; } = [];
-        public Dictionary<string, IImpactRider> ImpactRiders { get; } = [];
+        public IReadOnlyDictionary<string, IActivationRider> ActivationRiders => _activationRiders;
+        public IReadOnlyDictionary<string, IImpactRider> ImpactRiders => _impactRiders;
         public IReadOnlyDictionary<string, IAbilityAugment> InstalledUpgrades => _installedUpgrades;
         private readonly Dictionary<string, IAbilityAugment> _installedUpgrades = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, IActivationRider> _activationRiders = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, IImpactRider> _impactRiders = new(StringComparer.Ordinal);
         public ITargetingStrategy Targeting { get; set; } = TargetingStrategyFactory.From(data);
         public int CostValue => (int)this[AbilityParameter.CostValue];
         public string Id { get; } = data.Id;
@@ -221,6 +228,49 @@
                 await rider.Apply(impact);
         }
 
+        /// <summary>
+        /// How much of the augment in that socket is running. Its numbers are weighed against their
+        /// rivals; its RIDERS are counted as running whatever the numbers did, because a rider has no
+        /// rival to lose to — nothing on the ability can put one out of work, so an augment with a live
+        /// rider is never wholly asleep (owner's word, 2026-08-19). A record that is nothing but a rider
+        /// is therefore always working, and one whose number lost while its rider fires is Partly.
+        /// </summary>
+        public AugmentActivity ActivityOf(string socketAddress)
+        {
+            if (!_installedUpgrades.TryGetValue(socketAddress, out IAbilityAugment? worn)) return AugmentActivity.Working;
+
+            (int seated, int running) = Params.MovesOf(worn.Id);
+            int riders = RidersOf(worn.InstanceId);
+            seated += riders;
+            running += riders;
+
+            if (seated == 0 || running == seated) return AugmentActivity.Working;
+            return running == 0 ? AugmentActivity.Dormant : AugmentActivity.Partly;
+        }
+
+        /// <summary>Seats a rider under a name of the caller's choosing. Whoever installs it owns that
+        /// name and is the one who takes it off again — the ability itself never guesses at it.</summary>
+        public void AddImpactRider(string key, IImpactRider rider) => _impactRiders.TryAdd(key, rider);
+
+        /// <summary>Takes the rider off and tells it to let go of whatever it hooked. The one road out,
+        /// so a rider holding a subscription cannot be dropped without being told.</summary>
+        public void RemoveImpactRider(string key)
+        {
+            if (_impactRiders.Remove(key, out IImpactRider? rider)) rider.Detach();
+        }
+
+        public void AddActivationRider(string key, IActivationRider rider) => _activationRiders.TryAdd(key, rider);
+
+        public void RemoveActivationRider(string key)
+        {
+            if (_activationRiders.Remove(key, out IActivationRider? rider)) rider.Detach();
+        }
+
+        /// <summary>How many riders that copy has on this ability, of either kind.</summary>
+        private int RidersOf(string augmentInstanceId) =>
+            _impactRiders.Keys.Count(key => RiderKeys.BelongTo(key, augmentInstanceId))
+            + _activationRiders.Keys.Count(key => RiderKeys.BelongTo(key, augmentInstanceId));
+
         public void AddParameterDecorator(AbilityParameterDecorator decorator) => Params.AddDecorator(decorator);
 
         public void RemoveParameterDecorator(string decoratorId, string parameter) => Params.RemoveDecorator(decoratorId, parameter);
@@ -277,7 +327,7 @@
         /// has to know about <see cref="EffectApplyingContext.Effectiveness"/>. Sites carrying more write
         /// <c>Laying(target) with { Damage = … }</c>.</summary>
         protected EffectApplyingContext Laying(IFightable target) =>
-            new() { Caster = Owner!, Target = target, Source = InstanceId, Effectiveness = Effectiveness };
+            new() { Caster = Owner!, Target = target, Source = InstanceId, Effectiveness = Effectiveness, Trace = Trace };
 
         protected void ConsumeResource(IAbilityActivationContext context) => Owner?.ConsumeResource(context.CostType, context.Cost);
 

@@ -21,7 +21,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
         public IncreasingPressure(AbilityBaseData data) : base(data)
         {
             var splash = new SplashRandomTargetRider();
-            ImpactRiders[splash.Id] = splash;
+            AddImpactRider(splash.Id, splash);
         }
 
         /// <summary>The ability's bonus damage added on top of the owner's basic attack: flat + weapon- and spell-scaled.</summary>

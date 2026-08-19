@@ -47,7 +47,7 @@ namespace Battle.Source.Abilities.PoisonCoating
                 poisonDuration: PoisonDuration,
                 poisonDamagePercent: PoisonDamagePercent);
 
-            return coatingBuff.Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
+            return coatingBuff.Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId, Trace = Trace });
         }
     }
 }

@@ -121,10 +121,10 @@ namespace Battle.Source.Abilities.Armageddon
 
         private async Task ApplyStageThreeEffects(IFightable owner, IFightable target, DamageSnapshot damageDealt)
         {
-            await new StunEffect(StunDuration).Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId });
+            await new StunEffect(StunDuration).Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId, Trace = Trace });
             if (Stage3EffectFactory == null) return;
             await Stage3EffectFactory().ApplyStacks(
-                new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId, Damage = damageDealt },
+                new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId, Damage = damageDealt, Trace = Trace },
                 Stage3EffectStacks);
         }
 

@@ -19,7 +19,7 @@ namespace Battle.Source.Abilities
     /// <c>Docs/PLAN-Augments.md</c>). A tag promises a fit, not a result.
     /// </summary>
     public class AugmentExtendPoison(string id, string[] tags, int tier, int extension)
-        : AbilityAugmentImpactRider(id, tags, tier, new ExtendPoisonOnHitRider(extension))
+        : AbilityAugmentImpactRider(id, tags, tier, () => new ExtendPoisonOnHitRider(extension))
     {
         public override IAbilityAugment Copy() => new AugmentExtendPoison(Id, Tags, Tier, extension);
     }

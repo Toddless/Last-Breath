@@ -29,5 +29,10 @@
 
         /// <summary>Set on extra copies granted by application mutators — they skip the pipeline (see Effect.Apply).</summary>
         public bool IsBonusStack { get; init; }
+
+        /// <summary>The cast behind this application; nothing at all for a passive, an item grant or a
+        /// boss stage. Travels on when an effect lays another (a coating laying its poison), so the
+        /// whole chain answers to the ability that started it.</summary>
+        public AbilityTrace Trace { get; init; }
     }
 }

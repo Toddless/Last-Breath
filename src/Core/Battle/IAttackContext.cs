@@ -66,6 +66,17 @@ namespace Core.Battle
         int ReactionDepth { get; }
         bool IsReaction => ReactionDepth > 0;
 
+        /// <summary>
+        /// Whether this swing is thrown BACK at the one who threw the last one — a counter, and the only
+        /// reaction the delivery reports as <see cref="Enums.ImpactKind.Reaction"/>.
+        ///
+        /// Not every reaction answers: an extra hit off the chain passive is the attacker swinging again
+        /// at his own target, which is his aggression continuing rather than somebody replying to it, and
+        /// it goes on counting for the records written about a series of attacks. Told apart by who is
+        /// swinging and never by how deep the chain runs, because depth cannot tell the two apart.
+        /// </summary>
+        bool IsAnswer { get; }
+
         void AddDamage(DamageType type, float amount);
         void SetDamage(DamageType type, float amount);
 

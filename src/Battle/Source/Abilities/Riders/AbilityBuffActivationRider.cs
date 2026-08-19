@@ -13,6 +13,6 @@
         public async Task Apply(IAbilityActivationContext context) =>
             await buff
                 .Copy()
-                .Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster, Effectiveness = context.Ability.Effectiveness });
+                .Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster, Effectiveness = context.Ability.Effectiveness, Trace = context.Ability.Trace });
     }
 }

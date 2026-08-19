@@ -28,7 +28,7 @@ namespace Battle.Source.Abilities
         {
             foreach ((string parameter, OperationType operation, float amount) in moves)
                 ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
-                    parameter, Priority.Weak, operation, amount, DecoratorId(parameter), Id));
+                    parameter, Priority.Weak, operation, amount, DecoratorId(parameter), Id, rank: Tier));
         }
 
         public override void RemoveUpgrade(Ability ability)

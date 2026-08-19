@@ -37,7 +37,8 @@ namespace Battle.Source.Abilities.Riders
                 Damage = impact.Damage,
                 PoolFromWholeHit = poolFromWholeHit,
                 IsCritical = impact.IsCritical,
-                Effectiveness = impact.Source.Effectiveness
+                Effectiveness = impact.Source.Effectiveness,
+                Trace = impact.Source.Trace
             });
         }
     }

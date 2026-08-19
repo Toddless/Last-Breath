@@ -135,6 +135,10 @@ namespace Core.Battle.Abilities
             return Working(decorators, value).Aggregate(value, (current, decorator) => decorator.Decorate(current));
         }
 
+        /// <summary>The parameter as the ability itself registered it — the ground rivals are weighed on.</summary>
+        private float GetBaseValue(string parameter) =>
+            _baseValues.TryGetValue(parameter, out var baseValue) ? baseValue() : 0f;
+
         /// <summary>The parameter's value, or the given figure when the ability never declared it, with
         /// no report either way — for concepts where absence is an answer rather than a typo.</summary>
         public float ValueOr(string parameter, float fallback) =>
@@ -142,6 +146,35 @@ namespace Core.Battle.Abilities
 
         /// <summary>Whether the parameter was declared at all — absence told apart from a value of nothing.</summary>
         public bool Declares(string parameter) => _baseValues.ContainsKey(parameter);
+
+        /// <summary>
+        /// How many numbers one record moved on this ability, and how many of those moves are the one
+        /// read on their parameter. The verdict itself is not made here — a record's riders count too
+        /// and the set knows nothing of riders (see <c>Ability.ActivityOf</c>).
+        ///
+        /// <para>A record's own bill is left out of both counts: a price is charged whether or not the
+        /// gift it paid for won, so counting it as a move that still runs would report a record that lost
+        /// everything it gives as half-working — hiding the bad deal the mark exists to show.</para>
+        /// </summary>
+        public (int Seated, int Running) MovesOf(string source)
+        {
+            int seated = 0;
+            int running = 0;
+            foreach ((string parameter, List<AbilityParameterDecorator> decorators) in _decorators)
+            {
+                List<AbilityParameterDecorator> working = Working(decorators, GetBaseValue(parameter));
+                foreach (AbilityParameterDecorator decorator in decorators)
+                {
+                    if (!string.Equals(decorator.Source, source, StringComparison.Ordinal)) continue;
+                    if (decorator.Identity.Deal != null) continue;
+
+                    seated++;
+                    if (working.Contains(decorator)) running++;
+                }
+            }
+
+            return (seated, running);
+        }
 
         public void AddDecorator(AbilityParameterDecorator newDecorator)
         {

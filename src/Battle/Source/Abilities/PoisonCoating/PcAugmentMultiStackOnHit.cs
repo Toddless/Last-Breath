@@ -52,7 +52,8 @@ namespace Battle.Source.Abilities.PoisonCoating
                     Target = evt.Context.Target,
                     Source = _ability.InstanceId,
                     Damage = evt.Context.FinalDamage,
-                    IsCritical = evt.Context.IsCritical
+                    IsCritical = evt.Context.IsCritical,
+                    Trace = _ability.Trace
                 });
             }
         }

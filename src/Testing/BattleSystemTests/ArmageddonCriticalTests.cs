@@ -207,7 +207,7 @@ namespace LastBreathTest.BattleSystemTests
         private static List<AbilityImpact> Riding(IAbility ability)
         {
             var capture = new CaptureRider();
-            ability.ImpactRiders[capture.Id] = capture;
+            ability.AddImpactRider(capture.Id, capture);
             return capture.Impacts;
         }
 

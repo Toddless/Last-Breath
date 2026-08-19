@@ -1,5 +1,6 @@
 namespace Core.Context
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Battle;
@@ -48,6 +49,8 @@ namespace Core.Context
         public bool IsLast => Index == TotalCount - 1;
         public int ReactionDepth { get; private init; }
 
+        public bool IsAnswer { get; private init; }
+
         public bool IsValid => Target.IsAlive && Attacker.IsAlive;
 
         public void AddDamage(DamageType type, float amount) => _damageComponents[type] = _damageComponents.GetValueOrDefault(type, 0f) + amount;
@@ -64,6 +67,11 @@ namespace Core.Context
             new AttackContext(attacker, target, baseDamage, Rnd, AttackContextScheduler)
             {
                 ReactionDepth = ReactionDepth + 1,
+                // Somebody other than the one who just swung is swinging now: that is an answer. The
+                // same attacker swinging again is his own series carrying on. Read off the ids
+                // themselves rather than through IsSame — the genus of every counter in the game hangs
+                // on this line, and it must not be answerable by an override.
+                IsAnswer = !string.Equals(attacker.InstanceId, Attacker.InstanceId, StringComparison.Ordinal),
                 RawCriticalChance = attacker.Parameters.CriticalChance
             };
 

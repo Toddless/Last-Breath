@@ -87,7 +87,7 @@ namespace Battle.Source.Effects
                 // further from the ability, exactly as it would if the cast had applied it directly.
                 _ = attackerEffectFactory().Apply(new EffectApplyingContext
                 {
-                    Caster = Target, Target = attacker, Source = InstanceId, Effectiveness = Effectiveness
+                    Caster = Target, Target = attacker, Source = InstanceId, Effectiveness = Effectiveness, Trace = Trace
                 });
 
             float reflected = context.AbsorbedByBarrier * Effective(reflectPercent);

@@ -9,8 +9,9 @@ namespace Core.Battle.Abilities
     /// <c>CooldownLeft</c> negative, which never counts back down to nought and never lets the ability be
     /// cast again.</param>
     public class SimpleAbilityParameterDecorator(
-        string parameter, Priority priority, OperationType type, float value, string id, string source, float floor = 0f)
-        : AbilityParameterDecorator(parameter, priority, id, source)
+        string parameter, Priority priority, OperationType type, float value, string id, string source,
+        float floor = 0f, int rank = 0)
+        : AbilityParameterDecorator(parameter, priority, id, source, rank)
     {
         /// <summary>Read off the operation together with the amount it carries and not off the operation
         /// alone, so a move written with a negative number is the move it actually makes rather than the

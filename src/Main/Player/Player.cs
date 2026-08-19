@@ -476,9 +476,10 @@ namespace LastBreath.Player
             _gameEventBus?.Publish(new TurnStartEvent(this));
         }
 
-        public void OnTurnEnd()
+        public async Task OnTurnEnd()
         {
-            Effects.TriggerTurnEnd();
+            // Awaited: a tick may kill, and nothing below may call the turn over before it has landed.
+            await Effects.TriggerTurnEnd();
             TurnRecovery.Apply(this);
             CombatEvents.Publish(new TurnEndEvent());
             _battleEventBus?.Publish(new TurnEndEvent());

@@ -53,7 +53,8 @@ namespace Battle.Source.Abilities.Riders
                 Source = InstanceId,
                 Damage = impact.Damage,
                 IsCritical = impact.IsCritical,
-                Effectiveness = impact.Source.Effectiveness
+                Effectiveness = impact.Source.Effectiveness,
+                Trace = impact.Source.Trace
             });
         }
     }

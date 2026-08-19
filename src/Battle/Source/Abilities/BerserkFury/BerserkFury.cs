@@ -58,7 +58,7 @@ namespace Battle.Source.Abilities.BerserkFury
         {
             // Fury goes on first: it burns health on every attack of the series below.
             await FuryFactory(FuryDuration, FuryHealthPercent)
-                .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
+                .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId, Trace = Trace });
 
             foreach (IFightable target in targets)
             {

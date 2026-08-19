@@ -78,7 +78,7 @@ namespace LastBreathTest.BattleSystemTests
             var caster = new Brawler();
             bench.Seat(Applier);
 
-            IEffect bare = await bench.PoisonOneSwing(caster, new Brawler());
+            IEffect bare = await bench.PoisonSwing(caster, new Brawler());
             Assert.AreEqual(bench.Turns, bare.Duration, "the applier did not even lay the stack its own record declares");
             var ticking = bare as IDamageOverTurnEffect;
             Assert.IsNotNull(ticking, "the applier laid something that does not tick");
@@ -86,7 +86,7 @@ namespace LastBreathTest.BattleSystemTests
                 "the stack ticks for something other than its share of the blow — the potency moved onto the ability and lost its value on the way");
 
             bench.Seat(Amplifier);
-            IEffect amplified = await bench.PoisonOneSwing(caster, new Brawler());
+            IEffect amplified = await bench.PoisonSwing(caster, new Brawler());
 
             Assert.AreEqual(bench.Turns + bench.Extension, amplified.Duration,
                 "the amplifier is seated on the same ability and the stack lasts exactly as long as it did without it");
@@ -134,11 +134,11 @@ namespace LastBreathTest.BattleSystemTests
             var caster = new Brawler();
             bench.Seat(Applier);
             bench.Seat(Amplifier);
-            IEffect amplified = await bench.PoisonOneSwing(caster, new Brawler());
+            IEffect amplified = await bench.PoisonSwing(caster, new Brawler());
             Assert.AreEqual(bench.Turns + bench.Extension, amplified.Duration, "the pair never composed, so the removal below proves nothing");
 
             bench.Unseat(Amplifier);
-            IEffect bare = await bench.PoisonOneSwing(caster, new Brawler());
+            IEffect bare = await bench.PoisonSwing(caster, new Brawler());
 
             Assert.AreEqual(bench.Turns, bare.Duration, "the amplifier is back in the bag and its turns are still being paid out");
         }
@@ -157,7 +157,8 @@ namespace LastBreathTest.BattleSystemTests
             IAbilityAugment first = bench.Seat(Applier);
             IAbilityAugment second = bench.Seat(Applier);
             Assert.AreEqual(bench.Turns, bench.Ability[TurnsKey], "two copies of the applier left the ability with turns neither of them declares");
-            Assert.AreEqual(bench.Turns, (await bench.PoisonOneSwing(new Brawler(), new Brawler())).Duration, "the pair of copies poisons nothing at all");
+            Assert.AreEqual(bench.Turns, (await bench.PoisonSwing(new Brawler(), new Brawler(), expected: 2)).Duration,
+                "the pair of copies poisons nothing at all");
 
             bench.Unseat(first);
 
@@ -171,24 +172,26 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void TwoCopiesOfOneApplierRideAsOne()
+        public async Task EveryCopyOfAnApplierRidesForItself()
         {
-            // The other half of the pair above, pinned rather than fixed. Riders are held by id and the
-            // applier's rider names its behaviour and not its copy, so a second copy installs no second
-            // rider and the first copy to leave takes the shared one with it. Whether two identical
-            // appliers should lay two stacks is the rivalry question of wave D in Docs/PLAN-Augments.md —
-            // what matters here is that the NUMBERS do not follow the rider out (the walk above), so the
-            // day rider identity becomes per-copy nothing else has to move.
+            // The other half of the pair above. A copy is a purchase: two of them ride twice on one
+            // impact and lay two stacks, and pulling one takes away ITS rider and leaves the other's
+            // where it is. Riders used to be held by the record's name, so the second copy installed
+            // nothing at all and the first to leave took the only one with it — the player paid twice
+            // for one rider and lost it by unseating either half.
             var bench = new Bench();
             IAbilityAugment first = bench.Seat(Applier);
             bench.Seat(Applier);
 
-            Assert.AreEqual(1, bench.Ability.ImpactRiders.Count, "the second copy seated a rider of its own");
+            Assert.AreEqual(2, bench.Ability.ImpactRiders.Count, "the second copy rode along on the first one's rider");
 
             bench.Unseat(first);
 
-            Assert.AreEqual(0, bench.Ability.ImpactRiders.Count,
-                "the shared rider outlived the copy that installed it — riders stopped being held by id");
+            Assert.AreEqual(1, bench.Ability.ImpactRiders.Count,
+                "one copy left and took the other copy's rider with it");
+
+            // And the one still seated goes on working: one copy, one stack per swing.
+            await bench.PoisonSwing(new Brawler(), new Brawler(), expected: 1);
         }
 
         /// <summary>
@@ -240,7 +243,7 @@ namespace LastBreathTest.BattleSystemTests
 
             /// <summary>One landing impact of the ability, handed to its riders the way the attack
             /// pipeline hands one over, and the stack it left behind.</summary>
-            internal async Task<IEffect> PoisonOneSwing(Brawler caster, Brawler victim)
+            internal async Task<IEffect> PoisonSwing(Brawler caster, Brawler victim, int expected = 1)
             {
                 await Ability.ApplyImpactRiders(new AbilityImpact(caster.Object, victim.Object, Mock.Of<IBattleField>(), Damage: DamageSnapshot.Of(DamageType.Physical, Blow))
                 {
@@ -249,7 +252,7 @@ namespace LastBreathTest.BattleSystemTests
                 });
 
                 List<IEffect> poison = victim.Poison;
-                Assert.AreEqual(1, poison.Count, "the swing left a number of poison stacks other than one");
+                Assert.AreEqual(expected, poison.Count, $"the swing left a number of poison stacks other than {expected}");
                 return poison[0];
             }
 
