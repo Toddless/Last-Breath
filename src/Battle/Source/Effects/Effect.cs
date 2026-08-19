@@ -8,6 +8,7 @@
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
     using Core.Localization;
@@ -237,6 +238,16 @@
             if (!IsApplied) return; // rejected stacks must not react to anything
             bus.Subscribe(handler);
             _unsubscribes.Add(() => bus.Unsubscribe(handler));
+        }
+
+        /// <summary>Watches the effects standing beside this one leave the bearer, for as long as this one
+        /// stands. The same road as the bus overload and dropped by the same removal — an effect chained to
+        /// a neighbour must not outlive its own subscription and go on answering for a bearer it left.</summary>
+        protected void SubscribeUntilRemoved(IEffectsComponent effects, Action<IEffect> onNeighbourRemoved)
+        {
+            if (!IsApplied) return; // rejected stacks must not react to anything
+            effects.EffectRemoved += onNeighbourRemoved;
+            _unsubscribes.Add(() => effects.EffectRemoved -= onNeighbourRemoved);
         }
 
         /// <summary>

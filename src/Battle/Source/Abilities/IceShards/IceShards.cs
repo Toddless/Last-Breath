@@ -22,7 +22,7 @@ namespace Battle.Source.Abilities.IceShards
         public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
         public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
 
-        /// <summary>L3 upgrade point: critical shards skip the target's cold resistance.</summary>
+        /// <summary>Augment point: critical shards skip the target's cold resistance.</summary>
         public bool CritIgnoresColdResistance { get; set; }
 
         private const int EmpoweredShardsStage = 2;

@@ -27,7 +27,9 @@ namespace Core.Save
         /// (objectives are re-derived from facts + inventory, never stored).</summary>
         public const int Quests = 25;
 
-        /// <summary>Ability book, learned abilities and chosen upgrades.</summary>
+        /// <summary>Ability book: the per-stance slot layout, the active stance, and the augments and
+        /// ornaments seated on the abilities. The learned set itself is not stored — it follows from the
+        /// passive-tree allocation restored earlier.</summary>
         public const int Abilities = 30;
 
         public const int Stance = 40;

@@ -187,6 +187,7 @@
         },
         {
             "id": "Effect_Mythic_Calculation",
+            "power": "Strong",
             "properties": { "duration": 3, "maxStacks": 1 }
         },
         {

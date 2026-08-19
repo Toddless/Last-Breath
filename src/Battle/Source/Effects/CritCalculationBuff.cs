@@ -8,7 +8,7 @@ namespace Battle.Source.Effects
     /// <summary>
     /// Base "Crit Calculation" buff: raises critical chance by <c>value</c> and extends its own
     /// duration by 1 turn each time the bearer scores a critical hit, within the instance's extension
-    /// budget. (The "Lucky" mechanic is a separate L3 effect — see <see cref="LuckyCritChanceEffect"/>.)
+    /// budget. (The "Lucky" mechanic is a separate effect — see <see cref="LuckyCritChanceEffect"/>.)
     /// </summary>
     public class CritCalculationBuff(int duration, int maxStacks, EffectValue value)
         : ParameterChangeEffect(

@@ -3,7 +3,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
     using Core.Battle.Abilities;
 
     /// <summary>
-    /// L3 upgrade: replaces the series with one empowered strike that deals
+    /// Replaces the series with one empowered strike that deals
     /// the total damage to the full series (with incremental scaling applied).
     /// </summary>
     public class AugmentIpSingleEmpoweredAttack(string id, string[] tags, int tier)

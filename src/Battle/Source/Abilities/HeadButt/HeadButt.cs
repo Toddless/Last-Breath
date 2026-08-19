@@ -11,8 +11,9 @@ namespace Battle.Source.Abilities.HeadButt
     using Effects;
 
     /// <summary>
-    /// Single lunge that stuns the target on a successful hit. L3 turns it into two lunges;
-    /// impact riders (L2 armor debuff) fire per attack like in every attack-series ability.
+    /// Single lunge that stuns the target on a successful hit. The lunge count is a parameter no
+    /// shipped record moves; impact riders — the generic attack-tagged debuff records among them —
+    /// fire per attack as in every attack-series ability.
     /// </summary>
     public class HeadButt(AbilityBaseData data) : DamagingAbility(data)
     {

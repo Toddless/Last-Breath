@@ -5,7 +5,8 @@ namespace Battle.Source.Abilities.Riders
     using Core.Battle.Abilities;
 
     /// <summary>Cast rider: reduces the current cooldown of EVERY other ability of the caster by
-    /// <c>amount</c> (Deep Freeze L3 upgrade).</summary>
+    /// <c>amount</c>. Installed by <c>Augment_Reduce_All_Cooldowns</c>, which fits ANY ability rather
+    /// than belonging to one.</summary>
     public class ReduceAllCooldownsActivationRider(string id, int amount) : IActivationRider
     {
         public string Id => id;

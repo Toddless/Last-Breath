@@ -3,7 +3,7 @@ namespace Battle.Source.Abilities.BerserkFury
     using System;
     using Core.Battle.Abilities;
 
-    /// <summary>L3 upgrades: replace the plain Fury with a variant (Burning / Primal / Healing).</summary>
+    /// <summary>Replaces the plain Fury with a variant (Burning / Primal / Healing).</summary>
     public class AugmentBfFuryVariant(string id, string[] tags, int tier, Func<int, float, IEffect> factory)
         : Augment<BerserkFury>(id, tags, tier)
     {

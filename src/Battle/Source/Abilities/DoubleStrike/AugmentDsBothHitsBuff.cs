@@ -3,7 +3,7 @@ namespace Battle.Source.Abilities.DoubleStrike
     using Core.Battle.Abilities;
     using Effects;
 
-    /// <summary>L3 upgrade: landing BOTH strikes grants a damage buff for a few turns.</summary>
+    /// <summary>Landing BOTH strikes grants a damage buff for a few turns.</summary>
     public class AugmentDsBothHitsBuff(string id, string[] tags, int tier, float amount, int duration)
         : Augment<DoubleStrike>(id, tags, tier)
     {

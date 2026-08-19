@@ -10,8 +10,8 @@ namespace Battle.Source.Abilities.AresBlessing
 
     /// <summary>
     /// Self-buff: raises max health and health recovery for a few turns (one composite effect).
-    /// L3 upgrades add extra cast effects (incoming damage reduction / turn-end heal / damage buff)
-    /// through activation riders with deferred factories, so they follow the current duration.
+    /// The health half stands on the book's <see cref="AbilityParameter.HealthBonus"/> and records
+    /// reach it; the recovery half is the ability's own key, which no shipped record names.
     /// </summary>
     public class AresBlessing(AbilityBaseData data) : Ability(data)
     {

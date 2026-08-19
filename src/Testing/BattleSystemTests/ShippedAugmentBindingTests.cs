@@ -13,7 +13,7 @@
     /// ability names that ability, an augment working through the contract every ability honours
     /// claims the whole book, and everything else says neither yet. Those three readings are only
     /// worth what the seating does with them, so the walks below take the shipped file down the loader
-    /// the game uses and ask the real board â€” every binding seats where it was written and nowhere
+    /// the game uses and ask the real board — every binding seats where it was written and nowhere
     /// else, every claim on the book seats where no tag would have carried it, and a record that has
     /// said nothing so far is still refused, which is what keeps the filling from having quietly made
     /// the whole registry fit everywhere.
@@ -46,11 +46,11 @@
         /// judged by tags and implemented for one ability is the dead-socket class by construction.</remarks>
         private const int BoundRecords = 34;
 
-        /// <summary>How many records claim every ability there is â€” cost, cooldown and the other
+        /// <summary>How many records claim every ability there is — cost, cooldown and the other
         /// levers of the base contract. Held for the same reason as <see cref="BoundRecords"/>, and
         /// with more at stake: universality is the widest reach in the system. Four of them came out
-        /// of the collapse of the base-contract families â€” the plain cost cut, the plain cooldown cut,
-        /// the cooldown bought with a higher price and the price paid in health â€” one record each for
+        /// of the collapse of the base-contract families — the plain cost cut, the plain cooldown cut,
+        /// the cooldown bought with a higher price and the price paid in health — one record each for
         /// the whole book.</summary>
         private const int UniversalRecords = 11;
 
@@ -75,7 +75,7 @@
         public void EveryBoundRecordNamesAnAbilityTheBookDeclares()
         {
             // A binding used to be checked against the ability whose block held the record; the
-            // records stand on their own now, so the name is all there is â€” and a name the book does
+            // records stand on their own now, so the name is all there is — and a name the book does
             // not carry fails loudly nowhere: the augment simply never fits any slot in the game.
             (AbilityProvider book, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
             var abilities = book.KnownAbilityIds.ToHashSet(StringComparer.Ordinal);

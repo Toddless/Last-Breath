@@ -116,6 +116,61 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(BuffTurns + 1, calculation.Duration, "the calculation did not extend itself");
         }
 
+        [TestMethod]
+        public async Task TheCalculationLeavesWithTheHostBuffWhenItRunsOut()
+        {
+            // The augment is a reading OF the Crit Calculation, so it cannot stand where the buff it
+            // reads does not. Pinned on the host running out of turns rather than being taken off,
+            // because expiry is the road nobody calls: the turn end removes the buff itself.
+            var bearer = new ConditionOwner();
+            MythicCalculationEffect calculation = await Standing(bearer);
+            var host = new CritCalculationBuff(duration: 1, maxStacks: 1, value: 0.15f);
+            await Lay(host, bearer);
+
+            await bearer.Effects.TriggerTurnEnd();
+            await bearer.Effects.TriggerTurnEnd();
+
+            Assert.IsFalse(bearer.Effects.Effects.Contains(host), "the host buff outlived its own duration, so nothing below is measured");
+            Assert.IsTrue(calculation.Duration > 0, "the calculation ran out on its own, so its leaving proves nothing about the host");
+            Assert.IsFalse(bearer.Effects.Effects.Contains(calculation), "the host buff ran out and the mythic reading of it stayed standing");
+        }
+
+        [TestMethod]
+        public async Task TheCalculationLeavesWithTheHostBuffWhenItIsDispelled()
+        {
+            // The enemy's counter, and the reason the tie is worth having: the mythic is beyond a weak
+            // dispel itself (see EffectPowerTests), so taking the host is how it is answered at all.
+            var bearer = new ConditionOwner();
+            MythicCalculationEffect calculation = await Standing(bearer);
+            await Lay(new CritCalculationBuff(duration: 3, maxStacks: 1, value: 0.15f), bearer);
+
+            bearer.Effects.Dispel(EffectPower.Weak, DispelScope.Target);
+
+            Assert.IsFalse(bearer.Effects.Effects.Contains(calculation), "the host buff was dispelled and the mythic reading of it stayed standing");
+        }
+
+        [TestMethod]
+        public async Task OneStackOfTheHostGoingOutIsNotTheHostLeaving()
+        {
+            // The count is the whole of it: the Crit Calculation is laid in stacks, and a mythic that
+            // read the first removal as "the buff is gone" would end on the bearer's strongest turn.
+            var bearer = new ConditionOwner();
+            MythicCalculationEffect calculation = await Standing(bearer);
+            var first = new CritCalculationBuff(duration: 3, maxStacks: 2, value: 0.15f);
+            var second = new CritCalculationBuff(duration: 3, maxStacks: 2, value: 0.15f);
+            await Lay(first, bearer);
+            await Lay(second, bearer);
+            Assert.AreEqual(2, bearer.Effects.Effects.OfType<CritCalculationBuff>().Count(), "the host did not stack, so the walk proves nothing");
+
+            first.Remove();
+
+            Assert.IsTrue(bearer.Effects.Effects.Contains(calculation), "one stack of the host went out and took the mythic with it");
+
+            second.Remove();
+
+            Assert.IsFalse(bearer.Effects.Effects.Contains(calculation), "the last stack of the host went out and the mythic stayed");
+        }
+
         /// <summary>The calculation laid on the bearer the way a cast lays it — through the activation
         /// rider, so what the walks read is an effect that travelled the road the augment installs.</summary>
         private static async Task<MythicCalculationEffect> Standing(ConditionOwner bearer)

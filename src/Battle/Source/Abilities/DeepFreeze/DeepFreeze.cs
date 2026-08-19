@@ -31,10 +31,10 @@ namespace Battle.Source.Abilities.DeepFreeze
     /// </summary>
     public class DeepFreeze(AbilityBaseData data) : MulticastAbility<DeepFreezePlan>(data)
     {
-        /// <summary>L2 upgrade point: chance to also freeze one random other enemy.</summary>
+        /// <summary>Augment point: chance to also freeze one random other enemy.</summary>
         public float SpreadFreezeChance { get; set; }
 
-        /// <summary>L2 upgrade point: every effect already on the target lasts 1 more turn.</summary>
+        /// <summary>Augment point: every effect already on the target lasts 1 more turn.</summary>
         public bool ExtendTargetEffects { get; set; }
 
         /// <summary>Four durations of effects laid on the TARGET — none of them the caster-side
@@ -151,7 +151,8 @@ namespace Battle.Source.Abilities.DeepFreeze
                     .Apply(Laying(target));
         }
 
-        /// <summary>L2 upgrade: a coin flip freezes one random enemy the cast did not touch. He is a
+        /// <summary>A roll of the record's own chance (15% up to 50% at the best rarity) freezes one
+        /// random enemy the cast did not touch. He is a
         /// touched target all the same — a landing without damage is still a landing — but a SPLASH one:
         /// the plan never aimed at him (he is picked from the enemies it left out), and he is only frozen
         /// because the cast landed on somebody else.</summary>

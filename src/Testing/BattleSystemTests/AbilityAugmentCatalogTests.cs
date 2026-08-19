@@ -12,7 +12,7 @@
     /// Seating an augment names two ids and holds neither, so the fitting rule is only worth as much
     /// as the thing that turns those ids into records. That thing is the augment catalog: a data
     /// participant of Core's own, reading the section that declares the records and the tags of the
-    /// abilities a fit is judged against. These tests hold the seam end to end â€” the shipped data
+    /// abilities a fit is judged against. These tests hold the seam end to end — the shipped data
     /// reaching the catalog through the real loader, the catalog reaching the board through the
     /// container a project composes, and the board refusing what the rule refuses instead of taking
     /// what it is handed.
@@ -86,7 +86,7 @@
         public void AnIdNoFileDeclaresIsNotFoundAndCarriesNoTags()
         {
             // Both halves are asked about ids arriving from a save file or a drop, so neither may
-            // throw â€” but an augment nothing declares must not come back as a blank record either:
+            // throw — but an augment nothing declares must not come back as a blank record either:
             // a record declaring nothing is still a record, and the rule would judge it.
             IAbilityAugmentCatalog catalog = ShippedCatalog();
 
@@ -116,8 +116,8 @@
         public void TheBoardTheCompositionBuildsJudgesTheAugmentsItIsHanded()
         {
             // The point of the wiring, on shipped ids: the board a project builds refuses a record the
-            // rule refuses. The plain board is the control â€” the same id, the same slot, and it goes
-            // in â€” so the refusal is the catalog reaching the board and not the slot being closed.
+            // rule refuses. The plain board is the control — the same id, the same slot, and it goes
+            // in — so the refusal is the catalog reaching the board and not the slot being closed.
             ServiceProvider container = ProjectComposition();
             LoadInto(container);
             var catalog = container.GetRequiredService<IAbilityAugmentCatalog>();
@@ -180,8 +180,8 @@
         /// <summary>The shipped ability data as the game reads it: the real loader, the real parser.</summary>
         private static IAbilityAugmentCatalog ShippedCatalog() => ShippedAbilityData.Augments();
 
-        /// <summary>One poison ability, one cold ability, and â€” beside them rather than inside either
-        /// â€” one poison augment.</summary>
+        /// <summary>One poison ability, one cold ability, and — beside them rather than inside either
+        /// — one poison augment.</summary>
         private static string TwoAbilitiesAndOneAugment() =>
             $$"""
               {
@@ -196,7 +196,7 @@
               """;
 
         /// <summary>A shipped augment whose tier leaves a lower slot to be refused by, together with
-        /// an ability it belongs on â€” the record's own, so the refusal under test can only be the
+        /// an ability it belongs on — the record's own, so the refusal under test can only be the
         /// tier.</summary>
         private static (string Ability, string Augment, int Tier) AnAugmentAboveTierOne(IAbilityAugmentCatalog catalog)
         {

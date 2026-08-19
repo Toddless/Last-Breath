@@ -11,7 +11,8 @@ namespace Battle.Source.Effects
     /// <summary>
     /// Buff that increases critical damage and additionally raises the bearer's critical chance
     /// by a flat amount after each successful attack.
-    /// Used by CriticalCalculation L3 upgrade.
+    /// Nothing builds one: no ability and no augment constructs this buff, so it is a mechanic the
+    /// catalog currently has no record for.
     /// </summary>
     public class CritDamageOnHitBuff(
         EffectValue critDamageBonus,

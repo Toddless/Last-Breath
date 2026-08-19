@@ -25,10 +25,10 @@ namespace Battle.Source.Abilities.Discharge
     /// </summary>
     public class Discharge(AbilityBaseData data) : MulticastAbility<DischargePlan>(data)
     {
-        /// <summary>L3 upgrade point: the strike ignores elemental resistances.</summary>
+        /// <summary>Augment point: the strike ignores elemental resistances.</summary>
         public bool AlwaysIgnoreResistances { get; set; }
 
-        /// <summary>L3 upgrade point: the cast consumes MANA instead of barrier.</summary>
+        /// <summary>Augment point: the cast consumes MANA instead of barrier.</summary>
         public bool ConsumeManaInstead { get; set; }
 
         public static class Parameters

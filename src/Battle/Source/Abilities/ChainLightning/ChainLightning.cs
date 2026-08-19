@@ -39,7 +39,7 @@ namespace Battle.Source.Abilities.ChainLightning
         public int Jumps => (int)this[Parameters.Jumps];
         public float DamageFalloff => this[Parameters.DamageFalloff];
 
-        /// <summary>L3 upgrade point: the lightning ignores elemental resistances.</summary>
+        /// <summary>Augment point: the lightning ignores elemental resistances.</summary>
         public bool IgnoreResistances { get; set; }
 
         public static class Parameters

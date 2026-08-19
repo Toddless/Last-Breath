@@ -16,7 +16,7 @@ namespace Battle.Source.Abilities.BerserkFury
     /// <summary>
     /// Consecutive attacks: the chance to continue the series scales with CURRENT health, and the cast
     /// puts the Fury effect on the caster (burns health per attack) — the series self-balances.
-    /// L3 swaps the Fury variant through <see cref="FuryFactory"/>.
+    /// An augment swaps the Fury variant through <see cref="FuryFactory"/>.
     /// </summary>
     public class BerserkFury(AbilityBaseData data) : DamagingAbility(data), IAttackModifierHost
     {
@@ -30,7 +30,7 @@ namespace Battle.Source.Abilities.BerserkFury
         public float FuryHealthPercent => this[Parameters.FuryHealthPercent];
         public AttackModifierPipeline AttackModifiers { get; } = new();
 
-        /// <summary>L3 upgrade point: which Fury variant the cast applies (duration, healthPercent) → effect.</summary>
+        /// <summary>Augment point: which Fury variant the cast applies (duration, healthPercent) → effect.</summary>
         public Func<int, float, IEffect> FuryFactory { get; set; } =
             (duration, healthPercent) => new FuryEffect(duration, maxStacks: 1, healthPercent);
 

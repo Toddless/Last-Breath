@@ -48,7 +48,7 @@
         private const string FlatCutAugment = "Augment_Reduce_Cooldown_And_Cost";
 
         /// <summary>The record that took the place of two: the price paid in health. It moves no
-        /// number at all â€” the cost type is categorical â€” so it appears here only where the collapse
+        /// number at all — the cost type is categorical — so it appears here only where the collapse
         /// is what is being walked.</summary>
         private const string HealthCostAugment = "Augment_Cost_Type_Health";
 
@@ -59,15 +59,15 @@
 
         /// <summary>The augment of another tier the cost share has to share a parameter with: Head
         /// Butt's longer stun, bought with fifty more mana. The shipped record, built the way the
-        /// registry builds it â€” two flat moves on two parameters.</summary>
+        /// registry builds it — two flat moves on two parameters.</summary>
         private const string CostSurcharge = "Augment_Extend_Stun_Add_Cost";
 
-        /// <summary>The same on the other parameter â€” Armageddon reaching every target and waiting three
+        /// <summary>The same on the other parameter — Armageddon reaching every target and waiting three
         /// turns longer for it. Stood in for by an upgrade of the same shape (a flat addition to the
         /// wait), because Armageddon itself has nothing to do with the question.</summary>
         private const string CooldownSurcharge = "Augment_Armageddon_All_Targets";
 
-        /// <summary>How many augments the game holds after the collapse â€” the same number in the data
+        /// <summary>How many augments the game holds after the collapse — the same number in the data
         /// and in the registry, because one half without the other is either an offer nothing builds
         /// or code nothing can reach.</summary>
         private const int ShippedAugmentCount = 97;
@@ -154,7 +154,7 @@
             // The share is a share of the ability's price, and an augment of another tier charging fifty
             // more mana for a longer stun does not change what the ability costs to begin with. Read off
             // the number the parameter happens to carry instead, the same two augments would be worth
-            // one price picked in one order and another price picked in the other â€” and the build would
+            // one price picked in one order and another price picked in the other — and the build would
             // change again the next time the tier-one slot was emptied and refilled.
             Assert.AreEqual(155, PriceOf(surchargeFirst: true), "the share was measured against a price the surcharge had already raised");
             Assert.AreEqual(155, PriceOf(surchargeFirst: false), "the same two augments came to another price in the other order");
@@ -189,7 +189,7 @@
         {
             // A slot is emptied and refilled whenever an augment is swapped, and the whole arrangement
             // is taken down and put back up on every pass of the binder besides. A cut fixed from the
-            // number found at the moment of wearing deepens every time that happens â€” and says nothing
+            // number found at the moment of wearing deepens every time that happens — and says nothing
             // while it does.
             var ability = AbilityWith(cost: 150);
             ability.InstallUpgrades(InThisOrder(CostShareUpgrade(), StunSurcharge()));
@@ -439,7 +439,7 @@
         private static IAugment CostShareUpgrade() => new AugmentReduceCost(CostAugment, [], 1, CostShare);
 
         /// <summary>The distinct cooldowns the shipped abilities declare, read off the files. Casts
-        /// that wait for nothing are left out â€” they are answered by their own walk.</summary>
+        /// that wait for nothing are left out — they are answered by their own walk.</summary>
         private static List<int> ShippedCooldowns()
         {
             List<int> waits = [];

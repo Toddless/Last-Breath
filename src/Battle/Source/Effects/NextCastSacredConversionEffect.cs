@@ -8,7 +8,8 @@ namespace Battle.Source.Effects
     using Core.Modifiers.Context;
 
     /// <summary>
-    /// The Overload L3 upgrade payload: the NEXT activated ability deals <c>fraction</c> (0.3 = 30%)
+    /// Payload of <c>Augment_Next_Cast_Sacred</c>, which fits ANY ability rather than belonging to one:
+    /// the NEXT activated ability deals <c>fraction</c> (0.3 = 30%)
     /// of its damage as Sacred (converted, not added). Same cast-window mechanics as the other
     /// "next ability" charges; recasting the source ability never consumes it.
     /// </summary>

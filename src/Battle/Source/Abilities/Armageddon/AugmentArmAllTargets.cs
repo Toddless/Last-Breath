@@ -4,7 +4,7 @@ namespace Battle.Source.Abilities.Armageddon
     using Core.Enums;
     using HitDelivery;
 
-    /// <summary>L3 upgrade: hits every enemy on the field at the price of a longer cooldown.</summary>
+    /// <summary>Hits every enemy on the field at the price of a longer cooldown.</summary>
     public class AugmentArmAllTargets(string id, string[] tags, int tier, float additionalCooldown)
         : Augment<Armageddon>(id, tags, tier)
     {

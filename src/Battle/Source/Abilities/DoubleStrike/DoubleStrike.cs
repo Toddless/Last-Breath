@@ -13,8 +13,8 @@ namespace Battle.Source.Abilities.DoubleStrike
 
     /// <summary>
     /// Two consecutive strikes with individual damage numbers: the first shreds armor on a hit,
-    /// the second shreds evasion. L3a: both landing grants a damage buff (factory-injected);
-    /// L3b: the first hit restores health, the second — mana.
+    /// the second shreds evasion. Augments add: both landing grants a damage buff (factory-injected),
+    /// or the first hit restores health and the second — mana.
     /// </summary>
     public class DoubleStrike(AbilityBaseData data) : DamagingAbility(data), IAttackModifierHost
     {
@@ -28,7 +28,7 @@ namespace Battle.Source.Abilities.DoubleStrike
         public float ManaRestore => this[AbilityParameter.ManaRestore];
         public AttackModifierPipeline AttackModifiers { get; } = new();
 
-        /// <summary>L3 upgrade point: built when both strikes land, applied to the owner.</summary>
+        /// <summary>Augment point: built when both strikes land, applied to the owner.</summary>
         public Func<IEffect>? BothHitsBuffFactory { get; set; }
 
         public static class Parameters

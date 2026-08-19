@@ -21,7 +21,7 @@ namespace Battle.Source.Abilities.Armageddon
     /// </summary>
     public class Armageddon(AbilityBaseData data) : DamagingAbility(data), IChargedAbility
     {
-        /// <summary>"+1 damage per every 5 missing health" — the missing-health step of the L3 upgrade.</summary>
+        /// <summary>"+1 damage per every 5 missing health" — the missing-health step.</summary>
         private const float MissingHpStep = 5f;
 
         /// <summary>Charge bookkeeping; lazy — the affordability gate needs the owner.</summary>
@@ -34,7 +34,7 @@ namespace Battle.Source.Abilities.Armageddon
 
         public IHitSequenceStrategy HitSequence { get; set; } = new SelectedTargetsHits();
 
-        /// <summary>L2 upgrade point: extra effect stage 3 puts on every hit target (e.g. burning stacks).</summary>
+        /// <summary>Augment point: extra effect stage 3 puts on every hit target (e.g. burning stacks).</summary>
         public Func<IEffect>? Stage3EffectFactory { get; set; }
         public int Stage3EffectStacks { get; set; } = 1;
 

@@ -8,8 +8,8 @@
     using static AugmentCopies;
 
     /// <summary>
-    /// An augment declares what it is â€” its tier, what it is about, the one ability it was written
-    /// for, or every ability there is â€” and a slot is measured against that declaration. A slot takes
+    /// An augment declares what it is — its tier, what it is about, the one ability it was written
+    /// for, or every ability there is — and a slot is measured against that declaration. A slot takes
     /// its own tier and every tier under it, a claim on the whole book settles the binding question
     /// where it is made, a named ability is the whole answer where it is given and the tags answer
     /// where neither is, and one ability wears at most one augment of an exclusion group. What does
@@ -154,7 +154,7 @@
         public void AnAugmentClaimingEveryAbilityGoesOnOneItSharesNoTagWith()
         {
             // Cost and cooldown are worked through the contract every ability honours, so an augment
-            // over them belongs everywhere â€” and no tag says everywhere: the commonest one is carried
+            // over them belongs everywhere — and no tag says everywhere: the commonest one is carried
             // by seven abilities of twenty-five. The record carries a tag of another family here, so
             // the seating is the claim being honoured and not the tags quietly agreeing.
             var board = BoardOver(
@@ -219,7 +219,7 @@
         {
             // The record answers the binding question twice: every ability, and this one. The slot
             // under test is the ability it names and shares its tag, so both readings would seat it
-            // â€” which is precisely why the refusal has to come from the contradiction itself. Letting
+            // — which is precisely why the refusal has to come from the contradiction itself. Letting
             // one half win would make the other a comment, and nobody would learn which.
             AbilityAugmentData contradictory = Augment(
                 ContradictoryAugment, tier: 1, [AbilityTags.Poison], abilityId: PoisonAbility, fitsAnyAbility: true);
@@ -261,7 +261,7 @@
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(PoisonSlotTwo, PoisonAbility, tier: 2));
             Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(GroupedAugment)),
-                "the first group never went on â€” the second augment is being measured against a bare ability");
+                "the first group never went on — the second augment is being measured against a bare ability");
 
             Assert.IsTrue(board.Install(board.At(PoisonSlotTwo), Copy(OtherGroupAugment)));
         }
@@ -279,7 +279,7 @@
                 Slot(PoisonSlotOne, PoisonAbility, tier: 2),
                 Slot(ColdSlot, ColdAbility, tier: 2));
             Assert.IsTrue(board.Install(board.At(PoisonSlotOne), Copy(GroupedAugment)),
-                "the poison ability never wore the group â€” the cold slot is crossing nothing");
+                "the poison ability never wore the group — the cold slot is crossing nothing");
 
             Assert.IsTrue(board.Install(board.At(ColdSlot), Copy(SameGroupAugment)));
         }
@@ -300,7 +300,7 @@
         {
             // The seam stated out loud: the rule reads records, so a board composed without a
             // catalog has nothing to read and stays the plain slot-holder it was before there was
-            // a rule â€” this augment is three tiers above the slot and still goes in.
+            // a rule — this augment is three tiers above the slot and still goes in.
             var board = new AbilitySocketBoard();
             board.Sync([Slot(PoisonSlotOne, PoisonAbility, tier: 1)]);
 
@@ -367,8 +367,8 @@
         }
 
         /// <summary>
-        /// The rule is one predicate or it is not a rule. A second tier comparison â€” in the board, in
-        /// a socket window, in whatever judges a conversion â€” is a second answer to the same
+        /// The rule is one predicate or it is not a rule. A second tier comparison — in the board, in
+        /// a socket window, in whatever judges a conversion — is a second answer to the same
         /// question, and two answers agree only until one of them is edited: an augment the window
         /// offers and the board refuses. The audit walks the shipped sources: no file that speaks
         /// about the slots or about the records may hold tiers against each other or intersect tags
@@ -382,9 +382,9 @@
             Assert.IsTrue(File.Exists(predicate), $"the predicate is not where the rule lives: {predicate}");
 
             string[] rule = File.ReadAllLines(predicate);
-            Assert.IsTrue(rule.Any(s_tierComparison.IsMatch), "the predicate holds no tier against another â€” the tier rule is gone");
+            Assert.IsTrue(rule.Any(s_tierComparison.IsMatch), "the predicate holds no tier against another — the tier rule is gone");
             Assert.IsTrue(rule.Any(line => s_tagComparisons.Any(comparison => line.Contains(comparison, StringComparison.Ordinal))),
-                "the predicate compares no tags â€” the tag rule is gone");
+                "the predicate compares no tags — the tag rule is gone");
 
             foreach (string source in ShippedSources().Where(path => !string.Equals(path, predicate, StringComparison.OrdinalIgnoreCase)))
             {
@@ -394,9 +394,9 @@
                 foreach (string line in lines)
                 {
                     Assert.IsFalse(s_tierComparison.IsMatch(line),
-                        $"{Path.GetRelativePath(SrcRoot, source)}: holds tier against tier itself â€” '{line.Trim()}'");
+                        $"{Path.GetRelativePath(SrcRoot, source)}: holds tier against tier itself — '{line.Trim()}'");
                     Assert.IsFalse(s_tagComparisons.Any(comparison => line.Contains(comparison, StringComparison.Ordinal)),
-                        $"{Path.GetRelativePath(SrcRoot, source)}: compares tags itself â€” '{line.Trim()}'");
+                        $"{Path.GetRelativePath(SrcRoot, source)}: compares tags itself — '{line.Trim()}'");
                 }
             }
         }

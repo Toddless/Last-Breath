@@ -29,7 +29,7 @@ namespace Battle.Source.Abilities.Overload
     {
         public float ManaBurnPercent => this[Parameters.ManaBurnPercent];
 
-        /// <summary>L3 upgrade point: rolling the final stage resets this ability's cooldown.</summary>
+        /// <summary>Augment point: rolling the final stage resets this ability's cooldown.</summary>
         public bool ResetCooldownOnFinalStage { get; set; }
 
         public static class Parameters

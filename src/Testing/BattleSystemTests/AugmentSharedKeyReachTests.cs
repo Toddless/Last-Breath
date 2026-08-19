@@ -69,6 +69,19 @@ namespace LastBreathTest.BattleSystemTests
         private static readonly string[] s_declaresForWhatAugmentsLay = ["Ability_Head_Butt", "Ability_Increasing_Pressure"];
 
         /// <summary>
+        /// Records whose several rows are ALTERNATIVES rather than parts of one bargain, and which the
+        /// half-arrival walk therefore has nothing to say about. The aggregate duration record is the
+        /// only one and is a different shape from the rest of the ledger: it names no key at all, sells
+        /// one thing ("everything you apply lasts a turn longer") and lands on whichever members of the
+        /// family the ability it is seated on declares. An ability that has the poison duration and not
+        /// the stun one gets that bargain WHOLE — there is no second part of it left unpaid, which is
+        /// the only thing the walk exists to catch. Exempted by shape and not through
+        /// <see cref="s_knowinglyFree"/>, which means something else: there the owner looked at a real
+        /// half-arrival and let it stand.
+        /// </summary>
+        private static readonly string[] s_familyRecords = ["Augment_Applied_Duration"];
+
+        /// <summary>
         /// Where a record is knowingly worth more than it charges: the ability reads one of its moves
         /// and has no concept for the other, and the owner looked at that and let it stand. Written out
         /// per record so a NEW half-arrival still fails — none of these three counts what it lays, so
@@ -482,6 +495,125 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Consume_Effectiveness", AbilityParameter.ConsumeEffectiveness,
                 ["Ability_Overload", "Ability_Sacrifice"],
                 []),
+
+            // The factory half of the registry, ledgered the day it learned to say what it moves. Every
+            // row below existed as a record standing on a shared key from the day it was written, and
+            // none of them could be asked about: the completeness walk read the numeric table, a factory
+            // carries its work where the table cannot see it, and so the five records of the base
+            // contract below sat outside the ledger without reddening anything. They are the wide ones —
+            // nobody casts for free and nobody casts twice in a turn, so a bargain struck against the
+            // price or the wait lands on the whole book and is inert nowhere.
+            ("Augment_Reduce_Cost", AbilityParameter.CostValue,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
+            ("Augment_Reduce_Cooldown", AbilityParameter.Cooldown,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
+            ("Augment_Reduce_Cooldown_Add_Cost", AbilityParameter.Cooldown,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
+            ("Augment_Reduce_Cooldown_Add_Cost", AbilityParameter.CostValue,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
+            ("Augment_Reduce_Cooldown_And_Cost", AbilityParameter.Cooldown,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
+            ("Augment_Reduce_Cooldown_And_Cost", AbilityParameter.CostValue,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
+            ("Augment_Reduce_Cost_Add_Cooldown", AbilityParameter.CostValue,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
+            ("Augment_Reduce_Cost_Add_Cooldown", AbilityParameter.Cooldown,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
+
+            // The two that override the cost TYPE rather than its size. They reach the whole book for the
+            // same reason and are inert nowhere: an ability with a price has a kind of price to change.
+            ("Augment_Cost_Type_Health", AbilityParameter.CostType,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
+            ("Augment_Cost_Barrier", AbilityParameter.CostType,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
+
+            // The aggregate duration record, on the two shared keys of the family it moves. It never
+            // names a key: it lands on whatever the ability it is seated on calls an applied duration,
+            // so these two columns are the shared half of that answer and the private members are the
+            // abilities' own business. Worth reading twice — the stun row reaches the ice block ALONE,
+            // while the two other abilities that register a shared stun duration (Armageddon and the
+            // head butt) are in neither column, because the record does not fit them at all. So "every
+            // effect you apply lasts longer" is sold against a book where most wearers of the tag apply
+            // nothing with a shared duration, and the widest inert column in the ledger is the price.
+            ("Augment_Applied_Duration", AbilityParameter.PoisonDuration,
+                ["Ability_Jar_Of_Poison", "Ability_Poison_Coating"],
+                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis",
+                 "Ability_Ice_Block", "Ability_Porcupine", "Ability_Static_Armor"]),
+            ("Augment_Applied_Duration", AbilityParameter.StunDuration,
+                ["Ability_Ice_Block"],
+                ["Ability_Ares_Blessing", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Double_Strike", "Ability_Ice_Aegis",
+                 "Ability_Jar_Of_Poison", "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"]),
+
+            // The two bound records of the factory half: each names its ability outright, so it reaches
+            // that one and no other and the inert column is empty by construction rather than by luck.
+            ("Augment_Armageddon_All_Targets", AbilityParameter.Cooldown,
+                ["Ability_Armageddon"],
+                []),
+            ("Augment_Ice_Aegis_Turn_End_Heal_Under_Shield", AbilityParameter.HealthRegeneration,
+                ["Ability_Ice_Aegis"],
+                []),
         ];
 
         [TestMethod]
@@ -505,6 +637,58 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(0, unwritten.Count,
                 $"records on a shared key with no row in the ledger:\n  {string.Join("\n  ", unwritten)}");
+        }
+
+        [TestMethod]
+        public void EveryLedgerRowIsBackedByTheRegistrySayingTheRecordMovesThatKey()
+        {
+            // The converse of the walk above, and what turns the factory rows from transcription into a
+            // claim. The completeness walk only ever asks "does what the registry names have a row" — a
+            // record the registry says nothing about passes it in silence, which is exactly the state
+            // the factory half was in when the rows below were written out by hand. They now stand on
+            // the declaration beside the factory: take that declaration away and this walk names the
+            // record instead of quietly forgiving it.
+            (AbilityProvider registry, _) = ShippedAbilityData.Load();
+            List<string> unbacked = [];
+
+            foreach ((string augment, string parameter) in s_reach.Select(row => (row.Augment, row.Parameter)).Distinct())
+                if (!registry.ParametersMovedBy(augment).Contains(parameter, StringComparer.Ordinal))
+                    unbacked.Add($"the ledger says {augment} moves '{parameter}' and no half of the registry does");
+
+            Assert.IsTrue(s_reach.Length > 0, "the ledger is empty, so this walk proves nothing");
+            Assert.AreEqual(0, unbacked.Count,
+                $"ledger rows the mechanics do not stand behind:\n  {string.Join("\n  ", unbacked)}");
+        }
+
+        [TestMethod]
+        public void TheAppliedDurationRecordDeclaresExactlyTheSharedDurationsTheBookRegisters()
+        {
+            // The one record whose keys cannot be read off its own code: it moves whatever the ability it
+            // is seated on calls an applied duration, so what it DECLARES is checked against all of them
+            // at once. Both directions, and each catches a different silence. A shared duration nobody
+            // declared is a key of the book the record moves while ParametersMovedBy never says so — the
+            // completeness walk then stays blind to it, which is the exact gap the factory declarations
+            // were introduced to close. A declaration no ability backs is the opposite: a ledger row kept
+            // alive for a key that left the book.
+            AbilityProvider registry = ShippedAbilityData.Abilities();
+            HashSet<string> shared = SharedKeys();
+            var declared = registry.ParametersMovedBy("Augment_Applied_Duration").ToHashSet(StringComparer.Ordinal);
+
+            HashSet<string> family = [];
+            foreach (string abilityId in registry.KnownAbilityIds.Where(id => !registry.IsHidden(id)))
+                foreach (string parameter in registry.CreateAbility(abilityId).AppliedDurations)
+                    if (shared.Contains(parameter))
+                        family.Add(parameter);
+
+            Assert.IsTrue(family.Count > 0, "no ability calls a shared key an applied duration, so this walk proves nothing");
+
+            string[] undeclared = [.. family.Except(declared, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+            string[] unbacked = [.. declared.Except(family, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+
+            Assert.AreEqual(0, undeclared.Length,
+                $"shared applied durations the record moves and does not declare: [{string.Join(", ", undeclared)}]");
+            Assert.AreEqual(0, unbacked.Length,
+                $"shared durations the record declares that no ability registers: [{string.Join(", ", unbacked)}]");
         }
 
         /// <summary>Every shared key of the book, read by reflection so the list cannot drift.</summary>
@@ -600,7 +784,10 @@ namespace LastBreathTest.BattleSystemTests
             // moves come apart between abilities is the same bug wearing a different id — except where
             // the owner looked at a particular ability and accepted the arrival as it is, which is
             // written out in s_knowinglyFree and nowhere else.
-            var byRecord = s_reach.GroupBy(row => row.Augment, StringComparer.Ordinal).Where(group => group.Count() > 1);
+            var byRecord = s_reach
+                .Where(row => !s_familyRecords.Contains(row.Augment, StringComparer.Ordinal))
+                .GroupBy(row => row.Augment, StringComparer.Ordinal)
+                .Where(group => group.Count() > 1);
 
             foreach (IGrouping<string, (string Augment, string Parameter, string[] Works, string[] Inert)> record in byRecord)
             {

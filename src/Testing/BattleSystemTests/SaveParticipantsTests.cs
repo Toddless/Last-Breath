@@ -70,7 +70,7 @@
 
             var captured = new AbilityBookSaveParticipant(AccessorFor(PlayerWithBook(sourceBook))).Capture();
 
-            // Target: the abilities are already in the book â€” the passive tree hands them over on its
+            // Target: the abilities are already in the book — the passive tree hands them over on its
             // own section, which restores first. This one only arranges what is there.
             var targetBook = NewBook();
             foreach ((string id, Stance stance) in new[] { ("Ability_A", Stance.Dexterity), ("Ability_B", Stance.Dexterity), ("Ability_C", Stance.Strength) })

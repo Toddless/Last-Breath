@@ -4,7 +4,7 @@ namespace Battle.Source.Abilities.Armageddon
     using Core.Enums;
     using Effects;
 
-    /// <summary>L2 upgrade: stage 3 additionally puts burning stacks on every hit target.</summary>
+    /// <summary>Stage 3 additionally puts burning stacks on every hit target.</summary>
     public class AugmentArmStage3Burning(string id, string[] tags, int tier, int stacks, int duration, float damageMultiplier)
         : Augment<Armageddon>(id, tags, tier)
     {

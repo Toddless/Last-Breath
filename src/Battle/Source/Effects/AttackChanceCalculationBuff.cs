@@ -6,10 +6,12 @@ namespace Battle.Source.Effects
     using Core.Events;
 
     /// <summary>
-    /// Self-extending additional-attack-chance buff — the L3 "replace" variant of
+    /// Self-extending additional-attack-chance buff, written as the replacement variant of
     /// <see cref="CritCalculationBuff"/>: same stack/duration/extend-on-crit mechanic (budget and
     /// all), but boosts
     /// <see cref="EntityParameter.AdditionalHitChance"/> instead of critical chance.
+    /// <para>Nothing lays one: the swap it was written for goes through
+    /// <c>CriticalCalculation.PrimaryBuffFactory</c>, which no shipped record assigns.</para>
     /// </summary>
     public class AttackChanceCalculationBuff(int duration, int maxStacks, EffectValue value)
         : ParameterChangeEffect(

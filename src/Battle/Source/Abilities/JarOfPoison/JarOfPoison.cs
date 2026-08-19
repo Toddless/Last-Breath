@@ -16,7 +16,8 @@ namespace Battle.Source.Abilities.JarOfPoison
     {
         public int PoisonDuration => (int)this[AbilityParameter.PoisonDuration];
 
-        /// <summary>How the jar reaches its victims: the selected target, N bounces or every enemy (L3 upgrades swap it).</summary>
+        /// <summary>How the jar reaches its victims. The seam takes any hit sequence, but nothing in the
+        /// shipped catalog replaces it — every cast hits the selected target.</summary>
         public IHitSequenceStrategy HitSequence { get; set; } = new SelectedTargetsHits();
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)

@@ -21,7 +21,7 @@ namespace Battle.Source.Abilities
         /// <summary>Every hit of the plan skips elemental resistances.</summary>
         public bool IgnoreResistances { get; set; }
 
-        /// <summary>Only CRITICAL hits of the plan skip elemental resistances (Ice Shards L3 upgrade).</summary>
+        /// <summary>Only CRITICAL hits of the plan skip elemental resistances (an Ice Shards augment).</summary>
         public bool CritIgnoresResistances { get; set; }
     }
 }

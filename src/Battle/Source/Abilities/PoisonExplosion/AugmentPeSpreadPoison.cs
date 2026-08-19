@@ -3,7 +3,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
     using Core.Battle.Abilities;
 
     /// <summary>
-    /// L3 upgrade: instead of exploding, spreads all poison stacks from the target to all other enemies.
+    /// Instead of exploding, spreads all poison stacks from the target to all other enemies.
     /// </summary>
     public class AugmentPeSpreadPoison(string id, string[] tags, int tier)
         : Augment<PoisonExplosion>(id, tags, tier)

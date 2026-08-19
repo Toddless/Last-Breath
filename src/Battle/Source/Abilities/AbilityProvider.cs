@@ -47,17 +47,29 @@
         ];
 
         /// <summary>
-        /// The parameters a record moves through the numeric table, by the same rule the effect registry
-        /// publishes the keys a factory reads: a ledger that has to GUESS what a record touches guesses
-        /// wrong. Asked from the outside it answered only "which abilities does this fit", which is a
-        /// different question — every ability a record fits declares parameters the record never moves.
-        /// Empty for a record answered by a behaviour or by a factory of its own: those carry their work
-        /// somewhere the table cannot see, and saying nothing is the honest answer.
+        /// The parameters a record moves, by the same rule the effect registry publishes the keys a
+        /// factory reads: a ledger that has to GUESS what a record touches guesses wrong. Asked from the
+        /// outside it answered only "which abilities does this fit", which is a different question —
+        /// every ability a record fits declares parameters the record never moves.
+        /// <para>Both halves of the registry answer: the numeric table says which key each of its rows
+        /// stands on, and a factory registration declares its keys beside itself. A factory used to be
+        /// silent here, which made every ledger of shared keys blind to that half and left its rows to
+        /// be written by hand. Still empty for a record answered by a declared behaviour, and for the
+        /// factories whose work is a rider or a flag rather than a key — there the silence is the
+        /// honest answer rather than a gap.</para>
         /// </summary>
         public IReadOnlyCollection<string> ParametersMovedBy(string augmentId) =>
+            [.. TableMoves(augmentId).Concat(FactoryMoves(augmentId)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+
+        /// <summary>The keys the numeric table has this record standing on.</summary>
+        private IEnumerable<string> TableMoves(string augmentId) =>
             _parameterAugments.TryGetValue(augmentId, out AugmentParameterMove[]? moves)
-                ? [.. moves.Select(move => move.Parameter).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)]
+                ? moves.Select(move => move.Parameter)
                 : [];
+
+        /// <summary>The keys the record's own factory declares it moves.</summary>
+        private IEnumerable<string> FactoryMoves(string augmentId) =>
+            AbilityUpgrades.TryGetValue(augmentId, out AugmentFactory factory) ? factory.MovedParameters : [];
 
         public void Apply(string catalog, GameDataFile file)
         {
@@ -133,7 +145,7 @@
             // uniqueness of BuildableAugmentIds already refuses loudly. The sets do not overlap.
             if (!string.IsNullOrWhiteSpace(data.Behaviour)) return CreateBehaviour(data);
 
-            if (AbilityUpgrades.TryGetValue(data.Id, out var factory)) return factory(data);
+            if (AbilityUpgrades.TryGetValue(data.Id, out AugmentFactory factory)) return factory.Build(data);
 
             return _parameterAugments.TryGetValue(data.Id, out AugmentParameterMove[]? moves)
                 ? new AugmentParameterSet(data.Id, data.Tags, data.Tier,

@@ -6,7 +6,7 @@ namespace Battle.Source.Effects
 
     /// <summary>
     /// Wraps a passive skill into a timed effect: the skill's mechanics run only while the effect
-    /// lasts (e.g. the Porcupine L3 upgrade attaches the Echo passive for the buff's duration).
+    /// lasts (e.g. the Porcupine augment attaches the Echo passive for the buff's duration).
     /// </summary>
     public class TemporarySkillEffect(string id, int duration, ISkill skill) : Effect(id, duration, maxStacks: 1)
     {

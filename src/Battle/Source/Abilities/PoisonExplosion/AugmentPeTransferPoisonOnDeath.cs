@@ -3,7 +3,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
     using Core.Battle.Abilities;
 
     /// <summary>
-    /// L2 upgrade: when the target dies, its remaining poison stacks transfer to a random enemy.
+    /// When the target dies, its remaining poison stacks transfer to a random enemy.
     /// </summary>
     public class AugmentPeTransferPoisonOnDeath(string id, string[] tags, int tier)
         : Augment<PoisonExplosion>(id, tags, tier)

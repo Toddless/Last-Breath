@@ -63,10 +63,29 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void ARankAndFileEffectIsWeakWithoutSayingSoAnywhere()
         {
-            // The default carries the whole catalog: the canon names strengths for five rows out of fifty.
+            // The default carries the whole catalog: the canon names strengths for six rows out of 51.
             var clumsiness = new Clumsiness(duration: 3, maxStacks: 5, value: 0.15f);
 
             Assert.AreEqual(EffectPower.Weak, clumsiness.Power, "an effect no row calls strong came out stronger than weak");
+        }
+
+        [TestMethod]
+        public async Task AWeakDispelDoesNotReachTheMythicCalculationAndAStrongOneDoes()
+        {
+            // The one strong row, and the only one that is neither a seal nor weak. Measured with no
+            // Crit Calculation buff on the bearer at all: the mythic leaves with its host, so a walk
+            // that laid one would be reading the tie back to the host rather than the strength.
+            var bearer = new ConditionOwner();
+            var calculation = new MythicCalculationEffect(duration: 3, maxStacks: 1);
+            await calculation.Apply(new EffectApplyingContext { Caster = bearer, Target = bearer, Source = "Test_Effect_Power", Damage = default });
+
+            Assert.AreEqual(EffectPower.Strong, calculation.Power, "the canon no longer calls the mythic reading strong");
+
+            bearer.Effects.Dispel(EffectPower.Weak, DispelScope.Target);
+            Assert.IsTrue(bearer.Effects.Effects.Contains(calculation), "a weak dispel took an effect the canon calls strong");
+
+            bearer.Effects.Dispel(EffectPower.Strong, DispelScope.Target);
+            Assert.IsFalse(bearer.Effects.Effects.Contains(calculation), "a strong dispel left an effect of its own strength standing");
         }
 
         [TestMethod]

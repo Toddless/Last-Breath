@@ -11,8 +11,8 @@ namespace Battle.Source.Abilities.IncreasingPressure
     using Core.Events;
 
     /// <summary>
-    /// L3 upgrade strategy: each successful attack also deals a percentage of the damage
-    /// to a random enemy on the battlefield.
+    /// Execution strategy: each successful attack also deals a percentage of the damage to a random
+    /// enemy on the battlefield. Nothing installs it — no shipped record swaps the pressure's strategy.
     /// </summary>
     public class IpDamageRandomTargetStrategy(float splashDamagePercent) : IpDefaultExecutionStrategy
     {

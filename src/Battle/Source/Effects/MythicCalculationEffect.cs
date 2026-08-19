@@ -12,6 +12,9 @@ namespace Battle.Source.Effects
     /// <para>The loop is held by the same budget every extension travels through — each instance carries
     /// its own, so a fight of crits runs the buffs into their budgets instead of holding them up forever.
     /// This effect is a buff and extends itself along with the rest, exactly as its predecessor did.</para>
+    /// <para>It is the Crit Calculation buff's reading and does not outlive it: when the last host buff
+    /// leaves the bearer — run out or dispelled — this goes with it. That is what leaves an enemy a
+    /// counter, since the mythic itself is strong enough that a weak dispel cannot reach it.</para>
     /// </summary>
     public class MythicCalculationEffect(int duration, int maxStacks)
         : Effect(id: "Effect_Mythic_Calculation", duration, maxStacks)
@@ -22,6 +25,17 @@ namespace Battle.Source.Effects
             if (Target == null) return;
 
             SubscribeUntilRemoved<AfterAttackEvent>(Target.CombatEvents, OnAfterAttack);
+            SubscribeUntilRemoved(Target.Effects, OnNeighbourRemoved);
+        }
+
+        /// <summary>The tie to the host. Counted rather than assumed: the Crit Calculation is laid in
+        /// stacks, and one stack going out is not the buff leaving the bearer.</summary>
+        private void OnNeighbourRemoved(IEffect removed)
+        {
+            if (removed is not CritCalculationBuff || Target == null) return;
+            if (Target.Effects.GetBy(effect => effect is CritCalculationBuff).Any()) return;
+
+            Remove();
         }
 
         private void OnAfterAttack(AfterAttackEvent evt)

@@ -7,8 +7,10 @@ namespace Battle.Source.Abilities.PoisonCoating
     using Core.Events;
 
     /// <summary>
-    /// L3 upgrade: the number of poison stacks applied per attack equals the number of
+    /// The number of poison stacks applied per attack equals the number of
     /// living enemies on the battlefield (instead of a fixed 1 stack).
+    /// <para>Does not currently run: <c>_owner</c> is never assigned, so the subscription in
+    /// <see cref="ApplyUpgrade"/> is made on nothing and <c>OnAfterAttack</c> is never reached.</para>
     /// </summary>
     public class AugmentPcMultiStackOnHit(string id, string[] tags, int tier)
         : Augment<PoisonCoating>(id, tags, tier)

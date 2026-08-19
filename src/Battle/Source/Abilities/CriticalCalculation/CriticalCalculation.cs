@@ -23,7 +23,8 @@ namespace Battle.Source.Abilities.CriticalCalculation
 
         /// <summary>
         /// The buff the ability stacks on cast, built from the given duration and stack cap. Default is
-        /// the crit-chance buff; the L3 "replace" upgrade swaps it for an additional-attack-chance buff.
+        /// the crit-chance buff, and nothing in the shipped catalog assigns another — the seam is what a
+        /// replacing record would reach for, and every cast lays the default until one exists.
         /// ExecuteInternal applies <see cref="BuffStacks"/> stacks of whatever this returns.
         ///
         /// A factory hands over the figure it was WRITTEN with and nothing else: how strongly that

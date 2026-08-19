@@ -4,7 +4,7 @@ namespace Battle.Source.Abilities.DarkShroud
     using Core.Battle.Abilities;
     using Riders;
 
-    /// <summary>L3 "Immortality": the shroud puts the Life Aegis on its caster — the dodge of a first
+    /// <summary>"Immortality": the shroud puts the Life Aegis on its caster — the dodge of a first
     /// death. Built per cast, so the effect reads the ability's effectiveness instead of a figure the
     /// augment was seated with, and its numbers come from the canon rather than from the record.</summary>
     public class AugmentDsImmortality(string id, string[] tags, int tier, Func<IEffect?> effect)

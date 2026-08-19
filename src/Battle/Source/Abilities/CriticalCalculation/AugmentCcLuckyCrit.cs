@@ -5,7 +5,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
     using Riders;
 
     /// <summary>
-    /// L3: for the ability's buff duration, the caster's critical chance becomes "Lucky".
+    /// For the ability's buff duration, the caster's critical chance becomes "Lucky".
     /// </summary>
     public class AugmentCcLuckyCrit(string id, string[] tags, int tier, int duration)
         : Augment<CriticalCalculation>(id, tags, tier)

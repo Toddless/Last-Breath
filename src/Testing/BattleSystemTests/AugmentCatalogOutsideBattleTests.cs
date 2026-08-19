@@ -9,7 +9,7 @@
 
     /// <summary>
     /// What an augment id means, asked where nobody fights. The records used to be read by the ability
-    /// provider, which is the battle module's â€” so three of the five compositions the repository builds
+    /// provider, which is the battle module's — so three of the five compositions the repository builds
     /// had no augments at all, and not because anyone decided they should not: they simply never
     /// composed the class that reads the section. Nothing said so, because an absent catalog is a
     /// board that judges nothing and a lookup that finds nothing.
@@ -22,13 +22,13 @@
     [TestClass]
     public class AugmentCatalogOutsideBattleTests
     {
-        /// <summary>An ability no shipped record binds itself to â€” the control every refusal needs.
+        /// <summary>An ability no shipped record binds itself to — the control every refusal needs.
         /// Any id the book does not declare will do: the rule asks the record for a name and compares
         /// it, and a slot standing on an unwritten ability carries no tags to fall back on either.</summary>
         private const string Stranger = "Ability_No_File_Declares";
 
         /// <summary>The bootstraps that must end up holding the augment records. None of them is on
-        /// the test assembly's references â€” they are Godot projects â€” so the fact that each goes
+        /// the test assembly's references — they are Godot projects — so the fact that each goes
         /// through the shared root is read off its source.</summary>
         private static readonly string[] s_bootstraps =
         [
@@ -79,7 +79,7 @@
         {
             // Holding the records is half of it: a drop, a conversion or a window asks whether an
             // augment belongs somewhere, and that question needs the ability's tags as well. Both
-            // answers come out of the same catalog, so both are asked here â€” on a bound record,
+            // answers come out of the same catalog, so both are asked here — on a bound record,
             // seated on the ability its own data names and refused by every other.
             ServiceProvider container = CompositionWithoutBattle();
             LoadShippedData(container);
@@ -104,7 +104,7 @@
         {
             // The other half of the chain: the walks above resolve the catalog out of the shared
             // registration, and this one says who composes it. A bootstrap skipping the shared root
-            // would lose the records without a word â€” they are resolved by type, so their absence is
+            // would lose the records without a word — they are resolved by type, so their absence is
             // silent, which is exactly how three compositions went without them before.
             string root = Path.Combine(SrcRoot, s_sharedRoot);
             Assert.IsTrue(File.Exists(root), $"the shared composition root is not where it lived: {root}");
@@ -120,7 +120,7 @@
             }
         }
 
-        /// <summary>The container a project without the battle module builds â€” Core's own registrations
+        /// <summary>The container a project without the battle module builds — Core's own registrations
         /// and nothing else, which is what the loot and crafting sandboxes hold of the ability data.</summary>
         private static ServiceProvider CompositionWithoutBattle() =>
             new ServiceCollection().AddSharedGameDataParticipants().BuildServiceProvider();
@@ -153,7 +153,7 @@
 
         private static string Socket(string abilityId) => $"socket_{abilityId}";
 
-        /// <summary>Every augment id the shipped section writes, read off the files themselves â€” the
+        /// <summary>Every augment id the shipped section writes, read off the files themselves — the
         /// catalog is held against the data rather than against itself.</summary>
         private static List<string> DeclaredAugmentIds()
         {

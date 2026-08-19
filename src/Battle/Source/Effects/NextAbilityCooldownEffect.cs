@@ -7,7 +7,7 @@ namespace Battle.Source.Effects
     using Core.Modifiers.Context;
 
     /// <summary>
-    /// Deep Freeze L3 payload: the target's NEXT activated ability starts with +<c>amount</c>
+    /// Deep Freeze augment payload: the target's NEXT activated ability starts with +<c>amount</c>
     /// cooldown. One-shot — the mutator spends itself on the first activation it touches; the
     /// effect itself expires by duration if the target never casts.
     /// </summary>

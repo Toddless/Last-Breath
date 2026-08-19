@@ -6,7 +6,7 @@
     using Core.Modifiers;
     using Microsoft.Extensions.DependencyInjection;
 
-    /// <summary>Fast, seeded invariants of the drop pipeline â€” the economy's regression net.
+    /// <summary>Fast, seeded invariants of the drop pipeline — the economy's regression net.
     /// Run only these with: dotnet test --filter "TestCategory!=Simulation"</summary>
     [TestClass]
     public class LootSimulationTests
@@ -59,7 +59,7 @@
             };
             var result = await s_simulator.RunAsync(archetype, kills: 200);
 
-            // Mythic/Unique templates keep their data rarity by design â€” the floor applies to rolled equips.
+            // Mythic/Unique templates keep their data rarity by design — the floor applies to rolled equips.
             var rolledEquips = result.KillRecords
                 .SelectMany(kill => kill.Drops)
                 .Where(drop => drop is { IsEquip: true, Rarity: <= Rarity.Common });
@@ -302,7 +302,7 @@
             // The modifier procs on 20% of the purchases (tierUpgradeChance 0.2 in data): the share must
             // sit near that, not be a budget side-effect. Guards the once-dead JSON mapping.
             Assert.IsTrue(upgradedShare > 0.12f,
-                $"Tier-0 share {upgradedShare:P1} is far below the 20% upgrade chance â€” the modifier looks dead again.");
+                $"Tier-0 share {upgradedShare:P1} is far below the 20% upgrade chance — the modifier looks dead again.");
         }
 
         private static float TopTierShare(ScenarioResult result)

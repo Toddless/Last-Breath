@@ -36,10 +36,10 @@ namespace Battle.Source.Abilities.IceBlock
         /// <summary>Chance the cast clears its own cooldown when it is done.</summary>
         public float CooldownResetChance => this[AbilityParameter.CooldownResetChance];
 
-        /// <summary>L3 upgrade point: the stage-4 extra blocks crash on random enemies instead of the target.</summary>
+        /// <summary>Augment point: the stage-4 extra blocks crash on random enemies instead of the target.</summary>
         public bool ExtraBlocksHitRandomTargets { get; set; }
 
-        /// <summary>L3 upgrade point: an existing stun is consumed from the target and the block hits twice as hard.</summary>
+        /// <summary>Augment point: an existing stun is consumed from the target and the block hits twice as hard.</summary>
         public bool ConsumeStunForDoubleDamage { get; set; }
 
         public static class Parameters
@@ -152,7 +152,7 @@ namespace Battle.Source.Abilities.IceBlock
         }
 
         /// <summary>Stage 4: three more blocks crash down, each at a share of the main block's damage.
-        /// With the L3 upgrade every extra block picks its own random enemy.
+        /// With the augment every extra block picks its own random enemy.
         /// A hit and not a splash, on countability: the ability owns the number of them
         /// (<see cref="ExtraBlocks"/>, a parameter an augment can raise), each carries its own share of
         /// the damage and, upgraded, picks its own victim — while a splash is by definition the touch
