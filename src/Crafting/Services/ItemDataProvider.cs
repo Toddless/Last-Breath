@@ -72,8 +72,6 @@ namespace Crafting.Services
         public IReadOnlyList<IModifierDescriptor> GetEquipItemModifierPool(string id) =>
             !_equipItemModifierPools.TryGetValue(id, out var data) ? [] : data;
 
-        public Dictionary<string, int> GetEquipItemResources(string itemId) => throw new NotImplementedException();
-
         public IReadOnlyList<IModifierDescriptor> GetEquipItemBaseModifierPool(string id) =>
             !_equipItemModifierPools.TryGetValue(id.Split('_')[0], out var modifiers) ? [] : modifiers;
 

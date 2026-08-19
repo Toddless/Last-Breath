@@ -32,7 +32,6 @@
         IReadOnlyList<string> GetResourceIdsInCategory(string categoryId);
         /// <summary>Rollable affix pool of one item id (or an additive/mythic pool id) as immutable descriptors.</summary>
         IReadOnlyList<IModifierDescriptor> GetEquipItemModifierPool(string id);
-        Dictionary<string, int> GetEquipItemResources(string itemId);
         /// <summary>Family pool shared by every item of the piece (the id prefix before the first underscore).</summary>
         IReadOnlyList<IModifierDescriptor> GetEquipItemBaseModifierPool(string id);
         /// <summary>Sharpening cost resolved for the item's rarity (rune counts live in data, not code).</summary>

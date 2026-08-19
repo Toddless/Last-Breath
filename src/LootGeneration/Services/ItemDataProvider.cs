@@ -22,7 +22,6 @@ namespace LootGeneration.Services
         // Equip templates never enter _itemData: they live as blueprints and are born through the minter only.
         private readonly Dictionary<string, EquipItemBlueprint> _blueprints = [];
         private readonly Dictionary<string, List<IModifierDescriptor>> _equipItemModifierPools = [];
-        private readonly Dictionary<string, Dictionary<string, int>> _equipItemsResources = [];
 
         public IReadOnlyList<string> Catalogs =>
         [
@@ -30,7 +29,6 @@ namespace LootGeneration.Services
             DataCatalog.Recipes,
             DataCatalog.Resources,
             DataCatalog.ModifierPools,
-            DataCatalog.EquipItemResources,
         ];
 
         public void Apply(string catalog, GameDataFile file)
@@ -49,10 +47,6 @@ namespace LootGeneration.Services
                 case DataCatalog.ModifierPools:
                     foreach ((string id, var pool) in dataParser.ParseEquipItemModifierPools(file.Json))
                         _equipItemModifierPools.TryAdd(id, pool);
-                    break;
-                case DataCatalog.EquipItemResources:
-                    foreach ((string id, var resources) in dataParser.ParseEquipItemResources(file.Json))
-                        _equipItemsResources.TryAdd(id, resources);
                     break;
             }
         }
@@ -90,9 +84,6 @@ namespace LootGeneration.Services
             .OfType<ICraftingResource>()
             .Where(resource => resource.Material?.MaterialCategory?.Id == categoryId)
             .Select(resource => resource.Id)];
-
-        public Dictionary<string, int> GetEquipItemResources(string itemId) =>
-            _equipItemsResources.TryGetValue(itemId, out var res) ? res.ToDictionary() : [];
 
         // LootGeneration never upgrades or recrafts items — costs live in the crafting-side data.
         public IReadOnlyList<IRequirement> GetUpgradeCost(EquipmentCategory category, Rarity rarity) => [];

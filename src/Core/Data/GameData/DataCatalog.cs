@@ -34,7 +34,6 @@ namespace Core.Data.GameData
         public const string LootConfiguration = "LootConfiguration";
         public const string Items = "Items";
         public const string EquipItems = "EquipItems";
-        public const string EquipItemResources = "EquipItemResources";
         public const string Recipes = "Recipes";
         public const string CraftingAdditives = "CraftingAdditives";
         public const string CraftingMastery = "CraftingMastery";

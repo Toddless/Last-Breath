@@ -14,7 +14,6 @@ namespace Core.Data
     {
         LootTablesParseResult ParseLootTables(string json);
         LootConfigurationParseResult ParseLootConfiguration(string json);
-        Dictionary<string, Dictionary<string, int>> ParseEquipItemResources(string json);
         Dictionary<string, List<IModifierDescriptor>> ParseEquipItemModifierPools(string json);
         List<IItem> ParseItems(string json);
         List<EquipItemBlueprint> ParseEquipItems(string json);

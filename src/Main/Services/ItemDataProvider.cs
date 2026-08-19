@@ -19,7 +19,6 @@ namespace LastBreath.Services
         // Equip templates never enter _itemData: they live as blueprints and are born through the minter only.
         private readonly Dictionary<string, EquipItemBlueprint> _blueprints = [];
         private readonly Dictionary<string, List<IModifierDescriptor>> _equipItemModifierPools = [];
-        private readonly Dictionary<string, Dictionary<string, int>> _equipItemsResources = [];
         private Dictionary<CraftingMode, Dictionary<EquipmentCategory, List<CostRequirement>>> _upgradeCosts = [];
 
         public IReadOnlyList<string> Catalogs =>
@@ -28,7 +27,6 @@ namespace LastBreath.Services
             DataCatalog.Recipes,
             DataCatalog.Resources,
             DataCatalog.ModifierPools,
-            DataCatalog.EquipItemResources,
             DataCatalog.Items,
             DataCatalog.UpgradeCosts,
         ];
@@ -49,10 +47,6 @@ namespace LastBreath.Services
                 case DataCatalog.ModifierPools:
                     foreach ((string id, var pool) in dataParser.ParseEquipItemModifierPools(file.Json))
                         _equipItemModifierPools.TryAdd(id, pool);
-                    break;
-                case DataCatalog.EquipItemResources:
-                    foreach ((string id, var resources) in dataParser.ParseEquipItemResources(file.Json))
-                        _equipItemsResources.TryAdd(id, resources);
                     break;
                 // TODO:
                 // Данные предметы выбиваются из текущей архитектуры. Остаток старой системы. Убрать/переделать
@@ -97,9 +91,6 @@ namespace LastBreath.Services
             .OfType<ICraftingResource>()
             .Where(resource => resource.Material?.MaterialCategory?.Id == categoryId)
             .Select(resource => resource.Id)];
-
-        public Dictionary<string, int> GetEquipItemResources(string itemId) =>
-            _equipItemsResources.TryGetValue(itemId, out var res) ? res.ToDictionary() : [];
 
         public IReadOnlyList<IRequirement> GetUpgradeCost(EquipmentCategory category, Rarity rarity) => GetCost(CraftingMode.Upgrade, category, rarity);
         public IReadOnlyList<IRequirement> GetRecraftCost(EquipmentCategory category, Rarity rarity) => GetCost(CraftingMode.Recraft, category, rarity);

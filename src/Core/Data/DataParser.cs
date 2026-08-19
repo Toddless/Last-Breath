@@ -84,16 +84,6 @@ namespace Core.Data
                 data.MaxGoldPerKill);
         }
 
-        public Dictionary<string, Dictionary<string, int>> ParseEquipItemResources(string json)
-        {
-            // The shipped file is a bare array — deserializing the object wrapper here made the
-            // whole catalog silently fail to load (only visible as a Tracker line).
-            var data = JsonConvert.DeserializeObject<List<EquipItemResources>>(json) ?? throw new InvalidOperationException();
-            return data.ToDictionary(
-                e => e.ItemId,
-                e => e.Resources.ToDictionary(r => r.ResourceId, r => r.Amount));
-        }
-
         /// <summary>Rollable pools (item/family pools, mythic pool, additive recraft pools) parse straight
         /// into descriptors: every entry MUST claim a slot family (see <see cref="AffixPolicy.Required"/>).</summary>
         public Dictionary<string, List<IModifierDescriptor>> ParseEquipItemModifierPools(string json)
