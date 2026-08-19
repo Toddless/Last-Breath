@@ -50,6 +50,7 @@
         AllAttribute,
         AllDefence,
         AllResistancePenetration,
+        AllDoTDamageMultiplier,
 
         /// <summary>
         /// All elemental damage: cold, light, fire

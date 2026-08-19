@@ -7,7 +7,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
     /// the total damage to the full series (with incremental scaling applied).
     /// </summary>
     public class IpAugmentSingleEmpoweredAttack(string id, string[] tags, int tier)
-        : AbilityAugment<IncreasingPressure>(id, tags, tier)
+        : Augment<IncreasingPressure>(id, tags, tier)
     {
         private IIpExecutionStrategy? _previousStrategy;
 
@@ -24,7 +24,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
             _previousStrategy = null;
         }
 
-        public override IAbilityAugmentWrap<IncreasingPressure> Copy() =>
+        public override IAugmentWrap<IncreasingPressure> Copy() =>
             new IpAugmentSingleEmpoweredAttack(Id, Tags, Tier);
     }
 }

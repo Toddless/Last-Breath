@@ -17,12 +17,12 @@ namespace Battle.Source.Abilities
     /// another question and is not settled by the id — two augments reaching for the same parameter the
     /// same way are one effect, and only the strongest of them is read (<see cref="AbilityEffectIdentity"/>).
     /// </summary>
-    public class AbilityAugmentParameterSet(
+    public class AugmentParameterSet(
         string id,
         string[] tags,
         int tier,
         IReadOnlyList<(string Parameter, OperationType Operation, float Amount)> moves)
-        : AbilityAugment<Ability>(id, tags, tier)
+        : Augment<Ability>(id, tags, tier)
     {
         public override void ApplyUpgrade(Ability ability)
         {
@@ -37,7 +37,7 @@ namespace Battle.Source.Abilities
                 ability.RemoveParameterDecorator(DecoratorId(parameter), parameter);
         }
 
-        public override IAbilityAugment Copy() => new AbilityAugmentParameterSet(Id, Tags, Tier, moves);
+        public override IAbilityAugment Copy() => new AugmentParameterSet(Id, Tags, Tier, moves);
 
         private string DecoratorId(string parameter) => $"Ability_Parameter_Decorator_{Id}_{parameter}";
     }

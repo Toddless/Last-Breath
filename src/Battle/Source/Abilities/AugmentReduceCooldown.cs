@@ -12,8 +12,8 @@ namespace Battle.Source.Abilities
     /// never counts back down and the ability can never be cast again. An ability written to wait for
     /// nothing is untouched: the floor holds the cut back and hands out no wait the data never asked for.
     /// </summary>
-    public class AbilityAugmentReduceCooldown(string id, string[] tags, int tier, float cooldownTurns)
-        : AbilityAugment<Ability>(id, tags, tier)
+    public class AugmentReduceCooldown(string id, string[] tags, int tier, float cooldownTurns)
+        : Augment<Ability>(id, tags, tier)
     {
         private string DecoratorId => $"Ability_Parameter_Decorator_{Id}";
 
@@ -30,6 +30,6 @@ namespace Battle.Source.Abilities
         public override void RemoveUpgrade(Ability ability) =>
             ability.RemoveParameterDecorator(DecoratorId, AbilityParameter.Cooldown);
 
-        public override IAbilityAugment Copy() => new AbilityAugmentReduceCooldown(Id, Tags, Tier, cooldownTurns);
+        public override IAbilityAugment Copy() => new AugmentReduceCooldown(Id, Tags, Tier, cooldownTurns);
     }
 }

@@ -11,7 +11,7 @@ namespace Battle.Source.Abilities.PoisonCoating
     /// living enemies on the battlefield (instead of a fixed 1 stack).
     /// </summary>
     public class PcAugmentMultiStackOnHit(string id, string[] tags, int tier)
-        : AbilityAugment<PoisonCoating>(id, tags, tier)
+        : Augment<PoisonCoating>(id, tags, tier)
     {
         private PoisonCoating? _ability;
         private IFightable? _owner;
@@ -58,6 +58,6 @@ namespace Battle.Source.Abilities.PoisonCoating
             }
         }
 
-        public override IAbilityAugment Copy() => new PcAugmentMultiStackOnHit(Id, Tags, Tier);
+        public override IAugment Copy() => new PcAugmentMultiStackOnHit(Id, Tags, Tier);
     }
 }

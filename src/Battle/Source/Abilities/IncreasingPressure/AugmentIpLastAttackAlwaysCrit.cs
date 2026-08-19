@@ -5,13 +5,13 @@ namespace Battle.Source.Abilities.IncreasingPressure
 
     /// <summary>L3 upgrade: the last attack in the series always scores a critical hit.</summary>
     public class IpAugmentLastAttackAlwaysCrit(string id, string[] tags, int tier, LastAttackAlwaysCritContextModifier contextModifier)
-        : AbilityAugment<IncreasingPressure>(id, tags, tier)
+        : Augment<IncreasingPressure>(id, tags, tier)
     {
         public override void ApplyUpgrade(IncreasingPressure ability) => ability.AddAttackModifier(contextModifier);
 
         public override void RemoveUpgrade(IncreasingPressure ability) => ability.RemoveAttackModifier(contextModifier.Id);
 
-        public override IAbilityAugmentWrap<IncreasingPressure> Copy() =>
+        public override IAugmentWrap<IncreasingPressure> Copy() =>
             new IpAugmentLastAttackAlwaysCrit(Id, Tags, Tier, contextModifier);
     }
 }

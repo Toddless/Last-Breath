@@ -15,8 +15,8 @@ namespace Battle.Source.Abilities
     /// the fight. The design line for this record does not spell the floor out; the two cooldown lines
     /// beside it do, and the mechanism leaves no honest alternative.</para>
     /// </summary>
-    public class AbilityAugmentReduceCooldownAndCost(string id, string[] tags, int tier, float cooldownTurns, float costShare)
-        : AbilityAugment<Ability>(id, tags, tier)
+    public class AugmentReduceCooldownAndCost(string id, string[] tags, int tier, float cooldownTurns, float costShare)
+        : Augment<Ability>(id, tags, tier)
     {
         private string CooldownDecoratorId => $"Ability_Parameter_Decorator_{Id}_Cooldown";
         private string CostDecoratorId => $"Ability_Parameter_Decorator_{Id}_Cost";
@@ -37,6 +37,6 @@ namespace Battle.Source.Abilities
         }
 
         public override IAbilityAugment Copy() =>
-            new AbilityAugmentReduceCooldownAndCost(Id, Tags, Tier, cooldownTurns, costShare);
+            new AugmentReduceCooldownAndCost(Id, Tags, Tier, cooldownTurns, costShare);
     }
 }

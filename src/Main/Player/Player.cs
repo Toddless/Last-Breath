@@ -114,7 +114,6 @@ namespace LastBreath.Player
 
         public Fractions Fractions { get; } = Fractions.Human;
 
-        // why not x)
         public string PlayerName { get; private set; } = "Toddless";
 
         // TakeDamage owns the event order (damage beat first, death after) — see its comment.

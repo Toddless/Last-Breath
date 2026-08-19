@@ -4,7 +4,7 @@
     using Core.Battle.Abilities;
 
     public class PeAugmentExecuteBosses(string id, string[] tags, int tier, float stacksMultiplier = 1f)
-        : AbilityAugment<PoisonExplosion>(id, tags, tier)
+        : Augment<PoisonExplosion>(id, tags, tier)
     {
         private IExecuteCondition? _previousCondition;
 
@@ -15,6 +15,6 @@
         }
         public override void RemoveUpgrade(PoisonExplosion ability) => ability.ExecuteCondition = _previousCondition;
 
-        public override IAbilityAugment Copy() => new PeAugmentExecuteBosses(Id, Tags, Tier, stacksMultiplier);
+        public override IAugment Copy() => new PeAugmentExecuteBosses(Id, Tags, Tier, stacksMultiplier);
     }
 }

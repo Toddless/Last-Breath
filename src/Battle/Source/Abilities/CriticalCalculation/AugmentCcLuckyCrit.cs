@@ -8,7 +8,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
     /// L3: for the ability's buff duration, the caster's critical chance becomes "Lucky".
     /// </summary>
     public class CcAugmentLuckyCrit(string id, string[] tags, int tier, int duration)
-        : AbilityAugment<CriticalCalculation>(id, tags, tier)
+        : Augment<CriticalCalculation>(id, tags, tier)
     {
         private readonly IActivationRider _modifier =
             new AbilityBuffActivationRider(new LuckyCritChanceEffect(duration, 1));
@@ -17,6 +17,6 @@ namespace Battle.Source.Abilities.CriticalCalculation
 
         public override void RemoveUpgrade(CriticalCalculation ability) => ability.RemoveActivationRider(RiderKey(_modifier.Id));
 
-        public override IAbilityAugment Copy() => new CcAugmentLuckyCrit(Id, Tags, Tier, duration);
+        public override IAugment Copy() => new CcAugmentLuckyCrit(Id, Tags, Tier, duration);
     }
 }
