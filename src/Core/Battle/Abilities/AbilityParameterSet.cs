@@ -32,6 +32,10 @@ namespace Core.Battle.Abilities
 
         private readonly HashSet<string> _appliedDurations = new(StringComparer.Ordinal);
 
+        private readonly HashSet<string> _weaponScales = new(StringComparer.Ordinal);
+
+        private readonly HashSet<string> _spellScales = new(StringComparer.Ordinal);
+
         public event Action<string>? ParameterChanged;
 
         /// <summary>
@@ -42,6 +46,19 @@ namespace Core.Battle.Abilities
         /// </summary>
         public IReadOnlyCollection<string> AppliedDurations => _appliedDurations;
 
+        /// <summary>
+        /// Keys that are coefficients of the caster's weapon damage in the figures this cast deals, and
+        /// the same for spell damage. A delivery has one pair per figure — the main blow, a second strike,
+        /// a later stage, a fragment, a detonation — and every pair but the book's own is spelled
+        /// privately, so membership is the ability's word (<see cref="DeclareScales"/>). The book's pair
+        /// joins wherever it is registered: a key of <see cref="AbilityParameter"/> means the same thing in
+        /// every ability, so nothing has to say so twice.
+        /// </summary>
+        public IReadOnlyCollection<string> WeaponScales => _weaponScales;
+
+        /// <inheritdoc cref="WeaponScales"/>
+        public IReadOnlyCollection<string> SpellScales => _spellScales;
+
         public IReadOnlyCollection<string> Keys => _baseValues.Keys;
 
         public float this[string parameter] => GetValue(parameter);
@@ -50,14 +67,22 @@ namespace Core.Battle.Abilities
 
         public void Register(string parameter, Func<float> baseValue)
         {
-            if (_baseValues.TryAdd(parameter, baseValue)) return;
+            if (_baseValues.TryAdd(parameter, baseValue))
+            {
+                JoinBookScales(parameter);
+                return;
+            }
+
             Tracker.TrackError($"Ability parameter '{parameter}' is already registered", this);
         }
 
         /// <summary>The ability's fallback for a parameter the data may supply: silently skipped when
         /// the key is already registered (e.g. auto-registered from abilityProperties). The ability's
         /// own, so it is never counted as lent and no upgrade can take it away.</summary>
-        public void RegisterDefault(string parameter, float value) => _baseValues.TryAdd(parameter, () => value);
+        public void RegisterDefault(string parameter, float value)
+        {
+            if (_baseValues.TryAdd(parameter, () => value)) JoinBookScales(parameter);
+        }
 
         /// <summary>
         /// The same fallback, and a word about what the number IS: a duration of something this cast puts
@@ -70,6 +95,33 @@ namespace Core.Battle.Abilities
             RegisterDefault(parameter, value);
             _appliedDurations.Add(parameter);
         }
+
+        /// <summary>
+        /// Says the pair are the weapon and spell coefficients of one more figure this cast deals. They
+        /// come in twos because a figure reads both, and a figure the ability keeps quiet about is a touch
+        /// no record selling scales can reach — which is how "+40% weapon scale" bought the first strike of
+        /// a double strike and left the second one exactly where the data had put it.
+        /// </summary>
+        public void DeclareScales(string weaponParameter, string spellParameter)
+        {
+            _weaponScales.Add(weaponParameter);
+            _spellScales.Add(spellParameter);
+        }
+
+        /// <summary>
+        /// The parameters a move on the given key lands on. Every key but the two scales is itself — a key
+        /// names one number. The scale keys name a FAMILY, because scale points are sold to the CAST and
+        /// not to whichever of its touches the book's own key happens to carry: an ability whose damage
+        /// lives in a staged or secondary pair would otherwise wear the record, pay for it and hit exactly
+        /// as hard as before. An ability that scales nothing has an empty family and the move lands
+        /// nowhere, which is the record being inert rather than a key gone missing.
+        /// </summary>
+        public IReadOnlyCollection<string> Family(string parameter) => parameter switch
+        {
+            AbilityParameter.WeaponDamageScale => _weaponScales,
+            AbilityParameter.SpellDamageScale => _spellScales,
+            _ => [parameter]
+        };
 
         /// <summary>
         /// Lends the ability a parameter it does not own — an upgrade arriving with a number of its own,
@@ -133,6 +185,14 @@ namespace Core.Battle.Abilities
             float value = baseValue();
             if (!_decorators.TryGetValue(parameter, out var decorators)) return value;
             return Working(decorators, value).Aggregate(value, (current, decorator) => decorator.Decorate(current));
+        }
+
+        /// <summary>The book's own scale keys are members of their family the moment they are declared,
+        /// however the ability declared them — they carry the main blow of every cast that has one.</summary>
+        private void JoinBookScales(string parameter)
+        {
+            if (string.Equals(parameter, AbilityParameter.WeaponDamageScale, StringComparison.Ordinal)) _weaponScales.Add(parameter);
+            else if (string.Equals(parameter, AbilityParameter.SpellDamageScale, StringComparison.Ordinal)) _spellScales.Add(parameter);
         }
 
         /// <summary>The parameter as the ability itself registered it — the ground rivals are weighed on.</summary>

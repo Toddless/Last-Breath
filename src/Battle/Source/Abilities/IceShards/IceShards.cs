@@ -52,6 +52,8 @@ namespace Battle.Source.Abilities.IceShards
             parameters.RegisterDefault(Parameters.SecondStageDamage, 120f);
             parameters.RegisterDefault(Parameters.SecondStageWeaponDamageScale, 0.35f);
             parameters.RegisterDefault(Parameters.SecondStageSpellDamageScale, 1.2f);
+            parameters.DeclareScales(Parameters.ShrapnelWeaponDamageScale, Parameters.ShrapnelSpellDamageScale);
+            parameters.DeclareScales(Parameters.SecondStageWeaponDamageScale, Parameters.SecondStageSpellDamageScale);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new IceShards(Data) { CritIgnoresColdResistance = CritIgnoresColdResistance });

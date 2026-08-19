@@ -50,6 +50,19 @@
         /// buff the caster keeps on itself.</summary>
         IReadOnlyCollection<string> AppliedDurations { get; }
 
+        /// <summary>Keys this ability calls coefficients of the caster's weapon damage in the figures it
+        /// deals, and the same for spell damage — the families a record selling scale points moves. Empty
+        /// for a cast that scales nothing off either.</summary>
+        IReadOnlyCollection<string> WeaponScales { get; }
+
+        /// <inheritdoc cref="WeaponScales"/>
+        IReadOnlyCollection<string> SpellScales { get; }
+
+        /// <summary>What a move on the given key actually lands on: the key itself for everything that
+        /// names one number, and the whole family for the two damage scales, which name every coefficient
+        /// of the delivery rather than the one the main blow happens to read.</summary>
+        IReadOnlyCollection<string> Family(string parameter);
+
         /// <summary>False = no backing out once target selection began: the player must pick a
         /// target and the cast fires (charged Armageddon). Default true.</summary>
         bool IsCancellable => true;

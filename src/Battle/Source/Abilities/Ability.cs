@@ -71,6 +71,12 @@
 
         public IReadOnlyCollection<string> AppliedDurations => Params.AppliedDurations;
 
+        public IReadOnlyCollection<string> WeaponScales => Params.WeaponScales;
+
+        public IReadOnlyCollection<string> SpellScales => Params.SpellScales;
+
+        public IReadOnlyCollection<string> Family(string parameter) => Params.Family(parameter);
+
         /// <summary>
         /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
         /// Damage-dealing descendants stamp it onto their DamageContexts so the BattleDirector

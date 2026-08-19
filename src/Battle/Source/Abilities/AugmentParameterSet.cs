@@ -12,10 +12,17 @@ namespace Battle.Source.Abilities
     ///
     /// A decorator's id is the augment's id and the parameter it moves, which is what an upgrade takes
     /// off again: the pair names one move of one record, so taking this augment off an ability leaves
-    /// everything else it wears exactly where it was. One augment never names the same parameter twice,
-    /// so the pair is unique by construction. Whether the move actually works once it is seated is
+    /// everything else it wears exactly where it was. Uniqueness of the pair is not free any more — a
+    /// record naming both the book's scale key and a private member of the same family would land twice on
+    /// that member and only one of the two would ever come off — so it is asserted rather than assumed
+    /// (<c>NoTableRecordNamesTwoMembersOfOneFamily</c>). Whether the move actually works once it is seated is
     /// another question and is not settled by the id — two augments reaching for the same parameter the
     /// same way are one effect, and only the strongest of them is read (<see cref="AbilityEffectIdentity"/>).
+    ///
+    /// A key names one number everywhere except the two damage scales, which name a family: the ability
+    /// answers with every coefficient its delivery reads (<see cref="AbilityParameterSet.Family"/>) and
+    /// the move is laid on each of them. Scale points are sold to the CAST, so a delivery of several
+    /// figures gets them all rather than whichever figure the book's own key happens to carry.
     /// </summary>
     public class AugmentParameterSet(
         string id,
@@ -26,19 +33,19 @@ namespace Battle.Source.Abilities
     {
         public override void ApplyUpgrade(Ability ability)
         {
-            foreach ((string parameter, OperationType operation, float amount) in moves)
-                ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
-                    parameter, Priority.Weak, operation, amount, DecoratorId(parameter), Id, rank: Tier));
+            foreach ((string move, OperationType operation, float amount) in moves)
+                foreach (string parameter in ability.Family(move))
+                    ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
+                        parameter, Priority.Weak, operation, amount, DecoratorId(parameter), Id, rank: Tier));
         }
 
         public override void RemoveUpgrade(Ability ability)
         {
-            foreach ((string parameter, _, _) in moves)
-                ability.RemoveParameterDecorator(DecoratorId(parameter), parameter);
+            foreach ((string move, _, _) in moves)
+                foreach (string parameter in ability.Family(move))
+                    ability.RemoveParameterDecorator(DecoratorId(parameter), parameter);
         }
 
         public override IAugment Copy() => new AugmentParameterSet(Id, Tags, Tier, moves);
-
-        private string DecoratorId(string parameter) => $"Ability_Parameter_Decorator_{Id}_{parameter}";
     }
 }

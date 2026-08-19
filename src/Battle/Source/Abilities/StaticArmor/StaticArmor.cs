@@ -58,6 +58,7 @@ namespace Battle.Source.Abilities.StaticArmor
             parameters.RegisterDefault(Parameters.DetonationDamage, 250f);
             parameters.RegisterDefault(Parameters.DetonationWeaponScale, 0.85f);
             parameters.RegisterDefault(Parameters.DetonationSpellScale, 0.75f);
+            parameters.DeclareScales(Parameters.DetonationWeaponScale, Parameters.DetonationSpellScale);
             parameters.RegisterDefault(Parameters.RequiredStacks, 3);
             parameters.RegisterAppliedDuration(Parameters.ChargeDuration, 3);
             parameters.RegisterDefault(Parameters.StageTwoBarrierRestore, 0.25f);

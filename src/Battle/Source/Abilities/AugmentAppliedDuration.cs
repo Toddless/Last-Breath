@@ -35,7 +35,5 @@ namespace Battle.Source.Abilities
         }
 
         public override IAugment Copy() => new AugmentAppliedDuration(Id, Tags, Tier, turns);
-
-        private string DecoratorId(string parameter) => $"Ability_Parameter_Decorator_{Id}_{parameter}";
     }
 }

@@ -112,10 +112,22 @@ namespace LastBreathTest.BattleSystemTests
             // waiting and no damage. Not a defect of the record — a consequence of the two tags its design
             // line gives it, and the narrower alternative (binding it to abilities that declare scales) is
             // the owner's to pick.
+            // The static armor left this list at Б-2: it pays the turns and now gets the scale points, its
+            // detonation coefficients having joined the family the record moves.
             ["Augment_Increasing_Scales_Add_Cooldown"] =
                 ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
                  "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine",
-                 "Ability_Sacrifice", "Ability_Static_Armor"]
+                 "Ability_Sacrifice"],
+
+            // The same bargain shape one record along, and the reason Б-2 was opened at all. This one is a
+            // factory rather than a table row (its bill is a SHARE of the cast's own price), so the
+            // completeness walk cannot ask it what it moves and its rows are written here by hand. 'scale'
+            // reaches the damaging family and 'cost' reaches every ability that is paid for, so on the nine
+            // below the player buys a surcharge and no damage.
+            ["Augment_Increasing_Scales_Add_Cost"] =
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
+                 "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine",
+                 "Ability_Sacrifice"]
         };
 
         private static IEnumerable<string> Accepted(string augmentId) =>
@@ -156,18 +168,21 @@ namespace LastBreathTest.BattleSystemTests
             // Written down for the first time at CL-7b, found by the completeness walk rather than by
             // anybody noticing: both records are OLDER than the crit pair and had been standing on shared
             // keys unledgered all along. The scales are declared by every damaging ability through
-            // RegisterDamageParameters, so the pair works almost everywhere it lands; the Static Armor is
-            // the one exception, its detonation carrying scales of its own instead.
+            // RegisterDamageParameters, so the pair works everywhere it lands.
+            // The Static Armor was the one exception until Б-2, when the two scale keys stopped naming one
+            // number each and started naming the FAMILY of coefficients the delivery reads: its detonation
+            // carries a pair of its own and never registered the book's, so a record seated on it used to
+            // decorate a key nothing in the cast consulted.
             ("Augment_Increasing_Scales", AbilityParameter.WeaponDamageScale,
                 ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
                  "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
-                 "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
-                ["Ability_Static_Armor"]),
+                 "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks", "Ability_Static_Armor"],
+                []),
             ("Augment_Increasing_Scales", AbilityParameter.SpellDamageScale,
                 ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
                  "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
-                 "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks"],
-                ["Ability_Static_Armor"]),
+                 "Ability_Increasing_Pressure", "Ability_Series_Of_Attacks", "Ability_Static_Armor"],
+                []),
 
             // The cost half of the stun bargain. Cost is a base-contract key every ability registers, so
             // this half never misses — which is exactly why it needed writing down: the row above it
@@ -370,16 +385,50 @@ namespace LastBreathTest.BattleSystemTests
                  "Ability_Poison_Coating", "Ability_Porcupine", "Ability_Static_Armor"],
                 ["Ability_Berserk_Fury"]),
 
+            // Two of the three inert names are still inert after Б-2 and for reasons that have nothing to do
+            // with a key: the aegis scales a barrier off INTELLIGENCE and the explosion's damage IS the
+            // poison stacks it consumes, so neither has a weapon or spell coefficient anywhere in it. The
+            // static armor left because it has a pair and merely spelled it privately.
             ("Augment_Weapon_Scale", AbilityParameter.WeaponDamageScale,
                 ["Ability_Armageddon", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
                  "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
-                 "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks"],
-                ["Ability_Ice_Aegis", "Ability_Poison_Explosion", "Ability_Static_Armor"]),
+                 "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks", "Ability_Static_Armor"],
+                ["Ability_Ice_Aegis", "Ability_Poison_Explosion"]),
             ("Augment_Spell_Scale", AbilityParameter.SpellDamageScale,
                 ["Ability_Armageddon", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
                  "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards", "Ability_Increasing_Pressure",
-                 "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks"],
-                ["Ability_Ice_Aegis", "Ability_Poison_Explosion", "Ability_Static_Armor"]),
+                 "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks", "Ability_Static_Armor"],
+                ["Ability_Ice_Aegis", "Ability_Poison_Explosion"]),
+
+            // Б-2. The record the owner reported and the first FACTORY record to get rows: the completeness
+            // walk reads the numeric table and a factory carries its work where the table cannot see it, so
+            // this one had been standing on two shared keys unledgered since it was written. The lists are
+            // the scale rows above plus the jar and the berserker, who reach it through 'scale' and 'cost'.
+            ("Augment_Increasing_Scales_Add_Cost", AbilityParameter.WeaponDamageScale,
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
+                 "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine",
+                 "Ability_Sacrifice"]),
+            ("Augment_Increasing_Scales_Add_Cost", AbilityParameter.SpellDamageScale,
+                ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
+                 "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
+                 "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine",
+                 "Ability_Sacrifice"]),
+            // The bill, which is a share and so never misses: every ability is paid for.
+            ("Augment_Increasing_Scales_Add_Cost", AbilityParameter.CostValue,
+                ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
+                 "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
+                 "Ability_Head_Butt", "Ability_Ice_Aegis", "Ability_Ice_Block", "Ability_Ice_Shards",
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Overload", "Ability_Poison_Coating",
+                 "Ability_Poison_Explosion", "Ability_Porcupine", "Ability_Sacrifice", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
+                []),
 
             // The widest half-arrival in the catalog, and it comes straight out of the design line's own
             // tags: 'scale' reaches the damaging family, 'cooldown' reaches EVERY ability, and the record
@@ -389,17 +438,19 @@ namespace LastBreathTest.BattleSystemTests
             ("Augment_Increasing_Scales_Add_Cooldown", AbilityParameter.WeaponDamageScale,
                 ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
                  "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
-                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks"],
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
                 ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
                  "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine",
-                 "Ability_Sacrifice", "Ability_Static_Armor"]),
+                 "Ability_Sacrifice"]),
             ("Augment_Increasing_Scales_Add_Cooldown", AbilityParameter.SpellDamageScale,
                 ["Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Deep_Freeze", "Ability_Discharge",
                  "Ability_Double_Strike", "Ability_Head_Butt", "Ability_Ice_Block", "Ability_Ice_Shards",
-                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks"],
+                 "Ability_Increasing_Pressure", "Ability_Jar_Of_Poison", "Ability_Series_Of_Attacks",
+                 "Ability_Static_Armor"],
                 ["Ability_Ares_Blessing", "Ability_Critical_Calculation", "Ability_Dark_Shroud", "Ability_Ice_Aegis",
                  "Ability_Overload", "Ability_Poison_Coating", "Ability_Poison_Explosion", "Ability_Porcupine",
-                 "Ability_Sacrifice", "Ability_Static_Armor"]),
+                 "Ability_Sacrifice"]),
             ("Augment_Increasing_Scales_Add_Cooldown", AbilityParameter.Cooldown,
                 ["Ability_Ares_Blessing", "Ability_Armageddon", "Ability_Berserk_Fury", "Ability_Critical_Calculation",
                  "Ability_Dark_Shroud", "Ability_Deep_Freeze", "Ability_Discharge", "Ability_Double_Strike",
@@ -593,14 +644,24 @@ namespace LastBreathTest.BattleSystemTests
             return (works, inert);
         }
 
-        /// <summary>Whether anything on the ability reads the key: a move is laid on it and the number
-        /// is read back. An unregistered key answers the same nothing before and after, which is what
-        /// being inert IS — the augment is worn and changes not one number of the cast.</summary>
+        /// <summary>Whether anything on the ability reads the key: a move is laid on it and the numbers are
+        /// read back. An unregistered key answers the same nothing before and after, which is what being
+        /// inert IS — the augment is worn and changes not one number of the cast.
+        /// <para>What a move lands on is asked of the ability rather than assumed to be the key itself: the
+        /// two damage scales name every coefficient of the delivery, so an ability whose damage lives in a
+        /// staged or secondary pair moves through them without ever registering the book's own key.</para>
+        /// </summary>
         private static bool Moves(IAbility ability, string parameter)
         {
-            float before = ability[parameter];
+            string[] family = [.. ability.Family(parameter)];
+            float[] before = [.. family.Select(member => ability[member])];
+
             new AugmentParameterSet("Augment_Reach_Probe", [], 3, [(parameter, OperationType.Add, Probe)]).Apply(ability);
-            return Math.Abs(ability[parameter] - before) > 0.0001f;
+
+            for (int member = 0; member < family.Length; member++)
+                if (Math.Abs(ability[family[member]] - before[member]) > 0.0001f) return true;
+
+            return false;
         }
 
         /// <summary>Everything one cast of the ability left standing, on its caster and on the field.</summary>

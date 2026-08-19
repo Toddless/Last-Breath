@@ -26,6 +26,11 @@
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
 
+        /// <summary>The name a move of THIS RECORD is seated under on a parameter. The record and the
+        /// parameter, so one augment coming off an ability leaves every other move it made where it was,
+        /// and so a record moving several parameters names each of them once.</summary>
+        protected string DecoratorId(string parameter) => $"Ability_Parameter_Decorator_{Id}_{parameter}";
+
         /// <summary>The name THIS COPY's rider is seated under — see <see cref="RiderKeys"/>. Keyed by
         /// record the two copies were one: the first to arrive installed the only rider and the first to
         /// leave took it away from the other.</summary>

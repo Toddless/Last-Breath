@@ -79,6 +79,8 @@ namespace Battle.Source.Abilities.Armageddon
             parameters.RegisterDefault(Parameters.ThirdDamage, 1000f);
             parameters.RegisterDefault(Parameters.ThirdWeaponScale, 1.8f);
             parameters.RegisterDefault(Parameters.ThirdSpellScale, 1.8f);
+            parameters.DeclareScales(Parameters.SecondWeaponScale, Parameters.SecondSpellScale);
+            parameters.DeclareScales(Parameters.ThirdWeaponScale, Parameters.ThirdSpellScale);
             parameters.RegisterDefault(Parameters.Stage1HpCost, 0.05f);
             parameters.RegisterDefault(Parameters.Stage2HpCost, 0.15f);
             parameters.RegisterDefault(Parameters.Stage3HpCost, 0.30f);
