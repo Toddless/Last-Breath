@@ -3,22 +3,16 @@ namespace Core.PassiveTree
     using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    /// <summary>
-    /// The on-disk shape of a tree, written in the game's own data dialect: Newtonsoft records with
-    /// explicit <c>JsonProperty</c> names, camelCase keys, enums as strings. Property order here is
-    /// key order in the file — reorder a member and every existing file re-diffs.
-    /// </summary>
+    /// <summary>On-disk shape of a tree: Newtonsoft records, explicit <c>JsonProperty</c> names, camelCase
+    /// keys, enums as strings. Property order here is key order in the file — reordering re-diffs every file.</summary>
     public sealed class PassiveTreeDto
     {
         [JsonProperty("version")] public int Version { get; set; } = PassiveTreeFormat.Version;
 
         [JsonProperty("budget")] public int Budget { get; set; } = PassiveTreeDocument.DefaultBudget;
 
-        /// <summary>
-        /// How far apart the layout is drawn. Absent means the authored default, which is what a file
-        /// written before the field existed meant, so the writer leaves the key out at that value rather
-        /// than adding a line to every tree ever saved to say "unchanged".
-        /// </summary>
+        /// <summary>How far apart the layout is drawn. Absent means the authored default (what a
+        /// pre-field file meant), so the writer omits the key at that value rather than say "unchanged".</summary>
         [JsonProperty("spread", NullValueHandling = NullValueHandling.Ignore)]
         public float? Spread { get; set; }
 

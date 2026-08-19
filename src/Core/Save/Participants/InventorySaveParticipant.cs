@@ -7,16 +7,11 @@ namespace Core.Save.Participants
     using Items;
     using Newtonsoft.Json.Linq;
 
-    /// <summary>
-    /// Persists the bag. Rolled equip items round-trip through <see cref="EquipItemSaveConverter"/>
-    /// (their modifiers are unique) and augment copies through <see cref="IAugmentItemMinter"/> (their
-    /// numbers are); stackable resources are stored as id + amount and rebuilt from the item data.
-    /// Runs at <see cref="RestoreOrder.Items"/> — the item data providers are loaded and the bag has
-    /// been emptied by the session reset before this restores into it.
-    /// </summary>
-    /// <param name="augments">Optional: a composition that cannot build augments holds none in its
-    /// bag either. A file that does carry one is reported rather than dropped in silence — the copy's
-    /// numbers exist nowhere else and nothing can roll them again.</param>
+    /// <summary>Persists the bag. Rolled equip items round-trip through <see cref="EquipItemSaveConverter"/>
+    /// and augment copies through <see cref="IAugmentItemMinter"/> (both unique, non-reproducible numbers);
+    /// stackable resources are stored as id + amount and rebuilt from item data.</summary>
+    /// <param name="augments">Optional: a composition that can't build augments holds none. A file that
+    /// does carry one is reported rather than dropped silently — the copy's numbers can't be rolled again.</param>
     public class InventorySaveParticipant(
         IInventory inventory,
         IItemDataProvider itemData,
@@ -72,9 +67,8 @@ namespace Core.Save.Participants
             _ => new() { Amount = amount, ResourceId = item.Id },
         };
 
-        /// <summary>Puts the copy back exactly as it was written down. A record the catalog no longer
-        /// declares — or a build that mints no augments at all — cannot produce it, and the loss is
-        /// said out loud: the numbers were the copy's own and nothing can draw them again.</summary>
+        /// <summary>An unrecognized record, or a build that mints no augments, can't reproduce the
+        /// copy — the loss is reported rather than silent.</summary>
         private void RestoreAugment(AugmentSaveData saved)
         {
             if (augments?.Remembered(saved.Augment, saved.Values, saved.Rarity, saved.Effect) is { } copy && augments.Restore(copy) is { } item)

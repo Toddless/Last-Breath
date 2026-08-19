@@ -3,13 +3,10 @@ namespace Core.PassiveTree.Context
     using Entity;
     using Interfaces;
 
-    /// <summary>
-    /// A context line of a taken node with its predicate resolved: the pair a knob's total is added up
-    /// from. A line that names no condition carries no predicate and always counts, which is what keeps
-    /// an unconditional allocation exactly as expensive to read as it was before conditions existed.
-    /// <para>The predicate is per line and per fighter — it holds the state of the one it watches — so it
-    /// belongs here rather than on the authored line, which is shared by everyone reading the document.</para>
-    /// </summary>
+    /// <summary>A context line of a taken node with its predicate resolved — the pair a knob's total is
+    /// added from. No condition means it always counts, keeping an unconditional allocation as cheap to
+    /// read as before conditions existed. The predicate is per line and per fighter (it holds the watched
+    /// state), so it lives here rather than on the authored line shared by every reader.</summary>
     public sealed class TreeContextLine(ContextModifierLine line, ICondition? condition)
     {
         public ContextModifierLine Line { get; } = line;

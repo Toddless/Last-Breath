@@ -4,11 +4,8 @@ namespace Core.PassiveTree
     using System.Collections.Generic;
     using System.Linq;
 
-    /// <summary>
-    /// The tree itself: nodes, undirected links and the point budget. Every structural change goes
-    /// through this class so the id lookup, the adjacency map and the spatial index can never drift
-    /// apart from the node list.
-    /// </summary>
+    /// <summary>The tree itself: nodes, undirected links and the point budget. Every structural change
+    /// goes through this class so the id lookup, adjacency map and spatial index never drift apart.</summary>
     public sealed class PassiveTreeDocument
     {
         private readonly List<PassiveNode> _nodes = [];
@@ -23,9 +20,8 @@ namespace Core.PassiveTree
 
         public IReadOnlyList<PassiveNode> Nodes => _nodes;
 
-        /// <summary>No content at all: what the provider holds before the catalog is read and what the
-        /// reader hands out for a file that failed to parse. An allocation cannot be checked against
-        /// such a document — there is nothing for its ids to be missing from.</summary>
+        /// <summary>No content at all: pre-catalog-load, or a file that failed to parse. An allocation
+        /// cannot be checked against this — there's nothing for its ids to be missing from.</summary>
         public bool IsEmpty => _nodes.Count == 0;
 
         public IReadOnlyCollection<NodeLink> Links => _links;
@@ -50,20 +46,13 @@ namespace Core.PassiveTree
 
         public const int DefaultBudget = 62;
 
-        /// <summary>
-        /// How far apart the layout is pulled when it is drawn. It multiplies DISTANCES and nothing
-        /// else, so raising it opens the gaps a dense wheel hides its edges in while every node keeps
-        /// the size it was authored at.
-        /// <para>It belongs to the document and not to a viewer's settings: the author lays the tree out
-        /// while looking at it spread, so a reader that drew the same coordinates at another spread
-        /// would be showing a wheel nobody composed. Coordinates themselves are never touched by it —
-        /// the file keeps the numbers their author typed.</para>
-        /// </summary>
+        /// <summary>How far apart the layout is pulled when drawn — multiplies distances only, node size
+        /// unaffected. Belongs to the document, not a viewer's setting: the author composes the tree at
+        /// this spread, and coordinates on disk are never touched by it.</summary>
         public float Spread { get; set; } = View.CanvasTransform.DefaultSpread;
 
-        /// <summary>Stamped on every modifier a tree node contributes. Taking a node back means
-        /// dropping the modifiers carrying this source, so two spellings of it would mean lines that
-        /// can be granted and never revoked.</summary>
+        /// <summary>Stamped on every modifier a tree node contributes so a refund can find and drop it;
+        /// two spellings would mean lines granted and never revoked.</summary>
         public const string ModifierSource = "PassiveTree";
 
         public PassiveNode? Find(string id) => _byId.GetValueOrDefault(id);
@@ -154,12 +143,8 @@ namespace Core.PassiveTree
             return $"{prefix}_{suffix}";
         }
 
-        /// <summary>
-        /// The next id in the same series as an existing one: "small_strength_1" begets
-        /// "small_strength_2". Naming a cluster once is enough — the rest of it follows on its own.
-        /// A template without a trailing number starts a series ("armor_hub" → "armor_hub_2"), and
-        /// zero padding is kept ("node_01" → "node_02").
-        /// </summary>
+        /// <summary>Next id in the same series as an existing one ("small_strength_1" → "_2"); a template
+        /// with no trailing number starts one ("armor_hub" → "armor_hub_2"), zero padding is kept.</summary>
         public string NextIdFrom(string template)
         {
             if (string.IsNullOrWhiteSpace(template)) return NextId(PassiveNodeKind.Small);
@@ -194,17 +179,14 @@ namespace Core.PassiveTree
                 NodeKindRule rule = NodeKindRules.For(node.Kind);
                 bool hub = NodeKindRules.IsWheelHub(node);
 
-                // Both channels count against one limit: a line is content whichever road it takes to
-                // the fighter, and counting only the parametric ones would let a node carry a second
-                // payload nobody budgeted for.
+                // Both channels count against one limit — a line is content whichever road it takes.
                 if (node.LineCount < rule.MinModifiers)
                     issues.Add($"{node.Id}: {node.Kind} needs at least {rule.MinModifiers} modifier line(s), has {node.LineCount}");
 
                 if (node.LineCount > rule.MaxModifiers)
                     issues.Add($"{node.Id}: {node.Kind} allows at most {rule.MaxModifiers} modifier line(s), has {node.LineCount}");
 
-                // The hub is the one start that opens no stance, so it is also the one start with no
-                // ability to open: what a stance is given at its seed, the centre of the wheel is not.
+                // The hub opens no stance, so unlike a stance seed it is given no ability either.
                 if (rule.RequiresAbility && !hub && string.IsNullOrWhiteSpace(node.AbilityId))
                     issues.Add($"{node.Id}: {node.Kind} must reference an ability");
 
@@ -219,8 +201,7 @@ namespace Core.PassiveTree
             if (_nodes.Count > 0 && seedCount != StartPointCount)
                 issues.Add($"the tree has {seedCount} stance start point(s), the design calls for {StartPointCount}");
 
-            // More than one centre is a wheel with more than one middle: every extra hub is another root
-            // granted with the character, and the rays would hang off whichever one the author forgot.
+            // Every extra hub is another free root; the wheel has one centre.
             int hubCount = _nodes.Count(NodeKindRules.IsWheelHub);
             if (hubCount > 1)
                 issues.Add($"the tree has {hubCount} wheel hub(s) — start points without a stance — and the wheel has one centre");

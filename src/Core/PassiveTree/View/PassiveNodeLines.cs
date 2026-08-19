@@ -6,35 +6,29 @@ namespace Core.PassiveTree.View
 
     /// <summary>One line of a node as the player reads it.</summary>
     /// <param name="Text">The finished sentence, already through the game's own templates.</param>
-    /// <param name="IsConditional">The line is gated on a predicate. Marked rather than hidden: a
-    /// conditional line is content the node carries, and a wheel that showed it as unconditional would
-    /// promise a number the character does not always have.</param>
+    /// <param name="IsConditional">The line is gated on a predicate — marked rather than hidden, so the
+    /// wheel never shows a number the character doesn't always have.</param>
     public readonly record struct PassiveNodeLine(string Text, bool IsConditional);
 
     /// <summary>
     /// What a node says, in the same words the rest of the game uses: modifier lines through
     /// <see cref="ModifierFormatter"/> and pipeline knobs through <see cref="ContextModifierFormatter"/>,
-    /// so a passive reads exactly the way the same line reads in an item tooltip — same .po templates,
-    /// same percent-versus-number decision per parameter.
-    /// <para>One reading for the whole game: the wheel's tooltip and its node card both come through
-    /// here, so the two can never word the same node differently.</para>
+    /// so a passive reads exactly like the same line in an item tooltip — same .po templates, same
+    /// percent-versus-number decision. One reading for the whole game: the wheel's tooltip and its node
+    /// card both come through here, so the two can never word a node differently.
     /// </summary>
     public static class PassiveNodeLines
     {
-        /// <summary>How many steps a route needs before its price is worth printing beside the node. Every
-        /// node in the tree costs a point, so on a neighbour the figure only repeats what the player
-        /// already knows; from two steps on it stops being a property of the node and becomes one of the
-        /// distance to it, which is the number a plan is actually made with.</summary>
+        /// <summary>Minimum route length before its price is worth printing beside the node — every node
+        /// costs a point, so a neighbour's price just repeats that; from two steps on it's a property of
+        /// the distance, which is what a plan is actually made with.</summary>
         public const int ShortestPricedRoute = 2;
 
         /// <summary>Wraps the condition after the sentence it gates: "…  (WhileWounded)".</summary>
         private const string ConditionTemplate = "{0}  ({1})";
 
-        /// <summary>
-        /// Every line of the node, parametric ones first and pipeline knobs after, in the order they
-        /// were authored. A missing formatter is not an error the player should meet: the line falls
-        /// back to its raw parts rather than disappearing.
-        /// </summary>
+        /// <summary>Every line of the node, parametric ones first and pipeline knobs after, in authored
+        /// order. A missing formatter falls back to the raw parts rather than disappearing.</summary>
         public static List<PassiveNodeLine> Of(
             PassiveNode node,
             ModifierFormatter? modifiers,
@@ -53,7 +47,7 @@ namespace Core.PassiveTree.View
             return lines;
         }
 
-        /// <summary>Whether a route of this many steps is worth quoting a price for — see
+        /// <summary>Whether a route of this many steps is worth quoting a price — see
         /// <see cref="ShortestPricedRoute"/>. Unreachable nodes price at nothing and say nothing.</summary>
         public static bool PricesTheRoute(int steps) => steps >= ShortestPricedRoute;
 
@@ -76,8 +70,7 @@ namespace Core.PassiveTree.View
         }
 
         /// <summary>The knob entry exists for the sentence and nothing else — it is never attached to
-        /// anyone, because what a fighter gets is the sum of the taken lines and not one modifier per
-        /// node.</summary>
+        /// anyone, since what a fighter gets is the sum of the taken lines, not one modifier per node.</summary>
         private static string Describe(ContextModifierLine line, ContextModifierFormatter? formatter, ILocalizationProvider? localization, TextFormat format)
         {
             string text = formatter is null

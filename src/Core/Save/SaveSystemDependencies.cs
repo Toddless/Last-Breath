@@ -16,13 +16,10 @@ namespace Core.Save
     using PassiveTree.Allocation;
     using Services;
 
-    /// <summary>
-    /// The save stack is PROJECT infrastructure, not a battle-module concern (module discipline,
-    /// Todd 2026-07-24): each project's bootstrap calls this next to its own registrations.
-    /// The participant list is the Core-generic set — optional entries follow the GetService
-    /// pattern (a project without the service simply doesn't write the section); project-only
-    /// sections (Main's narrative, wallet) are registered on top by that project.
-    /// </summary>
+    /// <summary>Project infrastructure, not a battle-module concern — each project's bootstrap calls
+    /// this alongside its own registrations. Registers the Core-generic participant set; optional
+    /// entries follow GetService (missing service = section not written). Project-only sections
+    /// (Main's narrative, wallet) are added on top by that project.</summary>
     public static class SaveSystemDependencies
     {
         public static IServiceCollection AddSaveSystem(this IServiceCollection services)
@@ -82,9 +79,8 @@ namespace Core.Save
                     // What a saved ornament GRANTS: the file names it and the ability, the catalog says
                     // which tier of socket comes back with it.
                     sp.GetService<Battle.Abilities.IOrnamentCatalog>(),
-                    // How an ornament this build cannot place gets back to the player. A worn ornament is
-                    // in no bag, so without these two the only other outcome is losing an artefact that
-                    // one unrepeatable quest hands out.
+                    // How an ornament this build can't place gets back to the player — a worn ornament is
+                    // in no bag, so without these two it's lost, and it comes from an unrepeatable quest.
                     sp.GetService<Items.IOrnamentMinter>(),
                     sp.GetService<IInventory>()));
                 manager.Register(new PlayerVitalsSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));

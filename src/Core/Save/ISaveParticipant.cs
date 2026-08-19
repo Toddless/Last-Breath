@@ -25,18 +25,10 @@ namespace Core.Save
         /// version the data was written with — older versions are migrated by the participant.</summary>
         void Restore(JToken data, int savedVersion);
 
-        /// <summary>
-        /// Applies "the file hands me nothing to restore": the section is absent (written before it
-        /// existed, or by a build that did not have it), its data could not be read, or it was written
-        /// by a newer build. Does nothing by default, and for most participants that is the whole
-        /// answer: the restore starts by resetting the session (see <see cref="ISaveManager.Restore"/>),
-        /// so a service registered as <see cref="Session.ISessionResettable"/> is already back at its
-        /// fresh-game value by the time the section turns out to be unusable.
-        /// Override it where the fresh-game state is NOT the session reset's to give — state owned by
-        /// the scene, which is built before the file is applied and cannot be rebuilt by resetting a
-        /// singleton. An override has to land on the fresh-game state outright rather than add to what
-        /// is already there: it also runs after a <see cref="Restore"/> that threw partway through.
-        /// </summary>
+        /// <summary>Runs when the section is missing, unreadable, or from a newer build. No-op by default
+        /// since <see cref="ISaveManager.Restore"/> already resets session-owned state first; override for
+        /// scene-owned state the reset can't reach. Must set the fresh-game value outright (also runs after
+        /// a <see cref="Restore"/> that threw partway through).</summary>
         void RestoreWithoutSection()
         {
         }

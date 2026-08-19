@@ -3,12 +3,8 @@ namespace Core.PassiveTree.Allocation
     using System;
     using System.Collections.Generic;
 
-    /// <summary>
-    /// Which nodes are taken, what that costs, and what may still be taken or given back. The two
-    /// rules that shape it — a node must touch something already taken, and a refund may not orphan
-    /// anything — are enforced here and nowhere else, so the game service and the authoring tool
-    /// cannot drift apart on what a legal allocation is.
-    /// </summary>
+    /// <summary>Which nodes are taken, what that costs, and what may still be taken or refunded — sole
+    /// enforcer that a node must touch something already taken and a refund may not orphan anything.</summary>
     public sealed class AllocationState
     {
         private readonly HashSet<string> _taken = new(StringComparer.Ordinal);
@@ -32,12 +28,8 @@ namespace Core.PassiveTree.Allocation
                     _taken.Add(node.Id);
         }
 
-        /// <summary>
-        /// Replaces the whole set with a restored one — a save file, wholesale rather than node by
-        /// node. What arrives is not trusted: it is put through the same re-check an edited tree goes
-        /// through, so ids the tree no longer knows and anything that lost its route to a seed drop
-        /// out instead of becoming an allocation the take/refund rules could never have produced.
-        /// </summary>
+        /// <summary>Replaces the whole set from a save file, wholesale rather than node by node, then
+        /// re-checks it like an edited tree: unknown ids and anything with no route to a seed drop out.</summary>
         public void Restore(PassiveTreeDocument document, IEnumerable<string> nodes)
         {
             _taken.Clear();
@@ -45,13 +37,8 @@ namespace Core.PassiveTree.Allocation
             Resync(document);
         }
 
-        /// <summary>
-        /// Takes the set as it stands, with no tree to measure it against — a restore that arrived
-        /// before the catalog did. Nothing is checked and nothing is dropped, because a check against
-        /// a tree that is not there would drop everything. What the set costs stays as it was: the
-        /// price of a node cannot be read without the node, and the next <see cref="Resync"/> settles
-        /// both the set and the spend.
-        /// </summary>
+        /// <summary>Takes the set as-is when no tree exists yet to check it against (a restore that beat
+        /// the catalog to load) — nothing dropped, spend left stale until the next <see cref="Resync"/>.</summary>
         public void Adopt(IEnumerable<string> nodes)
         {
             _taken.Clear();
@@ -107,11 +94,8 @@ namespace Core.PassiveTree.Allocation
         public bool Take(PassiveTreeDocument document, string id, int budget) =>
             TryTake(document, id, budget) == AllocationResult.Success;
 
-        /// <summary>
-        /// Whether the node can go back, and why not when it cannot. It may go back only if nothing is
-        /// left hanging in the air — unwinding happens from the ends. Formally: with the node gone,
-        /// every still-taken node must reach a seed through taken nodes.
-        /// </summary>
+        /// <summary>Whether the node can go back, and why not: legal only if every still-taken node
+        /// still reaches a seed once it's gone — unwinding happens from the ends.</summary>
         public AllocationResult CheckRefund(PassiveTreeDocument document, string id)
         {
             PassiveNode? node = document.Find(id);
@@ -127,15 +111,9 @@ namespace Core.PassiveTree.Allocation
                 : AllocationResult.WouldOrphan;
         }
 
-        /// <summary>
-        /// Whether the whole set can go back AT ONCE, and why not when it cannot. Not the same question
-        /// as asking about each node in turn and it cannot be built out of that one: on a chain
-        /// seed—A—B—C the pair {B, C} is a legal thing to give back, while B alone would strand C. What
-        /// is checked is the state that would be LEFT — every node still taken must reach a seed through
-        /// taken nodes — so a set that unwinds a whole branch passes and a set with a hole in it does not.
-        /// <para>An empty set is <see cref="AllocationResult.NotTaken"/>: giving nothing back is not an
-        /// operation that succeeded, and whoever charges for one must not be handed a yes.</para>
-        /// </summary>
+        /// <summary>Whether the whole set can go back AT ONCE — not decomposable into per-node checks
+        /// (on seed—A—B—C, {B,C} is legal while B alone strands C). Checks the state that would be LEFT,
+        /// not each removal in turn. Empty set is <see cref="AllocationResult.NotTaken"/>, never a free success.</summary>
         public AllocationResult CheckRefundAll(PassiveTreeDocument document, IReadOnlyCollection<string> ids)
         {
             if (ids.Count == 0) return AllocationResult.NotTaken;
@@ -156,9 +134,8 @@ namespace Core.PassiveTree.Allocation
                 : AllocationResult.WouldOrphan;
         }
 
-        /// <summary>Gives the whole set back when the rules allow it; returns the same reason
-        /// <see cref="CheckRefundAll"/> would. All-or-nothing without a rollback to arrange: the one
-        /// check that can refuse it happens before anything is removed.</summary>
+        /// <summary>Gives the whole set back when allowed, same reason as <see cref="CheckRefundAll"/>.
+        /// All-or-nothing with no rollback needed — the only possible refusal is checked before anything is removed.</summary>
         public AllocationResult TryRefundAll(PassiveTreeDocument document, IReadOnlyCollection<string> ids)
         {
             AllocationResult result = CheckRefundAll(document, ids);
@@ -174,15 +151,9 @@ namespace Core.PassiveTree.Allocation
             return result;
         }
 
-        /// <summary>
-        /// The node and everything that would be left hanging without it. The rule that unwinding happens
-        /// from the ends is not lifted — this FINDS the ends instead of demanding them from the player.
-        /// <para>Ordered from the leaves inward: removing the set in this order strands nobody at any
-        /// step, so the list doubles as the order the removals may be made in. A node that is unknown,
-        /// not taken or granted comes back as itself alone — <see cref="CheckRefundAll"/> is what gives a
-        /// verdict about such a node, and an empty list would always answer
-        /// <see cref="AllocationResult.NotTaken"/> and so lie about a seed.</para>
-        /// </summary>
+        /// <summary>The node plus everything that would be left hanging without it, ordered leaves-inward
+        /// so the list is also a safe removal order. An unknown/not-taken/granted node comes back alone —
+        /// <see cref="CheckRefundAll"/> gives the verdict on that, since an empty list would misreport a seed as NotTaken.</summary>
         public List<string> RefundClosure(PassiveTreeDocument document, string id)
         {
             PassiveNode? node = document.Find(id);
@@ -221,11 +192,8 @@ namespace Core.PassiveTree.Allocation
         public bool Refund(PassiveTreeDocument document, string id) =>
             TryRefund(document, id) == AllocationResult.Success;
 
-        /// <summary>
-        /// Cheapest route from the current allocation to a node, excluding what is already taken.
-        /// Breadth-first from every taken node at once, so the answer is the fewest points that would
-        /// buy the target. Empty when the node is already taken or nothing connects to it.
-        /// </summary>
+        /// <summary>Cheapest route to a node (BFS from every taken node at once), excluding what's
+        /// already taken. Empty when the node is already taken or unreachable.</summary>
         public List<string> PathTo(PassiveTreeDocument document, string target)
         {
             if (!document.Contains(target) || _taken.Contains(target)) return [];
@@ -263,12 +231,8 @@ namespace Core.PassiveTree.Allocation
         public bool TakePath(PassiveTreeDocument document, IReadOnlyList<string> route, int budget) =>
             TryTakePath(document, route, budget) == AllocationResult.Success;
 
-        /// <summary>
-        /// The same purchase as <see cref="TakePath"/>, naming the first refusal instead of collapsing
-        /// it into a false — what an interface needs to say why a route it offered cannot be bought.
-        /// An empty route lands on <see cref="AllocationResult.NotConnected"/>: that is what
-        /// <see cref="PathTo"/> hands back for a node nothing reaches.
-        /// </summary>
+        /// <summary>Same purchase as <see cref="TakePath"/>, naming the first refusal instead of a bare false.
+        /// Empty route lands on <see cref="AllocationResult.NotConnected"/>, matching what <see cref="PathTo"/> returns for an unreachable node.</summary>
         public AllocationResult TryTakePath(PassiveTreeDocument document, IReadOnlyList<string> route, int budget)
         {
             if (route.Count == 0) return AllocationResult.NotConnected;
@@ -321,9 +285,8 @@ namespace Core.PassiveTree.Allocation
         private static HashSet<string> Reachable(PassiveTreeDocument document, HashSet<string> allowed) =>
             new(Depths(document, allowed).Keys, StringComparer.Ordinal);
 
-        /// <summary>The same walk, keeping how many steps from a seed each node stands. One implementation
-        /// of "what still holds together", so reachability and distance can never be answered by two
-        /// different traversals.</summary>
+        /// <summary>Same walk, keeping each node's step-distance from a seed — one traversal backs both
+        /// reachability and distance, so they can't disagree.</summary>
         private static Dictionary<string, int> Depths(PassiveTreeDocument document, HashSet<string> allowed)
         {
             var depths = new Dictionary<string, int>(StringComparer.Ordinal);

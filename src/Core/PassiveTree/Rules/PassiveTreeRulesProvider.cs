@@ -6,11 +6,8 @@ namespace Core.PassiveTree.Rules
     using Data.GameData;
     using Newtonsoft.Json;
 
-    /// <summary>
-    /// Reads the tree's pricing through the ordinary data seam and answers it. Its own catalog rather
-    /// than a second file beside the tree: the tree's reader parses every file it is handed as a
-    /// document, so a pricing file in that folder would be read as a tree with no nodes.
-    /// </summary>
+    /// <summary>Reads the tree's pricing through the ordinary data seam. Its own catalog rather than a
+    /// second file beside the tree — the tree's reader would parse a pricing file as a tree with no nodes.</summary>
     public sealed class PassiveTreeRulesProvider : IPassiveRespecPricing, IGameDataParticipant
     {
         private PassiveTreeRulesData _rules = new();
@@ -25,12 +22,8 @@ namespace Core.PassiveTree.Rules
             _rules = Sanitized(parsed, file.FileName);
         }
 
-        /// <summary>
-        /// The price of one respec: gold per node, opened up by the character's own progress, and cut to
-        /// the ceiling. Rounded UP, so the last fraction of a node is paid for rather than given away.
-        /// <para>A count that is not positive is not a respec and costs nothing — the gate refuses an
-        /// empty set before this is ever asked, and a price of zero is the honest answer either way.</para>
-        /// </summary>
+        /// <summary>Price of one respec: gold per node, scaled by progress, capped, rounded UP so the
+        /// last fraction of a node is paid for. A non-positive count costs nothing — an honest answer, since the gate refuses an empty set before this is asked.</summary>
         public int PriceOf(int nodeCount, int masteryLevel)
         {
             if (nodeCount <= 0) return 0;
@@ -41,9 +34,8 @@ namespace Core.PassiveTree.Rules
             return Math.Min(respec.MaxCost, (int)MathF.Ceiling(scaled));
         }
 
-        /// <summary>A price that is not positive is reported and replaced by the shipped default: a zero
-        /// per node or a zero ceiling would make every respec free, which is the one thing the price
-        /// exists to prevent, and it would do it silently.</summary>
+        /// <summary>A non-positive price is reported and replaced by the shipped default — a zero per
+        /// node or ceiling would silently make every respec free.</summary>
         private static PassiveTreeRulesData Sanitized(PassiveTreeRulesData parsed, string fileName)
         {
             var defaults = new RespecPricingData();

@@ -7,14 +7,10 @@ namespace Core.PassiveTree.Allocation
     using Modifiers.Conditions;
     using Session;
 
-    /// <summary>
-    /// Owns the allocation and keeps both contribution channels — parameters and pipeline knobs — in step
-    /// with it. The document is read lazily from the provider on every access: the data catalog is loaded
-    /// after the container is built, and a reload hands out a fresh document that the allocation has to be
-    /// re-checked against.
-    /// The service is a singleton and outlives the scene, so it also owns the two ways a playthrough
-    /// ends: a new game resets it, and a loaded file replaces the allocation wholesale.
-    /// </summary>
+    /// <summary>Owns the allocation and keeps both contribution channels (parameters, pipeline knobs) in
+    /// step with it. Reads the document lazily on every access, since the catalog loads after the
+    /// container is built; a reload re-checks the allocation against the fresh document. A singleton
+    /// outliving the scene, so it also owns session reset (new game) and wholesale load-file replace.</summary>
     public sealed class PassiveTreeService : IPassiveTreeService, ISessionResettable
     {
         private readonly AllocationState _allocation = new();
@@ -24,10 +20,9 @@ namespace Core.PassiveTree.Allocation
 
         private PassiveTreeDocument? _synced;
 
-        /// <summary>Only one channel is ever handed a fighter — the pipeline knobs are pushed into his
-        /// handler while the parameters are pulled from a registered source — and the predicates of both
-        /// read the state of that same fighter. The sighting is passed on here so the pulled channel does
-        /// not need a second wiring of its own on every fighter that carries a tree.</summary>
+        /// <summary>Pipeline knobs are pushed into the fighter's handler while parameters are pulled from a
+        /// registered source, but both channels' predicates read the same fighter — this relay spares the
+        /// pulled channel a second wiring on every fighter that carries a tree.</summary>
         public PassiveTreeService(IPassiveTreeProvider provider, IConditionProvider conditions)
         {
             _provider = provider;
@@ -115,10 +110,8 @@ namespace Core.PassiveTree.Allocation
             PassiveTreeDocument tree = SyncedTree();
             if (tree.IsEmpty)
             {
-                // Nothing to check the set against. It is held as it stands rather than dropped, so
-                // the next capture writes back what the file carried instead of an empty section —
-                // a tree that failed to load must not turn one bad launch into a permanent loss.
-                // The check happens on the first document that does load.
+                // Nothing to check against; held as-is so a failed load doesn't become a permanent loss.
+                // Checked against the first document that does load.
                 _allocation.Adopt(takenNodes);
                 Publish(tree);
                 return;
@@ -128,35 +121,26 @@ namespace Core.PassiveTree.Allocation
             Publish(tree);
         }
 
-        /// <summary>Back to the state a fresh character is in: no points granted, nothing taken but
-        /// the free seeds, and the contribution of the old allocation gone from every fighter it
-        /// reached. Mastery zeroes its own total in the same pass, so an allocation left standing
-        /// here would be one the character can neither pay for nor undo.</summary>
+        /// <summary>Back to a fresh character: no points, nothing but free seeds, old contribution gone
+        /// from every fighter it reached. Mastery zeroes its own total in the same pass, so an allocation
+        /// left standing here would be one the character can neither pay for nor undo.</summary>
         public void ResetSession()
         {
             SetTotalPoints(0);
             Respec();
         }
 
-        /// <summary>The allocation after the document it is measured against has been adopted. Every
-        /// read goes through here rather than touching the field: the catalog loads after the container
-        /// is built, so an accessor that skipped the check would answer from a set that was never
-        /// matched to the tree — an empty one, for a caller that never asked for <see cref="Tree"/>.</summary>
+        /// <summary>The allocation after its document has been adopted; every read goes through here
+        /// rather than the field, since a skipped check could answer from a set never matched to the tree.</summary>
         private AllocationState SyncedAllocation()
         {
             SyncedTree();
             return _allocation;
         }
 
-        /// <summary>
-        /// Adopts the document the provider currently holds. Allocation survives a reload where it
-        /// still makes sense and is dropped where it does not.
-        /// A document without nodes is never adopted: that is what the reader hands out when the file
-        /// fails to parse, and what the provider holds before the catalog is read at all. Adopting it
-        /// would measure the allocation against nothing and wipe every node — so the last document
-        /// that did load stays in force, and a broken file costs the player the tree's content for
-        /// that launch instead of his allocation forever.
-        /// </summary>
+        /// <summary>Adopts the provider's current document. An empty document (failed parse, or catalog
+        /// not read yet) is never adopted — that would wipe the allocation against nothing — so the last
+        /// document that did load stays in force; a broken file costs that launch's tree, not the allocation.</summary>
         private PassiveTreeDocument SyncedTree()
         {
             PassiveTreeDocument tree = _provider.Tree;
@@ -169,8 +153,8 @@ namespace Core.PassiveTree.Allocation
             return tree;
         }
 
-        /// <summary>The one place the allocation turns into a contribution. Both channels are rebuilt from
-        /// the taken set together, so neither can be left holding what the other has already given up.</summary>
+        /// <summary>The one place allocation turns into contribution; both channels rebuild together so
+        /// neither is left holding what the other gave up.</summary>
         private void Publish(PassiveTreeDocument tree)
         {
             _source.Rebuild(tree, _allocation.Taken);

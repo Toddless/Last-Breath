@@ -4,35 +4,29 @@ namespace Core.PassiveTree.View
     using System.Collections.Generic;
 
     /// <summary>
-    /// How big a node is on screen and which node a point on screen belongs to — one object, because
-    /// the two answers are the same number read twice. A drawn radius with a floor under it and a
-    /// picking radius without one is a node whose visible dot is larger than the area that answers a
-    /// click, and nothing says so until somebody misses.
-    /// <para>Everything is derived from <see cref="ScreenRadius"/>: the layer that draws the mass of
-    /// nodes asks for it in document units, a node scene asks for the counter-scale that keeps it that
-    /// size, a ring drawn around a node asks for a multiple of it, and the pick asks for it plus its
-    /// slack. One table of authored radii, two floors, no second arithmetic anywhere.</para>
-    /// <para>The look is not here. Shape, hue and texture differ between the game and the authoring
-    /// tool; the geometry does not, so only the geometry moved.</para>
+    /// A node's on-screen size and which node a screen point belongs to — one table, so drawing and
+    /// picking never disagree (a floored draw radius and an unfloored pick radius would let the visible
+    /// dot outgrow the clickable area). Everything else derives from <see cref="ScreenRadius"/> — node
+    /// scale and ring radius as multiples of it, the pick radius as it plus its slack — so there is one
+    /// table of authored radii, two floors and no second arithmetic anywhere. Geometry only: look
+    /// (shape/hue/texture) lives elsewhere and differs between game and editor.
     /// </summary>
     public sealed class NodeGeometry
     {
         private readonly Dictionary<PassiveNodeKind, float> _radii = new();
 
-        /// <summary>Reused across queries: picking runs on every mouse move, and a fresh list per move
-        /// would make hovering the wheel an allocation loop.</summary>
+        /// <summary>Reused across queries: picking runs on every mouse move, so a fresh list per move
+        /// would allocate on every hover.</summary>
         private readonly List<PassiveNode> _candidates = [];
 
         private readonly float _minScreenRadius;
         private readonly float _pickScreenSlack;
 
-        /// <param name="authoredRadii">Radius per node class in document units, at zoom 1. Every class
-        /// of the enum must have one: a missing entry would silently draw and pick at whatever the
-        /// fallback happened to be.</param>
-        /// <param name="minScreenRadius">How small a node may get on screen before it stops shrinking.
-        /// Below it the whole tree on one screen turns into dust nobody can aim at.</param>
-        /// <param name="pickScreenSlack">Pixels of reach added around a node when deciding what was
-        /// clicked.</param>
+        /// <param name="authoredRadii">Radius per node class in document units at zoom 1. Every enum
+        /// member must have an entry, or it would silently draw/pick at a fallback size.</param>
+        /// <param name="minScreenRadius">Floor under a node's on-screen size, so a zoomed-out tree does
+        /// not turn to unaimable dust.</param>
+        /// <param name="pickScreenSlack">Pixels of reach added around a node for click detection.</param>
         public NodeGeometry(IReadOnlyDictionary<PassiveNodeKind, float> authoredRadii, float minScreenRadius, float pickScreenSlack)
         {
             float largest = 0f;
@@ -54,71 +48,57 @@ namespace Core.PassiveTree.View
             _pickScreenSlack = pickScreenSlack;
         }
 
-        /// <summary>The widest class on the board — the reach a pick query has to cover. Computed from
-        /// the table so it can never become a second, stale constant.</summary>
+        /// <summary>Widest class on the board — the reach a pick query must cover.</summary>
         public float MaxAuthoredRadius { get; }
 
-        /// <summary>The narrowest class — the one whose floor engages first as the view pulls out.</summary>
+        /// <summary>Narrowest class — whose floor engages first as the view zooms out.</summary>
         public float MinAuthoredRadius { get; }
 
         public float AuthoredRadius(PassiveNodeKind kind) => _radii[kind];
 
-        /// <summary>What the node measures on screen: its authored size at this zoom, never below the
-        /// floor. Every other size in the wheel is this one divided by something.</summary>
+        /// <summary>The node's on-screen size: authored size at this zoom, never below the floor.</summary>
         public float ScreenRadius(PassiveNodeKind kind, float zoom) =>
             MathF.Max(_radii[kind] * zoom, _minScreenRadius);
 
-        /// <summary>The same size expressed in the units of the frame — what a layer drawing inside it
-        /// has to hand the draw call, since the frame multiplies by its own scale again. The scale is
-        /// asked for as a whole rather than as a zoom: the frame carries positions and therefore the
-        /// spread as well, and a size divided by the zoom alone would be drawn a spread too large.</summary>
+        /// <summary>Same size in frame units. Divides by the full scale (zoom*spread), not zoom alone —
+        /// the frame carries positions, so a size divided by zoom alone would draw a spread too large.</summary>
         public float DocumentRadius(PassiveNodeKind kind, ICanvasScale scale) =>
             scale.DocumentLength(ScreenRadius(kind, scale.Zoom));
 
         /// <summary>
-        /// The radius of a ring drawn AROUND a node — the mark under the pointer, the one on what can be
-        /// bought next — as a multiple of what the node actually measures on screen.
-        /// <para>Never a fixed number of pixels outside it: <see cref="ScreenRadius"/> has a floor and a
-        /// gap in pixels does not, so pulling the view out leaves the dot standing still at the floor
-        /// while the ring keeps its distance, and the mark ends up several times the size of the thing
-        /// it is about. A ring that big stops reading as that node's mark and starts reading as an
-        /// object of its own.</para>
+        /// Radius of a ring drawn around a node (hover mark, next-purchase mark), as a multiple of what
+        /// the node actually measures on screen — never a fixed pixel gap. <see cref="ScreenRadius"/> has
+        /// a floor and a pixel gap does not, so at low zoom the dot sits at the floor while a fixed gap
+        /// keeps its distance, blowing the ring out of proportion to the node it marks.
         /// </summary>
         public float ScreenRingRadius(PassiveNodeKind kind, float zoom, float ringScale) =>
             ScreenRadius(kind, zoom) * MathF.Max(ringScale, 1f);
 
-        /// <summary>The same ring in the units of the frame, for a layer drawing inside it.</summary>
+        /// <summary>Same ring in frame units.</summary>
         public float DocumentRingRadius(PassiveNodeKind kind, ICanvasScale scale, float ringScale) =>
             scale.DocumentLength(ScreenRingRadius(kind, scale.Zoom, ringScale));
 
-        /// <summary>The radius a click is measured against: what is drawn plus the slack that keeps a
-        /// node aimable when the whole tree is on screen.</summary>
+        /// <summary>What a click is measured against: drawn radius plus slack.</summary>
         public float PickRadius(PassiveNodeKind kind, float zoom) =>
             ScreenRadius(kind, zoom) + _pickScreenSlack;
 
-        /// <summary>What a node scene must be scaled by inside the frame so it ends up
-        /// <see cref="ScreenRadius"/> across on screen. A function of the class and the view alone —
-        /// every node of a class is scaled by the same number, however many scenes the zoom step then
-        /// walks through to write it. It falls below 1 wherever the frame is already blowing the layout
-        /// up past the authored size, which is what a spread above 1 does.</summary>
+        /// <summary>Scale factor for a node scene so it renders at <see cref="ScreenRadius"/>. Falls
+        /// below 1 wherever spread above 1 is already enlarging the layout past the authored size.</summary>
         public float ViewScale(PassiveNodeKind kind, ICanvasScale scale)
         {
             float authored = _radii[kind];
             return authored <= 0f ? 1f : DocumentRadius(kind, scale) / authored;
         }
 
-        /// <summary>
-        /// The node under a point on screen, or null. Nearest centre wins among everything the point
-        /// falls inside, so two overlapping shapes resolve by distance rather than by the order their
-        /// author happened to type them into the file.
-        /// </summary>
+        /// <summary>The node under a screen point, or null. Nearest centre wins among everything the
+        /// point falls inside, so overlapping shapes resolve by distance, not authoring order.</summary>
         public PassiveNode? At(PassiveTreeDocument document, CanvasTransform view, float screenX, float screenY)
         {
             float documentX = view.DocumentX(screenX);
             float documentY = view.DocumentY(screenY);
 
-            // The grid is indexed in document coordinates, so the widest node on screen has to be asked
-            // for in those — pixels of reach are worth less of the document the wider it is spread.
+            // Grid is indexed in document coordinates, so pixel reach is converted before querying —
+            // spread changes how much document a pixel covers.
             float reach = view.DocumentLength(MaxAuthoredRadius * view.Zoom + _pickScreenSlack);
 
             _candidates.Clear();

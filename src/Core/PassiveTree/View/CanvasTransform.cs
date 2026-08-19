@@ -3,44 +3,35 @@ namespace Core.PassiveTree.View
     using System;
 
     /// <summary>
-    /// The single place a document coordinate becomes a screen pixel and a screen pixel becomes a
-    /// document coordinate.
-    /// <para>Two multipliers sit between the two spaces and they do not mean the same thing.
-    /// <see cref="Spread"/> stretches distances and nothing else: the gap between two nodes grows while
-    /// each node keeps the size it was authored at, which is what makes a crowded wheel readable
-    /// instead of merely bigger. <see cref="Zoom"/> scales what is on screen, nodes included. A
-    /// position therefore travels through both (<see cref="PositionScale"/>), a size only through the
-    /// zoom.</para>
-    /// <para>Neither multiplier ever reaches the document. A coordinate written back into a node comes
-    /// from <see cref="DocumentX"/>/<see cref="DocumentY"/>, so a drag lands where the hand released it
-    /// at any spread, and the file keeps the layout its author typed.</para>
-    /// <para>Deliberately free of Godot: this is the arithmetic behind every click that has to hit what
-    /// the eye aimed at, and a mismatch between drawing and picking is invisible until someone misses.
-    /// It has to be readable on its own.</para>
+    /// Converts document coordinates to screen pixels and back. Two multipliers: <see cref="Spread"/>
+    /// stretches distances only (nodes keep their authored size), <see cref="Zoom"/> scales everything on
+    /// screen including node size. A position uses both (<see cref="PositionScale"/>), a size only the
+    /// zoom. Neither multiplier reaches the document — writes go through
+    /// <see cref="DocumentX"/>/<see cref="DocumentY"/> so a drag lands where released at any spread.
+    /// Deliberately Godot-free: this is the arithmetic behind hit-testing and must be readable on its own.
     /// </summary>
     public sealed class CanvasTransform : ICanvasScale
     {
-        /// <summary>Zoom bounds are bounds on how big a node may get on screen, so the spread does not
-        /// enter them: a node is the same number of pixels across at every spread by design.</summary>
+        /// <summary>Bounds on-screen node size; spread is excluded so a node is the same pixel size at
+        /// every spread.</summary>
         public const float MinZoom = 0.08f;
 
         public const float MaxZoom = 4f;
         public const float ZoomStep = 1.15f;
 
-        /// <summary>The authored layout is 1. Below it the wheel is packed tighter than the file says,
-        /// above it the gaps open up; the range is wide enough to tell apart two nodes that overlap at
-        /// 1 and still short of the point where a ray no longer fits on screen at a usable zoom.</summary>
+        /// <summary>1 = the authored layout. Range wide enough to separate overlapping nodes yet keep a
+        /// ray on screen at a usable zoom.</summary>
         public const float DefaultSpread = 1f;
 
         public const float MinSpread = 0.5f;
         public const float MaxSpread = 5f;
 
-        /// <summary>Step of the control and of one key press. A quarter divides the default exactly, so
-        /// stepping down from anywhere lands back on 1 rather than near it.</summary>
+        /// <summary>Step of the control/key press; a quarter of the default, so stepping down from
+        /// anywhere lands back on 1.</summary>
         public const float SpreadStep = 0.25f;
 
-        /// <summary>Half a step of the smallest thing that is stored, which is the spread grid: below
-        /// this two values are the same stop and setting one over the other is not a change.</summary>
+        /// <summary>Half the smallest stored step — below this two spread values are the same grid
+        /// stop.</summary>
         private const float Epsilon = SpreadStep / 100f;
 
         private float _zoom = 1f;
@@ -65,27 +56,20 @@ namespace Core.PassiveTree.View
 
         public float DocumentY(float screenY) => (screenY - PanY) / PositionScale;
 
-        /// <summary>A length measured on screen, in the document's own units — what a few pixels of
-        /// picking slack are worth to a query against the spatial grid.</summary>
+        /// <summary>A screen length in document units — e.g. what picking slack is worth against the
+        /// spatial grid.</summary>
         public float DocumentLength(float screenLength) => screenLength / PositionScale;
 
-        /// <summary>
-        /// A spread put on the grid it is stored on: clamped to the bounds and snapped to
-        /// <see cref="SpreadStep"/>. The one rule, used both when a value is read out of a document and
-        /// when one is written back — rounding on only one side would let a file keep 2.3 while the view
-        /// shows 2.25, and the picture and the document would part company at the first save.
-        /// </summary>
+        /// <summary>Clamps and snaps a spread to its grid. Used both on read and write so a file and the
+        /// view can never drift apart (e.g. file keeps 2.3 while the view shows 2.25).</summary>
         public static float NormalizeSpread(float value) =>
             Clamp(MathF.Round(value / SpreadStep) * SpreadStep, MinSpread, MaxSpread);
 
         /// <summary>
-        /// The placement of the frame everything is drawn inside: where its origin sits on screen and
-        /// what it multiplies by. The scale is <see cref="PositionScale"/> and not the zoom, because the
-        /// frame carries POSITIONS — a frame scaled by the zoom alone draws a tree at one spread and
-        /// picks it at another, and nothing says so until somebody misses.
-        /// <para>Handed out as one value so a caller assigns it rather than assembling it: the frame
-        /// lives in an engine node no headless test can reach, and a test that computes an aim point
-        /// from this struct is aiming exactly where the frame put the node.</para>
+        /// The drawing frame's origin and scale, bundled as one value. Scale is
+        /// <see cref="PositionScale"/> and not the zoom, since the frame carries positions — scaling by
+        /// zoom alone would draw at one spread and pick at another. Handed out as a struct so a headless
+        /// test can aim at exactly where the frame (which lives in an engine node) put the node.
         /// </summary>
         public CanvasFrame Frame() => new(PanX, PanY, PositionScale);
 
@@ -97,8 +81,8 @@ namespace Core.PassiveTree.View
 
         public void MovePan(float deltaX, float deltaY) => SetPan(PanX + deltaX, PanY + deltaY);
 
-        /// <summary>Zooms about a point on screen: the document under that pixel stays under it, which
-        /// is what makes the wheel a magnifier rather than a jump.</summary>
+        /// <summary>Zooms about a screen point: the document under that pixel stays under it (magnifier,
+        /// not jump).</summary>
         public void ZoomBy(float factor, float pivotScreenX, float pivotScreenY)
         {
             float pivotX = DocumentX(pivotScreenX);
@@ -108,19 +92,16 @@ namespace Core.PassiveTree.View
             Anchor(pivotX, pivotY, pivotScreenX, pivotScreenY);
         }
 
-        /// <summary>Raises the zoom to at least <paramref name="floor"/> and never lowers it. Arriving
-        /// from the whole-tree view onto a node two pixels across is not arriving anywhere, while a jump
-        /// that pulled the view out would throw away a close-up someone was working in.</summary>
+        /// <summary>Raises zoom to at least <paramref name="floor"/>, never lowers it — arriving at a
+        /// node should not undo an existing close-up.</summary>
         public void RaiseZoomTo(float floor)
         {
             if (_zoom < floor) _zoom = Clamp(floor, MinZoom, MaxZoom);
         }
 
-        /// <summary>
-        /// Sets the spread, snapped to its own step and clamped to its bounds, keeping the document
-        /// point at the given screen position where it is. Answers whether anything moved, so a caller
-        /// that mirrors the value in a control is not told about a press that changed nothing.
-        /// </summary>
+        /// <summary>Sets the spread (snapped, clamped), keeping the document point at the given screen
+        /// position fixed. Returns whether anything changed, so a caller mirroring the value in a control
+        /// isn't told a no-op press changed it.</summary>
         public bool SetSpread(float value, float anchorScreenX, float anchorScreenY)
         {
             float snapped = NormalizeSpread(value);
@@ -141,11 +122,8 @@ namespace Core.PassiveTree.View
         public void CenterOn(float documentX, float documentY, float viewWidth, float viewHeight) =>
             Anchor(documentX, documentY, viewWidth * 0.5f, viewHeight * 0.5f);
 
-        /// <summary>
-        /// Fits a document-space box into a view, leaving <paramref name="padding"/> pixels of margin in
-        /// total on each axis. Only the zoom is touched: the spread is a reading setting its owner chose
-        /// and framing has no business undoing it, so a spread-out tree frames spread out.
-        /// </summary>
+        /// <summary>Fits a document-space box into the view with padding, touching only zoom — spread is
+        /// a reading setting its owner chose and framing must not override it.</summary>
         public void Fit(float minX, float minY, float maxX, float maxY, float viewWidth, float viewHeight, float padding)
         {
             float extentX = MathF.Max(maxX - minX, 1f) * _spread;
@@ -157,16 +135,15 @@ namespace Core.PassiveTree.View
             CenterOn((minX + maxX) * 0.5f, (minY + maxY) * 0.5f, viewWidth, viewHeight);
         }
 
-        /// <summary>Resets the view to the untouched state, keeping the spread for the same reason
-        /// <see cref="Fit"/> does.</summary>
+        /// <summary>Resets zoom to 1, keeping spread for the same reason as <see cref="Fit"/>.</summary>
         public void ResetZoom(float viewWidth, float viewHeight)
         {
             _zoom = 1f;
             SetPan(viewWidth * 0.5f, viewHeight * 0.5f);
         }
 
-        /// <summary>Pans so that a document point sits at a screen position — the one move behind
-        /// zooming about the cursor, spreading about the middle and centring on a node.</summary>
+        /// <summary>The one move behind zoom-about-cursor, spread-about-middle and center-on-node: pans
+        /// so a document point sits at a screen position.</summary>
         private void Anchor(float documentX, float documentY, float screenX, float screenY) =>
             SetPan(screenX - documentX * PositionScale, screenY - documentY * PositionScale);
 

@@ -16,26 +16,18 @@ namespace Core.PassiveTree.Allocation
     }
 
     /// <summary>
-    /// A plan for the allocation that has not been paid for yet.
-    ///
-    /// <para>It is a PROJECTION and not a list of intentions: it holds a second
-    /// <see cref="AllocationState"/> carrying what the allocation WOULD BE once the plan is applied, and
-    /// marking a node is that node's own operation performed on the projection. So the rules of the tree
-    /// are read from one place for a plan and for a purchase — a node reachable only through another
-    /// marked node passes without a second body of rules to say so, and giving back the middle of a
-    /// branch is refused by the same reachability walk that refuses it for real.</para>
-    ///
-    /// <para>The marks live HERE and never in the service, which is the whole safety of the thing.
-    /// Nothing downstream of the allocation can see them: the parametric contribution, the pipeline
-    /// knobs, the ability book, the socket board and the save participant all feed on
-    /// <see cref="IPassiveTreeService"/>, and this object neither writes to it nor is reachable from it.
-    /// A marked node therefore gives no bonus, opens no slot, costs no point and is written to no file
-    /// until the plan is applied — not by agreement, but because there is no channel.</para>
-    ///
-    /// <para>Owned by the screen that shows it and dies with it. Anything that changes the real
-    /// allocation from outside — a direct purchase, the console, a loaded file, a new session, the tree
-    /// document being reloaded — arrives as <see cref="IPassiveTreeService.AllocationChanged"/> and the
-    /// plan is replayed on top of the new truth, dropping whatever no longer holds.</para>
+    /// A plan for the allocation that has not been paid for yet. It is a PROJECTION, not a list of
+    /// intentions: it holds a second <see cref="AllocationState"/> carrying what the allocation WOULD BE,
+    /// and marking a node is that node's own operation performed on it — so a plan and a purchase read the
+    /// tree's rules from one place, with no second body of reachability or budget rules.
+    /// <para>The marks live HERE and never in the service, which is the whole safety of the thing: everything
+    /// downstream (parametric contribution, pipeline knobs, ability book, socket board, save participant)
+    /// feeds on <see cref="IPassiveTreeService"/>, and this object neither writes to it nor is reachable
+    /// from it. A marked node gives no bonus, opens no slot, costs no point and reaches no file until the
+    /// plan is applied — because there is no channel, not by agreement.</para>
+    /// <para>Owned by the screen that shows it and dies with it. Any outside change to the real allocation
+    /// arrives as <see cref="IPassiveTreeService.AllocationChanged"/> and the plan is replayed on top of the
+    /// new truth, dropping whatever no longer holds.</para>
     /// </summary>
     public sealed class PassiveTreeDraft : IDisposable
     {
@@ -113,33 +105,24 @@ namespace Core.PassiveTree.Allocation
         /// a second time and the number the player is shown is the one he is charged for.</summary>
         public IReadOnlyList<string> RefundTailOf(string nodeId) => _projection.RefundClosure(_tree.Tree, nodeId);
 
-        /// <summary>
-        /// Whether the node can be marked, and why not when it cannot — the tree's own vocabulary, asked
-        /// of the projection. In <see cref="DraftMode.Refund"/> the question is about the whole tail the
-        /// mark would take (<see cref="RefundTailOf"/>) and not about the node alone. Already-marked nodes
-        /// answer for free: in <see cref="DraftMode.Take"/> the projection already holds one, so it comes
-        /// back <see cref="AllocationResult.AlreadyTaken"/>, and in <see cref="DraftMode.Refund"/> it no
-        /// longer does, so it comes back <see cref="AllocationResult.NotTaken"/>.
-        /// </summary>
+        /// <summary>Whether the node can be marked and why not, in the tree's own vocabulary, asked of the
+        /// projection. In <see cref="DraftMode.Refund"/> the question is about the whole tail
+        /// (<see cref="RefundTailOf"/>), not the node alone. An already-marked node answers out of the
+        /// projection itself: <see cref="AllocationResult.AlreadyTaken"/> when taking,
+        /// <see cref="AllocationResult.NotTaken"/> when refunding.</summary>
         public AllocationResult CanMark(string nodeId) => _mode == DraftMode.Take
             ? _projection.CheckTake(_tree.Tree, nodeId, _tree.TotalPoints)
             : _projection.CheckRefundAll(_tree.Tree, RefundTailOf(nodeId));
 
-        /// <summary>
-        /// Puts the node in the plan, or names the reason it cannot go in. A return takes the node
-        /// TOGETHER WITH whatever would be left hanging behind it, marked from the leaves inward so no
-        /// step of the plan strands anything. The size and the price of that tail are named before the
-        /// click, so the widening is not a bill nobody agreed to.
-        /// </summary>
+        /// <summary>Puts the node in the plan, or names the reason it cannot go in. A return takes the node
+        /// TOGETHER WITH whatever would hang behind it, marked from the leaves inward so no step strands
+        /// anything; the tail's size and price are named before the click.</summary>
         public AllocationResult Mark(string nodeId) =>
             _mode == DraftMode.Take ? MarkOne(nodeId) : MarkPath(RefundTailOf(nodeId));
 
-        /// <summary>
-        /// Marks a whole route at once — what a click on a node several steps away means. All-or-nothing:
-        /// a route half marked is not the route the player pointed at, and the steps already in the plan
-        /// are not in the route, so it is priced from where the plan stands rather than from where the
-        /// character does.
-        /// </summary>
+        /// <summary>Marks a whole route at once — what a click on a node several steps away means.
+        /// All-or-nothing, and priced from where the plan stands rather than from where the character does,
+        /// since steps already marked are not in the route.</summary>
         public AllocationResult MarkPath(IReadOnlyList<string> route)
         {
             if (route.Count == 0) return AllocationResult.NotConnected;
@@ -163,11 +146,8 @@ namespace Core.PassiveTree.Allocation
             return AllocationResult.Success;
         }
 
-        /// <summary>
-        /// Takes the node out of the plan. Not a deletion but a replay without it: what stood only on
-        /// that node stops standing on anything, and the same rule that let those marks in decides they
-        /// are out. Whoever asked keeps the list afterwards and can say what else went.
-        /// </summary>
+        /// <summary>Takes the node out of the plan — a replay without it rather than a deletion, so marks
+        /// that stood only on it fall by the same rule that admitted them.</summary>
         public void Unmark(string nodeId)
         {
             if (_marked.RemoveAll(id => string.Equals(id, nodeId, StringComparison.Ordinal)) == 0) return;
@@ -189,17 +169,12 @@ namespace Core.PassiveTree.Allocation
         /// price under the cursor is the price the player would actually be asked for.</summary>
         public IReadOnlyList<string> PathTo(string nodeId) => _projection.PathTo(_tree.Tree, nodeId);
 
-        /// <summary>
-        /// Buys the planned nodes. The mark order is the purchase order — every mark was adjacent to
-        /// what the marks before it reached — so the service's own all-or-nothing route purchase is the
-        /// whole of it, and no second walk of the graph is needed to put the set in a legal sequence.
-        /// <para>A plan that buys nothing, a return among them, prices at the empty route and comes back
-        /// <see cref="AllocationResult.NotConnected"/> — the same answer the allocation gives for
-        /// anything there is no way to reach.</para>
-        /// <para>Only the buying half is applied here. Giving nodes back spends gold as well as points
-        /// and belongs to a gate that settles both, so a screen sends <see cref="PendingRefunds"/> there
-        /// instead of asking this.</para>
-        /// </summary>
+        /// <summary>Buys the planned nodes. The mark order is already a legal purchase order, so the
+        /// service's all-or-nothing route purchase is the whole of it. A plan that buys nothing — a return
+        /// plan among them — prices at the empty route and comes back
+        /// <see cref="AllocationResult.NotConnected"/>. Only the buying half is applied here: giving nodes
+        /// back spends gold as well as points, so a screen sends <see cref="PendingRefunds"/> to the gate
+        /// that settles both.</summary>
         public AllocationResult ApplyTakes() => _tree.TakePath(_mode == DraftMode.Take ? _marked : []);
 
         public void Dispose() => _tree.AllocationChanged -= Revalidate;
@@ -232,19 +207,15 @@ namespace Core.PassiveTree.Allocation
             Reproject();
         }
 
-        /// <summary>
-        /// Rebuilds the projection from the real allocation and replays the marks onto it in the order
-        /// they were made, keeping those that still hold. A mark that lost its route, its budget or its
-        /// point in existing simply does not survive the replay — one rule for dropping a mark, and it is
-        /// the same rule that admitted it.
-        /// </summary>
+        /// <summary>Rebuilds the projection from the real allocation and replays the marks in order,
+        /// keeping those that still hold: a mark that lost its route, its budget or its point simply does
+        /// not survive — the rule that drops a mark is the rule that admitted it.</summary>
         private void Reproject()
         {
             List<string> replayed = [.. _marked];
 
-            // Raised before the document is even read: asking for it can adopt a reloaded catalog, which
-            // announces an allocation change of its own, and a replay reacting to its own reading would
-            // rebuild the plan from underneath itself.
+            // Raised before the document is read: reading it can adopt a reloaded catalog, which announces
+            // an allocation change of its own, and the replay would then rebuild itself from underneath.
             _replaying = true;
 
             _projection.Restore(_tree.Tree, _tree.TakenNodes);
@@ -258,12 +229,9 @@ namespace Core.PassiveTree.Allocation
             Changed?.Invoke();
         }
 
-        /// <summary>
-        /// The marks the plan and the allocation actually disagree about, in the order they were made.
-        /// Read off both states rather than off the mode, so a mark that the last replay quietly settled
-        /// — a node bought outside the plan, a node the tree no longer holds — is not reported as
-        /// something still to do.
-        /// </summary>
+        /// <summary>The marks the plan and the allocation actually disagree about, in the order they were
+        /// made. Read off both states rather than off the mode, so a mark the world already settled — a node
+        /// bought outside the plan, a node the tree no longer holds — is not reported as still to do.</summary>
         private List<string> Pending(bool inProjection)
         {
             List<string> pending = [];

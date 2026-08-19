@@ -69,27 +69,21 @@ namespace Core.Data.NpcData
     }
 
     /// <summary>
-    /// The "authored" section: identity facts a NAMED npc states instead of rolling them. Every
-    /// field is optional and independent — a named field replaces its roll, an unnamed one keeps
-    /// rolling, so a record pins only what its author actually cares about.
-    /// <para>This is the PREFERRED channel for pinning a named npc. The three older tricks that also
-    /// happen to freeze a fact — a single-element "stances", "levelMin" == "levelMax", the top-level
-    /// "rarity" field — keep working unchanged for records without a section, but they read as
-    /// coincidence and a routine balance edit (a second stance, a wider cap) silently thaws them.</para>
-    /// <para>What the section deliberately does NOT pin: WHICH npc modifiers a spawn wears, and the
-    /// ability pick. Neither is identity in this codebase (see <see cref="NpcDefinitionOverrides"/>):
-    /// the save system re-rolls both for every restored body, so pinning them here would hold only
-    /// until the first save/load. A record needing an exact kit already names it in "abilities".
-    /// "modifierCount" is the single thing the section does state about the modifiers — how many of
-    /// them there are, up to none at all — and it survives every reload because it is read off the
-    /// record again on each rebuild, unlike a list of ids would be.</para>
+    /// The "authored" section: identity facts a NAMED npc states instead of rolling them. Every field is
+    /// optional and independent — a named field replaces its roll, an unnamed one keeps rolling. The
+    /// PREFERRED channel for pinning a named npc; the older tricks that freeze a fact by coincidence (a
+    /// single-element "stances", "levelMin" == "levelMax", top-level "rarity") still work for records
+    /// without a section, but a routine balance edit silently thaws them.
+    /// <para>Deliberately NOT pinned: which npc modifiers a spawn wears and the ability pick — the save
+    /// system re-rolls both for every restored body (see <see cref="NpcDefinitionOverrides"/>), so pinning
+    /// them would hold only until the first load. An exact kit is named in "abilities"; "modifierCount"
+    /// states the count only and survives reloads because it is read off the record on each rebuild.</para>
     /// </summary>
     public record NpcAuthoredData
     {
         /// <summary>Fixed stance name; absent = rolled from "stances". A typo is refused, never defaulted.
-        /// Named, it ignores "stances" ENTIRELY — the list is not a whitelist and a stance outside it
-        /// is taken without complaint, so an authored record is expected to leave "stances" empty
-        /// rather than carry a list nobody reads.</summary>
+        /// Named, it ignores "stances" ENTIRELY — the list is not a whitelist — so an authored record is
+        /// expected to leave "stances" empty.</summary>
         [JsonProperty("stance")] public string? Stance { get; init; }
 
         /// <summary>Fixed level; absent = rolled between "levelMin" and the "levelMax"/EntityType cap.
@@ -101,13 +95,10 @@ namespace Core.Data.NpcData
         [JsonProperty("rarity")] public string? Rarity { get; init; }
 
         /// <summary>How many npc modifiers the spawn picks; absent = the type × rarity formula of
-        /// <see cref="NpcTypeDefaults.ModifierCount"/>. Named, it replaces that formula whole, and 0
-        /// is a real answer — nothing is picked at all, which is what an authored villager who should
-        /// simply be a person wants. The field is nullable precisely so 0 can mean zero: the older
-        /// "abilityCount" spends its 0 on "unset" and therefore cannot say this.
-        /// <para>It names the COUNT and never the SET: which modifiers land is still rolled.</para>
-        /// <para>A negative number is read as 0 rather than as an absent field — the record did name
-        /// a count, so the formula is out of the picture, and "fewer than none" is none.</para></summary>
+        /// <see cref="NpcTypeDefaults.ModifierCount"/>, named = that formula replaced whole. Nullable
+        /// precisely so 0 can mean zero (unlike "abilityCount", whose 0 means unset), and a negative number
+        /// reads as 0 rather than as absent. Names the COUNT and never the SET — which modifiers land is
+        /// still rolled.</summary>
         [JsonProperty("modifierCount")] public int? ModifierCount { get; init; }
     }
 
@@ -126,11 +117,8 @@ namespace Core.Data.NpcData
         [JsonProperty("canTalk")] public bool CanTalk { get; init; }
     }
 
-    /// <summary>
-    /// The "lifecycle" section: WHICH post-defeat cycle the NPC lives by plus the numbers of that
-    /// cycle. Each kind reads its own timer fields — the two cycles end differently, so one pair of
-    /// names could only lie about one of them. Fields of the kind not chosen are simply not read.
-    /// </summary>
+    /// <summary>The "lifecycle" section: WHICH post-defeat cycle the NPC lives by plus its numbers. Each
+    /// kind reads its own timer fields; fields of the kind not chosen are simply not read.</summary>
     public record NpcLifecycleData
     {
         /// <summary>Cycle name (<see cref="NpcLifecycleKind"/>). Absent = <see cref="NpcLifecycleKind.Undead"/>,

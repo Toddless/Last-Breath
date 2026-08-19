@@ -3,11 +3,8 @@ namespace Core.PassiveTree
     using System;
     using System.Collections.Generic;
 
-    /// <summary>
-    /// Uniform grid over node positions. A view draws and hit-tests through it so both costs scale
-    /// with what is on screen rather than with tree size — the reason the editor stays responsive
-    /// when the tree grows past its planned ~245 nodes.
-    /// </summary>
+    /// <summary>Uniform grid over node positions. A view draws and hit-tests through it so both costs
+    /// scale with what's on screen, not tree size — keeps the editor responsive past ~245 nodes.</summary>
     public sealed class NodeSpatialIndex
     {
         private const float CellSize = 160f;

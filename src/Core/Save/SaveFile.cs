@@ -3,12 +3,9 @@ namespace Core.Save
     using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    /// <summary>
-    /// One save slot payload: versioned envelope of independent sections, rewritten whole on every
-    /// save. The file belongs to a single project — storage is rooted at the running project's own
-    /// <c>user://saves</c> — so it holds exactly the sections that project's registered participants
-    /// captured, and a section nobody captures any more is gone with the next save.
-    /// </summary>
+    /// <summary>One save slot payload: versioned envelope of independent sections, rewritten whole
+    /// on every save. Scoped to a single project (<c>user://saves</c> is per-project), so it holds
+    /// exactly what that project's registered participants captured.</summary>
     public class SaveFile
     {
         public const int CurrentFormatVersion = 1;

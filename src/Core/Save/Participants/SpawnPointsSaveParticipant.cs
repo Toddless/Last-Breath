@@ -5,12 +5,9 @@ namespace Core.Save.Participants
     using Entity;
     using Newtonsoft.Json.Linq;
 
-    /// <summary>
-    /// Persists every registered spawn point's population state. On restore a point recreates
-    /// exactly the alive count it had at save time and resumes its respawn timers (game time);
-    /// points without saved data (fresh game, points added later) fill to capacity as usual.
-    /// The points themselves skip their on-ready fill while a load is pending.
-    /// </summary>
+    /// <summary>Persists every registered spawn point's population state. On restore a point recreates
+    /// its saved alive count and resumes respawn timers (game time); points with no saved data fill to
+    /// capacity as usual. Points skip their own on-ready fill while a load is pending.</summary>
     public class SpawnPointsSaveParticipant(ISpawnPointRegistry registry) : ISaveParticipant
     {
         public string SectionId => "spawnPoints";
@@ -25,12 +22,9 @@ namespace Core.Save.Participants
         public void Restore(JToken data, int savedVersion) =>
             Apply(data.ToObject<SpawnPointsSaveData>() ?? new SpawnPointsSaveData());
 
-        /// <summary>A file that hands us nothing describes a world where no point was ever touched:
-        /// every one of them fills to capacity as it does in a fresh game, whatever a failed restore
-        /// managed to spawn first. The points themselves skip their on-ready fill while a load is
-        /// pending, and a session reset cannot fill them — they are scene nodes, not a singleton's
-        /// state — so without this the load lands in a world holding not a single spawn-point
-        /// NPC.</summary>
+        /// <summary>No section means no point was ever touched — all fill to capacity. Needed because
+        /// points are scene nodes, not singleton state: a session reset can't fill them, and they skip
+        /// their on-ready fill while a load is pending.</summary>
         public void RestoreWithoutSection() => Apply(new SpawnPointsSaveData());
 
         private void Apply(SpawnPointsSaveData saved)

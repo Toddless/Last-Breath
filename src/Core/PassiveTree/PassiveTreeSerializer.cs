@@ -11,12 +11,8 @@ namespace Core.PassiveTree
     using Modifiers.Context;
     using Newtonsoft.Json;
 
-    /// <summary>
-    /// Reads and writes the tree file. Writing is canonical — nodes sorted by id, edges normalized
-    /// and sorted, positions rounded — so that the same tree always produces the same bytes and a
-    /// save after a load is a no-op in git. Reading mirrors the game's error policy: a broken record
-    /// is reported and skipped, the rest of the file still loads.
-    /// </summary>
+    /// <summary>Reads and writes the tree file. Writing is canonical (nodes/edges sorted, positions
+    /// rounded) so a save-after-load is a no-op in git. Reading skips and reports a broken record; the rest of the file still loads.</summary>
     public static class PassiveTreeSerializer
     {
         /// <summary>Half a step of the grid the spread is stored on: below this two values are the same
@@ -146,9 +142,8 @@ namespace Core.PassiveTree
             {
                 Budget = dto.Budget > 0 ? dto.Budget : PassiveTreeDocument.DefaultBudget,
 
-                // Mirror of the budget rule: a missing key, or a value that is not a spread at all, falls
-                // back to the authored default instead of clamping up to the nearest legal one, which
-                // would be a number nobody chose. Anything else lands on the same grid a save writes.
+                // Mirror of the budget rule: missing/invalid falls back to the authored default rather
+                // than clamping to a number nobody chose.
                 Spread = dto.Spread is > 0f
                     ? View.CanvasTransform.NormalizeSpread(dto.Spread.Value)
                     : View.CanvasTransform.DefaultSpread
@@ -214,8 +209,8 @@ namespace Core.PassiveTree
             {
                 var valueType = ParseMember<ModifierValueType>(dto.ValueType);
 
-                // A switch is meaningless in parameter math — the formula has no place to read it from —
-                // so the line is refused here instead of becoming a modifier the resolver silently drops.
+                // A switch is meaningless in parameter math, so it's refused here rather than becoming a
+                // modifier the resolver silently drops.
                 if (valueType == ModifierValueType.Flag)
                     throw new FormatException($"'{dto.Parameter}' is an entity parameter — a flag has no meaning in parameter math");
 
@@ -241,12 +236,9 @@ namespace Core.PassiveTree
                 var parameter = ParseMember<ContextParameter>(dto.Parameter);
                 var valueType = ParseMember<ModifierValueType>(dto.ValueType);
 
-                // Both halves are the knob's own business, not the author's. A knob with no binding throws
-                // the moment something attaches it, which in battle means a crash far away from the file
-                // that caused it; picking the wrong kind of line is silent everywhere downstream, where
-                // the pinned switch value reads as a full-strength bonus. The line loses its place on
-                // load instead. The refusal names the member rather than the authored text, which costs
-                // nothing here: a name ParseMember cannot resolve never gets this far.
+                // A knob's binding is its own business: an unbound knob throws far from the file that
+                // caused it, and the wrong line kind silently reads a switch as a full-strength bonus.
+                // Refused here at load instead, so the failure stays local.
                 if (ContextKnobs.WhyRefused(parameter, valueType) is { } refusal) throw new FormatException(refusal);
 
                 return new ContextModifierLine
@@ -264,11 +256,8 @@ namespace Core.PassiveTree
             }
         }
 
-        /// <summary>
-        /// Stricter than <see cref="EnumParser"/> alone, which accepts a bare number for any enum: a
-        /// "parameter": "42" would parse into a member that does not exist and produce a line nothing
-        /// can ever read.
-        /// </summary>
+        /// <summary>Stricter than <see cref="EnumParser"/> alone, which accepts a bare number for any enum
+        /// and would let "parameter": "42" parse into a nonexistent member.</summary>
         private static TEnum ParseMember<TEnum>(string value) where TEnum : struct, Enum
         {
             TEnum member = EnumParser.ParseEnum<TEnum>(value);
@@ -280,9 +269,8 @@ namespace Core.PassiveTree
 
         private static string? NullIfBlank(string value) => string.IsNullOrWhiteSpace(value) ? null : value;
 
-        /// <summary>The spread on the grid it is stored on, or nothing at the authored default: absent
-        /// already means the default, so writing it would add a line saying "unchanged" to every tree
-        /// ever saved and re-diff files whose layout nobody touched.</summary>
+        /// <summary>Spread on its storage grid, or null at the authored default — writing it there would
+        /// re-diff every file whose layout nobody touched.</summary>
         private static float? SpreadOrNothing(float spread)
         {
             float normalized = View.CanvasTransform.NormalizeSpread(spread);

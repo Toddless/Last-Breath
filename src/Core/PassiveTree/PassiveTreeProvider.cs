@@ -3,11 +3,8 @@ namespace Core.PassiveTree
     using System.Collections.Generic;
     using Data.GameData;
 
-    /// <summary>
-    /// Reads the tree through the ordinary data seam: one catalog, one file, no conversion layer.
-    /// A record the reader could not make sense of is reported and skipped — the same policy the
-    /// load orchestrator applies to a broken file — so one bad node never costs the whole tree.
-    /// </summary>
+    /// <summary>Reads the tree through the ordinary data seam: one catalog, one file, no conversion
+    /// layer. A record the reader can't make sense of is reported and skipped, so one bad node never costs the whole tree.</summary>
     public sealed class PassiveTreeProvider : IPassiveTreeProvider, IGameDataParticipant
     {
         private readonly List<string> _issues = [];

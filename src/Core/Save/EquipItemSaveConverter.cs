@@ -11,14 +11,11 @@ namespace Core.Save
     using Modifiers;
     using Modifiers.Conditions;
 
-    /// <summary>
-    /// Round-trips a procedurally rolled item through its save DTO. Restore rebuilds the item
-    /// through the normal mutation API (Set*/Upgrade/TryAscend) so every invariant — value
-    /// recomputation from the update multiplier, seal rules — is enforced by the item itself.
-    /// <para>A line held up by a condition stores the catalog id and rebuilds its predicate on restore.
-    /// An id the catalog no longer holds costs the line, exactly as it does when the line is rolled: a
-    /// gated bonus must never come back off a save as an unconditional one.</para>
-    /// </summary>
+    /// <summary>Round-trips a procedurally rolled item through its save DTO. Restore rebuilds the item
+    /// through the normal mutation API (Set*/Upgrade/TryAscend) so every invariant — value recomputation
+    /// from the update multiplier, seal rules — is enforced by the item itself. A conditioned line stores the catalog id and rebuilds
+    /// its predicate; an id the catalog no longer holds costs the line, same as when it's rolled — a
+    /// gated bonus must never come back unconditional.</summary>
     public class EquipItemSaveConverter(IGrantFactory grantFactory, IConditionProvider? conditions = null)
     {
         public EquipItemSaveData ToData(IEquipItem item) => new()

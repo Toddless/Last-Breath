@@ -13,9 +13,8 @@ namespace Core.Data.AbilityData
     /// </summary>
     public record AbilityAugmentData
     {
-        /// <summary>The placeholder a pool record's description prints its drawn effect under. Named
-        /// here beside <see cref="EffectPool"/> because it is the one description value that is not a
-        /// property of the record: the bag and the socket must print it under the same word.</summary>
+        /// <summary>The placeholder a pool record's description prints its drawn effect under — the one
+        /// description value that is not a property of the record, so bag and socket print it alike.</summary>
         public const string EffectPlaceholder = "effect";
 
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
@@ -47,15 +46,11 @@ namespace Core.Data.AbilityData
         /// handed to a whole family. Set, it decides alone; empty, the augment is bound to nothing.</summary>
         [JsonProperty("abilityId")] public string AbilityId { get; init; } = string.Empty;
 
-        /// <summary>Declares the augment at home on every ability there is — what a record does when it
-        /// works through the base contract every ability already honours, cost and cooldown being the
-        /// pair that turns up most. It is a word of its own because no tag is carried by the whole
-        /// book, and because universality has to be claimed: a record that simply names no tag is an
-        /// augment whose author forgot to say what it is about, and it stays refused. Only the binding
-        /// question is answered here — a universal augment is measured for tier and for the exclusion
-        /// group its ability already wears exactly like any other. Claiming this and naming an
-        /// <see cref="AbilityId"/> answers the same question twice, which no reading resolves; the
-        /// fitting rule refuses such a record outright (<see cref="Battle.Abilities.AugmentFitResult.ContradictoryDeclaration"/>).</summary>
+        /// <summary>Declares the augment at home on every ability — for records working through the base
+        /// contract (cost, cooldown). Universality must be CLAIMED: a record naming no tag is simply
+        /// refused. Only the binding question is answered here; tier and exclusion group still apply.
+        /// Claiming this and naming an <see cref="AbilityId"/> is refused outright
+        /// (<see cref="Battle.Abilities.AugmentFitResult.ContradictoryDeclaration"/>).</summary>
         [JsonProperty("fitsAnyAbility")] public bool FitsAnyAbility { get; init; }
 
         /// <summary>Id of the mutual-exclusion group: an ability wears at most one augment of a group.
@@ -75,14 +70,9 @@ namespace Core.Data.AbilityData
         /// <see cref="UpgradeProperties"/>. Read by the behaviours that lay one.</summary>
         [JsonProperty("effectId")] public string EffectId { get; init; } = string.Empty;
 
-        /// <summary>
-        /// The effects a copy of this record may turn out to lay, and the genus each one adds to
-        /// <see cref="GrantsTags"/> beyond the umbrella the whole pool shares. One record instead of one
-        /// per effect: which of them a copy lays is drawn at the mint and belongs to the COPY, so
-        /// widening the augment is a line of json rather than a record, an id, a name and a description.
-        /// Written instead of <see cref="EffectId"/> and never beside it — a record naming both says
-        /// twice what it lays, and no reading resolves that.
-        /// </summary>
+        /// <summary>The effects a copy of this record may turn out to lay, and the genus each adds to
+        /// <see cref="GrantsTags"/>. Which one a copy lays is drawn at the mint and belongs to the COPY.
+        /// Written INSTEAD of <see cref="EffectId"/> and never beside it.</summary>
         [JsonProperty("effectPool")] public Dictionary<string, string[]> EffectPool { get; init; } = [];
 
         /// <summary>The pool in the order the draw walks it — ordinal, so which effect an index means is
@@ -90,8 +80,7 @@ namespace Core.Data.AbilityData
         public IReadOnlyList<string> PoolEffects => [.. EffectPool.Keys.Order(StringComparer.Ordinal)];
 
         /// <summary>The effect the record lays when no copy has been drawn — its own, or the first of its
-        /// pool. The same answer the ladder gives an un-minted record: something has to be built from the
-        /// declaration alone, and a representative is what a declaration can offer.</summary>
+        /// pool: a representative, which is all a declaration alone can offer.</summary>
         public string LaidEffectId =>
             !string.IsNullOrWhiteSpace(EffectId) ? EffectId : PoolEffects.FirstOrDefault() ?? string.Empty;
 
@@ -121,22 +110,15 @@ namespace Core.Data.AbilityData
 
         [JsonProperty("upgradeProperties")] public Dictionary<string, float> UpgradeProperties { get; init; } = [];
 
-        /// <summary>
-        /// The far end of a design line that states a RANGE: what the property is worth at the BEST
-        /// rarity the record rolls, where <see cref="UpgradeProperties"/> gives it at the worst. A
-        /// record whose line names one number writes nothing here and every rarity is worth the same —
-        /// which is most of the catalog, so the field stays absent rather than repeating the figure.
-        /// Only properties the line puts a range on belong here; durations and stack counts the line
-        /// states flatly are not ladders. See <c>Docs/PLAN-Augments.md §4g</c>.
-        /// </summary>
+        /// <summary>What a ranged property is worth at the BEST rarity the record rolls;
+        /// <see cref="UpgradeProperties"/> gives it at the worst. Absent means every rarity is worth the
+        /// same. Only properties the design line puts a range on belong here — flatly stated durations and
+        /// stack counts are not ladders. See <c>Docs/PLAN-Augments.md §4g</c>.</summary>
         [JsonProperty("bestRarityProperties")] public Dictionary<string, float> BestRarityProperties { get; init; } = [];
 
-        /// <summary>
-        /// The rungs written out by hand, worst rarity first, one per rarity of the band. For lines the
-        /// even interpolation reads badly on — a narrow share ladder rounds two rarities onto one figure
-        /// — the author names every step instead, and nothing is interpolated or rounded. A record
-        /// without one keeps the two-ends path.
-        /// </summary>
+        /// <summary>Rungs written out by hand, worst rarity first, one per rarity of the band — for lines
+        /// even interpolation reads badly on. Nothing here is interpolated or rounded; a record without one
+        /// keeps the two-ends path.</summary>
         [JsonProperty("rarityLadder")] public Dictionary<string, float[]> RarityLadder { get; init; } = [];
 
         /// <summary>What one property is worth at the two ends of the band — the far end when the

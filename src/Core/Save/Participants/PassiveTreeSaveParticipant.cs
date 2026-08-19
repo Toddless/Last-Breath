@@ -5,12 +5,9 @@ namespace Core.Save.Participants
     using Newtonsoft.Json.Linq;
     using PassiveTree.Allocation;
 
-    /// <summary>
-    /// Persists the tree allocation as bare ids. Nodes the catalog no longer knows are reported and
-    /// dropped instead of failing the load: the tree is content, and content is rewritten between
-    /// builds while saves outlive it. The service re-checks whatever survives that filter, so a set
-    /// that lost its route to a seed arrives trimmed rather than as an allocation the rules forbid.
-    /// </summary>
+    /// <summary>Persists the tree allocation as bare ids. Unknown nodes (content changed between builds)
+    /// are reported and dropped rather than failing the load; the service then re-validates the survivors
+    /// so a set that lost its route to a seed arrives trimmed, not as a forbidden allocation.</summary>
     public class PassiveTreeSaveParticipant(IPassiveTreeService tree) : ISaveParticipant
     {
         public string SectionId => "passiveTree";
@@ -27,19 +24,15 @@ namespace Core.Save.Participants
             tree.RestoreState(KnownNodes(saved.Allocated));
         }
 
-        /// <summary>A file that hands us nothing describes a character with no allocation. The
-        /// service is a singleton that outlives the scene, so without this the nodes of the file
-        /// loaded before it stay on a character who never bought them — and the next save writes
-        /// them into a file that never had them.</summary>
+        /// <summary>No section means no allocation. Needed because the service is a singleton that
+        /// outlives the scene and would otherwise keep a prior file's nodes on a character who never
+        /// bought them.</summary>
         public void RestoreWithoutSection() => tree.RestoreState([]);
 
-        /// <summary>Keeps the ids the tree catalog still contains and reports the rest. The spend is
-        /// recounted from the set that survives, so the point a dropped node cost comes back to the
-        /// remainder — the player is left holding budget for a node that no longer exists, not a
-        /// charge for one.
-        /// While the catalog holds no tree at all there is nothing to check ids against: the set
-        /// passes through untouched instead of being reported gone wholesale, and the service holds
-        /// it until a document arrives to check it.</summary>
+        /// <summary>Keeps ids the catalog still contains, reports the rest, and lets spend re-count from
+        /// the survivors so a dropped node's point returns to the budget instead of staying spent. If the
+        /// catalog holds no tree yet, the set passes through unchecked rather than being reported gone
+        /// wholesale.</summary>
         private List<string> KnownNodes(IReadOnlyCollection<string> saved)
         {
             if (tree.Tree.IsEmpty) return [.. saved];

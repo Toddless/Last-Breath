@@ -10,11 +10,8 @@ namespace Core.PassiveTree.Rules
         [JsonProperty("respec")] public RespecPricingData Respec { get; init; } = new();
     }
 
-    /// <summary>
-    /// What undoing an allocation costs. Gold per node, scaled by how far the character's own mastery
-    /// has come — a late respec undoes a longer plan and is meant to be a decision rather than a habit —
-    /// and capped, so the curve has an end that balance can move without the formula being rewritten.
-    /// </summary>
+    /// <summary>What undoing an allocation costs: gold per node, scaled by earned mastery (a late respec
+    /// undoes a longer plan — meant as a decision, not a habit), and capped.</summary>
     public record RespecPricingData
     {
         [JsonProperty("goldPerNode")] public int GoldPerNode { get; init; } = 15;

@@ -9,36 +9,33 @@ namespace Core.PassiveTree.Summary
     using Modifiers.Context;
 
     /// <summary>
-    /// What a set of taken nodes is actually worth. The final number is produced by the game's own
+    /// What a set of taken nodes is worth. The final number goes through the game's own
     /// <see cref="Calculations.CalculateFloatValue"/> over real <see cref="SimpleModifier"/> instances
-    /// rather than by re-adding percentages here — a panel and a battle cannot disagree.
-    /// <para>Two readings, for the same reason <see cref="ContextKnobTotals.Gather"/> has two: WHAT AN
-    /// ALLOCATION CARRIES is the question an authoring tool asks, and it counts a gated line as if it
-    /// were always on because there is no fighter to answer the gate against. WHAT THE CHARACTER HOLDS
-    /// RIGHT NOW is the question a game screen asks, and a line that only counts sometimes has no
-    /// business in a total presented as the truth — it is left out and counted separately, so the panel
-    /// can say how much of the allocation it is not showing.</para>
-    /// <para>Not the same object as <see cref="PassiveTreeParameterSource"/> and deliberately so: that
-    /// one is a live contribution with a lifetime — predicates bound to a fighter and released again —
-    /// and it hands aggregates over unexpanded because the modifier component folds them at resolution.
-    /// This is a pure function with no owner behind it and nothing downstream to fold, so it expands
-    /// them itself.</para>
+    /// rather than re-adding percentages here, so a panel and a battle can't disagree.
+    /// <para>Two readings, mirroring <see cref="ContextKnobTotals.Gather"/>: what the allocation CARRIES
+    /// counts a gated line as always-on, since there's no fighter to test the gate against; what the
+    /// character HOLDS right now excludes gated lines from every total — a sometimes-true line has no
+    /// business in a total presented as fact — and reports them separately instead.</para>
+    /// <para>Not the same object as <see cref="PassiveTreeParameterSource"/>: that one is a live
+    /// contribution with a lifetime (predicates bound to a fighter and released again) and hands
+    /// aggregates over unexpanded since the modifier component folds them at resolution. This is a pure
+    /// function with no owner and nothing downstream to fold, so it expands them itself.</para>
     /// </summary>
     public static class PassiveTreeSummary
     {
-        /// <summary>What the allocation CARRIES: every line of it, a gated one counted as if it always
-        /// held and reported in <see cref="TreeSummary.ConditionalLines"/>.</summary>
+        /// <summary>What the allocation CARRIES: every line, a gated one counted as if always held and
+        /// reported in <see cref="TreeSummary.ConditionalLines"/>.</summary>
         public static TreeSummary Build(PassiveTreeDocument document, AllocationState allocation, IParameterBaseline baseline) =>
             Build(document, allocation.Taken, baseline);
 
-        /// <summary>The same reading over a bare set of ids — what a screen holding a projected
-        /// allocation has, where there is no allocation object to hand over.</summary>
+        /// <summary>The same reading over a bare set of ids — for a screen holding a projected allocation
+        /// with no allocation object to hand over.</summary>
         public static TreeSummary Build(PassiveTreeDocument document, IEnumerable<string> taken, IParameterBaseline baseline) =>
             Build(document, taken, baseline, skipConditional: false);
 
-        /// <summary>What the character HOLDS: the gated lines are left out of every total and only
-        /// counted, because a number a player reads as his own must not include a bonus that is off
-        /// while he reads it.</summary>
+        /// <summary>What the character HOLDS: gated lines are left out of every total and only counted,
+        /// since a number the player reads as his own must not include a bonus that's off while he reads
+        /// it.</summary>
         public static TreeSummary BuildUnconditional(PassiveTreeDocument document, IEnumerable<string> taken, IParameterBaseline baseline) =>
             Build(document, taken, baseline, skipConditional: true);
 
@@ -68,8 +65,8 @@ namespace Core.PassiveTree.Summary
                         if (skipConditional) continue;
                     }
 
-                    // An aggregate is bucket-only: the game folds it into every family member at
-                    // resolution, so "+2 to all attributes" has to land on all three here too.
+                    // An aggregate lands on every family member — the game folds it at resolution, so
+                    // "+2 to all attributes" must fold here too.
                     IReadOnlyList<EntityParameter> targets = AggregateParameters.IsAggregate(line.Parameter)
                         ? AggregateParameters.Members(line.Parameter)
                         : [line.Parameter];
@@ -93,8 +90,8 @@ namespace Core.PassiveTree.Summary
             summary.Parameters.Sort(static (first, second) =>
                 string.CompareOrdinal(first.Parameter.ToString(), second.Parameter.ToString()));
 
-            // Context lines go through the game's own grouping and summer: one row per knob holding the
-            // number the fighter's single modifier for that knob reads.
+            // Context lines go through the game's own grouping and summing: one row per knob, holding the
+            // number the fighter's single modifier for it reads.
             foreach (KeyValuePair<ContextParameter, List<ContextModifierLine>> knob in ContextKnobTotals.Gather(document, taken))
             {
                 int conditional = knob.Value.Count(line => line.IsConditional);
@@ -120,11 +117,9 @@ namespace Core.PassiveTree.Summary
             return summary;
         }
 
-        /// <summary>The bucket the knob's lines were written in — a note on the authoring and nothing the
-        /// total is read through: a binding is chosen by the parameter and reads the value, so the same
-        /// number does the same thing written as Flat or as Increase, and only the wording of a line's own
-        /// sentence follows the bucket. Null where the lines disagree, which is one knob written two ways
-        /// and worth pointing at rather than papering over with whichever bucket won.</summary>
+        /// <summary>The bucket the knob's lines were authored in — provenance only, since a binding reads
+        /// by parameter and never by bucket. Null where lines disagree: one knob written two ways, worth
+        /// flagging rather than papering over with whichever bucket won.</summary>
         private static ModifierValueType? BucketOf(List<ContextModifierLine> lines)
         {
             ModifierValueType first = lines[0].ValueType;
@@ -206,15 +201,13 @@ namespace Core.PassiveTree.Summary
         int Lines,
         int ConditionalLines);
 
-    /// <param name="Bucket">The bucket every line feeding the knob was written in, null where they
-    /// disagree. Authoring provenance only — a knob's value is read the way its binding reads it, never
-    /// the way its bucket is spelled.</param>
-    /// <param name="Value">What a fighter would end up carrying for the knob: every counted line added up
-    /// and then read the way the pipeline reads it, so a whole-unit knob shows the turns it really grants
-    /// and not the fraction that dies at the binding. A switch sums to the number of switches taken, one
-    /// being enough.</param>
-    /// <param name="ConditionalLines">How many of the lines carry a condition and were counted as if
-    /// always on. Zero in the reading that leaves them out.</param>
+    /// <param name="Bucket">Authoring provenance only, null where lines disagree — a knob's value is read
+    /// the way its binding reads it, never the way its bucket is spelled.</param>
+    /// <param name="Value">Every counted line summed, then read the way the pipeline reads it: a
+    /// whole-unit knob shows the turns it really grants rather than a fraction lost at the binding, and a
+    /// switch sums to the number of switches taken, one being enough.</param>
+    /// <param name="ConditionalLines">Lines carrying a condition, counted as if always on. Zero in the
+    /// reading that leaves them out.</param>
     public sealed record ContextTotal(
         ContextParameter Parameter,
         ModifierValueType? Bucket,
@@ -228,19 +221,19 @@ namespace Core.PassiveTree.Summary
 
         public List<ParameterTotal> Parameters { get; } = [];
 
-        /// <summary>Pipeline knobs, kept apart from <see cref="Parameters"/>: they never enter the
-        /// parameter formula, so folding them into that table would be a lie about where they land.</summary>
+        /// <summary>Pipeline knobs, kept apart from <see cref="Parameters"/> since they never enter the
+        /// parameter formula — folding them into that table would misstate where they land.</summary>
         public List<ContextTotal> Context { get; } = [];
 
         public List<string> Keystones { get; } = [];
 
         /// <summary>Ability references grouped by the class of node that granted them. A class with
-        /// nothing taken has no entry at all, so the panel never prints an empty row.</summary>
+        /// nothing taken has no entry, so the panel never prints an empty row.</summary>
         public IReadOnlyDictionary<PassiveNodeKind, List<string>> Unlocks => _unlocks;
 
-        /// <summary>Gated lines the allocation carries. In the reading that counts them it says how much
-        /// of the total is only sometimes true; in the reading that leaves them out it says how much of
-        /// the allocation the totals are not showing at all.</summary>
+        /// <summary>Gated lines the allocation carries — in the counted reading, how much of the total is
+        /// only sometimes true; in the excluding reading, how much of the allocation the totals don't
+        /// show.</summary>
         public int ConditionalLines { get; set; }
 
         public bool IsEmpty => Parameters.Count == 0 && Context.Count == 0 && Keystones.Count == 0 && _unlocks.Count == 0;

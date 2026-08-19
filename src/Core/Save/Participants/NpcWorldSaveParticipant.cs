@@ -12,34 +12,18 @@ namespace Core.Save.Participants
     using Newtonsoft.Json.Linq;
     using Services;
 
-    /// <summary>
-    /// World NPC deltas. Captured: lying bodies (rise timer preserved), wild risen undead and wild
-    /// LIVING NPCs — the facts nothing else re-creates. Skipped: living NPCs a spawn point owns (the
-    /// point re-rolls its own roster on load), summons (battle-scoped, no world return) and fighters
-    /// (checkpoint saves happen out of battle). Whether nobody owns an NPC travels IN THE RECORD, so a
-    /// restored quest NPC stays nobody's while a restored body returns to the roster its point still
-    /// counts it in — points refill independently, and a pair that the world used to heal by itself
-    /// once the body stood up again must not be written down forever. Rising and burning still flow
-    /// through the global events and the population cap. Concrete NPC classes are project-private:
-    /// instantiation goes through <see cref="INpcWorldSpawner"/>.
-    /// <para>
-    /// How a restored body ends is the business of the cycle the DEFINITION builds, never of the kind
-    /// written in the file: a body on a cycle that gets up alive (a peaceful resident) is laid down by
-    /// the very same path, and then it neither burns nor publishes anything — it simply stands back up
-    /// as itself, so none of the global events above are its story.
-    /// </para>
-    /// <para>
-    /// Identity is re-rolled from the record everywhere EXCEPT the modifiers of a wild living NPC:
-    /// a quest's trial target fought against a different set is a different trial, so its ids are
-    /// restated one by one. Bodies keep re-rolling theirs — an accepted fidelity loss for the many.
-    /// </para>
-    /// <para>
-    /// What a living record deliberately does NOT carry: vitals (a wounded target stands up whole),
-    /// the rolled ability set (it re-rolls with the definition) and the instance id (a new one, so the
-    /// personal reputation the player earned with THAT body is forgotten). Identity here is the record
-    /// plus its modifiers; the rest is the state of a session, not of the world.
-    /// </para>
-    /// </summary>
+    /// <summary>World NPC deltas: lying bodies (rise timer kept), wild risen undead, and wild LIVING
+    /// NPCs — the facts nothing else recreates. Skipped: spawn-point-owned living NPCs (point re-rolls
+    /// its own roster), summons (battle-scoped), fighters (checkpoint saves happen out of battle).
+    /// Concrete NPC classes are project-private; instantiation goes through <see cref="INpcWorldSpawner"/>.
+    /// Ownership ("wild") is stored in the record, not derived at restore: a quest NPC stays nobody's,
+    /// a body returns to the point's roster it still counts — points refill independently, so that pair
+    /// must not be written down forever. A restored body's ending follows the CURRENT definition's
+    /// lifecycle, not the kind written in the file — one now built as a peaceful resident just stands
+    /// back up, no rise/burn events fire. Identity re-rolls from the record everywhere except a wild
+    /// living NPC's modifiers, restated one by one (a quest trial needs its exact set); bodies re-roll
+    /// theirs. Not carried: vitals, rolled ability set, instance id (so past-life reputation resets) —
+    /// identity here is the record plus modifiers only.</summary>
     public class NpcWorldSaveParticipant(
         INpcWorldRegistry registry,
         INpcProvider npcProvider,
@@ -49,9 +33,8 @@ namespace Core.Save.Participants
     {
         public string SectionId => "npcWorld";
 
-        /// <summary>2 — wild LIVING NPCs joined the section (with the modifier ids they wear). A
-        /// version 1 file simply holds none, which is what a save written before quests could put a
-        /// nobody's NPC into the world means; its bodies read exactly as they always did.</summary>
+        /// <summary>2 — wild LIVING NPCs joined the section (with their modifier ids). A version 1
+        /// file simply holds none, so its bodies read exactly as they always did.</summary>
         public int Version => 2;
 
         public int RestoreOrder => Save.RestoreOrder.Npc;
@@ -95,9 +78,9 @@ namespace Core.Save.Participants
                 if (!npcProvider.KnownNpcIds.Contains(body.NpcId)) continue; // NPC removed from the data
                 bool alive = body.Kind == NpcBodySaveData.AliveKind;
 
-                // A living wild NPC was named by hand (a quest's trial target) and reserved its slot
-                // outside the limit when it first spawned; the load repeats that promise, so a world
-                // fuller than at save time pauses the spawn points instead of dropping the target.
+                // A living wild NPC reserved its slot outside the limit when it first spawned; the load
+                // repeats that promise, so a world fuller than at save time pauses the spawn points
+                // instead of dropping the target.
                 if (alive) population.ReserveOutsideLimit();
                 else if (!population.TryReserve()) continue; // cap reached: fresh spawns won, the body is dropped
 
@@ -112,10 +95,7 @@ namespace Core.Save.Participants
                 var npc = spawner.Spawn(definition, new Vector2(body.X, body.Y));
                 if (npc == null) break; // no world to spawn into — every later body would fail too
 
-                // Wildness is a fact of the RECORD, not of the restore. A quest's NPC comes back
-                // nobody's and the next save carries it again; a body a point still counts in its
-                // roster comes back the point's, so once it is on its feet the world is back to one
-                // resident instead of writing the load-time pair down forever.
+                // Wildness is a fact of the record, not of the restore (see class doc).
                 if (body.Wild) npc.MarkAsWild();
 
                 switch (body.Kind)
@@ -124,10 +104,7 @@ namespace Core.Save.Participants
                         break; // a fresh spawn already stands there with full vitals: nothing to lay down
 
                     case NpcBodySaveData.RisenKind:
-                        // The cycle the definition built decides the ending, not the kind in the file:
-                        // a record written while this NPC still rose undead must not hand the fate to
-                        // today's peaceful resident. A resident that was up and about at save time is
-                        // simply alive — the fresh spawn already stands there, nothing to restore.
+                        // Current definition decides the ending, not the file (see class doc).
                         if (npc.Lifecycle is IUndeadRiseLifecycle) npc.RestoreAsRisen(body.RisingBonus);
                         break;
                     case NpcBodySaveData.DormantKind:
@@ -140,9 +117,8 @@ namespace Core.Save.Participants
             }
         }
 
-        /// <summary>The modifier ids of the record the catalog still knows. A trial the data has since
-        /// stripped a modifier from comes back a modifier short: a weaker target the quest can still
-        /// finish beats a target the load drops and a stage that never ends.</summary>
+        /// <summary>Modifier ids from the record that the catalog still knows; a stripped modifier is
+        /// dropped rather than failing the whole restore.</summary>
         private List<INpcModifier> ReadModifiers(NpcBodySaveData body)
         {
             var known = modifierProvider.GetAllModifierIds();

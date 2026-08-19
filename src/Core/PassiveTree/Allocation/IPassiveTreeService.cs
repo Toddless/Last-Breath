@@ -5,11 +5,8 @@ namespace Core.PassiveTree.Allocation
     using Context;
     using Entity.Components;
 
-    /// <summary>
-    /// The character's passive-tree allocation: which nodes are taken, what they cost, and the
-    /// parametric contribution that follows from them. Points arrive from outside — the service
-    /// accounts for them, it does not award them.
-    /// </summary>
+    /// <summary>The character's passive-tree allocation: which nodes are taken, what they cost, and the
+    /// parametric contribution that follows. Points arrive from outside — this accounts for them, not awards them.</summary>
     public interface IPassiveTreeService
     {
         /// <summary>Raised after the taken set changed by any route: a purchase, a refund, a respec
@@ -19,14 +16,12 @@ namespace Core.PassiveTree.Allocation
         /// <summary>The tree the allocation is measured against; empty until the catalog is loaded.</summary>
         PassiveTreeDocument Tree { get; }
 
-        /// <summary>The contribution of the taken nodes, ready to be registered on a fighter's
-        /// modifier component. Registering it is the only channel — nothing writes tree lines into
-        /// the entity's own modifier list.</summary>
+        /// <summary>The contribution of the taken nodes, registered on a fighter's modifier component —
+        /// the only channel; nothing writes tree lines into the entity's own modifier list.</summary>
         IParameterModifierSource ParameterSource { get; }
 
-        /// <summary>The other half of the contribution: the pipeline knobs the taken nodes tune, folded to
-        /// one modifier per knob. Reaches a fighter by being attached to it rather than by being registered
-        /// — context modifiers live in the fighter's own handler — so whoever attaches it detaches it.</summary>
+        /// <summary>The other half: pipeline knobs the taken nodes tune, folded to one modifier per knob.
+        /// Reaches a fighter by being attached, not registered — whoever attaches it detaches it.</summary>
         IPassiveTreeContextSource ContextSource { get; }
 
         IReadOnlyCollection<string> TakenNodes { get; }
@@ -47,15 +42,12 @@ namespace Core.PassiveTree.Allocation
         /// or a console asks to show whether a node is available and why it is not.</summary>
         AllocationResult CheckTake(string nodeId);
 
-        /// <summary>The answer <see cref="Refund"/> would give, without giving anything back — the
-        /// mirror of <see cref="CheckTake"/>, and what a canvas asks to grey out a button and name the
-        /// reason before the click rather than after it.</summary>
+        /// <summary>The answer <see cref="Refund"/> would give, without giving anything back — mirror
+        /// of <see cref="CheckTake"/>, for greying out a button and naming the reason before the click.</summary>
         AllocationResult CheckRefund(string nodeId);
 
-        /// <summary>The cheapest route from the current allocation to a node, the nodes still to be
-        /// bought and in the order they would be bought. Empty when the node is already taken or
-        /// nothing reaches it. Its length is what reaching the node costs — the only place a price
-        /// bigger than one point exists, since a single node always costs one.</summary>
+        /// <summary>Cheapest route to a node, in buy order; empty when already taken or unreachable.
+        /// Its length is the only place a price bigger than one point exists.</summary>
         IReadOnlyList<string> PathTo(string nodeId);
 
         AllocationResult Take(string nodeId);
@@ -66,29 +58,21 @@ namespace Core.PassiveTree.Allocation
 
         AllocationResult Refund(string nodeId);
 
-        /// <summary>
-        /// The answer <see cref="RefundSet"/> would give, without giving anything back. Asked of the
-        /// whole set rather than of each node, because those are different questions: on a chain
-        /// seed—A—B—C the pair {B, C} is legal while B on its own strands C, so a set checked node by
-        /// node would be refused for a break it repairs itself.
-        /// </summary>
+        /// <summary>The answer <see cref="RefundSet"/> would give, without giving anything back — asked
+        /// of the whole set, not node by node: on seed—A—B—C, {B,C} is legal while B alone strands C.</summary>
         AllocationResult CheckRefundSet(IReadOnlyCollection<string> nodeIds);
 
-        /// <summary>Gives a whole set back at once, all-or-nothing. The one road for a planned respec:
-        /// the price of one is charged for the set, so a set half given back would leave the character
-        /// paid up and still holding nodes.</summary>
+        /// <summary>Gives a whole set back at once, all-or-nothing — the road for a planned respec, so a
+        /// half-refund never leaves the character paid up and still holding nodes.</summary>
         AllocationResult RefundSet(IReadOnlyCollection<string> nodeIds);
 
         /// <summary>Drops the whole allocation back to the granted seeds.</summary>
         void Respec();
 
-        /// <summary>Replaces the whole allocation with a saved one. Wholesale rather than node by
-        /// node: a set replayed through purchases would depend on the order it was written in. The
-        /// set is re-checked against the current tree, so nodes that stopped existing or stopped
-        /// being connected do not come back — unless there is no tree to check against
-        /// (<see cref="PassiveTreeDocument.IsEmpty"/>), in which case the set is held as it stands
-        /// until a document loads. Points are not part of it — the granted total belongs to mastery
-        /// and is restored before this.</summary>
+        /// <summary>Replaces the whole allocation with a saved one, wholesale rather than replayed as
+        /// purchases (order-dependent). Re-checked against the current tree, so dead/disconnected nodes
+        /// drop out — unless the tree is empty (<see cref="PassiveTreeDocument.IsEmpty"/>), where the set
+        /// is held as-is until one loads. Points are not part of it; mastery restores its total first.</summary>
         void RestoreState(IReadOnlyCollection<string> takenNodes);
     }
 }

@@ -1,10 +1,7 @@
 namespace Core.PassiveTree.Allocation
 {
-    /// <summary>
-    /// Outcome of one allocation request. A refusal names its own reason instead of collapsing into a
-    /// false, so the caller can say what went wrong — an unreachable node and an empty purse are not
-    /// the same problem to the player.
-    /// </summary>
+    /// <summary>Outcome of one allocation request. A refusal names its reason instead of collapsing into
+    /// a bare false, so the caller can distinguish an unreachable node from an empty purse.</summary>
     public enum AllocationResult
     {
         Success,

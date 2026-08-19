@@ -2,33 +2,26 @@ namespace Core.PassiveTree.View
 {
     using System;
 
-    /// <summary>Where one pip of a socket ring sits and how big it is: the centre in document units, and
-    /// the radius in both spaces, so whoever draws it and whoever picks it read the same two numbers.</summary>
+    /// <summary>Where one pip of a socket ring sits and how big it is: centre in document units, radius in
+    /// both spaces, so drawing and picking read the same two numbers.</summary>
     public readonly record struct SocketPipPlacement(float X, float Y, float DocumentRadius, float ScreenRadius);
 
     /// <summary>
-    /// The ring of augment slots drawn around an ability node: where each place of it sits and how big
-    /// it is.
-    ///
-    /// <para>Everything is a multiple of what the NODE measures on screen
-    /// (<see cref="NodeGeometry.ScreenRadius"/>) and never a gap in pixels — the node's size has a floor
-    /// under it and a gap does not, so a fixed offset outlives the floor and the ring ends up several
-    /// times the dot it belongs to. The same rule <see cref="NodeGeometry.ScreenRingRadius"/> is written
-    /// under, applied to a mark that also has to be aimed at.</para>
-    ///
-    /// <para>The ring is an ARC and not a circle, centred on the direction away from the middle of the
-    /// wheel: branches leave a node towards its neighbours, and pips spread over the whole circle would
-    /// sit on top of them.</para>
+    /// The ring of augment slots drawn around an ability node: where each place sits and how big it is.
+    /// Everything is a multiple of the NODE's own screen radius (<see cref="NodeGeometry.ScreenRadius"/>),
+    /// never a fixed pixel gap — the node's floor would otherwise leave a fixed offset several times the
+    /// dot's size at low zoom (same rule as <see cref="NodeGeometry.ScreenRingRadius"/>).
+    /// <para>The ring is an ARC, not a circle, centred away from the wheel's middle: branches leave a node
+    /// towards its neighbours, and pips spread over a full circle would sit on top of them.</para>
     /// </summary>
-    /// <param name="nodes">The one table of node sizes. Borrowed rather than copied: a ring measured off
-    /// a second reading of a node's size would drift from the node it is about.</param>
-    /// <param name="ringRadiusScale">How far out the pip centres sit, as a multiple of the node's own
-    /// screen radius.</param>
-    /// <param name="pipRadiusScale">How big a pip is, as a multiple of the node's own screen radius.</param>
+    /// <param name="nodes">The one table of node sizes, borrowed rather than copied so a ring can't drift
+    /// from the node it's about.</param>
+    /// <param name="ringRadiusScale">How far out pip centres sit, as a multiple of the node's radius.</param>
+    /// <param name="pipRadiusScale">How big a pip is, as a multiple of the node's radius.</param>
     /// <param name="arcDegrees">How wide the fan of pips opens.</param>
-    /// <param name="minPipScreenRadius">The floor under a pip, so it stays visible and aimable.</param>
-    /// <param name="minNodeScreenRadius">How small the NODE may get before its ring stops being drawn at
-    /// all. A mark on a dot a pixel and a half across has stopped being that dot's mark.</param>
+    /// <param name="minPipScreenRadius">Floor under a pip so it stays visible and aimable.</param>
+    /// <param name="minNodeScreenRadius">How small the NODE may get before its ring stops drawing at all —
+    /// a mark on a pixel-and-a-half dot has stopped being that dot's mark.</param>
     public sealed class SocketRingGeometry(
         NodeGeometry nodes,
         float ringRadiusScale,
@@ -37,14 +30,12 @@ namespace Core.PassiveTree.View
         float minPipScreenRadius,
         float minNodeScreenRadius)
     {
-        /// <summary>Whether the ring is worth drawing at this zoom at all. Asked by the drawing and by
-        /// the pick alike: a pip nobody can see must not answer a click either.</summary>
+        /// <summary>Whether the ring is worth drawing at this zoom — asked by drawing and picking alike,
+        /// since an invisible pip must not answer a click either.</summary>
         public bool Draws(PassiveNodeKind kind, float zoom) => nodes.ScreenRadius(kind, zoom) >= minNodeScreenRadius;
 
-        /// <summary>
-        /// Where the <paramref name="index"/>-th of <paramref name="count"/> pips of one node's ring sits.
-        /// A lone pip sits on the outward direction itself; several fan out evenly across the arc.
-        /// </summary>
+        /// <summary>Where the <paramref name="index"/>-th of <paramref name="count"/> pips sits. A lone
+        /// pip sits on the outward direction itself; several fan out evenly across the arc.</summary>
         public SocketPipPlacement Place(float nodeX, float nodeY, PassiveNodeKind kind, ICanvasScale scale, int index, int count)
         {
             float radians = Outward(nodeX, nodeY) + Offset(index, count);
@@ -58,13 +49,12 @@ namespace Core.PassiveTree.View
                 screenPip);
         }
 
-        /// <summary>The direction away from the middle of the wheel. A node standing exactly at the
-        /// middle has no outward direction, so it takes the one the fan opens from by default.</summary>
-        /// <summary>How big a pip is on screen: a share of the node's own size, never below the floor
-        /// that keeps it visible and aimable.</summary>
+        /// <summary>How big a pip is on screen: a share of the node's own size, never below the floor.</summary>
         private float ScreenPipRadius(PassiveNodeKind kind, float zoom) =>
             MathF.Max(nodes.ScreenRadius(kind, zoom) * pipRadiusScale, minPipScreenRadius);
 
+        /// <summary>Direction away from the wheel's middle; a node exactly at the middle has none, so it
+        /// takes the fan's default direction.</summary>
         private static float Outward(float nodeX, float nodeY) =>
             nodeX == 0f && nodeY == 0f ? 0f : MathF.Atan2(nodeY, nodeX);
 

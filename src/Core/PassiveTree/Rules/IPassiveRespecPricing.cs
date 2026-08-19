@@ -1,18 +1,13 @@
 namespace Core.PassiveTree.Rules
 {
-    /// <summary>
-    /// What giving nodes back costs in gold. One formula and one reader: the screen prints the live
-    /// price on its button from here and the gate charges from here, so the number the player agreed to
-    /// is the number he pays.
-    /// <para>A pure calculation — it sees no wallet and no allocation, and asking it costs nothing, which
-    /// is what lets a screen ask on every mark.</para>
-    /// </summary>
+    /// <summary>What giving nodes back costs in gold. One formula and one reader — the screen prints the
+    /// live price from here and the gate charges from here, so what the player agreed to is what he pays.
+    /// A pure calculation with no wallet or allocation, so a screen can ask on every mark.</summary>
     public interface IPassiveRespecPricing
     {
         /// <param name="nodeCount">How many nodes go back at once.</param>
-        /// <param name="masteryLevel">Levels the character EARNED. Never the effective level: that one
-        /// carries the bonus levels equipment grants, and a price that moved with a ring swapped on and
-        /// off would be a respec bought at whatever the cheapest gear of the moment says.</param>
+        /// <param name="masteryLevel">Levels EARNED, never effective — effective carries equipment bonus
+        /// levels, and the price must not move with a ring swapped on and off.</param>
         int PriceOf(int nodeCount, int masteryLevel);
     }
 }
