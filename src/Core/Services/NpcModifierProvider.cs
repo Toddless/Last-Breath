@@ -1,5 +1,6 @@
 namespace Core.Services
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Data;
@@ -30,8 +31,15 @@ namespace Core.Services
             ? throw new KeyNotFoundException($"No NPC modifier loaded for '{id}'")
             : modifier.Copy();
 
-        public List<string> GetAllModifierIds() => _npcModifiers.Keys.ToList();
+        /// <summary>Ordered like <see cref="GetAllModifiers"/> — the two describe one catalog, and a
+        /// membership check reads the same either way.</summary>
+        public List<string> GetAllModifierIds() => [.. _npcModifiers.Keys.OrderBy(id => id, StringComparer.Ordinal)];
 
-        public IReadOnlyList<INpcModifier> GetAllModifiers() => _npcModifiers.Values.ToList();
+        /// <summary>The rollable pool, ordered by id: callers turn this order into weight bands, so the
+        /// order decides WHICH modifier a given roll picks. Unordered, that answer would follow the order
+        /// the catalog happened to arrive in — which file of the folder was read first, and where inside
+        /// it the entry sat — so moving an entry between files would silently re-aim every seeded draw.</summary>
+        public IReadOnlyList<INpcModifier> GetAllModifiers() =>
+            [.. _npcModifiers.Values.OrderBy(modifier => modifier.Id, StringComparer.Ordinal)];
     }
 }

@@ -11,7 +11,9 @@ namespace LastBreathTest.LootSimulation
             var sb = new StringBuilder();
             sb.AppendLine("# Loot simulation report");
             sb.AppendLine();
-            sb.AppendLine($"Seed: `{seed}`, date: {DateTime.Now:yyyy-MM-dd HH:mm}");
+            // What the run WAS, never when it happened: a wall clock in the header makes every
+            // regeneration differ and turns a byte comparison of two reports into noise.
+            sb.AppendLine($"Seed: `{seed}`, scenarios: {results.Count}");
             sb.AppendLine();
 
             sb.AppendLine("## Summary");
