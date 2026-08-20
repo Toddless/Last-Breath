@@ -28,6 +28,26 @@ namespace LastBreathTest.BattleSystemTests
             "Effect_Seal_Of_Spirit"
         ];
 
+        /// <summary>The one strong row the design list does not carry: the mythic reading is off the list
+        /// entirely (see EffectCanonTests.s_offTheList), so it is named apart from the transcription.</summary>
+        private const string OffTheListStrong = "Effect_Mythic_Calculation";
+
+        /// <summary>Every row the design list marks "Сила: Сильный", transcribed from the list rather than
+        /// read back out of the canon.</summary>
+        private static readonly string[] s_strong =
+        [
+            "Effect_Fury",
+            "Effect_Burning_Fury",
+            "Effect_Primal_Fury",
+            "Effect_Healing_Fury",
+            "Effect_Evade_First_Death",
+            "Effect_Lucky_Crit_Chance",
+            "Effect_Fragility",
+            "Effect_Curse",
+            "Effect_Heal_Reduction",
+            "Effect_Frostbite"
+        ];
+
         /// <summary>The shipped canon behind a composition, exactly as the game reads it — the strength is
         /// pulled from the composition at the moment an effect is built, so a walk about it has to BE one.</summary>
         [TestInitialize]
@@ -63,7 +83,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void ARankAndFileEffectIsWeakWithoutSayingSoAnywhere()
         {
-            // The default carries the whole catalog: the canon names strengths for six rows out of 51.
+            // The default carries the whole catalog: the canon names strengths for sixteen rows out of 51.
             var clumsiness = new Clumsiness(duration: 3, maxStacks: 5, value: 0.15f);
 
             Assert.AreEqual(EffectPower.Weak, clumsiness.Power, "an effect no row calls strong came out stronger than weak");
@@ -72,9 +92,9 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public async Task AWeakDispelDoesNotReachTheMythicCalculationAndAStrongOneDoes()
         {
-            // The one strong row, and the only one that is neither a seal nor weak. Measured with no
-            // Crit Calculation buff on the bearer at all: the mythic leaves with its host, so a walk
-            // that laid one would be reading the tie back to the host rather than the strength.
+            // A strong row, neither a seal nor weak. Measured with no Crit Calculation buff on the bearer
+            // at all: the mythic leaves with its host, so a walk that laid one would be reading the tie
+            // back to the host rather than the strength.
             var bearer = new ConditionOwner();
             var calculation = new MythicCalculationEffect(duration: 3, maxStacks: 1);
             await calculation.Apply(new EffectApplyingContext { Caster = bearer, Target = bearer, Source = "Test_Effect_Power", Damage = default });
@@ -112,6 +132,35 @@ namespace LastBreathTest.BattleSystemTests
             string[] dispellable = [.. s_seals.Where(seal => GameServiceProvider.TryGet<IEffectProvider>()?.PowerOf(seal) != EffectPower.Absolute)];
 
             Assert.AreEqual(0, dispellable.Length, $"seals the canon leaves dispellable: [{string.Join(", ", dispellable)}]");
+        }
+
+        [TestMethod]
+        public void TheCanonRaisesTheseRowsAboveWeakAndNoOthers()
+        {
+            // Read as a SET and compared both ways, because a walk over the named ids only catches a
+            // strength going missing. A "power" typed onto a row the list calls weak, or an Absolute
+            // landing anywhere but a seal, is the same drift in the other direction and reaches nobody:
+            // the effect simply stops answering to the dispel it was balanced against.
+            IEffectProvider canon = GameServiceProvider.TryGet<IEffectProvider>()!;
+
+            string[] declared =
+            [
+                .. s_seals.Select(id => $"{id}={EffectPower.Absolute}")
+                    .Concat(s_strong.Append(OffTheListStrong).Select(id => $"{id}={EffectPower.Strong}"))
+                    .Order(StringComparer.Ordinal)
+            ];
+            string[] canonical =
+            [
+                .. canon.KnownIds.Where(id => canon.PowerOf(id) != EffectPower.Weak)
+                    .Select(id => $"{id}={canon.PowerOf(id)}")
+                    .Order(StringComparer.Ordinal)
+            ];
+
+            string[] lost = [.. declared.Except(canonical, StringComparer.Ordinal)];
+            string[] unaccounted = [.. canonical.Except(declared, StringComparer.Ordinal)];
+
+            Assert.AreEqual(0, lost.Length, $"strengths named here that the canon does not carry: [{string.Join(", ", lost)}]");
+            Assert.AreEqual(0, unaccounted.Length, $"strengths the canon carries that nothing here names: [{string.Join(", ", unaccounted)}]");
         }
 
         /// <summary>An effect wearing an id the canon carries no row for.</summary>

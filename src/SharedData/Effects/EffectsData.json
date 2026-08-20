@@ -2,18 +2,22 @@
     "effects": [
         {
             "id": "Effect_Fury",
+            "power": "Strong",
             "properties": { "duration": 3, "maxStacks": 1, "healthPercent": 0.05 }
         },
         {
             "id": "Effect_Burning_Fury",
+            "power": "Strong",
             "properties": { "duration": 3, "maxStacks": 1, "healthPercent": 0.05, "burnDamage": 0.75, "burningDuration": 3, "burningMaxStacks": 999 }
         },
         {
             "id": "Effect_Primal_Fury",
+            "power": "Strong",
             "properties": { "duration": 3, "maxStacks": 1, "healthPercent": 0.05, "damageMultiplier": 0.35 }
         },
         {
             "id": "Effect_Healing_Fury",
+            "power": "Strong",
             "properties": { "duration": 3, "maxStacks": 1, "healthPercent": 0.05, "healAmount": 0.15 }
         },
         {
@@ -59,10 +63,12 @@
         },
         {
             "id": "Effect_Evade_First_Death",
+            "power": "Strong",
             "properties": { "duration": 3, "maxStacks": 1, "percentHealthToRecover": 0.35 }
         },
         {
             "id": "Effect_Fragility",
+            "power": "Strong",
             "properties": { "duration": 3, "maxStacks": 3, "critDamageAmp": 0.35 }
         },
         {
@@ -135,6 +141,7 @@
         },
         {
             "id": "Effect_Curse",
+            "power": "Strong",
             "properties": { "duration": 1, "maxStacks": 1, "costIncrease": 150 }
         },
         {
@@ -167,6 +174,7 @@
         },
         {
             "id": "Effect_Heal_Reduction",
+            "power": "Strong",
             "properties": { "duration": 3, "maxStacks": 2, "reduceBy": 0.45 }
         },
         {
@@ -179,10 +187,12 @@
         },
         {
             "id": "Effect_Frostbite",
+            "power": "Strong",
             "properties": { "duration": 3, "maxStacks": 8, "coldDamageAmp": 0.15 }
         },
         {
             "id": "Effect_Lucky_Crit_Chance",
+            "power": "Strong",
             "properties": { "duration": 3, "maxStacks": 1 }
         },
         {
