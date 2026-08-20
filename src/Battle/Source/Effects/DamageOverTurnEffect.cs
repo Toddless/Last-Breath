@@ -13,23 +13,34 @@
 
     public class DamageOverTurnEffect(
         int duration,
-        StatusEffects statusEffect = StatusEffects.None,
-        int maxStacks = 999,
-        EffectValue percentFromDamage = default)
+        StatusEffects statusEffect,
+        int maxStacks,
+        EffectValue percentFromDamage)
         : Effect(IdFor(statusEffect), duration, maxStacks, statusEffect), IDamageOverTurnEffect
     {
         public override bool IsHarmful => true;
 
+        /// <summary>The ceiling a source names when it holds no opinion about one: the base class takes
+        /// the stack count down to whatever the canon balances the status at, so a figure above every
+        /// canonical ceiling means "as many as the canon allows".</summary>
+        public const int NoCeilingOfItsOwn = 999;
+
         private const string BaseId = "Effect_Damage_Over_Turn";
-        private const float DefaultPercentFromDamage = 0.7f;
+
+        /// <summary>What a tick carries where no canon can be read at all — a working figure of a host
+        /// that composed no registry (a bench, a tool), never a shipped one. Every shipped road either
+        /// names its own share or takes the canonical one through <see cref="FromCanon"/>.</summary>
+        private const float SandboxPercentFromDamage = 0.7f;
 
         /// <summary>The one figure a caster owns of a canonical stack: how long it lasts. Named as the
         /// registry declares it, because that is the key the canonical row is overridden under.</summary>
         private const string DurationKey = "duration";
 
         /// <summary>What each damaging status feeds on: the component of the blow its pool is taken from
-        /// (none = the whole blow) and the caster stat that multiplies that pool. A typeless DoT is not
-        /// listed — it feeds on the whole blow and no stat raises it.</summary>
+        /// and the caster stat that multiplies that pool. Burning takes the fire of the blow and bleeding
+        /// its physical part; POISON NAMES NO COMPONENT BY DESIGN — its pool is the whole blow, every
+        /// component the hit landed, which is what the null stands for and not a kind left unwritten.
+        /// A typeless DoT is not listed — it feeds on the whole blow and no stat raises it.</summary>
         private static readonly Dictionary<StatusEffects, (DamageType? Component, EntityParameter Multiplier)> s_pools = new()
         {
             [StatusEffects.Poison] = (null, EntityParameter.PoisonDamageMultiplier),
@@ -51,9 +62,9 @@
         }
 
         /// <summary>Share of the blow one tick carries, as authored — <see cref="Copy"/> hands it on
-        /// unscaled. The default stands in for the parameterless struct default.</summary>
-        public EffectValue PercentFromBase { get; } =
-            percentFromDamage.Authored == 0f ? DefaultPercentFromDamage : percentFromDamage;
+        /// unscaled. Whoever lays a stack names it: there is no figure to fall back on, because a share
+        /// nobody wrote is balance nobody sees.</summary>
+        public EffectValue PercentFromBase { get; } = percentFromDamage;
 
         /// <summary>Settable so effect-application mutators ("+X% burning damage") can scale the tick.</summary>
         public float DamagePerTick { get; set; }
@@ -66,12 +77,13 @@
         /// stack ceiling of the base class and for the same reasons: nothing holds a provider that may
         /// have been discarded. A composed registry that refuses the id has already named the reason in
         /// the Tracker and nothing is laid; where no composition exists at all there is no canon to read
-        /// and the effect is built with its own default — a sandbox answer, never a shipped one.</para>
+        /// and the stack is built at <see cref="SandboxPercentFromDamage"/> — a host's working answer,
+        /// named out loud here and reachable from nowhere else.</para>
         /// </summary>
         public static IEffect? FromCanon(int duration, StatusEffects status)
         {
             IEffectProvider? canon = GameServiceProvider.TryGet<IEffectProvider>();
-            if (canon == null) return new DamageOverTurnEffect(duration, status);
+            if (canon == null) return new DamageOverTurnEffect(duration, status, NoCeilingOfItsOwn, SandboxPercentFromDamage);
 
             string id = IdFor(status);
             var owned = new Dictionary<string, float>(StringComparer.Ordinal) { [DurationKey] = duration };

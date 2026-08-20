@@ -63,9 +63,11 @@ namespace LastBreathTest.BattleSystemTests
 
         private const float Blow = 100f;
 
-        /// <summary>Share of the blow one tick of a stack carries. The applier's record does not name it,
-        /// so the figure lives as the registry's fallback — and it is pinned here because a potency that
-        /// silently became zero would leave every walk above green over stacks that tick for nothing.</summary>
+        /// <summary>Share of the blow one tick of a stack carries — the figure the applier's record names
+        /// and LENDS to the ability. That lending is the whole point: a potency living on the ability is
+        /// a potency amplifiers can decorate, which is why this road keeps its own share instead of taking
+        /// the canonical one. Pinned here because a potency that silently became zero would leave every
+        /// walk above green over stacks that tick for nothing.</summary>
         private const float Potency = 0.7f;
 
         [TestMethod]

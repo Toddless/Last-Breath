@@ -16,6 +16,11 @@ namespace Battle.Source.PassiveSkills
     public class BloodthirstyPassiveSkill(int stackThreshold, float healPercent)
         : Skill(id: "Passive_Skill_Bloodthirsty")
     {
+        /// <summary>Turns the wound the passive opens bleeds for. The grant record names the threshold
+        /// and the share healed and nothing else, so this one figure is the passive's own; what a tick
+        /// of that bleed carries is the canon's.</summary>
+        private const int BleedDuration = 3;
+
         protected override IReadOnlyDictionary<string, object?>? DescriptionValues
         {
             get
@@ -58,8 +63,10 @@ namespace Battle.Source.PassiveSkills
         {
             if (Owner == null || evt.Context.Result is not AttackResults.Succeed) return;
             var target = evt.Context.Target;
-            var bleedEffect = new DamageOverTurnEffect(3, StatusEffects.Bleed);
-            _ = bleedEffect.Apply(new EffectApplyingContext { Source = InstanceId, Caster = Owner, Damage = evt.Context.FinalDamage, Target = target });
+            // The passive owns how long the wound bleeds; what a tick carries is balanced in the canon.
+            // A registry that refuses the row lays nothing, and the count below still detonates what stands.
+            IEffect? bleedEffect = DamageOverTurnEffect.FromCanon(BleedDuration, StatusEffects.Bleed);
+            _ = bleedEffect?.Apply(new EffectApplyingContext { Source = InstanceId, Caster = Owner, Damage = evt.Context.FinalDamage, Target = target });
 
             var bleeds = target.Effects
                 .GetBy(effect => (effect.Status & StatusEffects.Bleed) != 0)

@@ -22,6 +22,11 @@ namespace Battle.Source.Abilities.Riders
     /// The keys are put on the ability by whoever installs the rider (<see cref="AugmentPoisonOnHit"/>).
     /// An ability that already names a poison duration of its own keeps its own base value, and the
     /// stacks are laid at what THAT cast is worth.
+    ///
+    /// An installer that lends no potency at all is not an error and not a reason to invent one: the
+    /// stack is then laid the way the canon balances poison, through the registry. Only a potency the
+    /// ability actually carries goes the other road, because only that one is a number augments can
+    /// reach and decorate.
     /// </summary>
     public class PoisonOnHitRider : IImpactRider
     {
@@ -41,10 +46,8 @@ namespace Battle.Source.Abilities.Riders
         {
             if (!impact.Succeeded) return;
 
-            var poison = new DamageOverTurnEffect(
-                (int)impact.Source[AbilityParameter.PoisonDuration],
-                StatusEffects.Poison,
-                percentFromDamage: impact.Source[Parameters.PoisonPotency]);
+            IEffect? poison = PoisonFor((int)impact.Source[AbilityParameter.PoisonDuration], impact.Source);
+            if (poison == null) return;
 
             await poison.Apply(new EffectApplyingContext
             {
@@ -56,6 +59,17 @@ namespace Battle.Source.Abilities.Riders
                 Effectiveness = impact.Source.Effectiveness,
                 Trace = impact.Source.Trace
             });
+        }
+
+        /// <summary>The stack to lay, for as long as the ability says. A potency the ability carries is
+        /// used as it stands — decorators and all — and only its absence hands the question to the canon;
+        /// a share of nothing is an absence too, since a stack ticking for nothing is never laid anyway.</summary>
+        private static IEffect? PoisonFor(int duration, IAbility source)
+        {
+            float potency = source.ValueOr(Parameters.PoisonPotency, 0f);
+            return potency > 0f
+                ? new DamageOverTurnEffect(duration, StatusEffects.Poison, DamageOverTurnEffect.NoCeilingOfItsOwn, potency)
+                : DamageOverTurnEffect.FromCanon(duration, StatusEffects.Poison);
         }
     }
 }

@@ -42,6 +42,10 @@ namespace LastBreathTest.BattleSystemTests
         private const int PoisonTurns = 3;
         private const float Blow = 100f;
 
+        /// <summary>The share of the blow the stacks below tick with. Nothing here measures a tick, but a
+        /// stack that ticks for nothing is never laid at all, so the walks need SOME share named.</summary>
+        private const float TickShare = 0.5f;
+
         [TestMethod]
         public async Task WhatNoAbilityLaidBelongsToNoAbility()
         {
@@ -128,7 +132,7 @@ namespace LastBreathTest.BattleSystemTests
             var caster = new Fighter();
             var victim = new Fighter();
 
-            var original = new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison);
+            var original = new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison, DamageOverTurnEffect.NoCeilingOfItsOwn, TickShare);
             EffectApplyingContext laying = Laying(caster, victim, mine.Trace);
             await original.Apply(laying);
             await original.Copy().Apply(laying);
@@ -198,7 +202,7 @@ namespace LastBreathTest.BattleSystemTests
         /// none at all for what a passive would leave behind.</summary>
         private static async Task<IEffect> Poison(Fighter caster, Fighter victim, AbilityTrace trace)
         {
-            var stack = new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison, maxStacks: 99);
+            var stack = new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison, maxStacks: 99, percentFromDamage: TickShare);
             await stack.Apply(Laying(caster, victim, trace));
             return stack;
         }

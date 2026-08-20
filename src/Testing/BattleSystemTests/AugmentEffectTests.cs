@@ -67,6 +67,10 @@ namespace LastBreathTest.BattleSystemTests
         private const int PoisonTurns = 3;
         private const int Extension = 1;
 
+        /// <summary>The share of the blow the stack below ticks with. Nothing here measures a tick, but a
+        /// stack that ticks for nothing is never laid at all, so the walk needs SOME share named.</summary>
+        private const float TickShare = 0.5f;
+
         private const string Seed = "start";
         private const string UnlockNode = "abilityunlock_head_butt";
         private const string SocketNode = "sockettier2_head_butt";
@@ -247,7 +251,7 @@ namespace LastBreathTest.BattleSystemTests
         /// which is exactly what the domain reading above has to reach.</summary>
         private static async Task<IEffect> Poisoned(Fighter caster, Fighter victim)
         {
-            var poison = new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison);
+            var poison = new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison, DamageOverTurnEffect.NoCeilingOfItsOwn, TickShare);
             await poison.Apply(new EffectApplyingContext
             {
                 Caster = caster.Object,

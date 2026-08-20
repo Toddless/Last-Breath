@@ -37,6 +37,10 @@ namespace LastBreathTest.BattleSystemTests
         private const int PoisonTurns = 3;
         private const int BuffTurns = 3;
 
+        /// <summary>The share of the blow the stack below ticks with. Nothing here measures a tick, but a
+        /// stack that ticks for nothing is never laid at all, so the walks need SOME share named.</summary>
+        private const float TickShare = 0.5f;
+
         /// <summary>The shipped catalog the combat rules are read from.</summary>
         private const string RulesCatalog = "CombatRules";
 
@@ -162,7 +166,7 @@ namespace LastBreathTest.BattleSystemTests
         /// rather than from a bare instance.</summary>
         private static async Task<DamageOverTurnEffect> StandingPoison(Fighter? caster = null, Fighter? victim = null)
         {
-            var poison = new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison);
+            var poison = new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison, DamageOverTurnEffect.NoCeilingOfItsOwn, TickShare);
             await poison.Apply(new EffectApplyingContext
             {
                 Caster = (caster ?? new Fighter()).Object,

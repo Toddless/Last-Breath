@@ -3,13 +3,18 @@ namespace LastBreathTest.BattleSystemTests
     using System.Linq;
     using System.Threading.Tasks;
     using Battle.Source;
+    using Battle.Source.Abilities.Riders;
     using Battle.Source.Effects;
+    using Battle.Source.PassiveSkills;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Context;
+    using Core.Data;
     using Core.Data.AbilityData;
     using Core.Data.GameData;
     using Core.Entity;
     using Core.Enums;
+    using Core.Events;
     using Core.Services;
     using Microsoft.Extensions.DependencyInjection;
     using Moq;
@@ -30,16 +35,32 @@ namespace LastBreathTest.BattleSystemTests
     {
         private const string PoisonId = "Effect_Damage_Over_Turn_Poison";
         private const string BurningId = "Effect_Damage_Over_Turn_Burning";
+        private const string BleedId = "Effect_Damage_Over_Turn_Bleed";
 
         /// <summary>The canonical shares, transcribed. This is the one place the numbers may be written
         /// out in code: everywhere else they are read from the file.</summary>
         private const float PoisonPotency = 0.35f;
         private const float BurningPotency = 0.45f;
+        private const float BleedPotency = 0.8f;
 
         /// <summary>The canonical turns of the two rows — NOT what the casts below lay, which is the
         /// point: duration is the caster's figure and the potency is the canon's.</summary>
         private const int CanonicalPoisonTurns = 4;
         private const int CanonicalBurningTurns = 3;
+
+        /// <summary>What the Bloodthirsty grant declares: the wound it opens and how much of the burst it
+        /// gives back. The threshold stays above one stack on purpose — every walk below lands a single
+        /// blow, so nothing detonates and the tick under test is the tick of a standing wound.</summary>
+        private const int StackThreshold = 7;
+        private const float HealShare = 0.25f;
+
+        /// <summary>Turns the passive's own bleed lasts — the one figure it owns. The shipped bleed row
+        /// happens to name the same three, so the claim that duration comes from the passive is made
+        /// where the substitute canon says something else.</summary>
+        private const int BloodthirstyTurns = 3;
+
+        /// <summary>Turns the substitute bleed row names, chosen to differ from the passive's own.</summary>
+        private const int SubstituteBleedTurns = 6;
 
         /// <summary>The canonical ceiling both rows carry, restated by the substitute so it moves the
         /// share alone.</summary>
@@ -140,6 +161,68 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void TheBloodthirstyWoundTicksAtTheShareTheCanonBalancesTheBleedAt()
+        {
+            var owner = Fighter();
+            var victim = Fighter();
+            Bloodthirsty(owner);
+
+            LandBlowOn(owner, victim);
+
+            IDamageOverTurnEffect wound = StackOn(victim, BleedId);
+            Assert.AreEqual(Blow * BleedPotency, wound.DamagePerTick, Tolerance,
+                "the passive's wound ticks at a share the canon does not balance the bleed at — the figure is written in code again");
+        }
+
+        [TestMethod]
+        public void MovingTheCanonicalBleedMovesTheWoundButNotTheTurnsThePassiveOwns()
+        {
+            // The same claim as for the two casts, on the passive's road: the share follows the file and
+            // the duration does not, because duration is the only figure the passive hands over.
+            ComposedCanon().Apply(DataCatalog.Effects, new GameDataFile("substitute-bleed.json", SubstituteBleed()));
+
+            var owner = Fighter();
+            var victim = Fighter();
+            Bloodthirsty(owner);
+
+            LandBlowOn(owner, victim);
+
+            IDamageOverTurnEffect wound = StackOn(victim, BleedId);
+            Assert.AreEqual(Blow * Probe, wound.DamagePerTick, Tolerance,
+                "the wound stayed where it was after the canonical share moved — the passive reads a figure of its own");
+            Assert.AreNotEqual(BloodthirstyTurns, SubstituteBleedTurns, "the two turn counts were made equal, so the claim below proves nothing");
+            Assert.AreEqual(BloodthirstyTurns, wound.Duration,
+                "the wound lasts the canonical turns instead of the passive's own — duration is the caster's figure");
+        }
+
+        [TestMethod]
+        public async Task ARiderHandedNoPotencyPoisonsAtTheCanonicalShare()
+        {
+            // The applier that seats this rider lends it a potency, and a lent potency is what augments
+            // decorate — so that road keeps its own figure. This is the OTHER road: an ability carrying a
+            // poison duration and no potency at all. What a tick of that stack carries is then the canon's
+            // and not a number the rider invented for the occasion.
+            var caster = Fighter();
+            var victim = Fighter();
+            var jar = new JarOfPoisonCast(Data("Ability_Jar_Of_Poison"));
+            jar.SetOwner(caster);
+            Assert.IsFalse(jar.Declares(PoisonOnHitRider.Parameters.PoisonPotency),
+                "the ability under the rider carries a potency after all, so this walk measures the lent road and not the bare one");
+
+            await new PoisonOnHitRider().Apply(new AbilityImpact(caster, victim, FieldOf(caster, victim), Damage: DamageSnapshot.Of(DamageType.Physical, Blow))
+            {
+                Source = jar,
+                Kind = ImpactKind.Hit
+            });
+
+            IDamageOverTurnEffect stack = StackOn(victim, PoisonId);
+            Assert.AreEqual(Blow * PoisonPotency, stack.DamagePerTick, Tolerance,
+                "an impact with no potency behind it poisoned at a share the canon does not balance poison at");
+            Assert.AreEqual(JarTurns, stack.Duration,
+                "the stack lasts something other than the turns the ability under the rider declares");
+        }
+
+        [TestMethod]
         public void AStatusTheCanonCarriesNoRowForIsRefusedRatherThanQuietlyBuilt()
         {
             // The edge the registry owns: a typeless damage-over-time has no canonical row and nothing
@@ -172,6 +255,26 @@ namespace LastBreathTest.BattleSystemTests
 
         private static object Row(string id, int duration) =>
             new { id, properties = new { duration, maxStacks = CanonicalStacks, percentFromDamage = Probe } };
+
+        /// <summary>The bleed row with both its share and its turns moved — the turns so that a duration
+        /// taken from the canon would be visible instead of coinciding with the passive's own.</summary>
+        private static string SubstituteBleed() =>
+            JsonConvert.SerializeObject(new { effects = new[] { Row(BleedId, SubstituteBleedTurns) } });
+
+        /// <summary>The Bloodthirsty passive on a fighter, built with the figures its grant record names.</summary>
+        private static void Bloodthirsty(IFightable owner) =>
+            new BloodthirstyPassiveSkill(StackThreshold, HealShare).Attach(owner);
+
+        /// <summary>One landed blow as the fighters announce it: the passive listens on the attacker's own
+        /// bus, and everything it does hangs off what that blow actually dealt.</summary>
+        private static void LandBlowOn(IFightable attacker, IFightable victim)
+        {
+            var landed = new Mock<IAttackContext>();
+            landed.Setup(context => context.Result).Returns(AttackResults.Succeed);
+            landed.Setup(context => context.Target).Returns(victim);
+            landed.Setup(context => context.FinalDamage).Returns(DamageSnapshot.Of(DamageType.Physical, Blow));
+            attacker.CombatEvents.Publish(new AfterAttackEvent(landed.Object));
+        }
 
         /// <summary>The stack the cast laid, as the thing that ticks.</summary>
         private static IDamageOverTurnEffect StackOn(IFightable victim, string effectId)

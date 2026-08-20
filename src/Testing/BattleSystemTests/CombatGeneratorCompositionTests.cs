@@ -48,6 +48,10 @@ namespace LastBreathTest.BattleSystemTests
         private const float Health = 100f;
         private const float Damage = 40f;
 
+        /// <summary>The share of the blow the stack below ticks with. Nothing here measures a tick, but a
+        /// stack that ticks for nothing is never laid at all, so the walk needs SOME share named.</summary>
+        private const float TickShare = 0.5f;
+
         [TestMethod]
         public void TheDeliverySeatDefaultsToSomethingTheEngineNeverBuilt()
         {
@@ -329,7 +333,7 @@ namespace LastBreathTest.BattleSystemTests
             var owner = Fighter();
             var dying = Fighter();
             var heir = Fighter();
-            var poison = new DamageOverTurnEffect(duration: 3, StatusEffects.Poison);
+            var poison = new DamageOverTurnEffect(duration: 3, StatusEffects.Poison, DamageOverTurnEffect.NoCeilingOfItsOwn, TickShare);
             await poison.Apply(new EffectApplyingContext { Caster = owner, Target = dying, Source = nameof(ThePoisonHeir), Damage = DamageSnapshot.Of(DamageType.Physical, Damage) });
             await new TransferPoisonOnDeathRider().Apply(new AbilityImpact(owner, dying, FieldOf(owner, dying, heir))
             {

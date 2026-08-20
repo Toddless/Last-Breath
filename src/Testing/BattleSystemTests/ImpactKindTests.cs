@@ -49,6 +49,10 @@ namespace LastBreathTest.BattleSystemTests
 
         private const int PoisonTurns = 3;
 
+        /// <summary>The share of the blow the stack below ticks with. Nothing here measures a tick, but a
+        /// stack that ticks for nothing is never laid at all, so the walk needs SOME share named.</summary>
+        private const float TickShare = 0.5f;
+
         [TestMethod]
         public async Task EveryAttackOfASeriesReachesTheRidersAsAnAttack()
         {
@@ -434,7 +438,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>One poison stack on the victim, laid the way any cast lays one.</summary>
         private static async Task Poison(IFightable caster, IFightable victim) =>
-            await new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison).Apply(new EffectApplyingContext
+            await new DamageOverTurnEffect(PoisonTurns, StatusEffects.Poison, DamageOverTurnEffect.NoCeilingOfItsOwn, TickShare).Apply(new EffectApplyingContext
             {
                 Caster = caster,
                 Target = victim,

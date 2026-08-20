@@ -82,7 +82,7 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>One poison stack on the bearer, ticking a share of a blow.</summary>
         private static async Task<IEffect> Poison(Fighter bearer, int turns)
         {
-            var stack = new DamageOverTurnEffect(turns, StatusEffects.Poison, percentFromDamage: Potency);
+            var stack = new DamageOverTurnEffect(turns, StatusEffects.Poison, DamageOverTurnEffect.NoCeilingOfItsOwn, Potency);
             await stack.Apply(new EffectApplyingContext
             {
                 Caster = bearer.Object,

@@ -31,7 +31,7 @@ namespace LastBreathTest.BattleSystemTests
         public async Task PoisonFeedsOnEveryComponentOfTheBlow()
         {
             var caster = new ConditionOwner();
-            var poison = new DamageOverTurnEffect(Turns, StatusEffects.Poison, percentFromDamage: Share);
+            var poison = new DamageOverTurnEffect(Turns, StatusEffects.Poison, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
 
             await poison.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
 
@@ -43,7 +43,7 @@ namespace LastBreathTest.BattleSystemTests
         public async Task BurningFeedsOnTheFireOfTheBlowAlone()
         {
             var caster = new ConditionOwner();
-            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, percentFromDamage: Share);
+            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
 
             await burning.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
 
@@ -55,7 +55,7 @@ namespace LastBreathTest.BattleSystemTests
         public async Task BleedingFeedsOnThePhysicalOfTheBlowAlone()
         {
             var caster = new ConditionOwner();
-            var bleed = new DamageOverTurnEffect(Turns, StatusEffects.Bleed, percentFromDamage: Share);
+            var bleed = new DamageOverTurnEffect(Turns, StatusEffects.Bleed, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
 
             await bleed.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
 
@@ -69,7 +69,7 @@ namespace LastBreathTest.BattleSystemTests
             // Nothing in the game lays one today, but the class takes StatusEffects.None and the
             // fallback has to be the reading that loses nothing.
             var caster = new ConditionOwner();
-            var dot = new DamageOverTurnEffect(Turns, percentFromDamage: Share);
+            var dot = new DamageOverTurnEffect(Turns, StatusEffects.None, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
 
             await dot.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
 
@@ -84,7 +84,7 @@ namespace LastBreathTest.BattleSystemTests
             // at all — so a fireless blow would keep a working burn out for as long as it lasted.
             var caster = new ConditionOwner();
             var victim = new ConditionOwner();
-            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, percentFromDamage: Share);
+            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
 
             await burning.Apply(Blow(caster, victim, (DamageType.Physical, Physical)));
 
@@ -124,7 +124,7 @@ namespace LastBreathTest.BattleSystemTests
             // component of its own kind is not what it asks for.
             var caster = new ConditionOwner();
             var victim = new ConditionOwner();
-            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, percentFromDamage: Share);
+            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
 
             await burning.Apply(Blow(caster, victim, (DamageType.Physical, Physical)) with { PoolFromWholeHit = true });
 
@@ -137,7 +137,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             var caster = new ConditionOwner();
             caster.SetMaximum(EntityParameter.BurningDamageMultiplier, 0.5f);
-            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, percentFromDamage: Share);
+            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
 
             await burning.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
 
@@ -150,7 +150,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             var caster = new ConditionOwner();
             caster.SetMaximum(EntityParameter.PoisonDamageMultiplier, 0.5f);
-            var poison = new DamageOverTurnEffect(Turns, StatusEffects.Poison, percentFromDamage: Share);
+            var poison = new DamageOverTurnEffect(Turns, StatusEffects.Poison, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
 
             await poison.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
 
@@ -164,7 +164,7 @@ namespace LastBreathTest.BattleSystemTests
             var caster = new ConditionOwner();
             caster.SetMaximum(EntityParameter.PoisonDamageMultiplier, 1f);
             caster.SetMaximum(EntityParameter.BleedDamageMultiplier, 1f);
-            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, percentFromDamage: Share);
+            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
 
             await burning.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
 
@@ -178,7 +178,7 @@ namespace LastBreathTest.BattleSystemTests
             // The snapshot: the pool and the stat behind it are frozen at application, so a caster who
             // grows stronger afterwards moves his NEXT stack and not the one already standing.
             var caster = new ConditionOwner();
-            var poison = new DamageOverTurnEffect(Turns, StatusEffects.Poison, percentFromDamage: Share);
+            var poison = new DamageOverTurnEffect(Turns, StatusEffects.Poison, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
 
             await poison.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
             float laid = poison.DamagePerTick;
