@@ -1,5 +1,10 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из А-1c-1 (2026-08-20, коммит `1b1f1a4a`; принят, возврат закрыт)
+
+- (nit, тест-инфра) Пятая копия идиомы «walk-up от AppContext.BaseDirectory до исходников» в тестах (AugmentFitTests, EffectValueShapeRosterTests, AbilityUnlockTests, CombatWindowClosureTests, AbilityDefaultDriftTests) — просится общий хелпер рядом с `SharedData`.
+- (знать) `AugmentParameterTableTests.EveryTranslatedRecordFallsBack…` пинит те же 40 фолбэков ParameterAugments против НАМЕРЕННО литеральной таблицы (снимок доколлапсного поведения); новый дрейф-гард — вторая половина «код против записи»; при мутации краснеют оба — это корректно, не дубль.
+
 ## Из А-1b-3 (2026-08-20, коммит `be63ade1`; принят, minor в бэклог по бюджету окна)
 
 - **(minor, пять строк теста)** `StageAndAugmentNumbersTests.cs:279-296` — `maxStacks` Leach единственное из девяти чисел без доказанной ДОРОГИ: пин держит значение, но доктор-запись двигает только `duration`; вернуть литерал `maxStacks: 1` в код — тест останется зелёным. Фикс: в доктор-словарь `["maxStacks"] = 3` + ассерт на `moved.MaxStacks`.
