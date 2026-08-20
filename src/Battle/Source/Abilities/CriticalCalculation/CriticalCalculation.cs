@@ -50,7 +50,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
         {
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.Stacks, 3);
-            parameters.RegisterDefault(AbilityParameter.Duration, 1);
+            parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
             // The crit chance the buff is worth is the record's to name; the base is the neutral share
             // of nothing, so an ability built without the key grants no chance instead of a made-up one.

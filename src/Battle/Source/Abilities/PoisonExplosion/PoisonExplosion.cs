@@ -34,7 +34,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
         {
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.DamageMultiplier, 0f);
-            parameters.RegisterDefault(AbilityParameter.ExecutionThreshold, 42);
+            parameters.RegisterDefault(AbilityParameter.ExecutionThreshold, 15);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new PoisonExplosion(Data));

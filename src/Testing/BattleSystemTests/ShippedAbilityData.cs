@@ -4,6 +4,7 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source.Abilities;
     using Core.Battle.Abilities;
     using Core.Data.GameData;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// The shipped ability data as the game reads it: the real source, the real loader, the real
@@ -48,6 +49,44 @@ namespace LastBreathTest.BattleSystemTests
             AbilityProvider abilities = LoadFrom(root).Abilities;
             Directory.Delete(root, recursive: true);
             return abilities;
+        }
+
+        /// <summary>json camelCase to the PascalCase parameter name, the way the base registers it.</summary>
+        internal static string ParameterKey(string property) => char.ToUpperInvariant(property[0]) + property[1..];
+
+        /// <summary>Every shipped ability whose record carries property keys, and the keys it carries.</summary>
+        internal static IEnumerable<(string AbilityId, List<string> Keys)> ShippedProperties()
+        {
+            foreach (JObject entry in AbilityEntries())
+            {
+                List<string> keys = entry["abilityProperties"] is JObject properties
+                    ? [.. properties.Properties().Select(property => property.Name)]
+                    : [];
+                if (keys.Count > 0) yield return ((string?)entry["id"] ?? string.Empty, keys);
+            }
+        }
+
+        /// <summary>The shipped catalog with every ability's properties emptied — what each ability
+        /// declares on its own, with nothing the data added.</summary>
+        internal static string WithoutProperties()
+        {
+            JObject root = AbilityCatalog();
+            foreach (JObject entry in (root["abilities"] as JArray ?? []).OfType<JObject>())
+                entry["abilityProperties"] = new JObject();
+
+            return root.ToString();
+        }
+
+        private static IEnumerable<JObject> AbilityEntries() =>
+            (AbilityCatalog()["abilities"] as JArray ?? []).OfType<JObject>();
+
+        /// <summary>The shipped ability catalog as markup, read whole — for the walks that DOCTOR a
+        /// record and hand the result back to the loader.</summary>
+        internal static JObject AbilityCatalog()
+        {
+            string[] files = [.. Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Abilities), "*.json", SearchOption.AllDirectories)];
+            Assert.AreEqual(1, files.Length, "the ability catalog is no longer one file — this walk rewrites it whole");
+            return JObject.Parse(File.ReadAllText(files[0]));
         }
 
         /// <summary>Puts a shipped catalog beside a catalog a test wrote. The loader reads every catalog

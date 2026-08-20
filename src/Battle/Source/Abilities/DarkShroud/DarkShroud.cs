@@ -29,7 +29,7 @@ namespace Battle.Source.Abilities.DarkShroud
             base.RegisterBaseParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(AbilityParameter.Effectiveness, 1f);
-            parameters.RegisterDefault(AbilityParameter.Stacks, 3);
+            parameters.RegisterDefault(AbilityParameter.Stacks, 4);
             parameters.RegisterDefault(AbilityParameter.HealthRegeneration, 0.05f);
             parameters.RegisterDefault(Parameters.LightStepValue, 0.15f);
         }

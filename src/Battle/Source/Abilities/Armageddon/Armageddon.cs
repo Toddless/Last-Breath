@@ -85,7 +85,7 @@ namespace Battle.Source.Abilities.Armageddon
             parameters.DeclareScales(Parameters.ThirdWeaponScale, Parameters.ThirdSpellScale);
             parameters.RegisterDefault(Parameters.Stage1HpCost, 0.05f);
             parameters.RegisterDefault(Parameters.Stage2HpCost, 0.15f);
-            parameters.RegisterDefault(Parameters.Stage3HpCost, 0.30f);
+            parameters.RegisterDefault(Parameters.Stage3HpCost, 0.5f);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new Armageddon(Data));

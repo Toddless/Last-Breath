@@ -2,8 +2,6 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source.Abilities;
     using Core.Battle.Abilities;
-    using Core.Data.GameData;
-    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Every number an ability's record carries has to be a number the ability actually reads. The base
@@ -30,16 +28,16 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void EveryNumberARecordCarriesIsANumberItsAbilityReads()
         {
-            AbilityProvider bare = ShippedAbilityData.AbilitiesOver(WithoutProperties());
+            AbilityProvider bare = ShippedAbilityData.AbilitiesOver(ShippedAbilityData.WithoutProperties());
             List<string> orphans = [];
 
-            foreach ((string abilityId, List<string> keys) in ShippedProperties())
+            foreach ((string abilityId, List<string> keys) in ShippedAbilityData.ShippedProperties())
             {
                 IAbility stripped = bare.CreateAbility(abilityId);
 
                 foreach (string key in keys)
                 {
-                    string parameter = ToParameterKey(key);
+                    string parameter = ShippedAbilityData.ParameterKey(key);
                     if (stripped.Declares(parameter)) continue;
                     if (s_knowinglyUnread.Contains((abilityId, key))) continue;
 
@@ -57,49 +55,13 @@ namespace LastBreathTest.BattleSystemTests
         {
             // The walk above is only worth its green if it can go red. A key nothing declares is added to
             // one shipped record and the same reading is asked for it.
-            AbilityProvider bare = ShippedAbilityData.AbilitiesOver(WithoutProperties());
+            AbilityProvider bare = ShippedAbilityData.AbilitiesOver(ShippedAbilityData.WithoutProperties());
             IAbility stripped = bare.CreateAbility("Ability_Dark_Shroud");
 
-            Assert.IsFalse(stripped.Declares(ToParameterKey("reviewProbeOrphan")),
+            Assert.IsFalse(stripped.Declares(ShippedAbilityData.ParameterKey("reviewProbeOrphan")),
                 "the probe ability declares a key nobody wrote, so the walk cannot tell an orphan from a reader");
-            Assert.IsTrue(stripped.Declares(ToParameterKey("healthRegeneration")),
+            Assert.IsTrue(stripped.Declares(ShippedAbilityData.ParameterKey("healthRegeneration")),
                 "the Dark Shroud stopped asking for its own regeneration key, so the walk above is vacuous");
-        }
-
-        /// <summary>json camelCase to the PascalCase parameter name, the way the base does it.</summary>
-        private static string ToParameterKey(string key) => char.ToUpperInvariant(key[0]) + key[1..];
-
-        /// <summary>Every shipped ability and the property keys its record carries.</summary>
-        private static IEnumerable<(string AbilityId, List<string> Keys)> ShippedProperties()
-        {
-            foreach (JObject entry in Abilities())
-            {
-                List<string> keys = entry["abilityProperties"] is JObject properties
-                    ? [.. properties.Properties().Select(property => property.Name)]
-                    : [];
-                if (keys.Count > 0) yield return ((string?)entry["id"] ?? string.Empty, keys);
-            }
-        }
-
-        /// <summary>The shipped catalog with every ability's properties emptied — what each ability
-        /// declares on its own, with nothing the data added.</summary>
-        private static string WithoutProperties()
-        {
-            JObject root = Root();
-            foreach (JObject entry in (root["abilities"] as JArray ?? []).OfType<JObject>())
-                entry["abilityProperties"] = new JObject();
-
-            return root.ToString();
-        }
-
-        private static IEnumerable<JObject> Abilities() => (Root()["abilities"] as JArray ?? []).OfType<JObject>();
-
-        private static JObject Root()
-        {
-            string path = SharedData.Catalog(DataCatalog.Abilities);
-            string[] files = [.. Directory.EnumerateFiles(path, "*.json", SearchOption.AllDirectories)];
-            Assert.AreEqual(1, files.Length, "the ability catalog is no longer one file — this walk rewrites it whole");
-            return JObject.Parse(File.ReadAllText(files[0]));
         }
     }
 }

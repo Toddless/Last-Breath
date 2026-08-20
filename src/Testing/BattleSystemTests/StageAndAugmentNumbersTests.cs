@@ -11,7 +11,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Battle.Abilities;
     using Core.Data;
     using Core.Data.AbilityData;
-    using Core.Data.GameData;
     using Core.Entity;
     using Core.Entity.Components;
     using Core.Enums;
@@ -473,7 +472,7 @@ namespace LastBreathTest.BattleSystemTests
         /// the game runs. The copy lives in memory — nothing on disk moves.</summary>
         private static AbilityProvider AbilitiesWith(string abilityId, IReadOnlyDictionary<string, float> figures)
         {
-            JObject root = ShippedCatalog();
+            JObject root = ShippedAbilityData.AbilityCatalog();
             JObject entry = Entry(root, "abilities", abilityId);
             if (entry["abilityProperties"] is not JObject properties)
             {
@@ -492,13 +491,6 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.IsNotNull(entry, $"the shipped data declares no '{id}'");
             return entry;
-        }
-
-        private static JObject ShippedCatalog()
-        {
-            string[] files = [.. Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Abilities), "*.json", SearchOption.AllDirectories)];
-            Assert.AreEqual(1, files.Length, "the ability catalog is no longer one file — this walk rewrites it whole");
-            return JObject.Parse(File.ReadAllText(files[0]));
         }
 
         private static IEffect EffectOn(IFightable bearer, string effectId)

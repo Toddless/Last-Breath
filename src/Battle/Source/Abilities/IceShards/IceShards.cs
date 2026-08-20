@@ -46,12 +46,12 @@ namespace Battle.Source.Abilities.IceShards
             base.RegisterBaseParameters(parameters);
             RegisterDamageParameters(parameters);
             parameters.RegisterDefault(AbilityParameter.ProjectileCount, 3);
-            parameters.RegisterDefault(Parameters.ShrapnelDamage, 50f);
-            parameters.RegisterDefault(Parameters.ShrapnelWeaponDamageScale, 0.15f);
-            parameters.RegisterDefault(Parameters.ShrapnelSpellDamageScale, 0.55f);
-            parameters.RegisterDefault(Parameters.SecondStageDamage, 120f);
-            parameters.RegisterDefault(Parameters.SecondStageWeaponDamageScale, 0.35f);
-            parameters.RegisterDefault(Parameters.SecondStageSpellDamageScale, 1.2f);
+            parameters.RegisterDefault(Parameters.ShrapnelDamage, 30f);
+            parameters.RegisterDefault(Parameters.ShrapnelWeaponDamageScale, 0.05f);
+            parameters.RegisterDefault(Parameters.ShrapnelSpellDamageScale, 0.35f);
+            parameters.RegisterDefault(Parameters.SecondStageDamage, 100f);
+            parameters.RegisterDefault(Parameters.SecondStageWeaponDamageScale, 0.25f);
+            parameters.RegisterDefault(Parameters.SecondStageSpellDamageScale, 1.15f);
             parameters.DeclareScales(Parameters.ShrapnelWeaponDamageScale, Parameters.ShrapnelSpellDamageScale);
             parameters.DeclareScales(Parameters.SecondStageWeaponDamageScale, Parameters.SecondStageSpellDamageScale);
         }

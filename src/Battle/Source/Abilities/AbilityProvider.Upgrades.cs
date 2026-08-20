@@ -57,7 +57,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("costShare", 0.3f))),
+                    data.UpgradeProperties.GetValueOrDefault("costShare", 0.15f))),
             ["Augment_Reduce_Cooldown"] = new([AbilityParameter.Cooldown], data =>
                 new AugmentReduceCooldown(
                     data.Id,
@@ -250,7 +250,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("amount", 0.25f),
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.45f),
                     (int)data.UpgradeProperties.GetValueOrDefault("duration", 3))),
             ["Augment_Critical_Calculation_Lucky_Crit"] = new([], data =>
                 new AugmentCcLuckyCrit(
@@ -268,7 +268,7 @@
                     () => new AbilityBuffActivationRider(new CritLeechEffect(
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
                         (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 1),
-                        data.UpgradeProperties.GetValueOrDefault("amount", 0.15f))))),
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.05f))))),
             ["Augment_Dark_Shroud_Immortality"] = new([], data =>
                 new AugmentDsImmortality(
                     data.Id,
@@ -343,7 +343,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ability => ability.SpreadFreezeChance = data.UpgradeProperties.GetValueOrDefault("chance", 0.5f),
+                    ability => ability.SpreadFreezeChance = data.UpgradeProperties.GetValueOrDefault("chance", 0.15f),
                     ability => ability.SpreadFreezeChance = 0f)),
             ["Augment_Deep_Freeze_Control_Extend_Effects"] = new([], data =>
                 new DelegateAugment<DeepFreeze.DeepFreeze>(
@@ -384,7 +384,7 @@
                     data.Tags,
                     data.Tier,
                     AbilityParameter.ExecutionThreshold,
-                    data.UpgradeProperties.GetValueOrDefault("share", 0.25f))),
+                    data.UpgradeProperties.GetValueOrDefault("share", 0.10f))),
             ["Augment_Cost_Barrier"] = new([AbilityParameter.CostType], data =>
                 new AugmentCostTypeOverride(
                     data.Id,
