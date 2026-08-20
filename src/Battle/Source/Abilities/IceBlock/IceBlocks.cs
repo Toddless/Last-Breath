@@ -39,14 +39,16 @@ namespace Battle.Source.Abilities.IceBlock
         /// <summary>Augment point: the stage-4 extra blocks crash on random enemies instead of the target.</summary>
         public bool ExtraBlocksHitRandomTargets { get; set; }
 
-        /// <summary>Augment point: an existing stun is consumed from the target and the block hits twice as hard.</summary>
-        public bool ConsumeStunForDoubleDamage { get; set; }
+        /// <summary>Augment point: an existing stun is consumed from the target and the block hits for
+        /// this multiple of its damage. Zero is no augment worn — the stun is left standing.</summary>
+        public float ConsumeStunDamageMultiplier { get; set; }
 
         public static class Parameters
         {
             public const string WitheringDuration = nameof(WitheringDuration);
             public const string WitheringValue = nameof(WitheringValue);
             public const string ExtraBlocks = nameof(ExtraBlocks);
+            public const string StageTwoStunBonus = nameof(StageTwoStunBonus);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
@@ -59,6 +61,7 @@ namespace Battle.Source.Abilities.IceBlock
             parameters.RegisterDefault(AbilityParameter.Stacks, 3);
             parameters.RegisterDefault(Parameters.WitheringValue, 0.15f);
             parameters.RegisterDefault(Parameters.ExtraBlocks, 3);
+            parameters.RegisterDefault(Parameters.StageTwoStunBonus, 1);
             parameters.RegisterDefault(AbilityParameter.StageFourDamage, 0.5f);
             parameters.RegisterDefault(AbilityParameter.CooldownResetChance, 0f);
         }
@@ -66,7 +69,7 @@ namespace Battle.Source.Abilities.IceBlock
         public override IAbility Copy() => CopyUpgradesTo(new IceBlocks(Data)
         {
             ExtraBlocksHitRandomTargets = ExtraBlocksHitRandomTargets,
-            ConsumeStunForDoubleDamage = ConsumeStunForDoubleDamage
+            ConsumeStunDamageMultiplier = ConsumeStunDamageMultiplier
         });
 
         /// <summary>One heavy block per target: the hit stuns (base plan rider), stage riders and the
@@ -75,7 +78,7 @@ namespace Battle.Source.Abilities.IceBlock
         {
             foreach (IFightable target in plan.Targets.Where(t => t.IsAlive).ToList())
             {
-                float multiplier = TryConsumeStun(target) ? 2f : 1f;
+                float multiplier = TryConsumeStun(target) ? ConsumeStunDamageMultiplier : 1f;
                 var hit = await DealBlockDamage(plan, owner, target, multiplier);
                 foreach (var rider in plan.OnHitRiders)
                     rider(hit);
@@ -111,7 +114,7 @@ namespace Battle.Source.Abilities.IceBlock
             switch (stage)
             {
                 case 2:
-                    plan.StunDuration += 1;
+                    plan.StunDuration += (int)this[Parameters.StageTwoStunBonus];
                     break;
                 case 3:
                     plan.OnHitRiders.Add(hit => _ = new WitheringCurseEffect(
@@ -125,10 +128,10 @@ namespace Battle.Source.Abilities.IceBlock
         }
 
         /// <summary>The upgrade eats the target's stun instead of stacking on it — the block converts
-        /// the lost control into double damage.</summary>
+        /// the lost control into the damage its record is worth.</summary>
         private bool TryConsumeStun(IFightable target)
         {
-            if (!ConsumeStunForDoubleDamage) return false;
+            if (ConsumeStunDamageMultiplier <= 0f) return false;
             var stuns = target.Effects.GetBy(effect => effect.IsSame("Effect_Stun")).ToList();
             if (stuns.Count == 0) return false;
 

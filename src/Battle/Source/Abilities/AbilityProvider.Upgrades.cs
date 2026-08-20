@@ -267,7 +267,7 @@
                     data.Tier,
                     () => new AbilityBuffActivationRider(new CritLeechEffect(
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                        maxStacks: 1,
+                        (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 1),
                         data.UpgradeProperties.GetValueOrDefault("amount", 0.15f))))),
             ["Augment_Dark_Shroud_Immortality"] = new([], data =>
                 new AugmentDsImmortality(
@@ -336,8 +336,8 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ability => ability.ConsumeStunForDoubleDamage = true,
-                    ability => ability.ConsumeStunForDoubleDamage = false)),
+                    ability => ability.ConsumeStunDamageMultiplier = data.UpgradeProperties.GetValueOrDefault("damageMultiplier", 2f),
+                    ability => ability.ConsumeStunDamageMultiplier = 0f)),
             ["Augment_Deep_Freeze_Spread"] = new([], data =>
                 new DelegateAugment<DeepFreeze.DeepFreeze>(
                     data.Id,

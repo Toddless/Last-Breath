@@ -21,9 +21,6 @@ namespace Battle.Source.Abilities.Armageddon
     /// </summary>
     public class Armageddon(AbilityBaseData data) : DamagingAbility(data), IChargedAbility
     {
-        /// <summary>"+1 damage per every 5 missing health" — the missing-health step.</summary>
-        private const float MissingHpStep = 5f;
-
         /// <summary>Charge bookkeeping; lazy — the affordability gate needs the owner.</summary>
         private Activation.ChargedActivation Charge =>
             field ??= new Activation.ChargedActivation(maxStage: 3, stage => Owner != null && HpCost(stage) < Owner.CurrentHealth);
@@ -31,6 +28,9 @@ namespace Battle.Source.Abilities.Armageddon
         public int StunDuration => (int)this[AbilityParameter.StunDuration];
         public float HpCostMultiplier => this[Parameters.HpCostMultiplier];
         public float MissingHpRate => this[Parameters.MissingHpRate];
+
+        /// <summary>"+rate damage per every N missing health" — the health the rate is counted per.</summary>
+        public float MissingHpStep => this[Parameters.MissingHpStep];
 
         public IHitSequenceStrategy HitSequence { get; set; } = new SelectedTargetsHits();
 
@@ -55,6 +55,7 @@ namespace Battle.Source.Abilities.Armageddon
         {
             public const string HpCostMultiplier = nameof(HpCostMultiplier);
             public const string MissingHpRate = nameof(MissingHpRate);
+            public const string MissingHpStep = nameof(MissingHpStep);
             public const string SecondDamage = nameof(SecondDamage);
             public const string SecondWeaponScale = nameof(SecondWeaponScale);
             public const string SecondSpellScale = nameof(SecondSpellScale);
@@ -73,6 +74,7 @@ namespace Battle.Source.Abilities.Armageddon
             parameters.RegisterAppliedDuration(AbilityParameter.StunDuration, 2);
             parameters.RegisterDefault(Parameters.HpCostMultiplier, 1f);
             parameters.RegisterDefault(Parameters.MissingHpRate, 0f);
+            parameters.RegisterDefault(Parameters.MissingHpStep, 5f);
             parameters.RegisterDefault(Parameters.SecondDamage, 600f);
             parameters.RegisterDefault(Parameters.SecondWeaponScale, 1.2f);
             parameters.RegisterDefault(Parameters.SecondSpellScale, 1.2f);
@@ -99,7 +101,8 @@ namespace Battle.Source.Abilities.Armageddon
             {
                 if (!target.IsAlive) continue;
                 float total = abilityDamage;
-                if (MissingHpRate > 0)
+                // The step is a divisor the record names, so a zero there is asked about rather than divided by.
+                if (MissingHpRate > 0 && MissingHpStep > 0)
                     total += (target.Parameters.MaxHealth - target.CurrentHealth) / MissingHpStep * MissingHpRate;
 
                 // The crit reaches the DAMAGE of the blow and nothing else: the stage-three payload is

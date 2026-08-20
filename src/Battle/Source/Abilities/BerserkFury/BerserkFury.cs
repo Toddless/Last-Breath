@@ -20,14 +20,17 @@ namespace Battle.Source.Abilities.BerserkFury
     /// </summary>
     public class BerserkFury(AbilityBaseData data) : DamagingAbility(data), IAttackModifierHost
     {
-        private const float MinContinueChance = 0.05f;
-        private const float MaxContinueChance = 0.80f;
-
         /// <summary>How long the Fury on the caster holds — the common buff duration, so "+duration"
         /// lengthens the burn along with the series.</summary>
         public int FuryDuration => (int)this[AbilityParameter.Duration];
 
         public float FuryHealthPercent => this[Parameters.FuryHealthPercent];
+
+        /// <summary>The floor and the ceiling the health share is clamped to before it is rolled — how
+        /// little a dying berserk is still allowed to swing on, and how much a whole one never exceeds.</summary>
+        public float MinContinueChance => this[Parameters.MinContinueChance];
+        public float MaxContinueChance => this[Parameters.MaxContinueChance];
+
         public AttackModifierPipeline AttackModifiers { get; } = new();
 
         /// <summary>Augment point: which Fury variant the cast applies (duration, healthPercent) → effect.</summary>
@@ -38,6 +41,8 @@ namespace Battle.Source.Abilities.BerserkFury
         {
             /// <summary>Share of current health each attack burns — what the fury COSTS, not effectiveness.</summary>
             public const string FuryHealthPercent = nameof(FuryHealthPercent);
+            public const string MinContinueChance = nameof(MinContinueChance);
+            public const string MaxContinueChance = nameof(MaxContinueChance);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
@@ -47,6 +52,8 @@ namespace Battle.Source.Abilities.BerserkFury
             parameters.RegisterDefault(AbilityParameter.AccuracyBonus, 0f);
             parameters.RegisterDefault(AbilityParameter.Duration, 3);
             parameters.RegisterDefault(Parameters.FuryHealthPercent, 0.05f);
+            parameters.RegisterDefault(Parameters.MinContinueChance, 0.05f);
+            parameters.RegisterDefault(Parameters.MaxContinueChance, 0.80f);
         }
 
         public void AddAttackModifier(IAttackModifier modifier) => AttackModifiers.Add(modifier);

@@ -46,6 +46,7 @@ namespace Battle.Source.Abilities.ChainLightning
         {
             public const string Jumps = nameof(Jumps);
             public const string DamageFalloff = nameof(DamageFalloff);
+            public const string StageTwoJumpBonus = nameof(StageTwoJumpBonus);
             public const string StageThreeFalloffReduction = nameof(StageThreeFalloffReduction);
             public const string StageFourLastJumpMultiplier = nameof(StageFourLastJumpMultiplier);
         }
@@ -56,6 +57,7 @@ namespace Battle.Source.Abilities.ChainLightning
             RegisterDamageParameters(parameters);
             parameters.RegisterDefault(Parameters.Jumps, 2);
             parameters.RegisterDefault(Parameters.DamageFalloff, 0.25f);
+            parameters.RegisterDefault(Parameters.StageTwoJumpBonus, 1);
             parameters.RegisterDefault(Parameters.StageThreeFalloffReduction, 0.15f);
             parameters.RegisterDefault(Parameters.StageFourLastJumpMultiplier, 2f);
         }
@@ -80,7 +82,7 @@ namespace Battle.Source.Abilities.ChainLightning
             switch (stage)
             {
                 case 2:
-                    plan.Jumps += 1;
+                    plan.Jumps += (int)this[Parameters.StageTwoJumpBonus];
                     break;
                 case 3:
                     plan.DamageFalloff = Mathf.Max(0f, plan.DamageFalloff - this[Parameters.StageThreeFalloffReduction]);

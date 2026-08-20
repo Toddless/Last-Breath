@@ -44,7 +44,9 @@
             "damage": 50,
             "weaponDamageScale": 0.35,
             "spellDamageScale": 0.5,
-            "abilityProperties": {}
+            "abilityProperties": {
+                "poisonDuration": 3
+            }
         },
         {
             "id": "Ability_Dark_Shroud",
@@ -166,7 +168,9 @@
             "spellDamageScale": 0,
             "abilityProperties": {
                 "duration": 3,
-                "furyHealthPercent": 0.05
+                "furyHealthPercent": 0.05,
+                "minContinueChance": 0.05,
+                "maxContinueChance": 0.8
             }
         },
         {
@@ -220,7 +224,8 @@
                 "stage1HpCost": 0.05,
                 "stage2HpCost": 0.15,
                 "stage3HpCost": 0.5,
-                "stunDuration": 2
+                "stunDuration": 2,
+                "missingHpStep": 5
             }
         },
         {
@@ -240,6 +245,7 @@
                 "stacks": 3,
                 "witheringValue": 0.15,
                 "extraBlocks": 3,
+                "stageTwoStunBonus": 1,
                 "stageFourDamage": 0.5
             }
         },
@@ -275,6 +281,7 @@
             "abilityProperties": {
                 "jumps": 2,
                 "damageFalloff": 0.25,
+                "stageTwoJumpBonus": 1,
                 "stageThreeFalloffReduction": 0.15,
                 "stageFourLastJumpMultiplier": 2
             }
@@ -337,8 +344,10 @@
                 "frostbiteColdAmp": 0.15,
                 "coldResistanceShred": 0.25,
                 "shredDuration": 3,
+                "shredStacks": 1,
                 "healReductionValue": 0.45,
-                "healReductionDuration": 3
+                "healReductionDuration": 3,
+                "healReductionStacks": 2
             }
         },
         {
@@ -431,7 +440,8 @@
             "tier": 3,
             "tags": [ "attack", "series" ],
             "upgradeProperties": {
-                "poisonDuration": 3
+                "poisonDuration": 3,
+                "poisonPotency": 0.7
             }
         },
         {
@@ -933,7 +943,9 @@
             "tier": 2,
             "tags": [ "attack", "hit", "recovery", "critical" ],
             "upgradeProperties": {
-                "amount": 0.05
+                "amount": 0.05,
+                "duration": 3,
+                "maxStacks": 1
             },
             "bestRarityProperties": {
                 "amount": 0.25
@@ -1329,7 +1341,9 @@
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Block",
-            "upgradeProperties": {}
+            "upgradeProperties": {
+                "damageMultiplier": 2
+            }
         },
         {
             "id": "Augment_Overload_Mana_Step",
