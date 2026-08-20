@@ -7,5 +7,6 @@ namespace Core.Battle
         ArenaRules Arena { get; }
         ExhaustionRules Exhaustion { get; }
         EffectRules Effects { get; }
+        MulticastRules Multicast { get; }
     }
 }

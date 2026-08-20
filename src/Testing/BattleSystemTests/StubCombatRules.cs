@@ -13,5 +13,7 @@ namespace LastBreathTest.BattleSystemTests
         public ExhaustionRules Exhaustion => ExhaustionRules.Disabled;
 
         public EffectRules Effects => EffectRules.Default;
+
+        public MulticastRules Multicast => MulticastRules.Default;
     }
 }

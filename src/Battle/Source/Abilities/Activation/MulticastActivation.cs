@@ -1,40 +1,43 @@
 namespace Battle.Source.Abilities.Activation
 {
-    using System.Collections.Generic;
-    using System.Linq;
+    using Core.Battle;
     using Core.Entity;
     using Core.Enums;
+    using Core.Services;
     using Godot;
 
     /// <summary>
     /// The intelligence-stance activation roll: every cast lands on a stage, higher stages are rarer.
     /// Top-down roll, chance = clamp(base × (1 + owner's MulticastChance), cap); stage 1 always fires.
-    /// Stance-wide numbers live here; per-ability/per-build shifts come from decorators, not data.
+    /// Stance-wide numbers come from the combat rules; per-ability/per-build shifts come from decorators.
     /// </summary>
     public class MulticastActivation
     {
         private const int BaseStage = 1;
 
-        /// <summary>Stance-wide base chances per stage.</summary>
-        private readonly Dictionary<int, float> _baseStageChances = new() { [2] = 0.5f, [3] = 0.25f, [4] = 0.05f };
-
-        /// <summary>Stance-wide caps for the final stage chance: stage 2 may become guaranteed, higher stages may not.</summary>
-        private readonly Dictionary<int, float> _stageChanceCaps = new() { [2] = 1f, [3] = 0.65f, [4] = 0.4f };
-
         /// <summary>Per-ability multicast bonus on top of the owner's MulticastChance (upgrades set it).</summary>
         public float BonusChance { get; set; }
 
-        public int Roll(IFightable owner)
+        public int Roll(IFightable owner) => Roll(owner, ResolveRules());
+
+        /// <summary>The roll against explicit rules; the entry point above takes them from the combat
+        /// rules catalog.</summary>
+        public int Roll(IFightable owner, MulticastRules rules)
         {
             float multicast = owner.Parameters.GetValueForParameter(EntityParameter.MulticastChance) + BonusChance;
-            foreach (int stage in _baseStageChances.Keys.OrderByDescending(s => s))
+            foreach (MulticastStage stage in rules.Stages)
             {
-                float cap = _stageChanceCaps.GetValueOrDefault(stage, 1f);
-                float chance = Mathf.Clamp(_baseStageChances[stage] * (1 + multicast), 0f, cap);
-                if (CombatRandom.Rolls.RandFloat() <= chance) return stage;
+                float chance = Mathf.Clamp(stage.BaseChance * (1 + multicast), 0f, stage.Cap);
+                if (CombatRandom.Rolls.RandFloat() <= chance) return stage.Stage;
             }
 
             return BaseStage;
         }
+
+        /// <summary>The stance figures the combat rules carry, taken from the composition at the moment
+        /// of the cast; where no rules can be reached the stance rolls on the working defaults, because a
+        /// host composing no services still casts and a roll without figures would never leave stage 1.</summary>
+        private static MulticastRules ResolveRules() =>
+            GameServiceProvider.TryGet<ICombatRulesProvider>()?.Multicast ?? MulticastRules.Default;
     }
 }

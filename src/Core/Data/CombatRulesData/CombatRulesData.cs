@@ -8,6 +8,27 @@ namespace Core.Data.CombatRulesData
         [JsonProperty("arena")] public ArenaData Arena { get; init; } = new();
         [JsonProperty("exhaustion")] public ExhaustionData Exhaustion { get; init; } = new();
         [JsonProperty("effects")] public EffectsData Effects { get; init; } = new();
+        [JsonProperty("multicast")] public MulticastData Multicast { get; init; } = new();
+    }
+
+    /// <summary>The "multicast" section: the intelligence stance activation roll (see MulticastRules).</summary>
+    public record MulticastData
+    {
+        /// <summary>Rolled stages; stage 1 always fires and has no row here.</summary>
+        [JsonProperty("stages")] public MulticastStageData[] Stages { get; init; } = [];
+    }
+
+    /// <summary>One rolled stage: the stage it decides, its base chance and the ceiling that chance
+    /// may be raised to.</summary>
+    public record MulticastStageData
+    {
+        [JsonProperty("stage")] public int Stage { get; init; }
+
+        /// <summary>Chance before the caster's MulticastChance multiplies it.</summary>
+        [JsonProperty("chance")] public float Chance { get; init; }
+
+        /// <summary>Ceiling of the final chance; a stage is guaranteed only where its row says 1.</summary>
+        [JsonProperty("cap")] public float Cap { get; init; } = 1f;
     }
 
     /// <summary>The "effects" section: what holds for every effect instance (see EffectRules).</summary>
