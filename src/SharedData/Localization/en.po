@@ -4069,6 +4069,9 @@ msgstr "No room in the backpack"
 msgid "UI_Augment_Extract_CannotBeHeld"
 msgstr "That augment cannot be carried"
 
+msgid "UI_Augment_Tier"
+msgstr "Tier {Value}"
+
 msgid "Npc_Ronald"
 msgstr "Ronald the Smith"
 

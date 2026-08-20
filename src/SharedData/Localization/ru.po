@@ -3508,6 +3508,9 @@ msgstr ""
 msgid "UI_Augment_Extract_CannotBeHeld"
 msgstr ""
 
+msgid "UI_Augment_Tier"
+msgstr ""
+
 msgid "Npc_Ronald"
 msgstr ""
 

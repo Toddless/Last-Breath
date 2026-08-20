@@ -1,6 +1,7 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using System.Text;
+    using Core.Localization;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -64,6 +65,29 @@ namespace LastBreathTest.BattleSystemTests
                 Assert.Inconclusive($"en.po: не хватает {missingTotal} ключей из данных; ru.po: отстаёт на {missingInRu.Count} ключей. Полный список — в output теста.");
         }
 
+        /// <summary>
+        /// The augment tooltip's tier line, both halves of it. A key with no wording prints itself, and a
+        /// wording whose placeholder nobody fills prints the placeholder — the tier reaches the player only
+        /// when the catalog words the key under the name <see cref="Battle.Source.UIElements.AugmentTrayTile"/>
+        /// puts in its values.
+        /// </summary>
+        [TestMethod]
+        public void AugmentTierLineIsWordedAndFilledByTheTilePlaceholder()
+        {
+            const string key = "UI_Augment_Tier";
+            const string tilePlaceholder = "Value";
+
+            string? template = ReadEntries("en.po").GetValueOrDefault(key);
+            Assert.IsFalse(string.IsNullOrEmpty(template), $"en.po words no '{key}' — the tooltip shows the raw key");
+
+            var provider = new FakeLocalizationProvider();
+            string line = new TextTemplateEngine(provider)
+                .Render(template!, new Dictionary<string, object?> { [tilePlaceholder] = 2 }, TextFormat.Plain);
+
+            StringAssert.Contains(line, "2", $"'{key}' never places the tier — it names no '{{{tilePlaceholder}}}'");
+            Assert.IsFalse(line.Contains('{'), $"'{key}' keeps a placeholder the tile does not fill: {line}");
+        }
+
         private static List<(string Domain, List<string> Ids, bool NeedsDescription)> CollectDataIds() =>
         [
             // Modifier and ParameterChange templates localize parameter names by enum member
@@ -106,6 +130,32 @@ namespace LastBreathTest.BattleSystemTests
             if (!Directory.Exists(path)) yield break;
             foreach (string file in Directory.EnumerateFiles(path, "*.json", SearchOption.AllDirectories))
                 yield return JObject.Parse(File.ReadAllText(file));
+        }
+
+        /// <summary>Key → wording for the one-line entries the catalog is written in; a continued
+        /// entry simply comes back with its first line, which is enough to tell a worded key from an
+        /// empty one.</summary>
+        private static Dictionary<string, string> ReadEntries(string poFileName)
+        {
+            string[] lines = File.ReadAllLines(Path.Combine(Shared, "Localization", poFileName));
+            var entries = new Dictionary<string, string>(StringComparer.Ordinal);
+
+            for (int i = 0; i + 1 < lines.Length; i++)
+            {
+                if (!Quoted(lines[i], "msgid ", out string id) || id.Length == 0) continue;
+                if (Quoted(lines[i + 1], "msgstr ", out string text)) entries[id] = text;
+            }
+
+            return entries;
+        }
+
+        private static bool Quoted(string line, string prefix, out string value)
+        {
+            value = string.Empty;
+            if (!line.StartsWith(prefix + '"', StringComparison.Ordinal) || !line.EndsWith('"')) return false;
+
+            value = line[(prefix.Length + 1)..^1];
+            return true;
         }
 
         private static List<string> ReadMsgIds(string poFileName)
