@@ -69,6 +69,7 @@ namespace Battle.Source.UIElements.PassiveWheel
         private SocketRingGeometry? _geometry;
         private IAbilitySocketBoard? _board;
         private ICanvasScale? _scale;
+        private PassiveNodeVisualIndex<PassiveNodeVisualConfig>? _visuals;
 
         /// <summary>Every pip on screen, in the order they were laid out. The canvas reads this to decide
         /// what a point on the wheel means — one table, so what is drawn and what answers a click cannot
@@ -115,6 +116,15 @@ namespace Battle.Source.UIElements.PassiveWheel
         {
             _scale = scale;
             Rebuild();
+        }
+
+        /// <summary>The authored looks, or null when the wheel carries no library. A ring reads the row of
+        /// the NODE it hangs off — the ring is part of that node's presence, so its art is that node's
+        /// art and not a thing addressed on its own.</summary>
+        public void SetVisuals(PassiveNodeVisualIndex<PassiveNodeVisualConfig>? visuals)
+        {
+            _visuals = visuals;
+            QueueRedraw();
         }
 
         /// <summary>The addresses that would accept what is being dragged, or null when no drag is in the
@@ -175,7 +185,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             int segments = Segments(pip.ScreenRadius);
             Color color = ColorOf(pip);
 
-            if (pip.State == SocketSlotState.Filled) DrawCircle(centre, pip.DocumentRadius, color);
+            if (pip.State == SocketSlotState.Filled) DrawFilled(centre, pip, color);
             else
                 DrawArc(centre, pip.DocumentRadius, 0f, Mathf.Tau, segments, color, FromScreen(OutlineWidth), true);
 
@@ -185,6 +195,33 @@ namespace Battle.Source.UIElements.PassiveWheel
             // through, it reads as a place with something stuck in it rather than as a place to fill.
             var reach = new Vector2(pip.DocumentRadius * StrikeSpan, 0f);
             DrawLine(centre - reach, centre + reach, color, FromScreen(OutlineWidth));
+        }
+
+        /// <summary>
+        /// The picture of a slot that HOLDS something: the authored face of the ability's own row when it
+        /// carries one, otherwise the filled dot. Only this state takes a face — a slot with nothing in it
+        /// keeps its outline, so the ring goes on telling full from empty by SHAPE and not by colour
+        /// alone, and the state colour still modulates whatever is drawn.
+        /// </summary>
+        private void DrawFilled(Vector2 centre, PassiveSocketPip pip, Color color)
+        {
+            if (FaceOf(pip) is not { } face)
+            {
+                DrawCircle(centre, pip.DocumentRadius, color);
+                return;
+            }
+
+            float span = pip.DocumentRadius * 2f;
+            DrawTextureRect(face, new Rect2(centre - new Vector2(pip.DocumentRadius, pip.DocumentRadius),
+                new Vector2(span, span)), false, color);
+        }
+
+        private Texture2D? FaceOf(PassiveSocketPip pip)
+        {
+            if (_visuals == null) return null;
+
+            PassiveNode? node = _document?.Find(pip.NodeId);
+            return node == null ? null : _visuals.For(node)?.FilledSocketPip;
         }
 
         /// <summary>A drag in the air overrides the state: while the player is carrying an augment the

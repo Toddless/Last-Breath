@@ -74,6 +74,12 @@ namespace Battle.Source.UIElements.PassiveWheel
         [Export] private PackedScene? _nodeViewScene;
         [Export] private PassiveWheelStyle? _style;
 
+        /// <summary>Art authored per node and per class, and the only place it is assigned: the layers and
+        /// the node scenes are handed the lookup built from it, so one file dragged in here reaches all of
+        /// them. Left empty the wheel draws itself out of the style alone, which is the wheel that
+        /// shipped.</summary>
+        [Export] private PassiveNodeVisualLibrary? _visualLibrary;
+
         /// <summary>How far the pointer may travel with the button down before the gesture stops being
         /// a click and becomes a pan.</summary>
         [Export] private float _dragThresholdPixels = 4f;
@@ -99,6 +105,11 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         private NodeGeometry? _geometry;
         private SocketRingGeometry? _ringGeometry;
+
+        /// <summary>The library read through one lookup, built once. A library never changes under a live
+        /// window, so nothing rebuilds it.</summary>
+        private PassiveNodeVisualIndex<PassiveNodeVisualConfig>? _visuals;
+
         private IPassiveTreeService? _tree;
         private IAbilitySocketBoard? _board;
         private IAugmentCellHost? _sockets;
@@ -168,6 +179,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (_board != null) _board.Changed += OnBoardChanged;
 
             BuildGeometry();
+            _visuals = _visualLibrary?.Index();
             _socketRings?.SetBoard(_board);
             _tooltip = HoverTooltip.Follow(this, ShowNodeTooltip);
             Rebuild();
@@ -575,6 +587,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             _takenEdges?.SetDocument(_document);
             _field?.SetDocument(_document);
             _field?.SetGeometry(_geometry);
+            _field?.SetVisuals(_visuals);
 
             ResetCursorLayer(_route);
             ResetCursorLayer(_rim);
@@ -582,6 +595,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             _socketRings?.SetDocument(_document);
             _socketRings?.SetGeometry(_geometry, _ringGeometry);
             _socketRings?.SetRings(_rings);
+            _socketRings?.SetVisuals(_visuals);
 
             ReconcileAllocation();
             FrameAll();
@@ -718,7 +732,7 @@ namespace Battle.Source.UIElements.PassiveWheel
                 PassiveNodeView? view = Rent();
                 if (view == null) continue;
 
-                view.SetNode(node, _style);
+                view.SetNode(node, _style, _visuals?.For(node));
                 _views[id] = view;
             }
 
@@ -769,6 +783,10 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             view.SetDropTarget(null);
             view.SetSocketMark(null);
+
+            // A pooled view is hidden, not freed, and a hidden decoration goes on animating: a respec puts
+            // dozens away at once, so the effect is dropped here rather than at the next Rent.
+            view.ClearEffect();
             view.Visible = false;
             _pool.Push(view);
         }

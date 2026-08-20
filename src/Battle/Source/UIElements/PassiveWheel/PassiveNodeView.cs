@@ -36,9 +36,11 @@ namespace Battle.Source.UIElements.PassiveWheel
         private static readonly Color s_dropAccepted = Colors.LimeGreen;
         private static readonly Color s_dropRefused = Colors.IndianRed;
 
-        /// <summary>Classes already reported as carrying art too small for the deepest zoom. Said once
-        /// per class rather than once per node: the wheel builds dozens of scenes of the same class.</summary>
-        private static readonly HashSet<PassiveNodeKind> s_reportedBlur = [];
+        /// <summary>Rows already reported as carrying art too small for the deepest zoom, keyed the way
+        /// the report names them — by class for a class row, by node for a row that authored art for one
+        /// node. Said once per row rather than once per node: the wheel builds dozens of scenes of the
+        /// same class.</summary>
+        private static readonly HashSet<string> s_reportedBlur = new(StringComparer.Ordinal);
 
         [Export] private Sprite2D? _body;
         [Export] private Sprite2D? _glow;
@@ -54,7 +56,24 @@ namespace Battle.Source.UIElements.PassiveWheel
         [Export] private StringName? _installClip;
 
         private PassiveNodeVisual? _visual;
+
+        /// <summary>The authored row for the node standing here, or null when the library says nothing
+        /// about it — which is when everything below falls back to the class table.</summary>
+        private PassiveNodeVisualConfig? _config;
+
+        /// <summary>Hue of the node's ray, kept because the face is repainted on every state and the
+        /// colour it falls back to is the node's, not the state's.</summary>
+        private Color _ray = Colors.White;
+
+        private Node? _effect;
         private Action? _release;
+
+        /// <summary>The face the node wears while it is not held: the row's own art when it authored any,
+        /// otherwise the class's. Written once so the two places that set the texture cannot fall back
+        /// differently.</summary>
+        private Texture2D? IdleBody => _config?.Body ?? _visual?.Body;
+
+        private Texture2D? TakenBody => _config?.BodyTaken ?? _visual?.BodyTaken;
 
         /// <summary>
         /// Locks every control under this node out of the engine's mouse pass. In code rather than only
@@ -76,30 +95,31 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         /// <summary>Which node this view stands for. Position included: the whole wheel is drawn in
         /// document coordinates inside one scaled frame, so a node sits at the coordinates its author
-        /// typed and panning the wheel writes nothing into any view.</summary>
-        public void SetNode(PassiveNode node, PassiveWheelStyle style)
+        /// typed and panning the wheel writes nothing into any view.
+        /// <para><paramref name="config"/> is the authored row for this node, or null when the library
+        /// says nothing about it. Everything it can carry is an override: with no row the class table
+        /// answers for all of it, which is the wheel as it shipped.</para></summary>
+        public void SetNode(PassiveNode node, PassiveWheelStyle style, PassiveNodeVisualConfig? config)
         {
             _visual = style.Visual(node.Kind);
+            _config = config;
+            _ray = style.ColorOf(node);
             Position = new Vector2(node.X, node.Y);
-
-            Color accent = style.ColorOf(node);
-            if (_body != null)
-            {
-                _body.Texture = _visual.Body;
-                _body.SelfModulate = accent;
-                Normalize(_body, _visual.Radius * 2f);
-            }
 
             if (_glow != null)
             {
-                _glow.Texture = _visual.Glow;
-                _glow.SelfModulate = accent;
+                _glow.Texture = config?.Glow ?? _visual.Glow;
+                _glow.SelfModulate = PassiveNodeVisualConfig.ModulateOf(config, config?.Glow != null, _ray);
                 Normalize(_glow, _visual.GlowRadius * 2f);
                 SeedPulse(node.Id);
             }
 
-            ReportBlur(style);
+            BuildEffect();
+
+            // The body is painted by the state and by nothing else, so the report below reads the texture
+            // that is actually on screen rather than one written here and replaced a line later.
             SetState(PassiveNodeVisualState.Idle);
+            ReportBlur(node.Id, style);
             SetDropTarget(null);
             SetSocketMark(null);
         }
@@ -113,14 +133,18 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// class drawn as part of the mass, which has no scene to paint, so the plan's marks are drawn
         /// for every node at once by <see cref="WheelCursorLayer"/> — a second reading of the rule in
         /// here would be the one way the same mark comes out two different ways.</para>
+        /// <para>The face is repainted here as well as swapped: which of the two faces is on screen
+        /// decides whether the modulation is the ray's or the row's, so a row that authored only the taken
+        /// face would otherwise be shown under a colour chosen for the idle one.</para>
         /// </summary>
         public void SetState(PassiveNodeVisualState state)
         {
             if (_body != null && _visual != null)
             {
-                _body.Texture = state == PassiveNodeVisualState.Taken && _visual.BodyTaken != null
-                    ? _visual.BodyTaken
-                    : _visual.Body;
+                bool taken = state == PassiveNodeVisualState.Taken && TakenBody != null;
+
+                _body.Texture = taken ? TakenBody : IdleBody;
+                _body.SelfModulate = PassiveNodeVisualConfig.ModulateOf(_config, Authored(taken), _ray);
                 Normalize(_body, _visual.Radius * 2f);
             }
 
@@ -138,12 +162,25 @@ namespace Battle.Source.UIElements.PassiveWheel
             _dropMark.SelfModulate = accepted == true ? s_dropAccepted : s_dropRefused;
         }
 
+        /// <summary>The dot that says the node's own slot is occupied. A row may take it away, and that is
+        /// read here rather than by the caller: the mark is the view's picture, and a second reading of
+        /// the rule would be the one way a node keeps a dot the library took away.</summary>
         public void SetSocketMark(Texture2D? mark)
         {
             if (_socketMark == null) return;
 
-            _socketMark.Texture = mark;
-            _socketMark.Visible = mark != null;
+            Texture2D? shown = _config?.HidesAugmentMark == true ? null : mark;
+            _socketMark.Texture = shown;
+            _socketMark.Visible = shown != null;
+        }
+
+        /// <summary>Frees the node's ambient decoration. A pooled view is hidden and not freed, and a
+        /// hidden scene goes on ticking its own animation — a respec puts dozens of views away at once,
+        /// and each would keep a decoration running until something rented it again.</summary>
+        public void ClearEffect()
+        {
+            if (_effect != null && GodotObject.IsInstanceValid(_effect)) _effect.QueueFree();
+            _effect = null;
         }
 
         /// <summary>
@@ -189,20 +226,46 @@ namespace Battle.Source.UIElements.PassiveWheel
             sprite.Scale = new Vector2(scale, scale);
         }
 
-        /// <summary>Says out loud that a class carries art too small for the deepest zoom — the one
+        /// <summary>Says out loud that the art on screen is too small for the deepest zoom — the one
         /// symptom nobody reports as a bug, because a blurred dot still looks like a dot. Whoever brings
-        /// real art hears it even if he never reads the rule beside the export.</summary>
-        private void ReportBlur(PassiveWheelStyle style)
+        /// real art hears it even if he never reads the rule beside the export.
+        /// <para>Named by whoever authored the texture: the node, when its own row carries art, and the
+        /// class otherwise. A row's art reported under its class would send the reader to the wrong
+        /// file.</para></summary>
+        private void ReportBlur(string nodeId, PassiveWheelStyle style)
         {
             if (_visual == null || _body?.Texture is not { } texture) return;
 
             float wanted = _visual.Radius * 2f * style.TextureOversample;
-            if (texture.GetWidth() >= wanted || !s_reportedBlur.Add(_visual.Kind)) return;
+            bool own = _config is { Body: not null } row && IPassiveNodeVisual.IsNodeRow(row);
+            string address = own ? nodeId : _visual.Kind.ToString();
+            if (texture.GetWidth() >= wanted || !s_reportedBlur.Add(address)) return;
 
             Tracker.TrackNotFound(
-                $"Passive node art for '{_visual.Kind}' is {texture.GetWidth()}px wide and the wheel stretches it to " +
+                $"Passive node art for '{address}' is {texture.GetWidth()}px wide and the wheel stretches it to " +
                 $"{wanted:0}px at full zoom — author it at 2 x Radius x TextureOversample", this);
         }
+
+        /// <summary>Swaps the node's ambient decoration for the one its row authors. Freed and built
+        /// again rather than reused: a view is pooled and the node standing on it changes underneath.
+        /// The instance is locked out of the mouse pass BEFORE it is hung on the tree — the wheel has
+        /// exactly one picker, and a scene an artist dropped in must not be part of a GUI walk even for
+        /// the length of this call.</summary>
+        private void BuildEffect()
+        {
+            ClearEffect();
+
+            if (_config?.Effect is not { } scene) return;
+
+            Node instance = scene.Instantiate();
+            IgnoreMouse(instance);
+            AddChild(instance);
+            _effect = instance;
+        }
+
+        /// <summary>Whether the face on screen is the row's own art rather than the class's. Asked of the
+        /// texture actually chosen, so the colour follows what is being drawn.</summary>
+        private bool Authored(bool taken) => (taken ? _config?.BodyTaken : _config?.Body) != null;
 
         private bool Play(StringName? clip)
         {
@@ -238,13 +301,14 @@ namespace Battle.Source.UIElements.PassiveWheel
             material.SetShaderParameter(PhaseUniform, hash % 1000u / 1000f);
         }
 
+        /// <summary>Locks the node and everything under it out of the mouse pass. The root is included so
+        /// a scene handed here whole is locked by one call — this view's own root is a Node2D and takes
+        /// no filter, so including it changes nothing about the scene as it ships.</summary>
         private static void IgnoreMouse(Node node)
         {
-            foreach (Node child in node.GetChildren())
-            {
-                if (child is Control control) control.MouseFilter = Control.MouseFilterEnum.Ignore;
-                IgnoreMouse(child);
-            }
+            if (node is Control control) control.MouseFilter = Control.MouseFilterEnum.Ignore;
+
+            foreach (Node child in node.GetChildren()) IgnoreMouse(child);
         }
     }
 }

@@ -29,10 +29,20 @@ namespace Battle.Source.UIElements.PassiveWheel
         private PassiveTreeDocument? _document;
         private NodeGeometry? _geometry;
         private ICanvasScale? _scale;
+        private PassiveNodeVisualIndex<PassiveNodeVisualConfig>? _visuals;
 
         public void SetDocument(PassiveTreeDocument? document)
         {
             _document = document;
+            QueueRedraw();
+        }
+
+        /// <summary>The authored looks, or null when the wheel carries no library. Handed down by the
+        /// canvas rather than exported here, so one assignment in the editor serves every layer and the
+        /// mass cannot end up reading a different resource from the scenes above it.</summary>
+        public void SetVisuals(PassiveNodeVisualIndex<PassiveNodeVisualConfig>? visuals)
+        {
+            _visuals = visuals;
             QueueRedraw();
         }
 
@@ -68,11 +78,35 @@ namespace Battle.Source.UIElements.PassiveWheel
 
                 var centre = new Vector2(node.X, node.Y);
                 float radius = _geometry.DocumentRadius(node.Kind, _scale);
+                PassiveNodeVisualConfig? art = _visuals?.For(node);
+                Color ray = _style.ColorOf(node);
 
-                DrawCircle(centre, radius, _style.NodeIdleFill);
+                DrawFace(centre, radius, art, ray);
+
+                // The outline is the CLASS drawing, so it wears the ray whatever the row put inside it —
+                // one reading with the scenes above, through PassiveNodeVisualConfig.ModulateOf.
                 DrawArc(centre, radius, 0f, Mathf.Tau, CircleSegments,
-                    new Color(_style.ColorOf(node), _style.NodeIdleOutline.A), outline, true);
+                    new Color(PassiveNodeVisualConfig.ModulateOf(art, authored: false, ray), _style.NodeIdleOutline.A),
+                    outline, true);
             }
+        }
+
+        /// <summary>What fills the node: the authored face when a row carries one, otherwise the flat
+        /// disc the mass has always been. What colours it is not decided here — see
+        /// <see cref="PassiveNodeVisualConfig.ModulateOf"/>, which the node scenes read too, so one PNG
+        /// does not come out one colour on a class drawn as a scene and another on a class drawn here.
+        /// <para>The OUTLINE is drawn either way, so a node in the mass never stops saying which ray it
+        /// belongs to.</para></summary>
+        private void DrawFace(Vector2 centre, float radius, PassiveNodeVisualConfig? art, Color ray)
+        {
+            if (art?.Body is not { } face)
+            {
+                DrawCircle(centre, radius, _style!.NodeIdleFill);
+                return;
+            }
+
+            DrawTextureRect(face, new Rect2(centre - new Vector2(radius, radius), new Vector2(radius * 2f, radius * 2f)),
+                false, PassiveNodeVisualConfig.ModulateOf(art, authored: true, ray));
         }
     }
 }
