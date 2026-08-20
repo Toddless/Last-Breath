@@ -1,5 +1,13 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из ревью А-1a (2026-08-20, коммит `406f11de`; accept with minors)
+
+- (minor, лок — в Т-9 или владельцу) `en.po:2487`/`ru.po:1379` — описание Банки яда обещает полный `{Damage} + скейлы` КАЖДЫЙ ход, реальный тик = ×0.35 канона (расхождение было и при 0.7, фикс его усилил до ×2.86); тултип самого эффекта показывает правду — игрок видит оба числа рядом. Минимум — переформулировать «a share of …»; полный вариант — отдать долю в `DescriptionValues` способности тем же чтением канона.
+- (minor, садовый проход) Третья копия формы «Dictionary(Ordinal) → RecordProperties → CreateEffect» (`DamageOverTurnEffect.FromCanon`, `AbilityProvider.FuryFromCanon` :410/:413, инлайны реестра) + литерал `"duration"` теперь в трёх написаниях — свести extension `CreateEffect(this IEffectProvider, string id, params (string,float)[])` в Core + общие ключи.
+- (nit) `DotPotencyFromCanonTests.cs:143-150` — имя кейса говорит «канон не несёт строки», меряет ветку «реестр не знает фабрики»; переименовать в духе `AStatusTheRegistryBuildsNothingFor…`.
+- (знать) Отказ `FromCanon` СТРОЖЕ соседа `FuryFromCanon` (тот глотает и отказ реестра через `??`) — осознанно по DoD «громкий отказ»; фраза отчёта исполнителя «в точности ответ песочницы из FuryFromCanon» неточна в тексте, не в коде.
+- (знать, тест-инфра) Тест транзиивности `DotPotencyFromCanonTests` мутирует общий скомпонованный реестр с восстановлением в TestInitialize/TestCleanup — при включении параллелизма MSTest его придётся изолировать (в проекте `[assembly: Parallelize]` нет).
+
 ## Из техбатча (2026-08-19, коммит `e90a1308`; accept с доработкой)
 
 - **(БАГ, владельцу на решение)** `AugmentPcMultiStackOnHit`: поле `_owner` не присваивается никогда → подписка в `ApplyUpgrade` уходит в пустоту, `OnAfterAttack` не срабатывает. Легендарная T3 `Augment_Poison_Coating_Apply_Poison_For_Each_Enemy` отгружена и НЕ ДЕЛАЕТ НИЧЕГО. Правда записана в док класса, механика не тронута.
