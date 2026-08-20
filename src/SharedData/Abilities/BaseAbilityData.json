@@ -73,6 +73,7 @@
             "abilityProperties": {
                 "stacks": 3,
                 "duration": 3,
+                "criticalChance": 0.15,
                 "additionalDurationAmount": 1
             }
         },

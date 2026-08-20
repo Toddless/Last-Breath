@@ -83,7 +83,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void ARankAndFileEffectIsWeakWithoutSayingSoAnywhere()
         {
-            // The default carries the whole catalog: the canon names strengths for sixteen rows out of 51.
+            // The default carries the whole catalog: the canon names strengths for sixteen rows out of 52.
             var clumsiness = new Clumsiness(duration: 3, maxStacks: 5, value: 0.15f);
 
             Assert.AreEqual(EffectPower.Weak, clumsiness.Power, "an effect no row calls strong came out stronger than weak");

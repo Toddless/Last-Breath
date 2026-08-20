@@ -165,6 +165,10 @@
             "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
         },
         {
+            "id": "Effect_Crit_Calculation_Buff",
+            "properties": { "duration": 3, "maxStacks": 5, "value": 0.15 }
+        },
+        {
             "id": "Effect_Accuracy_Buff",
             "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
         },

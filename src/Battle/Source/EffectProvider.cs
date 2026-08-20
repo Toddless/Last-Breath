@@ -150,6 +150,11 @@ namespace Battle.Source
                 new AccuracyBuff(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("value"))),
             ["Effect_Critical_Chance_Buff"] = new(["duration", "maxStacks", "value"], p =>
                 new CriticalChanceBuffEffect(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("value"))),
+            // The Critical Calculation's own buff. How many turns a critical hit gives it back is NOT a
+            // figure of the effect: the cast that lays it names them (Ability_Critical_Calculation's
+            // additionalDurationAmount), so an instance built from the canon alone keeps its own turn.
+            ["Effect_Crit_Calculation_Buff"] = new(["duration", "maxStacks", "value"], p =>
+                new CritCalculationBuff(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("value"))),
             ["Effect_Critical_Damage_Buff"] = new(["duration", "maxStacks", "value"], p =>
                 new CriticalDamageBuffEffect(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("value"))),
             ["Effect_Lucky_Crit_Chance"] = new(["duration", "maxStacks"], p =>

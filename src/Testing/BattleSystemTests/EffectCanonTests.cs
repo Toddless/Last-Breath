@@ -94,7 +94,12 @@ namespace LastBreathTest.BattleSystemTests
             // effect, because what the augment grants is not a figure anybody balances — it is a rule about
             // other effects' turns. Its two canonical numbers are how long the rule holds and that it does
             // not stack; the extension it hands out is one turn by the augment's own line.
-            "Effect_Mythic_Calculation"
+            "Effect_Mythic_Calculation",
+            // The Critical Calculation's own buff, joined at А-1b. The design list names the ABILITY and
+            // the chance it grants, not an effect of its own; the row carries that chance, the turns it
+            // holds and a ceiling of five — the ability's three plus the two the stacks record can add,
+            // so registering the effect held nothing back that a shipped build already had.
+            "Effect_Crit_Calculation_Buff"
         ];
 
         [TestMethod]

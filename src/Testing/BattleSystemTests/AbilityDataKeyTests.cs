@@ -21,16 +21,11 @@ namespace LastBreathTest.BattleSystemTests
     public class AbilityDataKeyTests
     {
         /// <summary>Record keys that are deliberately not read by the ability that carries them. Empty,
-        /// and meant to stay so: a legitimate orphan needs a reason written next to it.</summary>
-        private static readonly (string AbilityId, string Key)[] s_knowinglyUnread =
-        [
-            // Found by this walk when it was written, and older than it. The Crit Calculation buff
-            // lengthens itself by ONE turn per critical hit, and the one is written into the effect
-            // rather than read from here. Left standing rather than deleted: the figure looks like the
-            // author's word for that step, and wiring it up would change what the ability does — the
-            // owner's call, not a guess made while adding a guard.
-            ("Ability_Critical_Calculation", "additionalDurationAmount"),
-        ];
+        /// and meant to stay so: a legitimate orphan needs a reason written next to it.
+        /// <para>The one entry it ever held — the Crit Calculation's <c>additionalDurationAmount</c>, whose
+        /// turn was written into the effect instead — left at А-1b: the cast hands the figure to the buff
+        /// it lays, so the record steers the extension it always looked like it was steering.</para></summary>
+        private static readonly (string AbilityId, string Key)[] s_knowinglyUnread = [];
 
         [TestMethod]
         public void EveryNumberARecordCarriesIsANumberItsAbilityReads()
