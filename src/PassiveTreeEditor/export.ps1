@@ -6,8 +6,9 @@
     Two steps and a link. The C# solution is built first so a compile error is read as a compile error
     rather than as a failed export; then Godot writes the binary headlessly from the "Windows Desktop"
     preset. The exported tool reads its catalogs from a folder beside the binary, so the last step
-    junctions Export/Data/Shared onto src/SharedData: edits made in the exported tool land in the
-    repository, exactly as they do when the tool runs from the editor.
+    links Export/Data/Shared to src/SharedData: edits made in the exported tool land in the repository,
+    exactly as they do when the tool runs from the editor. The link is relative, like every other link
+    in the repository — an absolute one keeps reading the live tree from wherever the folder is copied.
 
     Only the release template is what this exports with — a debug export needs a debug template
     installed next to it.
@@ -101,10 +102,36 @@ elseif (-not (Test-Path $assemblies)) {
     throw ('Export produced no "{0}".' -f $assemblies)
 }
 
-if (-not (Test-Path $dataLink)) {
-    New-Item -ItemType Directory -Force -Path (Split-Path $dataLink) | Out-Null
-    New-Item -ItemType Junction -Path $dataLink -Target $sharedData | Out-Null
-    Write-Host "linked $dataLink -> $sharedData" -ForegroundColor Cyan
+$linkDir = Split-Path $dataLink
+New-Item -ItemType Directory -Force -Path $linkDir | Out-Null
+
+# Spelled from the folder that holds the link, which is where Windows resolves a relative target from.
+Push-Location $linkDir
+try { $dataLinkTarget = Resolve-Path -Relative $sharedData }
+finally { Pop-Location }
+
+# A link an older run left behind names an absolute path and is replaced rather than kept. Only the
+# link itself goes: deleting a reparse point leaves what it points at alone, where a recursive delete
+# would walk into SharedData and take the repository with it.
+$existingLink = Get-Item -LiteralPath $dataLink -Force -ErrorAction SilentlyContinue
+if ($existingLink -and (@($existingLink.Target)[0] -ne $dataLinkTarget)) {
+    if (-not ($existingLink.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {
+        throw ('"{0}" is a real folder, not a link to SharedData. Move it aside and run again.' -f $dataLink)
+    }
+    [System.IO.Directory]::Delete($existingLink.FullName)
+    $existingLink = $null
+}
+
+if (-not $existingLink) {
+    # Windows PowerShell writes a symbolic link for an administrator only, Developer Mode or not; mklink
+    # is what asks for the unprivileged link that Developer Mode allows. A junction would be absolute.
+    & cmd.exe /c mklink /D "$dataLink" "$dataLinkTarget" | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        $failure = 'Cannot link "{0}" -> "{1}" (mklink exit code {2}). A symbolic link needs Developer Mode ' +
+                   '(Settings > System > For developers) or an elevated shell.'
+        throw ($failure -f $dataLink, $dataLinkTarget, $LASTEXITCODE)
+    }
+    Write-Host "linked $dataLink -> $dataLinkTarget" -ForegroundColor Cyan
 }
 
 # The link is stepped around on purpose: recursing through it would measure the whole repository.
