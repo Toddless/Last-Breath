@@ -1,5 +1,12 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из Х-3 (2026-08-20, коммит `6c29f029`; accept)
+
+- **(лок, в Т-9)** `Effect_Seal_Of_Oblivion`: `_Description` (en.po:1184) «passive skills are disabled» (= док), а `_Tooltip` (en.po:2673, ru.po:2025) «нельзя лечить» — тултип не от этой печати и ни от одной из пяти; один из текстов переписать.
+- (лок, Т-9) У 5 из 10 «сильных» эффектов нет русского имени: `Effect_Burning_Fury` — пустой msgstr, `Effect_Primal_Fury`/`Effect_Healing_Fury`/`Effect_Evade_First_Death`/`Effect_Heal_Reduction` — записей в ru.po нет вовсе.
+- (знать) `Dispel` в продакшене по-прежнему без вызывающих — сила эффектов пока ни на что не влияет; фундамент под предметы/способности с развеиванием.
+- (nit) `EffectCanonTests.s_designList` не несёт колонку «Сила» — второй независимой копии доковской силы нет (пин держит только `EffectPowerTests`); расширять кортеж — отдельный заход.
+
 ## Из Х-2 (2026-08-20, коммит `f1ad6c31`; accept with minors → возврат закрыт)
 
 - **(задача-кандидат, тест-инфра)** `CombatRandomScope`/`CastRandomScope` (`src/Testing/BattleSystemTests/CombatRandomScope.cs:18,23`) сажают генератор теста в СТАТИКИ процесса (`CombatRandom.Source`/`CastRandom.Source`) — при параллельных классах MSTest чужой бой получает spy соседа (23 красных при сдвиге расписания). Сейчас погашено `[assembly: DoNotParallelize]` (`src/Testing/TestExecution.cs`, цена ~0с); настоящая починка — сиденье ролла в контексте боя, не в статике; после неё файл удалить. Примечание: заодно защитило тест транзитивности `DotPotencyFromCanonTests` (мутирует общий реестр).
