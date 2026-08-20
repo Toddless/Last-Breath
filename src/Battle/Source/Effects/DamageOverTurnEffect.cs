@@ -1,11 +1,14 @@
 ﻿namespace Battle.Source.Effects
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data;
     using Core.Enums;
+    using Core.Services;
     using Godot;
 
     public class DamageOverTurnEffect(
@@ -19,6 +22,10 @@
 
         private const string BaseId = "Effect_Damage_Over_Turn";
         private const float DefaultPercentFromDamage = 0.7f;
+
+        /// <summary>The one figure a caster owns of a canonical stack: how long it lasts. Named as the
+        /// registry declares it, because that is the key the canonical row is overridden under.</summary>
+        private const string DurationKey = "duration";
 
         /// <summary>What each damaging status feeds on: the component of the blow its pool is taken from
         /// (none = the whole blow) and the caster stat that multiplies that pool. A typeless DoT is not
@@ -37,6 +44,26 @@
 
         /// <summary>Settable so effect-application mutators ("+X% burning damage") can scale the tick.</summary>
         public float DamagePerTick { get; set; }
+
+        /// <summary>
+        /// A stack of the status as the canon balances it: the caster hands over how long it lasts and
+        /// nothing else, so what one tick carries and how many stacks may stand come from
+        /// <c>SharedData/Effects</c> — moving the figure there moves every cast that lays this stack.
+        /// <para>The registry is pulled from the composition at the moment of the question, like the
+        /// stack ceiling of the base class and for the same reasons: nothing holds a provider that may
+        /// have been discarded. A composed registry that refuses the id has already named the reason in
+        /// the Tracker and nothing is laid; where no composition exists at all there is no canon to read
+        /// and the effect is built with its own default — a sandbox answer, never a shipped one.</para>
+        /// </summary>
+        public static IEffect? FromCanon(int duration, StatusEffects status)
+        {
+            IEffectProvider? canon = GameServiceProvider.TryGet<IEffectProvider>();
+            if (canon == null) return new DamageOverTurnEffect(duration, status);
+
+            string id = IdFor(status);
+            var owned = new Dictionary<string, float>(StringComparer.Ordinal) { [DurationKey] = duration };
+            return canon.CreateEffect(id, new RecordProperties(id, owned));
+        }
 
         public override async Task Apply(EffectApplyingContext context)
         {

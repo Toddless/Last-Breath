@@ -55,11 +55,14 @@ namespace Battle.Source.Abilities.JarOfPoison
 
         private async Task ApplyPoison(IFightable owner, IFightable target)
         {
+            // The jar owns how long its poison lasts; what a tick carries is balanced in the canon.
+            IEffect? poison = DamageOverTurnEffect.FromCanon(PoisonDuration, StatusEffects.Poison);
+            if (poison == null) return;
+
             float damage = Damage + (owner.Parameters.PhysicalDamage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
 
             // The jar deals no blow of its own: the poison feeds on the figure the ability authors.
             EffectApplyingContext context = Laying(target) with { Damage = DamageSnapshot.Of(DamageType.Poison, damage) };
-            var poison = new DamageOverTurnEffect(PoisonDuration, StatusEffects.Poison);
             await poison.Apply(context);
         }
     }
