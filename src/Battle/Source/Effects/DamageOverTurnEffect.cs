@@ -37,6 +37,19 @@
             [StatusEffects.Bleed] = (DamageType.Physical, EntityParameter.BleedDamageMultiplier)
         };
 
+        // Fine for a getter: Description is read on EffectsChanged (tooltip rebuild), not per frame.
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                var effects = Target?.Effects.GetBy(effect => effect.Id == Id).Cast<DamageOverTurnEffect>().ToList();
+                values["Damage"] = Mathf.RoundToInt(effects?.Sum(x => x.DamagePerTick) ?? DamagePerTick);
+                if (effects is { Count: > 0 }) values["Duration"] = effects.Max(x => x.Duration); // max across stacks
+                return values;
+            }
+        }
+
         /// <summary>Share of the blow one tick carries, as authored — <see cref="Copy"/> hands it on
         /// unscaled. The default stands in for the parameterless struct default.</summary>
         public EffectValue PercentFromBase { get; } =
@@ -92,19 +105,6 @@
             if (otherEffect is not DamageOverTurnEffect other) return false;
 
             return DamagePerTick > other.DamagePerTick;
-        }
-
-        // Fine for a getter: Description is read on EffectsChanged (tooltip rebuild), not per frame.
-        protected override Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                var effects = Target?.Effects.GetBy(x => x.Id == Id).Cast<DamageOverTurnEffect>().ToList();
-                values["Damage"] = Mathf.RoundToInt(effects?.Sum(x => x.DamagePerTick) ?? DamagePerTick);
-                if (effects is { Count: > 0 }) values["Duration"] = effects.Max(x => x.Duration); // max across stacks
-                return values;
-            }
         }
 
         public override IEffect Copy() => new DamageOverTurnEffect(Duration, Status, MaxStacks, PercentFromBase) { DamagePerTick = DamagePerTick };

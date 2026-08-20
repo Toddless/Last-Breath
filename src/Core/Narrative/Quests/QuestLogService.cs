@@ -29,6 +29,7 @@ namespace Core.Narrative.Quests
         private readonly IWorldFactsService _facts;
         private readonly IInventory _inventory;
         private readonly Items.IItemMinter _items;
+        private readonly Items.IUniqueItemQuery _uniqueItems;
         private readonly IInfluenceMastery _influence;
         private readonly IWorldClock _clock;
         private readonly INpcWorldRegistry _registry;
@@ -39,13 +40,14 @@ namespace Core.Narrative.Quests
         private bool _dirty;
 
         public QuestLogService(IQuestProvider quests, IWorldFactsService facts, IInventory inventory,
-            Items.IItemMinter items, IInfluenceMastery influence, IWorldClock clock,
+            Items.IItemMinter items, Items.IUniqueItemQuery uniqueItems, IInfluenceMastery influence, IWorldClock clock,
             INpcWorldRegistry registry, IGameEventBus events, IGameMessageBus messages, ILoadScope loadScope)
         {
             _quests = quests;
             _facts = facts;
             _inventory = inventory;
             _items = items;
+            _uniqueItems = uniqueItems;
             _influence = influence;
             _clock = clock;
             _registry = registry;
@@ -88,7 +90,8 @@ namespace Core.Narrative.Quests
             if (!CanAccept(questId, context)) return false;
             var quest = _quests.Get(questId)!;
 
-            var state = new QuestState(questId) { AcceptedAtMinutes = NowMinutes() };
+            var state = NewAttempt(questId);
+            state.AcceptedAtMinutes = NowMinutes();
             _states[questId] = state;
             SnapshotBaselines(state, quest.Stages[0]);
 
@@ -105,7 +108,7 @@ namespace Core.Narrative.Quests
             if (quest == null || GetState(questId) is { Status: QuestStatus.Active or QuestStatus.ReadyToTurnIn }) return;
 
             Execute(quest.OnDecline, context);
-            var state = new QuestState(questId);
+            var state = NewAttempt(questId);
             _states[questId] = state;
 
             // A refused failure leaves the offer returnable instead of the half-written state.
@@ -147,9 +150,9 @@ namespace Core.Narrative.Quests
         }
 
         public bool CanTurnIn(string questId) =>
-            GetState(questId) is { Status: QuestStatus.ReadyToTurnIn }
+            GetState(questId) is { Status: QuestStatus.ReadyToTurnIn } state
             && _quests.Get(questId) is { } quest
-            && _inventory.GetAvailableCapacity() >= quest.Rewards.Items.Count;
+            && _inventory.GetAvailableCapacity() >= OwedRewardItems(quest, state).Count;
 
         public bool TurnIn(string questId, NarrativeContext context)
         {
@@ -157,13 +160,12 @@ namespace Core.Narrative.Quests
             var quest = _quests.Get(questId)!;
             var state = GetState(questId)!;
 
-            foreach (var reward in quest.Rewards.Items)
-                // Minted, not copied: an equip reward is a fresh roll of its blueprint.
-                _inventory.TryAddItem(_items.MintItem(reward.ItemId), reward.Amount);
+            // The gate must not answer yes twice: paying items wakes the inventory event, and a turn-in is an
+            // authorable action, so the quest stops being turn-innable before a single reward is minted.
+            state.Status = QuestStatus.Completed;
+            GrantRewardItems(quest, state);
             if (quest.Rewards.InfluenceExp > 0) _influence.AddExperience(quest.Rewards.InfluenceExp);
             Execute(quest.Rewards.Actions, context);
-
-            state.Status = QuestStatus.Completed;
             Publish(state);
             return true;
         }
@@ -188,8 +190,52 @@ namespace Core.Narrative.Quests
             foreach (var state in states)
             {
                 // A quest removed from the game by a patch: log and drop the state.
-                if (_quests.Get(state.QuestId) == null) continue;
+                if (_quests.Get(state.QuestId) == null)
+                {
+                    Tracker.TrackInfo($"Quest '{state.QuestId}' is no longer in the catalog: its state is dropped, the ledger of unique rewards with it");
+                    continue;
+                }
+
                 _states[state.QuestId] = state;
+            }
+        }
+
+        /// <summary>A fresh attempt of the same quest: everything about the attempt starts blank, the
+        /// ledger of artefacts already handed over does not — it is the quest's, not the attempt's.</summary>
+        private QuestState NewAttempt(string questId)
+        {
+            var state = new QuestState(questId);
+            if (GetState(questId) is not { } previous) return state;
+
+            foreach (string itemId in previous.GrantedUniqueRewards)
+                state.GrantedUniqueRewards.Add(itemId);
+            return state;
+        }
+
+        /// <summary>Reward items this turn-in still owes — everything but the one-of-a-kind rewards the
+        /// quest already paid. The gate and the payout read the same list, so the bag is asked to hold
+        /// exactly what is about to be minted.</summary>
+        private static List<QuestRewardItem> OwedRewardItems(QuestDefinition quest, QuestState state) =>
+            quest.Rewards.Items.Where(reward => !state.GrantedUniqueRewards.Contains(reward.ItemId)).ToList();
+
+        /// <summary>Mints what the turn-in owes and writes every one-of-a-kind item down as handed over.
+        /// That note is the whole of the guarantee: a repeat turn-in reads it and pays around it.</summary>
+        private void GrantRewardItems(QuestDefinition quest, QuestState state)
+        {
+            foreach (var reward in OwedRewardItems(quest, state))
+            {
+                // Minted, not copied: an equip reward is a fresh roll of its blueprint.
+                if (!_inventory.TryAddItem(_items.MintItem(reward.ItemId), reward.Amount))
+                {
+                    // The ledger says "the player holds it", so a bag that refused writes nothing down.
+                    Tracker.TrackInfo($"Quest '{quest.Id}' could not hand over '{reward.ItemId}': the bag refused it");
+                    continue;
+                }
+
+                if (!_uniqueItems.IsUnique(reward.ItemId)) continue;
+
+                state.GrantedUniqueRewards.Add(reward.ItemId);
+                Tracker.TrackInfo($"Quest '{quest.Id}' handed out the unique reward '{reward.ItemId}': a repeat turn-in pays everything else, not this");
             }
         }
 

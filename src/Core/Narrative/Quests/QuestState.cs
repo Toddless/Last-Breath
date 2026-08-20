@@ -1,5 +1,6 @@
 namespace Core.Narrative.Quests
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -18,6 +19,11 @@ namespace Core.Narrative.Quests
 
         /// <summary>The one-candidate-left warning fired; never repeat it.</summary>
         public bool GhostHintShown { get; set; }
+
+        /// <summary>One-of-a-kind reward items this quest has already handed over. Belongs to the QUEST
+        /// and not to the attempt: a repeatable quest pays everything repeatable on every turn-in, and
+        /// an artefact exactly once, so a fresh attempt inherits this list.</summary>
+        public HashSet<string> GrantedUniqueRewards { get; } = new(StringComparer.Ordinal);
 
         /// <summary>World-clock minutes at accept; deadline = this + timeLimitHours × 60.</summary>
         public int AcceptedAtMinutes { get; set; }

@@ -12,6 +12,7 @@ namespace LastBreath.Services
     using Core.Entity;
     using Core.Interfaces;
     using Core.Inventory;
+    using Core.Items;
     using Core.MessageBus;
     using Core.MessageBus.Messages;
     using Core.MessageBus.Requests;
@@ -73,6 +74,8 @@ namespace LastBreath.Services
             services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
             services.AddSingleton<IDataParser, DataParser>();
             services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>();
+            // One reading of "one of a kind" for everyone who hands an item over.
+            services.AddSingleton<IUniqueItemQuery, UniqueItemQuery>();
             services.AddGameDataParticipant<IFactionRelationService, FactionRelationService>();
             services.AddGameDataParticipant<IReputationDeedProcessor, ReputationDeedProcessor>();
             services.AddGameDataParticipant<IPersonalReputationService, PersonalReputationService>();

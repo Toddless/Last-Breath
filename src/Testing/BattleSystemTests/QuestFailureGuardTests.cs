@@ -52,7 +52,8 @@ namespace LastBreathTest.BattleSystemTests
             clock.Setup(timeline => timeline.MinuteOfDay).Returns(() => _minuteOfDay);
 
             _questLog = new QuestLogService(_quests, _facts, Mock.Of<Core.Inventory.IInventory>(),
-                Mock.Of<Core.Items.IItemMinter>(), Mock.Of<Core.Narrative.Influence.IInfluenceMastery>(),
+                Mock.Of<Core.Items.IItemMinter>(), Mock.Of<Core.Items.IUniqueItemQuery>(),
+                Mock.Of<Core.Narrative.Influence.IInfluenceMastery>(),
                 clock.Object, _registry, _events, Mock.Of<Core.MessageBus.IGameMessageBus>(),
                 Mock.Of<Core.Save.ILoadScope>());
         }

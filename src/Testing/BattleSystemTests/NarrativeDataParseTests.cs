@@ -80,7 +80,8 @@ namespace LastBreathTest.BattleSystemTests
             ApplyCatalog(_dialogues, DataCatalog.Dialogues);
 
             _questLog = new QuestLogService(_quests, _facts, inventory.Object, Mock.Of<Core.Items.IItemMinter>(),
-                _influence, clock.Object, Mock.Of<Core.Ai.World.Skirmish.INpcWorldRegistry>(),
+                Mock.Of<Core.Items.IUniqueItemQuery>(), _influence, clock.Object,
+                Mock.Of<Core.Ai.World.Skirmish.INpcWorldRegistry>(),
                 _events, Mock.Of<Core.MessageBus.IGameMessageBus>(), Mock.Of<Core.Save.ILoadScope>());
         }
 
