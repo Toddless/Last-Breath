@@ -13,6 +13,60 @@ namespace Battle.Source.UIElements.PassiveWheel
     using Core.Views.UI;
     using Godot;
 
+    /// <summary>What a LEFT click on the wheel turns out to be about. One point can belong to two things
+    /// at once — a node, and a pip of that node's ring — and there is exactly one place that says which
+    /// of them the button meant.</summary>
+    public enum WheelClickTarget
+    {
+        /// <summary>The node the point belongs to: a mark in the plan, or a purchase with Ctrl.</summary>
+        Node,
+
+        /// <summary>The slot the pip stands for: the bag is asked what would go into it.</summary>
+        Slot
+    }
+
+    /// <summary>
+    /// What a point on the wheel is, and what the left button on it is about — the two readings the
+    /// canvas makes of every gesture, kept out here in plain C# so both can be walked without an engine.
+    ///
+    /// <para>A pip is asked about first and WITHOUT any slack of its own, so its priority holds exactly
+    /// inside its own small circle; everything wider is the node rule's business, which keeps the slack
+    /// that makes a dot aimable with the whole tree on screen.</para>
+    /// </summary>
+    public static class WheelHit
+    {
+        /// <summary>The pip a screen point lands on, or null when it lands on none. Pip centres are
+        /// document coordinates and pip radii are pixels, so the comparison is made in SCREEN space —
+        /// against the very radius the ring was drawn with, rather than against a second spelling of
+        /// it.</summary>
+        public static PassiveSocketPip? PipAt(
+            IReadOnlyList<PassiveSocketPip> pips, CanvasTransform view, float x, float y)
+        {
+            foreach (PassiveSocketPip pip in pips)
+            {
+                float deltaX = view.ScreenX(pip.X) - x;
+                float deltaY = view.ScreenY(pip.Y) - y;
+                if (deltaX * deltaX + deltaY * deltaY <= pip.ScreenRadius * pip.ScreenRadius) return pip;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Which of the two the left button meant. ONLY the pip of an open, empty slot is a target of its
+        /// own: it is the one state with a question to answer — what of mine would go in here — and the
+        /// click that asks it must not also reach the node underneath, or asking would plan to give the
+        /// ability back every time the player asks while a return is being drawn up.
+        /// <para>Every other pip leaves the click to its node, and nothing about those states is
+        /// invented here: a filled one gives its augment back to the RIGHT button, a closed one is
+        /// remove-only, and a pip whose node nobody has bought is the picture of a slot that does not
+        /// exist yet. For all three the ring stays part of its own node's presence, which is what a point
+        /// off the pips has always been.</para>
+        /// </summary>
+        public static WheelClickTarget LeftClickOn(PassiveSocketPip? pip) =>
+            pip is { State: SocketSlotState.Open } ? WheelClickTarget.Slot : WheelClickTarget.Node;
+    }
+
     /// <summary>
     /// The wheel itself: the only node of the whole screen the engine treats as a mouse target, and the
     /// only place that decides what a point on it means.
@@ -41,7 +95,9 @@ namespace Battle.Source.UIElements.PassiveWheel
     ///
     /// <para>Nothing here spends anything by itself. A click MARKS, and marks live in the draft the window
     /// owns; the two roads that actually move the character are a Ctrl-click, which buys through the
-    /// service, and the confirmation button, which is the window's.</para>
+    /// service, and the confirmation button, which is the window's. The one click that is not about the
+    /// plan at all is a click on the pip of an OPEN slot: it asks the courier what the bag holds for that
+    /// address, and the courier is the sheet's own — the wheel assembles no list and seats nothing.</para>
     /// </summary>
     [GlobalClass]
     public partial class PassiveWheelCanvas : Control, IRequireServices
@@ -375,14 +431,25 @@ namespace Battle.Source.UIElements.PassiveWheel
         }
 
         /// <summary>
-        /// A click means the same thing on a node and on one of its pips: the ring is part of its own
-        /// node's presence, not a target of its own.
+        /// The pip of an OPEN slot is a target of its own and the only one: clicking it asks the bag what
+        /// would go into that slot, and the node under it is left alone — see
+        /// <see cref="WheelHit.LeftClickOn"/> for why the other three states are not. Everywhere else the
+        /// ring is part of its own node's presence and a click means what it always meant.
+        /// <para>A composition with no courier (the battle sandbox) claims nothing: a pip that swallowed
+        /// the click and then had nowhere to send it would be a dead spot on the wheel.</para>
         /// <para>With Ctrl held it buys immediately, and only in the buying mode: the single road to the
         /// purse is a button with the price written on it, and one slipped modifier must not be able to
-        /// spend gold without a question.</para>
+        /// spend gold without a question. A pip stands outside that: a ring is only ever drawn around a
+        /// node the character already HOLDS, so there is no route to buy under one.</para>
         /// </summary>
         private void OnLeftClick(WheelTarget target, bool immediate)
         {
+            if (_sockets != null && target.Pip is { } pip && WheelHit.LeftClickOn(pip) == WheelClickTarget.Slot)
+            {
+                OfferSlot(pip);
+                return;
+            }
+
             if (target.Node is not { } node || _draft == null || _document == null) return;
 
             if (_draft.Mode == DraftMode.Refund)
@@ -427,6 +494,28 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (target.Node is not { } node || _draft == null) return;
 
             if (_draft.IsMarked(node.Id) || PlannedReturn(node.Id)) DropMark(node.Id);
+        }
+
+        /// <summary>
+        /// Asks the bag what would go into that slot and seats whatever the player picks — the courier's
+        /// job from here on, and the same courier the socket sheet hands its cells, so the list, its order
+        /// and the install are one road with two doors.
+        /// <para>The wheel's OWN refusals are answered first and out of the same reading the drop check
+        /// goes through: a slot whose node the plan means to give back would take the augment and then
+        /// close around it. It is the only one of the two that can be said here — a pip reading as open
+        /// has a socket on the board, and the board holds one exactly while its node is taken.</para>
+        /// <para>An empty answer is the courier's to say, and it says it on this window's hint line rather
+        /// than as an empty list: the player asked a question where he is looking.</para>
+        /// </summary>
+        private void OfferSlot(PassiveSocketPip pip)
+        {
+            if (OwnRefusal(pip.OpenerId) is { } refusal)
+            {
+                Announce(Localization.Localize(refusal));
+                return;
+            }
+
+            _sockets?.Pick(pip.Address);
         }
 
         /// <summary>Buys the cheapest route to the node through the service — the one place a click
@@ -890,22 +979,17 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// first and without any slack of its own, so its priority holds exactly inside its own small
         /// circle; everything else falls through to the node rule, which has the slack that keeps a dot
         /// aimable when the whole tree is on screen.
-        /// <para>A pip resolves to the node whose ring it belongs to. The ring is part of that node's
-        /// presence, so hovering a pip opens that node's popup and clicking one is a click on that node —
-        /// there is no second question about what a point means.</para>
+        /// <para>A pip always resolves to the node whose ring it belongs to as well, so hovering one opens
+        /// that node's popup and every gesture still has a node to reach for. WHICH half of the pair a
+        /// button is about is asked once, of <see cref="WheelHit.LeftClickOn"/> and of
+        /// <see cref="OnRightClick"/>, and never here — this reads the surface and decides nothing.</para>
         /// </summary>
         private WheelTarget Resolve(Vector2 position)
         {
             if (_document == null || _geometry == null) return default;
 
-            foreach (PassiveSocketPip pip in _socketRings?.Pips ?? [])
-            {
-                float deltaX = _view.ScreenX(pip.X) - position.X;
-                float deltaY = _view.ScreenY(pip.Y) - position.Y;
-                if (deltaX * deltaX + deltaY * deltaY > pip.ScreenRadius * pip.ScreenRadius) continue;
-
+            if (WheelHit.PipAt(_socketRings?.Pips ?? [], _view, position.X, position.Y) is { } pip)
                 return new WheelTarget(_document.Find(pip.NodeId), pip);
-            }
 
             return new WheelTarget(_geometry.At(_document, _view, position.X, position.Y), null);
         }
