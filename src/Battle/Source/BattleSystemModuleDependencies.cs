@@ -74,6 +74,11 @@
             // The ability registry builds data-declared behaviours out of it; lazy so registration order
             // stays irrelevant and a sandbox without one still mints every other augment.
             services.AddSingleton<Func<IEffectProvider?>>(sp => sp.GetService<IEffectProvider>);
+            // The other half of a card whose effect is named in code: the registry that builds those
+            // augments is the one that says what they lay, so the copy in the bag reaches the same canon
+            // the seated upgrade reaches. Lazy for the reason above.
+            services.AddSingleton<IAugmentLaidEffects>(sp => sp.GetRequiredService<AbilityProvider>());
+            services.AddSingleton<Func<IAugmentLaidEffects?>>(sp => sp.GetService<IAugmentLaidEffects>);
             // TryAdd: Main registers both module extensions — whichever runs first wins, the lambdas
             // resolve the providers lazily from the FINAL container, so registration order is irrelevant.
             services.TryAddSingleton<IGrantFactory>(sp => new GrantFactory(

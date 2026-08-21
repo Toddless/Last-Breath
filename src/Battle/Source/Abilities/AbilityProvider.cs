@@ -21,7 +21,7 @@
     /// never handed over at construction.
     /// </summary>
     public partial class AbilityProvider(IAbilityAugmentCatalog augments, Func<IEffectProvider?>? effects = null)
-        : IAbilityProvider, IGameDataParticipant
+        : IAbilityProvider, IGameDataParticipant, IAugmentLaidEffects
     {
         private readonly Dictionary<string, AbilityBaseData> _abilityBaseData = [];
 
@@ -59,6 +59,17 @@
         /// </summary>
         public IReadOnlyCollection<string> ParametersMovedBy(string augmentId) =>
             [.. TableMoves(augmentId).Concat(FactoryMoves(augmentId)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+
+        /// <summary>
+        /// The effect a record lays when its own declaration is silent about one — read off the very
+        /// registration that builds it, which is where a typed factory names its effect. The same answer
+        /// serves the augment seated in a socket and the copy lying in the bag, so a card whose figures
+        /// are balanced in the canon prints them wherever the player is looking at it.
+        /// <para>Empty for every other record, the ones naming their effect in data included: there the
+        /// record is the word and this would be a second one, free to disagree with it.</para>
+        /// </summary>
+        public string LaidEffectOf(string augmentId) =>
+            AbilityUpgrades.TryGetValue(augmentId, out AugmentFactory factory) ? factory.LaidEffectId : string.Empty;
 
         /// <summary>The keys the numeric table has this record standing on.</summary>
         private IEnumerable<string> TableMoves(string augmentId) =>
@@ -124,8 +135,9 @@
 
             // Placeholder = json property name, plus the canon of what the record lays: a record laying an
             // effect may not restate its figures, so its own dictionary is empty and the canon is where
-            // every number on its line comes from.
-            upgrade.DescriptionValues = AugmentDescription.Values(data, _effects());
+            // every number on its line comes from. What it lays is asked of this registry as well as of
+            // the record — a factory names its effect in code, and the card may not be blind to that.
+            upgrade.DescriptionValues = AugmentDescription.Values(data, _effects(), this);
             return upgrade;
         }
 

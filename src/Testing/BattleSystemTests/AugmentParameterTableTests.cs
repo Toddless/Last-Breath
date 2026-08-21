@@ -214,6 +214,34 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(TranslatedRecords, Translated().Count(), "the walks no longer cover the records the collapse translated");
         }
 
+        [TestMethod]
+        public void NoRecordNamesTheEffectItLaysInDataAndInItsFactoryAtOnce()
+        {
+            // The other place the registry keeps ONE word about a record. What an augment lays is said by
+            // its own data or by the factory that builds it, and a record saying both would be built from
+            // the factory's word while its card printed the data's — a disagreement no card can show,
+            // because every road that prints one reads the same rule and would read the same wrong half.
+            // Nothing enforces the split at the keyboard: a factory registration takes an effect id
+            // whatever the record beside it says.
+            (AbilityProvider registry, AbilityAugmentCatalog catalog) = ShippedAbilityData.Load();
+            List<string> doubled = [];
+            int codeNamed = 0;
+
+            foreach (AbilityAugmentData record in catalog.All)
+            {
+                string declared = registry.LaidEffectOf(record.Id);
+                if (string.IsNullOrWhiteSpace(declared)) continue;
+
+                codeNamed++;
+                if (!string.IsNullOrWhiteSpace(record.LaidEffectId))
+                    doubled.Add($"{record.Id}: data says '{record.LaidEffectId}', its factory says '{declared}'");
+            }
+
+            Assert.IsTrue(codeNamed > 0, "no factory names an effect at all, so this walk proves nothing");
+            Assert.AreEqual(0, doubled.Count,
+                $"records naming what they lay twice:\n  {string.Join("\n  ", doubled)}");
+        }
+
         private static IEnumerable<IGrouping<string, (string Augment, string Parameter, OperationType Operation, float Amount)>> Translated() =>
             s_moves.GroupBy(move => move.Augment, StringComparer.Ordinal);
 

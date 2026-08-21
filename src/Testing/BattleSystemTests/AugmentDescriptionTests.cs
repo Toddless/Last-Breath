@@ -1,6 +1,7 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
+    using Battle.Source.Abilities;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Data.GameData;
@@ -8,6 +9,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Enums;
     using Core.Items;
     using Core.Localization;
+    using Microsoft.Extensions.DependencyInjection;
     using Moq;
     using Newtonsoft.Json.Linq;
 
@@ -19,6 +21,9 @@ namespace LastBreathTest.BattleSystemTests
     /// <para>The walks below are about the SHIPPED wording against the SHIPPED canon, because that pairing
     /// is what a player reads and neither half can be checked alone: a line naming a figure nobody supplies
     /// and a canon nobody prints both look healthy from their own side.</para>
+    /// <para>An augment names the effect it lays in its own record OR in the factory that builds it. Both
+    /// answers reach the card through one rule, so which of the two a record uses is not a thing the
+    /// player can tell — and the walks here do not sort the catalog by it.</para>
     /// </summary>
     [TestClass]
     public class AugmentDescriptionTests
@@ -31,24 +36,119 @@ namespace LastBreathTest.BattleSystemTests
         /// that always printed correctly and must go on doing so.</summary>
         private const string PlainRecord = "Augment_Additional_Attacks";
 
+        /// <summary>A record whose effect is named in the CODE that builds it: a typed factory, so its own
+        /// declaration says nothing and the catalog alone cannot tell what its figures are balanced as.</summary>
+        private const string CodeNamedRecord = "Augment_Berserk_Fury_Healing";
+
+        private const string CodeNamedEffect = "Effect_Healing_Fury";
+
         [TestMethod]
-        public void EveryBehaviourRecordPrintsNumbersWhereItsLineNamesThem()
+        public void EveryRecordInTheCatalogPrintsNumbersWhereItsLineNamesThem()
         {
-            // Every copy a behaviour record can produce, against the wording the game ships. A pool record
-            // is walked member by member: which effect a copy lays is a draw, so a line that only works for
+            // Every copy every record can produce, against the wording the game ships. A pool record is
+            // walked member by member: which effect a copy lays is a draw, so a line that only works for
             // the member the seed happened to pick is a line broken for everybody else.
-            (_, AbilityAugmentCatalog catalog, EffectProvider effects) = ShippedAbilityData.Composed();
+            // The whole catalog and not the behaviour half alone: a record laying an effect its FACTORY
+            // names looks, from the data, exactly like a record laying nothing — which is how four
+            // legendaries went on printing "{healAmount:%}" while the behaviour walk stayed green.
+            (AbilityProvider abilities, AbilityAugmentCatalog catalog, EffectProvider effects) = ShippedAbilityData.Composed();
             UseShippedWording();
-            var minter = new AugmentItemMinter(catalog, new AugmentMinter(catalog, new DefaultRandomNumberGenerator(7)), () => effects);
+            IAugmentItemMinter minter = Minter(catalog, effects, abilities);
 
             List<string> unfilled = [];
-            foreach (AbilityAugmentData record in Behaviours(catalog))
+            foreach (AbilityAugmentData record in catalog.All)
                 foreach (string text in Cards(minter, catalog, record))
                     if (text.Contains('{')) unfilled.Add($"{record.Id}: {text}");
 
-            Assert.IsTrue(Behaviours(catalog).Count > 0, "no record declares a behaviour, so this walk proves nothing");
+            Assert.IsTrue(catalog.All.Count > 0, "the catalog declares no augment, so this walk proves nothing");
             Assert.AreEqual(0, unfilled.Count,
                 $"augment cards printing a placeholder instead of a number:\n  {string.Join("\n  ", unfilled)}");
+        }
+
+        [TestMethod]
+        public void ACopyReadsTheSameInTheBagAsItDoesSeatedOnTheAbility()
+        {
+            // Two assemblies of one card: the copy lying in the bag builds its own, and the upgrade the
+            // copy installs carries one built by the ability registry. The tray, the picker and the socket
+            // cell read the first; the seated augment reads the second. They are one card, so a road that
+            // knows something the other does not — which effect a factory lays, say — is a card that
+            // changes wording the moment the player seats it.
+            (AbilityProvider abilities, AbilityAugmentCatalog catalog, EffectProvider effects) = ShippedAbilityData.Composed();
+            UseShippedWording();
+            IAugmentItemMinter minter = Minter(catalog, effects, abilities);
+
+            List<string> disagreed = [];
+            foreach (AbilityAugmentData record in catalog.All)
+            {
+                IAugmentItem? carried = minter.Mint(record.Id);
+                Assert.IsNotNull(carried, $"the minter builds no copy of '{record.Id}'");
+
+                IAugment? seated = abilities.CreateUpgrade(carried.Augment);
+                Assert.IsNotNull(seated, $"the registry builds no upgrade out of a copy of '{record.Id}'");
+
+                string inSocket = Localization.RenderDescription(record.Id, seated.DescriptionValues);
+                if (!string.Equals(carried.Description, inSocket, StringComparison.Ordinal))
+                    disagreed.Add($"{record.Id}\n     bag:    {carried.Description}\n     socket: {inSocket}");
+            }
+
+            Assert.AreEqual(0, disagreed.Count,
+                $"augments reading differently in the bag and in the slot:\n  {string.Join("\n  ", disagreed)}");
+        }
+
+        [TestMethod]
+        public void TheCanonMovesACardWhoseEffectIsNamedInCode()
+        {
+            // The claim the walks above cannot make about the code-named half: that its figures are the
+            // CANON's rather than something the factory carries. Same doctoring as the behaviour half —
+            // the catalog is rebalanced in memory, the file on disk is only read — and the card follows.
+            // It is also what a wrongly declared effect trips over: another effect's canon does not carry
+            // this line's keys, so the card comes back with its braces instead of a different number.
+            (AbilityProvider abilities, AbilityAugmentCatalog catalog, EffectProvider effects) = ShippedAbilityData.Composed();
+            UseShippedWording();
+
+            string shipped = Card(catalog, effects, CodeNamedRecord, abilities);
+            StringAssert.Contains(shipped, "15%", $"'{CodeNamedRecord}' does not print the share the canon balances '{CodeNamedEffect}' at");
+
+            string rebalanced = Card(catalog, Rebalanced(CodeNamedEffect, "healAmount", 0.55f), CodeNamedRecord, abilities);
+            StringAssert.Contains(rebalanced, "55%", "the canon moved and the card did not follow it");
+
+            Assert.AreEqual(shipped, Card(catalog, effects, CodeNamedRecord, abilities),
+                "the shipped canon stopped answering what it did before");
+        }
+
+        [TestMethod]
+        public void TheComposedMintReachesTheRegistryThatNamesACodeNamedEffect()
+        {
+            // The registrations rather than the classes. What hands the bag's mint the registry naming an
+            // augment's effect is one line in the container, and its absence fails no build and throws
+            // nothing — it prints a template on a legendary. Composed as a project composes it, plus the
+            // one service outside these two extensions that a draw needs.
+            ServiceProvider container = new ServiceCollection()
+                .AddSharedGameDataParticipants()
+                .AddBattleSystemModuleDependencies()
+                .AddSingleton<IRandomNumberGenerator>(new DefaultRandomNumberGenerator(7))
+                .BuildServiceProvider();
+            LoadShippedInto(container);
+            UseShippedWording();
+
+            IAugmentItem? carried = container.GetRequiredService<IAugmentItemMinter>().Mint(CodeNamedRecord);
+
+            Assert.IsNotNull(carried, "the composed mint builds no copy of a record whose effect is named in code");
+            Assert.IsFalse(carried.Description.Contains('{'),
+                $"the composed mint printed a template instead of the canon: {carried.Description}");
+        }
+
+        [TestMethod]
+        public void WithoutTheRegistryThatNamesItACodeNamedCardKeepsItsPlaceholders()
+        {
+            // A composition holding the records and the canon but not the module whose factories name the
+            // effects — the bag alone. Nothing there can say what such a record lays, so the line says what
+            // it said before the declarations existed: a visible placeholder, and not a failed mint.
+            (_, AbilityAugmentCatalog catalog, EffectProvider effects) = ShippedAbilityData.Composed();
+            UseShippedWording();
+
+            StringAssert.Contains(Card(catalog, effects, CodeNamedRecord), "{",
+                "a card with nothing to name its effect invented numbers instead of showing the template");
         }
 
         [TestMethod]
@@ -95,6 +195,26 @@ namespace LastBreathTest.BattleSystemTests
             Dictionary<string, object?> printed = AugmentDescription.Values(copy.Applied(record), effects);
 
             Assert.AreEqual(0.9f, printed["value"], "the copy's own roll lost to the record and the canon behind it");
+        }
+
+        [TestMethod]
+        public void TheEffectARecordNamesItselfBeatsWhatAFactoryWouldNameForIt()
+        {
+            // The order of the two words about what an augment lays. It matters for the pool records above
+            // all: a COPY carries its drawn effect in exactly the field a record states its own in, so a
+            // declaration winning here would print one member of the pool on every copy of the record.
+            var effects = new Mock<IEffectProvider>();
+            effects.Setup(provider => provider.CanonOf("Effect_Stated")).Returns(new Dictionary<string, float> { ["value"] = 0.15f });
+            effects.Setup(provider => provider.CanonOf("Effect_Declared")).Returns(new Dictionary<string, float> { ["value"] = 0.9f });
+            var declared = new Mock<IAugmentLaidEffects>();
+            declared.Setup(source => source.LaidEffectOf("Augment_Probe")).Returns("Effect_Declared");
+            var record = new AbilityAugmentData { Id = "Augment_Probe", EffectId = "Effect_Stated" };
+
+            Dictionary<string, object?> values = AugmentDescription.Values(record, effects.Object, declared.Object);
+
+            Assert.AreEqual(0.15f, values["value"], "a declaration overruled the effect the record names itself");
+            Assert.AreEqual(new LocalizedId("Effect_Stated"), values[AbilityAugmentData.EffectPlaceholder],
+                "the card names an effect the record does not lay");
         }
 
         [TestMethod]
@@ -151,8 +271,28 @@ namespace LastBreathTest.BattleSystemTests
             }
         }
 
-        private static List<AbilityAugmentData> Behaviours(IAbilityAugmentCatalog catalog) =>
-            [.. catalog.All.Where(record => !string.IsNullOrWhiteSpace(record.Behaviour))];
+        /// <summary>The shipped data into a composed container, through the loader the game runs. The
+        /// participants are named one by one rather than taken whole: the container holds several a
+        /// project fills in, and a card's mint needs neither of them.</summary>
+        private static void LoadShippedInto(ServiceProvider container)
+        {
+            var service = new GameDataService(
+                new FileSystemDataSource(SharedData.Root()),
+                [container.GetRequiredService<AbilityAugmentCatalog>(), container.GetRequiredService<EffectProvider>()]);
+            List<string> failures = [];
+            service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
+
+            service.LoadAll();
+
+            Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
+        }
+
+        /// <summary>The mint the game composes: the records, the canon behind them, and whoever answers
+        /// for the records whose effect is named in code. The last is optional there and here.</summary>
+        private static IAugmentItemMinter Minter(
+            IAbilityAugmentCatalog catalog, IEffectProvider effects, IAugmentLaidEffects? laid = null) =>
+            new AugmentItemMinter(
+                catalog, new AugmentMinter(catalog, new DefaultRandomNumberGenerator(7)), () => effects, () => laid);
 
         private static AbilityAugmentData Record(IAbilityAugmentCatalog catalog, string augmentId)
         {
@@ -161,10 +301,10 @@ namespace LastBreathTest.BattleSystemTests
             return record;
         }
 
-        private static string Card(IAbilityAugmentCatalog catalog, IEffectProvider effects, string augmentId)
+        private static string Card(
+            IAbilityAugmentCatalog catalog, IEffectProvider effects, string augmentId, IAugmentLaidEffects? laid = null)
         {
-            IAugmentItem? item = new AugmentItemMinter(
-                catalog, new AugmentMinter(catalog, new DefaultRandomNumberGenerator(7)), () => effects).Mint(augmentId);
+            IAugmentItem? item = Minter(catalog, effects, laid).Mint(augmentId);
             Assert.IsNotNull(item, $"the minter builds no copy of '{augmentId}'");
             return item.Description;
         }

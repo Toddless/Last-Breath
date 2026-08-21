@@ -1934,13 +1934,13 @@ msgid "Augment_Reduce_Cooldown"
 msgstr "Снижение перезарядки"
 
 msgid "Augment_Reduce_Cooldown_Description"
-msgstr "-{cooldownShare:%} к перезарядке."
+msgstr "-{cooldownTurns|turn|turns} к перезарядке."
 
 msgid "Augment_Reduce_Cooldown_Add_Cost"
 msgstr ""
 
 msgid "Augment_Reduce_Cooldown_Add_Cost_Description"
-msgstr "-{cooldownShare:%} к перезарядке, но +{costShare:%} к стоимости."
+msgstr "-{cooldownTurns|turn|turns} к перезарядке, но +{costShare:%} к стоимости."
 
 msgid "Augment_Cost_Type_Health"
 msgstr ""
@@ -2292,13 +2292,13 @@ msgid "Augment_Berserk_Fury_Burning"
 msgstr ""
 
 msgid "Augment_Berserk_Fury_Burning_Description"
-msgstr "{@Effect_Fury} → {@Effect_Burning_Fury}: сожжённое HP также наносит урон ({burningDuration|turn|turns}, до {burningMaxStacks|stack|stacks})."
+msgstr "{@Effect_Fury} → {@Effect_Burning_Fury}: сожжённое HP также наносит урон ({burningDuration|turn|turns})."
 
 msgid "Augment_Berserk_Fury_Primal"
 msgstr ""
 
 msgid "Augment_Berserk_Fury_Primal_Description"
-msgstr "{@Effect_Fury} → Первобытная ярость (×{damageMultiplier} урона)."
+msgstr "{@Effect_Fury} → Первобытная ярость (+{damageMultiplier:%} урона)."
 
 msgid "Augment_Berserk_Fury_Healing"
 msgstr ""

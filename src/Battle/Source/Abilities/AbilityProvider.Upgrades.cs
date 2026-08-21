@@ -35,7 +35,23 @@
         /// LENDING a key the ability never had is the opposite direction and is not declared here: it
         /// creates the number rather than moving it, so a ledger reading it as a move would report a
         /// landing on every ability that does not have the key and is inert on all of them.</para></summary>
-        private readonly record struct AugmentFactory(string[] MovedParameters, Func<AbilityAugmentData, IAugment> Build);
+        private readonly record struct AugmentFactory(string[] MovedParameters, Func<AbilityAugmentData, IAugment> Build)
+        {
+            /// <summary>The effect the augment lays, for a factory that names one; empty for the rest.
+            /// A record naming its effect in DATA is not written here — there the record is the word, and
+            /// a second one beside it would be free to disagree.</summary>
+            public string LaidEffectId { get; private init; } = string.Empty;
+
+            /// <summary>A registration whose augment lays an effect the code names. The id is written
+            /// ONCE and serves both halves — the build receives it and the card reads it off the same
+            /// registration — so declaring one effect and laying another is not a thing that can be
+            /// written down.</summary>
+            public static AugmentFactory Laying(
+                string effectId,
+                string[] movedParameters,
+                Func<AbilityAugmentData, string, IAugment> build) =>
+                new(movedParameters, data => build(data, effectId)) { LaidEffectId = effectId };
+        }
 
         /// <summary>
         /// The augments that need code — a behaviour to install, a strategy to swap, a member of one
@@ -43,8 +59,8 @@
         /// that only moves numbers is not written here: it is a row of the parameter table
         /// (<c>AbilityProvider.ParameterAugments.cs</c>) and shares its one class with all the others.
         /// The two halves never name the same augment.
-        /// <para>Built on first use rather than in a field initializer: three of the entries reach the
-        /// effect registry for their canonical numbers, and a field initializer may not touch the
+        /// <para>Built on first use rather than in a field initializer: the entries laying an effect reach
+        /// the effect registry for its canonical numbers, and a field initializer may not touch the
         /// instance that holds it.</para>
         /// </summary>
         private Dictionary<string, AugmentFactory> AbilityUpgrades => field ??= new()
@@ -236,15 +252,15 @@
                     data.Tags,
                     data.Tier,
                     ability => new FreeCastEffect(ability.Id))),
-            ["Augment_Berserk_Fury_Burning"] = new([], data =>
+            ["Augment_Berserk_Fury_Burning"] = AugmentFactory.Laying("Effect_Burning_Fury", [], (data, effectId) =>
                 new AugmentBfFuryVariant(data.Id, data.Tags, data.Tier,
-                    (duration, healthPercent) => FuryFromCanon("Effect_Burning_Fury", duration, healthPercent))),
-            ["Augment_Berserk_Fury_Primal"] = new([], data =>
+                    (duration, healthPercent) => FuryFromCanon(effectId, duration, healthPercent))),
+            ["Augment_Berserk_Fury_Primal"] = AugmentFactory.Laying("Effect_Primal_Fury", [], (data, effectId) =>
                 new AugmentBfFuryVariant(data.Id, data.Tags, data.Tier,
-                    (duration, healthPercent) => FuryFromCanon("Effect_Primal_Fury", duration, healthPercent))),
-            ["Augment_Berserk_Fury_Healing"] = new([], data =>
+                    (duration, healthPercent) => FuryFromCanon(effectId, duration, healthPercent))),
+            ["Augment_Berserk_Fury_Healing"] = AugmentFactory.Laying("Effect_Healing_Fury", [], (data, effectId) =>
                 new AugmentBfFuryVariant(data.Id, data.Tags, data.Tier,
-                    (duration, healthPercent) => FuryFromCanon("Effect_Healing_Fury", duration, healthPercent))),
+                    (duration, healthPercent) => FuryFromCanon(effectId, duration, healthPercent))),
             ["Augment_Double_Strike_Two_Attacks_Apply_Buff"] = new([], data =>
                 new AugmentDsBothHitsBuff(
                     data.Id,
@@ -269,12 +285,12 @@
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
                         (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 1),
                         data.UpgradeProperties.GetValueOrDefault("amount", 0.05f))))),
-            ["Augment_Dark_Shroud_Immortality"] = new([], data =>
+            ["Augment_Dark_Shroud_Immortality"] = AugmentFactory.Laying("Effect_Evade_First_Death", [], (data, effectId) =>
                 new AugmentDsImmortality(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    () => EffectFromCanon("Effect_Evade_First_Death"))),
+                    () => EffectFromCanon(effectId))),
             ["Augment_Poison_Explosion_Execute_Bosses"] = new([], data =>
                 new AugmentPeExecuteBosses(
                     data.Id,
@@ -393,23 +409,21 @@
                     Costs.Barrier)),
         };
 
-        /// <summary>
-        /// A fury variant built from the canon. The two numbers the ABILITY owns are handed over — the
-        /// duration it was cast with and the share of health it burns, both of them keys an augment can
-        /// move — and everything the VARIANT is about (how much of the burned health becomes damage, how
-        /// long that damage lasts, what the primal multiplier is, what the healing gives back) comes from
-        /// <c>SharedData/Effects</c> like every other effect's balance. These three were the last records
-        /// carrying effect figures of their own: typed factories, so the gate CL-3b put on data-declared
-        /// behaviours never saw them, and their fallbacks had drifted a wave behind the design list.
-        /// <para>Without a registry composed there is nothing to read the canon from, and the plain fury
-        /// is laid instead of the variant — a sandbox answer, never a shipped one.</para>
-        /// </summary>
         /// <summary>An effect built entirely from the canon — every figure it carries is balanced in
         /// <c>SharedData/Effects</c> and the record adds none of its own. Null without a composed registry,
         /// which the riders read as "lay nothing" rather than throwing.</summary>
         private IEffect? EffectFromCanon(string effectId) =>
             _effects()?.CreateEffect(effectId, RecordProperties.Empty);
 
+        /// <summary>
+        /// A fury variant built from the canon. The two numbers the ABILITY owns are handed over — the
+        /// duration it was cast with and the share of health it burns, both of them keys an augment can
+        /// move — and everything the VARIANT is about (how much of the burned health becomes damage, how
+        /// long that damage lasts, what the primal multiplier is, what the healing gives back) comes from
+        /// <c>SharedData/Effects</c> like every other effect's balance.
+        /// <para>Without a registry composed there is nothing to read the canon from, and the plain fury
+        /// is laid instead of the variant — a sandbox answer, never a shipped one.</para>
+        /// </summary>
         private IEffect FuryFromCanon(string effectId, int duration, float healthPercent)
         {
             var owned = new Dictionary<string, float>(StringComparer.Ordinal)

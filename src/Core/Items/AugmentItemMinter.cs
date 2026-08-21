@@ -38,20 +38,29 @@ namespace Core.Items
     /// <param name="effects">Where the numbers of the effect a copy lays are balanced — the other half
     /// of what its card prints. Lazy and optional for the same reason the ability registry takes it
     /// that way: a composition without an effect registry still mints every augment there is.</param>
+    /// <param name="laid">Who says WHICH effect a record lays where the record itself does not — the
+    /// augments a typed factory builds. Lazy and optional like the registry above, and for the same
+    /// reason: the factories live in the battle module and the bag is composed without it.</param>
     public sealed class AugmentItemMinter(
         IAbilityAugmentCatalog augments,
         AugmentMinter minter,
-        Func<IEffectProvider?>? effects = null) : IAugmentItemMinter
+        Func<IEffectProvider?>? effects = null,
+        Func<IAugmentLaidEffects?>? laid = null) : IAugmentItemMinter
     {
         private readonly Func<IEffectProvider?> _effects = effects ?? (static () => null);
 
+        private readonly Func<IAugmentLaidEffects?> _laid = laid ?? (static () => null);
+
         public IAugmentItem? Mint(string augmentId, Rarity? rarity = null) =>
             augments.Find(augmentId) is { } record
-                ? new AugmentItem(rarity is { } decided ? minter.Mint(record, decided) : minter.Mint(record), record, _effects())
+                ? new AugmentItem(
+                    rarity is { } decided ? minter.Mint(record, decided) : minter.Mint(record), record, _effects(), _laid())
                 : null;
 
         public IAugmentItem? Restore(AugmentInstance augment) =>
-            augments.Find(augment.AugmentId) is { } record ? new AugmentItem(augment, record, _effects()) : null;
+            augments.Find(augment.AugmentId) is { } record
+                ? new AugmentItem(augment, record, _effects(), _laid())
+                : null;
 
         public AugmentInstance? Remembered(string augmentId, IReadOnlyDictionary<string, float> values, Rarity? rarity, string effectId = "") =>
             augments.Find(augmentId) is { } record

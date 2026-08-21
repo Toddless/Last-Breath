@@ -39,6 +39,8 @@ namespace Core.Items
 
         private readonly IEffectProvider? _effects;
 
+        private readonly IAugmentLaidEffects? _laid;
+
         /// <summary>The one word the bag knows every augment by, whatever the augment is about. The
         /// record's own tags describe what it improves and are read off the record where that
         /// question is asked; carrying them here as well would leave an augment's tags written in two
@@ -54,12 +56,19 @@ namespace Core.Items
         /// copy's dictionary to print — which for such a record is empty.</param>
         /// <param name="effects">Where the numbers of the laid effect are balanced. Absent — a host with
         /// no effect registry — the line prints what the copy alone knows, placeholders and all.</param>
-        public AugmentItem(AugmentInstance augment, AbilityAugmentData? record = null, IEffectProvider? effects = null)
+        /// <param name="laid">Who answers WHICH effect a record lays when the record does not name one —
+        /// the augments built by a factory. Absent, such a card is printed as a card that lays nothing.</param>
+        public AugmentItem(
+            AugmentInstance augment,
+            AbilityAugmentData? record = null,
+            IEffectProvider? effects = null,
+            IAugmentLaidEffects? laid = null)
         {
             Augment = augment;
             Rarity = augment.Rarity;
             _record = record;
             _effects = effects;
+            _laid = laid;
         }
 
         public AugmentInstance Augment { get; }
@@ -106,14 +115,17 @@ namespace Core.Items
 
         /// <summary>Another passage for the same copy: the numbers are shared because they are frozen,
         /// the identity is not — a copy handed on is still a separate thing in the bag.</summary>
-        public T Copy<T>() => (T)(object)new AugmentItem(Augment, _record, _effects);
+        public T Copy<T>() => (T)(object)new AugmentItem(Augment, _record, _effects, _laid);
 
         /// <summary>The copy's numbers as the card prints them, assembled where every surface assembles
-        /// them. A copy nobody can name — no record behind it — prints its own dictionary and nothing
-        /// else: the effect it lays is unknown, so there is no canon to reach for.</summary>
+        /// them. A copy nobody can name — no record behind it — still asks what its id lays, because a
+        /// factory answers for an id whether or not the catalog is at hand.</summary>
         private Dictionary<string, object?> Printed() =>
             _record is { } record
-                ? AugmentDescription.Values(Augment.Applied(record), _effects)
-                : AugmentDescription.Values(Augment.Values, Augment.EffectId, _effects);
+                ? AugmentDescription.Values(Augment.Applied(record), _effects, _laid)
+                : AugmentDescription.Values(
+                    Augment.Values,
+                    AugmentDescription.LaidEffect(Augment.AugmentId, Augment.EffectId, _laid),
+                    _effects);
     }
 }

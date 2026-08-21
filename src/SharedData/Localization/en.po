@@ -2581,13 +2581,13 @@ msgid "Augment_Reduce_Cooldown"
 msgstr "Reduce Cooldown"
 
 msgid "Augment_Reduce_Cooldown_Description"
-msgstr "-{cooldownShare:%} cooldown."
+msgstr "-{cooldownTurns|turn|turns} cooldown."
 
 msgid "Augment_Reduce_Cooldown_Add_Cost"
 msgstr "Reduce Cooldown Add Cost"
 
 msgid "Augment_Reduce_Cooldown_Add_Cost_Description"
-msgstr "-{cooldownShare:%} cooldown, but +{costShare:%} cost."
+msgstr "-{cooldownTurns|turn|turns} cooldown, but +{costShare:%} cost."
 
 msgid "Augment_Cost_Type_Health"
 msgstr "Cost Type Health"
@@ -2987,13 +2987,13 @@ msgid "Augment_Berserk_Fury_Burning"
 msgstr "Burning Fury"
 
 msgid "Augment_Berserk_Fury_Burning_Description"
-msgstr "{@Effect_Fury} becomes {@Effect_Burning_Fury}: the burned health also deals damage ({burningDuration|turn|turns}, up to {burningMaxStacks|stack|stacks})."
+msgstr "{@Effect_Fury} becomes {@Effect_Burning_Fury}: the burned health also deals damage ({burningDuration|turn|turns})."
 
 msgid "Augment_Berserk_Fury_Primal"
 msgstr "Primal Fury"
 
 msgid "Augment_Berserk_Fury_Primal_Description"
-msgstr "{@Effect_Fury} becomes Primal Fury (×{damageMultiplier} damage)."
+msgstr "{@Effect_Fury} becomes Primal Fury (+{damageMultiplier:%} damage)."
 
 msgid "Augment_Berserk_Fury_Healing"
 msgstr "Healing Fury"
