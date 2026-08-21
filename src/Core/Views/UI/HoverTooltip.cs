@@ -7,6 +7,8 @@ namespace Core.Views.UI
     /// Wires a hover tooltip to a source control: the popup appears after a short delay, lives
     /// while the pointer stays on the source and dies when it leaves. An Alt-pinned tooltip
     /// survives leaving the source (ShowPopup's same-type replacement and Esc still clear it).
+    /// Nothing opens while a drag is in the air — a card standing over the thing being dragged, or over
+    /// the target it is aimed at, is in the way of the gesture rather than an answer to it.
     /// </summary>
     public static class HoverTooltip
     {
@@ -89,6 +91,11 @@ namespace Core.Views.UI
 
                 if (generation != _generation) return;
                 if (!GodotObject.IsInstanceValid(_host) || !_host.IsInsideTree()) return;
+
+                // A drag in the air outranks every card: the engine hides its own tooltips then, and these
+                // are not the engine's. One reading of that rule for the whole game — a surface guarding
+                // its own would be the one surface that forgot to.
+                if (_host.GetViewport()?.GuiIsDragging() == true) return;
 
                 _current = _show(key);
             }

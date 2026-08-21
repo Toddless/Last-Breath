@@ -27,6 +27,9 @@ namespace Battle.Source.RequestHandlers
     /// <param name="minter">Turns a seated copy back into the thing it would be in the bag, which is
     /// where a cell's name, description and rarity come from. Asked rather than reproduced: the player
     /// must read the same augment in the slot as he read in his bag.</param>
+    /// <param name="augments">Where the tier of a seated copy comes from — the record's, read out of the
+    /// same catalog the tray reads it out of, because an augment's tier is one number however the player
+    /// happens to be looking at it. Optional: a composition supplying no records prints no tier.</param>
     /// <param name="art">Where a picture comes from. Injectable because loading one is an engine call,
     /// and a host without the engine (a walk over the sheet's composition) must be able to ask for the
     /// rows without one.</param>
@@ -35,6 +38,7 @@ namespace Battle.Source.RequestHandlers
         IPlayerAccessor players,
         IAbilityProvider abilities,
         IAugmentItemMinter minter,
+        IAbilityAugmentCatalog? augments = null,
         Func<string, Texture2D?>? art = null)
         : IRequestHandler<GetAbilitySocketRowsRequest, IReadOnlyList<AbilitySocketRowView>>
     {
@@ -126,7 +130,7 @@ namespace Battle.Source.RequestHandlers
         {
             if (socket.Augment is not { } augment)
                 return new AugmentCellView(
-                    socket.Address, AugmentCellKind.Empty, socket.Tier,
+                    socket.Address, AugmentCellKind.Empty, socket.Tier, 0,
                     string.Empty, string.Empty, string.Empty, null, Rarity.Common, AugmentActivity.Working);
 
             IAugmentItem? carried = minter.Restore(augment);
@@ -134,6 +138,7 @@ namespace Battle.Source.RequestHandlers
                 socket.Address,
                 socket.IsOpen ? AugmentCellKind.Filled : AugmentCellKind.Held,
                 socket.Tier,
+                augments?.Find(augment.AugmentId)?.Tier ?? 0,
                 augment.AugmentId,
                 carried?.DisplayName ?? Localization.Localize(augment.AugmentId),
                 carried?.Description ?? string.Empty,

@@ -102,6 +102,25 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public async Task ACellCarriesBothTiers_TheSlotsAndTheAugmentsOwn()
+        {
+            // The cell shows the SLOT's tier and the card of what is in it shows the AUGMENT's, so the
+            // sheet has to hand over both. Read out of the catalog the tray reads it out of: an augment's
+            // tier is one number however the player happens to be looking at it.
+            var bench = new Bench();
+            bench.Own(OwnedAbility);
+            bench.Open(UnlockNode, OwnedAbility, tier: 1);
+            bench.Open(SocketNode, OwnedAbility, tier: 3);
+            bench.Seat(SocketNode, OwnedAbility, tier: 3);
+
+            AbilitySocketRowView row = (await bench.Rows()).Single();
+
+            Assert.AreEqual(0, row.Cells[0].AugmentTier, "an empty slot named a tier of an augment it does not hold");
+            Assert.AreEqual(3, row.Cells[1].Tier, "the cell lost the tier of the slot");
+            Assert.AreEqual(2, row.Cells[1].AugmentTier, "the cell reports the tier of the slot instead of the tier of the augment");
+        }
+
+        [TestMethod]
         public async Task ARowKeepsItsPlaceWhileASlotStillHoldsSomethingAfterTheAbilityIsGone()
         {
             // Decision 7 of the screen, and the reason it cannot be a filter over the book: the player
@@ -216,7 +235,7 @@ namespace LastBreathTest.BattleSystemTests
                     _catalog, new DefaultRandomNumberGenerator(Seed)));
                 IPlayerAccessor players = AccessorFor(_book);
                 Gate = new AugmentInstallGate(Board, new Mock<IAbilityAugmentBinder>().Object, Bag);
-                Handler = new AbilitySocketRowsRequestHandler(Board, players, _abilities, _minter, _ => null);
+                Handler = new AbilitySocketRowsRequestHandler(Board, players, _abilities, _minter, _catalog, _ => null);
             }
 
             internal AbilitySocketBoard Board { get; }

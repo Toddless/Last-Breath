@@ -47,6 +47,10 @@ namespace Battle.Source.UIElements
     /// a filled slot does nothing rather than something clever — the slot is taken, and the way to
     /// change what is in it is to empty it first.
     /// </para>
+    /// <para>
+    /// Hovering a slot that holds something shows its card. An empty one shows none: what could go into
+    /// it is what the left button asks, and the answer to that is a list rather than a card.
+    /// </para>
     /// </summary>
     [GlobalClass]
     public partial class AugmentCell : PanelContainer
@@ -64,12 +68,26 @@ namespace Battle.Source.UIElements
         [Export] private Control? _highlight;
 
         private IAugmentCellHost? _host;
+        private IUiElementsManager? _windows;
         private AugmentCellView? _view;
         private StyleBox? _emptyStyle;
 
-        public override void _Ready() => _emptyStyle = GetThemeStylebox("panel");
+        /// <summary>The card of whatever is in the slot appears on hover and dies with the cell — a cell
+        /// is rebuilt whenever the board moves, and a tooltip outliving the thing it describes would go on
+        /// naming an augment that has been taken out.</summary>
+        public override void _Ready()
+        {
+            _emptyStyle = GetThemeStylebox("panel");
+            HoverTooltip.Attach(this, ShowTooltip);
+        }
 
-        public void Bind(IAugmentCellHost host) => _host = host;
+        /// <param name="windows">Where the hover card is opened. Optional: a composition without one
+        /// seats augments and shows no cards, which is what the sandbox does.</param>
+        public void Bind(IAugmentCellHost host, IUiElementsManager? windows)
+        {
+            _host = host;
+            _windows = windows;
+        }
 
         public void SetView(AugmentCellView view)
         {
@@ -155,6 +173,19 @@ namespace Battle.Source.UIElements
 
         public static PackedScene? Initialize() =>
             string.IsNullOrEmpty(UID) ? null : ResourceLoader.Load<PackedScene>(UID);
+
+        /// <summary>What is in the slot, worded by the one place that words an augment — the same card
+        /// the tray shows for the same copy and the picker showed before it was seated. An empty slot has
+        /// no card: what could go in it is what a click asks, and the answer to that is a list.</summary>
+        private IPopup? ShowTooltip()
+        {
+            if (_view == null || _windows == null || _view.Kind == AugmentCellKind.Empty) return null;
+            if (_windows.ShowPopup(typeof(TextTooltipPopup)) is not TextTooltipPopup popup) return null;
+
+            AugmentCard card = AugmentText.Card(_view);
+            popup.Show(card.Name, card.TierLine, card.Description, card.RarityColor);
+            return popup;
+        }
 
         /// <summary>A filled cell borrows the augment's rarity for its frame; a remove-only one is
         /// dimmed on top of that, and an empty one falls back to the scene's neutral stylebox.</summary>

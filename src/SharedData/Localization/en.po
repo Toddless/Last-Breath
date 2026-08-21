@@ -4078,6 +4078,12 @@ msgstr "Augments that fit"
 msgid "UI_Augment_Pick_Nothing"
 msgstr "You carry nothing this slot would take"
 
+msgid "UI_Augment_Dormant"
+msgstr "Asleep: everything it gives is already given, stronger, elsewhere on this ability — and its cost and cooldown are still charged in full"
+
+msgid "UI_Augment_Partly"
+msgstr "Partly asleep: some of what it gives is already given, stronger, elsewhere on this ability — and its cost and cooldown are still charged in full"
+
 msgid "Npc_Ronald"
 msgstr "Ronald the Smith"
 

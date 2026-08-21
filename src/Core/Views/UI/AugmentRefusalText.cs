@@ -22,7 +22,13 @@ namespace Core.Views.UI
         public static string KeyFor(AugmentInstallResult result) =>
             result.Outcome == AugmentInstallOutcome.DoesNotFit
                 ? $"{InstallPrefix}{result.Fit?.ToString() ?? "UnknownRecord"}"
-                : $"{InstallPrefix}{result.Outcome}";
+                : KeyFor(result.Outcome);
+
+        /// <summary>The same wording named rather than answered, for the screens that state a slot's
+        /// standing before anything is dropped on it — the card of a slot that can only be emptied says
+        /// what the gate would say to a drop on it. Named out of this table and not beside it: two
+        /// wordings of one fact are how they drift apart.</summary>
+        public static string KeyFor(AugmentInstallOutcome outcome) => $"{InstallPrefix}{outcome}";
 
         /// <summary>The same for the way back out. Its own prefix rather than a shared one: an
         /// extraction fails for reasons an install has no word for — the bag is full — and one table of

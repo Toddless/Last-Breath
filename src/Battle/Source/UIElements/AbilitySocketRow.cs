@@ -76,7 +76,7 @@ namespace Battle.Source.UIElements
             {
                 var node = _cellScene.Instantiate<AugmentCell>();
                 _cells.AddChild(node);
-                node.Bind(_host);
+                node.Bind(_host, _windows);
                 node.SetView(cell);
                 _cellNodes.Add(node);
             }

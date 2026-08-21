@@ -38,9 +38,18 @@ namespace Battle.Source.UIElements
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(ScenePath);
 
-        public void Show(string title, string? info, string descriptionBbcode)
+        /// <param name="titleColor">What the title is painted in, for the cards whose title carries a
+        /// meaning of its own — an augment's rarity. Left out, the title is not touched at all and keeps
+        /// exactly the look the scene gave it, which is what every caller that has nothing to say with
+        /// the colour wants.</param>
+        public void Show(string title, string? info, string descriptionBbcode, Color? titleColor = null)
         {
-            _title?.Text = title;
+            if (_title != null)
+            {
+                _title.Text = title;
+                Paint(_title, titleColor);
+            }
+
             if (_info != null)
             {
                 _info.Text = info ?? string.Empty;
@@ -48,6 +57,32 @@ namespace Battle.Source.UIElements
             }
 
             _description?.Text = descriptionBbcode;
+        }
+
+        /// <summary>
+        /// Puts the colour where the label actually reads one from. A label carrying LabelSettings takes
+        /// its colour from that resource and ignores the theme entirely, so a theme override on this one
+        /// would be written and never drawn.
+        /// <para>The settings in the scene are ONE object shared by every instance of it: painting it
+        /// would repaint every tooltip in the process, so the popup copies it first and wears the copy.
+        /// A caller naming no colour is left alone — no copy, no allocation, and a title that looks
+        /// exactly as it shipped. There is no colour to clear on the way in either: a popup is a fresh
+        /// instance shown once, so what it starts with IS what the scene shipped.</para>
+        /// </summary>
+        private static void Paint(Label title, Color? color)
+        {
+            if (color == null) return;
+
+            if (title.LabelSettings is not { } shared)
+            {
+                // No settings resource: the theme is what the label reads, and an override reaches it.
+                title.AddThemeColorOverride("font_color", color.Value);
+                return;
+            }
+
+            var own = (LabelSettings)shared.Duplicate();
+            own.FontColor = color.Value;
+            title.LabelSettings = own;
         }
     }
 }

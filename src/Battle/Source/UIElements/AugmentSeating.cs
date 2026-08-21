@@ -67,24 +67,18 @@ namespace Battle.Source.UIElements
 
         public void ShowReason(string text) => showReason(text);
 
-        /// <summary>The tier line of a picker row, the same one the tray's tooltip prints.</summary>
-        private static string TierOf(AugmentTrayTileView candidate) =>
-            Localization.Render(AugmentText.Tier,
-                new Dictionary<string, object?> { [AugmentText.TierValue] = candidate.Tier });
-
         /// <summary>The rows as the picker draws them: the copy's own name in its rarity's colour, and
-        /// its tier and what it does under the pointer. The list arrives in the order the gate offered
-        /// it and is not touched — a window that re-sorted would be answering a question the domain has
+        /// its tier and what it does under the pointer — the same card the tray shows and the same one
+        /// the slot will show once the copy is in it. The list arrives in the order the gate offered it
+        /// and is not touched — a window that re-sorted would be answering a question the domain has
         /// already answered.</summary>
         private static IReadOnlyList<PickerEntry> Rows(IReadOnlyList<AugmentTrayTileView> candidates) =>
         [
-            .. candidates.Select(candidate => new PickerEntry(
-                candidate.InstanceId,
-                candidate.DisplayName,
-                candidate.Icon,
-                $"{TierOf(candidate)}\n{candidate.Description}",
-                Color.FromHtml(TextPalette.RarityColor(candidate.Rarity))))
+            .. candidates.Select(candidate => Row(candidate, AugmentText.Card(candidate)))
         ];
+
+        private static PickerEntry Row(AugmentTrayTileView candidate, AugmentCard card) =>
+            new(candidate.InstanceId, card.Name, candidate.Icon, card.Body, card.RarityColor);
 
         /// <summary>
         /// Shows what the bag holds for that slot and seats whatever is chosen. WHICH copies those are

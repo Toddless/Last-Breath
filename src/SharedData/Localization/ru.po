@@ -3517,6 +3517,12 @@ msgstr ""
 msgid "UI_Augment_Pick_Nothing"
 msgstr ""
 
+msgid "UI_Augment_Dormant"
+msgstr ""
+
+msgid "UI_Augment_Partly"
+msgstr ""
+
 msgid "Npc_Ronald"
 msgstr ""
 

@@ -1,6 +1,5 @@
 namespace Battle.Source.UIElements
 {
-    using System.Collections.Generic;
     using Core.Inventory;
     using Core.Localization;
     using Core.Views;
@@ -72,9 +71,8 @@ namespace Battle.Source.UIElements
             if (_view == null || _windows == null) return null;
             if (_windows.ShowPopup(typeof(TextTooltipPopup)) is not TextTooltipPopup popup) return null;
 
-            string info = Localization.Render(AugmentText.Tier,
-                new Dictionary<string, object?> { [AugmentText.TierValue] = _view.Tier });
-            popup.Show(_view.DisplayName, info, _view.Description);
+            AugmentCard card = AugmentText.Card(_view);
+            popup.Show(card.Name, card.TierLine, card.Description, card.RarityColor);
             return popup;
         }
 

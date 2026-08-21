@@ -30,6 +30,11 @@ namespace Core.Views
     /// <param name="Tier">The tier the SLOT takes, not the one the augment is written at: the player
     /// looks at the slot, and it is the slot a refusal about tiers is about. Repeats are legal — an
     /// ornament is a second node of the same tier on one ability.</param>
+    /// <param name="AugmentTier">The tier the AUGMENT is written at — what its card says, and what it
+    /// said in the bag. Never the slot's: a tier-one copy dropped into a tier-three socket is still a
+    /// tier-one copy, and a card borrowing the slot's number would make the same augment read one way in
+    /// the bag and another in the socket. Zero while the cell is empty, and zero for a record the catalog
+    /// no longer declares.</param>
     /// <param name="AugmentId">The record in the cell; empty while the cell is.</param>
     /// <param name="DisplayName">The copy's name; empty while the cell is.</param>
     /// <param name="Description">What THIS copy does, in the numbers it rolled.</param>
@@ -41,6 +46,7 @@ namespace Core.Views
         string SocketAddress,
         AugmentCellKind Kind,
         int Tier,
+        int AugmentTier,
         string AugmentId,
         string DisplayName,
         string Description,
