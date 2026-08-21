@@ -13,6 +13,7 @@ namespace Core.Session
     using Narrative.Influence;
     using Narrative.Quests;
     using PassiveTree.Allocation;
+    using PassiveTree.View;
     using Reputation;
     using Save;
     using Services;
@@ -53,6 +54,7 @@ namespace Core.Session
                 Add<INpcPopulationService>();
                 Add<INpcSkirmishService>(); // ghost skirmishes must not outlive the scene's NPCs
                 Add<IUiContextService>();
+                Add<PassiveWheelViewMemory>(); // a new playthrough opens the wheel on the whole tree
                 return session;
 
                 void Add<T>()

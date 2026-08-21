@@ -3843,9 +3843,6 @@ msgstr "No points granted yet"
 msgid "UI_PassiveTree_AugmentsWaiting"
 msgstr "{count} augments waiting in closed slots"
 
-msgid "UI_PassiveTree_Cost_Path"
-msgstr "The whole way here costs {points|point|points}"
-
 msgid "UI_PassiveTree_Apply_Take"
 msgstr "Take {count} · {points} pts"
 

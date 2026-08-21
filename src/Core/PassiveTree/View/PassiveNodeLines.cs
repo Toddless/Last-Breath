@@ -19,12 +19,8 @@ namespace Core.PassiveTree.View
     /// </summary>
     public static class PassiveNodeLines
     {
-        /// <summary>Minimum route length before its price is worth printing beside the node — every node
-        /// costs a point, so a neighbour's price just repeats that; from two steps on it's a property of
-        /// the distance, which is what a plan is actually made with.</summary>
-        public const int ShortestPricedRoute = 2;
-
-        /// <summary>Wraps the condition after the sentence it gates: "…  (WhileWounded)".</summary>
+        /// <summary>The shape a gated line falls back to with no catalog behind it — the parts, the way
+        /// the rest of this class falls back to them. The wording of a gate is the catalog's.</summary>
         private const string ConditionTemplate = "{0}  ({1})";
 
         /// <summary>Every line of the node, parametric ones first and pipeline knobs after, in authored
@@ -47,10 +43,6 @@ namespace Core.PassiveTree.View
             return lines;
         }
 
-        /// <summary>Whether a route of this many steps is worth quoting a price — see
-        /// <see cref="ShortestPricedRoute"/>. Unreachable nodes price at nothing and say nothing.</summary>
-        public static bool PricesTheRoute(int steps) => steps >= ShortestPricedRoute;
-
         /// <summary>The node's headline: its title, or what it is about when it was never titled.</summary>
         public static string TitleOf(PassiveNode node, ILocalizationProvider? localization)
         {
@@ -66,7 +58,7 @@ namespace Core.PassiveTree.View
                 ? $"{line.Parameter} {line.ValueType} {line.Value}"
                 : formatter.Format(new SimpleModifier(line.Parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource), format);
 
-            return WithCondition(text, line.Condition, line.IsConditional, localization);
+            return WithCondition(text, line.Condition, line.IsConditional, localization, format);
         }
 
         /// <summary>The knob entry exists for the sentence and nothing else — it is never attached to
@@ -77,11 +69,21 @@ namespace Core.PassiveTree.View
                 ? $"{line.Parameter} {line.ValueType} {line.Value}"
                 : formatter.Format(new ContextModifierEntry(line.Parameter, line.ValueType, line.Value), format);
 
-            return WithCondition(text, line.Condition, line.IsConditional, localization);
+            return WithCondition(text, line.Condition, line.IsConditional, localization, format);
         }
 
-        private static string WithCondition(string text, string condition, bool conditional, ILocalizationProvider? localization) =>
-            conditional ? string.Format(ConditionTemplate, text, Translate(localization, condition)) : text;
+        /// <summary>The gate, joined to the sentence it holds up through the game's ONE reading of a
+        /// conditional line: the clause is worded under the condition's own catalog key, so a passive
+        /// announces a gate in the same words an item does instead of printing the raw id.</summary>
+        private static string WithCondition(
+            string text, string condition, bool conditional, ILocalizationProvider? localization, TextFormat format)
+        {
+            if (!conditional) return text;
+
+            return localization is null
+                ? string.Format(ConditionTemplate, text, condition)
+                : ConditionalLineText.Join(localization, text, condition, format);
+        }
 
         private static string Translate(ILocalizationProvider? localization, string key) =>
             localization is null ? key : localization.Translate(key);

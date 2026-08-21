@@ -135,6 +135,15 @@ namespace Core.PassiveTree.View
             CenterOn((minX + maxX) * 0.5f, (minY + maxY) * 0.5f, viewWidth, viewHeight);
         }
 
+        /// <summary>Puts a view back where it was read from, zoom and pan together. The zoom passes the
+        /// same bounds a wheel click does, so a stored value can never open the tree at a scale the
+        /// controls cannot reach; the spread is left alone, being the document's and not the reader's.</summary>
+        public void Restore(float zoom, float panX, float panY)
+        {
+            _zoom = Clamp(zoom, MinZoom, MaxZoom);
+            SetPan(panX, panY);
+        }
+
         /// <summary>Resets zoom to 1, keeping spread for the same reason as <see cref="Fit"/>.</summary>
         public void ResetZoom(float viewWidth, float viewHeight)
         {

@@ -31,7 +31,6 @@ namespace Battle.Source.UIElements.PassiveWheel
         public const string Close = "UI_PassiveTree_Close";
 
         // What the hint line says about the last gesture.
-        public const string PathCost = "UI_PassiveTree_Cost_Path";
         public const string ModeCleared = "UI_PassiveTree_ModeCleared";
         public const string RefundNeedsButton = "UI_PassiveTree_RefundNeedsButton";
         public const string UnmarkedAlso = "UI_PassiveTree_UnmarkedAlso";

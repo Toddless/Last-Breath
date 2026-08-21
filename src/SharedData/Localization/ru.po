@@ -3286,9 +3286,6 @@ msgstr ""
 msgid "UI_PassiveTree_AugmentsWaiting"
 msgstr ""
 
-msgid "UI_PassiveTree_Cost_Path"
-msgstr "Вся дорога сюда — {points|point|points}"
-
 msgid "UI_PassiveTree_Apply_Take"
 msgstr ""
 

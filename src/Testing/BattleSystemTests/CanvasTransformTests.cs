@@ -1,6 +1,9 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Core.PassiveTree.View;
+    using Core.Save;
+    using Core.Session;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// The arithmetic behind every click that has to hit what the eye aimed at. It moved out of the
@@ -145,6 +148,84 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(height * 0.5f, view.ScreenY(0f), Tolerance);
             Assert.IsTrue(view.ScreenX(-400f) >= 0f && view.ScreenX(400f) <= width, "the box does not fit across");
             Assert.IsTrue(view.ScreenY(-300f) >= 0f && view.ScreenY(300f) <= height, "the box does not fit down");
+        }
+
+        /// <summary>Coming back to a wheel that was closed looking at one corner of the tree. The view
+        /// comes back whole — the same frame the picker and the GPU were both reading — and a stored zoom
+        /// still passes the bounds a wheel click passes, so no remembered value can open the tree at a
+        /// scale the controls cannot reach. The spread stays the document's.</summary>
+        [TestMethod]
+        public void RestoringAView_GivesBackTheSameFrame_AndClampsTheZoomItWasHanded()
+        {
+            var left = new CanvasTransform();
+            left.SetSpread(2f, 0f, 0f);
+            left.ZoomBy(2f, 400f, 300f);
+            left.MovePan(-120f, 45f);
+            CanvasFrame frame = left.Frame();
+
+            var reopened = new CanvasTransform();
+            reopened.SetSpread(2f, 0f, 0f);
+            reopened.Restore(left.Zoom, left.PanX, left.PanY);
+
+            Assert.AreEqual(frame.X, reopened.Frame().X, Tolerance);
+            Assert.AreEqual(frame.Y, reopened.Frame().Y, Tolerance);
+            Assert.AreEqual(frame.Scale, reopened.Frame().Scale, Tolerance, "the wheel reopened at a different scale than it was left at");
+
+            reopened.Restore(CanvasTransform.MaxZoom * 10f, 0f, 0f);
+            Assert.AreEqual(CanvasTransform.MaxZoom, reopened.Zoom, Tolerance);
+
+            reopened.Restore(0f, 0f, 0f);
+            Assert.AreEqual(CanvasTransform.MinZoom, reopened.Zoom, Tolerance);
+            Assert.AreEqual(2f, reopened.Spread, Tolerance, "a restored view overruled the layout its document was authored at");
+        }
+
+        /// <summary>Where the wheel was left, kept outside the window that was closed. Empty until
+        /// somebody leaves something in it — an empty one is what makes a first open fit the whole
+        /// tree.</summary>
+        [TestMethod]
+        public void TheWheelsMemory_IsEmptyUntilAViewIsLeftInIt_AndGivesBackWhatWasLeft()
+        {
+            var memory = new PassiveWheelViewMemory();
+            var left = new CanvasTransform();
+            left.ZoomBy(2f, 0f, 0f);
+            left.SetPan(-300f, 180f);
+
+            Assert.IsTrue(memory.IsEmpty);
+            Assert.IsFalse(memory.Restore(left), "an empty memory answered as though it held a view");
+
+            memory.Remember(left);
+            var reopened = new CanvasTransform();
+
+            Assert.IsTrue(memory.Restore(reopened), "the wheel reopened on a memory that was written to");
+            Assert.AreEqual(left.Zoom, reopened.Zoom, Tolerance);
+            Assert.AreEqual(left.PanX, reopened.PanX, Tolerance);
+            Assert.AreEqual(left.PanY, reopened.PanY, Tolerance);
+        }
+
+        /// <summary>No stand-in for the wiring: a new playthrough has to reach the memory through the
+        /// container the game builds, and the wheel has to find the very same instance there — it asks
+        /// optionally, which is a resolve that answers with nothing when the registration is missing.</summary>
+        [TestMethod]
+        public void TheSessionResetStack_ReachesTheWheelsMemory()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton<LoadScope>();
+            services.AddSingleton<PassiveWheelViewMemory>();
+            services.AddSessionReset();
+
+            ServiceProvider provider = services.BuildServiceProvider();
+            PassiveWheelViewMemory? memory = provider.GetServices<PassiveWheelViewMemory>().FirstOrDefault();
+            Assert.IsNotNull(memory, "the wheel asks the container for its memory and would be handed nothing");
+
+            var left = new CanvasTransform();
+            left.ZoomBy(2f, 0f, 0f);
+            left.SetPan(-300f, 180f);
+            memory.Remember(left);
+
+            provider.GetRequiredService<ISessionResetService>().ResetSession();
+
+            Assert.IsTrue(memory.IsEmpty, "the registered reset stack does not know about the wheel's memory");
+            Assert.IsFalse(memory.Restore(new CanvasTransform()), "a new playthrough inherited the last one's view of the wheel");
         }
 
         [TestMethod]

@@ -175,6 +175,10 @@ namespace Battle.Source.UIElements.PassiveWheel
         private ILocalizationProvider? _localization;
         private HoverTooltipHandle? _tooltip;
 
+        /// <summary>Where the wheel was left last time it was open. It lives in the container because this
+        /// node does not survive a close, and it is asked once — for the FIRST view of a window.</summary>
+        private PassiveWheelViewMemory? _memory;
+
         private PassiveTreeDraft? _draft;
         private PassiveRespecQuotes? _quotes;
         private PassiveTreeDocument? _document;
@@ -202,6 +206,10 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// besides what was asked. Said synchronously, where the player is looking.</summary>
         public event Action<string>? StatusChanged;
 
+        /// <summary>The layout has run and there is a view to fit a tree into. Everything that decides
+        /// where the wheel looks asks this and not the numbers behind it.</summary>
+        private bool HasSize => Size.X > 1f && Size.Y > 1f;
+
         public override void _Ready()
         {
             MouseFilter = MouseFilterEnum.Stop;
@@ -218,6 +226,11 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (_board != null) _board.Changed -= OnBoardChanged;
             if (_draft != null) _draft.Changed -= OnDraftChanged;
             _tooltip?.Cancel();
+
+            // Written once, where the view stops being touched: a pan is a single field assignment per
+            // mouse move and it stays that cheap. A view nothing ever framed, or one framed onto an empty
+            // document, is not one to come back to — the next open would inherit a centred nothing.
+            if (_framed && _document is { Nodes.Count: > 0 }) _memory?.Remember(_view);
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -230,6 +243,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             _modifiers = provider.Optional<ModifierFormatter>();
             _knobs = provider.Optional<ContextModifierFormatter>();
             _localization = provider.Optional<ILocalizationProvider>();
+            _memory = provider.Optional<PassiveWheelViewMemory>();
 
             if (_tree != null) _tree.AllocationChanged += OnAllocationChanged;
             if (_board != null) _board.Changed += OnBoardChanged;
@@ -266,7 +280,7 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// away from the content.</summary>
         public void FrameAll()
         {
-            if (Size.X <= 1f || Size.Y <= 1f) return;
+            if (!HasSize) return;
 
             _framed = true;
 
@@ -687,7 +701,31 @@ namespace Battle.Source.UIElements.PassiveWheel
             _socketRings?.SetVisuals(_visuals);
 
             ReconcileAllocation();
+            OpenView();
+        }
+
+        /// <summary>Where the wheel looks when it is shown. Only the FIRST view of a window comes from the
+        /// session's memory; anything later — a document swapped under a live window — is a fit of the tree
+        /// now on screen. Reached from the rebuild and from the first layout alike, because either of the
+        /// two can be the one that first has a size to measure.</summary>
+        private void OpenView()
+        {
+            if (RestoreRememberedView()) return;
+
             FrameAll();
+        }
+
+        /// <summary>Puts back the view the wheel was last closed at, and says whether there was one. Only
+        /// ever the FIRST view: after that the wheel, the drag and the Frame button are what move it.</summary>
+        private bool RestoreRememberedView()
+        {
+            if (_framed || !HasSize) return false;
+            if (_memory?.Restore(_view) != true) return false;
+
+            _framed = true;
+            ApplyTransform();
+            ApplyScale();
+            return true;
         }
 
         /// <summary>Both cursor layers are told the same things and each ignores the half that is not its
@@ -1030,9 +1068,10 @@ namespace Battle.Source.UIElements.PassiveWheel
         private void Announce(string text) => StatusChanged?.Invoke(text);
 
         /// <summary>
-        /// Everything the node says, in one popup: its name once, its class, its lines, what reaching it
-        /// would cost, what its ability's slots hold, and — while a return is being planned — how much
-        /// the click would take back and what that would cost in gold.
+        /// Everything the node says, in one popup: its name once, its class, its lines, whose slot it
+        /// opens, what its ability's slots hold, and — while a return is being planned — how much the
+        /// click would take back and what that would cost in gold. The price of the road to it is not
+        /// here: the plan's own button carries it, and the dotted route already shows its length.
         /// </summary>
         private IPopup? ShowNodeTooltip(object? key)
         {
@@ -1046,7 +1085,6 @@ namespace Battle.Source.UIElements.PassiveWheel
             foreach (PassiveNodeLine line in PassiveNodeLines.Of(node, _modifiers, _knobs, _localization, TextFormat.Rich))
                 Append(body, line.Text);
 
-            AppendCost(body, node);
             AppendOwnedSlot(body, node);
             AppendSlots(body, node);
             AppendReturn(body, node);
@@ -1055,20 +1093,6 @@ namespace Battle.Source.UIElements.PassiveWheel
                 Localization.Localize($"{PassiveWheelText.KindPrefix}{node.Kind}"), body.ToString());
 
             return popup;
-        }
-
-        /// <summary>What reaching the node would cost in points, priced from the plan so a step already
-        /// marked is not charged for twice. Said only where it says something the wheel does not — see
-        /// <see cref="PassiveNodeLines.PricesTheRoute"/>.</summary>
-        private void AppendCost(StringBuilder body, PassiveNode node)
-        {
-            if (_draft == null || _draft.Mode == DraftMode.Refund) return;
-
-            int cost = _draft.PathTo(node.Id).Count;
-            if (!PassiveNodeLines.PricesTheRoute(cost)) return;
-
-            Append(body, Localization.Render(PassiveWheelText.PathCost,
-                new Dictionary<string, object?> { [PassiveWheelText.PointsValue] = cost }));
         }
 
         /// <summary>Whose slot the node opens, for a node that opens one of its own. The ring is drawn
@@ -1179,12 +1203,12 @@ namespace Battle.Source.UIElements.PassiveWheel
         }
 
         /// <summary>The control has no size until the layout has run, and framing a tree into nothing
-        /// would leave the wheel off screen. Framed once, on the first size it actually gets.</summary>
+        /// would leave the wheel off screen. Decided once, on the first size it actually gets.</summary>
         private void OnResized()
         {
             if (_framed) return;
 
-            FrameAll();
+            OpenView();
         }
 
         /// <summary>What a point on the wheel means: the node it belongs to, and the pip of that node's

@@ -1,6 +1,7 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Core.Enums;
+    using Core.Localization;
     using Core.PassiveTree;
     using Core.PassiveTree.Allocation;
     using Core.PassiveTree.View;
@@ -30,6 +31,10 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>A class that carries a scene of its own.</summary>
         private const PassiveNodeKind Carrier = PassiveNodeKind.Notable;
+
+        /// <summary>The catalog entry that joins a line to the clause gating it. Spelled out here because
+        /// the join is what is under test — a fixture without it would word nothing at all.</summary>
+        private const string ConditionalTemplate = "Modifier_Conditional";
 
         /// <summary>The four things a node can be, and four pictures for them. Held-and-planned is owned,
         /// planned-without-being-held is a purchase, held-without-being-planned is a return.</summary>
@@ -126,16 +131,42 @@ namespace LastBreathTest.BattleSystemTests
                     $"{id} is one thing to its own scene and another to the layer that marks the field");
         }
 
-        /// <summary>What the popup prices. One point is what ANY node costs, so on a neighbour the figure
-        /// only repeats the rule of the tree; from two steps up it is the length of the road and worth
-        /// saying.</summary>
+        /// <summary>A node whose line is held up by something says so in words. The clause is worded under
+        /// the condition's own catalog key, the way every other surface with conditional lines words it, so
+        /// what the popup prints is a sentence and never the id the tree file names the gate by.</summary>
         [TestMethod]
-        public void ThePriceOfARoute_IsSaidOnlyOnceItIsAPropertyOfTheDistance()
+        public void AConditionalLine_PrintsTheCatalogsClause_AndNotTheRawConditionId()
         {
-            Assert.IsFalse(PassiveNodeLines.PricesTheRoute(0), "an unreachable node quoted a price");
-            Assert.IsFalse(PassiveNodeLines.PricesTheRoute(1), "a neighbour was told what every node costs");
-            Assert.IsTrue(PassiveNodeLines.PricesTheRoute(2));
-            Assert.IsTrue(PassiveNodeLines.PricesTheRoute(6));
+            const string condition = "Stance_Strength";
+            const string clause = "while holding the stance of force";
+
+            var provider = new FakeLocalizationProvider();
+            provider.Strings[ConditionalLineText.ClauseKey(condition)] = clause;
+            provider.Strings[ConditionalTemplate] = "{line} ({condition})";
+
+            var node = new PassiveNode { Id = First, Kind = Carrier };
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.Strength,
+                ValueType = ModifierValueType.Flat,
+                Value = 5f,
+                Condition = condition
+            });
+
+            List<PassiveNodeLine> lines = PassiveNodeLines.Of(node, null, null, provider);
+
+            Assert.AreEqual(1, lines.Count);
+            Assert.IsTrue(lines[0].IsConditional, "the line lost the mark that says something holds it up");
+            StringAssert.Contains(lines[0].Text, clause, "the node named its gate with no words at all");
+            Assert.IsFalse(lines[0].Text.Contains(condition, StringComparison.Ordinal),
+                $"the node printed the raw condition id: {lines[0].Text}");
+
+            // The wheel's popup is the rich reading, and a clause is painted apart from the sentence it
+            // gates there — the plain one above would pass on a node that never reached the rich road.
+            List<PassiveNodeLine> rich = PassiveNodeLines.Of(node, null, null, provider, TextFormat.Rich);
+
+            StringAssert.Contains(rich[0].Text, TextPalette.Colorize(clause, TextPalette.Muted),
+                $"the popup's clause arrived unpainted: {rich[0].Text}");
         }
 
         /// <summary>The window's own reading, node by node — the one a node scene is painted from.</summary>

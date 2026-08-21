@@ -16,6 +16,7 @@ namespace Core.Services
     using MessageBus;
     using MessageBus.Messages;
     using Microsoft.Extensions.DependencyInjection;
+    using PassiveTree.View;
     using Views.UI;
 
     /// <summary>
@@ -84,6 +85,9 @@ namespace Core.Services
             services.AddSingleton<IUiElementsManager, UiElementsManager>();
             services.AddSingleton<IUiContextService, UiContextService>();
             services.AddSingleton<IUIWindowPositionStorage, UiWindowPositionStorage>();
+            // Beside the window positions, and for the same reason: the wheel is a fresh instance every
+            // time it opens, so where the player left it has to be kept somewhere that outlives it.
+            services.AddSingleton<PassiveWheelViewMemory>();
             services.AddSingleton<IPlayerAccessor, PlayerAccessor>();
             services.AddSingleton<IRestRecoveryService, RestRecoveryService>();
             services.AddSingleton<ISmartPointRegistry, SmartPointRegistry>();
