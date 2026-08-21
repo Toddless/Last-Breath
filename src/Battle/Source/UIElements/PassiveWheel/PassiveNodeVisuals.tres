@@ -2,6 +2,10 @@
 
 [ext_resource type="Script" uid="uid://c5u1ydlvei3f" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisualConfig.cs" id="1_cfg"]
 [ext_resource type="Script" uid="uid://dfqia0kgwcy7e" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisualLibrary.cs" id="2_lib"]
+[ext_resource type="Texture2D" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier2Body.png" id="3_s2body"]
+[ext_resource type="Texture2D" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier2Taken.png" id="4_s2taken"]
+[ext_resource type="Texture2D" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier3Body.png" id="5_s3body"]
+[ext_resource type="Texture2D" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier3Taken.png" id="6_s3taken"]
 
 [sub_resource type="Resource" id="Hide_unlock"]
 script = ExtResource("1_cfg")
@@ -9,15 +13,19 @@ Kind = 3
 HidesAugmentMark = true
 metadata/_custom_type_script = "uid://c5u1ydlvei3f"
 
-[sub_resource type="Resource" id="Hide_socket2"]
+[sub_resource type="Resource" id="Face_socket2"]
 script = ExtResource("1_cfg")
 Kind = 4
+Body = ExtResource("3_s2body")
+BodyTaken = ExtResource("4_s2taken")
 HidesAugmentMark = true
 metadata/_custom_type_script = "uid://c5u1ydlvei3f"
 
-[sub_resource type="Resource" id="Hide_socket3"]
+[sub_resource type="Resource" id="Face_socket3"]
 script = ExtResource("1_cfg")
 Kind = 5
+Body = ExtResource("5_s3body")
+BodyTaken = ExtResource("6_s3taken")
 HidesAugmentMark = true
 metadata/_custom_type_script = "uid://c5u1ydlvei3f"
 
@@ -29,4 +37,4 @@ metadata/_custom_type_script = "uid://c5u1ydlvei3f"
 
 [resource]
 script = ExtResource("2_lib")
-Configs = Array[ExtResource("1_cfg")]([SubResource("Hide_unlock"), SubResource("Hide_socket2"), SubResource("Hide_socket3"), SubResource("Hide_start")])
+Configs = Array[ExtResource("1_cfg")]([SubResource("Hide_unlock"), SubResource("Face_socket2"), SubResource("Face_socket3"), SubResource("Hide_start")])
