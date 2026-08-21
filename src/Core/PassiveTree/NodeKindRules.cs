@@ -55,6 +55,11 @@ namespace Core.PassiveTree
         /// <summary>Whether taking the node puts the ability it names into the character's book — true
         /// for a stance's seed and its unlock nodes, both of which also bring the tier-1 slot with them.</summary>
         public static bool UnlocksAbility(PassiveNodeKind kind) => SocketTier(kind) == UnlockSocketTier;
+
+        /// <summary>Whether the node opens a slot OF ITS OWN: the socket classes out on the branches, and
+        /// not the classes that hand the ability over with its first slot already bundled in.</summary>
+        public static bool OpensOwnSlot(PassiveNodeKind kind) =>
+            SocketTier(kind) != NoSocket && !UnlocksAbility(kind);
     }
 
     /// <param name="MinModifiers">Fewer lines than this is a content error, reported but not blocked.</param>

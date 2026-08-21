@@ -79,11 +79,10 @@ namespace Core.PassiveTree.View
 
             foreach (PassiveNode node in document.Nodes)
             {
-                int tier = NodeKindRules.SocketTier(node.Kind);
-                if (tier == NodeKindRules.NoSocket || tier == NodeKindRules.UnlockSocketTier) continue;
+                if (!NodeKindRules.OpensOwnSlot(node.Kind)) continue;
                 if (!string.Equals(node.AbilityId, unlock.AbilityId, StringComparison.Ordinal)) continue;
 
-                slots.Add(Slot(node.Id, unlock.AbilityId, tier));
+                slots.Add(Slot(node.Id, unlock.AbilityId, NodeKindRules.SocketTier(node.Kind)));
             }
 
             return

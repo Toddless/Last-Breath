@@ -50,6 +50,8 @@ namespace Battle.Source.UIElements.PassiveWheel
         public const string SlotHeld = "UI_PassiveTree_Slot_Held";
         public const string SlotUnopened = "UI_PassiveTree_Slot_Unopened";
 
+        public const string SlotOwner = "UI_PassiveTree_Slot_Owner";
+
         // The panel of totals.
         public const string SummaryTitle = "UI_PassiveTree_Summary_Title";
         public const string SummaryEmpty = "UI_PassiveTree_Summary_Empty";

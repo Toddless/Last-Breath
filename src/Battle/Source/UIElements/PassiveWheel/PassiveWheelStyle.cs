@@ -98,7 +98,8 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         [Export] private float _socketPipRadiusScale = 0.55f;
 
-        /// <summary>How wide the fan of pips opens, centred on the direction away from the core.</summary>
+        /// <summary>How wide the fan of pips opens. WHERE it opens is not authored — the geometry lays it
+        /// clear of the node's own branches; see <see cref="SocketRingGeometry"/>.</summary>
         [Export] private float _socketArcDegrees = 120f;
 
         [Export] private float _minPipScreenRadius = 2f;

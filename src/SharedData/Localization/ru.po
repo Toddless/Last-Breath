@@ -3352,6 +3352,9 @@ msgstr ""
 msgid "UI_PassiveTree_Slot_Unopened"
 msgstr ""
 
+msgid "UI_PassiveTree_Slot_Owner"
+msgstr ""
+
 msgid "UI_PassiveTree_Socket_NotOpened"
 msgstr ""
 

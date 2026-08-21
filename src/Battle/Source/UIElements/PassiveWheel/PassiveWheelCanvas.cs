@@ -1047,6 +1047,7 @@ namespace Battle.Source.UIElements.PassiveWheel
                 Append(body, line.Text);
 
             AppendCost(body, node);
+            AppendOwnedSlot(body, node);
             AppendSlots(body, node);
             AppendReturn(body, node);
 
@@ -1068,6 +1069,20 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             Append(body, Localization.Render(PassiveWheelText.PathCost,
                 new Dictionary<string, object?> { [PassiveWheelText.PointsValue] = cost }));
+        }
+
+        /// <summary>Whose slot the node opens, for a node that opens one of its own. The ring is drawn
+        /// around the ABILITY, which may be a long way off across the wheel, so a socket node standing on
+        /// its own branch has nothing else to say what it is part of.</summary>
+        private void AppendOwnedSlot(StringBuilder body, PassiveNode node)
+        {
+            if (!NodeKindRules.OpensOwnSlot(node.Kind) || string.IsNullOrWhiteSpace(node.AbilityId)) return;
+
+            Append(body, Localization.Render(PassiveWheelText.SlotOwner, new Dictionary<string, object?>
+            {
+                [PassiveWheelText.TierValue] = NodeKindRules.SocketTier(node.Kind),
+                [PassiveWheelText.NameValue] = Localization.Localize(node.AbilityId)
+            }));
         }
 
         /// <summary>The ability's slots in words. The ring beside the node says the same thing in colour,

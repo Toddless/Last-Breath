@@ -20,6 +20,14 @@ namespace LastBreathTest.BattleSystemTests
         private const float MinScreenRadius = 1.5f;
         private const float PickSlack = 6f;
 
+        /// <summary>The shape of the socket ring in the game's look. A copy on purpose, like the radii
+        /// below: the real numbers live in a Godot resource, and what is under test is the RULE they are
+        /// fed into.</summary>
+        private const float SocketRingScale = 2.1f;
+
+        private const float SocketPipScale = 0.55f;
+        private const float SocketArcDegrees = 120f;
+
         /// <summary>Which classes carry a scene in the game's look. A copy on purpose: the real answer
         /// is a flag in a Godot resource, and what is under test is the SPLIT, not the resource.</summary>
         private static bool HasView(PassiveNodeKind kind) => kind != PassiveNodeKind.Small;
@@ -151,6 +159,97 @@ namespace LastBreathTest.BattleSystemTests
             }
 
             Assert.IsTrue(priced > 0, "nothing in the shipped tree could be reached at all");
+        }
+
+        /// <summary>
+        /// Not one pip of the shipped markup is drawn over a branch of its own node. The ring is laid in
+        /// the widest gap between the lines leaving the node and squeezed to fit it, so what is checked is
+        /// the outcome over the real markup rather than the arithmetic: every pip clears every branch by
+        /// its own width.
+        /// <para>The angular width of a pip is worked out here from the authored ratio rather than asked of
+        /// the geometry — a check that borrowed the geometry's own reading would agree with it whatever it
+        /// said.</para>
+        /// </summary>
+        [TestMethod]
+        public void NoShippedRing_DrawsAPipOverOneOfItsOwnBranches()
+        {
+            PassiveTreeDocument document = ShippedTree();
+            SocketRingGeometry rings = ShippedRings();
+            CanvasTransform view = ShippedView();
+            var composition = new Dictionary<string, List<SocketRingSlot>>(StringComparer.Ordinal);
+            SocketRings.Collect(document, composition);
+
+            float pipWidth = InDegrees(MathF.Asin(SocketPipScale / SocketRingScale));
+            var clipped = new List<string>();
+
+            Assert.IsTrue(composition.Count > 0, "the shipped tree draws no rings at all");
+
+            foreach (KeyValuePair<string, List<SocketRingSlot>> ring in composition)
+            {
+                PassiveNode node = document.Find(ring.Key)!;
+                SocketRingFan fan = rings.Fan(document, node, ring.Value.Count);
+
+                for (int index = 0; index < ring.Value.Count; index++)
+                {
+                    float pip = Bearing(node, rings.Place(fan, node, view, index, ring.Value.Count));
+
+                    foreach (float branch in Branches(document, node))
+                        if (Apart(pip, branch) < pipWidth)
+                            clipped.Add($"{node.Id}: pip {index} is {Apart(pip, branch):0.#} degrees off a branch, "
+                                + $"and a pip is {pipWidth:0.#} wide (gap {InDegrees(fan.ArcRadians):0.#} of fan)");
+                }
+            }
+
+            Assert.AreEqual(0, clipped.Count,
+                "a branch of the shipped tree is drawn through a slot of its own node:\n  " + string.Join("\n  ", clipped));
+        }
+
+        /// <summary>Which way every branch leaves the node, in degrees of a turn.</summary>
+        private static List<float> Branches(PassiveTreeDocument document, PassiveNode node)
+        {
+            List<float> branches = [];
+            foreach (string neighbourId in document.Neighbours(node.Id))
+            {
+                PassiveNode? neighbour = document.Find(neighbourId);
+                if (neighbour == null || (neighbour.X == node.X && neighbour.Y == node.Y)) continue;
+
+                branches.Add(Degrees(MathF.Atan2(neighbour.Y - node.Y, neighbour.X - node.X)));
+            }
+
+            return branches;
+        }
+
+        private static float Bearing(PassiveNode node, SocketPipPlacement pip) =>
+            Degrees(MathF.Atan2(pip.Y - node.Y, pip.X - node.X));
+
+        private static float InDegrees(float radians) => radians * 180f / MathF.PI;
+
+        private static float Degrees(float radians)
+        {
+            float degrees = InDegrees(radians) % 360f;
+
+            return degrees < 0f ? degrees + 360f : degrees;
+        }
+
+        /// <summary>How far apart two directions are, the short way round.</summary>
+        private static float Apart(float first, float second)
+        {
+            float delta = MathF.Abs(first - second) % 360f;
+
+            return delta > 180f ? 360f - delta : delta;
+        }
+
+        private static SocketRingGeometry ShippedRings() =>
+            new(ShippedGeometry(), SocketRingScale, SocketPipScale, SocketArcDegrees, 2f, 6f);
+
+        private static CanvasTransform ShippedView()
+        {
+            var view = new CanvasTransform();
+            view.SetSpread(CanvasTransform.DefaultSpread, 0f, 0f);
+            view.ZoomBy(2f, 0f, 0f);
+            view.SetPan(640f, 360f);
+
+            return view;
         }
 
         private static string? FirstBuyableOfTheMass(IPassiveTreeService service, PassiveTreeDocument document)

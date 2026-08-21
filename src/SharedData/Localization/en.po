@@ -3909,6 +3909,9 @@ msgstr "Tier {tier} — {name} (closed, remove only)"
 msgid "UI_PassiveTree_Slot_Unopened"
 msgstr "Tier {tier} — not opened"
 
+msgid "UI_PassiveTree_Slot_Owner"
+msgstr "Opens a tier {tier} slot of {name}"
+
 msgid "UI_PassiveTree_Socket_NotOpened"
 msgstr "That node is not bought yet, so it opens no slot"
 

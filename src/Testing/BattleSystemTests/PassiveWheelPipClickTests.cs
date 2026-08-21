@@ -38,6 +38,16 @@ namespace LastBreathTest.BattleSystemTests
         /// Any positive slack would do: the rule has none of its own.</summary>
         private const float JustOutsidePixels = 2f;
 
+        /// <summary>The gap the fixture's two branches leave between them, and what a fan of the authored
+        /// width has to spare inside it — half the difference on either side.</summary>
+        private const float WidestGapDegrees = 270f;
+
+        private const float LeastClearanceDegrees = (WidestGapDegrees - ArcDegrees) * 0.5f;
+
+        /// <summary>Slack on an angle: the outermost pip lands exactly on the clearance, and the
+        /// arithmetic that puts it there is single-precision trigonometry.</summary>
+        private const float ToleranceDegrees = 0.1f;
+
         /// <summary>
         /// Only the pip of an open, empty slot takes the left button for itself. Walked over one ring
         /// holding all four states in turn, because they are four readings of ONE board and a fixture per
@@ -112,6 +122,34 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>
+        /// The ring is laid clear of the node's own branches, and the pick moves with it: every pip
+        /// answers at the very place it was drawn. Drawing and picking read ONE layout, so what protects
+        /// them is walking that layout where the branches have pushed it to — a fan aimed away from the
+        /// wheel's middle, as it used to be, would put pips on the lines the edge layer draws.
+        /// </summary>
+        [TestMethod]
+        public void TheFanLaidClearOfTheBranchesIsPickedWhereItIsDrawn()
+        {
+            var bench = new Bench();
+            bench.Open(Unlock, NodeKindRules.UnlockSocketTier);
+            bench.Open(SecondSlot, tier: 2);
+
+            IReadOnlyList<PassiveSocketPip> pips = bench.Pips();
+            Assert.AreEqual(3, pips.Count, "the fixture did not draw the ring the case is about");
+
+            foreach (PassiveSocketPip pip in pips)
+            {
+                foreach (float branch in Bench.BranchDegrees)
+                    Assert.IsTrue(bench.Apart(pip, branch) >= LeastClearanceDegrees - ToleranceDegrees,
+                        $"a pip sits {bench.Apart(pip, branch):0.#} degrees off the branch leaving at {branch}, where the edge is drawn");
+
+                Assert.AreEqual(pip.Address,
+                    WheelHit.PipAt(pips, bench.View, bench.View.ScreenX(pip.X), bench.View.ScreenY(pip.Y))?.Address,
+                    "a pip moved off the branches stopped answering where it is drawn");
+            }
+        }
+
+        /// <summary>
         /// The address a claimed pip hands the courier is the one the board knows the slot by — the same
         /// one a dropped copy is judged against. Read off the board rather than spelled out here, since
         /// what is being protected is that there is ONE spelling.
@@ -169,9 +207,24 @@ namespace LastBreathTest.BattleSystemTests
                 SocketRings.Collect(_document, _rings);
             }
 
+            /// <summary>Where the node's own branches leave, which is what the fan has to be laid clear
+            /// of. Read here rather than recomputed by the cases: the tree below is what puts them
+            /// there.</summary>
+            internal static IReadOnlyList<float> BranchDegrees => [0f, 270f];
+
             internal AbilitySocketBoard Board { get; }
 
             internal CanvasTransform View { get; }
+
+            /// <summary>How far a pip sits from a direction out of the node, the short way round.</summary>
+            internal float Apart(PassiveSocketPip pip, float degrees)
+            {
+                PassiveNode node = Node();
+                float direction = MathF.Atan2(pip.Y - node.Y, pip.X - node.X) * 180f / MathF.PI;
+                float delta = MathF.Abs(direction - degrees) % 360f;
+
+                return delta > 180f ? 360f - delta : delta;
+            }
 
             /// <summary>Adds a slot to what the allocation opens and syncs the board to it.</summary>
             internal void Open(string socketId, int tier)
@@ -209,11 +262,12 @@ namespace LastBreathTest.BattleSystemTests
                 PassiveNode node = Node();
                 List<SocketRingSlot> ring = _rings[Unlock];
                 List<PassiveSocketPip> pips = [];
+                SocketRingFan fan = _geometry.Fan(_document, node, ring.Count);
 
                 for (int index = 0; index < ring.Count; index++)
                 {
                     SocketPipPlacement placement =
-                        _geometry.Place(node.X, node.Y, node.Kind, View, index, ring.Count);
+                        _geometry.Place(fan, node, View, index, ring.Count);
 
                     pips.Add(new PassiveSocketPip(
                         ring[index].Address, node.Id, ring[index].OpenerId,
@@ -236,25 +290,35 @@ namespace LastBreathTest.BattleSystemTests
                 return radii;
             }
 
-            /// <summary>An ability node away from the middle of the wheel — the ring fans out from the
-            /// direction the node lies in, and a node at the origin has none — plus two socket nodes of
-            /// the same ability, one of which is never bought.</summary>
+            /// <summary>An ability node away from the middle of the wheel, with the two socket nodes of
+            /// its own ability hanging off it on branches — so the ring has lines to be laid clear of,
+            /// which is what half the walks below are about. One of the two is never bought.</summary>
             private static PassiveTreeDocument Tree()
             {
+                const float nodeX = 120f;
+                const float nodeY = -80f;
+                const float branch = 100f;
+
                 var document = new PassiveTreeDocument();
                 document.AddNode(new PassiveNode
                 {
                     Id = Unlock,
                     Kind = PassiveNodeKind.AbilityUnlock,
                     AbilityId = Ability,
-                    X = 120f,
-                    Y = -80f
+                    X = nodeX,
+                    Y = nodeY
                 });
 
-                document.AddNode(new PassiveNode { Id = SecondSlot, Kind = PassiveNodeKind.SocketTier2, AbilityId = Ability });
-                document.AddNode(new PassiveNode { Id = ThirdSlot, Kind = PassiveNodeKind.SocketTier3, AbilityId = Ability });
+                Branch(SecondSlot, PassiveNodeKind.SocketTier2, nodeX + branch, nodeY);
+                Branch(ThirdSlot, PassiveNodeKind.SocketTier3, nodeX, nodeY - branch);
 
                 return document;
+
+                void Branch(string id, PassiveNodeKind kind, float x, float y)
+                {
+                    document.AddNode(new PassiveNode { Id = id, Kind = kind, AbilityId = Ability, X = x, Y = y });
+                    document.Link(Unlock, id);
+                }
             }
         }
     }

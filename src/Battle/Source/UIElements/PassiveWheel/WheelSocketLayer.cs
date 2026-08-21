@@ -161,16 +161,20 @@ namespace Battle.Source.UIElements.PassiveWheel
                 PassiveNode? node = _document.Find(ring.Key);
                 if (node == null || !_geometry.Draws(node.Kind, _scale.Zoom)) continue;
 
+                // Which way the fan opens is a property of the NODE, not of any one place on it: read
+                // once here rather than re-derived from the graph for every pip.
+                SocketRingFan fan = _geometry.Fan(_document, node, ring.Value.Count);
+
                 for (int index = 0; index < ring.Value.Count; index++)
-                    _pips.Add(Pip(node, ring.Value[index], index, ring.Value.Count));
+                    _pips.Add(Pip(node, fan, ring.Value[index], index, ring.Value.Count));
             }
 
             QueueRedraw();
         }
 
-        private PassiveSocketPip Pip(PassiveNode node, SocketRingSlot slot, int index, int count)
+        private PassiveSocketPip Pip(PassiveNode node, SocketRingFan fan, SocketRingSlot slot, int index, int count)
         {
-            SocketPipPlacement placement = _geometry!.Place(node.X, node.Y, node.Kind, _scale!, index, count);
+            SocketPipPlacement placement = _geometry!.Place(fan, node, _scale!, index, count);
 
             return new PassiveSocketPip(
                 slot.Address, node.Id, slot.OpenerId, SocketRings.StateOf(_board?.Find(slot.Address)),

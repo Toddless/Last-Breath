@@ -1,6 +1,7 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using System.Text;
+    using Battle.Source.UIElements.PassiveWheel;
     using Core.Localization;
     using Newtonsoft.Json.Linq;
 
@@ -86,6 +87,32 @@ namespace LastBreathTest.BattleSystemTests
 
             StringAssert.Contains(line, "2", $"'{key}' never places the tier — it names no '{{{tilePlaceholder}}}'");
             Assert.IsFalse(line.Contains('{'), $"'{key}' keeps a placeholder the tile does not fill: {line}");
+        }
+
+        /// <summary>The line a socket node of the passive tree prints: which tier of slot it opens and
+        /// whose. A key with no wording prints itself, and a wording whose placeholders nobody fills prints
+        /// the placeholders, so both names the wheel puts in its values have to be in the catalog's.</summary>
+        [TestMethod]
+        public void TheSocketNodesOwnerLineIsWordedAndFilledByTheWheelsPlaceholders()
+        {
+            const string ability = "Ability_Dex";
+
+            string? template = ReadEntries("en.po").GetValueOrDefault(PassiveWheelText.SlotOwner);
+            Assert.IsFalse(string.IsNullOrEmpty(template),
+                $"en.po words no '{PassiveWheelText.SlotOwner}' — the popup shows the raw key");
+
+            string line = new TextTemplateEngine(new FakeLocalizationProvider()).Render(
+                template!,
+                new Dictionary<string, object?>
+                {
+                    [PassiveWheelText.TierValue] = 2,
+                    [PassiveWheelText.NameValue] = ability
+                },
+                TextFormat.Plain);
+
+            StringAssert.Contains(line, "2", $"'{PassiveWheelText.SlotOwner}' never places the tier");
+            StringAssert.Contains(line, ability, $"'{PassiveWheelText.SlotOwner}' never names the ability");
+            Assert.IsFalse(line.Contains('{'), $"'{PassiveWheelText.SlotOwner}' keeps a placeholder the wheel does not fill: {line}");
         }
 
         private static List<(string Domain, List<string> Ids, bool NeedsDescription)> CollectDataIds() =>
