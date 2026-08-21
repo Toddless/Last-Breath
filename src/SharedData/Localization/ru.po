@@ -393,6 +393,12 @@ msgstr ""
 msgid "Modifier_Multiplicative"
 msgstr ""
 
+msgid "Modifier_Increase_Negative"
+msgstr ""
+
+msgid "Modifier_Multiplicative_Negative"
+msgstr ""
+
 msgid "Context_Modifier_HealingEfficiency"
 msgstr ""
 
@@ -421,6 +427,12 @@ msgid "Modifier_Increase_Range"
 msgstr ""
 
 msgid "Modifier_Multiplicative_Range"
+msgstr ""
+
+msgid "Modifier_Increase_Negative_Range"
+msgstr ""
+
+msgid "Modifier_Multiplicative_Negative_Range"
 msgstr ""
 
 msgid "Modifier_Conditional"

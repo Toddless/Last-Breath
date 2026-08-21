@@ -2,7 +2,10 @@ namespace LastBreathTest.BattleSystemTests
 {
     using System.Text;
     using Battle.Source.UIElements.PassiveWheel;
+    using Core.Data.GameData;
     using Core.Localization;
+    using Core.PassiveTree;
+    using Core.PassiveTree.View;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -113,6 +116,34 @@ namespace LastBreathTest.BattleSystemTests
             StringAssert.Contains(line, "2", $"'{PassiveWheelText.SlotOwner}' never places the tier");
             StringAssert.Contains(line, ability, $"'{PassiveWheelText.SlotOwner}' never names the ability");
             Assert.IsFalse(line.Contains('{'), $"'{PassiveWheelText.SlotOwner}' keeps a placeholder the wheel does not fill: {line}");
+        }
+
+        /// <summary>
+        /// The keystone that pays for its gift, read the way the wheel reads it — shipped tree, shipped
+        /// catalog, no fixture in between. The penalty has to arrive as a sentence a player parses at a
+        /// glance and never as a signed multiplier ("-25% more"), which reads like a bonus going the
+        /// wrong way.
+        /// </summary>
+        [TestMethod]
+        public void TheKeystonesPenaltyReadsAsASentenceInTheShippedTree()
+        {
+            const string keystone = "keystone_6";
+            const string penalty = "25% less Health Recovery";
+
+            var tree = new PassiveTreeProvider();
+            var formats = new ParameterFormatProvider();
+            new GameDataService(new FileSystemDataSource(LastBreathTest.SharedData.Root()), [tree, formats]).LoadAll();
+
+            PassiveNode? node = tree.Tree.Find(keystone);
+            Assert.IsNotNull(node, $"the shipped tree carries no '{keystone}' to read");
+
+            var catalog = new FakeLocalizationProvider();
+            foreach ((string key, string wording) in ReadEntries("en.po")) catalog.Strings[key] = wording;
+
+            string[] lines = [.. PassiveNodeLines.Of(node!, new ModifierFormatter(catalog, formats), null, catalog)
+                .Select(line => line.Text)];
+
+            CollectionAssert.Contains(lines, penalty, $"'{keystone}' words its cost as: {string.Join(" | ", lines)}");
         }
 
         private static List<(string Domain, List<string> Ids, bool NeedsDescription)> CollectDataIds() =>

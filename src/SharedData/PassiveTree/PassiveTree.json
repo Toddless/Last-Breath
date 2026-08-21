@@ -234,7 +234,7 @@
                 },
                 {
                     "parameter": "HealthRecovery",
-                    "valueType": "Increase",
+                    "valueType": "Multiplicative",
                     "value": -0.25
                 }
             ]

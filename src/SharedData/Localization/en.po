@@ -1578,6 +1578,14 @@ msgstr "{value} increased {parameter}"
 msgid "Modifier_Multiplicative"
 msgstr "{value} more {parameter}"
 
+# Negative twins: a penalty is worded, not signed — {value} arrives without its minus ("25% less Health Recovery").
+
+msgid "Modifier_Increase_Negative"
+msgstr "{value} reduced {parameter}"
+
+msgid "Modifier_Multiplicative_Negative"
+msgstr "{value} less {parameter}"
+
 # Range twins for unrolled spreads: {min} carries the sign, {max} carries the unit ("+40–60% increased ...").
 
 msgid "Modifier_Flat_Range"
@@ -1588,6 +1596,12 @@ msgstr "{min}–{max} increased {parameter}"
 
 msgid "Modifier_Multiplicative_Range"
 msgstr "{min}–{max} more {parameter}"
+
+msgid "Modifier_Increase_Negative_Range"
+msgstr "{min}–{max} reduced {parameter}"
+
+msgid "Modifier_Multiplicative_Negative_Range"
+msgstr "{min}–{max} less {parameter}"
 
 # A line held up by a condition: {line} = the rendered line, {condition} = the clause below.
 

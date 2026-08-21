@@ -9,8 +9,9 @@ namespace Core.Localization
     /// Turns a modifier into a localized phrase through .po templates:
     /// Modifier_Flat / Modifier_Increase / Modifier_Multiplicative with {value} and {parameter};
     /// unrolled value spreads render through the *_Range twins with {min} and {max}
-    /// ("+40–60 Strength"). Percent parameters follow IParameterFormatProvider
-    /// (data stores fractions: 0.5 = 50%).
+    /// ("+40–60 Strength"), and a percent penalty through the *_Negative twins, which word the
+    /// minus instead of printing it ("25% less Health Recovery"). Percent parameters follow
+    /// IParameterFormatProvider (data stores fractions: 0.5 = 50%).
     /// </summary>
     public class ModifierFormatter(ILocalizationProvider localization, IParameterFormatProvider formats)
     {
@@ -94,16 +95,29 @@ namespace Core.Localization
                 _ => MathF.Abs(min) is > 0f and < 1f ? "Modifier_Increase" : "Modifier_Flat",
             };
             bool isPercent = templateKey != "Modifier_Flat" || formats.GetUnit(parameter) == ParameterUnit.Percent;
+
+            // The one place a sign decides wording: a percent penalty reads "25% less" rather than
+            // "-25% more", so the template carries the minus and the number sheds it — the bounds
+            // flip to stay ascending. Flat keeps its sign, "-25 Health" already reads as a loss.
+            bool penalty = templateKey != "Modifier_Flat" && min < 0f && max < 0f;
+            if (penalty)
+            {
+                templateKey += "_Negative";
+                (min, max) = (-max, -min);
+            }
+
             float scale = isPercent ? 100f : 1f;
             return MathF.Abs(max - min) < 0.0001f
-                ? Render(templateKey, SignedValue(min * scale, isPercent), parameter, format)
-                : RenderRange(templateKey + "_Range", min * scale, max * scale, isPercent, parameter, format);
+                ? Render(templateKey, Value(min * scale, isPercent, signed: !penalty), parameter, format)
+                : RenderRange(templateKey + "_Range", min * scale, max * scale, isPercent, parameter, format, signed: !penalty);
         }
 
-        /// <summary>Range twin of Render: {min} carries the sign, {max} carries the unit ("+40–60% ...").</summary>
-        private string RenderRange(string templateKey, float min, float max, bool isPercent, EntityParameter parameter, TextFormat format)
+        /// <summary>Range twin of Render: {min} carries the sign unless the wording already does,
+        /// {max} carries the unit ("+40–60% ...").</summary>
+        private string RenderRange(
+            string templateKey, float min, float max, bool isPercent, EntityParameter parameter, TextFormat format, bool signed = true)
         {
-            string minText = $"{(min >= 0 ? "+" : "-")}{Number(MathF.Abs(min))}";
+            string minText = $"{Sign(min, signed)}{Number(MathF.Abs(min))}";
             string maxText = $"{Number(MathF.Abs(max))}{(isPercent ? "%" : string.Empty)}";
             if (format == TextFormat.Rich)
             {
@@ -128,8 +142,14 @@ namespace Core.Localization
         private bool IsPercentDisplay(ModifierValueType valueType, EntityParameter parameter) =>
             valueType != ModifierValueType.Flat || formats.GetUnit(parameter) == ParameterUnit.Percent;
 
-        private static string SignedValue(float value, bool isPercent) =>
-            $"{(value >= 0 ? "+" : "-")}{Number(MathF.Abs(value))}{(isPercent ? "%" : string.Empty)}";
+        private static string SignedValue(float value, bool isPercent) => Value(value, isPercent, signed: true);
+
+        /// <summary>The number as the templates take it: unit-suffixed, and signed unless the wording
+        /// already says which way it goes.</summary>
+        private static string Value(float value, bool isPercent, bool signed) =>
+            $"{Sign(value, signed)}{Number(MathF.Abs(value))}{(isPercent ? "%" : string.Empty)}";
+
+        private static string Sign(float value, bool signed) => !signed ? string.Empty : value >= 0 ? "+" : "-";
 
         private static string Number(float value) => value.ToString("0.#", CultureInfo.InvariantCulture);
     }

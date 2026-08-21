@@ -164,6 +164,10 @@ namespace LastBreathTest.BattleSystemTests
             _provider.Strings["Modifier_Flat_Range"] = "{min}–{max} {parameter}";
             _provider.Strings["Modifier_Increase_Range"] = "{min}–{max} increased {parameter}";
             _provider.Strings["Modifier_Multiplicative_Range"] = "{min}–{max} more {parameter}";
+            _provider.Strings["Modifier_Increase_Negative"] = "{value} reduced {parameter}";
+            _provider.Strings["Modifier_Multiplicative_Negative"] = "{value} less {parameter}";
+            _provider.Strings["Modifier_Increase_Negative_Range"] = "{min}–{max} reduced {parameter}";
+            _provider.Strings["Modifier_Multiplicative_Negative_Range"] = "{min}–{max} less {parameter}";
             _provider.Strings["PhysicalDamage"] = "Damage";
             _provider.Strings["CriticalChance"] = "Critical Chance";
 
@@ -191,9 +195,27 @@ namespace LastBreathTest.BattleSystemTests
             // multiplicative values in data are DELTAS folded as (1 + Σ value): 0.2 = "+20% more"
             Assert.AreEqual("+20% more Damage", _formatter.Format(new Modifier(ModifierValueType.Multiplicative, EntityParameter.PhysicalDamage, 0.2f)));
 
+        /// <summary>A percent penalty is worded, not signed: the template carries the minus and the
+        /// number sheds it, so the line reads as a sentence instead of "-25% increased".</summary>
         [TestMethod]
-        public void NegativeValuesCarryMinusSign() =>
-            Assert.AreEqual("-15% increased Damage", _formatter.Format(new Modifier(ModifierValueType.Increase, EntityParameter.PhysicalDamage, -0.15f)));
+        public void NegativeIncreaseIsWordedAsReducedWithoutASign() =>
+            Assert.AreEqual("25% reduced Damage", _formatter.Format(new Modifier(ModifierValueType.Increase, EntityParameter.PhysicalDamage, -0.25f)));
+
+        [TestMethod]
+        public void NegativeMultiplicativeIsWordedAsLessWithoutASign() =>
+            Assert.AreEqual("25% less Damage", _formatter.Format(new Modifier(ModifierValueType.Multiplicative, EntityParameter.PhysicalDamage, -0.25f)));
+
+        /// <summary>Flat stays outside the wording: "-25 Damage" already reads as a loss.</summary>
+        [TestMethod]
+        public void NegativeFlatKeepsItsMinusSign() =>
+            Assert.AreEqual("-25 Damage", _formatter.Format(new Modifier(ModifierValueType.Flat, EntityParameter.PhysicalDamage, -25f)));
+
+        /// <summary>A penalty spread words itself the same way, and its bounds come out ascending
+        /// rather than counting down from the deepest one.</summary>
+        [TestMethod]
+        public void NegativeSpreadRendersThroughTheWordedRangeTwin() =>
+            Assert.AreEqual("20–30% reduced Damage", _formatter.FormatDescriptor(new ParameterDescriptor(
+                EntityParameter.PhysicalDamage, ModifierValueType.Increase, new ValueRange(-0.3f, -0.2f), ModifierScope.Global)));
 
         [TestMethod]
         public void RangedFlatRendersThroughTheRangeTemplate() =>
