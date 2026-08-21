@@ -4072,6 +4072,12 @@ msgstr "That augment cannot be carried"
 msgid "UI_Augment_Tier"
 msgstr "Tier {Value}"
 
+msgid "UI_Augment_Pick_Title"
+msgstr "Augments that fit"
+
+msgid "UI_Augment_Pick_Nothing"
+msgstr "You carry nothing this slot would take"
+
 msgid "Npc_Ronald"
 msgstr "Ronald the Smith"
 

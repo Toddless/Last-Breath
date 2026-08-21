@@ -95,7 +95,8 @@
             services.AddSingleton<IAugmentInstallGate>(sp => new AugmentInstallGate(
                 sp.GetRequiredService<IAbilitySocketBoard>(),
                 sp.GetRequiredService<IAbilityAugmentBinder>(),
-                sp.GetService<IInventory>()));
+                sp.GetService<IInventory>(),
+                sp.GetService<IAbilityAugmentCatalog>()));
 
             // The other thing that moves between the bag and an ability. No binder: an ornament opens an
             // empty socket and cannot come off a full one, so what the abilities WEAR never changes here.
@@ -109,6 +110,8 @@
             // MOVES an augment goes through the two request gates below.
             services.AddTransient<IRequestHandler<GetAbilitySocketRowsRequest, IReadOnlyList<AbilitySocketRowView>>, AbilitySocketRowsRequestHandler>();
             services.AddTransient<IRequestHandler<GetCarriedAugmentsRequest, IReadOnlyList<AugmentTrayTileView>>, CarriedAugmentsRequestHandler>();
+            // The offer an empty slot makes: the same reader, filtered by the install gate itself.
+            services.AddTransient<IRequestHandler<GetAugmentCandidatesRequest, IReadOnlyList<AugmentTrayTileView>>, CarriedAugmentsRequestHandler>();
             // The gates an augment travels between the bag and a slot. They need a bag, which is the
             // game project's — a composition without one owns no augment to move and answers every id
             // as one it does not carry.

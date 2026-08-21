@@ -71,6 +71,7 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         private PassiveTreeDraft? _draft;
         private PassiveRespecQuotes? _quotes;
+        private AugmentSeating? _seating;
 
         private bool _summaryOpen;
 
@@ -108,6 +109,9 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (_wallet != null) _wallet.GoldChanged -= OnGoldChanged;
             if (_draft != null) _draft.Changed -= Refresh;
 
+            // Anything the courier put on the Overlay layer belongs to this window's lifetime: the layer
+            // outlives it, and a list left standing over the world still seats augments.
+            _seating?.ClosePicker();
             _draft?.Dispose();
             _draft = null;
         }
@@ -146,7 +150,9 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             // The wheel seats augments through the same courier the socket sheet uses, with its own line
             // to print refusals on. A second copy of that road would be a second reading of one rule.
-            _canvas?.UseSocketHost(new AugmentSeating(_bus, provider.Optional<IAugmentInstallGate>(), ShowHint));
+            _seating = new AugmentSeating(
+                _bus, provider.Optional<IAugmentInstallGate>(), ShowHint, provider.Optional<IUiElementsManager>());
+            _canvas?.UseSocketHost(_seating);
 
             Refresh();
         }
@@ -408,9 +414,12 @@ namespace Battle.Source.UIElements.PassiveWheel
             Close();
         }
 
+        /// <summary>Guarded against a DEAD node and not merely a missing one: every road here is an
+        /// answer arriving later than the gesture that asked for it — a bus reply, or a pick made in a
+        /// popup that outlives the window — and by then the wheel may have been closed and freed.</summary>
         private void ShowHint(string text)
         {
-            if (_hint == null) return;
+            if (_hint == null || !IsInstanceValid(_hint)) return;
 
             _hint.Text = text;
             _hint.Visible = text.Length > 0;

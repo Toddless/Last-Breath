@@ -200,20 +200,12 @@
             var ordered = stacks
                 .GroupBy(x => x.Item!.MaxStackSize > 1 ? x.Item.Id : x.Item.InstanceId)
                 .Select(group => (Item: group.First().Item!, Amount: group.Sum(x => x.Quantity)))
-                .OrderBy(x => RarityRank(x.Item.Rarity))
+                .OrderBy(x => x.Item.Rarity.DisplayRank())
                 .ThenBy(x => x.Item.DisplayName, StringComparer.Ordinal);
 
             foreach (var (item, amount) in ordered)
                 FitItemsInSlots(item.Id, item.InstanceId, amount, item.MaxStackSize);
         }
-
-        /// <summary>Display order: best first — the enum itself puts Unique/Mythic at 10/11.</summary>
-        private static int RarityRank(Rarity rarity) => rarity switch
-        {
-            Rarity.Mythic => 0,
-            Rarity.Unique => 1,
-            _ => (int)rarity + 2,
-        };
 
         /// <summary>Adds an item into the specific slot the player dropped it on; an occupied slot falls back to the usual placement.</summary>
         public bool TryAddItemAt(IItem item, IInventorySlot slot)

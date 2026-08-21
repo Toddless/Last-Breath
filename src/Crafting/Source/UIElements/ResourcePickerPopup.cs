@@ -11,8 +11,13 @@ namespace Crafting.Source.UIElements
     /// layout never moves. A single click picks and closes; the cancel button, Esc or a click
     /// outside just closes. The panel stays hidden until the deferred placement lands, so it never
     /// flashes at the scene origin.
+    /// <para>
+    /// It is the game project's <see cref="IPickerPopup"/>: the socket screens pick an augment out of
+    /// the bag the same way crafting picks a piece, and one list of candidates at the cursor is one
+    /// scene rather than two that drift apart.
+    /// </para>
     /// </summary>
-    public partial class ResourcePickerPopup : Control, IPopup
+    public partial class ResourcePickerPopup : Control, IPickerPopup
     {
         // Path, not uid: the scene is authored outside the editor, so its uid is minted on the
         // first import — a hardcoded one here would dangle.
@@ -26,8 +31,6 @@ namespace Crafting.Source.UIElements
 
         private readonly List<string> _ids = [];
         private Action<string>? _onPicked;
-
-        public readonly record struct PickerEntry(string Id, string Label, Texture2D? Icon, string? Tooltip = null, Color? LabelColor = null);
 
         public PopupLifetime Lifetime => PopupLifetime.Pinned;
 

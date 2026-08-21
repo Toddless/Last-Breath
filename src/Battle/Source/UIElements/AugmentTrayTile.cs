@@ -26,9 +26,6 @@ namespace Battle.Source.UIElements
 
         private const float DragPreviewSize = 60f;
 
-        /// <summary>Template of the tooltip's one info line: the tier the record is written at.</summary>
-        private const string TierLine = "UI_Augment_Tier";
-
         [Export] private TextureRect? _icon;
         [Export] private Label? _tier;
 
@@ -75,7 +72,8 @@ namespace Battle.Source.UIElements
             if (_view == null || _windows == null) return null;
             if (_windows.ShowPopup(typeof(TextTooltipPopup)) is not TextTooltipPopup popup) return null;
 
-            string info = Localization.Render(TierLine, new Dictionary<string, object?> { ["Value"] = _view.Tier });
+            string info = Localization.Render(AugmentText.Tier,
+                new Dictionary<string, object?> { [AugmentText.TierValue] = _view.Tier });
             popup.Show(_view.DisplayName, info, _view.Description);
             return popup;
         }

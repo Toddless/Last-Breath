@@ -7,14 +7,19 @@ namespace Battle.Source.UIElements
     using Core.Views.UI;
     using Godot;
 
-    /// <summary>What a cell needs from whoever owns it. One interface rather than four delegates: the
-    /// four are one job — the panel's — and a cell handed them separately could be wired with half of
+    /// <summary>What a cell needs from whoever owns it. One interface rather than five delegates: the
+    /// five are one job — the panel's — and a cell handed them separately could be wired with half of
     /// them.</summary>
     public interface IAugmentCellHost
     {
         /// <summary>What an install of that copy into that slot would answer, right now and moving
         /// nothing. Called from the engine's drop check, which is synchronous.</summary>
         AugmentInstallResult Judge(string socketAddress, string itemInstanceId);
+
+        /// <summary>Offers what the bag holds for that slot and seats whatever is chosen. The other way
+        /// in, beside the drag: an empty slot is a question, and clicking it is how the player asks it
+        /// without hunting through his bag for something that fits.</summary>
+        void Pick(string socketAddress);
 
         /// <summary>Actually moves it, through the bus.</summary>
         void Install(string socketAddress, string itemInstanceId);
@@ -36,6 +41,12 @@ namespace Battle.Source.UIElements
     /// augment out — the mirror of unequipping. It is not a drag SOURCE: moving an augment from one
     /// slot to another is two operations through two gates, and the bag's own slots resolve a drag
     /// source as one of their own, which this is not.
+    /// <para>
+    /// The two buttons mean opposite things and each means only one: a left click on an EMPTY slot asks
+    /// what could go in it, a right click on a FILLED one takes what is in it back out. A left click on
+    /// a filled slot does nothing rather than something clever — the slot is taken, and the way to
+    /// change what is in it is to empty it first.
+    /// </para>
     /// </summary>
     [GlobalClass]
     public partial class AugmentCell : PanelContainer
@@ -81,11 +92,12 @@ namespace Battle.Source.UIElements
             SetHighlight(null);
         }
 
-        /// <summary>Whether this slot would take that copy, asked of the gate the drop itself will go
-        /// through. Answered by the cell because the address it is about is the cell's own, and never
-        /// by measuring anything: the rule lives in one place and this is a reading of it.</summary>
-        public bool WouldAccept(IAugmentInstallGate gate, string itemInstanceId) =>
-            _view != null && gate.Judge(_view.SocketAddress, itemInstanceId).Installed;
+        /// <summary>Whether this slot would take that copy, asked through the host — the same road the
+        /// drop check takes, and therefore the same gate. Answered by the cell because the address it is
+        /// about is the cell's own, and never by measuring anything: the rule lives in one place and
+        /// this is a reading of it.</summary>
+        public bool WouldAccept(IAugmentCellHost host, string itemInstanceId) =>
+            _view != null && host.Judge(_view.SocketAddress, itemInstanceId).Installed;
 
         /// <summary>Lights the cell up while a drag is in the air: green where the copy would go in,
         /// red where it would not, nothing at all when no drag is happening.</summary>
@@ -117,12 +129,27 @@ namespace Battle.Source.UIElements
             _host.Install(_view.SocketAddress, instanceId);
         }
 
+        /// <summary>A slot the allocation no longer backs (<see cref="AugmentCellKind.Held"/>) answers
+        /// the right button and nothing else: it exists to be emptied, and there is no such thing as an
+        /// empty one to offer anything to.</summary>
         public override void _GuiInput(InputEvent @event)
         {
-            if (@event is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right }) return;
-            if (_view == null || _view.Kind == AugmentCellKind.Empty || _host == null) return;
+            if (@event is not InputEventMouseButton { Pressed: true } click) return;
+            if (_view == null || _host == null) return;
 
-            _host.Extract(_view.SocketAddress);
+            bool empty = _view.Kind == AugmentCellKind.Empty;
+            switch (click.ButtonIndex)
+            {
+                case MouseButton.Left when empty:
+                    _host.Pick(_view.SocketAddress);
+                    break;
+                case MouseButton.Right when !empty:
+                    _host.Extract(_view.SocketAddress);
+                    break;
+                default:
+                    return;
+            }
+
             AcceptEvent();
         }
 

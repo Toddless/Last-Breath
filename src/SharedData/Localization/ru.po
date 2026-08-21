@@ -3511,6 +3511,12 @@ msgstr ""
 msgid "UI_Augment_Tier"
 msgstr ""
 
+msgid "UI_Augment_Pick_Title"
+msgstr ""
+
+msgid "UI_Augment_Pick_Nothing"
+msgstr ""
+
 msgid "Npc_Ronald"
 msgstr ""
 

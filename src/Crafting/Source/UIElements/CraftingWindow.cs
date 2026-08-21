@@ -208,7 +208,7 @@ namespace Crafting.Source.UIElements
                 .Select(entry => entry.Item)
                 .OfType<IEquipItem>()
                 .Where(item => ModeAccepts(item, mode))
-                .Select(item => new ResourcePickerPopup.PickerEntry(
+                .Select(item => new PickerEntry(
                     item.InstanceId,
                     item.UpdateLevel > 0 ? $"{item.DisplayName} +{item.UpdateLevel}" : item.DisplayName,
                     item.Icon,
@@ -216,7 +216,7 @@ namespace Crafting.Source.UIElements
                     Color.FromHtml(TextPalette.RarityColor(item.Rarity))))
                 .ToList();
 
-            _pickerPopup = _uiElements?.ShowPopup(typeof(ResourcePickerPopup)) as ResourcePickerPopup;
+            _pickerPopup = _uiElements?.ShowPopup(typeof(IPickerPopup)) as ResourcePickerPopup;
             _pickerPopup?.Present(Localization.Localize("UI_Craft_PickItem"), entries, instanceId =>
             {
                 if (_inventory?.GetItem<IEquipItem>(instanceId) is { } picked) SetItem(picked, mode);
@@ -1322,14 +1322,14 @@ namespace Crafting.Source.UIElements
         private void OpenPicker(string title, List<string> ids, Action<string> onPicked)
         {
             var entries = ids
-                .Select(id => new ResourcePickerPopup.PickerEntry(
+                .Select(id => new PickerEntry(
                     id,
                     $"{Localization.Localize(id)}   ({_inventory?.GetTotalItemAmount(id) ?? 0})",
                     _dataProvider?.GetItemIcon(id),
                     ResourceTooltip(id)))
                 .ToList();
 
-            _pickerPopup = _uiElements?.ShowPopup(typeof(ResourcePickerPopup)) as ResourcePickerPopup;
+            _pickerPopup = _uiElements?.ShowPopup(typeof(IPickerPopup)) as ResourcePickerPopup;
             _pickerPopup?.Present(title, entries, onPicked);
         }
 
