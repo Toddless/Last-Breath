@@ -103,6 +103,17 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>The same pair over any data root — for records the shipped files do not declare.</summary>
         internal static (AbilityProvider Abilities, AbilityAugmentCatalog Augments) LoadFrom(string root)
         {
+            (AbilityProvider abilities, AbilityAugmentCatalog augments, _) = ComposeFrom(root);
+            return (abilities, augments);
+        }
+
+        /// <summary>The shipped data with the effect canon beside it — for walks that need the registry
+        /// itself and not only the records that read through it.</summary>
+        internal static (AbilityProvider Abilities, AbilityAugmentCatalog Augments, EffectProvider Effects) Composed() =>
+            ComposeFrom(SharedData.Root());
+
+        private static (AbilityProvider Abilities, AbilityAugmentCatalog Augments, EffectProvider Effects) ComposeFrom(string root)
+        {
             var augments = new AbilityAugmentCatalog();
             // The effect registry reads the canonical numbers as a participant of this very load, so a
             // record reaching an effect through this stand travels the road it travels in the game:
@@ -117,7 +128,7 @@ namespace LastBreathTest.BattleSystemTests
             service.LoadAll();
 
             Assert.AreEqual(0, failures.Count, string.Join("; ", failures));
-            return (abilities, augments);
+            return (abilities, augments, effects);
         }
     }
 }

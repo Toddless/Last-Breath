@@ -233,6 +233,8 @@ namespace Battle.Source
         public IReadOnlyCollection<string>? KeysOf(string effectId) =>
             s_factories.TryGetValue(effectId, out EffectFactory? factory) ? [.. factory.Keys] : null;
 
+        public IReadOnlyDictionary<string, float>? CanonOf(string effectId) => _canon.GetValueOrDefault(effectId);
+
         public IEffect? CreateEffect(string id, RecordProperties properties)
         {
             ReportPairingOnce();

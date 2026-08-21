@@ -2854,7 +2854,7 @@ msgid "Augment_Apply_Enhanced_Defence"
 msgstr "Apply Enhanced Defence"
 
 msgid "Augment_Apply_Enhanced_Defence_Description"
-msgstr "Applies {@Effect_Enhance_Defense} ({duration|turn|turns}, up to {stacks|stack|stacks}, {value:%})."
+msgstr "Applies {@Effect_Enhance_Defense} ({duration|turn|turns}, up to {maxStacks|stack|stacks}, {value:%})."
 
 msgid "Augment_Apply_Seal_Of_Oblivion"
 msgstr "Apply Seal Of Oblivion"
@@ -2890,13 +2890,13 @@ msgid "Augment_Attacks_Reduce_Incoming_Heal"
 msgstr "Attacks Reduce Incoming Heal"
 
 msgid "Augment_Attacks_Reduce_Incoming_Heal_Description"
-msgstr "Attacks apply -{reduceBy:%} incoming healing ({maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Attacks apply -{value:%} incoming healing ({maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Augment_Attacks_Reduce_Armor"
 msgstr "Attacks Reduce Armor"
 
 msgid "Augment_Attacks_Reduce_Armor_Description"
-msgstr "Attacks apply -{reduceArmorBy:%} armor (up to {maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Attacks apply -{reduceBy:%} armor (up to {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Augment_Poison_Coating_Apply_Poison_For_Each_Enemy"
 msgstr "Apply Stack For Each Enemy"

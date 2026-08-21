@@ -16,6 +16,11 @@ namespace Core.Battle.Abilities
         /// <summary>Property keys the effect is built from, or null when no factory answers the id.</summary>
         IReadOnlyCollection<string>? KeysOf(string effectId);
 
+        /// <summary>The canonical figures an effect is balanced at, or null for an id the canon carries
+        /// no row for. What a record leaves unsaid is filled from here — the numbers the effect is built
+        /// with, and the numbers a record's description prints, come out of one place.</summary>
+        IReadOnlyDictionary<string, float>? CanonOf(string effectId);
+
         /// <summary>The effect, or null with a report: unknown id, unknown key or missing key.</summary>
         IEffect? CreateEffect(string id, RecordProperties properties);
 

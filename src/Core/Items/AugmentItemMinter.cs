@@ -1,5 +1,6 @@
 namespace Core.Items
 {
+    using System;
     using System.Collections.Generic;
     using Battle.Abilities;
     using Enums;
@@ -34,15 +35,23 @@ namespace Core.Items
     /// <param name="minter">The one place a copy's numbers are drawn. Handed the record rather than
     /// the id, so an id nobody declares is answered here instead of reported as a miss — the item
     /// minter offers it every id there is.</param>
-    public sealed class AugmentItemMinter(IAbilityAugmentCatalog augments, AugmentMinter minter) : IAugmentItemMinter
+    /// <param name="effects">Where the numbers of the effect a copy lays are balanced — the other half
+    /// of what its card prints. Lazy and optional for the same reason the ability registry takes it
+    /// that way: a composition without an effect registry still mints every augment there is.</param>
+    public sealed class AugmentItemMinter(
+        IAbilityAugmentCatalog augments,
+        AugmentMinter minter,
+        Func<IEffectProvider?>? effects = null) : IAugmentItemMinter
     {
+        private readonly Func<IEffectProvider?> _effects = effects ?? (static () => null);
+
         public IAugmentItem? Mint(string augmentId, Rarity? rarity = null) =>
             augments.Find(augmentId) is { } record
-                ? new AugmentItem(rarity is { } decided ? minter.Mint(record, decided) : minter.Mint(record))
+                ? new AugmentItem(rarity is { } decided ? minter.Mint(record, decided) : minter.Mint(record), record, _effects())
                 : null;
 
         public IAugmentItem? Restore(AugmentInstance augment) =>
-            augments.Find(augment.AugmentId) is { } ? new AugmentItem(augment) : null;
+            augments.Find(augment.AugmentId) is { } record ? new AugmentItem(augment, record, _effects()) : null;
 
         public AugmentInstance? Remembered(string augmentId, IReadOnlyDictionary<string, float> values, Rarity? rarity, string effectId = "") =>
             augments.Find(augmentId) is { } record

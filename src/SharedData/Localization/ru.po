@@ -2159,7 +2159,7 @@ msgid "Augment_Apply_Enhanced_Defence"
 msgstr ""
 
 msgid "Augment_Apply_Enhanced_Defence_Description"
-msgstr "Накладывает {@Effect_Enhance_Defense} ({duration|turn|turns}, до {stacks|stack|stacks}, {value:%})."
+msgstr "Накладывает {@Effect_Enhance_Defense} ({duration|turn|turns}, до {maxStacks|stack|stacks}, {value:%})."
 
 msgid "Augment_Apply_Seal_Of_Oblivion"
 msgstr ""
@@ -2195,13 +2195,13 @@ msgid "Augment_Attacks_Reduce_Incoming_Heal"
 msgstr ""
 
 msgid "Augment_Attacks_Reduce_Incoming_Heal_Description"
-msgstr "Атаки накладывают -{reduceBy:%} получаемого лечения ({maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Атаки накладывают -{value:%} получаемого лечения ({maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Augment_Attacks_Reduce_Armor"
 msgstr ""
 
 msgid "Augment_Attacks_Reduce_Armor_Description"
-msgstr "Атаки накладывают -{reduceArmorBy:%} брони (до {maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Атаки накладывают -{reduceBy:%} брони (до {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Augment_Poison_Coating_Apply_Poison_For_Each_Enemy"
 msgstr ""

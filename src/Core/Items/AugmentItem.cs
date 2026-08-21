@@ -5,6 +5,7 @@ namespace Core.Items
     using System.Linq;
     using Battle.Abilities;
     using Constants;
+    using Data.AbilityData;
     using Enums;
     using Godot;
 
@@ -34,6 +35,10 @@ namespace Core.Items
     /// </remarks>
     public sealed class AugmentItem : IAugmentItem
     {
+        private readonly AbilityAugmentData? _record;
+
+        private readonly IEffectProvider? _effects;
+
         /// <summary>The one word the bag knows every augment by, whatever the augment is about. The
         /// record's own tags describe what it improves and are read off the record where that
         /// question is asked; carrying them here as well would leave an augment's tags written in two
@@ -44,10 +49,17 @@ namespace Core.Items
         /// drawn at the mint from the record's band and written down with its numbers. The consequence
         /// is deliberate: rebalancing a record moves neither the numbers nor the rarity of the copies
         /// already in the world.</param>
-        public AugmentItem(AugmentInstance augment)
+        /// <param name="record">What the copy is a copy OF. Carried for the card alone: a record that
+        /// lays an effect states no figures of its own, so without it the line has nothing but the
+        /// copy's dictionary to print — which for such a record is empty.</param>
+        /// <param name="effects">Where the numbers of the laid effect are balanced. Absent — a host with
+        /// no effect registry — the line prints what the copy alone knows, placeholders and all.</param>
+        public AugmentItem(AugmentInstance augment, AbilityAugmentData? record = null, IEffectProvider? effects = null)
         {
             Augment = augment;
             Rarity = augment.Rarity;
+            _record = record;
+            _effects = effects;
         }
 
         public AugmentInstance Augment { get; }
@@ -94,18 +106,14 @@ namespace Core.Items
 
         /// <summary>Another passage for the same copy: the numbers are shared because they are frozen,
         /// the identity is not — a copy handed on is still a separate thing in the bag.</summary>
-        public T Copy<T>() => (T)(object)new AugmentItem(Augment);
+        public T Copy<T>() => (T)(object)new AugmentItem(Augment, _record, _effects);
 
-        private Dictionary<string, object?> Printed()
-        {
-            Dictionary<string, object?> printed = Augment.Values.ToDictionary(rolled => rolled.Key, rolled => (object?)rolled.Value);
-
-            // The drawn effect, under the same placeholder the seated augment prints it by: which of its
-            // record's pool a copy lays is the copy's own and cannot be read off the record.
-            if (!string.IsNullOrWhiteSpace(Augment.EffectId))
-                printed[Data.AbilityData.AbilityAugmentData.EffectPlaceholder] = new Localization.LocalizedId(Augment.EffectId);
-
-            return printed;
-        }
+        /// <summary>The copy's numbers as the card prints them, assembled where every surface assembles
+        /// them. A copy nobody can name — no record behind it — prints its own dictionary and nothing
+        /// else: the effect it lays is unknown, so there is no canon to reach for.</summary>
+        private Dictionary<string, object?> Printed() =>
+            _record is { } record
+                ? AugmentDescription.Values(Augment.Applied(record), _effects)
+                : AugmentDescription.Values(Augment.Values, Augment.EffectId, _effects);
     }
 }
