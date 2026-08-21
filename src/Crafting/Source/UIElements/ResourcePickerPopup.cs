@@ -21,7 +21,7 @@ namespace Crafting.Source.UIElements
     {
         // Path, not uid: the scene is authored outside the editor, so its uid is minted on the
         // first import — a hardcoded one here would dangle.
-        private const string ScenePath = "res://Addons/Crafting/UIElements/Scenes/ResourcePickerPopup.tscn";
+        private const string UID = "uid://dupapy2hnba7p";
         private const float CursorOffset = 16f;
 
         [Export] private PanelContainer? _panel;
@@ -71,7 +71,7 @@ namespace Crafting.Source.UIElements
 
         public void Close() => QueueFree();
 
-        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(ScenePath);
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         private void OnItemSelected(long index)
         {

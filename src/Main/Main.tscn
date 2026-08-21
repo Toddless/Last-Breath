@@ -8,6 +8,7 @@
 script = ExtResource("1_r0du0")
 _mainWorld = NodePath("MainWorld")
 _layerManager = NodePath("UiLayerManager")
+_addTestItems = true
 
 [node name="MainWorld" parent="." unique_id=1079202584 instance=ExtResource("2_cm0pq")]
 

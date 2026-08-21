@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b3me1ofsbyw38"]
 
-[ext_resource type="Script" uid="uid://btl58i7nmjy1" path="res://Source/UIElements/FlyNumbers.cs" id="1_ihq18"]
+[ext_resource type="Script" uid="uid://c4n558x64n1u0" path="res://Addons/Battle/UIElements/FlyNumbers.cs" id="1_ihq18"]
 
 [node name="FlyNumbers" type="Node2D" unique_id=2138044428 node_paths=PackedStringArray("_label")]
 script = ExtResource("1_ihq18")

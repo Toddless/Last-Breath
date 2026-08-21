@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bt5rv8kd1ye3q"]
 
-[ext_resource type="Script" uid="uid://ca7mq3xn0v2ib" path="res://Source/UIElements/AugmentCell.cs" id="1_cell"]
+[ext_resource type="Script" uid="uid://bpfdq820pvg6v" path="res://Addons/Battle/UIElements/AugmentCell.cs" id="1_cell"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cell"]
 content_margin_left = 3.0

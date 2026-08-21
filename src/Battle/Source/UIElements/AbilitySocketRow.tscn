@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cx8hj2lm5ta0d"]
 
-[ext_resource type="Script" uid="uid://dn4wc6zp9uk7f" path="res://Source/UIElements/AbilitySocketRow.cs" id="1_row"]
-[ext_resource type="PackedScene" uid="uid://bt5rv8kd1ye3q" path="res://Source/UIElements/AugmentCell.tscn" id="2_cell"]
+[ext_resource type="Script" uid="uid://cq8mv4uaaxvn" path="res://Addons/Battle/UIElements/AbilitySocketRow.cs" id="1_row"]
+[ext_resource type="PackedScene" uid="uid://bt5rv8kd1ye3q" path="res://Addons/Battle/UIElements/AugmentCell.tscn" id="2_cell"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
 content_margin_left = 10.0

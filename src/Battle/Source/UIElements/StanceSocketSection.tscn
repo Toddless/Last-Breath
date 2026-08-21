@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bh2sn5qe8dc1r"]
 
-[ext_resource type="Script" uid="uid://cv9lb0tj6xz4m" path="res://Source/UIElements/StanceSocketSection.cs" id="1_section"]
-[ext_resource type="PackedScene" uid="uid://dk3fp7ag2wr5h" path="res://Source/UIElements/AbilitySocketPanel.tscn" id="2_panel"]
+[ext_resource type="Script" uid="uid://dj1yhpc8y7ij5" path="res://Addons/Battle/UIElements/StanceSocketSection.cs" id="1_section"]
+[ext_resource type="PackedScene" uid="uid://dk3fp7ag2wr5h" path="res://Addons/Battle/UIElements/AbilitySocketPanel.tscn" id="2_panel"]
 
 [node name="StanceSocketSection" type="VBoxContainer" node_paths=PackedStringArray("_header", "_panel")]
 offset_right = 560.0

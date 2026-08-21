@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://dp4ta9cn1mh8k"]
+[gd_scene format=3 uid="uid://dp4tbacn1mh8k"]
 
-[ext_resource type="Script" uid="uid://bz7ei2od5vq3t" path="res://Source/UIElements/AugmentTrayTile.cs" id="1_tile"]
+[ext_resource type="Script" uid="uid://c7o4wtarcxuix" path="res://Addons/Battle/UIElements/AugmentTrayTile.cs" id="1_tile"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tile"]
 content_margin_left = 3.0

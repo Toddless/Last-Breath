@@ -37,6 +37,7 @@
         private BattleContext? _activeContext;
         [Export] private MainWorld? _mainWorld;
         [Export] private UiLayerManager? _layerManager;
+        [Export] private bool _addTestItems = false;
 
         public override void _Ready()
         {
@@ -61,7 +62,7 @@
             _gameEventBus.Subscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
             _gameEventBus.Subscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
             _uiElementProvider.ChangeHud(typeof(PlayerHud));
-            AddTestItems();
+            if (_addTestItems) AddTestItems();
         }
 
         private void AddTestItems()

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cm0ug8yh3ls6n"]
 
-[ext_resource type="Script" uid="uid://dj1kx4rw7bf9p" path="res://Source/UIElements/AugmentTray.cs" id="1_tray"]
-[ext_resource type="PackedScene" uid="uid://dp4ta9cn1mh8k" path="res://Source/UIElements/AugmentTrayTile.tscn" id="2_tile"]
+[ext_resource type="Script" uid="uid://bbk73xd44eaya" path="res://Addons/Battle/UIElements/AugmentTray.cs" id="1_tray"]
+[ext_resource type="PackedScene" uid="uid://dp4tbacn1mh8k" path="res://Addons/Battle/UIElements/AugmentTrayTile.tscn" id="2_tile"]
 
 [node name="AugmentTray" type="Control" node_paths=PackedStringArray("_grid", "_trayEmpty")]
 custom_minimum_size = Vector2(300, 0)

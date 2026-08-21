@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" uid="uid://c5u1ydlvei3f" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisualConfig.cs" id="1_cfg"]
 [ext_resource type="Script" uid="uid://dfqia0kgwcy7e" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisualLibrary.cs" id="2_lib"]
-[ext_resource type="Texture2D" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier2Body.png" id="3_s2body"]
-[ext_resource type="Texture2D" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier2Taken.png" id="4_s2taken"]
-[ext_resource type="Texture2D" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier3Body.png" id="5_s3body"]
-[ext_resource type="Texture2D" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier3Taken.png" id="6_s3taken"]
+[ext_resource type="Texture2D" uid="uid://bwikm8qju0wmg" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier2Body.png" id="3_s2body"]
+[ext_resource type="Texture2D" uid="uid://ryk2vv3vqs1b" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier2Taken.png" id="4_s2taken"]
+[ext_resource type="Texture2D" uid="uid://cbrii2oc7hctf" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier3Body.png" id="5_s3body"]
+[ext_resource type="Texture2D" uid="uid://cypo1qdemlyta" path="res://Addons/Battle/UIElements/PassiveWheel/SocketTier3Taken.png" id="6_s3taken"]
 
 [sub_resource type="Resource" id="Hide_unlock"]
 script = ExtResource("1_cfg")

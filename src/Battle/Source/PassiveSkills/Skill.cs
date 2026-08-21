@@ -10,6 +10,8 @@
     public abstract class Skill(string id) : ISkill
     {
         protected IFightable? Owner;
+        /// <summary>Named values for the description template ({Chance}, {Threshold}...); null = static text.</summary>
+        protected virtual IReadOnlyDictionary<string, object?>? DescriptionValues => null;
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public Texture2D? Icon { get; }
@@ -19,10 +21,7 @@
             DescriptionValues is { } values
                 ? Localization.RenderDescription(Id, values, TextFormat.Rich)
                 : Localization.LocalizeDescription(Id);
-
-        /// <summary>Named values for the description template ({Chance}, {Threshold}...); null = static text.</summary>
-        protected virtual IReadOnlyDictionary<string, object?>? DescriptionValues => null;
-
+        
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public abstract void Attach(IFightable owner);
         public abstract void Detach(IFightable owner);

@@ -22,8 +22,53 @@
         // One shared, time-seeded generator instead of a fresh one per activation, built lazily on the
         // first real cast — a preview never materializes it.
         private static IRandomNumberGenerator? s_castRnd;
+        private readonly Dictionary<string, IAugment> _installedUpgrades = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, IActivationRider> _activationRiders = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, IImpactRider> _impactRiders = new(StringComparer.Ordinal);
+        private static IRandomNumberGenerator CastRnd => s_castRnd ??= CastRandomSource();
 
         protected IFightable? Owner;
+
+        /// <summary>The data record the ability was built from — the single source of base values;
+        /// <see cref="Copy"/> rebuilds fresh instances from it.</summary>
+        protected AbilityBaseData Data { get; } = data;
+
+        /// <summary>
+        /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
+        /// Damage-dealing descendants stamp it onto their DamageContexts so the BattleDirector
+        /// can play the whole cast as one chord.
+        /// </summary>
+        protected string CastId { get; private set; } = string.Empty;
+
+        /// <summary>The single parameter store: base values registered by the ability, decorated by upgrades.</summary>
+        protected AbilityParameterSet Params
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new AbilityParameterSet();
+                RegisterBaseParameters(field);
+                field.ParameterChanged += OnParameterChangedInternal;
+                return field;
+            }
+        }
+
+        /// <summary>
+        /// Named values for the description template: placeholder = parameter key ({Cooldown},
+        /// {Damage}, {StunDuration}...). Every registered parameter is exposed, decorated values —
+        /// upgrades change the text automatically; percent-fractions are rescaled by the template.
+        /// </summary>
+        protected virtual Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = new Dictionary<string, object?>();
+                foreach (string key in Params.Keys)
+                    values[key] = Params[key];
+                values.Remove(AbilityParameter.CostType); // enum stored as float — meaningless as a number
+                return values;
+            }
+        }
 
         /// <summary>
         /// Builds the generator every cast rolls on. The seat starts on <see cref="DefaultCastRandom"/>,
@@ -44,23 +89,6 @@
             }
         } = DefaultCastRandom;
 
-        /// <summary>The data record the ability was built from — the single source of base values;
-        /// <see cref="Copy"/> rebuilds fresh instances from it.</summary>
-        protected AbilityBaseData Data { get; } = data;
-
-        /// <summary>The single parameter store: base values registered by the ability, decorated by upgrades.</summary>
-        protected AbilityParameterSet Params
-        {
-            get
-            {
-                if (field != null) return field;
-                field = new AbilityParameterSet();
-                RegisterBaseParameters(field);
-                field.ParameterChanged += OnParameterChangedInternal;
-                return field;
-            }
-        }
-
         public float this[string parameter] => Params[parameter];
 
         public float Effectiveness => Params.ValueOr(AbilityParameter.Effectiveness, 1f);
@@ -77,34 +105,10 @@
 
         public IReadOnlyCollection<string> Family(string parameter) => Params.Family(parameter);
 
-        /// <summary>
-        /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
-        /// Damage-dealing descendants stamp it onto their DamageContexts so the BattleDirector
-        /// can play the whole cast as one chord.
-        /// </summary>
-        protected string CastId { get; private set; } = string.Empty;
-
         /// <summary>Who this cast is, for everything it leaves behind on somebody. The instance id is
         /// the half that makes it MINE rather than merely this ability's: two fighters carrying the same
         /// ability carry two instances of it.</summary>
         public AbilityTrace Trace => new(Id, CastId, InstanceId);
-
-        /// <summary>
-        /// Named values for the description template: placeholder = parameter key ({Cooldown},
-        /// {Damage}, {StunDuration}...). Every registered parameter is exposed, decorated values —
-        /// upgrades change the text automatically; percent-fractions are rescaled by the template.
-        /// </summary>
-        protected virtual Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = new Dictionary<string, object?>();
-                foreach (string key in Params.Keys)
-                    values[key] = Params[key];
-                values.Remove(AbilityParameter.CostType); // enum stored as float — meaningless as a number
-                return values;
-            }
-        }
 
         public Costs CostType => (Costs)this[AbilityParameter.CostType];
         public Stance Stance { get; set; } = data.Stance;
@@ -112,9 +116,7 @@
         public IReadOnlyDictionary<string, IActivationRider> ActivationRiders => _activationRiders;
         public IReadOnlyDictionary<string, IImpactRider> ImpactRiders => _impactRiders;
         public IReadOnlyDictionary<string, IAugment> InstalledUpgrades => _installedUpgrades;
-        private readonly Dictionary<string, IAugment> _installedUpgrades = new(StringComparer.Ordinal);
-        private readonly Dictionary<string, IActivationRider> _activationRiders = new(StringComparer.Ordinal);
-        private readonly Dictionary<string, IImpactRider> _impactRiders = new(StringComparer.Ordinal);
+
         public ITargetingStrategy Targeting { get; set; } = TargetingStrategyFactory.From(data);
         public int CostValue => (int)this[AbilityParameter.CostValue];
         public string Id { get; } = data.Id;
@@ -223,8 +225,6 @@
         /// and free of the engine, so a host that never boots Godot survives a cast instead of dying on
         /// the first one.</summary>
         public static DefaultRandomNumberGenerator DefaultCastRandom() => new();
-
-        private static IRandomNumberGenerator CastRnd => s_castRnd ??= CastRandomSource();
 
         /// <summary>Delivery implementations (internal loops and execution strategies) call this on every
         /// impact so per-impact riders fire for each touched target.</summary>
@@ -425,6 +425,8 @@
             ActivationEffect.Values.ToList().ForEach(mod => mod.Apply(context));
             Owner?.ModifierHandler.Apply(context);
         }
+
+
 
         private static string ToParameterKey(string jsonKey) => char.ToUpperInvariant(jsonKey[0]) + jsonKey[1..];
 

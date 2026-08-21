@@ -4,267 +4,6 @@
 [ext_resource type="Script" uid="uid://4a2smsvqm4hg" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisual.cs" id="2_visual"]
 [ext_resource type="Script" uid="uid://nqssfbi64bh8" path="res://Addons/Battle/UIElements/PassiveWheel/WheelSector.cs" id="3_sector"]
 
-[sub_resource type="Gradient" id="Gradient_disc"]
-offsets = PackedFloat32Array(0, 0.72, 1)
-colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
-
-[sub_resource type="Gradient" id="Gradient_ring"]
-offsets = PackedFloat32Array(0, 0.54, 0.78, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
-
-[sub_resource type="GradientTexture2D" id="Body_small"]
-gradient = SubResource("Gradient_ring")
-width = 45
-height = 45
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Taken_small"]
-gradient = SubResource("Gradient_disc")
-width = 45
-height = 45
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Glow_small"]
-gradient = SubResource("Gradient_disc")
-width = 96
-height = 96
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Body_notable"]
-gradient = SubResource("Gradient_ring")
-width = 96
-height = 96
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Taken_notable"]
-gradient = SubResource("Gradient_disc")
-width = 96
-height = 96
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Glow_notable"]
-gradient = SubResource("Gradient_disc")
-width = 208
-height = 208
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Body_keystone"]
-gradient = SubResource("Gradient_ring")
-width = 136
-height = 136
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Taken_keystone"]
-gradient = SubResource("Gradient_disc")
-width = 136
-height = 136
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Glow_keystone"]
-gradient = SubResource("Gradient_disc")
-width = 288
-height = 288
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Body_unlock"]
-gradient = SubResource("Gradient_ring")
-width = 88
-height = 88
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Taken_unlock"]
-gradient = SubResource("Gradient_disc")
-width = 88
-height = 88
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Glow_unlock"]
-gradient = SubResource("Gradient_disc")
-width = 192
-height = 192
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Body_socket2"]
-gradient = SubResource("Gradient_ring")
-width = 48
-height = 48
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Taken_socket2"]
-gradient = SubResource("Gradient_disc")
-width = 48
-height = 48
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Glow_socket2"]
-gradient = SubResource("Gradient_disc")
-width = 104
-height = 104
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Body_socket3"]
-gradient = SubResource("Gradient_ring")
-width = 60
-height = 60
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Taken_socket3"]
-gradient = SubResource("Gradient_disc")
-width = 60
-height = 60
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Glow_socket3"]
-gradient = SubResource("Gradient_disc")
-width = 128
-height = 128
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Body_start"]
-gradient = SubResource("Gradient_ring")
-width = 112
-height = 112
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Taken_start"]
-gradient = SubResource("Gradient_disc")
-width = 112
-height = 112
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="Glow_start"]
-gradient = SubResource("Gradient_disc")
-width = 240
-height = 240
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="GradientTexture2D" id="SocketMark"]
-gradient = SubResource("Gradient_disc")
-width = 10
-height = 10
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="Resource" id="Visual_small"]
-script = ExtResource("2_visual")
-Kind = 0
-Radius = 5.6
-GlowRadius = 12.0
-Body = SubResource("Body_small")
-BodyTaken = SubResource("Taken_small")
-Glow = SubResource("Glow_small")
-HasView = false
-metadata/_custom_type_script = "uid://4a2smsvqm4hg"
-
-[sub_resource type="Resource" id="Visual_notable"]
-script = ExtResource("2_visual")
-Kind = 1
-Radius = 12.0
-GlowRadius = 26.0
-Body = SubResource("Body_notable")
-BodyTaken = SubResource("Taken_notable")
-Glow = SubResource("Glow_notable")
-HasView = true
-metadata/_custom_type_script = "uid://4a2smsvqm4hg"
-
-[sub_resource type="Resource" id="Visual_keystone"]
-script = ExtResource("2_visual")
-Kind = 2
-Radius = 17.0
-GlowRadius = 36.0
-Body = SubResource("Body_keystone")
-BodyTaken = SubResource("Taken_keystone")
-Glow = SubResource("Glow_keystone")
-HasView = true
-metadata/_custom_type_script = "uid://4a2smsvqm4hg"
-
-[sub_resource type="Resource" id="Visual_unlock"]
-script = ExtResource("2_visual")
-Kind = 3
-Radius = 11.0
-GlowRadius = 24.0
-Body = SubResource("Body_unlock")
-BodyTaken = SubResource("Taken_unlock")
-Glow = SubResource("Glow_unlock")
-HasView = true
-metadata/_custom_type_script = "uid://4a2smsvqm4hg"
-
-[sub_resource type="Resource" id="Visual_socket2"]
-script = ExtResource("2_visual")
-Kind = 4
-Radius = 6.0
-GlowRadius = 13.0
-Body = SubResource("Body_socket2")
-BodyTaken = SubResource("Taken_socket2")
-Glow = SubResource("Glow_socket2")
-HasView = true
-metadata/_custom_type_script = "uid://4a2smsvqm4hg"
-
-[sub_resource type="Resource" id="Visual_socket3"]
-script = ExtResource("2_visual")
-Kind = 5
-Radius = 7.5
-GlowRadius = 16.0
-Body = SubResource("Body_socket3")
-BodyTaken = SubResource("Taken_socket3")
-Glow = SubResource("Glow_socket3")
-HasView = true
-metadata/_custom_type_script = "uid://4a2smsvqm4hg"
-
-[sub_resource type="Resource" id="Visual_start"]
-script = ExtResource("2_visual")
-Kind = 6
-Radius = 14.0
-GlowRadius = 30.0
-Body = SubResource("Body_start")
-BodyTaken = SubResource("Taken_start")
-Glow = SubResource("Glow_start")
-HasView = true
-metadata/_custom_type_script = "uid://4a2smsvqm4hg"
-
 [sub_resource type="Resource" id="Sector_strength"]
 script = ExtResource("3_sector")
 AngleDegrees = -90.0
@@ -301,49 +40,270 @@ AngleDegrees = 210.0
 Tint = Color(0.69, 0.518, 0.196, 1)
 metadata/_custom_type_script = "uid://nqssfbi64bh8"
 
+[sub_resource type="Gradient" id="Gradient_disc"]
+offsets = PackedFloat32Array(0, 0.72, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="SocketMark"]
+gradient = SubResource("Gradient_disc")
+width = 10
+height = 10
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_ring"]
+offsets = PackedFloat32Array(0, 0.54, 0.78, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="Body_small"]
+gradient = SubResource("Gradient_ring")
+width = 45
+height = 45
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Taken_small"]
+gradient = SubResource("Gradient_disc")
+width = 45
+height = 45
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Glow_small"]
+gradient = SubResource("Gradient_disc")
+width = 96
+height = 96
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Resource" id="Visual_small"]
+script = ExtResource("2_visual")
+Radius = 5.6
+Body = SubResource("Body_small")
+BodyTaken = SubResource("Taken_small")
+Glow = SubResource("Glow_small")
+metadata/_custom_type_script = "uid://4a2smsvqm4hg"
+
+[sub_resource type="GradientTexture2D" id="Body_notable"]
+gradient = SubResource("Gradient_ring")
+width = 96
+height = 96
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Taken_notable"]
+gradient = SubResource("Gradient_disc")
+width = 96
+height = 96
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Glow_notable"]
+gradient = SubResource("Gradient_disc")
+width = 208
+height = 208
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Resource" id="Visual_notable"]
+script = ExtResource("2_visual")
+Kind = 1
+Radius = 12.0
+GlowRadius = 26.0
+Body = SubResource("Body_notable")
+BodyTaken = SubResource("Taken_notable")
+Glow = SubResource("Glow_notable")
+HasView = true
+metadata/_custom_type_script = "uid://4a2smsvqm4hg"
+
+[sub_resource type="GradientTexture2D" id="Body_keystone"]
+gradient = SubResource("Gradient_ring")
+width = 136
+height = 136
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Taken_keystone"]
+gradient = SubResource("Gradient_disc")
+width = 136
+height = 136
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Glow_keystone"]
+gradient = SubResource("Gradient_disc")
+width = 288
+height = 288
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Resource" id="Visual_keystone"]
+script = ExtResource("2_visual")
+Kind = 2
+Radius = 17.0
+GlowRadius = 36.0
+Body = SubResource("Body_keystone")
+BodyTaken = SubResource("Taken_keystone")
+Glow = SubResource("Glow_keystone")
+HasView = true
+metadata/_custom_type_script = "uid://4a2smsvqm4hg"
+
+[sub_resource type="GradientTexture2D" id="Body_unlock"]
+gradient = SubResource("Gradient_ring")
+width = 88
+height = 88
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Taken_unlock"]
+gradient = SubResource("Gradient_disc")
+width = 88
+height = 88
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Glow_unlock"]
+gradient = SubResource("Gradient_disc")
+width = 192
+height = 192
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Resource" id="Visual_unlock"]
+script = ExtResource("2_visual")
+Kind = 3
+Radius = 11.0
+GlowRadius = 24.0
+Body = SubResource("Body_unlock")
+BodyTaken = SubResource("Taken_unlock")
+Glow = SubResource("Glow_unlock")
+HasView = true
+metadata/_custom_type_script = "uid://4a2smsvqm4hg"
+
+[sub_resource type="GradientTexture2D" id="Body_socket2"]
+gradient = SubResource("Gradient_ring")
+width = 48
+height = 48
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Taken_socket2"]
+gradient = SubResource("Gradient_disc")
+width = 48
+height = 48
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Glow_socket2"]
+gradient = SubResource("Gradient_disc")
+width = 104
+height = 104
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Resource" id="Visual_socket2"]
+script = ExtResource("2_visual")
+Kind = 4
+GlowRadius = 13.0
+Body = SubResource("Body_socket2")
+BodyTaken = SubResource("Taken_socket2")
+Glow = SubResource("Glow_socket2")
+HasView = true
+metadata/_custom_type_script = "uid://4a2smsvqm4hg"
+
+[sub_resource type="GradientTexture2D" id="Body_socket3"]
+gradient = SubResource("Gradient_ring")
+width = 60
+height = 60
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Taken_socket3"]
+gradient = SubResource("Gradient_disc")
+width = 60
+height = 60
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Glow_socket3"]
+gradient = SubResource("Gradient_disc")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Resource" id="Visual_socket3"]
+script = ExtResource("2_visual")
+Kind = 5
+Radius = 7.5
+GlowRadius = 16.0
+Body = SubResource("Body_socket3")
+BodyTaken = SubResource("Taken_socket3")
+Glow = SubResource("Glow_socket3")
+HasView = true
+metadata/_custom_type_script = "uid://4a2smsvqm4hg"
+
+[sub_resource type="GradientTexture2D" id="Body_start"]
+gradient = SubResource("Gradient_ring")
+width = 112
+height = 112
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Taken_start"]
+gradient = SubResource("Gradient_disc")
+width = 112
+height = 112
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="GradientTexture2D" id="Glow_start"]
+gradient = SubResource("Gradient_disc")
+width = 240
+height = 240
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Resource" id="Visual_start"]
+script = ExtResource("2_visual")
+Kind = 6
+Radius = 14.0
+GlowRadius = 30.0
+Body = SubResource("Body_start")
+BodyTaken = SubResource("Taken_start")
+Glow = SubResource("Glow_start")
+HasView = true
+metadata/_custom_type_script = "uid://4a2smsvqm4hg"
+
 [resource]
 script = ExtResource("1_style")
 _visuals = Array[ExtResource("2_visual")]([SubResource("Visual_small"), SubResource("Visual_notable"), SubResource("Visual_keystone"), SubResource("Visual_unlock"), SubResource("Visual_socket2"), SubResource("Visual_socket3"), SubResource("Visual_start")])
 _ringRadii = PackedFloat32Array(70, 215, 385, 520)
 _sectors = Array[ExtResource("3_sector")]([SubResource("Sector_strength"), SubResource("Sector_intelligence_strength"), SubResource("Sector_intelligence"), SubResource("Sector_dexterity_intelligence"), SubResource("Sector_dexterity"), SubResource("Sector_strength_dexterity")])
-_sectorRadius = 548.0
-_sectorHalfAngleDegrees = 30.0
-_coreGlowRadius = 112.0
-_ringWidth = 2.0
-_void = Color(0.043, 0.035, 0.024, 1)
-_ringLine = Color(0.227, 0.188, 0.125, 1)
-_coreGlow = Color(0.227, 0.173, 0.082, 1)
-_edgeIdle = Color(0.169, 0.141, 0.094, 1)
-_edgeTaken = Color(0.941, 0.831, 0.537, 1)
-_edgePath = Color(0.941, 0.831, 0.537, 1)
-_frontier = Color(0.847, 0.706, 0.369, 1)
-_hover = Color(0.988, 0.898, 0.62, 1)
-_planTake = Color(0.529, 0.804, 0.541, 1)
-_planRefund = Color(0.851, 0.412, 0.353, 1)
-_nodeIdleFill = Color(0.086, 0.067, 0.039, 1)
-_nodeIdleOutline = Color(0.298, 0.259, 0.192, 1)
-_strength = Color(0.776, 0.325, 0.251, 1)
-_dexterity = Color(0.435, 0.62, 0.333, 1)
-_intelligence = Color(0.302, 0.518, 0.741, 1)
-_neutral = Color(0.847, 0.706, 0.369, 1)
-_wedgeStrengthDexterity = Color(0.69, 0.518, 0.196, 1)
-_wedgeDexterityIntelligence = Color(0.184, 0.561, 0.541, 1)
-_wedgeIntelligenceStrength = Color(0.541, 0.388, 0.678, 1)
 _idleEdgeWidth = 1.6
-_takenEdgeWidth = 3.0
-_minEdgeScreenWidth = 1.0
-_minNodeScreenRadius = 1.5
-_pickScreenSlack = 6.0
-_textureOversample = 4.0
 _socketRingRadiusScale = 2.1
 _socketPipRadiusScale = 0.55
-_socketArcDegrees = 120.0
-_minPipScreenRadius = 2.0
-_socketRingMinNodeScreenRadius = 6.0
-_socketOpen = Color(0.847, 0.706, 0.369, 1)
-_socketFilled = Color(0.988, 0.898, 0.62, 1)
-_socketHeld = Color(0.478, 0.427, 0.322, 1)
-_socketUnopened = Color(0.298, 0.259, 0.192, 1)
-_socketDropTarget = Color(0.529, 0.804, 0.541, 1)
 _socketMark = SubResource("SocketMark")
 metadata/_custom_type_script = "uid://gt38wxhty8t1"
