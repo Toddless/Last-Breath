@@ -2,8 +2,10 @@
 
 ## Из С-1 плейсхолдер-фикса карточек (2026-08-21, коммит `ffbd6db0`; принят сверкой ведущего)
 
-- **(хвост класса, 4 записи)** Фабричные записи, чей эффект назван В КОДЕ (`AbilityProvider.Upgrades.cs`: FuryFromCanon/EffectFromCanon), ассемблеру описаний невидимы — карточки по-прежнему с сырыми плейсхолдерами: `Augment_Berserk_Fury_Burning` ({burningDuration},{burningMaxStacks}), `Augment_Berserk_Fury_Healing` ({healAmount}), `Augment_Berserk_Fury_Primal` ({damageMultiplier}), `Augment_Dark_Shroud_Immortality` ({duration}). Форма починки: объявлять уложенный effectId в регистрации `AugmentFactory` рядом с MovedParameters и отдавать его в `AugmentDescription`.
-- (лок/механика, владельцу или Т-9) `Augment_Reduce_Cooldown`/`Augment_Reduce_Cooldown_Add_Cost` — тексты обещают `{cooldownShare:%}` (долю), запись несёт `cooldownTurns` (целые ходы): расхождение текста и механики, переименованием плейсхолдера не лечится.
+- ~~**(хвост класса, 4 записи)** Фабричные записи, чей эффект назван В КОДЕ, ассемблеру описаний невидимы~~ — ЗАКРЫТО С-1b `0cf29ef1` (`AugmentFactory.Laying`, резолвер `IAugmentLaidEffects`).
+- ~~(лок/механика) `Augment_Reduce_Cooldown*` обещают долю, запись несёт ходы~~ — ЗАКРЫТО С-1b `0cf29ef1` (тексты под `{cooldownTurns|turn|turns}`); там же Primal «+{damageMultiplier:%}» (механика ShareGained = +35%) и Burning без клаузы стаков (канон 999 = без предела).
+- (nit, тест-инфра) `AugmentDescriptionTests.Cards(minter, catalog, record)` — параметр `catalog` не используется.
+- (nit, тест-пин) `AugmentDescriptionTests:110,113` — канон-пин прибит к числу `Effect_Healing_Fury.healAmount` 15%/55% — ребаланс покраснит (та же цена, что у соседа `TheNumbersOnACardAreTheCanonsAndMoveWithIt`).
 - (знать, propertyRefs) `propertyRefs` (duration → Duration хозяйки) читаются в момент каста, описание собирается раньше: строка, назвавшая такой ключ, напечатает канонные ходы, а не декорированные хозяйкины. Сегодня ни одна не называет — вреда нет.
 - (открытая развилка дизайна, не баг подстановки) Дизайн-док («Гниющие раны», «Разложение») описывает эти аугменты как «стак эффекта с УВЕЛИЧЕННОЙ на 10–45% эффективностью», а .po описывает сам эффект — развилка «эффективность на эффект» из прохода аугментов (§4f) всё ещё не решена.
 
