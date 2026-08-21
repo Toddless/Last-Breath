@@ -1,8 +1,32 @@
-[gd_resource type="Resource" script_class="PassiveNodeVisualLibrary" format=3]
+[gd_resource type="Resource" script_class="PassiveNodeVisualLibrary" format=3 uid="uid://clcr03qqjtk6e"]
 
-[ext_resource type="Script" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisualConfig.cs" id="1_cfg"]
-[ext_resource type="Script" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisualLibrary.cs" id="2_lib"]
+[ext_resource type="Script" uid="uid://c5u1ydlvei3f" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisualConfig.cs" id="1_cfg"]
+[ext_resource type="Script" uid="uid://dfqia0kgwcy7e" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisualLibrary.cs" id="2_lib"]
+
+[sub_resource type="Resource" id="Hide_unlock"]
+script = ExtResource("1_cfg")
+Kind = 3
+HidesAugmentMark = true
+metadata/_custom_type_script = "uid://c5u1ydlvei3f"
+
+[sub_resource type="Resource" id="Hide_socket2"]
+script = ExtResource("1_cfg")
+Kind = 4
+HidesAugmentMark = true
+metadata/_custom_type_script = "uid://c5u1ydlvei3f"
+
+[sub_resource type="Resource" id="Hide_socket3"]
+script = ExtResource("1_cfg")
+Kind = 5
+HidesAugmentMark = true
+metadata/_custom_type_script = "uid://c5u1ydlvei3f"
+
+[sub_resource type="Resource" id="Hide_start"]
+script = ExtResource("1_cfg")
+Kind = 6
+HidesAugmentMark = true
+metadata/_custom_type_script = "uid://c5u1ydlvei3f"
 
 [resource]
 script = ExtResource("2_lib")
-Configs = Array[ExtResource("1_cfg")]([])
+Configs = Array[ExtResource("1_cfg")]([SubResource("Hide_unlock"), SubResource("Hide_socket2"), SubResource("Hide_socket3"), SubResource("Hide_start")])
