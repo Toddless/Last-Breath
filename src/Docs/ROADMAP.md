@@ -67,7 +67,6 @@ Closes the economy loop (loot → gold → purchases) and activates already-buil
 Only what a new player sees in the first hour:
 
 - [ ] Boss presentation iteration (moved from Stage 1; absorbs "Доработать" #66): stage-transition beat, "Immune!" beat + log line, StageGuard "N prevented" display, shield bar over the barrier + log, arena-wide cast presentation.
-
 - [ ] Loading screen ("Доработать" #18) and ally/enemy join-battle notification (#19).
 - [ ] Destroy-mode confirmation (#22) — a misclicked legendary ruins a playtest.
 - [ ] Equipped-item comparison (#38) and modifier ranges on reroll (#85) — minimum for loot readability.
