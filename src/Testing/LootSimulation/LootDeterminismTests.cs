@@ -19,10 +19,10 @@ namespace LastBreathTest.LootSimulation
         /// <summary>What <see cref="BossDrops"/> produced at <see cref="Seed"/> when the committed report
         /// was last regenerated. Recorded fingerprints move only when the drops move: regenerate the report
         /// (<c>LOOT_SIMULATION_REPORT=1 dotnet test</c>), commit it, and paste the value the failure prints.</summary>
-        private const string BossDropsFingerprint = "79351117BE577D495F54B39083856104837C936F68ED4755AAEC74897395FB19";
+        private const string BossDropsFingerprint = "29566E2A16D2B21FBD0FAF4D989001612C1F9D635A4E3140C0F4E297AEC2012C";
 
         /// <summary>The same for <see cref="RolledModifiers"/>.</summary>
-        private const string RolledModifiersFingerprint = "6F2C635EF4FECA78D292421B296C02DB94C06CFB47D3EF8183ED08E6BCA94247";
+        private const string RolledModifiersFingerprint = "6223122F8B33E711F29B7C0CC283F42A8D23BD45B8EEDB8A4EFDF301F0A581A1";
 
         /// <summary>The boss carries the paths a regular kill never reaches — equip affix rolls, grant
         /// rolls and augment seats — which is where a run stops repeating itself first.</summary>

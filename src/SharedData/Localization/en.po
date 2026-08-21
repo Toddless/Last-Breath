@@ -2397,6 +2397,15 @@ msgstr "All Attributes"
 msgid "AllDefence"
 msgstr "All Defence"
 
+msgid "PoisonDamageMultiplier"
+msgstr "Poison Damage Multiplier"
+
+msgid "BurningDamageMultiplier"
+msgstr "Burning Damage Multiplier"
+
+msgid "BleedDamageMultiplier"
+msgstr "Bleed Damage Multiplier"
+
 # ------------------------------
 # Ability parameters (battle UI)
 # ------------------------------

@@ -1311,6 +1311,15 @@ msgstr ""
 msgid "AllDefence"
 msgstr ""
 
+msgid "PoisonDamageMultiplier"
+msgstr ""
+
+msgid "BurningDamageMultiplier"
+msgstr ""
+
+msgid "BleedDamageMultiplier"
+msgstr ""
+
 msgid "MoveSpeed"
 msgstr ""
 
@@ -1916,13 +1925,13 @@ msgstr "Восстанавливает процент максимальной �
 # ------------------------------
 
 msgid "Augment_Reduce_Cost"
-msgstr ""
+msgstr "Снижение стоимости"
 
 msgid "Augment_Reduce_Cost_Description"
 msgstr "-{costShare:%} к стоимости."
 
 msgid "Augment_Reduce_Cooldown"
-msgstr ""
+msgstr "Снижение перезарядки"
 
 msgid "Augment_Reduce_Cooldown_Description"
 msgstr "-{cooldownShare:%} к перезарядке."
