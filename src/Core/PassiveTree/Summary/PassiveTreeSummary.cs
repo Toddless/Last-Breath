@@ -59,11 +59,15 @@ namespace Core.PassiveTree.Summary
                 {
                     if (line.ValueType == ModifierValueType.Flag) continue;
 
-                    if (line.IsConditional)
-                    {
-                        summary.ConditionalLines++;
-                        if (skipConditional) continue;
-                    }
+                    // Counted before anything is skipped, so both readings say the same about a line that
+                    // is gated AND scaled at once.
+                    if (line.IsConditional) summary.ConditionalLines++;
+                    if (line.IsScaled) summary.ScaledLines++;
+
+                    // A line measured per unit of a carrier parameter has no honest column here: this
+                    // reading has no fighter to measure, and folding it against a bare baseline would put
+                    // a number in the table nobody actually holds. Counted instead of guessed.
+                    if (line.IsScaled || (skipConditional && line.IsConditional)) continue;
 
                     // An aggregate lands on every family member — the game folds it at resolution, so
                     // "+2 to all attributes" must fold here too.
@@ -235,6 +239,11 @@ namespace Core.PassiveTree.Summary
         /// only sometimes true; in the excluding reading, how much of the allocation the totals don't
         /// show.</summary>
         public int ConditionalLines { get; set; }
+
+        /// <summary>Lines whose value is per unit of a carrier parameter. Left out of every total — what
+        /// they are worth is the carrier's, not the allocation's — so this is how much of the allocation
+        /// the numbers above don't cover.</summary>
+        public int ScaledLines { get; set; }
 
         public bool IsEmpty => Parameters.Count == 0 && Context.Count == 0 && Keystones.Count == 0 && _unlocks.Count == 0;
 

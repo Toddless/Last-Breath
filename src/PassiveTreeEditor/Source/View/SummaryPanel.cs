@@ -42,6 +42,11 @@ namespace PassiveTreeEditor.Source.View
             // conditionals must not lose the warning with the parameter grid it never had.
             if (summary.ConditionalLines > 0)
                 AddChild(EditorControls.Wrapped($"{summary.ConditionalLines} conditional line(s) counted as always active."));
+
+            // A line worth its value per unit of a parameter is in no table above: there is no carrier here
+            // to measure it against, and a tree whose only line is one of those must not read as empty.
+            if (summary.ScaledLines > 0)
+                AddChild(EditorControls.Wrapped($"{summary.ScaledLines} per-parameter line(s) left out — their value is the carrier's."));
         }
 
         private static string Signed(float value, bool percent)

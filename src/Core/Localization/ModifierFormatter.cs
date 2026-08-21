@@ -9,14 +9,17 @@ namespace Core.Localization
     /// Turns a modifier into a localized phrase through .po templates:
     /// Modifier_Flat / Modifier_Increase / Modifier_Multiplicative with {value} and {parameter};
     /// unrolled value spreads render through the *_Range twins with {min} and {max}
-    /// ("+40–60 Strength"), and a percent penalty through the *_Negative twins, which word the
-    /// minus instead of printing it ("25% less Health Recovery"). Percent parameters follow
+    /// ("+40–60 Strength"), a percent penalty through the *_Negative twins, which word the
+    /// minus instead of printing it ("25% less Health Recovery"), and a value measured per unit of
+    /// another parameter through the *_PerParameter twins, which name that parameter in {per}
+    /// ("+1% increased Physical Damage per Strength"). Percent parameters follow
     /// IParameterFormatProvider (data stores fractions: 0.5 = 50%).
     /// </summary>
     public class ModifierFormatter(ILocalizationProvider localization, IParameterFormatProvider formats)
     {
-        public string Format(IModifier modifier, TextFormat format = TextFormat.Plain) =>
-            RenderLine(modifier.ModifierValueType, modifier.EntityParameter, modifier.Value, modifier.Value, format);
+        /// <param name="per">Carrier parameter the value is counted per unit of; null on an ordinary line.</param>
+        public string Format(IModifier modifier, TextFormat format = TextFormat.Plain, EntityParameter? per = null) =>
+            RenderLine(modifier.ModifierValueType, modifier.EntityParameter, modifier.Value, modifier.Value, format, per);
 
         /// <summary>Crafting preview: the value rolls within [min..max] multipliers of the base.</summary>
         public string FormatRanged(IModifier modifier, float rangeMinValue, float rangeMaxValue, TextFormat format = TextFormat.Plain) =>
@@ -81,7 +84,8 @@ namespace Core.Localization
                 : $"{Number(descriptor.Value.Min * scale)} – {Number(descriptor.Value.Max * scale)}{unit}";
         }
 
-        private string RenderLine(ModifierValueType valueType, EntityParameter parameter, float min, float max, TextFormat format)
+        private string RenderLine(
+            ModifierValueType valueType, EntityParameter parameter, float min, float max, TextFormat format, EntityParameter? per = null)
         {
             // Multiplicative modifier Value is a DELTA, not a full multiplier: the engine folds it as
             // (1 + Σ Value) (see Calculations.CalculateModifiers), so 0.2 means "+20% more". Rendering
@@ -106,16 +110,23 @@ namespace Core.Localization
                 (min, max) = (-max, -min);
             }
 
+            // A value measured off its carrier has to say so in words, or the number reads as an outright
+            // bonus; the wording is the same sentence with a "per {per}" tail.
+            if (per is not null) templateKey += "_PerParameter";
+
             float scale = isPercent ? 100f : 1f;
-            return MathF.Abs(max - min) < 0.0001f
-                ? Render(templateKey, Value(min * scale, isPercent, signed: !penalty), parameter, format)
-                : RenderRange(templateKey + "_Range", min * scale, max * scale, isPercent, parameter, format, signed: !penalty);
+            if (MathF.Abs(max - min) < 0.0001f)
+                return Render(templateKey, Value(min * scale, isPercent, signed: !penalty), parameter, per, format);
+
+            // A spread and a carrier never meet: only a node line names a carrier, and a node line always
+            // renders one value — so no *_PerParameter_Range wording exists, and none is asked for.
+            return RenderRange(templateKey + "_Range", min * scale, max * scale, isPercent, parameter, per, format, signed: !penalty);
         }
 
         /// <summary>Range twin of Render: {min} carries the sign unless the wording already does,
         /// {max} carries the unit ("+40–60% ...").</summary>
         private string RenderRange(
-            string templateKey, float min, float max, bool isPercent, EntityParameter parameter, TextFormat format, bool signed = true)
+            string templateKey, float min, float max, bool isPercent, EntityParameter parameter, EntityParameter? per, TextFormat format, bool signed = true)
         {
             string minText = $"{Sign(min, signed)}{Number(MathF.Abs(min))}";
             string maxText = $"{Number(MathF.Abs(max))}{(isPercent ? "%" : string.Empty)}";
@@ -128,16 +139,22 @@ namespace Core.Localization
             return localization.Translate(templateKey)
                 .Replace("{min}", minText)
                 .Replace("{max}", maxText)
-                .Replace("{parameter}", localization.Translate(parameter.ToString()));
+                .Replace("{parameter}", localization.Translate(parameter.ToString()))
+                .Replace("{per}", Name(per));
         }
 
-        private string Render(string templateKey, string value, EntityParameter parameter, TextFormat format)
+        private string Render(string templateKey, string value, EntityParameter parameter, EntityParameter? per, TextFormat format)
         {
             string styledValue = format == TextFormat.Rich ? TextPalette.ColorizeNumber(value) : value;
             return localization.Translate(templateKey)
                 .Replace("{value}", styledValue)
-                .Replace("{parameter}", localization.Translate(parameter.ToString()));
+                .Replace("{parameter}", localization.Translate(parameter.ToString()))
+                .Replace("{per}", Name(per));
         }
+
+        /// <summary>The carrier parameter as the player reads it; empty where the line names none, which is
+        /// where no template carries the placeholder either.</summary>
+        private string Name(EntityParameter? per) => per is { } parameter ? localization.Translate(parameter.ToString()) : string.Empty;
 
         private bool IsPercentDisplay(ModifierValueType valueType, EntityParameter parameter) =>
             valueType != ModifierValueType.Flat || formats.GetUnit(parameter) == ParameterUnit.Percent;

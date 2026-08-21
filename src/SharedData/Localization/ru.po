@@ -399,6 +399,21 @@ msgstr ""
 msgid "Modifier_Multiplicative_Negative"
 msgstr ""
 
+msgid "Modifier_Flat_PerParameter"
+msgstr ""
+
+msgid "Modifier_Increase_PerParameter"
+msgstr ""
+
+msgid "Modifier_Multiplicative_PerParameter"
+msgstr ""
+
+msgid "Modifier_Increase_Negative_PerParameter"
+msgstr ""
+
+msgid "Modifier_Multiplicative_Negative_PerParameter"
+msgstr ""
+
 msgid "Context_Modifier_HealingEfficiency"
 msgstr ""
 
@@ -3380,6 +3395,9 @@ msgid "UI_PassiveTree_Summary_Planned"
 msgstr ""
 
 msgid "UI_PassiveTree_Summary_Conditional"
+msgstr ""
+
+msgid "UI_PassiveTree_Summary_Scaled"
 msgstr ""
 
 msgid "UI_PassiveTree_Summary_Unlocks"

@@ -52,11 +52,14 @@ namespace Core.PassiveTree.View
             return node.Id;
         }
 
+        /// <summary>A line measured per unit of a carrier parameter hands that parameter to the formatter,
+        /// which words it — the number alone would read as an outright bonus.</summary>
         private static string Describe(ModifierLine line, ModifierFormatter? formatter, ILocalizationProvider? localization, TextFormat format)
         {
             string text = formatter is null
-                ? $"{line.Parameter} {line.ValueType} {line.Value}"
-                : formatter.Format(new SimpleModifier(line.Parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource), format);
+                ? $"{line.Parameter} {line.ValueType} {line.Value}{(line.IsScaled ? $" per {line.PerParameter}" : string.Empty)}"
+                : formatter.Format(
+                    new SimpleModifier(line.Parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource), format, line.PerParameter);
 
             return WithCondition(text, line.Condition, line.IsConditional, localization, format);
         }

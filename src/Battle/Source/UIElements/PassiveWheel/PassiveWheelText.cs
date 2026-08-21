@@ -56,6 +56,7 @@ namespace Battle.Source.UIElements.PassiveWheel
         public const string SummaryEmpty = "UI_PassiveTree_Summary_Empty";
         public const string SummaryPlanned = "UI_PassiveTree_Summary_Planned";
         public const string SummaryConditional = "UI_PassiveTree_Summary_Conditional";
+        public const string SummaryScaled = "UI_PassiveTree_Summary_Scaled";
         public const string SummaryUnlocks = "UI_PassiveTree_Summary_Unlocks";
         public const string SummaryParameters = "UI_PassiveTree_Summary_Parameters";
         public const string SummaryKnobs = "UI_PassiveTree_Summary_Knobs";

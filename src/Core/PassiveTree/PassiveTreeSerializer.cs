@@ -125,6 +125,7 @@ namespace Core.PassiveTree
             Parameter = line.Parameter.ToString(),
             ValueType = line.ValueType.ToString(),
             Value = MathF.Round(line.Value, PassiveTreeFormat.ValueDecimals),
+            PerParameter = line.PerParameter?.ToString(),
             Condition = NullIfBlank(line.Condition)
         };
 
@@ -208,17 +209,24 @@ namespace Core.PassiveTree
             try
             {
                 var valueType = ParseMember<ModifierValueType>(dto.ValueType);
+                var parameter = ParseMember<EntityParameter>(dto.Parameter);
+                EntityParameter? perParameter = string.IsNullOrWhiteSpace(dto.PerParameter)
+                    ? null
+                    : ParseMember<EntityParameter>(dto.PerParameter);
 
                 // A switch is meaningless in parameter math, so it's refused here rather than becoming a
                 // modifier the resolver silently drops.
                 if (valueType == ModifierValueType.Flag)
                     throw new FormatException($"'{dto.Parameter}' is an entity parameter — a flag has no meaning in parameter math");
 
+                if (WhyNotScalable(parameter, perParameter) is { } refusal) throw new FormatException(refusal);
+
                 return new ModifierLine
                 {
-                    Parameter = ParseMember<EntityParameter>(dto.Parameter),
+                    Parameter = parameter,
                     ValueType = valueType,
                     Value = dto.Value,
+                    PerParameter = perParameter,
                     Condition = dto.Condition ?? string.Empty
                 };
             }
@@ -254,6 +262,22 @@ namespace Core.PassiveTree
                 issues.Add($"node '{nodeId}', context line: {exception.Message}, skipped");
                 return null;
             }
+        }
+
+        /// <summary>Why a line cannot be measured per unit of <paramref name="per"/>, or null when it can.
+        /// A parameter that resolves its own scale rewrites itself on every resolve, and an aggregate hands
+        /// its change to every member of the family, so sharing a family is the same loop one step wider.
+        /// An aggregate as the scale is refused outright: nobody ever holds a value for one, so the line
+        /// would be worth nothing and say nothing about why.</summary>
+        private static string? WhyNotScalable(EntityParameter parameter, EntityParameter? per)
+        {
+            if (per is not { } scale) return null;
+            if (scale == parameter) return $"'{parameter}' cannot be scaled per unit of itself";
+            if (AggregateParameters.IsAggregate(scale)) return $"'{scale}' is an aggregate — nothing holds a value for it to scale by";
+            if (AggregateParameters.Members(parameter).Contains(scale) || AggregateParameters.Aggregates(parameter).Contains(scale))
+                return $"'{parameter}' and '{scale}' are one family — resolving either resolves the other";
+
+            return null;
         }
 
         /// <summary>Stricter than <see cref="EnumParser"/> alone, which accepts a bare number for any enum

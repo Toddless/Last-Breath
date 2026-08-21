@@ -650,8 +650,12 @@ namespace LastBreath.Helpers
             $"{Signed(formatter, modifier.ModifierValueType, modifier.EntityParameter, modifier.Value)} {modifier.ModifierValueType} ({modifier.Source})"
             + (modifier is IConditionalModifier conditional ? conditional.IsActive ? " [on]" : " [off]" : string.Empty);
 
+        // The dump names the carrier of a per-unit line too: without it the authored number reads as an
+        // outright bonus and the console disagrees with the wheel about the same line.
         private static string FormatTreeLine(ModifierFormatter formatter, ModifierLine line) =>
-            $"{Signed(formatter, line.ValueType, line.Parameter, line.Value)} {line.Parameter} {line.ValueType}{(line.IsConditional ? $" if \"{line.Condition}\"" : string.Empty)}";
+            $"{Signed(formatter, line.ValueType, line.Parameter, line.Value)} {line.Parameter} {line.ValueType}"
+            + (line.IsScaled ? $" per {line.PerParameter}" : string.Empty)
+            + (line.IsConditional ? $" if \"{line.Condition}\"" : string.Empty);
 
         /// <summary>The formatter renders the magnitude with its unit and carries the minus sign; the
         /// plus is a console convention and the only thing added on top of it.</summary>

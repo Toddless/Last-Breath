@@ -230,7 +230,8 @@
                 {
                     "parameter": "PhysicalDamage",
                     "valueType": "Increase",
-                    "value": 0.01
+                    "value": 0.01,
+                    "perParameter": "Strength"
                 },
                 {
                     "parameter": "HealthRecovery",

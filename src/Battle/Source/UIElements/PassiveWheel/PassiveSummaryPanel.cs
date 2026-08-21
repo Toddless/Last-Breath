@@ -14,9 +14,10 @@ namespace Battle.Source.UIElements.PassiveWheel
     /// and the abilities his nodes unlocked. What replaced the column of node cards — a player plans
     /// against a total, not against one node at a time.
     ///
-    /// <para>Gated lines are LEFT OUT of every number and only counted. A total a player reads as his own
-    /// must not carry a bonus that is off while he reads it; how much of the allocation is not being shown
-    /// is said in one line at the bottom.</para>
+    /// <para>Gated lines are LEFT OUT of every number and only counted, and so are lines worth their value
+    /// per unit of a parameter — this panel has no fighter to measure one against. A total a player reads as
+    /// his own must not carry a bonus that is off while he reads it, nor a number nobody holds; how much of
+    /// the allocation is not being shown is said at the bottom.</para>
     ///
     /// <para>Measured against <see cref="NoBaseline"/> on purpose: the panel shows the CONTRIBUTION OF THE
     /// TREE, and the tree's contribution is already registered on the living character — reading it
@@ -87,11 +88,26 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             if (_conditional == null) return;
 
-            _conditional.Visible = held.ConditionalLines > 0;
-            if (_conditional.Visible)
-                _conditional.Text = Localization.Render(PassiveWheelText.SummaryConditional,
-                    new Dictionary<string, object?> { [PassiveWheelText.CountValue] = held.ConditionalLines });
+            string note = Uncounted(held);
+            _conditional.Visible = note.Length > 0;
+            _conditional.Text = note;
         }
+
+        /// <summary>What the totals above do NOT cover, one sentence per reason: lines held up by a gate,
+        /// and lines whose value is per unit of a parameter this panel has no carrier to measure. Both share
+        /// the one footnote the scene owns — a count that never reached the player would leave a taken node
+        /// looking like it gave nothing at all.</summary>
+        private static string Uncounted(TreeSummary held)
+        {
+            List<string> notes = [];
+            if (held.ConditionalLines > 0) notes.Add(Counted(PassiveWheelText.SummaryConditional, held.ConditionalLines));
+            if (held.ScaledLines > 0) notes.Add(Counted(PassiveWheelText.SummaryScaled, held.ScaledLines));
+
+            return string.Join("\n", notes);
+        }
+
+        private static string Counted(string key, int lines) =>
+            Localization.Render(key, new Dictionary<string, object?> { [PassiveWheelText.CountValue] = lines });
 
         public static PackedScene? Initialize() =>
             string.IsNullOrEmpty(UID) ? null : ResourceLoader.Load<PackedScene>(UID);

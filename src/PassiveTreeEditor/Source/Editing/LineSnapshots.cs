@@ -11,13 +11,14 @@ namespace PassiveTreeEditor.Source.Editing
     /// </summary>
     public static class LineSnapshots
     {
-        /// <summary>Whether a gesture left the line as it found it. Field for field against the same
-        /// four the snapshot copies: a comparison over fewer of them would let a real edit past as a
+        /// <summary>Whether a gesture left the line as it found it. Field for field against the same ones
+        /// the snapshot copies: a comparison over fewer of them would let a real edit past as a
         /// no-op, which is the one direction of this mistake that loses work.</summary>
         public static bool Same(ModifierLine first, ModifierLine second) =>
             first.Parameter == second.Parameter
             && first.ValueType == second.ValueType
             && first.Value.Equals(second.Value)
+            && first.PerParameter == second.PerParameter
             && string.Equals(first.Condition, second.Condition, StringComparison.Ordinal);
 
         public static bool Same(ContextModifierLine first, ContextModifierLine second) =>
@@ -26,11 +27,14 @@ namespace PassiveTreeEditor.Source.Editing
             && first.Value.Equals(second.Value)
             && string.Equals(first.Condition, second.Condition, StringComparison.Ordinal);
 
+        /// <summary>The per-unit carrier travels with the rest: the tool authors no field for it, so a copy
+        /// that dropped it would quietly strip a hand-written line the first time the node was edited.</summary>
         public static void Assign(ModifierLine target, ModifierLine source)
         {
             target.Parameter = source.Parameter;
             target.ValueType = source.ValueType;
             target.Value = source.Value;
+            target.PerParameter = source.PerParameter;
             target.Condition = source.Condition;
         }
 

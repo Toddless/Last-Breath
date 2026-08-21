@@ -1586,6 +1586,24 @@ msgstr "{value} reduced {parameter}"
 msgid "Modifier_Multiplicative_Negative"
 msgstr "{value} less {parameter}"
 
+# Per-unit twins: the value is worth that much for every unit of {per} the carrier holds
+# ("+1% increased Physical Damage per Strength").
+
+msgid "Modifier_Flat_PerParameter"
+msgstr "{value} {parameter} per {per}"
+
+msgid "Modifier_Increase_PerParameter"
+msgstr "{value} increased {parameter} per {per}"
+
+msgid "Modifier_Multiplicative_PerParameter"
+msgstr "{value} more {parameter} per {per}"
+
+msgid "Modifier_Increase_Negative_PerParameter"
+msgstr "{value} reduced {parameter} per {per}"
+
+msgid "Modifier_Multiplicative_Negative_PerParameter"
+msgstr "{value} less {parameter} per {per}"
+
 # Range twins for unrolled spreads: {min} carries the sign, {max} carries the unit ("+40–60% increased ...").
 
 msgid "Modifier_Flat_Range"
@@ -3940,6 +3958,9 @@ msgstr "Plan: {count} nodes"
 
 msgid "UI_PassiveTree_Summary_Conditional"
 msgstr "{count} conditional lines are not counted"
+
+msgid "UI_PassiveTree_Summary_Scaled"
+msgstr "{count} per-parameter lines are not counted"
 
 msgid "UI_PassiveTree_Summary_Unlocks"
 msgstr "Abilities"

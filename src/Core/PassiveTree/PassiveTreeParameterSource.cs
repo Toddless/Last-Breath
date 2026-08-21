@@ -17,9 +17,10 @@ namespace Core.PassiveTree
     {
         private readonly Dictionary<EntityParameter, List<IModifierInstance>> _modifiers = [];
 
-        /// <summary>Conditional lines, kept apart because they're the only ones with anything to release —
-        /// their predicates watch a fighter, and a silent drop would leave that watch running.</summary>
-        private readonly List<ConditionalModifier> _conditional = [];
+        /// <summary>Lines bound to the carrier — gated ones and ones measured off him. Kept apart because
+        /// they're the only ones with anything to release: they watch a fighter, and a silent drop would
+        /// leave that watch running.</summary>
+        private readonly List<ConditionalModifier> _bound = [];
 
         private IFightable? _owner;
 
@@ -38,7 +39,7 @@ namespace Core.PassiveTree
         {
             var affected = new HashSet<EntityParameter>(_modifiers.Keys);
             Release();
-            _conditional.Clear();
+            _bound.Clear();
             _modifiers.Clear();
 
             foreach (string id in taken)
@@ -53,10 +54,10 @@ namespace Core.PassiveTree
             if (affected.Count > 0) SourceChanged?.Invoke(affected);
         }
 
-        /// <summary>Points the conditional lines at the owning fighter (or releases them). This channel is
-        /// pulled and knows the fighter only through this call, yet its predicates read that fighter's
-        /// state, so the sighting must arrive from the pushed half. Announces only the conditional lines'
-        /// own parameters afterward — everything else resolves the same regardless of owner.</summary>
+        /// <summary>Points the bound lines at the owning fighter (or releases them). This channel is
+        /// pulled and knows the fighter only through this call, yet its lines read that fighter's state,
+        /// so the sighting must arrive from the pushed half. Announces only the bound lines' own
+        /// parameters afterward — everything else resolves the same regardless of owner.</summary>
         public void Follow(IFightable? owner)
         {
             if (ReferenceEquals(_owner, owner)) return;
@@ -65,7 +66,7 @@ namespace Core.PassiveTree
             _owner = owner;
             Bind();
 
-            var affected = new HashSet<EntityParameter>(_conditional.Select(modifier => modifier.EntityParameter));
+            var affected = new HashSet<EntityParameter>(_bound.Select(modifier => modifier.EntityParameter));
             if (affected.Count > 0) SourceChanged?.Invoke(affected);
         }
 
@@ -84,16 +85,23 @@ namespace Core.PassiveTree
                 _modifiers[line.Parameter] = lines;
             }
 
-            lines.Add(condition is null ? line.ToModifier() : Conditional(line, condition));
+            lines.Add(Mint(line, condition));
             affected.Add(line.Parameter);
         }
 
-        /// <summary>A line that counts only while its condition holds. Lives in the same map as every other
-        /// line, never on the fighter's own list — only reachable when he resolves the value.</summary>
-        private IModifierInstance Conditional(ModifierLine line, ICondition condition)
+        /// <summary>The modifier a line becomes. A fixed amount resolves the same for everyone; a line held
+        /// up by a gate or measured per unit of a carrier parameter has to read the fighter, so it is kept
+        /// for binding. Either way it lives in this map, never on the fighter's own list — only reachable
+        /// when he resolves the value.</summary>
+        private IModifierInstance Mint(ModifierLine line, ICondition? condition)
         {
-            var modifier = new ConditionalModifier(weight: 0f, line.ValueType, line.Parameter, line.Value, condition, PassiveTreeDocument.ModifierSource);
-            _conditional.Add(modifier);
+            if (line.PerParameter is null && condition is null) return line.ToModifier();
+
+            ConditionalModifier modifier = line.PerParameter is { } scale
+                ? new ScaledByParameterModifier(line.ValueType, line.Parameter, scale, line.Value, condition, PassiveTreeDocument.ModifierSource)
+                : new ConditionalModifier(weight: 0f, line.ValueType, line.Parameter, line.Value, condition, PassiveTreeDocument.ModifierSource);
+
+            _bound.Add(modifier);
 
             return modifier;
         }
@@ -102,12 +110,12 @@ namespace Core.PassiveTree
         {
             if (_owner is not { } owner) return;
 
-            foreach (ConditionalModifier modifier in _conditional) modifier.Bind(owner);
+            foreach (ConditionalModifier modifier in _bound) modifier.Bind(owner);
         }
 
         private void Release()
         {
-            foreach (ConditionalModifier modifier in _conditional) modifier.Unbind();
+            foreach (ConditionalModifier modifier in _bound) modifier.Unbind();
         }
     }
 }

@@ -118,8 +118,9 @@ namespace PassiveTreeEditor.Source.View
         private string Describe(ModifierLine line)
         {
             string text = _formatter is null
-                ? $"{line.Parameter} {line.ValueType} {line.Value}"
-                : _formatter.Format(new SimpleModifier(line.Parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource));
+                ? $"{line.Parameter} {line.ValueType} {line.Value}{(line.IsScaled ? $" per {line.PerParameter}" : string.Empty)}"
+                : _formatter.Format(
+                    new SimpleModifier(line.Parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource), TextFormat.Plain, line.PerParameter);
 
             return line.IsConditional ? $"{text}  ({line.Condition})" : text;
         }

@@ -61,6 +61,11 @@ namespace Core.PassiveTree
 
         [JsonProperty("value")] public float Value { get; set; }
 
+        /// <summary>Names the carrier parameter the value is counted per unit of. Absent on an ordinary
+        /// line, so the key is written only where the author meant a scale.</summary>
+        [JsonProperty("perParameter", NullValueHandling = NullValueHandling.Ignore)]
+        public string? PerParameter { get; set; }
+
         [JsonProperty("condition", NullValueHandling = NullValueHandling.Ignore)]
         public string? Condition { get; set; }
     }
