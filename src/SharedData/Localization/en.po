@@ -11,11 +11,20 @@ msgstr ""
 msgid "Weapon_Bloodthirsty"
 msgstr "Bloodthirsty"
 
+msgid "Weapon_Bloodthirsty_Description"
+msgstr ""
+
 msgid "Weapon_Silent_Fury"
 msgstr "Silent Fury"
 
+msgid "Weapon_Silent_Fury_Description"
+msgstr ""
+
 msgid "Amulet_Creators_Nature"
 msgstr "Creator`s Nature"
+
+msgid "Amulet_Creators_Nature_Description"
+msgstr ""
 
 msgid "Amulet_Diamond"
 msgstr "Diamond Amulet"
@@ -311,10 +320,10 @@ msgstr "Ring of the Hunter"
 msgid "Ring_of_Hunter_Description"
 msgstr ""
 
-msgid "Ring_of_Assasin"
+msgid "Ring_of_Assassin"
 msgstr "Ring of the Assassin"
 
-msgid "Ring_of_Assasin_Description"
+msgid "Ring_of_Assassin_Description"
 msgstr ""
 
 msgid "Ring_of_Trickster"
@@ -387,17 +396,32 @@ msgstr "Belt of Life"
 msgid "Belt_Life_Flow"
 msgstr "Flow of Life"
 
+msgid "Belt_Life_Flow_Description"
+msgstr ""
+
 msgid "Belt_Mana_Flow"
 msgstr "Flow of Mana"
+
+msgid "Belt_Mana_Flow_Description"
+msgstr ""
 
 msgid "Belt_Ether_Flow"
 msgstr "Flow of Ether"
 
+msgid "Belt_Ether_Flow_Description"
+msgstr ""
+
 msgid "Body_Disaster_Herald"
 msgstr "Herald of Disaster"
 
+msgid "Body_Disaster_Herald_Description"
+msgstr ""
+
 msgid "Body_Ice_Mage"
 msgstr "Ice Mage's Armor"
+
+msgid "Body_Ice_Mage_Description"
+msgstr ""
 
 msgid "Belt_Of_Life_Description"
 msgstr ""
@@ -848,6 +872,24 @@ msgstr "Direwolf Claw"
 msgid "Crafting_Resource_Essence_Accuracy"
 msgstr "Essence of Accuracy"
 
+msgid "Crafting_Resource_Essence_Critical_Chance"
+msgstr "Essence of Critical Chance"
+
+msgid "Crafting_Resource_Essence_Damage"
+msgstr "Essence of Damage"
+
+msgid "Crafting_Resource_Essence_Health"
+msgstr "Essence of Health"
+
+msgid "Crafting_Resource_Essence_Armor"
+msgstr "Essence of Armor"
+
+msgid "Crafting_Resource_Essence_Evade"
+msgstr "Essence of Evade"
+
+msgid "Crafting_Resource_Essence_Barrier"
+msgstr "Essence of Barrier"
+
 # -----------------------
 # Essences
 # -----------------------
@@ -893,6 +935,63 @@ msgstr "Random Belt"
 
 msgid "Recipe_Generic_Gloves"
 msgstr "Random Gloves"
+
+msgid "Recipe_Creators_Ring"
+msgstr "Creator's Finger"
+
+msgid "Recipe_Ring_Of_Fire_Demon"
+msgstr "Fire Demon's Finger"
+
+msgid "Recipe_Weapon_Simple_Sword"
+msgstr "Simple Sword"
+
+msgid "Recipe_Weapon_Simple_Dagger"
+msgstr "Simple Dagger"
+
+msgid "Recipe_Weapon_Simple_Axe"
+msgstr "Simple Axe"
+
+msgid "Recipe_Body_Steel_Bastion"
+msgstr "Steel Bastion"
+
+msgid "Recipe_Body_Aegis"
+msgstr "Aegis"
+
+msgid "Recipe_Body_Iron_Bastion"
+msgstr "Iron Bastion"
+
+msgid "Recipe_Body_Hunter_Chestplate"
+msgstr "Hunter's Chestplate"
+
+msgid "Recipe_Body_Archmage_Mantle"
+msgstr "Archmage's Mantle"
+
+msgid "Recipe_Helmet_Iron_Bastion"
+msgstr "Iron Bastion Helmet"
+
+msgid "Recipe_Helmet_Hunter"
+msgstr "Hunter's Helmet"
+
+msgid "Recipe_Helmet_Archmage_Cap"
+msgstr "Archmage's Cap"
+
+msgid "Recipe_Gloves_Iron_Bastion"
+msgstr "Iron Bastion Gloves"
+
+msgid "Recipe_Gloves_Hunter"
+msgstr "Hunter's Gloves"
+
+msgid "Recipe_Gloves_Archmage"
+msgstr "Archmage's Gloves"
+
+msgid "Recipe_Boots_Iron_Bastion"
+msgstr "Iron Bastion Boots"
+
+msgid "Recipe_Boots_Hunter"
+msgstr "Hunter's Boots"
+
+msgid "Recipe_Boots_Archmage_Sandals"
+msgstr "Archmage's Sandals"
 
 # ------------------------
 # Categories
@@ -2435,6 +2534,15 @@ msgstr "Burning Damage Multiplier"
 msgid "BleedDamageMultiplier"
 msgstr "Bleed Damage Multiplier"
 
+msgid "AllDoTDamageMultiplier"
+msgstr "All Damage over Time Multiplier"
+
+msgid "AllElementalDamage"
+msgstr "All Elemental Damage"
+
+msgid "Damage"
+msgstr "Damage"
+
 # ------------------------------
 # Ability parameters (battle UI)
 # ------------------------------
@@ -2513,7 +2621,7 @@ msgid "Ability_Critical_Calculation"
 msgstr "Critical Calculation"
 
 msgid "Ability_Critical_Calculation_Description"
-msgstr "Grants {Stacks} stacks of increased critical chance for {Duration|turn|turns}. A critical strike extends the buff by 1 turn."
+msgstr "Grants {Stacks} stacks of increased critical chance for {Duration|turn|turns}. A critical strike extends the buff by {AdditionalDurationAmount|turn|turns}."
 
 msgid "Ability_Dark_Shroud_Description"
 msgstr "For {Duration|turn|turns} applies {Stacks} stacks of Light Step (+{LightStepValue:%} evade each). Restores {HealthRegen:%} health at the start of each turn."
@@ -2522,7 +2630,7 @@ msgid "Ability_Jar_Of_Poison"
 msgstr "Jar of Poison"
 
 msgid "Ability_Jar_Of_Poison_Description"
-msgstr "Applies a poison stack dealing {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) damage each turn for {PoisonDuration|turn|turns}."
+msgstr "Applies a poison stack dealing a share of {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) as damage each turn for {PoisonDuration|turn|turns}."
 
 msgid "Ability_Increasing_Pressure_Description"
 msgstr "A series of up to {Attacks} escalating attacks. Each attack deals an additional {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) base damage. Every successful hit empowers the next one by {AttackDamageStepMultiplier:%}."
@@ -2708,7 +2816,7 @@ msgid "Effect_Seal_Of_Oblivion"
 msgstr "Seal of Oblivion"
 
 msgid "Effect_Seal_Of_Oblivion_Tooltip"
-msgstr "The sealed target cannot be healed."
+msgstr "Disables the sealed target's passive skills."
 
 msgid "Effect_Fragility"
 msgstr "Fragility"
@@ -2850,7 +2958,7 @@ msgid "Augment_Increasing_Scales"
 msgstr "Increasing Scales"
 
 msgid "Augment_Increasing_Scales_Description"
-msgstr "Poison scaling becomes {weaponDamageScale:%} / {spellDamageScale:%}."
+msgstr "+{weaponDamageScale:%} weapon and +{spellDamageScale:%} spell damage scaling."
 
 msgid "Augment_Poison_Duration"
 msgstr "Poison Duration"
@@ -3419,6 +3527,21 @@ msgstr "Bear Claw"
 msgid "Crafting_Resource_Ancient_Fang"
 msgstr "Ancient Fang"
 
+msgid "Npc_Dummy"
+msgstr "Training Dummy"
+
+msgid "Npc_Bandit"
+msgstr "Bandit"
+
+msgid "Npc_Skeleton_Mage"
+msgstr "Skeleton Mage"
+
+msgid "Npc_Grave_Revenant"
+msgstr "Grave Revenant"
+
+msgid "Npc_Cursed_Sorcerer"
+msgstr "Cursed Sorcerer"
+
 msgid "Npc_Wolf"
 msgstr "Wolf"
 
@@ -3568,85 +3691,157 @@ msgstr "Unique"
 msgid "Npc_Modifier_Scale_Double_Health"
 msgstr "Giant"
 
+msgid "Npc_Modifier_Scale_Double_Health_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Scale_Double_Damage"
 msgstr "Berserk"
+
+msgid "Npc_Modifier_Scale_Double_Damage_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Scale_Double_Defence"
 msgstr "Unbreakable"
 
+msgid "Npc_Modifier_Scale_Double_Defence_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Scale_Double_Health_Recovery"
 msgstr "Regenerating"
+
+msgid "Npc_Modifier_Scale_Double_Health_Recovery_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Tier_Upgrade_To_Maximum"
 msgstr "Royal"
 
+msgid "Npc_Modifier_Tier_Upgrade_To_Maximum_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Tier_Upgrade_By_Two"
 msgstr "Wealthy"
+
+msgid "Npc_Modifier_Tier_Upgrade_By_Two_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Tier_Upgrade_By_One"
 msgstr "Prosperous"
 
+msgid "Npc_Modifier_Tier_Upgrade_By_One_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Guaranteed_Items_Crafting_Resource"
 msgstr "Breadwinner"
+
+msgid "Npc_Modifier_Guaranteed_Items_Crafting_Resource_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Guaranteed_Items_Crafting_Upgrade"
 msgstr "Craftsman"
 
+msgid "Npc_Modifier_Guaranteed_Items_Crafting_Upgrade_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Guaranteed_Items_Equip"
 msgstr "The Soul Collector"
+
+msgid "Npc_Modifier_Guaranteed_Items_Equip_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Guaranteed_Items_Essence"
 msgstr "Goblin"
 
+msgid "Npc_Modifier_Guaranteed_Items_Essence_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Tier_Multiplier_Huge"
 msgstr "Fortune's Smile"
+
+msgid "Npc_Modifier_Tier_Multiplier_Huge_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Tier_Multiplier_Big"
 msgstr "Impressive"
 
+msgid "Npc_Modifier_Tier_Multiplier_Big_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Tier_Multiplier_Mid"
 msgstr "The Gift"
+
+msgid "Npc_Modifier_Tier_Multiplier_Mid_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Tier_Multiplier_Small"
 msgstr "Minor"
 
+msgid "Npc_Modifier_Tier_Multiplier_Small_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Item_Effect_Execution"
 msgstr "Executioner"
+
+msgid "Npc_Modifier_Item_Effect_Execution_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Item_Effect_Vampire"
 msgstr "Vampire"
 
+msgid "Npc_Modifier_Item_Effect_Vampire_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Item_Effect_Poisoned_Claw"
 msgstr "Poisoned"
+
+msgid "Npc_Modifier_Item_Effect_Poisoned_Claw_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Item_Effect_Burning"
 msgstr "Burning"
 
+msgid "Npc_Modifier_Item_Effect_Burning_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Rarity_Upgrade_Huge"
 msgstr "Precious"
+
+msgid "Npc_Modifier_Rarity_Upgrade_Huge_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Rarity_Upgrade_Big"
 msgstr "A Storyteller for the Ages"
 
+msgid "Npc_Modifier_Rarity_Upgrade_Big_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Rarity_Upgrade_Mid"
 msgstr "Who Found the Curiosity"
+
+msgid "Npc_Modifier_Rarity_Upgrade_Mid_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Rarity_Upgrade_Small"
 msgstr "A Little Miracle"
 
+msgid "Npc_Modifier_Rarity_Upgrade_Small_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Min_Rarity_Legend"
 msgstr "Who Saw the Legend"
+
+msgid "Npc_Modifier_Min_Rarity_Legend_Description"
+msgstr ""
 
 msgid "Npc_Modifier_Min_Rarity_Epic"
 msgstr "A Witness to Greatness"
 
+msgid "Npc_Modifier_Min_Rarity_Epic_Description"
+msgstr ""
+
 msgid "Npc_Modifier_Min_Rarity_Rare"
 msgstr "One Who Touched the Secret"
 
-msgid ""
-msgstr ""
-
-msgid ""
+msgid "Npc_Modifier_Min_Rarity_Rare_Description"
 msgstr ""
 
 msgid "Effect_Stage_Guard"
@@ -3701,7 +3896,7 @@ msgid "Augment_Ice_Block_Consume_Stun_Deal_Double_Damage"
 msgstr "Consume Stun"
 
 msgid "Augment_Ice_Block_Consume_Stun_Deal_Double_Damage_Description"
-msgstr "Consumes the target's stun and deals double damage."
+msgstr "Consumes the target's stun and deals ×{damageMultiplier} damage."
 
 # Deep Freeze upgrades
 
