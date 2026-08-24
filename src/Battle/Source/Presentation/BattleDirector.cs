@@ -36,7 +36,6 @@ namespace Battle.Source.Presentation
 
         private const string AttackAnimation = "Fight_Attack";
         private const string HurtAnimation = "Fight_Hurt";
-        private const string DeadAnimation = "Dead";
 
         private const string StunnedAnimation = "Stunned";
 
@@ -91,8 +90,27 @@ namespace Battle.Source.Presentation
             _shownDead.Clear();
         }
 
-        /// <summary>Completes once everything recorded so far has been shown.</summary>
-        public Task WaitUntilIdleAsync() => _playback;
+        /// <summary>
+        /// Completes once everything recorded so far has been shown — the queue is EMPTY, not merely
+        /// "the pump that was running when you asked has ended". Entries recorded while the caller was
+        /// waiting start a fresh pump; the loop picks it up, so the turn gate (and the battle end
+        /// behind it) can't slip through between two pumps and leave beats unplayed.
+        /// </summary>
+        public async Task WaitUntilIdleAsync()
+        {
+            // The reference comparison is the whole trick: a pump that has work always suspends on its
+            // first line (the frame wait), so two live pumps are never the same object — an inequality
+            // means new entries arrived and started one. Outside the tree a pump returns synchronously
+            // as the shared completed task, matching the field's seed, so the loop exits at once —
+            // correct, because a director out of the tree has nothing to show anyway.
+            Task playback;
+            do
+            {
+                playback = _playback;
+                await playback;
+            }
+            while (playback != _playback);
+        }
 
         public override void _ExitTree() => Teardown();
 
@@ -198,7 +216,8 @@ namespace Battle.Source.Presentation
         private async Task PlayEvent(object evnt)
         {
             if (!_beatHandlers.TryGetValue(evnt.GetType(), out var handler)) return;
-            if (ShouldSkipPosthumous(evnt)) return;
+            // Death cuts the corpse's remaining beats — the fall itself is never among them (DeathBeat).
+            if (DeathBeat.IsPosthumous(evnt, IsShownDead)) return;
             await handler(evnt);
         }
 
@@ -327,11 +346,7 @@ namespace Battle.Source.Presentation
             }
         }
 
-        private Task PlayEntityDied(EntityDiedEvent evnt)
-        {
-            if (!IsShownDead(evnt.Entity)) ShowDeath(evnt.Entity);
-            return Task.CompletedTask;
-        }
+        private Task PlayEntityDied(EntityDiedEvent evnt) => ShowDeathAsync(evnt.Entity);
 
         private Task RepublishBeat<T>(T evnt)
             where T : IBattleEvent
@@ -350,7 +365,7 @@ namespace Battle.Source.Presentation
             Task impact = PlayAttackImpact(evnt);
             await evnt.Target.Animations.PlayAnimationAsync(HurtAnimation, CurrentSpeed);
             await impact;
-            if (evnt.Vitals.IsDead) ShowDeath(evnt.Target);
+            if (evnt.Vitals.IsDead) await ShowDeathAsync(evnt.Target);
         }
 
         private Task PlayAttackImpact(DamageTakenEvent evnt)
@@ -360,10 +375,20 @@ namespace Battle.Source.Presentation
             return visual == null ? Task.CompletedTask : _vfx.PlayImpactAsync(visual, evnt.Target.InstanceId);
         }
 
-        private void ShowDeath(IFightable target)
+        /// <summary>
+        /// The fall, as a beat of its own: the corpse starts its Dead clip and the queue HOLDS for the
+        /// clip's length, so the turn gate — and the battle end waiting behind it — never outruns the
+        /// animation (tracker #191). Idempotent: a fighter falls once, a second sighting adds no hold.
+        /// The clip is started rather than awaited through PlayAnimationAsync on purpose — that helper
+        /// restores the PREVIOUS clip when it ends and would stand the corpse back up.
+        /// The hold is scaled by the playback speed like every other wait, so the abort fast-forward
+        /// flashes past it instead of holding a quit for seconds.
+        /// </summary>
+        private async Task ShowDeathAsync(IFightable target)
         {
-            target.Animations.PlayAnimation(DeadAnimation);
-            _shownDead.Add(target.InstanceId);
+            if (!_shownDead.Add(target.InstanceId)) return;
+            target.Animations.PlayAnimation(DeathBeat.Animation);
+            await WaitAsync(DeathBeat.HoldSeconds(target.Animations));
         }
 
 
@@ -477,7 +502,7 @@ namespace Battle.Source.Presentation
 
             await hurt;
             await impact;
-            if (hits[^1].Vitals.IsDead) ShowDeath(target);
+            if (hits[^1].Vitals.IsDead) await ShowDeathAsync(target);
         }
 
         /// <summary>
@@ -538,7 +563,7 @@ namespace Battle.Source.Presentation
                 Republish(hit);
                 await hurt;
                 await impact;
-                if (hit.Vitals.IsDead) ShowDeath(hit.Target);
+                if (hit.Vitals.IsDead) await ShowDeathAsync(hit.Target);
                 from = hit.Target.InstanceId;
             }
         }
@@ -639,27 +664,6 @@ namespace Battle.Source.Presentation
             if (scaled <= 0 || !IsInsideTree()) return;
             await ToSignal(GetTree().CreateTimer(scaled), SceneTreeTimer.SignalName.Timeout);
         }
-
-        /// <summary>
-        /// Death cuts the corpse's remaining beats: the killing hit finishes its animation
-        /// (handled in <see cref="PlayDamageTaken"/>), everything recorded after it that
-        /// involves the dead entity is dropped. Logic already prevents posthumous actions,
-        /// so this is a presentation-side guarantee, not a rules check.
-        /// </summary>
-        private bool ShouldSkipPosthumous(object evnt) => evnt switch
-        {
-            BeforeAttackEvent attack => IsShownDead(attack.Context.Attacker),
-            DamageTakenEvent damage => IsShownDead(damage.Target),
-            EntityHealedEvent healed => IsShownDead(healed.Healed),
-            AbilityActivatedEvent ability => IsShownDead(ability.Caster),
-            TurnSkippedEvent skipped => IsShownDead(skipped.Fighter),
-            AttackEvadedEvent evaded => IsShownDead(evaded.Context.Attacker),
-            AttackBlockedEvent blocked => IsShownDead(blocked.Context.Attacker),
-            EffectAppliedEvent applied => IsShownDead(applied.Target),
-            AbilityStageActivatedEvent stage => IsShownDead(stage.Caster),
-            ExhaustionChangedEvent exhaustion => IsShownDead(exhaustion.Fighter),
-            _ => false,
-        };
 
         private Dictionary<Type, Func<object, Task>> CreateBeatHandlers() => new()
         {
