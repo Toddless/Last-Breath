@@ -2406,6 +2406,18 @@ msgstr "Усиленная защита"
 msgid "Effect_Enhance_Defense_Tooltip"
 msgstr "Увеличивает защитные параметры владельца."
 
+msgid "Effect_Crit_Mitigation"
+msgstr "Защита от критов"
+
+msgid "Effect_Crit_Mitigation_Tooltip"
+msgstr "Снижает получаемый владельцем критический урон."
+
+msgid "Effect_Ice_Crit_Mitigation"
+msgstr "Ледяная защита от критов"
+
+msgid "Effect_Ice_Crit_Mitigation_Tooltip"
+msgstr "Снижает получаемый владельцем критический урон."
+
 msgid "Effect_Lucky_Crit_Chance"
 msgstr "Удачливый крит"
 
@@ -4585,6 +4597,12 @@ msgid "Effect_Withering_Curse_Description"
 msgstr ""
 
 msgid "Effect_Enhance_Defense_Description"
+msgstr ""
+
+msgid "Effect_Crit_Mitigation_Description"
+msgstr ""
+
+msgid "Effect_Ice_Crit_Mitigation_Description"
 msgstr ""
 
 msgid "Effect_Blind_Description"

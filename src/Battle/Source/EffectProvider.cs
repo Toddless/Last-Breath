@@ -140,8 +140,16 @@ namespace Battle.Source
                 new GiantsBlessingEffect(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("value"))),
             ["Effect_Sorcery_Gift"] = new(["duration", "maxStacks", "value"], p =>
                 new SorceryGiftEffect(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("value"))),
+            // Crit mitigation under three names. All three cut the same parameter by the same rule and
+            // differ only in wording and figure, so — like the Mana Flow above — one class ships thrice:
+            // the general defence buff a pool draws, the Porcupine's quills and the Ice Aegis' shell.
+            // They were three identical classes until the crit augments were given figures of their own.
             ["Effect_Enhance_Defense"] = new(["duration", "maxStacks", "value"], p =>
-                new EnhanceDefenseEffect(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("value"))),
+                new CritMitigationEffect(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("value"), id: "Effect_Enhance_Defense")),
+            ["Effect_Crit_Mitigation"] = new(["duration", "maxStacks", "value"], p =>
+                new CritMitigationEffect(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("value"))),
+            ["Effect_Ice_Crit_Mitigation"] = new(["duration", "maxStacks", "value"], p =>
+                new CritMitigationEffect(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("value"), id: "Effect_Ice_Crit_Mitigation")),
             ["Effect_Incoming_Damage_Reduction"] = new(["duration", "maxStacks", "reduce"], p =>
                 new IncomingDamageReductionEffect(p.GetInt("duration"), p.GetInt("maxStacks"), p.Get("reduce"))),
             ["Effect_Light_Step"] = new(["duration", "maxStacks", "value"], p =>

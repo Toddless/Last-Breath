@@ -33,14 +33,18 @@
         public static float CalculateFloatValue(IReadOnlyList<IModifier> modifiers, float baseValue = 0)
             => Math.Max(0, CalculateModifiers(modifiers, baseValue));
 
+        /// <summary>Crit mitigation cuts the crit's SURPLUS and never the hit under it, so a fully
+        /// mitigated critical (1.0, the cap) lands as an ordinary hit rather than for nothing.</summary>
         public static void CalculateInitialAttackDamage(IAttackContext context)
         {
             if (context is { IsCritical: false, ForceCriticalAttack: false }) return;
 
-            // Mitigation is 0 for most targets -> factor is 1 (no-op). Bounds (0..1) live in EntityParametersComponent.
+            // Mitigation is 0 for most targets -> factor is the raw multiplier (no-op). Bounds (0..1) live in
+            // EntityParametersComponent. Scaling the WHOLE multiplier instead would invert the crit above
+            // 1/RawCriticalDamage of mitigation: an 1.8x crit under 80% landed at 0.36x — weaker than a normal hit.
             float critMitigation = context.Target.Parameters.GetValueForParameter(EntityParameter.CriticalDamageMitigation);
             // The crit multiplies the whole dictionary — elemental components crit alongside Physical.
-            context.ScaleDamage(context.RawCriticalDamage * (1 - critMitigation));
+            context.ScaleDamage(1 + ((context.RawCriticalDamage - 1) * (1 - critMitigation)));
         }
 
         /// <summary>The one place a resolved attack becomes a damage context: every component

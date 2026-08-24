@@ -154,7 +154,9 @@ advantage = max(0, evade − accuracy)
 Вердикт возвращается значением; отменяющих событий исхода нет (`TargetEvadedAttackEvent`/`TargetBlockedAttackEvent` снесены — подписчиков не было). «Нельзя уклониться/блокировать» — флаги контекста `IsUnevadable`/`IsUnblockable`.
 
 ### 3.3 Крит
-`RawCriticalChance` — от `CriticalChance` (кап 0..1). `RawCriticalDamage` — от `CriticalDamage` (**без капа**). Применение — `CalculateInitialAttackDamage:32-40`: `ScaleDamage(RawCriticalDamage * (1 − CriticalDamageMitigation))`, множит **все** компоненты.
+`RawCriticalChance` — от `CriticalChance` (кап 0..1). `RawCriticalDamage` — от `CriticalDamage` (**без капа**). Применение — `CalculateInitialAttackDamage`: `ScaleDamage(1 + (RawCriticalDamage − 1) × (1 − CriticalDamageMitigation))`, множит **все** компоненты.
+
+**Митигация режет надбавку, а не весь множитель:** при `CriticalDamageMitigation = 1` (кап) крит бьёт как обычный удар, а не в ноль; пол — обычный удар, инверсия («крит слабее обычного удара») невозможна.
 
 **Множитель заменяет урон, а не добавляет:** база 1.5 даёт ×1.5; при `RawCriticalDamage = 0` крит **обнуляет** удар.
 

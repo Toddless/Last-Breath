@@ -172,6 +172,36 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void TheCritProtectionCardsPrintTheShareTheirOwnEffectIsBalancedAt()
+        {
+            // #199, from the side the player saw it: both crit-protection augments laid the shared
+            // defence buff, so cards promising to cut critical damage printed that buff's 15%. The walk
+            // above only asks that a number appears; this one asks that it is the RIGHT number, and that
+            // each card reads its own effect's canon rather than a neighbour's.
+            (_, AbilityAugmentCatalog catalog, EffectProvider effects) = ShippedAbilityData.Composed();
+            UseShippedWording();
+
+            string porcupine = Card(catalog, effects, "Augment_Porcupine_Crit_Mitigation");
+            string iceAegis = Card(catalog, effects, "Augment_Ice_Aegis_Crit_Mitigation_Under_Shield");
+
+            StringAssert.Contains(porcupine, "80%", "the Porcupine's crit protection does not print the 80% the design list gives it");
+            StringAssert.Contains(iceAegis, "50%", "the Ice Aegis' crit protection does not print the 50% its canon carries");
+            Assert.IsFalse(porcupine.Contains('{'), $"the Porcupine's card printed a template: {porcupine}");
+            Assert.IsFalse(iceAegis.Contains('{'), $"the Ice Aegis' card printed a template: {iceAegis}");
+
+            // The control. One class now builds all three crit-mitigation rows, so the general defence
+            // buff a pool draws has to go on printing its own 15% and not a crit protection's figure.
+            StringAssert.Contains(Card(catalog, effects, "Augment_Apply_Enhanced_Defence"), "15%",
+                "the shared defence buff's card moved when the crit protections were given figures of their own");
+
+            // Two effects and not one: rebalancing the Porcupine's must leave the Ice Aegis' where it was.
+            string moved = Card(catalog, Rebalanced("Effect_Crit_Mitigation", "value", 0.35f), "Augment_Porcupine_Crit_Mitigation");
+            StringAssert.Contains(moved, "35%", "the canon moved and the Porcupine's card did not follow it");
+            Assert.AreEqual(iceAegis, Card(catalog, effects, "Augment_Ice_Aegis_Crit_Mitigation_Under_Shield"),
+                "the two crit protections share a figure, so neither can be balanced without the other");
+        }
+
+        [TestMethod]
         public void ACopysOwnNumberBeatsTheCanonicalOne()
         {
             // The order the two sources are merged in. A record laying an effect is forbidden to restate

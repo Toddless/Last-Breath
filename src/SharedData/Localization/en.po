@@ -1268,6 +1268,12 @@ msgstr "{Value} {Parameter} for {Duration|turn|turns}."
 msgid "Effect_Enhance_Defense_Description"
 msgstr "{Value} {Parameter} for {Duration|turn|turns}."
 
+msgid "Effect_Crit_Mitigation_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Ice_Crit_Mitigation_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
 msgid "Effect_Blind_Description"
 msgstr "{Value} {Parameter} for {Duration|turn|turns}."
 
@@ -2805,6 +2811,18 @@ msgstr "Enhanced Defence"
 
 msgid "Effect_Enhance_Defense_Tooltip"
 msgstr "Increases the owner's defensive parameters."
+
+msgid "Effect_Crit_Mitigation"
+msgstr "Crit Protection"
+
+msgid "Effect_Crit_Mitigation_Tooltip"
+msgstr "Reduces the critical damage the owner takes."
+
+msgid "Effect_Ice_Crit_Mitigation"
+msgstr "Icy Crit Protection"
+
+msgid "Effect_Ice_Crit_Mitigation_Tooltip"
+msgstr "Reduces the critical damage the owner takes."
 
 msgid "Effect_Lucky_Crit_Chance"
 msgstr "Lucky Crit"

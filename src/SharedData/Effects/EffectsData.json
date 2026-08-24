@@ -190,6 +190,14 @@
             "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
         },
         {
+            "id": "Effect_Crit_Mitigation",
+            "properties": { "duration": 3, "maxStacks": 1, "value": 0.8 }
+        },
+        {
+            "id": "Effect_Ice_Crit_Mitigation",
+            "properties": { "duration": 3, "maxStacks": 1, "value": 0.5 }
+        },
+        {
             "id": "Effect_Frostbite",
             "power": "Strong",
             "properties": { "duration": 3, "maxStacks": 8, "coldDamageAmp": 0.15 }

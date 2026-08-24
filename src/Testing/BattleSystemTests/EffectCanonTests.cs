@@ -1,11 +1,17 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using System.Threading.Tasks;
     using Battle.Source;
     using Battle.Source.Abilities;
     using Battle.Source.Abilities.StaticArmor;
+    using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Context;
+    using Core.Data.AbilityData;
     using Core.Data.GameData;
+    using Core.Enums;
+    using Moq;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -99,7 +105,12 @@ namespace LastBreathTest.BattleSystemTests
             // the chance it grants, not an effect of its own; the row carries that chance, the turns it
             // holds and a ceiling of five — the ability's three plus the two the stacks record can add,
             // so registering the effect held nothing back that a shipped build already had.
-            "Effect_Crit_Calculation_Buff"
+            "Effect_Crit_Calculation_Buff",
+            // The two crit protections. The list of temporary effects does not name them: their figures
+            // are written on the AUGMENTS that lay them, and are walked against that list separately —
+            // see TheCritProtectionsSayWhatTheAugmentListSays.
+            "Effect_Crit_Mitigation",
+            "Effect_Ice_Crit_Mitigation"
         ];
 
         [TestMethod]
@@ -161,6 +172,108 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0, unaccounted.Length,
                 $"canonical rows neither on the design list nor named as off it: [{string.Join(", ", unaccounted)}]");
         }
+
+        [TestMethod]
+        public void TheCritProtectionsSayWhatTheAugmentListSays()
+        {
+            // Both figures come from the augment list rather than the effect list: "снижает получаемый
+            // критический урон на 80%" for the Porcupine's, "снижен на 50-80%" for the Ice Aegis'. The
+            // second is a ladder by rarity the canon has no way to hold — a record laying an effect may
+            // not restate its numbers — so the canon carries the floor of it and the ladder waits.
+            var canon = Canon();
+
+            Assert.AreEqual(0.8f, canon["Effect_Crit_Mitigation"]["value"], 0.0001f,
+                "the Porcupine's crit protection left the 80% the augment list gives it");
+            Assert.AreEqual(0.5f, canon["Effect_Ice_Crit_Mitigation"]["value"], 0.0001f,
+                "the Ice Aegis' crit protection left the floor of the 50-80% the augment list gives it");
+
+            // One stack each: the parameter is capped at 1 and a second stack of either would spend the
+            // whole cap, flattening a crit into an ordinary hit for free.
+            Assert.AreEqual(1f, canon["Effect_Crit_Mitigation"]["maxStacks"], 0.0001f);
+            Assert.AreEqual(1f, canon["Effect_Ice_Crit_Mitigation"]["maxStacks"], 0.0001f);
+        }
+
+        [TestMethod]
+        public void TheCritProtectionsAreDrawnAcrossTheRaritiesTheAugmentListGivesThem()
+        {
+            // The other half of what the list says about them, and the half no figure can carry: the
+            // Porcupine's is a legendary at a flat 80%, while the Ice Aegis' spans "Эпический -
+            // Легендарный" because its 50-80% is a ladder by rarity. Until the ladder can be expressed
+            // the canon holds its floor, so the BAND is the only place that reading survives — and a
+            // band quietly narrowed back to one rarity would erase it without moving a number.
+            (_, AbilityAugmentCatalog catalog, _) = ShippedAbilityData.Composed();
+
+            AbilityAugmentData porcupine = Record(catalog, "Augment_Porcupine_Crit_Mitigation");
+            AbilityAugmentData iceAegis = Record(catalog, "Augment_Ice_Aegis_Crit_Mitigation_Under_Shield");
+
+            Assert.AreEqual((Rarity.Legendary, Rarity.Legendary), porcupine.RarityBand,
+                "the Porcupine's crit protection is one rarity at a flat figure and the list gives it no band");
+            Assert.AreEqual((Rarity.Epic, Rarity.Legendary), iceAegis.RarityBand,
+                "the Ice Aegis' crit protection lost the epic-to-legendary band its 50-80% is a ladder across");
+        }
+
+        /// <summary>One shipped record by id, or a failure naming it rather than a null dereference.</summary>
+        private static AbilityAugmentData Record(AbilityAugmentCatalog catalog, string augmentId)
+        {
+            AbilityAugmentData? record = catalog.Find(augmentId);
+            Assert.IsNotNull(record, $"the shipped catalog holds no record '{augmentId}'");
+            return record;
+        }
+
+        [TestMethod]
+        public void TheCritProtectionsAreNotTheGeneralDefenceBuffTheRecordsUsedToLay()
+        {
+            // What #199 was: both crit-protection augments laid Effect_Enhance_Defense, a shared buff the
+            // effect pool and another record draw as well. Its 15% read out on cards promising far more,
+            // and any rebalance of it moved three unrelated things at once. Named here so pointing them
+            // back at it — or quietly rebalancing the shared buff to 80% — cannot pass unnoticed.
+            var canon = Canon();
+
+            Assert.AreEqual(0.15f, canon["Effect_Enhance_Defense"]["value"], 0.0001f,
+                "the shared defence buff moved; check it was not rebalanced to serve the crit protections again");
+            Assert.AreNotEqual("Effect_Enhance_Defense", LaidBy("Augment_Porcupine_Crit_Mitigation"));
+            Assert.AreEqual("Effect_Crit_Mitigation", LaidBy("Augment_Porcupine_Crit_Mitigation"),
+                "the Porcupine's crit augment lays something other than its own crit protection");
+            Assert.AreEqual("Effect_Ice_Crit_Mitigation", LaidBy("Augment_Ice_Aegis_Crit_Mitigation_Under_Shield"),
+                "the Ice Aegis' crit augment lays something other than its own crit protection");
+        }
+
+        [TestMethod]
+        public async Task ACritProtectionBuiltFromTheCanonAloneActuallyCutsACriticalHit()
+        {
+            // The whole channel, end to end: the canon builds the effect, the effect lands on a fighter,
+            // and a critical hit against him is resolved by the real calculation. Everything between the
+            // file and the damage has to hold — the right parameter, an additive decorator, the caps —
+            // and none of it is visible from the canon walks, which only read numbers off a file.
+            var provider = Loaded();
+            var owner = new ConditionOwner();
+
+            IEffect? protection = provider.CreateEffect("Effect_Crit_Mitigation", RecordProperties.Empty);
+            Assert.IsNotNull(protection, "the canon alone does not build the Porcupine's crit protection");
+            await protection.Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = "test" });
+
+            Assert.AreEqual(0.8f, owner.Parameters.GetValueForParameter(EntityParameter.CriticalDamageMitigation), 0.0001f,
+                "the crit protection did not reach the parameter the crit calculation reads");
+
+            var attacker = new ConditionOwner();
+            var hit = new AttackContext(attacker, owner, 100f, null!, Mock.Of<IAttackContextScheduler>())
+            {
+                IsCritical = true,
+                RawCriticalDamage = 3f
+            };
+            Calculations.CalculateInitialAttackDamage(hit);
+
+            // Only the crit's SURPLUS is cut: a triple-damage crit against 80% protection keeps the hit
+            // under it and a fifth of the two it added — 1 + (3 - 1) × (1 - 0.8) = 1.4 of the base hit.
+            Assert.AreEqual(140f, hit.DamageComponents[DamageType.Physical], 0.0001f,
+                "the crit protection is on the fighter and the critical hit was not cut by it");
+            Assert.IsTrue(hit.DamageComponents[DamageType.Physical] > 100f,
+                "a mitigated crit landed for less than the ordinary hit under it — the whole multiplier was scaled, not the surplus");
+        }
+
+        /// <summary>The effect a shipped augment record names, straight out of the catalog file.</summary>
+        private static string LaidBy(string augmentId) =>
+            EffectRecordsInData().Single(record => record.Id == augmentId).EffectId;
 
         [TestMethod]
         public void TheBurningFuryBurnIsNotTheBurningEffectAndIsNotToBeMergedWithIt()

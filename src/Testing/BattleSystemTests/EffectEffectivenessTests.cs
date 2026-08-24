@@ -30,7 +30,7 @@ namespace LastBreathTest.BattleSystemTests
             // Passives, item grants, boss stages: everything that is not a cast has no effectiveness to
             // hand over, and the default has to be the number that changes nothing. A multiplier that
             // started at the struct default would zero every figure of every such effect in the game.
-            var buff = new EnhanceDefenseEffect(duration: 3, maxStacks: 3, value: Authored);
+            var buff = new CritMitigationEffect(duration: 3, maxStacks: 3, value: Authored);
 
             await buff.Apply(Laying(new ConditionOwner()));
 
@@ -41,7 +41,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public async Task ACastThatLandsHarderRaisesTheFigureTheEffectCarries()
         {
-            var buff = new EnhanceDefenseEffect(duration: 3, maxStacks: 3, value: Authored);
+            var buff = new CritMitigationEffect(duration: 3, maxStacks: 3, value: Authored);
 
             await buff.Apply(Laying(new ConditionOwner(), Strong));
 
@@ -159,14 +159,27 @@ namespace LastBreathTest.BattleSystemTests
             // Bonus stacks and transfers are copies, and a copy built from the figure this instance
             // CAME TO would be scaled again the moment it was applied. What a copy carries is what its
             // original was written with.
-            var buff = new EnhanceDefenseEffect(duration: 3, maxStacks: 3, value: Authored);
+            var buff = new CritMitigationEffect(duration: 3, maxStacks: 3, value: Authored);
             await buff.Apply(Laying(new ConditionOwner(), Strong));
 
             IEffect copy = buff.Copy();
             await copy.Apply(Laying(new ConditionOwner(), Strong));
 
-            Assert.AreEqual(buff.Value, ((EnhanceDefenseEffect)copy).Value, 0.0001f,
+            Assert.AreEqual(buff.Value, ((CritMitigationEffect)copy).Value, 0.0001f,
                 "the copy came out at a different figure than the effect it was made of");
+        }
+
+        [TestMethod]
+        public void AnEffectShippingUnderSeveralNamesCarriesItsNameIntoItsCopies()
+        {
+            // What a class serving more than one canonical row has to answer for. Copy() rebuilding at
+            // the constructor's DEFAULT id would rename the effect halfway through a fight: a stack of
+            // the Ice Aegis' protection would come back as the Porcupine's, wearing its wording and
+            // stacking against the wrong ceiling.
+            var named = new CritMitigationEffect(duration: 3, maxStacks: 1, value: Authored, id: "Effect_Ice_Crit_Mitigation");
+
+            Assert.AreEqual("Effect_Ice_Crit_Mitigation", named.Copy().Id,
+                "a copy came back under the class's default name instead of the one its original ships as");
         }
 
         [TestMethod]
@@ -275,7 +288,7 @@ namespace LastBreathTest.BattleSystemTests
         /// it or taken off it, never multiplied — so their figure passes through unreshaped.</summary>
         private static IEnumerable<ParameterChangeEffect> Plain()
         {
-            yield return new EnhanceDefenseEffect(duration: 3, maxStacks: 3, value: Authored);
+            yield return new CritMitigationEffect(duration: 3, maxStacks: 3, value: Authored);
             yield return new CriticalDamageBuffEffect(duration: 3, maxStacks: 3, value: Authored);
             yield return new ColdResistanceShredEffect(duration: 3, maxStacks: 1, value: Authored);
         }

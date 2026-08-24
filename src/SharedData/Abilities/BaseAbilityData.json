@@ -1134,7 +1134,7 @@
             "tags": [],
             "abilityId": "Ability_Porcupine",
             "behaviour": "BuffOnCast",
-            "effectId": "Effect_Enhance_Defense",
+            "effectId": "Effect_Crit_Mitigation",
             "propertyRefs": { "duration": "Duration" },
             "upgradeProperties": {}
         },
@@ -1436,14 +1436,14 @@
         },
         {
             "id": "Augment_Ice_Aegis_Crit_Mitigation_Under_Shield",
-            "minRarity": "Legendary",
+            "minRarity": "Epic",
             "maxRarity": "Legendary",
             "grantsTags": [ "buff", "effect" ],
             "tier": 3,
             "tags": [],
             "abilityId": "Ability_Ice_Aegis",
             "behaviour": "BuffOnCast",
-            "effectId": "Effect_Enhance_Defense",
+            "effectId": "Effect_Ice_Crit_Mitigation",
             "propertyRefs": { "duration": "Duration" },
             "upgradeProperties": {}
         },
