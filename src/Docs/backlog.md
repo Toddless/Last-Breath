@@ -2,7 +2,7 @@
 
 ## Из Т-9 (2026-08-24, коммит `88920cdd`; сверка ведущего) — хвосты владельцу
 
-- **(похоже на БАГ механики)** `Augment_Porcupine_Crit_Mitigation` и `Augment_Ice_Aegis_Crit_Mitigation_Under_Shield` кладут `Effect_Enhance_Defense` (канон 0.15, «Increases the owner's defensive parameters»), а описания обещают «−15% получаемого крит-урона», док же называет 80% и 50–80% — либо эффект не тот, либо описания и док.
+- ~~(похоже на БАГ механики) Crit Mitigation-аугменты кладут Effect_Enhance_Defense~~ — ПОДТВЕРЖДЕНО Todd 2026-08-24: «эффект не тот» → карточка #199 (Todo), задача С-3: правильный эффект в `CriticalDamageMitigation` с канон-строкой, значения по доку (80% / 50–80% лестницей по редкостям), записи на behaviour-дорогу.
 - (данные) `Augment_Stage_Four_Damage`: теги [spell, stage], док «Урон 4 стадии» (Перегрузка), а en-имя/описание — про Ice Block («Extra Block Damage»).
 - (лок, дубли имён en в трее) «Incoming Reduction» ×2, «Crit Mitigation» ×2, «Ignore Resistances» ×2 — развести формулировками.
 - (лок, знать) En-имена-эхо id (Apply Buff Critical Chance и др.) и три ru-имени, разошедшихся с доком (Снижение стоимости/перезарядки, Регенерация) — оставлены как были; «Чистое эхо» — возможно «Священное эхо» (запись давно sacred).
