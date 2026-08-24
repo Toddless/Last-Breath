@@ -2541,7 +2541,7 @@ msgid "AllElementalDamage"
 msgstr "All Elemental Damage"
 
 msgid "Damage"
-msgstr "Damage"
+msgstr "All Damage"
 
 # ------------------------------
 # Ability parameters (battle UI)

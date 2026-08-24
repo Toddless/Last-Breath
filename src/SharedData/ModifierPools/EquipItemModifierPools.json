@@ -28,6 +28,13 @@
                     "affix": "Prefix"
                 },
                 {
+                    "parameter": "AllDoTDamageMultiplier",
+                    "modifierType": "flat",
+                    "value": { "min": 0.05, "max": 0.15 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
                     "parameter": "PoisonDamageMultiplier",
                     "modifierType": "flat",
                     "value": { "min": 0.05, "max": 0.15 },

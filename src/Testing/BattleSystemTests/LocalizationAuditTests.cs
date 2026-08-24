@@ -5,16 +5,19 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source.UIElements.PassiveWheel;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Data;
     using Core.Data.GameData;
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Items;
     using Core.Localization;
     using Core.MessageBus.Requests;
+    using Core.Modifiers;
     using Core.PassiveTree;
     using Core.PassiveTree.View;
     using Core.Views;
     using Core.Views.UI;
+    using LootGeneration.Internal;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -318,6 +321,53 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(1, lines.Length, $"'{composite}' still speaks in parts: {string.Join(" | ", lines)}");
             Assert.AreEqual(sentence, lines[0]);
+        }
+
+        /// <summary>
+        /// The amulet's damage-over-time line as a player reads it — shipped pool, shipped units, shipped
+        /// wording, both as the pool's spread and as one rolled line. The catalog stores the bonus as a
+        /// fraction, so a parameter left out of the unit table reaches the card as "+0.1", a number nobody
+        /// can act on and one that looks like a rounding bug rather than a missing entry.
+        /// </summary>
+        [TestMethod]
+        public void TheAmuletsDamageOverTimeLineReadsAsAPercentInTheShippedData()
+        {
+            const string pool = "Amulet";
+            const string wording = "All Damage over Time Multiplier";
+
+            var formats = new ParameterFormatProvider();
+            new GameDataService(new FileSystemDataSource(LastBreathTest.SharedData.Root()), [formats]).LoadAll();
+
+            var catalog = new FakeLocalizationProvider();
+            foreach ((string key, string text) in ReadEntries("en.po")) catalog.Strings[key] = text;
+            var formatter = new ModifierFormatter(catalog, formats);
+
+            ParameterDescriptor entry = ShippedPool(pool)
+                .OfType<ParameterDescriptor>()
+                .Single(descriptor => descriptor.Parameter == EntityParameter.AllDoTDamageMultiplier);
+
+            Assert.AreEqual($"+5–15% {wording}", formatter.FormatDescriptor(entry),
+                "the pool's spread does not reach the player as a percentage");
+
+            var sink = new CollectingSink();
+            new ModifierMaterializer(new DefaultRandomNumberGenerator(Seed)).Materialize(entry, sink, pool);
+            string line = formatter.Format(sink.Entities.Single());
+
+            StringAssert.EndsWith(line, $"% {wording}", $"a rolled line of the amulet reads: {line}");
+        }
+
+        /// <summary>One shipped pool through the real parser — the entries the game actually rolls.</summary>
+        private static IReadOnlyList<IModifierDescriptor> ShippedPool(string poolId)
+        {
+            var parser = new DataParser(new ItemGameDataFactory());
+            foreach (string file in Directory.EnumerateFiles(
+                LastBreathTest.SharedData.Catalog(DataCatalog.ModifierPools), "*.json", SearchOption.AllDirectories))
+            {
+                if (parser.ParseEquipItemModifierPools(File.ReadAllText(file)).TryGetValue(poolId, out var pool)) return pool;
+            }
+
+            Assert.Fail($"the shipped pools carry no '{poolId}'");
+            return [];
         }
 
         private static List<(string Domain, List<string> Ids, bool NeedsDescription)> CollectDataIds() =>

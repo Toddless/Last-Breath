@@ -22,7 +22,7 @@ namespace LastBreathTest.LootSimulation
         private const string BossDropsFingerprint = "29566E2A16D2B21FBD0FAF4D989001612C1F9D635A4E3140C0F4E297AEC2012C";
 
         /// <summary>The same for <see cref="RolledModifiers"/>.</summary>
-        private const string RolledModifiersFingerprint = "6223122F8B33E711F29B7C0CC283F42A8D23BD45B8EEDB8A4EFDF301F0A581A1";
+        private const string RolledModifiersFingerprint = "2113525D3DFC485735235ED303BE9DB4DB16A56E7F5E82C1C6B51A7B7A26D288";
 
         /// <summary>The boss carries the paths a regular kill never reaches — equip affix rolls, grant
         /// rolls and augment seats — which is where a run stops repeating itself first.</summary>

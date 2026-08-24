@@ -12,6 +12,7 @@
 		{ "parameter": "PoisonDamageMultiplier", "unit": "Percent" },
 		{ "parameter": "BurningDamageMultiplier", "unit": "Percent" },
 		{ "parameter": "BleedDamageMultiplier", "unit": "Percent" },
+		{ "parameter": "AllDoTDamageMultiplier", "unit": "Percent" },
 		{ "parameter": "FireResistance", "unit": "Percent" },
 		{ "parameter": "ColdResistance", "unit": "Percent" },
 		{ "parameter": "LightningResistance", "unit": "Percent" },

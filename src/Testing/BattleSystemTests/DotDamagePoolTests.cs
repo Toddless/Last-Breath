@@ -7,6 +7,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Enums;
+    using Core.Modifiers;
 
     /// <summary>
     /// What a damage-over-time tick is taken from. A blow is not one number — it is a split by type, and
@@ -170,6 +171,49 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(Fire * Share, burning.DamagePerTick, 0.0001f,
                 "a poison or bleed stat moved a burn — the kinds are not told apart");
+        }
+
+        /// <summary>The bucket line an amulet carries ("+X% damage over time"), on the road it is worn on:
+        /// one modifier written for no status in particular has to reach the pool of every one of the three.
+        /// It is a modifier and not a base value on purpose — a bucket parameter holds no value of its own,
+        /// so the only thing that can make it work is the fold at resolution.</summary>
+        [TestMethod]
+        public async Task TheBucketMultiplierRaisesThePoolOfAllThreeStatuses()
+        {
+            const float Bonus = 0.2f;
+
+            var caster = new ConditionOwner();
+            caster.ParameterModifiers.AddModifier(new SimpleModifier(EntityParameter.AllDoTDamageMultiplier, ModifierValueType.Flat, Bonus, "amulet"));
+            var poison = new DamageOverTurnEffect(Turns, StatusEffects.Poison, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
+            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
+            var bleed = new DamageOverTurnEffect(Turns, StatusEffects.Bleed, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
+
+            await poison.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
+            await burning.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
+            await bleed.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
+
+            Assert.AreEqual((Physical + Fire) * (1 + Bonus) * Share, poison.DamagePerTick, 0.0001f, "the bucket never reached the poison");
+            Assert.AreEqual(Fire * (1 + Bonus) * Share, burning.DamagePerTick, 0.0001f, "the bucket never reached the burn");
+            Assert.AreEqual(Physical * (1 + Bonus) * Share, bleed.DamagePerTick, 0.0001f, "the bucket never reached the bleed");
+        }
+
+        /// <summary>The bucket and a status's own multiplier are one sum, counted once each: the fold hands
+        /// the bucket over to the member and the member's own line stands beside it.</summary>
+        [TestMethod]
+        public async Task TheBucketAndTheStatusOwnMultiplierAddUpOnce()
+        {
+            const float Bucket = 0.2f;
+            const float Own = 0.5f;
+
+            var caster = new ConditionOwner();
+            caster.SetMaximum(EntityParameter.BurningDamageMultiplier, Own);
+            caster.ParameterModifiers.AddModifier(new SimpleModifier(EntityParameter.AllDoTDamageMultiplier, ModifierValueType.Flat, Bucket, "amulet"));
+            var burning = new DamageOverTurnEffect(Turns, StatusEffects.Burning, DamageOverTurnEffect.NoCeilingOfItsOwn, Share);
+
+            await burning.Apply(Blow(caster, new ConditionOwner(), (DamageType.Physical, Physical), (DamageType.Fire, Fire)));
+
+            Assert.AreEqual(Fire * (1 + Own + Bucket) * Share, burning.DamagePerTick, 0.0001f,
+                "the burn does not carry the bucket and its own multiplier exactly once each");
         }
 
         [TestMethod]

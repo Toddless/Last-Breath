@@ -17,6 +17,11 @@ namespace Core.Enums
                 [EntityParameter.AllAttribute] = [EntityParameter.Strength, EntityParameter.Dexterity, EntityParameter.Intelligence],
                 [EntityParameter.AllDefence] = [EntityParameter.Evade, EntityParameter.Armor],
                 [EntityParameter.AllResistancePenetration] = [EntityParameter.FireResistancePenetration, EntityParameter.ColdResistancePenetration, EntityParameter.LightningResistancePenetration, EntityParameter.PoisonResistancePenetration],
+                [EntityParameter.AllDoTDamageMultiplier] = [EntityParameter.PoisonDamageMultiplier, EntityParameter.BurningDamageMultiplier, EntityParameter.BleedDamageMultiplier],
+                [EntityParameter.AllElementalDamage] = [EntityParameter.FireDamage, EntityParameter.ColdDamage, EntityParameter.LightningDamage],
+                // The widest bucket, and the one whose members belong to another family too: an elemental
+                // damage parameter answers to both buckets, each folded once at resolution.
+                [EntityParameter.Damage] = [EntityParameter.PhysicalDamage, EntityParameter.FireDamage, EntityParameter.ColdDamage, EntityParameter.LightningDamage, EntityParameter.SpellDamage],
             };
 
         // Reverse index (concrete member -> aggregates that include it), built once for the resolution-time fold.
