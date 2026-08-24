@@ -3965,9 +3965,6 @@ msgstr "Increased"
 msgid "UI_PassiveTree_Summary_Col_More"
 msgstr "More"
 
-msgid "UI_PassiveTree_Summary_Col_Total"
-msgstr "Total"
-
 msgid "UI_PassiveTree_Close_Title"
 msgstr "The plan is not applied"
 

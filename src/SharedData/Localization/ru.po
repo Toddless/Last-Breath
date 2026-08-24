@@ -3403,9 +3403,6 @@ msgstr ""
 msgid "UI_PassiveTree_Summary_Col_More"
 msgstr ""
 
-msgid "UI_PassiveTree_Summary_Col_Total"
-msgstr ""
-
 msgid "UI_PassiveTree_Close_Title"
 msgstr ""
 

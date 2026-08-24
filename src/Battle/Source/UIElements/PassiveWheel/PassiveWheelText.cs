@@ -59,7 +59,6 @@ namespace Battle.Source.UIElements.PassiveWheel
         public const string SummaryColumnFlat = "UI_PassiveTree_Summary_Col_Flat";
         public const string SummaryColumnIncrease = "UI_PassiveTree_Summary_Col_Increase";
         public const string SummaryColumnMore = "UI_PassiveTree_Summary_Col_More";
-        public const string SummaryColumnTotal = "UI_PassiveTree_Summary_Col_Total";
 
         // The guard that catches an unapplied plan on the way out.
         public const string CloseTitle = "UI_PassiveTree_Close_Title";

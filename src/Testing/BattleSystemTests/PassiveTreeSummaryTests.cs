@@ -1,6 +1,8 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using Battle.Source.UIElements.PassiveWheel;
     using Core.Enums;
+    using Core.Localization;
     using Core.Modifiers.Context;
     using Core.PassiveTree;
     using Core.PassiveTree.Summary;
@@ -164,5 +166,46 @@ namespace LastBreathTest.BattleSystemTests
         {
             public float Of(EntityParameter parameter) => value;
         }
+    }
+
+    /// <summary>
+    /// What the totals panel prints in a row's cells. The panel has no base value and no gear behind it,
+    /// so a line lives in the bucket it was written in and nowhere else — a percent quietly re-read as a
+    /// flat number is how a node worth 40% came to read as nothing at all.
+    /// </summary>
+    [TestClass]
+    public class PassiveSummaryCellsTests
+    {
+        private readonly ModifierFormatter _formatter =
+            new(new FakeLocalizationProvider(), new ParameterFormatProvider());
+
+        [TestMethod]
+        public void APercentLine_FillsItsOwnBucketAndLeavesTheOthersEmpty()
+        {
+            (string flat, string increase, string more) = PassiveSummaryCells.Buckets(_formatter, Total(increase: 0.4f));
+
+            Assert.AreEqual(string.Empty, flat, "a percent line was quoted as a flat amount");
+            Assert.AreEqual("40%", increase);
+            Assert.AreEqual(string.Empty, more, "an increase landed under the multiplier heading");
+        }
+
+        [TestMethod]
+        public void APlanOfPercentNodes_StillPreviewsWhatItWouldAdd() =>
+            Assert.AreEqual("+40%", PassiveSummaryCells.PlanDelta(_formatter, Total(), Total(increase: 0.4f)),
+                "the preview said nothing about a plan the player is about to pay for");
+
+        /// <summary>Three buckets cannot be added together without a fighter to fold them against, so the
+        /// preview quotes each in its own units and marks the multiplier one.</summary>
+        [TestMethod]
+        public void APlanTouchingSeveralBuckets_QuotesEachOfThem() =>
+            Assert.AreEqual("+20, +10%, ×5%",
+                PassiveSummaryCells.PlanDelta(_formatter, Total(), Total(20f, 0.1f, 0.05f)));
+
+        [TestMethod]
+        public void APlanThatChangesNothing_PreviewsNothing() =>
+            Assert.AreEqual(string.Empty, PassiveSummaryCells.PlanDelta(_formatter, Total(increase: 0.4f), Total(increase: 0.4f)));
+
+        private static ParameterTotal Total(float flat = 0f, float increase = 0f, float more = 0f) =>
+            new(EntityParameter.Evade, flat, increase, more, 0f, flat, 1, 0);
     }
 }

@@ -21,7 +21,9 @@ namespace Battle.Source.UIElements.PassiveWheel
     ///
     /// <para>Measured against <see cref="NoBaseline"/> on purpose: the panel shows the CONTRIBUTION OF THE
     /// TREE, and the tree's contribution is already registered on the living character — reading it
-    /// against him would count every line twice.</para>
+    /// against him would count every line twice. Which is also why the buckets are never folded into one
+    /// number here: with no base and no gear behind them, a combined total states the flat bucket and
+    /// calls a whole percent column zero.</para>
     /// </summary>
     [GlobalClass]
     public partial class PassiveSummaryPanel : PanelContainer
@@ -126,13 +128,13 @@ namespace Battle.Source.UIElements.PassiveWheel
             foreach (ParameterTotal total in rows)
             {
                 ParameterTotal? after = ahead.GetValueOrDefault(total.Parameter);
+                (string flat, string increase, string more) = PassiveSummaryCells.Buckets(_modifiers, total);
                 Row(_parameters)?.Show(
                     Localization.Localize(total.Parameter.ToString()),
-                    Bucket(total.Parameter, ModifierValueType.Flat, total.Flat),
-                    Bucket(total.Parameter, ModifierValueType.Increase, total.Increase),
-                    Bucket(total.Parameter, ModifierValueType.Multiplicative, total.Multiplicative),
-                    Value(total.Parameter, ModifierValueType.Flat, total.Total),
-                    planned ? Delta(total.Parameter, total.Total, after?.Total ?? 0f) : string.Empty);
+                    flat,
+                    increase,
+                    more,
+                    planned ? PassiveSummaryCells.PlanDelta(_modifiers, total, after) : string.Empty);
             }
 
             Section(_parametersCaption, PassiveWheelText.SummaryParameters, _parameters.GetChildCount() > 0);
@@ -152,7 +154,7 @@ namespace Battle.Source.UIElements.PassiveWheel
                 string sentence = _context?.Format(entry) ?? $"{total.Parameter} {total.Value}";
                 float after = ahead.GetValueOrDefault(total.Parameter);
 
-                Row(_knobs)?.Show(sentence, string.Empty, string.Empty, string.Empty, string.Empty,
+                Row(_knobs)?.Show(sentence, string.Empty, string.Empty, string.Empty,
                     planned && !Mathf.IsEqualApprox(after, total.Value) ? Signed(after - total.Value) : string.Empty);
             }
 
@@ -164,10 +166,12 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (_unlocks == null) return;
 
             _unlocks.QueueFreeChildren();
+            // The class of node that granted the ability rides in the last bucket cell: this section has no
+            // headings of its own, and the column it used to sit in is gone from every row alike.
             foreach (KeyValuePair<PassiveNodeKind, List<string>> group in held.Unlocks)
                 foreach (string abilityId in group.Value)
                     Row(_unlocks)?.Show(Localization.Localize(abilityId), string.Empty, string.Empty,
-                        string.Empty, Localization.Localize($"{PassiveWheelText.KindPrefix}{group.Key}"), string.Empty);
+                        Localization.Localize($"{PassiveWheelText.KindPrefix}{group.Key}"), string.Empty);
 
             Section(_unlocksCaption, PassiveWheelText.SummaryUnlocks, _unlocks.GetChildCount() > 0);
         }
@@ -178,7 +182,7 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             _keystones.QueueFreeChildren();
             foreach (string keystone in held.Keystones)
-                Row(_keystones)?.Show(keystone, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+                Row(_keystones)?.Show(keystone, string.Empty, string.Empty, string.Empty, string.Empty);
 
             Section(_keystonesCaption, PassiveWheelText.SummaryKeystones, _keystones.GetChildCount() > 0);
         }
@@ -221,7 +225,7 @@ namespace Battle.Source.UIElements.PassiveWheel
         private static string Signed(float delta) =>
             delta >= 0f ? $"+{delta:0.#}" : $"{delta:0.#}";
 
-        /// <summary>The column names, as a row of the same kind the numbers are printed in — so the four
+        /// <summary>The column names, as a row of the same kind the numbers are printed in — so the three
         /// columns cannot drift apart from the words above them.</summary>
         private void Header()
         {
@@ -232,7 +236,6 @@ namespace Battle.Source.UIElements.PassiveWheel
                 Localization.Localize(PassiveWheelText.SummaryColumnFlat),
                 Localization.Localize(PassiveWheelText.SummaryColumnIncrease),
                 Localization.Localize(PassiveWheelText.SummaryColumnMore),
-                Localization.Localize(PassiveWheelText.SummaryColumnTotal),
                 string.Empty);
         }
 
@@ -245,16 +248,5 @@ namespace Battle.Source.UIElements.PassiveWheel
             return row;
         }
 
-        /// <summary>A bucket that summed to nothing is not printed at all.</summary>
-        private string Bucket(EntityParameter parameter, ModifierValueType valueType, float value) =>
-            Mathf.IsZeroApprox(value) ? string.Empty : Value(parameter, valueType, value);
-
-        private string Value(EntityParameter parameter, ModifierValueType valueType, float value) =>
-            _modifiers?.FormatValue(valueType, parameter, value) ?? $"{value:0.#}";
-
-        private string Delta(EntityParameter parameter, float held, float projected) =>
-            Mathf.IsEqualApprox(held, projected)
-                ? string.Empty
-                : (projected >= held ? "+" : "-") + Value(parameter, ModifierValueType.Flat, Mathf.Abs(projected - held));
     }
 }
