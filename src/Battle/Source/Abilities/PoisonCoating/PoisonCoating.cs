@@ -20,6 +20,11 @@ namespace Battle.Source.Abilities.PoisonCoating
         public int PoisonDuration => (int)this[AbilityParameter.PoisonDuration];
         public float PoisonDamagePercent => this[Parameters.PoisonMultiplier];
 
+        /// <summary>Set by the record that buys a stack for every enemy: the coating lays one per living
+        /// enemy instead of one per blow. A switch rather than a number — the count belongs to the field
+        /// at the moment of the blow, not to the cast.</summary>
+        public bool StacksPerLivingEnemy { get; set; }
+
         public static class Parameters
         {
             public const string PoisonMultiplier = nameof(PoisonMultiplier);
@@ -45,7 +50,8 @@ namespace Battle.Source.Abilities.PoisonCoating
                 duration: Duration,
                 maxStacks: 1,
                 poisonDuration: PoisonDuration,
-                poisonDamagePercent: PoisonDamagePercent);
+                poisonDamagePercent: PoisonDamagePercent,
+                stacksPerLivingEnemyOn: StacksPerLivingEnemy ? field : null);
 
             return coatingBuff.Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId, Trace = Trace });
         }

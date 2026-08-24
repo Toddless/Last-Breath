@@ -308,10 +308,12 @@
                     data.Tags,
                     data.Tier)),
             ["Augment_Poison_Coating_Apply_Poison_For_Each_Enemy"] = new([], data =>
-                new AugmentPcMultiStackOnHit(
+                new DelegateAugment<PoisonCoating.PoisonCoating>(
                     data.Id,
                     data.Tags,
-                    data.Tier)),
+                    data.Tier,
+                    ability => ability.StacksPerLivingEnemy = true,
+                    ability => ability.StacksPerLivingEnemy = false)),
             ["Augment_Ice_Shards_Multicast"] = new([], data =>
                 new DelegateAugment<IceShards.IceShards>(
                     data.Id,
