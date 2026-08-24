@@ -68,6 +68,11 @@ namespace Core.PassiveTree
 
         [JsonProperty("condition", NullValueHandling = NullValueHandling.Ignore)]
         public string? Condition { get; set; }
+
+        /// <summary>Names the composite the record belongs to. Absent on a line that stands alone, so the
+        /// key is written only where the author joined records into one sentence.</summary>
+        [JsonProperty("groupId", NullValueHandling = NullValueHandling.Ignore)]
+        public string? GroupId { get; set; }
     }
 
     /// <summary>The context line's own record. A flag writes no <c>value</c> at all — the number is not
@@ -83,6 +88,11 @@ namespace Core.PassiveTree
 
         [JsonProperty("condition", NullValueHandling = NullValueHandling.Ignore)]
         public string? Condition { get; set; }
+
+        /// <summary>The composite stamp, shared with the parametric channel — a line may be spelled by
+        /// records from both.</summary>
+        [JsonProperty("groupId", NullValueHandling = NullValueHandling.Ignore)]
+        public string? GroupId { get; set; }
     }
 
     public sealed class PassiveEdgeDto

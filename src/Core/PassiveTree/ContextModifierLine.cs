@@ -30,6 +30,14 @@ namespace Core.PassiveTree
         /// parametric line's condition, but costs a knob nothing: a line that stops holding just stops being added.</summary>
         public string Condition { get; set; } = string.Empty;
 
+        /// <summary>Composite stamp shared with the parametric channel: records carrying it are ONE
+        /// player-facing line and cost the node one slot together. Null on a line that stands alone.</summary>
+        public string? GroupId
+        {
+            get => field;
+            set => field = string.IsNullOrWhiteSpace(value) ? null : value;
+        }
+
         public bool IsConditional => !string.IsNullOrWhiteSpace(Condition);
 
         public bool IsFlag => ValueType == ModifierValueType.Flag;
@@ -39,7 +47,8 @@ namespace Core.PassiveTree
             Parameter = Parameter,
             ValueType = ValueType,
             Value = Value,
-            Condition = Condition
+            Condition = Condition,
+            GroupId = GroupId
         };
     }
 }

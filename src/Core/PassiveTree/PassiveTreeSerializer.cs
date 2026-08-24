@@ -126,7 +126,8 @@ namespace Core.PassiveTree
             ValueType = line.ValueType.ToString(),
             Value = MathF.Round(line.Value, PassiveTreeFormat.ValueDecimals),
             PerParameter = line.PerParameter?.ToString(),
-            Condition = NullIfBlank(line.Condition)
+            Condition = NullIfBlank(line.Condition),
+            GroupId = line.GroupId
         };
 
         private static ContextModifierLineDto ToDto(ContextModifierLine line) => new()
@@ -134,7 +135,8 @@ namespace Core.PassiveTree
             Parameter = line.Parameter.ToString(),
             ValueType = line.ValueType.ToString(),
             Value = line.IsFlag ? null : MathF.Round(line.Value, PassiveTreeFormat.ValueDecimals),
-            Condition = NullIfBlank(line.Condition)
+            Condition = NullIfBlank(line.Condition),
+            GroupId = line.GroupId
         };
 
         private static PassiveTreeDocument FromDto(PassiveTreeDto dto, List<string> issues)
@@ -227,7 +229,8 @@ namespace Core.PassiveTree
                     ValueType = valueType,
                     Value = dto.Value,
                     PerParameter = perParameter,
-                    Condition = dto.Condition ?? string.Empty
+                    Condition = dto.Condition ?? string.Empty,
+                    GroupId = dto.GroupId
                 };
             }
             catch (FormatException exception)
@@ -254,7 +257,8 @@ namespace Core.PassiveTree
                     Parameter = parameter,
                     ValueType = valueType,
                     Value = dto.Value ?? 0f,
-                    Condition = dto.Condition ?? string.Empty
+                    Condition = dto.Condition ?? string.Empty,
+                    GroupId = dto.GroupId
                 };
             }
             catch (FormatException exception)

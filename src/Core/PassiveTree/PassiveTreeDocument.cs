@@ -179,12 +179,18 @@ namespace Core.PassiveTree
                 NodeKindRule rule = NodeKindRules.For(node.Kind);
                 bool hub = NodeKindRules.IsWheelHub(node);
 
-                // Both channels count against one limit — a line is content whichever road it takes.
-                if (node.LineCount < rule.MinModifiers)
-                    issues.Add($"{node.Id}: {node.Kind} needs at least {rule.MinModifiers} modifier line(s), has {node.LineCount}");
+                // Folded once and read by every rule below that asks about lines: one folding per node
+                // instead of one per question.
+                List<NodeLineGroup> lines = node.LineGroups();
 
-                if (node.LineCount > rule.MaxModifiers)
-                    issues.Add($"{node.Id}: {node.Kind} allows at most {rule.MaxModifiers} modifier line(s), has {node.LineCount}");
+                // Both channels count against one limit — a line is content whichever road it takes.
+                if (lines.Count < rule.MinModifiers)
+                    issues.Add($"{node.Id}: {node.Kind} needs at least {rule.MinModifiers} modifier line(s), has {lines.Count}");
+
+                if (lines.Count > rule.MaxModifiers)
+                    issues.Add($"{node.Id}: {node.Kind} allows at most {rule.MaxModifiers} modifier line(s), has {lines.Count}");
+
+                CheckComposites(node.Id, lines, issues);
 
                 // The hub opens no stance, so unlike a stance seed it is given no ability either.
                 if (rule.RequiresAbility && !hub && string.IsNullOrWhiteSpace(node.AbilityId))
@@ -207,6 +213,23 @@ namespace Core.PassiveTree
                 issues.Add($"the tree has {hubCount} wheel hub(s) — start points without a stance — and the wheel has one centre");
 
             return issues;
+        }
+
+        /// <summary>What a composite may not be, in the one place the rule is spelled: its records print as
+        /// a single sentence, so they must share the gate holding that sentence up, and a value measured off
+        /// a carrier has to stand alone — its number is a rate, unreadable inside a list of outright bonuses.</summary>
+        private static void CheckComposites(string nodeId, List<NodeLineGroup> lines, List<string> issues)
+        {
+            foreach (NodeLineGroup group in lines)
+            {
+                if (group.PartCount < 2) continue;
+
+                if (group.HasSplitCondition)
+                    issues.Add($"{nodeId}: composite line '{group.GroupId}' names more than one condition — every part of one line hangs on the same gate");
+
+                if (group.IsScaled)
+                    issues.Add($"{nodeId}: composite line '{group.GroupId}' holds a per-unit value, which is a rate and stands on its own line");
+            }
         }
 
         /// <summary>One seed per stance, granted with the character.</summary>

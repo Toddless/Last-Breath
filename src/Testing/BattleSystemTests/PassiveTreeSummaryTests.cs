@@ -118,6 +118,50 @@ namespace LastBreathTest.BattleSystemTests
                 "the aggregate stayed in the table beside the members it expanded into");
         }
 
+        /// <summary>The warning counts what the player reads, and a composite is ONE gated line however
+        /// many records spell it — across both channels — while its parts still land on their own
+        /// parameters.</summary>
+        [TestMethod]
+        public void AGatedComposite_IsOneLineOfTheWarningAndSeveralLinesOfTheTotals()
+        {
+            const string composite = "composite";
+            const string stamp = "mana";
+            var document = new PassiveTreeDocument();
+            var node = new PassiveNode { Id = composite, Kind = PassiveNodeKind.Notable };
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.Strength,
+                ValueType = ModifierValueType.Flat,
+                Value = OnlyWounded,
+                Condition = ConditionCatalogs.WhileWounded,
+                GroupId = stamp
+            });
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.Dexterity,
+                ValueType = ModifierValueType.Flat,
+                Value = OnlyWounded,
+                Condition = ConditionCatalogs.WhileWounded,
+                GroupId = stamp
+            });
+            node.ContextModifiers.Add(new ContextModifierLine
+            {
+                Parameter = ContextParameter.BleedDamage,
+                ValueType = ModifierValueType.Increase,
+                Value = 0.2f,
+                Condition = ConditionCatalogs.WhileWounded,
+                GroupId = stamp
+            });
+            document.AddNode(node);
+
+            TreeSummary carried = PassiveTreeSummary.Build(document, [composite], NoBaseline.Instance);
+
+            Assert.AreEqual(1, carried.ConditionalLines, "one sentence was counted once per record it is spelled by");
+            Assert.AreEqual(OnlyWounded, carried.Parameters.Single(total => total.Parameter == EntityParameter.Strength).Flat, Tolerance);
+            Assert.AreEqual(OnlyWounded, carried.Parameters.Single(total => total.Parameter == EntityParameter.Dexterity).Flat, Tolerance,
+                "a part of the composite stopped reaching its own parameter");
+        }
+
         /// <summary>Two nodes: one carrying lines that always count, one carrying the same lines gated on
         /// a condition. Both channels, because both reach a fighter and both have to be answered.</summary>
         private static PassiveTreeDocument Tree()

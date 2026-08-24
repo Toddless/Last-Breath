@@ -1,5 +1,6 @@
 namespace Core.PassiveTree
 {
+    using System;
     using System.Collections.Generic;
     using Enums;
 
@@ -40,7 +41,67 @@ namespace Core.PassiveTree
         public List<ContextModifierLine> ContextModifiers { get; } = [];
 
         /// <summary>Everything the node says in lines, both channels. The per-class content limits count
-        /// content, not the road a line takes.</summary>
-        public int LineCount => Modifiers.Count + ContextModifiers.Count;
+        /// content, not the road a line takes — and a composite is one piece of content however many
+        /// records spell it.</summary>
+        public int LineCount => LineGroups().Count;
+
+        /// <summary>The node's records folded into the lines a player reads: records sharing a group stamp
+        /// become one entry, an unstamped record is an entry of its own. Both channels flatten into one
+        /// ordered list first — parametric records, then pipeline knobs — so a group sits where its first
+        /// record does and a composite may reach the fighter by both roads at once.</summary>
+        public List<NodeLineGroup> LineGroups()
+        {
+            List<NodeLineGroup> groups = [];
+            var byId = new Dictionary<string, NodeLineGroup>(StringComparer.Ordinal);
+
+            foreach (ModifierLine line in Modifiers) Place(groups, byId, line.GroupId).Modifiers.Add(line);
+            foreach (ContextModifierLine line in ContextModifiers) Place(groups, byId, line.GroupId).ContextModifiers.Add(line);
+
+            return groups;
+        }
+
+        /// <summary>The group a record joins: the one already opened under its stamp, or a fresh entry
+        /// appended in reading order — which an unstamped record always gets.</summary>
+        private static NodeLineGroup Place(List<NodeLineGroup> groups, Dictionary<string, NodeLineGroup> byId, string? groupId)
+        {
+            if (groupId is not null && byId.TryGetValue(groupId, out NodeLineGroup? existing)) return existing;
+
+            var group = new NodeLineGroup { GroupId = groupId };
+            groups.Add(group);
+            if (groupId is not null) byId[groupId] = group;
+
+            return group;
+        }
+    }
+
+    /// <summary>One line of a node as content: the records that spell it, in reading order. A group of one
+    /// is an ordinary line — the composite shape costs an unstamped record nothing.</summary>
+    public sealed class NodeLineGroup
+    {
+        /// <summary>The stamp the records share, null for a record standing alone.</summary>
+        public string? GroupId { get; init; }
+
+        public List<ModifierLine> Modifiers { get; } = [];
+
+        public List<ContextModifierLine> ContextModifiers { get; } = [];
+
+        /// <summary>The gate the whole line hangs on — the leading record's, which every other record of
+        /// the group has to repeat for the line to be printable at all.</summary>
+        public string Condition => Modifiers.Count > 0 ? Modifiers[0].Condition : ContextModifiers[0].Condition;
+
+        public bool IsConditional => !string.IsNullOrWhiteSpace(Condition);
+
+        /// <summary>The line is measured off a carrier, so its worth is the carrier's rather than the
+        /// allocation's.</summary>
+        public bool IsScaled => Modifiers.Exists(line => line.IsScaled);
+
+        /// <summary>Records of the group naming different gates — half a line held up and half not, which
+        /// no single sentence can honestly say.</summary>
+        public bool HasSplitCondition =>
+            Modifiers.Exists(line => !string.Equals(line.Condition, Condition, StringComparison.Ordinal))
+            || ContextModifiers.Exists(line => !string.Equals(line.Condition, Condition, StringComparison.Ordinal));
+
+        /// <summary>How many records the line is spelled by — one means it is an ordinary line.</summary>
+        public int PartCount => Modifiers.Count + ContextModifiers.Count;
     }
 }

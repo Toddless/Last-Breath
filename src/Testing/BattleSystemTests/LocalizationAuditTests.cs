@@ -242,6 +242,34 @@ namespace LastBreathTest.BattleSystemTests
             CollectionAssert.Contains(lines, penalty, $"'{keystone}' words its cost as: {string.Join(" | ", lines)}");
         }
 
+        /// <summary>
+        /// A composite node read the way the wheel reads it — shipped tree, shipped catalog. Two records
+        /// stamped into one group have to arrive as ONE sentence with both numbers in it; two rows saying
+        /// half of the node each is what the stamp exists to prevent.
+        /// </summary>
+        [TestMethod]
+        public void ACompositeNodeOfTheShippedTreeReadsAsASingleLine()
+        {
+            const string composite = "small_mana_mana_recovery_1";
+            const string sentence = "+2% increased Mana, +3% increased Mana Recovery";
+
+            var tree = new PassiveTreeProvider();
+            var formats = new ParameterFormatProvider();
+            new GameDataService(new FileSystemDataSource(LastBreathTest.SharedData.Root()), [tree, formats]).LoadAll();
+
+            PassiveNode? node = tree.Tree.Find(composite);
+            Assert.IsNotNull(node, $"the shipped tree carries no '{composite}' to read");
+
+            var catalog = new FakeLocalizationProvider();
+            foreach ((string key, string wording) in ReadEntries("en.po")) catalog.Strings[key] = wording;
+
+            string[] lines = [.. PassiveNodeLines.Of(node!, new ModifierFormatter(catalog, formats), null, catalog)
+                .Select(line => line.Text)];
+
+            Assert.AreEqual(1, lines.Length, $"'{composite}' still speaks in parts: {string.Join(" | ", lines)}");
+            Assert.AreEqual(sentence, lines[0]);
+        }
+
         private static List<(string Domain, List<string> Ids, bool NeedsDescription)> CollectDataIds() =>
         [
             // Modifier and ParameterChange templates localize parameter names by enum member

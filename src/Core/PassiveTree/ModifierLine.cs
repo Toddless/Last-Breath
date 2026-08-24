@@ -22,6 +22,14 @@ namespace Core.PassiveTree
         /// fighter counts it only while it holds; the editor's summator (no battle state) counts it as always-on and flags the total.</summary>
         public string Condition { get; set; } = string.Empty;
 
+        /// <summary>Composite stamp: records sharing it are ONE player-facing line and cost the node one
+        /// slot together. Null on a line that stands alone; a blank stamp normalizes to null.</summary>
+        public string? GroupId
+        {
+            get => field;
+            set => field = string.IsNullOrWhiteSpace(value) ? null : value;
+        }
+
         public bool IsConditional => !string.IsNullOrWhiteSpace(Condition);
 
         /// <summary>The value is measured off a carrier, so the line is worth nothing until one is known.</summary>
@@ -46,7 +54,8 @@ namespace Core.PassiveTree
             ValueType = ValueType,
             Value = Value,
             PerParameter = PerParameter,
-            Condition = Condition
+            Condition = Condition,
+            GroupId = GroupId
         };
     }
 }

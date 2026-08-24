@@ -19,16 +19,19 @@ namespace PassiveTreeEditor.Source.Editing
             && first.ValueType == second.ValueType
             && first.Value.Equals(second.Value)
             && first.PerParameter == second.PerParameter
-            && string.Equals(first.Condition, second.Condition, StringComparison.Ordinal);
+            && string.Equals(first.Condition, second.Condition, StringComparison.Ordinal)
+            && string.Equals(first.GroupId, second.GroupId, StringComparison.Ordinal);
 
         public static bool Same(ContextModifierLine first, ContextModifierLine second) =>
             first.Parameter == second.Parameter
             && first.ValueType == second.ValueType
             && first.Value.Equals(second.Value)
-            && string.Equals(first.Condition, second.Condition, StringComparison.Ordinal);
+            && string.Equals(first.Condition, second.Condition, StringComparison.Ordinal)
+            && string.Equals(first.GroupId, second.GroupId, StringComparison.Ordinal);
 
-        /// <summary>The per-unit carrier travels with the rest: the tool authors no field for it, so a copy
-        /// that dropped it would quietly strip a hand-written line the first time the node was edited.</summary>
+        /// <summary>The per-unit carrier and the composite stamp travel with the rest: the tool authors no
+        /// field for either, so a copy that dropped one would quietly strip a hand-written line the first
+        /// time the node was edited.</summary>
         public static void Assign(ModifierLine target, ModifierLine source)
         {
             target.Parameter = source.Parameter;
@@ -36,6 +39,7 @@ namespace PassiveTreeEditor.Source.Editing
             target.Value = source.Value;
             target.PerParameter = source.PerParameter;
             target.Condition = source.Condition;
+            target.GroupId = source.GroupId;
         }
 
         /// <summary>A snapshot of a line that is currently a switch carries the pinned one, not the
@@ -47,6 +51,7 @@ namespace PassiveTreeEditor.Source.Editing
             target.ValueType = source.ValueType;
             target.Value = source.Value;
             target.Condition = source.Condition;
+            target.GroupId = source.GroupId;
         }
     }
 }

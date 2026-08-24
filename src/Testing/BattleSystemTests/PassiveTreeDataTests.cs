@@ -510,6 +510,8 @@ namespace LastBreathTest.BattleSystemTests
             CollectionAssert.AreEquivalent(Enum.GetValues<ContextParameter>(), ContextKnobs.Bound.ToArray());
         }
 
+        /// <summary>Unstamped records are lines of their own, so three of them across the two channels are
+        /// three lines whatever road each takes.</summary>
         [TestMethod]
         public void BothLineChannelsCountAgainstTheSameNodeBudget()
         {
@@ -522,8 +524,183 @@ namespace LastBreathTest.BattleSystemTests
 
             List<string> issues = document.Validate();
 
+            Assert.AreEqual(3, node.LineCount, "records nobody joined into a composite stopped costing a slot each");
             Assert.IsTrue(issues.Any(issue => issue.Contains("small_1") && issue.Contains("at most 2")),
                 "a payload past the limit slipped through on the context channel: " + string.Join("; ", issues));
+        }
+
+        /// <summary>The composite stamp is authored by hand and read by both the game and the tool, so it
+        /// has to survive a save; an unstamped line must come back unstamped rather than as a blank group
+        /// that would silently swallow its neighbour.</summary>
+        [TestMethod]
+        public void ACompositeStampSurvivesTheRoundTripAndAnUnstampedLineComesBackWithout()
+        {
+            var document = new PassiveTreeDocument { Budget = 20 };
+            var node = new PassiveNode { Id = "notable_1", Kind = PassiveNodeKind.Notable };
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.Mana, ValueType = ModifierValueType.Increase, Value = 0.25f, GroupId = "mana"
+            });
+            node.Modifiers.Add(new ModifierLine { Parameter = EntityParameter.Armor, ValueType = ModifierValueType.Increase, Value = 0.06f });
+            node.ContextModifiers.Add(new ContextModifierLine
+            {
+                Parameter = ContextParameter.BleedDamage, ValueType = ModifierValueType.Increase, Value = 0.1f, GroupId = "mana"
+            });
+            document.AddNode(node);
+            List<string> issues = [];
+
+            PassiveNode? reloaded = PassiveTreeSerializer
+                .Deserialize(PassiveTreeSerializer.Serialize(document), issues)
+                .Find("notable_1");
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            Assert.IsNotNull(reloaded);
+            Assert.AreEqual("mana", reloaded.Modifiers[0].GroupId);
+            Assert.IsNull(reloaded.Modifiers[1].GroupId, "a line nobody stamped came back inside a composite");
+            Assert.AreEqual("mana", reloaded.ContextModifiers[0].GroupId, "the stamp did not survive on the context channel");
+
+            // A blank stamp is not a stamp: left as written it would be a group id like any other, joining
+            // every other blank-stamped record of the node into one sentence and going back into the file.
+            const string blank = """
+                {
+                    "version": 1,
+                    "nodes": [
+                        {
+                            "id": "small_1",
+                            "kind": "Small",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "modifiers": [ { "parameter": "Armor", "valueType": "Increase", "value": 0.06, "groupId": "" } ]
+                        }
+                    ],
+                    "edges": []
+                }
+                """;
+            List<string> blankIssues = [];
+            PassiveTreeDocument blankDocument = PassiveTreeSerializer.Deserialize(blank, blankIssues);
+
+            Assert.AreEqual(0, blankIssues.Count, string.Join("; ", blankIssues));
+            Assert.IsNull(blankDocument.Find("small_1")!.Modifiers[0].GroupId, "a blank stamp came back as a composite of one");
+            Assert.IsFalse(PassiveTreeSerializer.Serialize(blankDocument).Contains("groupId"), "a blank stamp was written back into the file");
+        }
+
+        /// <summary>What a composite costs: the records sharing a stamp are one line, the record beside
+        /// them is another — two lines out of three records.</summary>
+        [TestMethod]
+        public void RecordsOfOneCompositeCostTheNodeASingleLine()
+        {
+            var node = new PassiveNode { Id = "small_1", Kind = PassiveNodeKind.Small };
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.Mana, ValueType = ModifierValueType.Increase, Value = 0.02f, GroupId = "mana"
+            });
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.ManaRecovery, ValueType = ModifierValueType.Increase, Value = 0.03f, GroupId = "mana"
+            });
+            node.Modifiers.Add(new ModifierLine { Parameter = EntityParameter.Armor, ValueType = ModifierValueType.Increase, Value = 0.06f });
+
+            Assert.AreEqual(2, node.LineCount, "a composite was charged per record instead of per line");
+        }
+
+        /// <summary>A composite may be spelled by records taking different roads to the fighter, and the
+        /// player still reads one line — so the budget is charged once.</summary>
+        [TestMethod]
+        public void ACompositeSpanningBothChannelsIsOneLineOfTheBudget()
+        {
+            var node = new PassiveNode { Id = "notable_1", Kind = PassiveNodeKind.Notable };
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.Mana, ValueType = ModifierValueType.Increase, Value = 0.25f, GroupId = "mana"
+            });
+            node.ContextModifiers.Add(new ContextModifierLine
+            {
+                Parameter = ContextParameter.ManaOnHit, ValueType = ModifierValueType.Flat, Value = 25f, GroupId = "mana"
+            });
+
+            Assert.AreEqual(1, node.LineCount, "one line spelled through both channels was charged twice");
+        }
+
+        /// <summary>One sentence hangs on one gate. Records of a composite naming different conditions
+        /// would print as half-held-up, so the rule is reported rather than guessed at print time.</summary>
+        [TestMethod]
+        public void ACompositeWhoseRecordsNameDifferentGatesIsReported()
+        {
+            var document = new PassiveTreeDocument();
+            var node = new PassiveNode { Id = "small_1", Kind = PassiveNodeKind.Small, Stance = Stance.Strength };
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.Mana,
+                ValueType = ModifierValueType.Increase,
+                Value = 0.02f,
+                GroupId = "mana",
+                Condition = "while wounded"
+            });
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.ManaRecovery, ValueType = ModifierValueType.Increase, Value = 0.03f, GroupId = "mana"
+            });
+            document.AddNode(node);
+
+            List<string> issues = document.Validate();
+
+            Assert.IsTrue(issues.Any(issue => issue.Contains("small_1") && issue.Contains("more than one condition")),
+                "a line half held up by a gate was accepted: " + string.Join("; ", issues));
+        }
+
+        /// <summary>The same rule where the halves take different roads: the gate a context record names is
+        /// as much the line's gate as a parametric one, and the sentence is printed off the leading record,
+        /// so a mismatch on the other channel would silently promise an always-on bonus.</summary>
+        [TestMethod]
+        public void ACompositeGatedOnOneChannelOnlyIsReported()
+        {
+            var document = new PassiveTreeDocument();
+            var node = new PassiveNode { Id = "notable_1", Kind = PassiveNodeKind.Notable, Stance = Stance.Strength };
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.Mana, ValueType = ModifierValueType.Increase, Value = 0.25f, GroupId = "mana"
+            });
+            node.ContextModifiers.Add(new ContextModifierLine
+            {
+                Parameter = ContextParameter.ManaOnHit,
+                ValueType = ModifierValueType.Flat,
+                Value = 25f,
+                GroupId = "mana",
+                Condition = "while wounded"
+            });
+            document.AddNode(node);
+
+            List<string> issues = document.Validate();
+
+            Assert.IsTrue(issues.Any(issue => issue.Contains("notable_1") && issue.Contains("more than one condition")),
+                "a gate named on the context channel alone was accepted: " + string.Join("; ", issues));
+        }
+
+        /// <summary>A value measured off a carrier is a rate, and a rate inside a list of outright bonuses
+        /// reads as one of them — so it keeps a line to itself.</summary>
+        [TestMethod]
+        public void APerUnitValueInsideACompositeIsReported()
+        {
+            var document = new PassiveTreeDocument();
+            var node = new PassiveNode { Id = "small_1", Kind = PassiveNodeKind.Small, Stance = Stance.Strength };
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.Mana, ValueType = ModifierValueType.Increase, Value = 0.02f, GroupId = "mana"
+            });
+            node.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.ManaRecovery,
+                ValueType = ModifierValueType.Increase,
+                Value = 0.01f,
+                PerParameter = EntityParameter.Intelligence,
+                GroupId = "mana"
+            });
+            document.AddNode(node);
+
+            List<string> issues = document.Validate();
+
+            Assert.IsTrue(issues.Any(issue => issue.Contains("small_1") && issue.Contains("per-unit")),
+                "a rate was folded into a composite sentence: " + string.Join("; ", issues));
         }
 
         [TestMethod]

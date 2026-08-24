@@ -23,8 +23,13 @@ namespace Core.PassiveTree.View
         /// the rest of this class falls back to them. The wording of a gate is the catalog's.</summary>
         private const string ConditionTemplate = "{0}  ({1})";
 
+        /// <summary>The separator between the parts of one composite line, the way an item tooltip joins
+        /// the parts of a composite roll.</summary>
+        private const string PartSeparator = ", ";
+
         /// <summary>Every line of the node, parametric ones first and pipeline knobs after, in authored
-        /// order. A missing formatter falls back to the raw parts rather than disappearing.</summary>
+        /// order; records sharing a group stamp arrive as ONE line, joined in the group's order and gated
+        /// once. A missing formatter falls back to the raw parts rather than disappearing.</summary>
         public static List<PassiveNodeLine> Of(
             PassiveNode node,
             ModifierFormatter? modifiers,
@@ -34,11 +39,8 @@ namespace Core.PassiveTree.View
         {
             List<PassiveNodeLine> lines = [];
 
-            foreach (ModifierLine line in node.Modifiers)
-                lines.Add(new PassiveNodeLine(Describe(line, modifiers, localization, format), line.IsConditional));
-
-            foreach (ContextModifierLine line in node.ContextModifiers)
-                lines.Add(new PassiveNodeLine(Describe(line, knobs, localization, format), line.IsConditional));
+            foreach (NodeLineGroup group in node.LineGroups())
+                lines.Add(new PassiveNodeLine(Describe(group, modifiers, knobs, localization, format), group.IsConditional));
 
             return lines;
         }
@@ -52,28 +54,37 @@ namespace Core.PassiveTree.View
             return node.Id;
         }
 
+        /// <summary>One line's sentence: every part of the group worded on its own, joined, and the gate
+        /// named once at the end — a clause per part would say the same thing twice.</summary>
+        private static string Describe(
+            NodeLineGroup group,
+            ModifierFormatter? modifiers,
+            ContextModifierFormatter? knobs,
+            ILocalizationProvider? localization,
+            TextFormat format)
+        {
+            List<string> parts = [];
+
+            foreach (ModifierLine line in group.Modifiers) parts.Add(Describe(line, modifiers, format));
+            foreach (ContextModifierLine line in group.ContextModifiers) parts.Add(Describe(line, knobs, format));
+
+            return WithCondition(string.Join(PartSeparator, parts), group.Condition, group.IsConditional, localization, format);
+        }
+
         /// <summary>A line measured per unit of a carrier parameter hands that parameter to the formatter,
         /// which words it — the number alone would read as an outright bonus.</summary>
-        private static string Describe(ModifierLine line, ModifierFormatter? formatter, ILocalizationProvider? localization, TextFormat format)
-        {
-            string text = formatter is null
+        private static string Describe(ModifierLine line, ModifierFormatter? formatter, TextFormat format) =>
+            formatter is null
                 ? $"{line.Parameter} {line.ValueType} {line.Value}{(line.IsScaled ? $" per {line.PerParameter}" : string.Empty)}"
                 : formatter.Format(
                     new SimpleModifier(line.Parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource), format, line.PerParameter);
 
-            return WithCondition(text, line.Condition, line.IsConditional, localization, format);
-        }
-
         /// <summary>The knob entry exists for the sentence and nothing else — it is never attached to
         /// anyone, since what a fighter gets is the sum of the taken lines, not one modifier per node.</summary>
-        private static string Describe(ContextModifierLine line, ContextModifierFormatter? formatter, ILocalizationProvider? localization, TextFormat format)
-        {
-            string text = formatter is null
+        private static string Describe(ContextModifierLine line, ContextModifierFormatter? formatter, TextFormat format) =>
+            formatter is null
                 ? $"{line.Parameter} {line.ValueType} {line.Value}"
                 : formatter.Format(new ContextModifierEntry(line.Parameter, line.ValueType, line.Value), format);
-
-            return WithCondition(text, line.Condition, line.IsConditional, localization, format);
-        }
 
         /// <summary>The gate, joined to the sentence it holds up through the game's ONE reading of a
         /// conditional line: the clause is worded under the condition's own catalog key, so a passive

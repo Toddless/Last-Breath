@@ -54,15 +54,11 @@ namespace Core.PassiveTree.Summary
                 if (node is null) continue;
 
                 Describe(node, summary);
+                Count(node, summary);
 
                 foreach (ModifierLine line in node.Modifiers)
                 {
                     if (line.ValueType == ModifierValueType.Flag) continue;
-
-                    // Counted before anything is skipped, so both readings say the same about a line that
-                    // is gated AND scaled at once.
-                    if (line.IsConditional) summary.ConditionalLines++;
-                    if (line.IsScaled) summary.ScaledLines++;
 
                     // A line measured per unit of a carrier parameter has no honest column here: this
                     // reading has no fighter to measure, and folding it against a bare baseline would put
@@ -99,7 +95,6 @@ namespace Core.PassiveTree.Summary
             foreach (KeyValuePair<ContextParameter, List<ContextModifierLine>> knob in ContextKnobTotals.Gather(document, taken))
             {
                 int conditional = knob.Value.Count(line => line.IsConditional);
-                summary.ConditionalLines += conditional;
 
                 List<ContextModifierLine> counted = skipConditional
                     ? knob.Value.Where(line => !line.IsConditional).ToList()
@@ -129,6 +124,19 @@ namespace Core.PassiveTree.Summary
             ModifierValueType first = lines[0].ValueType;
 
             return lines.TrueForAll(line => line.ValueType == first) ? first : null;
+        }
+
+        /// <summary>How much of the allocation the totals below don't state plainly, counted in LINES the
+        /// player reads rather than records: a composite spelled by three records is one gated line and one
+        /// scaled line, not three. Counted before anything is skipped, so both readings say the same about
+        /// a line that is gated AND scaled at once.</summary>
+        private static void Count(PassiveNode node, TreeSummary summary)
+        {
+            foreach (NodeLineGroup group in node.LineGroups())
+            {
+                if (group.IsConditional) summary.ConditionalLines++;
+                if (group.IsScaled) summary.ScaledLines++;
+            }
         }
 
         private static void Describe(PassiveNode node, TreeSummary summary)
