@@ -231,8 +231,8 @@ namespace LastBreathTest.BattleSystemTests
             // cast is. Printed in front of the words that do, they are what makes a reader stop reading.
             AbilityCard card = AbilityText.Card(Row("Cost: 5 Mana", "Cooldown: 3 turns",
             [
-                AbilityTags.Cost, AbilityTags.Attack, AbilityTags.Cooldown,
-                AbilityTags.Scale, AbilityTags.Effect, AbilityTags.Poison
+                AbilityTags.Cost, AbilityTags.Attack, AbilityTags.Cooldown, AbilityTags.Scale,
+                AbilityTags.Effect, AbilityTags.Activation, AbilityTags.Poison
             ]));
 
             Assert.AreEqual($"{TagText.KeyOf(AbilityTags.Attack)}, {TagText.KeyOf(AbilityTags.Poison)}", card.TagsLine,

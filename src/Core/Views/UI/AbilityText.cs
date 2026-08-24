@@ -2,7 +2,6 @@ namespace Core.Views.UI
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
     using Battle.Abilities;
     using Enums;
@@ -33,24 +32,20 @@ namespace Core.Views.UI
         /// <summary>What separates two readings sharing one line.</summary>
         private const string MetaSeparator = " · ";
 
-        /// <summary>How a wait is written: the real number, and the fraction of a turn only where there is
-        /// one. An augment that shaves a fifth off a cooldown has to be visible in the line the player
-        /// bought it for.</summary>
-        private const string TurnsFormat = "0.#";
-
         /// <summary>
         /// The tags an ability's card does not print. They are true tags and the fitting rule reads them
         /// exactly as it reads the rest — this is a rule about a SENTENCE, not about the system: an axis
-        /// almost every cast stands on says nothing about what this cast is, and four such words in front
-        /// of the ones that do is how a reader stops reading the line at all.
+        /// almost every cast stands on says nothing about what this cast is, and a row of such words in
+        /// front of the ones that do is how a reader stops reading the line at all.
         /// <para>Cost and cooldown are the pure case (twenty-one of the twenty-five abilities), scale is
-        /// the coefficient every measured cast carries, and the effect umbrella always rides beside the
-        /// genus already printed next to it. An augment's card inherits none of this: there the mechanical
-        /// axis is the whole answer to "where does this thing fit".</para>
+        /// the coefficient every measured cast carries, activation names how a cast is reached rather than
+        /// what it does, and the effect umbrella always rides beside the genus already printed next to it.
+        /// An augment's card inherits none of this: there the mechanical axis is the whole answer to
+        /// "where does this thing fit".</para>
         /// </summary>
         public static readonly IReadOnlySet<string> UnprintedTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            AbilityTags.Cost, AbilityTags.Cooldown, AbilityTags.Scale, AbilityTags.Effect,
+            AbilityTags.Cost, AbilityTags.Cooldown, AbilityTags.Scale, AbilityTags.Effect, AbilityTags.Activation,
         };
 
         /// <summary>The whole card of one ability, read off the answer the socket sheet gives — the one
@@ -66,16 +61,16 @@ namespace Core.Views.UI
                 [ResourcePlaceholder] = Localization.Localize(resource.ToString()),
             });
 
-        /// <summary>The wait between casts, worded — and nothing at all for a cast that has none. "Cooldown:
-        /// 0 turns" is a line about a rule the ability does not obey. The number goes in already written,
-        /// fraction and all: rounded to whole turns, a cooldown cut by a fifth would read as the cooldown
-        /// the player had before he paid for the cut.</summary>
+        /// <summary>The wait between casts, worded — and nothing at all for a cast that has none, because
+        /// "Cooldown: 0 turns" is a line about a rule the ability does not obey. The number goes in raw and
+        /// the template counts turns with it: every road that moves a cooldown moves it by whole turns, so
+        /// there is no fraction here for the counting to lose.</summary>
         public static string CooldownLine(float turns) =>
             turns <= 0f
                 ? string.Empty
                 : Localization.Render(CooldownKey, new Dictionary<string, object?>
                 {
-                    [ValuePlaceholder] = turns.ToString(TurnsFormat, CultureInfo.InvariantCulture),
+                    [ValuePlaceholder] = turns,
                 });
 
         /// <summary>The tags this card has anything to say with — see <see cref="UnprintedTags"/>. The list

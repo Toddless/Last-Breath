@@ -1833,7 +1833,7 @@ msgid "UI_AbilityCost"
 msgstr "Cost: {Value} {Resource}"
 
 msgid "UI_AbilityCooldown"
-msgstr "Cooldown: {Value} turns"
+msgstr "Cooldown: {Value|turn|turns}"
 
 # ------------------------------
 # Notifications

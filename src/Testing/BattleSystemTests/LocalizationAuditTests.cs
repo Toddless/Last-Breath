@@ -152,19 +152,19 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>
         /// The price and the wait, worded out of the shipped catalog. Both go through one templating, so a
         /// key nobody worded or a placeholder nobody fills is visible here rather than in a screenshot. The
-        /// fraction is the point of the second half: an augment that shaves a fifth off a cooldown is
-        /// bought for a number the player can SEE, and rounding to whole turns hides exactly that.
+        /// wait also has to COUNT: a cooldown of one is one turn, and a card reading "1 turns" is a card
+        /// written by a machine.
         /// </summary>
         [TestMethod]
-        public void ThePriceAndTheWaitAreWordedAndTheWaitKeepsItsFraction()
+        public void ThePriceAndTheWaitAreWordedAndTheWaitCountsItsTurns()
         {
             UseEnglishCatalog();
 
             Assert.AreEqual("Cost: 150 Mana", AbilityText.CostLine(150, Costs.Mana),
                 "the price line lost its template, its number or its resource");
-            Assert.AreEqual("Cooldown: 4 turns", AbilityText.CooldownLine(4f));
-            Assert.AreEqual("Cooldown: 3.2 turns", AbilityText.CooldownLine(3.2f),
-                "a cut cooldown was rounded back to the number the player had before he paid for the cut");
+            Assert.AreEqual("Cooldown: 3 turns", AbilityText.CooldownLine(3f));
+            Assert.AreEqual("Cooldown: 1 turn", AbilityText.CooldownLine(1f),
+                "the wait lost its plural form — one turn is not 'turns'");
             Assert.AreEqual(string.Empty, AbilityText.CooldownLine(0f),
                 "a cast that makes nobody wait printed a line about waiting");
         }
