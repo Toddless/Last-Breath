@@ -156,7 +156,11 @@
             // AddEffect reports whether the stacking rules accepted THIS instance; a rejected
             // single-stack re-application only refreshes the existing effect's duration.
             IsApplied = Target.Effects.AddEffect(this);
-            if (IsApplied) Target.CombatEvents.Publish(new EffectAppliedEvent(this, Target, context.Caster));
+            if (IsApplied)
+            {
+                HoldBackIfLaidInsideTheBearersTurn(context);
+                Target.CombatEvents.Publish(new EffectAppliedEvent(this, Target, context.Caster));
+            }
             // here we need to notify caster that he applied some effect. Target will get notified within TryApplyStatusEffect
             if (Target.TryApplyStatusEffect(Status)) context.Caster.CombatEvents.Publish(new StatusEffectAppliedEvent(Status));
             return Task.CompletedTask;
@@ -268,6 +272,24 @@
         private static int ResolveExtensionBudget() =>
             GameServiceProvider.TryGet<ICombatRulesProvider>()?.Effects.MaxExtendedTurns
             ?? EffectRules.Default.MaxExtendedTurns;
+
+        /// <summary>
+        /// Somebody else's effect landing on a fighter whose turn is already under way does not spend
+        /// that turn: he was in the middle of it when it arrived, and it was not his doing. A reaction
+        /// freezing the fighter who shattered a guard has to cost him the turn AFTER, not the tail of
+        /// the one he is playing.
+        /// <para>His own casts are the other side of the line and spend the turn as they always did —
+        /// a self-buff bought for one turn is meant to be gone by the next one. A re-application that
+        /// only refreshes a standing stack is not held back either: that stack has been living on the
+        /// bearer's clock since it landed.</para>
+        /// </summary>
+        private void HoldBackIfLaidInsideTheBearersTurn(EffectApplyingContext context)
+        {
+            if (context.Caster.IsSame(context.Target.InstanceId)) return;
+            if (!context.Target.Effects.IsOwnersTurn) return;
+
+            context.Target.Effects.SitOutThisTurnEnd(this);
+        }
 
         private void ClearSubscriptions()
         {

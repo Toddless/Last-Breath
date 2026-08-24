@@ -12,6 +12,9 @@
     {
         IReadOnlyList<IEffect> Effects { get; }
 
+        /// <summary>True while the bearer's own turn is under way — between his turn start and his turn end.</summary>
+        bool IsOwnersTurn { get; }
+
         event Action<IEffect>? EffectAdded;
         event Action<IEffect>? EffectRemoved;
         /// <summary>Fires whenever the aggregated effect view list changes (add/remove/duration tick).</summary>
@@ -23,6 +26,10 @@
         public IEnumerable<IEffect> GetBy(Func<IEffect, bool> predicate);
         public IEnumerable<IEffect> GetBySource(string source);
         void RegisterDotTick(DotTick tick);
+
+        /// <summary>Holds an effect back from the end of the turn it landed in — the whole end of turn,
+        /// whatever it would tick or heal included. Spent by that one end of turn.</summary>
+        void SitOutThisTurnEnd(IEffect effect);
         void RemoveEffect(IEffect effect);
         /// <summary>The bearer's end of turn: durations first, then the damage they booked. Awaitable
         /// because the damage can kill, and the turn may not be called over before it has.</summary>

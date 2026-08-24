@@ -19,7 +19,17 @@
         // re-application refreshes are both read off this list.
         private readonly List<IEffect> _orderedEffects = [];
         private readonly List<DotTick> _dotTicks = [];
+
+        /// <summary>Instances that landed on the bearer after his turn had already started: that end of
+        /// turn is not theirs to spend. Held by instance id, spent by the one end of turn that follows.</summary>
+        private readonly HashSet<string> _sittingOutThisTurn = [];
+
+        /// <summary>True between the bearer's turn start and his turn end — the component is told both
+        /// edges, so the fact is its own and nothing has to reach the turn loop for it.</summary>
+        private bool _turnIsUnderWay;
+
         public IReadOnlyList<IEffect> Effects => _orderedEffects;
+        public bool IsOwnersTurn => _turnIsUnderWay;
         public event Action<IEffect>? EffectAdded;
         public event Action<IEffect>? EffectRemoved;
         public event Action? EffectsChanged;
@@ -35,6 +45,11 @@
         public IEnumerable<IEffect> GetBySource(string source) => _effectsBySource.GetValueOrDefault(source, []);
 
         public void RegisterDotTick(DotTick tick) => _dotTicks.Add(tick);
+
+        /// <summary>Holds an effect back from the end of the turn it landed in — the WHOLE end of turn,
+        /// whatever it would tick or heal included, not merely the countdown. Spent by that one end of
+        /// turn, so the effect starts counting from the bearer's next one.</summary>
+        public void SitOutThisTurnEnd(IEffect effect) => _sittingOutThisTurn.Add(effect.InstanceId);
 
         public bool AddEffect(IEffect newEffect)
         {
@@ -91,6 +106,11 @@
             _effectsBySource.Clear();
             _orderedEffects.Clear();
             _dotTicks.Clear();
+            // The debt is owed BY effects, so nothing is owed once there are none. The bearer's turn
+            // is not touched: this is also the road a boss transformation wipes effects by, in the
+            // middle of the bearer's own turn, and closing his turn here would switch the turn rules
+            // off for the rest of it.
+            _sittingOutThisTurn.Clear();
         }
 
         /// <summary>
@@ -104,10 +124,18 @@
         /// </summary>
         public async Task TriggerTurnEnd()
         {
+            _turnIsUnderWay = false;
             try
             {
                 foreach (var effect in GetEffects())
+                {
+                    // What landed inside this very turn and was not the bearer's own doing sits it out:
+                    // he was already in the middle of the turn when it arrived, so the turn was never
+                    // one of the turns the effect was bought for.
+                    if (_sittingOutThisTurn.Remove(effect.InstanceId)) continue;
                     effect.TurnEnd();
+                }
+
                 EffectsChanged?.Invoke();
                 await ApplyDotDamage();
             }
@@ -117,10 +145,17 @@
                 // stands over the whole of the bearer's end of turn.
                 Tracker.TrackException($"End of turn of '{owner.InstanceId}'", exception, this);
             }
+            finally
+            {
+                // Housekeeping: what the pass did not consume names an effect that had already left
+                // the bearer, and nobody will ever claim those ids again.
+                _sittingOutThisTurn.Clear();
+            }
         }
 
         public void TriggerTurnStart()
         {
+            _turnIsUnderWay = true;
             foreach (var effect in GetEffects())
                 effect.TurnStart();
             EffectsChanged?.Invoke();
