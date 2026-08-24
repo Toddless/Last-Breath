@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bydqibgb11sb7" path="res://Addons/Battle/UIElements/PassiveWheel/WheelBackdropLayer.cs" id="2_backdrop"]
 [ext_resource type="Script" uid="uid://db44epcayfdvm" path="res://Addons/Battle/UIElements/PassiveWheel/WheelEdgeLayer.cs" id="3_edges"]
 [ext_resource type="Script" uid="uid://bvbgx6qr2hqqk" path="res://Addons/Battle/UIElements/PassiveWheel/WheelFieldLayer.cs" id="4_field"]
-[ext_resource type="Resource" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisuals.tres" id="4_ghf8w"]
+[ext_resource type="Resource" uid="uid://clcr03qqjtk6e" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisuals.tres" id="4_ghf8w"]
 [ext_resource type="Script" uid="uid://do1bejy3kj6rc" path="res://Addons/Battle/UIElements/PassiveWheel/WheelCursorLayer.cs" id="5_cursor"]
 [ext_resource type="Resource" uid="uid://ctm2vd7hnxs4b" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveWheelStyle.tres" id="6_style"]
 [ext_resource type="PackedScene" uid="uid://dnx5txabkc2ef" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeView.tscn" id="7_nodeview"]

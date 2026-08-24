@@ -303,6 +303,7 @@ _visuals = Array[ExtResource("2_visual")]([SubResource("Visual_small"), SubResou
 _ringRadii = PackedFloat32Array(70, 215, 385, 520)
 _sectors = Array[ExtResource("3_sector")]([SubResource("Sector_strength"), SubResource("Sector_intelligence_strength"), SubResource("Sector_intelligence"), SubResource("Sector_dexterity_intelligence"), SubResource("Sector_dexterity"), SubResource("Sector_strength_dexterity")])
 _idleEdgeWidth = 1.6
+_takenEdgeWidth = 1.7
 _socketRingRadiusScale = 2.1
 _socketPipRadiusScale = 0.55
 _socketMark = SubResource("SocketMark")
