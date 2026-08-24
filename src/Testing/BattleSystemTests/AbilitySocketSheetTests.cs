@@ -2,6 +2,7 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source.Abilities;
     using Battle.Source.RequestHandlers;
+    using Battle.Source.UIElements.PassiveWheel;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data;
@@ -11,6 +12,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Items;
     using Core.Localization;
     using Core.MessageBus.Requests;
+    using Core.PassiveTree;
     using Core.Services;
     using Core.Views;
     using Core.Views.UI;
@@ -265,20 +267,37 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void TheBodyAWheelPopupPrintsIsMetaTagsAndDescription_AndNeverASlotAgain()
+        public void TheUnlockNodePrintsTheWholeCard_AndNeverASlotAgain()
         {
-            // The body of a node's popup is the card's own, whole. Listing what the slots hold was the
-            // popup saying everything about the sockets and nothing about the cast they sit on — the ring
-            // beside the node already draws that.
+            // The body of an unlock node's popup is the card's own, whole. Listing what the slots hold was
+            // the popup saying everything about the sockets and nothing about the cast they sit on — the
+            // ring beside the node already draws that.
             AbilityCard card = AbilityText.Card(Row("Cost: 5 Mana", "Cooldown: 3 turns", [AbilityTags.Fire]));
 
-            string body = card.Body;
+            string body = WheelAbilityText.AbilityBodyOf(PassiveNodeKind.AbilityUnlock, card);
 
             StringAssert.Contains(body, "Cost: 5 Mana", "the body lost the price of the cast");
             StringAssert.Contains(body, TagText.KeyOf(AbilityTags.Fire), "the body lost the tags");
             StringAssert.Contains(body, card.Description, "the body lost what the ability does");
             Assert.IsFalse(body.Contains("UI_PassiveTree_Slot", StringComparison.Ordinal),
                 $"the body still lists slots: {body}");
+            Assert.AreEqual(body, WheelAbilityText.AbilityBodyOf(PassiveNodeKind.Start, card),
+                "the stance's seed hands an ability over too, and its node says nothing about it");
+        }
+
+        [TestMethod]
+        public void ASocketNodeNamesWhoseSlotItIsAndReadsOutNothingElse()
+        {
+            // One ability is named by several nodes — the one that hands it over, and every socket node
+            // that opens a slot on it. The card belongs to the first of them: pinned up under each socket
+            // as well, it is the same page three times over, and the slot itself gets lost behind it.
+            AbilityCard card = AbilityText.Card(Row("Cost: 5 Mana", "Cooldown: 3 turns", [AbilityTags.Fire]));
+
+            Assert.AreEqual(string.Empty, WheelAbilityText.AbilityBodyOf(PassiveNodeKind.SocketTier2, card),
+                "a socket node reads the whole ability out under a line that already names it");
+            Assert.AreEqual(string.Empty, WheelAbilityText.AbilityBodyOf(PassiveNodeKind.SocketTier3, card));
+            Assert.AreEqual(string.Empty, WheelAbilityText.AbilityBodyOf(PassiveNodeKind.AbilityUnlock, null),
+                "a node whose card never arrived printed something anyway");
         }
 
         [TestMethod]

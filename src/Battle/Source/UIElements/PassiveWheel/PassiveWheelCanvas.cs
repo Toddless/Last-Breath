@@ -68,6 +68,25 @@ namespace Battle.Source.UIElements.PassiveWheel
     }
 
     /// <summary>
+    /// Which node of an ability's little constellation is the one that READS it out. Several nodes name
+    /// the same ability — the one that hands it over, and every socket node that opens a slot on it — and
+    /// the whole card belongs to exactly one of them.
+    /// </summary>
+    public static class WheelAbilityText
+    {
+        /// <summary>
+        /// The card at the node that hands the ability over, and nothing at all at a socket node. A socket
+        /// node is about a SLOT: it already says whose slot it is, and printing the ability's cost, tags
+        /// and description under each of its sockets is the same page pinned up three times beside itself.
+        /// <para>The split is the tree's own — a node either unlocks the ability or opens a slot on it,
+        /// never both — so it is asked of <see cref="NodeKindRules"/> rather than spelled out again here,
+        /// and it is the very border the owner line is drawn along.</para>
+        /// </summary>
+        public static string AbilityBodyOf(PassiveNodeKind kind, AbilityCard? card) =>
+            NodeKindRules.UnlocksAbility(kind) && card is { } known ? known.Body : string.Empty;
+    }
+
+    /// <summary>
     /// The wheel itself: the only node of the whole screen the engine treats as a mouse target, and the
     /// only place that decides what a point on it means.
     ///
@@ -1122,21 +1141,14 @@ namespace Battle.Source.UIElements.PassiveWheel
             }));
         }
 
-        /// <summary>
-        /// The ability the node stands for, in full: what it costs, what it counts as and what it does in
-        /// the numbers it is wearing right now — bought or not, because a node the player is deciding
-        /// about is exactly the one he has not bought.
-        /// <para>What its slots HOLD is not listed: the ring beside the node draws that, and a popup that
-        /// spelled the ring out again said everything about the sockets and nothing about the cast they
-        /// sit on. Neither is the tree's own line for the node — the ability is worded once, in the
-        /// catalog, and a second wording in the tree file is one that silently stops agreeing with it.</para>
-        /// </summary>
+        /// <summary>The ability the node stands for, as far as THIS node is the place to read it — see
+        /// <see cref="WheelAbilityText.AbilityBodyOf"/> for which node that is.</summary>
         private void AppendAbility(StringBuilder body, PassiveNode node)
         {
             if (string.IsNullOrWhiteSpace(node.AbilityId)) return;
-            if (!_abilityCards.TryGetValue(node.AbilityId, out AbilityCard card)) return;
 
-            Append(body, card.Body);
+            AbilityCard? card = _abilityCards.TryGetValue(node.AbilityId, out AbilityCard known) ? known : null;
+            Append(body, WheelAbilityText.AbilityBodyOf(node.Kind, card));
         }
 
         /// <summary>
