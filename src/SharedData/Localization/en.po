@@ -4095,6 +4095,12 @@ msgstr "That augment cannot be carried"
 msgid "UI_Augment_Tier"
 msgstr "Tier {Value}"
 
+msgid "UI_Augment_Fits"
+msgstr "Fits: {Name}"
+
+msgid "UI_Augment_Fits_Any"
+msgstr "Fits: any ability"
+
 msgid "UI_Augment_Pick_Title"
 msgstr "Augments that fit"
 

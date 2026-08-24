@@ -6,6 +6,7 @@ namespace Battle.Source.RequestHandlers
     using System.Threading.Tasks;
     using Abilities;
     using Core.Battle.Abilities;
+    using Core.Data.AbilityData;
     using Core.Inventory;
     using Core.Items;
     using Core.MessageBus;
@@ -66,14 +67,23 @@ namespace Battle.Source.RequestHandlers
             return Task.FromResult(tiles);
         }
 
-        private AugmentTrayTileView ToTile(IAugmentItem item) =>
-            new(
+        /// <summary>One tile. Name, numbers and rarity belong to the COPY; tier, tags and binding are read
+        /// off the record, because where an augment fits is the same for every copy of it — and a copy
+        /// whose record the catalog no longer declares simply says none of it.</summary>
+        private AugmentTrayTileView ToTile(IAugmentItem item)
+        {
+            AbilityAugmentData? record = augments.Find(item.Id);
+            return new AugmentTrayTileView(
                 item.InstanceId,
                 item.Id,
                 item.DisplayName,
                 item.Description,
                 _art(item.Id),
                 item.Rarity,
-                augments.Find(item.Id)?.Tier ?? 0);
+                record?.Tier ?? 0,
+                record?.Tags ?? [],
+                record?.AbilityId ?? string.Empty,
+                record?.FitsAnyAbility ?? false);
+        }
     }
 }

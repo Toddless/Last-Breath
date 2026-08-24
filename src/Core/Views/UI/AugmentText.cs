@@ -1,6 +1,7 @@
 namespace Core.Views.UI
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Battle.Abilities;
     using Enums;
     using Godot;
@@ -29,6 +30,16 @@ namespace Core.Views.UI
         /// <summary>The placeholder <see cref="Tier"/> is filled by.</summary>
         public const string TierValue = "Value";
 
+        /// <summary>Where a record written for ONE ability sits, worded — the ability's name goes in
+        /// under <see cref="NameValue"/>.</summary>
+        public const string Fits = "UI_Augment_Fits";
+
+        /// <summary>Where a record claiming every ability sits, worded.</summary>
+        public const string FitsAny = "UI_Augment_Fits_Any";
+
+        /// <summary>The placeholder <see cref="Fits"/> names the ability in.</summary>
+        public const string NameValue = "Name";
+
         /// <summary>Title of the picker an empty slot opens.</summary>
         public const string PickTitle = "UI_Augment_Pick_Title";
 
@@ -41,10 +52,15 @@ namespace Core.Views.UI
         /// <summary>Said of a seated augment some of whose moves lost.</summary>
         public const string PartlyDormant = "UI_Augment_Partly";
 
-        /// <summary>A carried copy: its own name, its own tier, and what it does in the numbers it
-        /// rolled.</summary>
+        /// <summary>A carried copy: its own name, its own tier, where it may sit, and what it does in the
+        /// numbers it rolled.</summary>
         public static AugmentCard Card(AugmentTrayTileView tile) =>
-            new(tile.DisplayName, TierLine(tile.Tier), tile.Description, RarityColor(tile.Rarity));
+            new(
+                tile.DisplayName,
+                TierLine(tile.Tier),
+                FitLine(tile.Tags, tile.AbilityId, tile.FitsAnyAbility),
+                tile.Description,
+                RarityColor(tile.Rarity));
 
         /// <summary>
         /// The same card for a copy already in a slot, plus what the SLOT makes of it: a card printing
@@ -55,7 +71,34 @@ namespace Core.Views.UI
         /// cell — so the copy reads in the socket exactly as it read in the bag.</para>
         /// </summary>
         public static AugmentCard Card(AugmentCellView cell) =>
-            new(cell.DisplayName, TierLine(cell.AugmentTier), Body(cell), RarityColor(cell.Rarity));
+            new(
+                cell.DisplayName,
+                TierLine(cell.AugmentTier),
+                FitLine(cell.Tags, cell.AbilityId, cell.FitsAnyAbility),
+                Body(cell),
+                RarityColor(cell.Rarity));
+
+        /// <summary>
+        /// Where the record declares it may sit, read in the order the fitting rule reads the same
+        /// declaration: a claim on every ability, then a named ability, then the tags. Exactly ONE of the
+        /// three is printed because exactly one of them decides — a record naming an ability is seated by
+        /// that name alone, and the tags it happens to carry beside it would promise a family it never
+        /// reaches. Nothing is judged here: the card reads out a declaration, it does not measure a slot.
+        /// <para>The tags go out whole. The mechanical axes an ability's card leaves unsaid (cost,
+        /// cooldown, scale) are the whole answer to "where does this augment go", so the sentence rule of
+        /// <see cref="AbilityText.UnprintedTags"/> does not reach this line.</para>
+        /// </summary>
+        public static string FitLine(IReadOnlyList<string>? tags, string abilityId, bool fitsAnyAbility)
+        {
+            if (fitsAnyAbility) return Localization.Localize(FitsAny);
+
+            return string.IsNullOrWhiteSpace(abilityId)
+                ? TagText.Line(tags)
+                : Localization.Render(Fits, new Dictionary<string, object?>
+                {
+                    [NameValue] = Localization.Localize(abilityId),
+                });
+        }
 
         private static Color RarityColor(Rarity rarity) => Color.FromHtml(TextPalette.RarityColor(rarity));
 
@@ -96,22 +139,33 @@ namespace Core.Views.UI
     }
 
     /// <summary>
-    /// One augment as a screen shows it: the copy's own name in its rarity's colour, its tier, and what
-    /// it does in the numbers it rolled. Text only — every surface draws it with its own controls, and
-    /// none of them assembles it.
+    /// One augment as a screen shows it: the copy's own name in its rarity's colour, its tier, where it
+    /// may sit, and what it does in the numbers it rolled. Text only — every surface draws it with its
+    /// own controls, and none of them assembles it.
     /// </summary>
     /// <param name="Name">The copy's name.</param>
     /// <param name="TierLine">The tier, worded.</param>
+    /// <param name="FitLine">Where the record declares it may sit — the ability it was written for, the
+    /// claim on every ability, or the tags an ability has to share with it.</param>
     /// <param name="Description">What this copy does, in its own numbers.</param>
     /// <param name="RarityColor">What the name is painted in.</param>
-    public readonly record struct AugmentCard(string Name, string TierLine, string Description, Color RarityColor)
+    public readonly record struct AugmentCard(
+        string Name,
+        string TierLine,
+        string FitLine,
+        string Description,
+        Color RarityColor)
     {
-        /// <summary>Tier and description as one stretch of text, for a surface carrying a single text
-        /// field — a picker row — rather than a title and a body of its own. A missing half leaves no
-        /// blank line behind it.</summary>
-        public string Body =>
-            string.IsNullOrEmpty(TierLine) || string.IsNullOrEmpty(Description)
-                ? $"{TierLine}{Description}"
-                : $"{TierLine}\n{Description}";
+        /// <summary>Everything under the name as one stretch of text, for a surface carrying a single
+        /// text field — a picker row — rather than a title and a body of its own. A missing part leaves
+        /// no blank line behind it.</summary>
+        public string Body => Join(TierLine, FitLine, Description);
+
+        /// <summary>The same without the tier, for a surface already showing that as its own subtitle —
+        /// a hover tooltip, which prints the tier under the name.</summary>
+        public string Details => Join(FitLine, Description);
+
+        private static string Join(params string[] parts) =>
+            string.Join('\n', parts.Where(part => !string.IsNullOrEmpty(part)));
     }
 }

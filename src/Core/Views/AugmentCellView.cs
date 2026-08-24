@@ -1,5 +1,6 @@
 namespace Core.Views
 {
+    using System.Collections.Generic;
     using Battle.Abilities;
     using Enums;
     using Godot;
@@ -42,6 +43,12 @@ namespace Core.Views
     /// <param name="Rarity">Where the record stands on the item scale — the cell's frame colour.</param>
     /// <param name="Activity">How much of it is running. Meaningless unless <see cref="Kind"/> is
     /// <see cref="AugmentCellKind.Filled"/>.</param>
+    /// <param name="Tags">What the seated RECORD is about — the tags an ability has to share with it, so
+    /// the copy says where it belongs in the socket exactly as it said it in the bag. Empty while the
+    /// cell is, and empty for a record the catalog no longer declares.</param>
+    /// <param name="AbilityId">The one ability the record was written for; empty when it was written for
+    /// none.</param>
+    /// <param name="FitsAnyAbility">Whether the record claims every ability there is.</param>
     public record AugmentCellView(
         string SocketAddress,
         AugmentCellKind Kind,
@@ -52,5 +59,8 @@ namespace Core.Views
         string Description,
         Texture2D? Icon,
         Rarity Rarity,
-        AugmentActivity Activity);
+        AugmentActivity Activity,
+        IReadOnlyList<string> Tags,
+        string AbilityId,
+        bool FitsAnyAbility);
 }

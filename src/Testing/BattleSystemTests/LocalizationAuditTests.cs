@@ -150,6 +150,56 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>
+        /// Every tag every augment record of the shipped catalog declares is worded. The guard above
+        /// covers the words the CODE knows; this one covers the words the DATA uses — a record's tags are
+        /// printed verbatim on its card as the line telling the player where the augment goes, so an
+        /// unworded (or differently spelled) one reaches him as a raw key in the middle of that line.
+        /// </summary>
+        [TestMethod]
+        public void EveryTagOfEveryAugmentRecordIsWordedInEnglish()
+        {
+            Dictionary<string, string> en = ReadEntries("en.po");
+            List<string> unworded = ShippedAbilityData.Augments().All
+                .SelectMany(record => record.Tags)
+                .Distinct(StringComparer.Ordinal)
+                .Select(TagText.KeyOf)
+                .Where(key => string.IsNullOrEmpty(en.GetValueOrDefault(key)))
+                .OrderBy(key => key, StringComparer.Ordinal)
+                .ToList();
+
+            Assert.AreEqual(0, unworded.Count,
+                $"en.po words no name for {unworded.Count} tag(s) an augment record declares: {string.Join(", ", unworded)}");
+        }
+
+        /// <summary>
+        /// Where an augment says it goes, read off the shipped records and the shipped wording. Three
+        /// declarations, three sentences: tags for the records seated by a shared tag, the ability's own
+        /// name for the ones written for one, and the claim itself for the ones at home everywhere.
+        /// </summary>
+        [TestMethod]
+        public void TheFittingLineOfAnAugmentReadsOffTheShippedCatalogAndWording()
+        {
+            UseEnglishCatalog();
+            IAbilityAugmentCatalog augments = ShippedAbilityData.Augments();
+
+            Assert.AreEqual("Attack, Series", FitLineOf(augments, "Augment_Apply_Buff_Critical_Damage"),
+                "an unbound record no longer names the tags that seat it");
+            Assert.AreEqual("Cost, Cooldown", FitLineOf(augments, "Augment_Reduce_Cooldown_And_Cost"),
+                "the mechanical axes were swallowed — on an augment they are the whole answer");
+            Assert.AreEqual("Fits: Critical Calculation", FitLineOf(augments, "Augment_Critical_Calculation_Mythic"),
+                "a record written for one ability does not name it");
+            Assert.AreEqual("Fits: any ability", FitLineOf(augments, "Augment_Reduce_Cost"),
+                "a record at home on every ability does not say so");
+        }
+
+        private static string FitLineOf(IAbilityAugmentCatalog augments, string augmentId)
+        {
+            Core.Data.AbilityData.AbilityAugmentData? record = augments.Find(augmentId);
+            Assert.IsNotNull(record, $"the shipped catalog declares no '{augmentId}' to read");
+            return AugmentText.FitLine(record.Tags, record.AbilityId, record.FitsAnyAbility);
+        }
+
+        /// <summary>
         /// The price and the wait, worded out of the shipped catalog. Both go through one templating, so a
         /// key nobody worded or a placeholder nobody fills is visible here rather than in a screenshot. The
         /// wait also has to COUNT: a cooldown of one is one turn, and a card reading "1 turns" is a card

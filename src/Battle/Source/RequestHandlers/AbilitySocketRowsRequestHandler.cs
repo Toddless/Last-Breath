@@ -6,6 +6,7 @@ namespace Battle.Source.RequestHandlers
     using System.Threading.Tasks;
     using Core;
     using Core.Battle.Abilities;
+    using Core.Data.AbilityData;
     using Core.Enums;
     using Core.Items;
     using Core.Localization;
@@ -29,9 +30,10 @@ namespace Battle.Source.RequestHandlers
     /// <param name="minter">Turns a seated copy back into the thing it would be in the bag, which is
     /// where a cell's name, description and rarity come from. Asked rather than reproduced: the player
     /// must read the same augment in the slot as he read in his bag.</param>
-    /// <param name="augments">Where the tier of a seated copy comes from — the record's, read out of the
-    /// same catalog the tray reads it out of, because an augment's tier is one number however the player
-    /// happens to be looking at it. Optional: a composition supplying no records prints no tier.</param>
+    /// <param name="augments">Where the tier, the tags and the binding of a seated copy come from — the
+    /// record's, read out of the same catalog the tray reads them out of, because what an augment is and
+    /// where it fits are the same however the player happens to be looking at it. Optional: a composition
+    /// supplying no records prints neither tier nor fitting.</param>
     /// <param name="art">Where a picture comes from. Injectable because loading one is an engine call,
     /// and a host without the engine (a walk over the sheet's composition) must be able to ask for the
     /// rows without one.</param>
@@ -154,20 +156,25 @@ namespace Battle.Source.RequestHandlers
             if (socket.Augment is not { } augment)
                 return new AugmentCellView(
                     socket.Address, AugmentCellKind.Empty, socket.Tier, 0,
-                    string.Empty, string.Empty, string.Empty, null, Rarity.Common, AugmentActivity.Working);
+                    string.Empty, string.Empty, string.Empty, null, Rarity.Common, AugmentActivity.Working,
+                    [], string.Empty, false);
 
             IAugmentItem? carried = minter.Restore(augment);
+            AbilityAugmentData? record = augments?.Find(augment.AugmentId);
             return new AugmentCellView(
                 socket.Address,
                 socket.IsOpen ? AugmentCellKind.Filled : AugmentCellKind.Held,
                 socket.Tier,
-                augments?.Find(augment.AugmentId)?.Tier ?? 0,
+                record?.Tier ?? 0,
                 augment.AugmentId,
                 carried?.DisplayName ?? Localization.Localize(augment.AugmentId),
                 carried?.Description ?? string.Empty,
                 _art(augment.AugmentId),
                 carried?.Rarity ?? Rarity.Common,
-                ActivityOf(owned, socket));
+                ActivityOf(owned, socket),
+                record?.Tags ?? [],
+                record?.AbilityId ?? string.Empty,
+                record?.FitsAnyAbility ?? false);
         }
     }
 }

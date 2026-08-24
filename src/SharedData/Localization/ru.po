@@ -3529,6 +3529,12 @@ msgstr ""
 msgid "UI_Augment_Tier"
 msgstr ""
 
+msgid "UI_Augment_Fits"
+msgstr ""
+
+msgid "UI_Augment_Fits_Any"
+msgstr ""
+
 msgid "UI_Augment_Pick_Title"
 msgstr ""
 

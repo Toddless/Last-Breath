@@ -21,9 +21,14 @@ namespace LastBreathTest.BattleSystemTests
     {
         private const string Name = "Augment_Sharpened";
         private const string Description = "Bleeding lasts 2 turns longer";
+        private const string BoundAbility = "Ability_Double_Strike";
 
         private const int SlotTier = 3;
         private const int RecordTier = 1;
+
+        /// <summary>What the record is about. One of them is an axis an ABILITY's card leaves unsaid — on
+        /// an augment that axis is the answer to "where does this go".</summary>
+        private static readonly string[] Tags = [AbilityTags.Bleed, AbilityTags.Cost];
 
         [TestInitialize]
         public void Setup()
@@ -33,7 +38,7 @@ namespace LastBreathTest.BattleSystemTests
             localization
                 .Setup(service => service.Render(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, object?>>(), It.IsAny<TextFormat>()))
                 .Returns<string, IReadOnlyDictionary<string, object?>, TextFormat>(
-                    (key, values, _) => $"{key}:{values[AugmentText.TierValue]}");
+                    (key, values, _) => $"{key}:{string.Join(',', values.Values)}");
 
             Localization.Override(localization.Object);
         }
@@ -62,8 +67,69 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(carried.Name, seated.Name);
             Assert.AreEqual(carried.TierLine, seated.TierLine, "one copy is announced at two different tiers");
+            Assert.AreEqual(carried.FitLine, seated.FitLine, "one copy names two different places it belongs");
             Assert.AreEqual(carried.Description, seated.Description, "one copy describes itself two different ways");
             Assert.AreEqual(carried.RarityColor, seated.RarityColor, "one copy is painted in two different rarities");
+        }
+
+        [TestMethod]
+        public void AnUnboundCopySaysWhichAbilitiesTakeItByNamingItsTags()
+        {
+            // The card's answer to "where does this thing go". An unbound record is seated by a shared
+            // tag, so the tags ARE the answer — and they reach both text fields a surface may have.
+            AugmentCard card = AugmentText.Card(Carried());
+
+            Assert.AreEqual($"{TagText.KeyOf(AbilityTags.Bleed)}, {TagText.KeyOf(AbilityTags.Cost)}", card.FitLine,
+                "the card of an unbound copy says nothing about which abilities take it");
+            StringAssert.Contains(card.Details, card.FitLine, "the tooltip body dropped the fitting line");
+            StringAssert.Contains(card.Body, card.FitLine, "the picker row dropped the fitting line");
+        }
+
+        [TestMethod]
+        public void TheMechanicalAxesAreNamedOnAnAugmentsCardAndNotSwallowed()
+        {
+            // 'cost' and its neighbours are what an ABILITY's card leaves unsaid: an axis every cast
+            // stands on tells the reader nothing about that cast. The augment inherits none of that —
+            // a record tagged 'cost' seats on every ability that has one, which is the whole answer.
+            AugmentCard card = AugmentText.Card(Carried());
+
+            Assert.IsTrue(AbilityText.UnprintedTags.Contains(AbilityTags.Cost),
+                "the case no longer proves anything — 'cost' is not one of the tags an ability's card drops");
+            StringAssert.Contains(card.FitLine, TagText.KeyOf(AbilityTags.Cost),
+                "the augment's card borrowed the ability card's silence about the mechanical axes");
+        }
+
+        [TestMethod]
+        public void ACopyWrittenForOneAbilityNamesItInsteadOfListingTags()
+        {
+            // A named ability is the whole of the binding rule: the tags such a record happens to carry
+            // decide nothing, so printing them beside the name would promise a family it never reaches.
+            AugmentCard card = AugmentText.Card(Carried() with { AbilityId = BoundAbility });
+
+            StringAssert.Contains(card.FitLine, AugmentText.Fits, "a copy written for one ability did not say so");
+            StringAssert.Contains(card.FitLine, BoundAbility, "the fitting line never names the ability");
+            Assert.IsFalse(card.FitLine.Contains(TagText.KeyOf(AbilityTags.Bleed)),
+                "a copy bound to one ability advertised a family of abilities it can never be seated on");
+        }
+
+        [TestMethod]
+        public void ACopyClaimingEveryAbilitySaysThatAndNothingElse()
+        {
+            // Universality is CLAIMED rather than inferred, and it is past the tag question entirely.
+            AugmentCard card = AugmentText.Card(Carried() with { FitsAnyAbility = true });
+
+            Assert.AreEqual(AugmentText.FitsAny, card.FitLine, "a record at home on every ability listed tags instead");
+        }
+
+        [TestMethod]
+        public void WithoutARecordTheCardSimplyDeclaresNoFitting()
+        {
+            // A composition supplying no records knows neither tags nor binding. Nothing is guessed and
+            // no blank line is left where the line would have been.
+            AugmentCard card = AugmentText.Card(Carried() with { Tags = [] });
+
+            Assert.AreEqual(string.Empty, card.FitLine, "a fitting nobody declared was printed anyway");
+            Assert.AreEqual(Description, card.Details, "the missing fitting left a blank line above the description");
         }
 
         [TestMethod]
@@ -107,7 +173,7 @@ namespace LastBreathTest.BattleSystemTests
             // A composition supplying no records cannot say what tier a copy is written at. Tiers start at
             // one, so the zero it answers with is an unknown tier — and "Tier 0" would be a number the
             // catalog never wrote.
-            AugmentCard card = AugmentText.Card(Seated(AugmentActivity.Working) with { AugmentTier = 0 });
+            AugmentCard card = AugmentText.Card(Seated(AugmentActivity.Working) with { AugmentTier = 0, Tags = [] });
 
             Assert.AreEqual(string.Empty, card.TierLine, "a tier nobody declared was printed as tier zero");
             Assert.AreEqual(Description, card.Body, "the missing tier left a blank line above the description");
@@ -125,10 +191,10 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         private static AugmentTrayTileView Carried() =>
-            new("instance", Name, Name, Description, null, Rarity.Rare, RecordTier);
+            new("instance", Name, Name, Description, null, Rarity.Rare, RecordTier, Tags, string.Empty, false);
 
         private static AugmentCellView Seated(AugmentActivity activity) =>
             new("socket|ability|3", AugmentCellKind.Filled, SlotTier, RecordTier,
-                Name, Name, Description, null, Rarity.Rare, activity);
+                Name, Name, Description, null, Rarity.Rare, activity, Tags, string.Empty, false);
     }
 }

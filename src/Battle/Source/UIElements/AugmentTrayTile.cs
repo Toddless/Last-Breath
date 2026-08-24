@@ -72,7 +72,7 @@ namespace Battle.Source.UIElements
             if (_windows.ShowPopup(typeof(TextTooltipPopup)) is not TextTooltipPopup popup) return null;
 
             AugmentCard card = AugmentText.Card(_view);
-            popup.Show(card.Name, card.TierLine, card.Description, card.RarityColor);
+            popup.Show(card.Name, card.TierLine, card.Details, card.RarityColor);
             return popup;
         }
 
