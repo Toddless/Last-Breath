@@ -86,11 +86,13 @@ namespace LastBreathTest.BattleSystemTests
         private static ContextModifierEntry Entry() =>
             new(ContextParameter.DamageTakenReductionFromAttack, ModifierValueType.Increase, Reduction);
 
+        /// <summary>A blow at the owner, run the way a fighter runs one: through the point that names the
+        /// receiver and both modifier sides.</summary>
         private static float TakeAttack(IFightable owner)
         {
-            var context = new DamageContext { Source = Mock.Of<IFightable>(), Cause = DamageCause.Attack };
+            var context = new DamageContext { Source = Owner("attacker"), Cause = DamageCause.Attack };
             context.Add(DamageType.Physical, IncomingDamage);
-            owner.ModifierHandler.Apply(context);
+            Core.Calculations.ApplyDamageModifiers(context, owner);
             return context.TotalDamage;
         }
 
@@ -99,6 +101,7 @@ namespace LastBreathTest.BattleSystemTests
             var owner = new Mock<IFightable>();
             owner.SetupGet(mock => mock.ModifierHandler).Returns(handler?.Object ?? new ModifierHandlerComponent());
             owner.SetupGet(mock => mock.InstanceId).Returns(id);
+            owner.Setup(mock => mock.IsSame(It.IsAny<string>())).Returns<string>(other => other == id);
             return owner.Object;
         }
     }

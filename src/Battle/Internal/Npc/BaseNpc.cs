@@ -620,8 +620,7 @@ namespace Battle.Internal.Npc
         public Task TakeDamage(IDamageContext context)
         {
             _lastDamageSource = context.Source; // killer attribution: whoever lands the lethal hit
-            ModifierHandler.Apply(context);
-            context.Source.ModifierHandler.Apply(context);
+            Calculations.ApplyDamageModifiers(context, this);
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
             Calculations.CalculateMitigation(context, this, CombatRolls);
 

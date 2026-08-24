@@ -11,6 +11,12 @@ namespace Core.Context
 
         IFightable Source { get; }
 
+        /// <summary>The fighter the hit lands on. Named by <see cref="Calculations.ApplyDamageModifiers"/>,
+        /// the one point every damage road passes, so a line about damage TAKEN reads its receiver instead of
+        /// inferring him from the source — an inference self-inflicted damage always answered wrong.
+        /// Until a hit is handed to a fighter it belongs to nobody but the one who made it.</summary>
+        IFightable Target { get; set; }
+
         /// <summary>Sum of all damage components.</summary>
         float TotalDamage { get; }
 

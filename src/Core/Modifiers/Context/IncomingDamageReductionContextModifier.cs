@@ -7,9 +7,10 @@ namespace Core.Modifiers.Context
     using Enums;
 
     /// <summary>Reduces every damage component of hits the owner TAKES by <c>reduce</c> (0.25 = −25%),
-    /// optionally only from one <see cref="DamageCause"/> ("−15% damage from abilities"). The owner gate is
-    /// not optional: the handler also runs on damage the owner DEALS, and without it a defensive line would
-    /// quietly cut the wearer's own output.
+    /// optionally only from one <see cref="DamageCause"/> ("−15% damage from abilities"). The gate is on the
+    /// RECEIVER and not optional: the handler also runs on damage the owner DEALS, and without it a defensive
+    /// line would quietly cut the wearer's own output. Damage the owner inflicts on himself passes it — such a
+    /// hit is still one he takes, and its cause is the mechanism that dealt it (a self-burn is Effect damage).
     /// The reduction is read lazily, so a source whose value changes (item upgrade) is picked up without
     /// re-attach — sharpening a WORN piece runs no re-equip. Read once per hit so every component of the
     /// same hit shares one number.</summary>
@@ -24,7 +25,7 @@ namespace Core.Modifiers.Context
 
         public void Apply(IDamageContext context)
         {
-            if (context.Source.IsSame(owner.InstanceId)) return;
+            if (!context.Target.IsSame(owner.InstanceId)) return;
             if (cause != null && context.Cause != cause) return;
 
             float reduction = reduce();

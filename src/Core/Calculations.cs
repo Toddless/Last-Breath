@@ -61,8 +61,24 @@
         }
 
         /// <summary>
+        /// Runs both modifier sides of one hit: the receiver's list first, then the source's. The hit names its
+        /// receiver here, which is what lets a line about damage TAKEN gate on the fighter it is written for
+        /// instead of on "anyone but the source" — the reading that made self-inflicted damage invisible.
+        /// Self-inflicted damage runs the list ONCE: source and receiver are the same handler, and a second
+        /// pass would square every line it holds.
+        /// </summary>
+        public static void ApplyDamageModifiers(IDamageContext context, IFightable target)
+        {
+            context.Target = target;
+            target.ModifierHandler.Apply(context);
+            if (context.Source.IsSame(target.InstanceId)) return;
+
+            context.Source.ModifierHandler.Apply(context);
+        }
+
+        /// <summary>
         /// Defender-side mitigation — the single place that knows how each damage type is reduced.
-        /// Pipeline order: outgoing modifiers (source) -> incoming modifiers (target) -> mitigation per component
+        /// Pipeline order: incoming modifiers (target) -> outgoing modifiers (source) -> mitigation per component
         /// -> suppression -> shield -> barrier -> stage guard -> health.
         /// Rules: Physical and Bleed — armor scaled by the source's armor penetration; Fire/Cold/Lightning —
         /// the matching resistance (fraction 0..1) scaled by the source's resistance penetration; Burning — fire

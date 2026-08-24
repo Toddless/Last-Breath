@@ -401,10 +401,8 @@ namespace Battle.Internal.Player
         public Task TakeDamage(IDamageContext context)
         {
             _lastDamageSource = context.Source; // killer attribution: whoever lands the lethal hit
-            // Apply modifiers like "Reduce all damage taken"
-            ModifierHandler.Apply(context);
-            // apply attackers modifiers like "increase all damage dealt"
-            context.Source.ModifierHandler.Apply(context);
+            // "Reduce all damage taken" of ours, then "increase all damage dealt" of the source's
+            Calculations.ApplyDamageModifiers(context, this);
             // passive/effects that react right before we are about to take some damage
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
             Calculations.CalculateMitigation(context, this, CombatRolls);

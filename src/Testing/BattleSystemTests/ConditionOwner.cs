@@ -185,8 +185,7 @@ namespace LastBreathTest.BattleSystemTests
 
             // The shape a real fighter uses: both modifier pipelines, then mitigation, then health.
             // No absorption layers — nothing here wears a shield or a barrier.
-            ModifierHandler.Apply(context);
-            context.Source.ModifierHandler.Apply(context);
+            Calculations.ApplyDamageModifiers(context, this);
             Calculations.CalculateMitigation(context, this, s_rolls);
             if (context.TotalDamage > 0) CurrentHealth -= context.TotalDamage;
             return Task.CompletedTask;

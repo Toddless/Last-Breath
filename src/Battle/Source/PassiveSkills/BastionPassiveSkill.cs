@@ -59,7 +59,7 @@ namespace Battle.Source.PassiveSkills
         public override bool IsStronger(ISkill skill) =>
             skill is BastionPassiveSkill bastion && Reduce > bastion.Reduce;
 
-        /// <summary>Incoming-damage gate: one charge per rearm; the owner's own dealt damage
+        /// <summary>Incoming-damage gate: one charge per rearm; damage the owner DEALS
         /// (the handler runs for both directions) never consumes it.</summary>
         private sealed class FirstHitTakenReduction(BastionPassiveSkill skill)
             : ContextModifier(priority: ContextModifierPriority.Normal, id: "Context_Modifier_Bastion"), IDamageModifier
@@ -71,7 +71,7 @@ namespace Battle.Source.PassiveSkills
             public void Apply(IDamageContext context)
             {
                 if (!_armed || skill.Owner == null) return;
-                if (context.Source.IsSame(skill.Owner.InstanceId)) return;
+                if (!context.Target.IsSame(skill.Owner.InstanceId)) return;
                 if (context.Cause is not (DamageCause.Attack or DamageCause.Ability)) return;
                 if (context.TotalDamage <= 0) return;
 

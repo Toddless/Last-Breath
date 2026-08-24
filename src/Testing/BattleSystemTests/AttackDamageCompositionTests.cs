@@ -174,23 +174,96 @@ namespace LastBreathTest.BattleSystemTests
         public void Blight_IsStillCutByTypeAgnosticReductions()
         {
             // Carapace and its kin reduce whatever a hit carries, before mitigation ever names a type.
-            var owner = Fighter();
-            owner.SetupGet(f => f.InstanceId).Returns("owner");
+            var owner = Named(Fighter(), "owner");
             var modifier = new IncomingDamageReductionContextModifier(owner.Object, 0.25f);
             var context = Damage(Fighter(), DamageType.Blight, 100f);
+            context.Target = owner.Object;
 
             modifier.Apply(context);
 
             Assert.AreEqual(75f, context.DamageComponents[DamageType.Blight], 0.001f);
         }
 
+        /// <summary>Health a fighter burns off himself is damage he TAKES: the source is no longer what a
+        /// defensive line reads, so a self-inflicted burn answers to "less damage taken from effects" the way
+        /// an enemy's burn does. Its cause stays the mechanism that dealt it — a self-burn is Effect damage.</summary>
+        [TestMethod]
+        public void SelfInflictedDamage_IsCutByTheBearersIncomingReduction()
+        {
+            var owner = Named(Fighter(), "owner");
+            var modifier = new IncomingDamageReductionContextModifier(owner.Object, 0.4f, DamageCause.Effect);
+            var context = Damage(owner, DamageType.Burning, 100f);
+            context.Target = owner.Object;
+
+            modifier.Apply(context);
+
+            Assert.AreEqual(60f, context.DamageComponents[DamageType.Burning], 0.001f);
+        }
+
+        /// <summary>The other half of the same gate: what the owner deals to somebody else must not be cut by
+        /// his own defensive line, and that is now decided by who is hit rather than by who dealt it.</summary>
+        [TestMethod]
+        public void DamageTheOwnerDeals_IsNotCutByHisIncomingReduction()
+        {
+            var owner = Named(Fighter(), "owner");
+            var modifier = new IncomingDamageReductionContextModifier(owner.Object, 0.4f, DamageCause.Effect);
+            var context = Damage(owner, DamageType.Burning, 100f);
+            context.Target = Named(Fighter(), "victim").Object;
+
+            modifier.Apply(context);
+
+            Assert.AreEqual(100f, context.DamageComponents[DamageType.Burning], 0.001f);
+        }
+
+        /// <summary>Source and receiver share one handler on a self-inflicted hit, so the list runs once.
+        /// Running it twice squared every line it holds — a 43.7% reduction landed as 68%.</summary>
+        [TestMethod]
+        public void SelfInflictedDamage_RunsTheOwnerList_Once()
+        {
+            var owner = Named(Fighter(), "owner");
+            var handler = new ModifierHandlerComponent();
+            owner.SetupGet(f => f.ModifierHandler).Returns(handler);
+            handler.Add(new IncomingDamageReductionContextModifier(owner.Object, 0.5f));
+            var context = Damage(owner, DamageType.Burning, 100f);
+
+            Calculations.ApplyDamageModifiers(context, owner.Object);
+
+            Assert.AreEqual(50f, context.DamageComponents[DamageType.Burning], 0.001f, "the reduction was applied twice");
+            Assert.AreSame(owner.Object, context.Target, "the receiver is named where the pipelines run");
+        }
+
+        /// <summary>The receiver's list runs BEFORE the source's, so what the attacker adds is never offered to
+        /// the defence: the attacker's numbers shape an already-reduced hit. Told apart by an asymmetric pair —
+        /// the defender doubles fire he takes, the attacker adds the fire afterwards. Reversed, the defence
+        /// would find that fire and the hit would land at 300 instead of 200.</summary>
+        [TestMethod]
+        public void DamageModifiers_RunTheReceiverBeforeTheSource()
+        {
+            var target = WithHandler(Named(Fighter(), "target"));
+            var source = WithHandler(Named(Fighter(), "source"));
+            target.Object.ModifierHandler.Add(new DamageTypeTakenContextModifier(target.Object, DamageType.Fire, 1f));
+            source.Object.ModifierHandler.Add(new AddedElementalDamageContextModifier(source.Object, DamageType.Fire, () => 1f, DamageCause.Attack));
+            var context = new DamageContext { Source = source.Object, Cause = DamageCause.Attack };
+            context.Add(DamageType.Physical, 100f);
+
+            Calculations.ApplyDamageModifiers(context, target.Object);
+
+            Assert.AreEqual(200f, context.TotalDamage, 0.001f, "the source's list ran before the receiver's");
+        }
+
+        private static Mock<IFightable> WithHandler(Mock<IFightable> fighter)
+        {
+            fighter.SetupGet(f => f.ModifierHandler).Returns(new ModifierHandlerComponent());
+            return fighter;
+        }
+
         [TestMethod]
         public void DotTakenReduction_MaskReducesOnlyTheMatchingStatus()
         {
-            var owner = Fighter();
-            owner.SetupGet(f => f.InstanceId).Returns("owner");
+            var owner = Named(Fighter(), "owner");
             var modifier = new DotDamageTakenReductionContextModifier(owner.Object, () => 0.5f, DamageType.Burning);
             var context = Damage(Fighter(), DamageType.Burning, 100f);
+            context.Target = owner.Object;
             context.Add(DamageType.Bleed, 100f);
 
             modifier.Apply(context);
@@ -229,10 +302,19 @@ namespace LastBreathTest.BattleSystemTests
 
         private static DamageContext Damage(Mock<IFightable> source, DamageType type, float amount)
         {
-            source.SetupGet(f => f.InstanceId).Returns("source");
+            if (string.IsNullOrEmpty(source.Object.InstanceId)) Named(source, "source");
             var context = new DamageContext { Source = source.Object, Cause = DamageCause.Effect };
             context.Add(type, amount);
             return context;
+        }
+
+        /// <summary>Gives a mock fighter an identity both ways round — the id he answers with and the id he
+        /// recognises — so a gate written as "is this me" can be asked at all.</summary>
+        private static Mock<IFightable> Named(Mock<IFightable> fighter, string id)
+        {
+            fighter.SetupGet(f => f.InstanceId).Returns(id);
+            fighter.Setup(f => f.IsSame(It.IsAny<string>())).Returns<string>(other => other == id);
+            return fighter;
         }
 
         private static Mock<IFightable> Fighter(params (EntityParameter Parameter, float Value)[] values)

@@ -85,19 +85,24 @@ namespace LastBreathTest.BattleSystemTests
             return effect.Object;
         }
 
+        /// <summary>A blow at the owner, run the way a fighter runs one: through the point that names the
+        /// receiver and both modifier sides.</summary>
         private static float TakeAttack(IFightable owner, float damage)
         {
-            var context = new DamageContext { Source = Mock.Of<IFightable>(), Cause = DamageCause.Attack };
+            var context = new DamageContext { Source = Fighter("attacker"), Cause = DamageCause.Attack };
             context.Add(DamageType.Physical, damage);
-            owner.ModifierHandler.Apply(context);
+            Core.Calculations.ApplyDamageModifiers(context, owner);
             return context.TotalDamage;
         }
 
-        private static IFightable Owner()
+        private static IFightable Owner() => Fighter("owner");
+
+        private static IFightable Fighter(string id)
         {
             var owner = new Mock<IFightable>();
             owner.SetupGet(mock => mock.ModifierHandler).Returns(new ModifierHandlerComponent());
-            owner.SetupGet(mock => mock.InstanceId).Returns("owner");
+            owner.SetupGet(mock => mock.InstanceId).Returns(id);
+            owner.Setup(mock => mock.IsSame(It.IsAny<string>())).Returns<string>(other => other == id);
             return owner.Object;
         }
     }

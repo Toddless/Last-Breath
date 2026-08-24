@@ -10,8 +10,17 @@
     public record DamageContext : IDamageContext
     {
         private readonly Dictionary<DamageType, float> _damageComponents = [];
+        private IFightable? _target;
         public IReadOnlyDictionary<DamageType, float> DamageComponents => _damageComponents;
         public required IFightable Source { get; init; }
+
+        /// <summary>Unnamed until the hit reaches a fighter, and until then it is the source's own.</summary>
+        public IFightable Target
+        {
+            get => _target ?? Source;
+            set => _target = value;
+        }
+
         public float TotalDamage => _damageComponents.Values.Sum();
         public DamageCause Cause { get; set; }
         public bool IsCrit { get; set; }
