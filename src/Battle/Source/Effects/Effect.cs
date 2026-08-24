@@ -179,10 +179,13 @@
         {
         }
 
+        /// <summary>One end of the bearer's turn spent. A duration of N buys N ends of turn: the effect
+        /// does whatever it does on the turn end, the turn is counted off after it, and the turn that
+        /// empties the counter is the last one the effect is on the bearer at all.</summary>
         public virtual void TurnEnd()
         {
+            if (Duration > 0) Duration--;
             if (Expired) Remove();
-            Duration--;
         }
 
         public virtual void TurnStart()
@@ -199,9 +202,9 @@
         /// landed, APPLICATION shapes the duration an effect lands with (duration scaling, flat
         /// duration bonuses, control resistance, a re-application refreshing the standing stack) and
         /// pays nothing here — those mutators run before there is an instance standing to extend.
-        /// An effect whose duration has run out is not extended either: it has lived its last turn and
-        /// lies in the list until the turn end takes it away, and lengthening it there would be a
-        /// resurrection rather than an extension.
+        /// An effect whose duration has run out is not extended either: the turn end that emptied it
+        /// has already taken it off, and lengthening it there would be a resurrection rather than an
+        /// extension.
         /// </summary>
         /// <param name="turns">Turns asked for. Nothing and less is not an extension and costs nothing.</param>
         /// <returns>Turns actually added: what was left of the budget when it runs short, zero once it

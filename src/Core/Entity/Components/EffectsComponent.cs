@@ -56,7 +56,9 @@
             _effectsBySource.TryGetValue(source, out List<IEffect>? effects);
             effects?.Remove(effect);
             _orderedEffects.Remove(effect);
-            _dotTicks.RemoveAll(dot => dot.Source == effect.InstanceId);
+            // A stack taken off with turns still on it cancels the tick it had pending; one leaving
+            // because its turns ran out keeps it — that tick is what its last turn was for.
+            if (effect.Duration > 0) _dotTicks.RemoveAll(dot => dot.Source == effect.InstanceId);
             if (effects?.Count == 0) _effectsBySource.Remove(source);
             EffectRemoved?.Invoke(effect);
             EffectsChanged?.Invoke();

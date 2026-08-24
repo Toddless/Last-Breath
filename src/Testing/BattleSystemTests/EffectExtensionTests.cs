@@ -57,9 +57,9 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(PoisonTurns + 2, poison.Duration, "the extensions did not add up on the effect");
 
-            // And the other end of the same road: an effect that has run its last turn lies in the
-            // list until the turn end takes it away, and the budget still has room in it. Extending
-            // there would raise the dead rather than lengthen the living.
+            // And the other end of the same road: an effect that has spent its last turn is off the
+            // bearer, and the budget still has room in it. Extending there would raise the dead
+            // rather than lengthen the living.
             for (int turn = 0; turn < PoisonTurns + 2; turn++) poison.TurnEnd();
             Assert.AreEqual(0, poison.Duration, "the poison did not run out, so the assert below proves nothing");
 
