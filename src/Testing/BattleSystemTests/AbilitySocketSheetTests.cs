@@ -41,6 +41,14 @@ namespace LastBreathTest.BattleSystemTests
 
         private const string Augment = "Augment_Sharpened";
 
+        /// <summary>What the stub's abilities cost, so a row with a reading behind it prints a price and a
+        /// row without one is visibly empty.</summary>
+        private const int CostValue = 10;
+
+        /// <summary>The stamp of the FIRST instance the stub ever built — the one a walk puts in the book
+        /// before it asks for anything.</summary>
+        private const string FirstInstance = "#1";
+
         [TestInitialize]
         public void Setup()
         {
@@ -154,6 +162,126 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public async Task TheWheelsSheetCarriesTheAbilitiesNobodyHasUnlockedYet_EachReadOffAnInstanceOfItsOwn()
+        {
+            // What the passive wheel is for: the player spends it looking at nodes he has NOT bought, and
+            // a node with no card is a node he cannot decide about. The reading comes from an instance
+            // built and thrown away — an ability words its own description off its own numbers whether or
+            // not anybody owns it.
+            var bench = new Bench();
+            bench.Own(OwnedAbility);
+
+            IReadOnlyList<AbilitySocketRowView> rows = await bench.Rows(unowned: true);
+
+            CollectionAssert.AreEqual(
+                new[] { OwnedAbility, OtherOwnedAbility, NeverUnlocked, StrengthAbility }
+                    .OrderBy(id => id, StringComparer.Ordinal).ToArray(),
+                rows.Select(row => row.AbilityId).ToArray(),
+                "the wheel was handed something other than the whole catalog");
+
+            AbilitySocketRowView never = rows.Single(row => row.AbilityId == NeverUnlocked);
+            Assert.IsFalse(never.IsOwned, "an ability nobody unlocked was reported as owned");
+            Assert.AreNotEqual(string.Empty, never.Cost, "its node prints no price, so it says nothing worth reading");
+            Assert.AreEqual($"{NeverUnlocked}_Description", never.Description);
+            CollectionAssert.AreEqual(new[] { AbilityTags.Poison, AbilityTags.Buff }, never.Tags.ToArray(),
+                "an unowned row carries no tags, so its card cannot say what the cast counts as");
+        }
+
+        [TestMethod]
+        public async Task AnOwnedRowIsReadOffTheInstanceInTheBookAndNeverOffAFreshOne()
+        {
+            // The book's instance is the one wearing his augments. A row rebuilt from the catalog beside it
+            // would print the ability he would have had if he had never seated anything — and the two only
+            // differ once something IS seated, which is exactly when the difference matters most.
+            var bench = new Bench();
+            bench.Own(OwnedAbility);
+
+            AbilitySocketRowView owned = (await bench.Rows(unowned: true)).Single(row => row.AbilityId == OwnedAbility);
+
+            Assert.IsTrue(owned.IsOwned);
+            Assert.AreEqual($"{OwnedAbility}{FirstInstance}", owned.DisplayName,
+                "the row was built from a fresh instance instead of read off the one in the book");
+        }
+
+        [TestMethod]
+        public async Task OneAbilityReadsTheSameOwnedOrNot_WhileItsSlotsAreEmpty()
+        {
+            // The promise of a single card: what the wheel shows him before he buys is what the socket
+            // sheet shows him after, minus whatever he then seats. A second assembly for the unowned half
+            // would be free to drift from the first.
+            var mine = new Bench();
+            mine.Own(OwnedAbility);
+            var stranger = new Bench();
+
+            AbilitySocketRowView bought = (await mine.Rows(unowned: true)).Single(row => row.AbilityId == OwnedAbility);
+            AbilitySocketRowView offered = (await stranger.Rows(unowned: true)).Single(row => row.AbilityId == OwnedAbility);
+
+            Assert.IsTrue(bought.IsOwned);
+            Assert.IsFalse(offered.IsOwned);
+            Assert.AreEqual(bought.Description, offered.Description, "one ability reads two ways with nothing in its slots");
+            Assert.AreEqual(bought.Cost, offered.Cost);
+            Assert.AreEqual(bought.Cooldown, offered.Cooldown);
+            CollectionAssert.AreEqual(bought.Tags.ToArray(), offered.Tags.ToArray());
+        }
+
+        [TestMethod]
+        public void ACardDoesNotPrintTheAxesEveryCastAlreadyStandsOn()
+        {
+            // Cost and cooldown are tags because an augment fits along them, not because they say what a
+            // cast is. Printed in front of the words that do, they are what makes a reader stop reading.
+            AbilityCard card = AbilityText.Card(Row("Cost: 5 Mana", "Cooldown: 3 turns",
+            [
+                AbilityTags.Cost, AbilityTags.Attack, AbilityTags.Cooldown,
+                AbilityTags.Scale, AbilityTags.Effect, AbilityTags.Poison
+            ]));
+
+            Assert.AreEqual($"{TagText.KeyOf(AbilityTags.Attack)}, {TagText.KeyOf(AbilityTags.Poison)}", card.TagsLine,
+                "the card prints an axis every cast stands on, or lost a tag that names what this one is");
+        }
+
+        [TestMethod]
+        public void TheCardIsTheOneReadingOfACast_Meta_Tags_AndWhatItDoes()
+        {
+            // Three surfaces print one ability. The card is what they all print, so what it holds and how
+            // it is put together is decided here rather than three times over.
+            AbilityCard card = AbilityText.Card(Row("Cost: 5 Mana", "Cooldown: 3 turns", [AbilityTags.Fire, "no_such_tag"]));
+
+            Assert.AreEqual("Cost: 5 Mana · Cooldown: 3 turns", card.MetaLine, "price and wait are not one line");
+            Assert.AreEqual($"{TagText.KeyPrefix}{AbilityTags.Fire}, {TagText.KeyPrefix}no_such_tag", card.TagsLine,
+                "the tags lost their order, or a tag nobody worded went missing instead of showing its key");
+            Assert.AreEqual($"{card.MetaLine}\n{card.TagsLine}\n{card.Description}", card.Body);
+            Assert.AreEqual($"{card.TagsLine}\n{card.Description}", card.Details,
+                "the surface that prints the meta beside the name would print it twice");
+        }
+
+        [TestMethod]
+        public void ACastWithNoTagsAndNoWaitLeavesNoBlankLineBehindThem()
+        {
+            AbilityCard card = AbilityText.Card(Row("Cost: 5 Mana", string.Empty, []));
+
+            Assert.AreEqual("Cost: 5 Mana", card.MetaLine, "an absent cooldown left its separator dangling");
+            Assert.AreEqual(string.Empty, card.TagsLine);
+            Assert.AreEqual($"Cost: 5 Mana\n{card.Description}", card.Body);
+        }
+
+        [TestMethod]
+        public void TheBodyAWheelPopupPrintsIsMetaTagsAndDescription_AndNeverASlotAgain()
+        {
+            // The body of a node's popup is the card's own, whole. Listing what the slots hold was the
+            // popup saying everything about the sockets and nothing about the cast they sit on — the ring
+            // beside the node already draws that.
+            AbilityCard card = AbilityText.Card(Row("Cost: 5 Mana", "Cooldown: 3 turns", [AbilityTags.Fire]));
+
+            string body = card.Body;
+
+            StringAssert.Contains(body, "Cost: 5 Mana", "the body lost the price of the cast");
+            StringAssert.Contains(body, TagText.KeyOf(AbilityTags.Fire), "the body lost the tags");
+            StringAssert.Contains(body, card.Description, "the body lost what the ability does");
+            Assert.IsFalse(body.Contains("UI_PassiveTree_Slot", StringComparison.Ordinal),
+                $"the body still lists slots: {body}");
+        }
+
+        [TestMethod]
         public void TheRefusalTheWindowShowsIsTheOneTheGateGave()
         {
             // The window names a reason by asking the gate, and the gate carries the fitting rule's own
@@ -204,6 +332,12 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(bench.Board.Find(bench.Board.At(SocketNode))?.IsEmpty, "judging seated the augment");
             Assert.IsNotNull(bench.Bag.GetItem<IAugmentItem>(carried.InstanceId), "judging took the augment out of the bag");
         }
+
+        /// <summary>One row of the sheet, written by hand: the card walks read the answer and never build
+        /// it, so a case about the card owes nothing to the board.</summary>
+        private static AbilitySocketRowView Row(string cost, string cooldown, string[] tags) =>
+            new(OwnedAbility, $"{OwnedAbility}_Name", $"{OwnedAbility}_Description",
+                cost, cooldown, tags, null, Stance.Dexterity, IsOwned: true, []);
 
         /// <summary>The records the walks name, read through the loader the game runs.</summary>
         private static string Records() =>
@@ -271,17 +405,23 @@ namespace LastBreathTest.BattleSystemTests
                 return minted;
             }
 
-            internal Task<IReadOnlyList<AbilitySocketRowView>> Rows(Stance? stance = null) =>
-                Handler.HandleRequest(new GetAbilitySocketRowsRequest(stance));
+            /// <summary>What a screen asks for: the mastery window's question by default, the wheel's — the
+            /// whole catalog, unlocked or not — when the case says so.</summary>
+            internal Task<IReadOnlyList<AbilitySocketRowView>> Rows(Stance? stance = null, bool unowned = false) =>
+                Handler.HandleRequest(new GetAbilitySocketRowsRequest(stance, IncludeUnowned: unowned));
 
             private const int BagSlots = 8;
             private const int Seed = 11;
             private const float Spread = 0.25f;
         }
 
-        /// <summary>Catalog stub: four abilities, one of them of another stance, nothing hidden.</summary>
+        /// <summary>Catalog stub: four abilities, one of them of another stance, nothing hidden. Every
+        /// instance it hands out is STAMPED with the order it was built in, so a walk can tell the copy in
+        /// the book from one made a moment ago to read a card off.</summary>
         private sealed class SheetAbilityProvider : IAbilityProvider
         {
+            private int _built;
+
             public IReadOnlyCollection<string> KnownAbilityIds => [OwnedAbility, OtherOwnedAbility, NeverUnlocked, StrengthAbility];
 
             public IAbility CreateAbility(string abilityId)
@@ -290,8 +430,11 @@ namespace LastBreathTest.BattleSystemTests
                 var ability = new Mock<IAbility>();
                 ability.SetupGet(a => a.Id).Returns(abilityId);
                 ability.SetupGet(a => a.InstanceId).Returns(instanceId);
-                ability.SetupGet(a => a.DisplayName).Returns(abilityId);
+                ability.SetupGet(a => a.DisplayName).Returns($"{abilityId}#{++_built}");
+                ability.SetupGet(a => a.CostValue).Returns(CostValue);
                 ability.SetupGet(a => a.Description).Returns($"{abilityId}_Description");
+                // One tag more than the record declares: what an augment GRANTS lives on the instance.
+                ability.SetupGet(a => a.Tags).Returns(new[] { AbilityTags.Poison, AbilityTags.Buff });
                 ability.SetupGet(a => a.CostType).Returns(Costs.Mana);
                 ability.SetupGet(a => a.InstalledUpgrades).Returns(new Dictionary<string, IAugment>());
                 ability.Setup(a => a.IsSame(It.IsAny<string>())).Returns((string other) => other == instanceId);

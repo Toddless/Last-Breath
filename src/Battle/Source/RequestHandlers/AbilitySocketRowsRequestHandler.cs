@@ -4,6 +4,7 @@ namespace Battle.Source.RequestHandlers
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
     using Core.Battle.Abilities;
     using Core.Enums;
     using Core.Items;
@@ -12,6 +13,7 @@ namespace Battle.Source.RequestHandlers
     using Core.MessageBus.Requests;
     using Core.Services;
     using Core.Views;
+    using Core.Views.UI;
     using Godot;
 
     /// <summary>
@@ -50,27 +52,14 @@ namespace Battle.Source.RequestHandlers
 
             IReadOnlyList<AbilitySocketRowView> rows =
             [
-                .. Subjects(owned.Keys)
+                .. Subjects(owned.Keys, request.IncludeUnowned)
                     .Where(abilityId => Matches(request, abilityId))
                     .OrderBy(abilityId => abilityId, StringComparer.Ordinal)
-                    .Select(abilityId => ToRow(abilityId, owned.GetValueOrDefault(abilityId)))
+                    .Select(abilityId => ToRow(abilityId, owned.GetValueOrDefault(abilityId), request.IncludeUnowned))
             ];
 
             return Task.FromResult(rows);
         }
-
-        private static string CostOf(IAbility ability) =>
-            Localization.Render("UI_AbilityCost", new Dictionary<string, object?>
-            {
-                ["Value"] = ability.CostValue,
-                ["Resource"] = Localization.Localize(ability.CostType.ToString()),
-            });
-
-        private static string CooldownOf(IAbility ability) =>
-            Localization.Render("UI_AbilityCooldown", new Dictionary<string, object?>
-            {
-                ["Value"] = Mathf.RoundToInt(ability.Cooldown),
-            });
 
         /// <summary>How much of the seated augment is running, asked of the live instance — the one place
         /// the winner of two augments reaching for one parameter is decided. A row without an instance
@@ -84,13 +73,18 @@ namespace Battle.Source.RequestHandlers
         /// keeps an ability whose node was refunded on screen while his property is still in it; the
         /// second is a guarantee that an ability reaching the book by some other road is not invisible.
         /// An id the catalog no longer declares is skipped: there is no stance to file it under.
+        /// <para>Asked for the unowned too, it is simply the whole catalog — every id above is already in
+        /// it — minus the abilities no player ever casts. A hidden one is a boss reaction: it has no node,
+        /// so a card of it would be a page about something unreachable.</para>
         /// </summary>
-        private IEnumerable<string> Subjects(IEnumerable<string> ownedIds) =>
-            sockets.Sockets
-                .Select(socket => socket.AbilityId)
-                .Concat(ownedIds)
-                .Where(abilities.KnownAbilityIds.Contains)
-                .Distinct(StringComparer.Ordinal);
+        private IEnumerable<string> Subjects(IEnumerable<string> ownedIds, bool includeUnowned) =>
+            (includeUnowned
+                ? abilities.KnownAbilityIds.Where(abilityId => !abilities.IsHidden(abilityId))
+                : sockets.Sockets
+                    .Select(socket => socket.AbilityId)
+                    .Concat(ownedIds)
+                    .Where(abilities.KnownAbilityIds.Contains))
+            .Distinct(StringComparer.Ordinal);
 
         private bool Matches(GetAbilitySocketRowsRequest request, string abilityId) =>
             (request.Stance == null || abilities.GetAbilityStance(abilityId) == request.Stance)
@@ -107,20 +101,49 @@ namespace Battle.Source.RequestHandlers
             return owned;
         }
 
-        /// <summary>One row. Name, art and stance come from the catalog whether or not the ability is
-        /// still owned — a row the player kept only because his augments are in it has no instance to
-        /// read anything off.</summary>
-        private AbilitySocketRowView ToRow(string abilityId, IAbility? owned) =>
-            new(
+        /// <summary>
+        /// One row. Everything the player reads — name, price, wait, tags, description — is read off ONE
+        /// instance, so a card is assembled the same way whoever is looking at it. Which instance is the
+        /// only question: the book's where the player owns the ability, because that one wears his
+        /// augments, and otherwise the one built for the reading.
+        /// <para>Art, stance and ownership stay outside that: they are the catalog's answer and the book's,
+        /// and neither of them is a number an instance decorates.</para>
+        /// </summary>
+        private AbilitySocketRowView ToRow(string abilityId, IAbility? owned, bool readUnowned)
+        {
+            IAbility? reading = owned ?? (readUnowned ? Preview(abilityId) : null);
+            return new AbilitySocketRowView(
                 abilityId,
-                owned?.DisplayName ?? Localization.Localize(abilityId),
-                owned?.Description ?? string.Empty,
-                owned == null ? string.Empty : CostOf(owned),
-                owned == null ? string.Empty : CooldownOf(owned),
+                reading?.DisplayName ?? Localization.Localize(abilityId),
+                reading?.Description ?? string.Empty,
+                reading == null ? string.Empty : AbilityText.CostLine(reading.CostValue, reading.CostType),
+                reading == null ? string.Empty : AbilityText.CooldownLine(reading.Cooldown),
+                reading?.Tags ?? [],
                 _art(abilityId),
                 abilities.GetAbilityStance(abilityId),
                 owned != null,
                 [.. sockets.SocketsOf(abilityId).Select(socket => ToCell(owned, socket))]);
+        }
+
+        /// <summary>
+        /// The ability as the catalog alone declares it, built to be read and thrown away. Nothing is
+        /// learned and nothing is bound: a bare instance already words its own description off its own
+        /// numbers, which is exactly the undecorated card of an ability the player has not bought yet.
+        /// <para>Null and reported where the registry cannot build one — a record with no factory behind
+        /// it parses and is listed, and the wheel walks every id there is.</para>
+        /// </summary>
+        private IAbility? Preview(string abilityId)
+        {
+            try
+            {
+                return abilities.CreateAbility(abilityId);
+            }
+            catch (Exception exception)
+            {
+                Tracker.TrackException($"Cannot read the card of ability '{abilityId}'", exception, this);
+                return null;
+            }
+        }
 
         /// <summary>One cell. An augment whose record the catalog no longer declares cannot be turned
         /// back into a thing — the minter says so by handing back nothing — and the cell then shows the

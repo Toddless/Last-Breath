@@ -1,11 +1,20 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using System.Text;
+    using Battle.Source.RequestHandlers;
     using Battle.Source.UIElements.PassiveWheel;
+    using Core.Battle;
+    using Core.Battle.Abilities;
     using Core.Data.GameData;
+    using Core.Entity.Components;
+    using Core.Enums;
+    using Core.Items;
     using Core.Localization;
+    using Core.MessageBus.Requests;
     using Core.PassiveTree;
     using Core.PassiveTree.View;
+    using Core.Views;
+    using Core.Views.UI;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -16,6 +25,9 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class LocalizationAuditTests
     {
+        /// <summary>The minter needs a die; nothing here reads what it rolls.</summary>
+        private const int Seed = 11;
+
         private static string SrcRoot
         {
             get
@@ -116,6 +128,90 @@ namespace LastBreathTest.BattleSystemTests
             StringAssert.Contains(line, "2", $"'{PassiveWheelText.SlotOwner}' never places the tier");
             StringAssert.Contains(line, ability, $"'{PassiveWheelText.SlotOwner}' never names the ability");
             Assert.IsFalse(line.Contains('{'), $"'{PassiveWheelText.SlotOwner}' keeps a placeholder the wheel does not fill: {line}");
+        }
+
+        /// <summary>
+        /// Every tag of the vocabulary is worded. Tags are printed on the card of an ability and on the
+        /// card of an augment alike, and an unworded one reaches the player as the raw key — which is the
+        /// vocabulary's internal spelling, in lower case, in the middle of a sentence.
+        /// </summary>
+        [TestMethod]
+        public void EveryCombatTagOfTheVocabularyIsWordedInEnglish()
+        {
+            Dictionary<string, string> en = ReadEntries("en.po");
+            List<string> unworded = AbilityTags.All
+                .Select(TagText.KeyOf)
+                .Where(key => string.IsNullOrEmpty(en.GetValueOrDefault(key)))
+                .OrderBy(key => key, StringComparer.Ordinal)
+                .ToList();
+
+            Assert.AreEqual(0, unworded.Count,
+                $"en.po words no name for {unworded.Count} tag(s), so a card prints the raw key: {string.Join(", ", unworded)}");
+        }
+
+        /// <summary>
+        /// The price and the wait, worded out of the shipped catalog. Both go through one templating, so a
+        /// key nobody worded or a placeholder nobody fills is visible here rather than in a screenshot. The
+        /// fraction is the point of the second half: an augment that shaves a fifth off a cooldown is
+        /// bought for a number the player can SEE, and rounding to whole turns hides exactly that.
+        /// </summary>
+        [TestMethod]
+        public void ThePriceAndTheWaitAreWordedAndTheWaitKeepsItsFraction()
+        {
+            UseEnglishCatalog();
+
+            Assert.AreEqual("Cost: 150 Mana", AbilityText.CostLine(150, Costs.Mana),
+                "the price line lost its template, its number or its resource");
+            Assert.AreEqual("Cooldown: 4 turns", AbilityText.CooldownLine(4f));
+            Assert.AreEqual("Cooldown: 3.2 turns", AbilityText.CooldownLine(3.2f),
+                "a cut cooldown was rounded back to the number the player had before he paid for the cut");
+            Assert.AreEqual(string.Empty, AbilityText.CooldownLine(0f),
+                "a cast that makes nobody wait printed a line about waiting");
+        }
+
+        /// <summary>
+        /// The card of an ability NOBODY owns, read the way the passive wheel reads it: the shipped
+        /// catalog, the real handler, the real wording. This is most of what the wheel prints — the player
+        /// is looking at nodes he has not bought — and it is built from an instance nobody learned, so a
+        /// card that only works for the owned half would leave the whole screen mute.
+        /// </summary>
+        [TestMethod]
+        public async Task TheCardOfAnAbilityNobodyOwnsIsFullyWordedInTheShippedCatalog()
+        {
+            const string ability = "Ability_Head_Butt";
+
+            UseEnglishCatalog();
+            (Battle.Source.Abilities.AbilityProvider abilities, AbilityAugmentCatalog augments) = ShippedAbilityData.Load();
+            var handler = new AbilitySocketRowsRequestHandler(
+                new AbilitySocketBoard(augments),
+                AbilityBookStand.AccessorFor(AbilityBookStand.NewBook()),
+                abilities,
+                new AugmentItemMinter(augments, new AugmentMinter(augments, new DefaultRandomNumberGenerator(Seed))),
+                augments,
+                _ => null);
+
+            IReadOnlyList<AbilitySocketRowView> rows = await handler.HandleRequest(
+                new GetAbilitySocketRowsRequest(AbilityId: ability, IncludeUnowned: true));
+
+            AbilitySocketRowView row = rows.Single();
+            Assert.IsFalse(row.IsOwned, "the book was not empty, so the case proves nothing about an unowned card");
+
+            AbilityCard card = AbilityText.Card(row);
+            Assert.AreNotEqual(string.Empty, card.MetaLine, "the card of an unowned ability names no price and no wait");
+            Assert.AreNotEqual(string.Empty, card.TagsLine, "the card of an unowned ability says nothing about what it counts as");
+            Assert.AreNotEqual(string.Empty, card.Description, "the card of an unowned ability says nothing about what it does");
+            Assert.IsFalse(card.Body.Contains('{'), $"the card keeps a placeholder nobody fills: {card.Body}");
+        }
+
+        /// <summary>The shipped wording, pinned to the static facade every card reads through.</summary>
+        private static void UseEnglishCatalog()
+        {
+            var catalog = new FakeLocalizationProvider();
+            foreach ((string key, string wording) in ReadEntries("en.po")) catalog.Strings[key] = wording;
+
+            Localization.Override(new LocalizationService(catalog,
+                new ModifierFormatter(catalog, new ParameterFormatProvider()),
+                new ContextModifierFormatter(catalog), []));
         }
 
         /// <summary>

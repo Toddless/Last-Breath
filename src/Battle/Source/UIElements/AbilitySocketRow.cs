@@ -51,12 +51,13 @@ namespace Battle.Source.UIElements
             _host = host;
             _windows = windows;
 
+            AbilityCard card = AbilityText.Card(view);
             _abilityIcon?.Texture = view.Icon;
-            _abilityName?.Text = view.DisplayName;
+            _abilityName?.Text = card.Name;
             if (_meta != null)
             {
-                _meta.Text = $"{view.Cost} {view.Cooldown}".Trim();
-                _meta.Visible = !string.IsNullOrWhiteSpace(_meta.Text);
+                _meta.Text = card.MetaLine;
+                _meta.Visible = _meta.Text.Length > 0;
             }
 
             Modulate = view.IsOwned ? Colors.White : s_unownedTint;
@@ -82,14 +83,18 @@ namespace Battle.Source.UIElements
             }
         }
 
-        /// <summary>The ability's own text on hover. The owner asked for no detail arrow, but the
-        /// description is what the numbers in the row are about and must stay reachable.</summary>
+        /// <summary>The ability's own card on hover — the same one the wheel's node popup and the battle
+        /// bar print. The row itself has no field for the tags, so they are shown here and only here; the
+        /// meta stays the subtitle it already is beside the name.</summary>
         private IPopup? ShowAbilityTooltip()
         {
-            if (_view == null || _windows == null || string.IsNullOrEmpty(_view.Description)) return null;
+            if (_view == null || _windows == null) return null;
+
+            AbilityCard card = AbilityText.Card(_view);
+            if (card.Details.Length == 0) return null;
             if (_windows.ShowPopup(typeof(TextTooltipPopup)) is not TextTooltipPopup popup) return null;
 
-            popup.Show(_view.DisplayName, _meta?.Text, _view.Description);
+            popup.Show(card.Name, card.MetaLine, card.Details);
             return popup;
         }
     }

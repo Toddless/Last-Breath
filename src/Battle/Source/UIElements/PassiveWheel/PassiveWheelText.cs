@@ -42,13 +42,8 @@ namespace Battle.Source.UIElements.PassiveWheel
         public const string RefundPrice = "UI_PassiveTree_RefundPrice";
         public const string StrandedAugments = "UI_PassiveTree_StrandedAugments";
 
-        // The ability's slots, listed in its node's popup.
-        public const string SlotsCaption = "UI_PassiveTree_Slots_Caption";
-        public const string SlotOpen = "UI_PassiveTree_Slot_Open";
-        public const string SlotFilled = "UI_PassiveTree_Slot_Filled";
-        public const string SlotHeld = "UI_PassiveTree_Slot_Held";
-        public const string SlotUnopened = "UI_PassiveTree_Slot_Unopened";
-
+        // Whose slot a socket node opens. What is IN the slots is not worded at all: the ring beside the
+        // node says it in colour, and the node's popup is about the ABILITY rather than about its sockets.
         public const string SlotOwner = "UI_PassiveTree_Slot_Owner";
 
         // The panel of totals.

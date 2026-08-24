@@ -179,6 +179,12 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// node does not survive a close, and it is asked once — for the FIRST view of a window.</summary>
         private PassiveWheelViewMemory? _memory;
 
+        /// <summary>The card of every ability the socket sheet knows, by id. Handed down by the window
+        /// ahead of the cursor: a popup opens under a hover and has nowhere to wait for an answer from the
+        /// bus, and the canvas holds no bus of its own to ask with.</summary>
+        private IReadOnlyDictionary<string, AbilityCard> _abilityCards =
+            new Dictionary<string, AbilityCard>(StringComparer.Ordinal);
+
         private PassiveTreeDraft? _draft;
         private PassiveRespecQuotes? _quotes;
         private PassiveTreeDocument? _document;
@@ -275,6 +281,13 @@ namespace Battle.Source.UIElements.PassiveWheel
         /// <summary>Where an augment dropped on the wheel goes. The wheel writes no request of its own —
         /// a second copy of that road would be a second reading of the same rule.</summary>
         public void UseSocketHost(IAugmentCellHost? host) => _sockets = host;
+
+        /// <summary>The ability cards the node popups print, refreshed by the window whenever what an
+        /// ability does can have changed. Nothing is asked for here: the popup is drawn where the pointer
+        /// already is, and a hover that waited on a request would print an empty card and then a full
+        /// one.</summary>
+        public void UseAbilityCards(IReadOnlyDictionary<string, AbilityCard>? cards) =>
+            _abilityCards = cards ?? new Dictionary<string, AbilityCard>(StringComparer.Ordinal);
 
         /// <summary>Fits the whole tree on screen — the recovery hatch when panning has taken the view
         /// away from the content.</summary>
@@ -1069,9 +1082,9 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         /// <summary>
         /// Everything the node says, in one popup: its name once, its class, its lines, whose slot it
-        /// opens, what its ability's slots hold, and — while a return is being planned — how much the
-        /// click would take back and what that would cost in gold. The price of the road to it is not
-        /// here: the plan's own button carries it, and the dotted route already shows its length.
+        /// opens, the whole card of the ability it stands for, and — while a return is being planned — how
+        /// much the click would take back and what that would cost in gold. The price of the road to it is
+        /// not here: the plan's own button carries it, and the dotted route already shows its length.
         /// </summary>
         private IPopup? ShowNodeTooltip(object? key)
         {
@@ -1086,7 +1099,7 @@ namespace Battle.Source.UIElements.PassiveWheel
                 Append(body, line.Text);
 
             AppendOwnedSlot(body, node);
-            AppendSlots(body, node);
+            AppendAbility(body, node);
             AppendReturn(body, node);
 
             popup.Show(PassiveNodeLines.TitleOf(node, _localization),
@@ -1109,33 +1122,21 @@ namespace Battle.Source.UIElements.PassiveWheel
             }));
         }
 
-        /// <summary>The ability's slots in words. The ring beside the node says the same thing in colour,
-        /// and an icon inside a pip eight pixels across would be unreadable — so what is IN a slot is
-        /// printed here and shown nowhere else.</summary>
-        private void AppendSlots(StringBuilder body, PassiveNode node)
+        /// <summary>
+        /// The ability the node stands for, in full: what it costs, what it counts as and what it does in
+        /// the numbers it is wearing right now — bought or not, because a node the player is deciding
+        /// about is exactly the one he has not bought.
+        /// <para>What its slots HOLD is not listed: the ring beside the node draws that, and a popup that
+        /// spelled the ring out again said everything about the sockets and nothing about the cast they
+        /// sit on. Neither is the tree's own line for the node — the ability is worded once, in the
+        /// catalog, and a second wording in the tree file is one that silently stops agreeing with it.</para>
+        /// </summary>
+        private void AppendAbility(StringBuilder body, PassiveNode node)
         {
-            if (!_rings.TryGetValue(node.Id, out List<SocketRingSlot>? slots)) return;
+            if (string.IsNullOrWhiteSpace(node.AbilityId)) return;
+            if (!_abilityCards.TryGetValue(node.AbilityId, out AbilityCard card)) return;
 
-            Append(body, Localization.Localize(PassiveWheelText.SlotsCaption));
-            foreach (SocketRingSlot slot in slots)
-            {
-                AbilitySocket? socket = _board?.Find(slot.Address);
-                string key = SocketRings.StateOf(socket) switch
-                {
-                    SocketSlotState.Held => PassiveWheelText.SlotHeld,
-                    SocketSlotState.Open => PassiveWheelText.SlotOpen,
-                    SocketSlotState.Filled => PassiveWheelText.SlotFilled,
-                    _ => PassiveWheelText.SlotUnopened
-                };
-
-                Append(body, Localization.Render(key, new Dictionary<string, object?>
-                {
-                    [PassiveWheelText.TierValue] = slot.Tier,
-                    [PassiveWheelText.NameValue] = socket?.Augment is { } augment
-                        ? Localization.Localize(augment.AugmentId)
-                        : string.Empty
-                }));
-            }
+            Append(body, card.Body);
         }
 
         /// <summary>

@@ -1760,9 +1760,6 @@ msgstr "End Turn"
 msgid "UI_Flee"
 msgstr "Flee"
 
-msgid "UI_Cooldown"
-msgstr "Cooldown"
-
 msgid "Stance_Dexterity"
 msgstr "Dexterity Stance"
 
@@ -1836,7 +1833,7 @@ msgid "UI_AbilityCost"
 msgstr "Cost: {Value} {Resource}"
 
 msgid "UI_AbilityCooldown"
-msgstr "Cooldown: {Value|turn|turns}"
+msgstr "Cooldown: {Value} turns"
 
 # ------------------------------
 # Notifications
@@ -3923,21 +3920,6 @@ msgstr "{gold} gold"
 msgid "UI_PassiveTree_StrandedAugments"
 msgstr "{count} augments would stay in closed slots"
 
-msgid "UI_PassiveTree_Slots_Caption"
-msgstr "Augment slots"
-
-msgid "UI_PassiveTree_Slot_Open"
-msgstr "Tier {tier} — empty"
-
-msgid "UI_PassiveTree_Slot_Filled"
-msgstr "Tier {tier} — {name}"
-
-msgid "UI_PassiveTree_Slot_Held"
-msgstr "Tier {tier} — {name} (closed, remove only)"
-
-msgid "UI_PassiveTree_Slot_Unopened"
-msgstr "Tier {tier} — not opened"
-
 msgid "UI_PassiveTree_Slot_Owner"
 msgstr "Opens a tier {tier} slot of {name}"
 
@@ -4375,3 +4357,167 @@ msgstr "Borrowed Curse"
 
 msgid "Augment_Apply_Debuff_Description"
 msgstr "Every touch of the ability applies a stack of {effect} to what it touched."
+
+# ------------------------------
+# Combat tags — the compatibility axis of the augment system. One key per member of the
+# vocabulary; the audit test holds that invariant.
+# ------------------------------
+
+msgid "Tag_attack"
+msgstr "Attack"
+
+msgid "Tag_spell"
+msgstr "Spell"
+
+msgid "Tag_series"
+msgstr "Series"
+
+msgid "Tag_buff"
+msgstr "Buff"
+
+msgid "Tag_poison"
+msgstr "Poison"
+
+msgid "Tag_projectile"
+msgstr "Projectile"
+
+msgid "Tag_cold"
+msgstr "Cold"
+
+msgid "Tag_lightning"
+msgstr "Lightning"
+
+msgid "Tag_fire"
+msgstr "Fire"
+
+msgid "Tag_stun"
+msgstr "Stun"
+
+msgid "Tag_freeze"
+msgstr "Freeze"
+
+msgid "Tag_critical"
+msgstr "Critical"
+
+msgid "Tag_barrier"
+msgstr "Barrier"
+
+msgid "Tag_mana"
+msgstr "Mana"
+
+msgid "Tag_health"
+msgstr "Health"
+
+msgid "Tag_evasion"
+msgstr "Evasion"
+
+msgid "Tag_execute"
+msgstr "Execute"
+
+msgid "Tag_retaliation"
+msgstr "Retaliation"
+
+msgid "Tag_empowered"
+msgstr "Empowered"
+
+msgid "Tag_shield"
+msgstr "Shield"
+
+msgid "Tag_summon"
+msgstr "Summon"
+
+msgid "Tag_npc"
+msgstr "Monster"
+
+msgid "Tag_accuracy"
+msgstr "Accuracy"
+
+msgid "Tag_armor"
+msgstr "Armor"
+
+msgid "Tag_bleed"
+msgstr "Bleed"
+
+msgid "Tag_burn"
+msgstr "Burn"
+
+msgid "Tag_charge"
+msgstr "Charge"
+
+msgid "Tag_control"
+msgstr "Control"
+
+msgid "Tag_cooldown"
+msgstr "Cooldown"
+
+msgid "Tag_cost"
+msgstr "Cost"
+
+msgid "Tag_curse"
+msgstr "Curse"
+
+msgid "Tag_damage"
+msgstr "Damage"
+
+msgid "Tag_debuff"
+msgstr "Debuff"
+
+msgid "Tag_defence"
+msgstr "Defence"
+
+msgid "Tag_effect"
+msgstr "Effect"
+
+msgid "Tag_evadable"
+msgstr "Evadable"
+
+msgid "Tag_heal"
+msgstr "Heal"
+
+msgid "Tag_hit"
+msgstr "Hit"
+
+msgid "Tag_leech"
+msgstr "Leech"
+
+msgid "Tag_recovery"
+msgstr "Recovery"
+
+msgid "Tag_restore"
+msgstr "Restore"
+
+msgid "Tag_scale"
+msgstr "Scaling"
+
+msgid "Tag_splash"
+msgstr "Splash"
+
+msgid "Tag_spread"
+msgstr "Spread"
+
+msgid "Tag_target"
+msgstr "Targeting"
+
+msgid "Tag_thorn"
+msgstr "Thorns"
+
+msgid "Tag_activation"
+msgstr "Activation"
+
+msgid "Tag_elemental"
+msgstr "Elemental"
+
+msgid "Tag_physical"
+msgstr "Physical"
+
+msgid "Tag_sacred"
+msgstr "Sacred"
+
+msgid "Tag_consume"
+msgstr "Consume"
+
+msgid "Tag_fury"
+msgstr "Fury"
+
+msgid "Tag_stage"
+msgstr "Stage"

@@ -16,6 +16,7 @@ namespace Battle.Source.UIElements.PassiveWheel
     using Core.PassiveTree.Rules;
     using Core.PassiveTree.Summary;
     using Core.Trade;
+    using Core.Views;
     using Core.Views.UI;
     using Godot;
 
@@ -106,6 +107,8 @@ namespace Battle.Source.UIElements.PassiveWheel
         {
             if (_tree != null) _tree.AllocationChanged -= Refresh;
             if (_board != null) _board.Changed -= Refresh;
+            if (_tree != null) _tree.AllocationChanged -= RefreshAbilityCards;
+            if (_board != null) _board.Changed -= RefreshAbilityCards;
             if (_wallet != null) _wallet.GoldChanged -= OnGoldChanged;
             if (_draft != null) _draft.Changed -= Refresh;
 
@@ -142,6 +145,12 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (_board != null) _board.Changed += Refresh;
             if (_wallet != null) _wallet.GoldChanged += OnGoldChanged;
 
+            // The two events after which an ability can DO something else: a node bought or given back, and
+            // an augment seated or pulled out. The plan is deliberately not among them — a mark gives no
+            // bonus, so nothing it touches changes a card.
+            if (_tree != null) _tree.AllocationChanged += RefreshAbilityCards;
+            if (_board != null) _board.Changed += RefreshAbilityCards;
+
             _summary?.UseFormatters(_modifiers, _knobs);
 
             _canvas?.InjectServices(provider);
@@ -154,7 +163,40 @@ namespace Battle.Source.UIElements.PassiveWheel
                 _bus, provider.Optional<IAugmentInstallGate>(), ShowHint, provider.Optional<IUiElementsManager>());
             _canvas?.UseSocketHost(_seating);
 
+            RefreshAbilityCards();
             Refresh();
+        }
+
+        /// <summary>
+        /// The ability cards the node popups print, fetched ahead of the cursor and handed to the canvas.
+        /// The sheet's own answer is what they are built from — the wheel prints the ability the socket
+        /// screen prints, down to the numbers the seated augments put in it — and it is asked for the whole
+        /// catalog at once rather than per hover, because a popup opens where the pointer already is and
+        /// has nowhere to wait for the bus.
+        /// <para>The UNOWNED are asked for too, and that is the point of the screen: the player spends the
+        /// wheel looking at nodes he has not bought, and the card is what tells him whether to.</para>
+        /// </summary>
+        private async void RefreshAbilityCards()
+        {
+            try
+            {
+                if (_bus == null || _canvas == null) return;
+
+                IReadOnlyList<AbilitySocketRowView> rows =
+                    await _bus.SendRequest<GetAbilitySocketRowsRequest, IReadOnlyList<AbilitySocketRowView>>(
+                        new GetAbilitySocketRowsRequest(IncludeUnowned: true));
+
+                if (!IsInstanceValid(_canvas)) return;
+
+                Dictionary<string, AbilityCard> cards = new(StringComparer.Ordinal);
+                foreach (AbilitySocketRowView row in rows) cards[row.AbilityId] = AbilityText.Card(row);
+
+                _canvas.UseAbilityCards(cards);
+            }
+            catch (Exception exception)
+            {
+                Tracker.TrackException("Failed to read the ability cards of the passive wheel", exception, this);
+            }
         }
 
         // Close = death (QueueFree), the IWindow contract: RemoveChild left a live, still-tracked node

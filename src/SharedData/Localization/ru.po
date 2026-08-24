@@ -942,9 +942,6 @@ msgstr ""
 msgid "UI_Flee"
 msgstr ""
 
-msgid "UI_Cooldown"
-msgstr ""
-
 msgid "Stance_Dexterity"
 msgstr ""
 
@@ -3361,21 +3358,6 @@ msgstr ""
 msgid "UI_PassiveTree_StrandedAugments"
 msgstr ""
 
-msgid "UI_PassiveTree_Slots_Caption"
-msgstr ""
-
-msgid "UI_PassiveTree_Slot_Open"
-msgstr ""
-
-msgid "UI_PassiveTree_Slot_Filled"
-msgstr ""
-
-msgid "UI_PassiveTree_Slot_Held"
-msgstr ""
-
-msgid "UI_PassiveTree_Slot_Unopened"
-msgstr ""
-
 msgid "UI_PassiveTree_Slot_Owner"
 msgstr ""
 
@@ -3704,3 +3686,166 @@ msgstr "Твёрдая рука"
 
 msgid "Effect_Light_Step"
 msgstr "Лёгкий шаг"
+
+# ------------------------------
+# Боевые теги
+# ------------------------------
+
+msgid "Tag_attack"
+msgstr ""
+
+msgid "Tag_spell"
+msgstr ""
+
+msgid "Tag_series"
+msgstr ""
+
+msgid "Tag_buff"
+msgstr ""
+
+msgid "Tag_poison"
+msgstr ""
+
+msgid "Tag_projectile"
+msgstr ""
+
+msgid "Tag_cold"
+msgstr ""
+
+msgid "Tag_lightning"
+msgstr ""
+
+msgid "Tag_fire"
+msgstr ""
+
+msgid "Tag_stun"
+msgstr ""
+
+msgid "Tag_freeze"
+msgstr ""
+
+msgid "Tag_critical"
+msgstr ""
+
+msgid "Tag_barrier"
+msgstr ""
+
+msgid "Tag_mana"
+msgstr ""
+
+msgid "Tag_health"
+msgstr ""
+
+msgid "Tag_evasion"
+msgstr ""
+
+msgid "Tag_execute"
+msgstr ""
+
+msgid "Tag_retaliation"
+msgstr ""
+
+msgid "Tag_empowered"
+msgstr ""
+
+msgid "Tag_shield"
+msgstr ""
+
+msgid "Tag_summon"
+msgstr ""
+
+msgid "Tag_npc"
+msgstr ""
+
+msgid "Tag_accuracy"
+msgstr ""
+
+msgid "Tag_armor"
+msgstr ""
+
+msgid "Tag_bleed"
+msgstr ""
+
+msgid "Tag_burn"
+msgstr ""
+
+msgid "Tag_charge"
+msgstr ""
+
+msgid "Tag_control"
+msgstr ""
+
+msgid "Tag_cooldown"
+msgstr ""
+
+msgid "Tag_cost"
+msgstr ""
+
+msgid "Tag_curse"
+msgstr ""
+
+msgid "Tag_damage"
+msgstr ""
+
+msgid "Tag_debuff"
+msgstr ""
+
+msgid "Tag_defence"
+msgstr ""
+
+msgid "Tag_effect"
+msgstr ""
+
+msgid "Tag_evadable"
+msgstr ""
+
+msgid "Tag_heal"
+msgstr ""
+
+msgid "Tag_hit"
+msgstr ""
+
+msgid "Tag_leech"
+msgstr ""
+
+msgid "Tag_recovery"
+msgstr ""
+
+msgid "Tag_restore"
+msgstr ""
+
+msgid "Tag_scale"
+msgstr ""
+
+msgid "Tag_splash"
+msgstr ""
+
+msgid "Tag_spread"
+msgstr ""
+
+msgid "Tag_target"
+msgstr ""
+
+msgid "Tag_thorn"
+msgstr ""
+
+msgid "Tag_activation"
+msgstr ""
+
+msgid "Tag_elemental"
+msgstr ""
+
+msgid "Tag_physical"
+msgstr ""
+
+msgid "Tag_sacred"
+msgstr ""
+
+msgid "Tag_consume"
+msgstr ""
+
+msgid "Tag_fury"
+msgstr ""
+
+msgid "Tag_stage"
+msgstr ""

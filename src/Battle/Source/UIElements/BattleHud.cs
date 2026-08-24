@@ -133,13 +133,13 @@
             return popup;
         }
 
-        private static string AbilityInfoLine(Core.Battle.Abilities.IAbility ability)
-        {
-            string cost = $"{ability.CostValue} {ability.CostType}";
-            return ability.Cooldown > 0
-                ? $"{cost} · {Core.Localization.Localization.Localize("UI_Cooldown")} {ability.Cooldown:0.#}"
-                : cost;
-        }
+        /// <summary>The price and the wait of the cast under the cursor, worded by the same card the socket
+        /// sheet and the passive wheel print — the bar used to spell both out for itself and read a resource
+        /// out in English wherever the game was translated.</summary>
+        private static string AbilityInfoLine(Core.Battle.Abilities.IAbility ability) =>
+            AbilityText.MetaLine(
+                AbilityText.CostLine(ability.CostValue, ability.CostType),
+                AbilityText.CooldownLine(ability.Cooldown));
 
         private IPopup? ShowStanceTooltip(Stance stance)
         {

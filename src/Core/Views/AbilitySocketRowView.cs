@@ -14,7 +14,11 @@ namespace Core.Views
     /// into every number. Empty for a row the player no longer owns the ability of: there is no
     /// instance to read numbers off, only the catalog's name and art.</param>
     /// <param name="Cost">The live cast price, rendered. Empty on an unowned row.</param>
-    /// <param name="Cooldown">The live cooldown, rendered. Empty on an unowned row.</param>
+    /// <param name="Cooldown">The live cooldown, rendered. Empty on an unowned row and on a cast that
+    /// makes its caster wait for nothing.</param>
+    /// <param name="Tags">What the cast counts as — the compatibility axis the augments fit along. Read
+    /// off the live instance where there is one, so a tag an augment GRANTS is named; off the catalog's
+    /// record otherwise, because an unowned ability still counts as what it is.</param>
     /// <param name="Icon">The ability's art; null when it has none yet.</param>
     /// <param name="Stance">Which stance section the row belongs to.</param>
     /// <param name="IsOwned">Whether the player still holds the ability. False rows exist because their
@@ -28,6 +32,7 @@ namespace Core.Views
         string Description,
         string Cost,
         string Cooldown,
+        IReadOnlyList<string> Tags,
         Texture2D? Icon,
         Stance Stance,
         bool IsOwned,
