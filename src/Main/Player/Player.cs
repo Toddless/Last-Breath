@@ -470,6 +470,7 @@ namespace LastBreath.Player
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
+            TurnRecovery.ApplyTurnStart(this);
             CombatEvents.Publish(new TurnStartEvent(this));
             _battleEventBus?.Publish(new TurnStartEvent(this));
             _gameEventBus?.Publish(new TurnStartEvent(this));
@@ -479,7 +480,7 @@ namespace LastBreath.Player
         {
             // Awaited: a tick may kill, and nothing below may call the turn over before it has landed.
             await Effects.TriggerTurnEnd();
-            TurnRecovery.Apply(this);
+            TurnRecovery.ApplyTurnEnd(this);
             CombatEvents.Publish(new TurnEndEvent());
             _battleEventBus?.Publish(new TurnEndEvent());
             _gameEventBus?.Publish(new TurnEndEvent());

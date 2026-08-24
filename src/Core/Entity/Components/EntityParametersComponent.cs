@@ -63,6 +63,7 @@
         public float ArmorPenetration => this[EntityParameter.ArmorPenetration];
         public float Evade => this[EntityParameter.Evade];
         public float MaxBarrier => this[EntityParameter.Barrier];
+        public float BarrierRecovery => this[EntityParameter.BarrierRecovery];
         public float Suppress => this[EntityParameter.Suppress];
         public float MaxMana => this[EntityParameter.Mana];
         public float ManaRecovery => this[EntityParameter.ManaRecovery];

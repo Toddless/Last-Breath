@@ -17,6 +17,9 @@
         Armor,
         Evade,
         Barrier,
+
+        /// <summary>Flat barrier the owner regains at the start of every turn of his, capped by <see cref="Barrier"/>.</summary>
+        BarrierRecovery,
         Mana,
         ManaRecovery,
         MoveSpeed,

@@ -20,6 +20,7 @@
         float ArmorPenetration { get; }
         float Evade { get; }
         float MaxBarrier { get; }
+        float BarrierRecovery { get; }
         float MaxMana { get; }
         float ManaRecovery { get; }
         float MoveSpeed { get; }

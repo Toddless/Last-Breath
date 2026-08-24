@@ -34,7 +34,11 @@ namespace LastBreath.UI
                 EntityParameter.Suppress, EntityParameter.CriticalDamageMitigation, EntityParameter.FireResistance,
                 EntityParameter.ColdResistance, EntityParameter.LightningResistance, EntityParameter.PoisonResistance,
             ]),
-            ("UI_Char_Misc", [EntityParameter.MoveSpeed, EntityParameter.HealthRecovery, EntityParameter.ManaRecovery]),
+            ("UI_Char_Misc",
+            [
+                EntityParameter.MoveSpeed, EntityParameter.HealthRecovery, EntityParameter.ManaRecovery,
+                EntityParameter.BarrierRecovery,
+            ]),
         ];
 
         [Export] private VBoxContainer? _stats;

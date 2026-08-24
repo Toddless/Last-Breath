@@ -1605,6 +1605,9 @@ msgstr ""
 msgid "HealthRecovery"
 msgstr ""
 
+msgid "BarrierRecovery"
+msgstr ""
+
 msgid "CriticalDamageMitigation"
 msgstr ""
 

@@ -2492,6 +2492,9 @@ msgstr "Health"
 msgid "HealthRecovery"
 msgstr "Health Recovery"
 
+msgid "BarrierRecovery"
+msgstr "Barrier Recovery"
+
 msgid "CriticalDamageMitigation"
 msgstr "Critical Damage Mitigation"
 
