@@ -54,7 +54,7 @@ namespace Crafting.Source.UIElements
 
         private readonly Dictionary<string, string> _categoryChoices = [];
         private readonly string?[] _additiveChoices = new string?[AdditiveSlots];
-        private ResourcePickerPopup? _pickerPopup;
+        private IPickerPopup? _pickerPopup;
 
         private IItemDataProvider? _dataProvider;
         private ModifierFormatter? _modifierFormatter;
@@ -216,7 +216,7 @@ namespace Crafting.Source.UIElements
                     Color.FromHtml(TextPalette.RarityColor(item.Rarity))))
                 .ToList();
 
-            _pickerPopup = _uiElements?.ShowPopup(typeof(IPickerPopup)) as ResourcePickerPopup;
+            _pickerPopup = _uiElements?.ShowPopup(typeof(IPickerPopup)) as IPickerPopup;
             _pickerPopup?.Present(Localization.Localize("UI_Craft_PickItem"), entries, instanceId =>
             {
                 if (_inventory?.GetItem<IEquipItem>(instanceId) is { } picked) SetItem(picked, mode);
@@ -1329,7 +1329,7 @@ namespace Crafting.Source.UIElements
                     ResourceTooltip(id)))
                 .ToList();
 
-            _pickerPopup = _uiElements?.ShowPopup(typeof(IPickerPopup)) as ResourcePickerPopup;
+            _pickerPopup = _uiElements?.ShowPopup(typeof(IPickerPopup)) as IPickerPopup;
             _pickerPopup?.Present(title, entries, onPicked);
         }
 
@@ -1353,7 +1353,7 @@ namespace Crafting.Source.UIElements
 
         private void ClosePicker()
         {
-            if (_pickerPopup != null && IsInstanceValid(_pickerPopup)) _pickerPopup.Close();
+            if (_pickerPopup is Node node && IsInstanceValid(node)) _pickerPopup.Close();
             _pickerPopup = null;
         }
 

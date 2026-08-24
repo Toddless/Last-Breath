@@ -77,9 +77,6 @@
         {
             var uiElementManager = provider.GetService<IUiElementsManager>();
             uiElementManager.RegisterWindowFactory(typeof(CraftingWindow), () => CraftingWindow.Initialize().Instantiate<CraftingWindow>(), UiContext.World);
-            // Under the shared contract and not under its own class: the socket screens of another
-            // module open the same list of candidates, and they cannot name a class of this assembly.
-            uiElementManager.RegisterPopupFactory(typeof(IPickerPopup), () => ResourcePickerPopup.Initialize().Instantiate<ResourcePickerPopup>());
         }
     }
 }

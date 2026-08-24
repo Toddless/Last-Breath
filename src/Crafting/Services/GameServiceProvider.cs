@@ -9,6 +9,7 @@ namespace Crafting.Services
     using Internal;
     using Internal.Inventory;
     using Microsoft.Extensions.DependencyInjection;
+    using SharedUi;
     using Source;
 
     /// <summary>Project bootstrap: the shared Core provider + Crafting registrations. The only place touching the static root.</summary>
@@ -20,6 +21,7 @@ namespace Crafting.Services
         {
             var provider = Core.Services.GameServiceProvider.Initialize(RegisterProjectServices);
             provider.AddCraftingWindowFactories();
+            provider.AddSharedUiFactories();
             RegisterProjectWindows(provider);
             provider.GetService<IGameDataService>().LoadAll();
             return provider;

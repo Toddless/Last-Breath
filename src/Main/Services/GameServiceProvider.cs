@@ -39,6 +39,7 @@ namespace LastBreath.Services
     using LootGeneration.Source;
     using Microsoft.Extensions.DependencyInjection;
     using Npc;
+    using SharedUi;
     using Trade;
     using UI;
     using World;
@@ -233,6 +234,7 @@ namespace LastBreath.Services
             uiElements.RegisterPopupFactory(typeof(ItemTooltipPopup), () => ItemTooltipPopup.Initialize().Instantiate<ItemTooltipPopup>());
             provider.AddCraftingWindowFactories();
             provider.AddBattleUiElementsFactory();
+            provider.AddSharedUiFactories();
         }
     }
 }

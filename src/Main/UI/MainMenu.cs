@@ -7,6 +7,7 @@
     using Crafting.Source;
     using Godot;
     using Services;
+    using SharedUi;
 
     public partial class MainMenu : Control, IInitializable
     {
@@ -19,6 +20,7 @@
             _provider.GetService<ISettingsHandler>().ApplySavedSettings();
             _provider.AddCraftingWindowFactories();
             _provider.AddBattleUiElementsFactory();
+            _provider.AddSharedUiFactories();
             _loadGameButton?.Pressed += LoadGamePressed;
             _optionsButton?.Pressed += OptionsButtonPressed;
             _quitButton?.Pressed += () => GetTree().Quit();

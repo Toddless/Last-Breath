@@ -1,4 +1,4 @@
-namespace Crafting.Source.UIElements
+namespace SharedUi
 {
     using System;
     using System.Collections.Generic;
@@ -12,15 +12,15 @@ namespace Crafting.Source.UIElements
     /// outside just closes. The panel stays hidden until the deferred placement lands, so it never
     /// flashes at the scene origin.
     /// <para>
-    /// It is the game project's <see cref="IPickerPopup"/>: the socket screens pick an augment out of
-    /// the bag the same way crafting picks a piece, and one list of candidates at the cursor is one
-    /// scene rather than two that drift apart.
+    /// It is the shared <see cref="IPickerPopup"/>: the socket screens pick an augment out of the bag
+    /// the same way crafting picks a piece, and one list of candidates at the cursor is one scene
+    /// rather than two that drift apart.
     /// </para>
     /// </summary>
     public partial class ResourcePickerPopup : Control, IPickerPopup
     {
-        // Path, not uid: the scene is authored outside the editor, so its uid is minted on the
-        // first import — a hardcoded one here would dangle.
+        // The uid rather than the path: the same file is mounted into every project, and only the
+        // uid resolves the scene from all of them.
         private const string UID = "uid://dupapy2hnba7p";
         private const float CursorOffset = 16f;
 

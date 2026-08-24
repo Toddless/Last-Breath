@@ -13,6 +13,7 @@ namespace Battle.Services
     using Internal.Npc;
     using Internal.World;
     using Microsoft.Extensions.DependencyInjection;
+    using SharedUi;
     using Source;
 
     /// <summary>Project bootstrap: the shared Core provider + Battle registrations. The only place touching the static root.</summary>
@@ -55,6 +56,7 @@ namespace Battle.Services
                 // saving belongs to the game project alone, the sandbox is for isolated tests.
                 .AddSessionReset());
             provider.AddBattleUiElementsFactory();
+            provider.AddSharedUiFactories();
 
             provider.GetService<IGameDataService>().LoadAll();
             provider.GetService<NpcFinalDeathFactTracker>(); // eager: lives on bus subscriptions only

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dupapy2hnba7p"]
 
-[ext_resource type="Script" uid="uid://b3oilj0r8insy" path="res://Addons/Crafting/UIElements/ResourcePickerPopup.cs" id="1_rpick"]
+[ext_resource type="Script" uid="uid://b3oilj0r8insy" path="res://Addons/SharedUi/ResourcePickerPopup.cs" id="1_rpick"]
 
 [node name="ResourcePickerPopup" type="Control" unique_id=1984158304 node_paths=PackedStringArray("_panel", "_title", "_list", "_cancel")]
 layout_mode = 3
