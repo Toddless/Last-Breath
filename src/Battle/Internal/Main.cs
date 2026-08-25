@@ -45,6 +45,8 @@
             // Resolve once: the service catches the player's book up on every non-hidden ability it
             // does not hold yet, and keeps watching the accessor for a new player.
             _provider.GetService<IAbilityUnlockService>();
+            // Same resolve on the other channel: nodes that hand over a passive rather than an ability.
+            _provider.GetService<PassiveGrantService>();
             var mastery = _provider.GetService<IMartialArtMastery>();
             mastery.AddExperience(500000);
             _gameEventBus = _provider.GetService<IGameEventBus>();

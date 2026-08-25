@@ -68,6 +68,9 @@
             services.AddSingleton<IAugmentItemMinter, AugmentItemMinter>();
 
             services.AddSingleton<ISkillProvider, PassiveSkillProvider>();
+            // The other half of what the allocation hands out: nodes carrying a passive instead of lines.
+            // A singleton beside the unlock service, and after the registry it builds passives through.
+            services.AddSingleton<PassiveGrantService>();
             // A data participant since CL-3a: the numbers of every effect are balanced in one catalog,
             // and the registry that builds them is the one place that reads it.
             services.AddGameDataParticipant<IEffectProvider, EffectProvider>();

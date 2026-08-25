@@ -7,9 +7,15 @@ namespace Battle.Source
     using Core.Battle.Skills;
     using PassiveSkills;
 
-    /// <summary>Battle-side skill factory for item grants: maps a skill id to a constructor fed by
-    /// numeric properties from item JSON — balance lives in data, this registry only wires ids to code.
-    /// A missing property refuses the grant loudly instead of constructing a mis-tuned skill.</summary>
+    /// <summary>Battle-side skill factory for item grants and passive-tree nodes: maps a skill id to a
+    /// constructor fed by numeric properties from data — balance lives in data, this registry only wires
+    /// ids to code. A missing or unreadable property refuses the grant loudly instead of constructing a
+    /// mis-tuned skill.
+    /// <para>Beside the named entries stands one open family: an id under
+    /// <see cref="StatPassiveSkill.IdPrefix"/> is built from its own fields, so a passive that is nothing
+    /// but stat lines is authored as a record and needs no entry here. A named entry always wins over the
+    /// family, which is what lets a stat-shaped id later grow a factory of its own — the table is a
+    /// hardcoded static, so that precedence cannot be shown by a test until the registry is data-driven.</para></summary>
     public class PassiveSkillProvider : ISkillProvider
     {
         private static readonly Dictionary<string, Func<RecordProperties, ISkill>> s_factories = new()
@@ -101,17 +107,24 @@ namespace Battle.Source
 
         public ISkill? CreateSkill(string id, RecordProperties properties)
         {
-            if (!s_factories.TryGetValue(id, out var create))
+            if (!s_factories.TryGetValue(id, out Func<RecordProperties, ISkill>? create))
             {
-                Tracker.TrackNotFound($"Passive skill factory for '{id}'", this);
-                return null;
+                if (!StatPassiveSkill.Owns(id))
+                {
+                    Tracker.TrackNotFound($"Passive skill factory for '{id}'", this);
+                    return null;
+                }
+
+                create = records => StatPassiveSkill.Create(id, records);
             }
 
             try
             {
                 return create(properties);
             }
-            catch (KeyNotFoundException e)
+            // A property the record does not carry, and a field name the record should not have carried:
+            // the same failure from either side of the contract, refused the same way.
+            catch (Exception e) when (e is KeyNotFoundException or FormatException)
             {
                 Tracker.TrackError($"Skill '{id}' not granted: {e.Message}");
                 return null;

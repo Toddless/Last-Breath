@@ -4,6 +4,7 @@ namespace LastBreathTest.BattleSystemTests
     using System.Collections.Generic;
     using System.Linq;
     using Battle.Source.PassiveSkills;
+    using Core.Battle;
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Entity.Components;
@@ -55,6 +56,9 @@ namespace LastBreathTest.BattleSystemTests
             yield return Pair(new ServantHellPassiveSkill(0.4f), new ServantHellPassiveSkill(0.15f));
             yield return Pair(new SilentFuryPassive(0.4f), new SilentFuryPassive(0.15f));
             yield return Pair(new SoulDevouringPassiveSkill(40f), new SoulDevouringPassiveSkill(10f));
+            // Two copies of one authored stat passive, told apart only by how far their lines move: the
+            // numbers are the record's, so copies differ only where a scaling hand has been.
+            yield return Pair(StatPassive(0.4f), StatPassive(0.1f));
             // Same step, fatter bonus: the pair that separates the two fields of Trapped Beast.
             yield return Pair(new TrappedBeastPassiveSkill(0.1f, 0.4f), new TrappedBeastPassiveSkill(0.1f, 0.1f));
             yield return Pair(new VampireAttackPassiveSkill(0.3f), new VampireAttackPassiveSkill(0.1f));
@@ -127,6 +131,15 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         private static object[] Pair(ISkill stronger, ISkill weaker) => [stronger.GetType().Name, stronger, weaker];
+
+        /// <summary>One authored stat passive, built the way a record builds it — same id both times, so
+        /// the two copies collide the way every other pair here does.</summary>
+        private static StatPassiveSkill StatPassive(float value)
+        {
+            const string id = "Passive_Skill_Stats_Ranked";
+            return StatPassiveSkill.Create(id,
+                new RecordProperties(id, new Dictionary<string, float> { ["Armor:Increase"] = value }));
+        }
 
         /// <summary>The skill left in the slot after the given skills collided on their shared Id.</summary>
         private static ISkill? Survivor(params ISkill[] added) => Component(added).GetSkill(added[0].Id);

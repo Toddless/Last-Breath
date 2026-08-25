@@ -61,10 +61,12 @@ namespace LastBreathTest.BattleSystemTests
         ];
 
         /// <summary>Components a PlayerChanged subscriber dereferences the moment it is called:
-        /// the ability book (this service) and the parameter component (the world HUD).</summary>
+        /// the ability book (this service), the passive roster (the passive-grant service) and the
+        /// parameter component (the world HUD).</summary>
         private static readonly string[] s_componentsReadOnAnnouncement =
         [
             "AbilityBook = new AbilityBookComponent(this)",
+            "PassiveSkills = new PassiveSkillsComponent(this)",
             "Parameters = new EntityParametersComponent()",
         ];
 

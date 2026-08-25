@@ -56,6 +56,8 @@
             // Resolve once: the service catches the player's book up on every non-hidden ability it
             // does not hold yet, and keeps watching the accessor for a new player.
             _provider.GetService<IAbilityUnlockService>();
+            // Same resolve on the other channel: nodes that hand over a passive rather than an ability.
+            _provider.GetService<PassiveGrantService>();
             // Spoils of battle land on this world's floor (cleared on exit — the node dies with the scene).
             _provider.GetService<ILootOrchestrator>().SetFloorToSpawnItems(_mainWorld);
             _gameEventBus = _provider.GetService<IGameEventBus>();
