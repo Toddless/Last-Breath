@@ -346,14 +346,63 @@ namespace LastBreathTest.BattleSystemTests
                 .OfType<ParameterDescriptor>()
                 .Single(descriptor => descriptor.Parameter == EntityParameter.AllDoTDamageMultiplier);
 
-            Assert.AreEqual($"+5–15% {wording}", formatter.FormatDescriptor(entry),
+            Assert.AreEqual($"+5–15% to {wording}", formatter.FormatDescriptor(entry),
                 "the pool's spread does not reach the player as a percentage");
 
             var sink = new CollectingSink();
             new ModifierMaterializer(new DefaultRandomNumberGenerator(Seed)).Materialize(entry, sink, pool);
             string line = formatter.Format(sink.Entities.Single());
 
-            StringAssert.EndsWith(line, $"% {wording}", $"a rolled line of the amulet reads: {line}");
+            StringAssert.EndsWith(line, $"% to {wording}", $"a rolled line of the amulet reads: {line}");
+        }
+
+        /// <summary>
+        /// The flat twins name their parameter with "to" in English, percent and plain number alike:
+        /// nothing else stands between the number and the name, so "+15% Critical Chance" runs together
+        /// into one noun phrase. The worded twins already carry a joining word and must not gain a second
+        /// one. A flat penalty keeps its minus and the same wording — "-25 to X" is the sentence read
+        /// backwards, not a different one.
+        /// </summary>
+        [TestMethod]
+        public void TheFlatLineNamesItsParameterWithToInTheShippedCatalog()
+        {
+            var formats = new ParameterFormatProvider();
+            new GameDataService(new FileSystemDataSource(LastBreathTest.SharedData.Root()), [formats]).LoadAll();
+
+            var catalog = new FakeLocalizationProvider();
+            foreach ((string key, string wording) in ReadEntries("en.po")) catalog.Strings[key] = wording;
+            var formatter = new ModifierFormatter(catalog, formats);
+
+            Assert.AreEqual("+15% to Critical Chance",
+                formatter.Format(new Modifier(ModifierValueType.Flat, EntityParameter.CriticalChance, 0.15f)),
+                "a percent flat line still runs its number into the parameter name");
+            Assert.AreEqual("+25 to Strength",
+                formatter.Format(new Modifier(ModifierValueType.Flat, EntityParameter.Strength, 25f)),
+                "a plain flat line still runs its number into the parameter name");
+            Assert.AreEqual("+40–60 to Strength",
+                formatter.FormatRanged(new Modifier(ModifierValueType.Flat, EntityParameter.Strength, 50f), 0.8f, 1.2f),
+                "a flat spread words itself differently from the single value it rolls into");
+            Assert.AreEqual("-25 to Strength",
+                formatter.Format(new Modifier(ModifierValueType.Flat, EntityParameter.Strength, -25f)),
+                "a flat penalty drops the wording its bonus twin uses");
+            Assert.AreEqual("+10% increased Physical Damage",
+                formatter.Format(new Modifier(ModifierValueType.Increase, EntityParameter.PhysicalDamage, 0.1f)),
+                "a worded twin picked up a joining word it already had");
+        }
+
+        /// <summary>The "to" is English wording, not line structure: Russian words its own templates and
+        /// this pass left them alone.</summary>
+        [TestMethod]
+        public void TheRussianModifierTemplatesAreUntouchedByTheEnglishWording()
+        {
+            Dictionary<string, string> ru = ReadEntries("ru.po");
+
+            foreach (string key in new[] { "Modifier_Flat", "Modifier_Flat_Range", "Modifier_Flat_PerParameter" })
+            {
+                Assert.IsTrue(ru.ContainsKey(key), $"ru.po lost '{key}' — the line would print its raw key");
+                StringAssert.DoesNotMatch(ru[key], new System.Text.RegularExpressions.Regex(@"\bto\b"),
+                    $"ru.po '{key}' carries the English joining word: {ru[key]}");
+            }
         }
 
         /// <summary>One shipped pool through the real parser — the entries the game actually rolls.</summary>

@@ -1672,10 +1672,12 @@ msgid "Context_Modifier_BleedDamageTakenReduction_Range"
 msgstr "Reduces bleed damage taken by {min}–{max}"
 # ------------------------------
 # Modifier templates: {value} = formatted number, {parameter} = localized parameter name
+# The flat twins name their parameter with "to" ("+15% to Bleed Damage Multiplier"): without it the
+# number and the name collide into one noun phrase. The worded twins already carry a joining word.
 # ------------------------------
 
 msgid "Modifier_Flat"
-msgstr "{value} {parameter}"
+msgstr "{value} to {parameter}"
 
 msgid "Modifier_Increase"
 msgstr "{value} increased {parameter}"
@@ -1695,7 +1697,7 @@ msgstr "{value} less {parameter}"
 # ("+1% increased Physical Damage per Strength").
 
 msgid "Modifier_Flat_PerParameter"
-msgstr "{value} {parameter} per {per}"
+msgstr "{value} to {parameter} per {per}"
 
 msgid "Modifier_Increase_PerParameter"
 msgstr "{value} increased {parameter} per {per}"
@@ -1712,7 +1714,7 @@ msgstr "{value} less {parameter} per {per}"
 # Range twins for unrolled spreads: {min} carries the sign, {max} carries the unit ("+40–60% increased ...").
 
 msgid "Modifier_Flat_Range"
-msgstr "{min}–{max} {parameter}"
+msgstr "{min}–{max} to {parameter}"
 
 msgid "Modifier_Increase_Range"
 msgstr "{min}–{max} increased {parameter}"

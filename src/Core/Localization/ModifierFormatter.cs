@@ -9,7 +9,7 @@ namespace Core.Localization
     /// Turns a modifier into a localized phrase through .po templates:
     /// Modifier_Flat / Modifier_Increase / Modifier_Multiplicative with {value} and {parameter};
     /// unrolled value spreads render through the *_Range twins with {min} and {max}
-    /// ("+40–60 Strength"), a percent penalty through the *_Negative twins, which word the
+    /// ("+40–60 to Strength"), a percent penalty through the *_Negative twins, which word the
     /// minus instead of printing it ("25% less Health Recovery"), and a value measured per unit of
     /// another parameter through the *_PerParameter twins, which name that parameter in {per}
     /// ("+1% increased Physical Damage per Strength"). Percent parameters follow
