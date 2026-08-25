@@ -451,3 +451,12 @@
 
 - `PassiveTreeServiceTests.StubSource.SourceChanged` — предсуществующий CS0067.
 - Дефолты таймера жителя 30/180 с — плейсхолдер, балансом не подтверждён (всплывёт в P-13/балансном проходе).
+
+## Из ревью сейв-кластера (полка/земля, 2026-08-25)
+
+- (реальное окно, решить с владельцем) Сейв в раздачу лута после боя молча теряет неразлитые предметы: `BattleContext.RunBattleAsync` гасит `IsFighting` в `finally` ДО публикации game-bus `BattleEndEvent`, весь асинхронный цикл раздачи (~0.25–0.45 с × N дропов) идёт при разрешённом `CanSave`, а предметы в этот момент в локальном `pending` — ни в `_itemsOnGround`, ни в кэше. Входы: SaveLoadWindow, DebugConsole save. Лечится гейтом «раздача идёт» в CanSave или флашем pending при капчуре — трогает контракт SaveGameService, потому не в minors.
+- (minor) `EnsureFreshState` в TraderService: ветка `|| NextRestockMinutes == double.MinValue` мертва (`NowMinutes >= MinValue` истинно всегда) — наследство; поведение верное (стокуется по общему условию), ветку можно снять при следующем касании.
+- (minor) `NowMinutes` при `clock == null` = 0: сейв в композиции без часов и загрузка с часами (и наоборот) неверно датируют дедлайны рестока — проблема сборки, не секций.
+- (nit) `TraderOfferSaveData.Item` вкладывает `InventoryItemSaveData` без `[JsonProperty]` — в файле смешение "offerId" и "Amount"/"Equip"; нормализация отклонена ведущим (косметика ценой касания формата сумки).
+- (инфо) `RegisterProjectSaveSections` резолвит `IGroundItemStore` в `CreateProvider()` — `LootOrchestrator` теперь строится в статическом инициализаторе `GameServiceProvider.Instance`, не лениво; вреда нет (ctor только подписывается на шины, подписка раньше), принято.
+- (владельцу) Висячий untracked `src/LootGeneration/Source/Assets/ItemOnGround.cs.uid` (0 байт): сам `.cs` живёт уровнем выше со своим uid — файл ждёт перескана/удаления в редакторе Godot.
