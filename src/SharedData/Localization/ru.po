@@ -1641,6 +1641,21 @@ msgstr ""
 msgid "AllResistancePenetration"
 msgstr ""
 
+msgid "FireResistanceMaximum"
+msgstr ""
+
+msgid "ColdResistanceMaximum"
+msgstr ""
+
+msgid "LightningResistanceMaximum"
+msgstr ""
+
+msgid "PoisonResistanceMaximum"
+msgstr ""
+
+msgid "AllResistanceMaximum"
+msgstr ""
+
 msgid "AllAttribute"
 msgstr ""
 

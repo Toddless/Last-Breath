@@ -63,6 +63,19 @@
         /// <summary>
         /// All damage at once: phys, elemental, spell
         /// </summary>
-        Damage
+        Damage,
+
+        // New members go HERE, at the end: a save writes an entity parameter as its ordinal, so a member
+        // inserted above silently remaps every parameter under it in files already on disk.
+
+        /// <summary>Ceiling the matching resistance mitigates at (0.75 = 75%). The resistance total itself is
+        /// not capped: what stands above the maximum is a reserve against resistance shred.</summary>
+        FireResistanceMaximum,
+        ColdResistanceMaximum,
+        LightningResistanceMaximum,
+        PoisonResistanceMaximum,
+
+        /// <summary>Aggregate of the four maximums (see the bucket block above).</summary>
+        AllResistanceMaximum
     }
 }

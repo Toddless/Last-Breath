@@ -595,6 +595,8 @@ namespace LastBreath.Helpers
             foreach (var parameter in parameters)
             {
                 string lines = string.Join(", ", tree.ParameterSource.GetModifiers(parameter).Select(modifier => FormatTreeModifier(formatter, modifier)));
+                // The raw total on purpose: this line answers what the tree resolved into the parameter,
+                // not what a resistance mitigates with after its maximum.
                 string resolved = carried
                     ? $" → player {ParameterValueText.Format(formats, parameter, player!.Parameters.GetValueForParameter(parameter))}"
                     : string.Empty;

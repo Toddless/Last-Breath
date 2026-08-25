@@ -2528,6 +2528,21 @@ msgstr "Poison Resistance Penetration"
 msgid "AllResistancePenetration"
 msgstr "All Resistance Penetration"
 
+msgid "FireResistanceMaximum"
+msgstr "Maximum Fire Resistance"
+
+msgid "ColdResistanceMaximum"
+msgstr "Maximum Cold Resistance"
+
+msgid "LightningResistanceMaximum"
+msgstr "Maximum Lightning Resistance"
+
+msgid "PoisonResistanceMaximum"
+msgstr "Maximum Poison Resistance"
+
+msgid "AllResistanceMaximum"
+msgstr "Maximum All Resistances"
+
 msgid "AllAttribute"
 msgstr "All Attributes"
 

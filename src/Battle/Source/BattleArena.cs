@@ -628,6 +628,8 @@
         /// CURRENT value × share (cast-time snapshot), vitals start full.</summary>
         private static void InheritSummonerParameters(IFightableNpc summon, IFightable summoner, float statShare)
         {
+            // Resistance maximums come across as stats like the rest of the profile — the shadow inherits the
+            // master's cap scaled by its share, not the standard one.
             foreach (EntityParameter parameter in Enum.GetValues<EntityParameter>())
                 summon.Parameters.SetBaseValueForParameter(parameter, summoner.Parameters.GetValueForParameter(parameter) * statShare);
 

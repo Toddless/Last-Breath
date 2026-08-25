@@ -77,13 +77,13 @@ namespace LastBreathTest.BattleSystemTests
         public void Mitigation_ElementalUsesResistanceScaledBySourcePenetration()
         {
             var source = Fighter((EntityParameter.FireResistancePenetration, 0.5f));
-            var target = Fighter((EntityParameter.FireResistance, 0.8f));
+            var target = Fighter((EntityParameter.FireResistance, 0.6f)); // under the cap: the cap is pinned elsewhere
             var context = Damage(source, DamageType.Fire, 100f);
 
             Calculations.CalculateMitigation(context, target.Object, NoRolls);
 
-            // 0.8 resistance × (1 − 0.5 penetration) = 0.4 → 60 damage through
-            Assert.AreEqual(60f, context.DamageComponents[DamageType.Fire], 0.001f);
+            // 0.6 resistance × (1 − 0.5 penetration) = 0.3 → 70 damage through
+            Assert.AreEqual(70f, context.DamageComponents[DamageType.Fire], 0.001f);
         }
 
         [TestMethod]
@@ -135,13 +135,13 @@ namespace LastBreathTest.BattleSystemTests
         public void Mitigation_PoisonResistanceIsScaledBySourcePenetration()
         {
             var source = Fighter((EntityParameter.PoisonResistancePenetration, 0.5f));
-            var target = Fighter((EntityParameter.PoisonResistance, 0.8f));
+            var target = Fighter((EntityParameter.PoisonResistance, 0.6f)); // under the cap: the cap is pinned elsewhere
             var context = Damage(source, DamageType.Poison, 100f);
 
             Calculations.CalculateMitigation(context, target.Object, NoRolls);
 
-            // 0.8 resistance × (1 − 0.5 penetration) = 0.4 → 60 damage through
-            Assert.AreEqual(60f, context.DamageComponents[DamageType.Poison], 0.001f);
+            // 0.6 resistance × (1 − 0.5 penetration) = 0.3 → 70 damage through
+            Assert.AreEqual(70f, context.DamageComponents[DamageType.Poison], 0.001f);
         }
 
         [TestMethod]
@@ -320,6 +320,10 @@ namespace LastBreathTest.BattleSystemTests
         private static Mock<IFightable> Fighter(params (EntityParameter Parameter, float Value)[] values)
         {
             var parameters = new Mock<IEntityParametersComponent>();
+            // A real entity is born with the standard resistance cap; a mock left at zero would cap every
+            // resistance to nothing and quietly answer that mitigation does not happen at all.
+            foreach (var maximum in ResistanceParameters.Maximums)
+                parameters.Setup(p => p.GetValueForParameter(maximum)).Returns(ResistanceParameters.DefaultMaximum);
             foreach ((EntityParameter parameter, float value) in values)
                 parameters.Setup(p => p.GetValueForParameter(parameter)).Returns(value);
 

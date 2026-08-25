@@ -11,12 +11,19 @@
 
     public class EntityParametersComponent : IEntityParametersComponent
     {
+        /// <summary>Hard ceiling of a resistance maximum: at 1 the mitigation formula would turn a hit into
+        /// healing, so the parameter that raises the cap has a cap of its own.</summary>
+        private const float ResistanceMaximumCeiling = 0.9f;
+
         /// <summary>Effective-value bounds — the single owner of every parameter cap. Applied in the
         /// indexer, so ALL read channels (named properties, GetValueForParameter, ParameterChanged,
         /// CalculateForBase previews) agree; decorators cannot push a value past its cap (tracker #42).
         /// Parameters without an entry are floored at zero: every member of the enum is a magnitude
         /// or a chance, and a negative value corrupts downstream formulas (negative armor amplifies
-        /// damage). The modifier-recalc path already clamped this way; the decorator path must agree.</summary>
+        /// damage). The modifier-recalc path already clamped this way; the decorator path must agree.
+        /// Resistances themselves are deliberately unbounded above: their ceiling is a parameter
+        /// (<see cref="ResistanceParameters"/>) read at mitigation, and a clamped total would erase the
+        /// overcap that shred eats first.</summary>
         private static readonly Dictionary<EntityParameter, (float Min, float Max)> s_bounds = new()
         {
             [EntityParameter.BlockChance] = (0f, 0.9f),
@@ -25,10 +32,10 @@
             [EntityParameter.ArmorPenetration] = (0f, 1f),
             [EntityParameter.Suppress] = (0f, 0.75f),
             [EntityParameter.CriticalDamageMitigation] = (0f, 1f),
-            [EntityParameter.LightningResistance] = (0f, 0.85f),
-            [EntityParameter.FireResistance] = (0f, 0.85f),
-            [EntityParameter.ColdResistance] = (0f, 0.85f),
-            [EntityParameter.PoisonResistance] = (0f, 0.85f),
+            [EntityParameter.LightningResistanceMaximum] = (0f, ResistanceMaximumCeiling),
+            [EntityParameter.FireResistanceMaximum] = (0f, ResistanceMaximumCeiling),
+            [EntityParameter.ColdResistanceMaximum] = (0f, ResistanceMaximumCeiling),
+            [EntityParameter.PoisonResistanceMaximum] = (0f, ResistanceMaximumCeiling),
             [EntityParameter.SuppressChance] = (0f, 1f),
             [EntityParameter.FireResistancePenetration] = (0f, 1f),
             [EntityParameter.ColdResistancePenetration] = (0f, 1f),
@@ -36,7 +43,14 @@
             [EntityParameter.PoisonResistancePenetration] = (0f, 1f)
         };
 
-        private readonly Dictionary<EntityParameter, (float Base, float Current)> _parameterValues = Enum.GetValues<EntityParameter>().ToDictionary(key => key, key => (0f, 0f));
+        /// <summary>Bases an entity is born with. A resistance maximum is a rule of the game rather than a
+        /// line of a stat profile, so it stands here instead of in every entity's data: a seeding pass that
+        /// leaves the parameter unnamed leaves the standard cap in place.</summary>
+        private static readonly Dictionary<EntityParameter, float> s_defaultBases =
+            ResistanceParameters.Maximums.ToDictionary(maximum => maximum, _ => ResistanceParameters.DefaultMaximum);
+
+        private readonly Dictionary<EntityParameter, (float Base, float Current)> _parameterValues =
+            Enum.GetValues<EntityParameter>().ToDictionary(key => key, key => (DefaultBase(key), DefaultBase(key)));
 
         /// <summary>Luck sources per parameter, counted signed: lucky and unlucky sources coexist and cancel
         /// one another, so the roll asks for a single verdict instead of the list.</summary>
@@ -70,10 +84,6 @@
         public float MoveSpeed => this[EntityParameter.MoveSpeed];
         public float SuppressChance => this[EntityParameter.SuppressChance];
         public float CriticalDamageMitigation => this[EntityParameter.CriticalDamageMitigation];
-        public float LightningResistance => this[EntityParameter.LightningResistance];
-        public float FireResistance => this[EntityParameter.FireResistance];
-        public float ColdResistance => this[EntityParameter.ColdResistance];
-        public float PoisonResistance => this[EntityParameter.PoisonResistance];
 
         public event Action<EntityParameter, float>? ParameterChanged;
 
@@ -110,8 +120,8 @@
         public void SetBaseValueForParameter(EntityParameter parameter, float baseValue)
         {
             if (!_parameterValues.TryGetValue(parameter, out var value)) return;
-            value.Base = baseValue;
-            value.Current = Calculations.CalculateFloatValue(_getModifiersForParameter?.Invoke(parameter) ?? [], baseValue);
+            value.Base = SeededBase(parameter, baseValue);
+            value.Current = Calculations.CalculateFloatValue(_getModifiersForParameter?.Invoke(parameter) ?? [], value.Base);
             _parameterValues[parameter] = value;
             RaiseParameterChanges(parameter);
         }
@@ -130,6 +140,13 @@
 
         private void RaiseParameterChanges(EntityParameter args) =>
             ParameterChanged?.Invoke(args, this[args]);
+
+        private static float DefaultBase(EntityParameter parameter) => s_defaultBases.GetValueOrDefault(parameter);
+
+        /// <summary>A seeding pass walks the whole enum and names zero for everything its data leaves out,
+        /// so zero means "unnamed" and hands the parameter back its default base.</summary>
+        private static float SeededBase(EntityParameter parameter, float baseValue) =>
+            baseValue == 0f ? DefaultBase(parameter) : baseValue;
 
         private static float ApplyBounds(EntityParameter parameter, float value) =>
             s_bounds.TryGetValue(parameter, out (float Min, float Max) bounds) ? Mathf.Clamp(value, bounds.Min, bounds.Max) : Mathf.Max(0f, value);

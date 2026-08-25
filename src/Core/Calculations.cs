@@ -167,8 +167,10 @@
 
         private static float ApplyResistance(float damage, IFightable source, IFightable target, (EntityParameter Resistance, EntityParameter Penetration) elemental)
         {
-            // Resistance and penetration caps both live in EntityParametersComponent's bounds table.
-            float resist = target.Parameters.GetValueForParameter(elemental.Resistance) * (1 - source.Parameters.GetValueForParameter(elemental.Penetration));
+            // The target mitigates with its resistance cut down to its own maximum, and the source's
+            // penetration bites into that: an overcap is a reserve against shred, never against penetration.
+            float effective = ResistanceParameters.Effective(target.Parameters, elemental.Resistance);
+            float resist = effective * (1 - source.Parameters.GetValueForParameter(elemental.Penetration));
             return damage * (1 - resist);
         }
 

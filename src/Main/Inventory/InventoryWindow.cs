@@ -341,7 +341,7 @@ namespace LastBreath.Inventory
         }
 
         private string FormatValue(EntityParameter parameter, IPlayer player) =>
-            ParameterValueText.Format(_formats, parameter, player.Parameters.GetValueForParameter(parameter));
+            ParameterValueText.Format(_formats, parameter, player.Parameters);
 
         /// <summary>Dims the bag slots that fall out of the current search/rarity/type filter.
         /// The slots stay in place (the grid IS the bag) — filtered-out items just fade.</summary>

@@ -116,7 +116,7 @@ namespace LastBreath.UI
         }
 
         private string FormatValue(EntityParameter parameter, IPlayer player) =>
-            ParameterValueText.Format(_formats, parameter, player.Parameters.GetValueForParameter(parameter));
+            ParameterValueText.Format(_formats, parameter, player.Parameters);
 
         private void RenderReputation()
         {

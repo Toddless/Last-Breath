@@ -17,6 +17,7 @@ namespace Core.Enums
                 [EntityParameter.AllAttribute] = [EntityParameter.Strength, EntityParameter.Dexterity, EntityParameter.Intelligence],
                 [EntityParameter.AllDefence] = [EntityParameter.Evade, EntityParameter.Armor],
                 [EntityParameter.AllResistancePenetration] = [EntityParameter.FireResistancePenetration, EntityParameter.ColdResistancePenetration, EntityParameter.LightningResistancePenetration, EntityParameter.PoisonResistancePenetration],
+                [EntityParameter.AllResistanceMaximum] = [EntityParameter.FireResistanceMaximum, EntityParameter.ColdResistanceMaximum, EntityParameter.LightningResistanceMaximum, EntityParameter.PoisonResistanceMaximum],
                 [EntityParameter.AllDoTDamageMultiplier] = [EntityParameter.PoisonDamageMultiplier, EntityParameter.BurningDamageMultiplier, EntityParameter.BleedDamageMultiplier],
                 [EntityParameter.AllElementalDamage] = [EntityParameter.FireDamage, EntityParameter.ColdDamage, EntityParameter.LightningDamage],
                 // The widest bucket, and the one whose members belong to another family too: an elemental

@@ -91,6 +91,11 @@ namespace LastBreathTest.BattleSystemTests
                     EntityParameter.FireResistancePenetration, EntityParameter.ColdResistancePenetration,
                     EntityParameter.LightningResistancePenetration, EntityParameter.PoisonResistancePenetration
                 ],
+                [EntityParameter.AllResistanceMaximum] =
+                [
+                    EntityParameter.FireResistanceMaximum, EntityParameter.ColdResistanceMaximum,
+                    EntityParameter.LightningResistanceMaximum, EntityParameter.PoisonResistanceMaximum
+                ],
                 [EntityParameter.AllDoTDamageMultiplier] =
                 [
                     EntityParameter.PoisonDamageMultiplier, EntityParameter.BurningDamageMultiplier,
