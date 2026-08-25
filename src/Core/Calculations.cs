@@ -202,10 +202,31 @@
                     defender.GetChanceLuck(EntityParameter.Evade)))
                 return AttackResults.Evaded;
 
-            if (!context.IsUnblockable && ChanceRoll.Roll(defender.BlockChance, draw, defender.GetChanceLuck(EntityParameter.BlockChance)))
+            if (!context.IsUnblockable && RollsBlock(context.Target, defender, draw))
                 return AttackResults.Blocked;
 
             return AttackResults.Succeed;
+        }
+
+        /// <summary>
+        /// The block roll and the guard that owns it: block belongs to the Strength stance and to nothing
+        /// else, so outside that stance neither the baseline every fighter is born with nor a line off gear
+        /// or the tree ever stops a swing.
+        ///
+        /// The draw is taken WHATEVER the stance and only the verdict is gated. A roll skipped would pull
+        /// every later draw of the fight one step forward, and then the same seed would play out differently
+        /// for no reason but which guard the defender happened to stand in — the stance may decide whether a
+        /// hit is blocked and may not decide anybody's stream.
+        ///
+        /// The stance is read off the defender's own ability book at the moment of the roll, the same live
+        /// reading <see cref="Modifiers.Conditions.StanceCondition"/> makes, so a switch mid-battle is in
+        /// force from the very next swing. NPCs answer through the same book and block on whatever chance
+        /// they carry — today none of them carries any.
+        /// </summary>
+        private static bool RollsBlock(IFightable defender, IEntityParametersComponent parameters, Func<float> draw)
+        {
+            bool rolled = ChanceRoll.Roll(parameters.BlockChance, draw, parameters.GetChanceLuck(EntityParameter.BlockChance));
+            return rolled && defender.AbilityBook.CurrentStance == Stance.Strength;
         }
 
         public static float[] CalculateChances<TModifier>(IReadOnlyList<INpcModifier> modifiers, float[] chances)

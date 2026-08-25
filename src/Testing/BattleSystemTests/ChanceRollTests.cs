@@ -13,6 +13,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Entity;
     using Core.Entity.Components;
     using Core.Enums;
+    using Core.Modifiers.Context;
     using Moq;
     using Godot;
 
@@ -133,10 +134,90 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void AnUnblockableAttackIsNeverBlocked()
         {
+            // The defender stands in the one stance that blocks at all, so what is turned away here is the
+            // mark and not the guard.
             var context = Attack(Defender(evade: 0f, block: 1f));
             context.IsUnblockable = true;
 
             Assert.AreEqual(AttackResults.Succeed, Calculations.ResolveAttackOutcome(context, new Draws(0f, 0f).RandFloat));
+        }
+
+        [TestMethod]
+        public void TheUnblockableModifierIsWhatSetsThatMark()
+        {
+            // The registry key 'Unblockable' is answered by this modifier, and the modifier is answered at
+            // the block roll: the whole road from a record naming it to a swing going through a raised
+            // shield, walked in one place.
+            var context = Attack(Defender(evade: 0f, block: 1f));
+            new UnblockableAttackContextModifier().Apply(context);
+
+            Assert.IsTrue(context.IsUnblockable, "the modifier left the attack blockable");
+            Assert.AreEqual(AttackResults.Succeed, Calculations.ResolveAttackOutcome(context, new Draws(1f, 1f).RandFloat),
+                "a certain block stopped an attack the modifier had marked unblockable");
+        }
+
+        [TestMethod]
+        public void OnlyTheStrengthStanceBlocks()
+        {
+            foreach (Stance stance in Enum.GetValues<Stance>())
+            {
+                var context = Attack(Defender(evade: 0f, block: 1f, guard: new StanceGuard { Stance = stance }));
+
+                Assert.AreEqual(stance is Stance.Strength ? AttackResults.Blocked : AttackResults.Succeed,
+                    Calculations.ResolveAttackOutcome(context, new Draws(1f, 1f).RandFloat),
+                    $"a certain block chance answered wrongly while the defender stood in the {stance} stance");
+            }
+        }
+
+        [TestMethod]
+        public void OutOfStanceNoBlockChanceEverStopsAnything()
+        {
+            // Forced across the whole span of the draw: outside the Strength stance there is no roll a
+            // block can be won on, whatever the fighter carries on his gear or his tree.
+            foreach (Stance stance in Enum.GetValues<Stance>().Where(guard => guard is not Stance.Strength))
+                for (int step = 0; step <= 20; step++)
+                {
+                    float roll = step / 20f;
+                    var context = Attack(Defender(evade: 0f, block: 1f, guard: new StanceGuard { Stance = stance }));
+
+                    Assert.AreEqual(AttackResults.Succeed, Calculations.ResolveAttackOutcome(context, new Draws(roll, roll).RandFloat),
+                        $"the {stance} stance blocked on a draw of {roll}");
+                }
+        }
+
+        [TestMethod]
+        public void TheStanceGatesTheVerdictAndNeverTheStream()
+        {
+            // A gate that skipped the roll would pull every later draw of the fight one step forward, and
+            // the same seed would then play out differently for no reason but which guard the defender
+            // happened to stand in.
+            var inStance = new Draws(1f, 1f);
+            var outOfStance = new Draws(1f, 1f);
+
+            Assert.AreEqual(AttackResults.Blocked,
+                Calculations.ResolveAttackOutcome(Attack(Defender(evade: 0f, block: 1f, guard: new StanceGuard { Stance = Stance.Strength })), inStance.RandFloat));
+            Assert.AreEqual(AttackResults.Succeed,
+                Calculations.ResolveAttackOutcome(Attack(Defender(evade: 0f, block: 1f, guard: new StanceGuard { Stance = Stance.Dexterity })), outOfStance.RandFloat));
+
+            Assert.AreEqual(2, inStance.Taken, "the resolve stopped burning the evade and block rolls");
+            Assert.AreEqual(inStance.Taken, outOfStance.Taken, "leaving the Strength stance shifted the stream behind the block roll");
+        }
+
+        [TestMethod]
+        public void AStanceSwitchMidBattleIsInForceOnTheNextSwing()
+        {
+            var guard = new StanceGuard { Stance = Stance.Strength };
+            IFightable defender = Defender(evade: 0f, block: 1f, guard: guard);
+
+            Assert.AreEqual(AttackResults.Blocked, Calculations.ResolveAttackOutcome(Attack(defender), new Draws(1f, 1f).RandFloat));
+
+            guard.Stance = Stance.Intelligence;
+            Assert.AreEqual(AttackResults.Succeed, Calculations.ResolveAttackOutcome(Attack(defender), new Draws(1f, 1f).RandFloat),
+                "the guard was read once when the fighter was built rather than at the moment of the roll");
+
+            guard.Stance = Stance.Strength;
+            Assert.AreEqual(AttackResults.Blocked, Calculations.ResolveAttackOutcome(Attack(defender), new Draws(1f, 1f).RandFloat),
+                "the defender came back to the blocking stance and the block did not come back with him");
         }
 
         [TestMethod]
@@ -232,17 +313,31 @@ namespace LastBreathTest.BattleSystemTests
 
         private static FakeAttack Attack(IFightable target) => new() { Target = target };
 
-        private static IFightable Defender(float evade, float block, EntityParameter? lucky = null)
+        /// <summary>Defaults to the Strength stance: block belongs to that guard alone, and a defender who
+        /// stood anywhere else would make every block claim above pass for the wrong reason.</summary>
+        private static IFightable Defender(float evade, float block, EntityParameter? lucky = null, StanceGuard? guard = null)
         {
             var parameters = new Mock<IEntityParametersComponent>();
             parameters.SetupGet(p => p.Evade).Returns(evade);
             parameters.SetupGet(p => p.BlockChance).Returns(block);
             if (lucky != null) parameters.Setup(p => p.GetChanceLuck(lucky.Value)).Returns(ChanceLuck.Lucky);
 
+            guard ??= new StanceGuard();
+            var book = new Mock<IAbilityBookComponent>();
+            book.SetupGet(b => b.CurrentStance).Returns(() => guard.Stance);
+
             var defender = new Mock<IFightable>();
             defender.SetupGet(f => f.Parameters).Returns(parameters.Object);
+            defender.SetupGet(f => f.AbilityBook).Returns(book.Object);
             defender.SetupGet(f => f.IsAlive).Returns(true);
             return defender.Object;
+        }
+
+        /// <summary>The guard a defender stands in, changeable after he has already been swung at: the
+        /// stance is read at the roll, so a switch mid-battle must reach the very next attack.</summary>
+        private sealed class StanceGuard
+        {
+            public Stance Stance { get; set; } = Stance.Strength;
         }
 
         /// <summary>Hands out a scripted sequence of draws and counts what was taken: which rolls a resolve

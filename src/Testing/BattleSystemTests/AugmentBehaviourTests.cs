@@ -206,6 +206,22 @@ namespace LastBreathTest.BattleSystemTests
                 "a field nothing reads was accepted, so a line of data stays invisible");
 
         [TestMethod]
+        public void TheAttackModifierRegistryKnowsUnblockable()
+        {
+            // Registered ahead of any record naming it, so the key is claimed here rather than by the
+            // shipped data: nothing declares 'Unblockable' today, and a key nobody names is a key nobody
+            // notices has gone.
+            AbilityAugmentData attackModifier = Shipped("Augment_Attacks_Cannot_Be_Evaded");
+            Assert.AreEqual("AttackModifier", attackModifier.Behaviour,
+                "the record borrowed as the shape of an attack-modifier declaration no longer is one");
+
+            Assert.IsNotNull(Built(attackModifier with { AttackModifier = "Unblockable" }),
+                "the registry does not know the attack modifier 'Unblockable'");
+            Assert.IsNull(Built(attackModifier with { AttackModifier = "Unblokable" }),
+                "an attack modifier nothing builds came back with an upgrade, so the claim above proves nothing");
+        }
+
+        [TestMethod]
         public void ARecordWithoutABehaviourStillGoesToItsOwnFactory() =>
             Assert.IsNotNull(Built(Shipped("Augment_Poison_Attack_Series")),
                 "a named augment stopped being answered by the factory written for it");

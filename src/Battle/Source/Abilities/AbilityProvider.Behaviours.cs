@@ -51,10 +51,14 @@ namespace Battle.Source.Abilities
                 new AugmentAttackModifier(data.Id, data.Tags, data.Tier, s_attackModifiers[data.AttackModifier]())),
         };
 
-        /// <summary>Attack modifiers a record may name. One today; it grows by record.</summary>
+        /// <summary>Attack modifiers a record may name. Two today; it grows by record.
+        /// 'Unblockable' stands ready before anything declares it: the mark it sets is honoured at the
+        /// block roll (<see cref="Calculations.ResolveAttackOutcome(IAttackContext, Func{float})"/>), so
+        /// the day a record names it the swing goes through a guard rather than through a missing key.</summary>
         private static readonly Dictionary<string, Func<IAttackModifier>> s_attackModifiers = new(StringComparer.Ordinal)
         {
             ["Unevadable"] = () => new UnevadableAttackContextModifier(),
+            ["Unblockable"] = () => new UnblockableAttackContextModifier(),
         };
 
         /// <summary>Behaviour names a record may declare — for the walks that hold the data to them.</summary>
