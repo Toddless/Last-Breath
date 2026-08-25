@@ -359,7 +359,10 @@ namespace LastBreathTest.BattleSystemTests
                 "a typo in a field name handed out a passive missing the line the author wrote");
             Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage"] = 0.1f }),
                 "a key naming no value bucket was read anyway");
-            Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage:Increase:Poison:Extra"] = 0.1f }));
+            // Every word of it names something real, so what is refused here is the COUNT and nothing else:
+            // a fourth word with a bad name in it would be refused for the name and leave the ceiling untested.
+            Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage:Increase:Strength:Extra"] = 0.1f }),
+                "a key of four words was read as a line, so the grammar has no ceiling");
             Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage:Flag"] = 1f }),
                 "a pipeline switch was read as a parametric line");
             Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["Strength:Increase:Strength"] = 0.1f }),

@@ -14,11 +14,16 @@ namespace Core.Localization
         private readonly TextTemplateEngine _engine = new(provider);
         private readonly List<ITextFormatter> _formatters = formatters.ToList();
 
+        /// <summary>What a thing's rule text is filed under: its id with this after it. The convention is
+        /// spelled once so a reader holding only an <see cref="ILocalizationProvider"/> — a tree popup, an
+        /// authoring tool — asks for the same key this service would.</summary>
+        public const string DescriptionSuffix = "_Description";
+
         public ILocalizationProvider Provider => provider;
 
         public string Localize(string key) => provider.Translate(key);
 
-        public string LocalizeDescription(string id) => provider.Translate(id + "_Description");
+        public string LocalizeDescription(string id) => provider.Translate(id + DescriptionSuffix);
 
         public string RenderDescription(string id, IReadOnlyDictionary<string, object?> values, TextFormat format = TextFormat.Plain) =>
             _engine.Render(LocalizeDescription(id), values, format);

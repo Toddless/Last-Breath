@@ -1,6 +1,7 @@
 namespace Core.PassiveTree.View
 {
     using System.Collections.Generic;
+    using Battle.Skills;
     using Localization;
     using Modifiers;
 
@@ -27,9 +28,14 @@ namespace Core.PassiveTree.View
         /// the parts of a composite roll.</summary>
         private const string PartSeparator = ", ";
 
-        /// <summary>Every line of the node, parametric ones first and pipeline knobs after, in authored
-        /// order; records sharing a group stamp arrive as ONE line, joined in the group's order and gated
-        /// once. A missing formatter falls back to the raw parts rather than disappearing.</summary>
+        /// <summary>
+        /// Every line of the node, parametric ones first and pipeline knobs after, in authored order;
+        /// records sharing a group stamp arrive as ONE line, joined in the group's order and gated once.
+        /// A missing formatter falls back to the raw parts rather than disappearing.
+        /// <para>A node that hands over a PASSIVE says what the passive says instead — see
+        /// <see cref="OfPassive"/>. The two are alternatives in the data (a node carrying both is refused
+        /// where it is read), so the passive is asked about first and the line channel is left alone.</para>
+        /// </summary>
         public static List<PassiveNodeLine> Of(
             PassiveNode node,
             ModifierFormatter? modifiers,
@@ -39,16 +45,61 @@ namespace Core.PassiveTree.View
         {
             List<PassiveNodeLine> lines = [];
 
+            if (node.PassiveId is { } passiveId) return OfPassive(passiveId, node, modifiers, localization, format);
+
             foreach (NodeLineGroup group in node.LineGroups())
                 lines.Add(new PassiveNodeLine(Describe(group, modifiers, knobs, localization, format), group.IsConditional));
 
             return lines;
         }
 
-        /// <summary>The node's headline: its title, or what it is about when it was never titled.</summary>
+        /// <summary>
+        /// What a passive-bearing node says. The two families answer differently because they are written
+        /// differently:
+        /// <list type="bullet">
+        /// <item>a passive built from FIELDS (<see cref="StatPassiveGrammar"/>) has no rule text anybody
+        /// could have written — its whole content is its numbers, so the node prints them through the very
+        /// formatter an ordinary node line goes through, and the wheel and the passive's own card cannot
+        /// disagree;</item>
+        /// <item>a passive written as a CLASS has a hand-written description under its own
+        /// <c>&lt;Id&gt;_Description</c> key, and the node reads it out rather than guessing at the
+        /// numbers it was tuned with.</item>
+        /// </list>
+        /// <para>Nothing here is gated: a gate lives on a node's parametric records, and a passive carries
+        /// none.</para>
+        /// <para>A record the grammar cannot read whole says nothing at all — the node is left with its
+        /// title and its class. The popup promises exactly what the grant hands over, and the grant refuses
+        /// such a record entire; half a card would sell the node for lines the player never receives.</para>
+        /// </summary>
+        private static List<PassiveNodeLine> OfPassive(
+            string passiveId,
+            PassiveNode node,
+            ModifierFormatter? modifiers,
+            ILocalizationProvider? localization,
+            TextFormat format)
+        {
+            List<PassiveNodeLine> lines = [];
+
+            if (!StatPassiveGrammar.Owns(passiveId))
+            {
+                lines.Add(new PassiveNodeLine(
+                    Translate(localization, passiveId + LocalizationService.DescriptionSuffix), IsConditional: false));
+
+                return lines;
+            }
+
+            foreach (string text in StatPassiveLineText.Lines(node.Properties, modifiers, format))
+                lines.Add(new PassiveNodeLine(text, IsConditional: false));
+
+            return lines;
+        }
+
+        /// <summary>The node's headline: its title, or what it is about when it was never titled — the
+        /// passive it hands over, the ability it unlocks, and its own id when it is none of those.</summary>
         public static string TitleOf(PassiveNode node, ILocalizationProvider? localization)
         {
             if (!string.IsNullOrWhiteSpace(node.Title)) return node.Title;
+            if (node.PassiveId is { } passiveId) return Translate(localization, passiveId);
             if (!string.IsNullOrWhiteSpace(node.AbilityId)) return Translate(localization, node.AbilityId);
 
             return node.Id;

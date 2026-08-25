@@ -997,8 +997,12 @@ namespace LastBreathTest.BattleSystemTests
                 "the passive channel leaked into the parametric one");
         }
 
-        /// <summary>A node with no lines is a node with nothing to print, not a reader that falls over: the
-        /// wheel's wording and the totals both have to come back empty-handed and keep standing.</summary>
+        /// <summary>A node with no LINES still has something to print — the passive it hands over — and
+        /// nothing at all to add to the totals: the passive reaches the fighter as a skill, not as records
+        /// the summary could count. Both readers have to keep standing.
+        /// <para>The wording of a passive written as a class is its own hand-written rule text, read out
+        /// under its <c>_Description</c> key; with no catalog behind the reader the key comes back, the way
+        /// every other miss in this class does.</para></summary>
         [TestMethod]
         public void APassiveNodeWithNoLinesPrintsAndSumsWithoutFalling()
         {
@@ -1017,7 +1021,11 @@ namespace LastBreathTest.BattleSystemTests
             TreeSummary summary = PassiveTreeSummary.Build(document, ["keystone_1"], NoBaseline.Instance);
 
             Assert.AreEqual(0, node.LineCount);
-            Assert.AreEqual(0, PassiveNodeLines.Of(node, null, null, null).Count, "a node with nothing to say printed a line");
+
+            List<PassiveNodeLine> printed = PassiveNodeLines.Of(node, null, null, null);
+            Assert.AreEqual(1, printed.Count, "the passive the node hands over went unsaid");
+            Assert.AreEqual("Passive_Skill_Porcupine_Description", printed[0].Text);
+            Assert.IsFalse(printed[0].IsConditional, "a passive was marked as gated — gates live on lines");
             Assert.AreEqual("Porcupine", PassiveNodeLines.TitleOf(node, null));
             Assert.AreEqual(0, summary.Parameters.Count);
             Assert.AreEqual(0, summary.Context.Count);

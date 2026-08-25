@@ -77,6 +77,9 @@ namespace Core.Services
             services.AddSingleton<IOrnamentMinter, OrnamentMinter>();
             services.AddSingleton<ModifierFormatter>();
             services.AddSingleton<ITextFormatter, ModifierTextFormatter>();
+            // A stat passive's line is a modifier line the player has not been handed yet: it words itself
+            // through the same formatter, and only the carrier tail tells the two entries apart.
+            services.AddSingleton<ITextFormatter, StatPassiveLineTextFormatter>();
             services.AddSingleton<ContextModifierFormatter>();
             services.AddSingleton<ITextFormatter, ContextModifierTextFormatter>();
             services.AddSingleton<ITextFormatter, ModifierDescriptorTextFormatter>();

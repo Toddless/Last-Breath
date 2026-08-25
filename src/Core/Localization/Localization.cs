@@ -23,12 +23,13 @@ namespace Core.Localization
 
         public static string LocalizeDescription(string id) => Service.LocalizeDescription(id);
 
-        /// <summary>False when the catalog has no <c>&lt;Id&gt;_Description</c> entry. The provider
-        /// echoes the key back on a miss — this is the ONE place that knows that convention.</summary>
+        /// <summary>False when the catalog has no description entry for the id. The provider echoes the key
+        /// back on a miss, so a miss is told from a wording by rebuilding the key — under
+        /// <see cref="LocalizationService.DescriptionSuffix"/>, which is where that convention is spelled.</summary>
         public static bool TryLocalizeDescription(string id, out string description)
         {
             description = Service.LocalizeDescription(id);
-            return !string.IsNullOrEmpty(description) && description != $"{id}_Description";
+            return !string.IsNullOrEmpty(description) && description != id + LocalizationService.DescriptionSuffix;
         }
 
         public static string RenderDescription(string id, IReadOnlyDictionary<string, object?> values, TextFormat format = TextFormat.Plain) =>

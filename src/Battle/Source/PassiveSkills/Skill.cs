@@ -17,7 +17,10 @@
         public Texture2D? Icon { get; }
         public string DisplayName => Localization.Localize(Id);
 
-        public string Description =>
+        /// <summary>The catalog's rule text, with the passive's own numbers rendered into it. Virtual for
+        /// the one family that has no catalog entry to render into: a passive built from a record's fields
+        /// is nothing but its lines, and says so by wording them (<see cref="StatPassiveSkill"/>).</summary>
+        public virtual string Description =>
             DescriptionValues is { } values
                 ? Localization.RenderDescription(Id, values, TextFormat.Rich)
                 : Localization.LocalizeDescription(Id);
