@@ -3,6 +3,7 @@ namespace PassiveTreeEditor.Source.View
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Battle.Skills;
     using Core.Data.GameData;
     using Core.Entity;
     using Core.Enums;
@@ -26,6 +27,10 @@ namespace PassiveTreeEditor.Source.View
     public partial class EditorRoot : Control
     {
         private readonly AbilityCatalog _abilities = new();
+
+        // Which passives a node may name. The registry that builds them is battle-side, out of this tool's
+        // reach, so the tool reads the shipped catalog and a test in the game suite holds the two together.
+        private readonly PassiveSkillCatalog _passives = new();
         private readonly PassiveTreeProvider _treeProvider = new();
         private readonly AllocationState _allocation = new();
 
@@ -366,7 +371,7 @@ namespace PassiveTreeEditor.Source.View
         private void WireEvents()
         {
             _canvas.Initialize(_editor);
-            _inspector.Initialize(_canvas, _editor, _abilities, _conditions);
+            _inspector.Initialize(_canvas, _editor, _abilities, _conditions, _passives);
 
             _editor.Restored += OnHistoryStep;
             _editor.History.Changed += RefreshHistoryButtons;
@@ -426,12 +431,15 @@ namespace PassiveTreeEditor.Source.View
             string root = DataRoot();
             var failures = new List<string>();
             var source = new FileSystemDataSource(root);
-            var participants = new IGameDataParticipant[] { _abilities, _treeProvider, _playerStats, _parameterFormats, _conditions };
+            var participants = new IGameDataParticipant[]
+                { _abilities, _passives, _treeProvider, _playerStats, _parameterFormats, _conditions };
+
             var service = new GameDataService(source, participants);
 
             // The catalogs of the previous root are not this root's: everything that grows by file has
             // to start empty, or a second read shows every ability twice.
             _abilities.Reset();
+            _passives.Reset();
 
             service.LoadFailed += (catalog, exception) => failures.Add($"{catalog}: {exception.Message}");
             service.LoadAll();
@@ -452,7 +460,7 @@ namespace PassiveTreeEditor.Source.View
             AdoptDocument(document);
             _canvas.FrameAll();
 
-            SetStatus($"{_abilities.Abilities.Count} abilities, {document.Nodes.Count} nodes"
+            SetStatus($"{_abilities.Abilities.Count} abilities, {_passives.Ids.Count} passives, {document.Nodes.Count} nodes"
                       + (failures.Count > 0 ? $", {failures.Count} catalog(s) unavailable" : string.Empty)
                       + (issues.Count > 0 ? $", {issues.Count} data issue(s)" : string.Empty));
 

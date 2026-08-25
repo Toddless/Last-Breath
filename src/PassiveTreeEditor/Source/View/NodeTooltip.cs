@@ -1,5 +1,8 @@
 namespace PassiveTreeEditor.Source.View
 {
+    using System.Collections.Generic;
+    using System.Globalization;
+    using Core.Battle.Skills;
     using Core.Localization;
     using Core.Modifiers;
     using Core.PassiveTree;
@@ -85,6 +88,9 @@ namespace PassiveTreeEditor.Source.View
             if (!string.IsNullOrWhiteSpace(node.AbilityId))
                 _content.AddChild(Row(Translate(node.AbilityId), CanvasStyle.Ink1));
 
+            if (node.IsPassive)
+                foreach (string line in PassiveLines(node)) _content.AddChild(Row(line, CanvasStyle.Ink2));
+
             foreach (ModifierLine line in node.Modifiers) _content.AddChild(Row(Describe(line), CanvasStyle.Ink2));
             foreach (ContextModifierLine line in node.ContextModifiers) _content.AddChild(Row(Describe(line), CanvasStyle.Ink2));
 
@@ -136,6 +142,37 @@ namespace PassiveTreeEditor.Source.View
 
             return line.IsConditional ? $"{text}  ({line.Condition})" : text;
         }
+
+        /// <summary>
+        /// What the passive on the node says. A stat-family id is nothing but its fields, so they are read
+        /// through the game's own grammar and worded by the same formatter a modifier line goes through —
+        /// the card and the wheel say the same sentence. All of them or none: one unreadable field refuses
+        /// the whole grant, and a card printing the readable half would promise lines the game withholds.
+        /// <para>Everything else is a factory living in the game, out of this tool's reach: the id and the
+        /// numbers it is tuned by are the whole of what can honestly be shown.</para>
+        /// </summary>
+        private List<string> PassiveLines(PassiveNode node)
+        {
+            List<StatPassiveLine> stats = StatPassiveGrammar.Owns(node.PassiveId)
+                ? StatPassiveGrammar.ReadWhole(node.Properties)
+                : [];
+
+            if (stats.Count > 0) return stats.ConvertAll(Describe);
+
+            List<string> lines = [node.PassiveId ?? string.Empty];
+            foreach (KeyValuePair<string, float> property in node.Properties)
+                lines.Add($"{property.Key} = {property.Value.ToString("0.###", CultureInfo.InvariantCulture)}");
+
+            return lines;
+        }
+
+        private string Describe(StatPassiveLine line) =>
+            _formatter is null
+                ? $"{line.Parameter} {line.ValueType} {line.Value}"
+                  + (line.PerParameter is { } carrier ? $" per {carrier}" : string.Empty)
+                : _formatter.Format(
+                    new SimpleModifier(line.Parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource),
+                    TextFormat.Plain, line.PerParameter);
 
         private string Translate(string key) => _localization?.Translate(key) ?? key;
     }

@@ -50,6 +50,14 @@ namespace PassiveTreeEditor.Source.Validation
         /// <summary>More modifier lines than the class allows.</summary>
         TooManyLines,
 
+        /// <summary>The node promises a passive and modifier lines at once — the reader drops such a node
+        /// whole, and every edge leaning on it goes with it.</summary>
+        ChannelsCollide,
+
+        /// <summary>Named numbers on a node that grants no passive: no factory is ever handed them, so the
+        /// balance sits in the file doing nothing.</summary>
+        PropertiesStranded,
+
         /// <summary>A keystone with no rule text — the whole of what a keystone is.</summary>
         KeystoneWithoutRule
     }

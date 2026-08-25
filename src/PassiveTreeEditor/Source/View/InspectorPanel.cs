@@ -2,6 +2,7 @@ namespace PassiveTreeEditor.Source.View
 {
     using System;
     using System.Collections.Generic;
+    using Core.Battle.Skills;
     using Core.Enums;
     using Core.Modifiers.Conditions;
     using Core.Modifiers.Context;
@@ -17,6 +18,23 @@ namespace PassiveTreeEditor.Source.View
     /// </summary>
     public partial class InspectorPanel : VBoxContainer
     {
+        /// <summary>Name a fresh property row is created under — never one already on the node.</summary>
+        private const string NewFieldName = "field";
+
+        private const string LinesHoldTheNode =
+            "this node speaks in modifier lines — a node grants a passive or carries lines, never both";
+
+        private const string PassiveHoldsTheNode =
+            "this node grants a passive — a node grants a passive or carries lines, never both";
+
+        private const string PassiveIdHint =
+            "id of the passive this node hands over. " + StatPassiveGrammar.IdPrefix
+            + "<Name> is built from the stat fields below and needs no code";
+
+        private const string FieldNameHint =
+            "field name the passive's factory reads. For the stat family: Parameter:ValueType"
+            + " or Parameter:ValueType:PerParameter";
+
         /// <summary>What a line carrying a number may be. Flag is deliberately absent: it is a switch,
         /// and a switch belongs only to the context knobs whose binding reads no value at all.</summary>
         private static readonly ModifierValueType[] s_numericValueTypes =
@@ -30,8 +48,14 @@ namespace PassiveTreeEditor.Source.View
         /// knob changes, and what the author typed has to outlive the control that took it.</summary>
         private readonly ContextLineValues _contextValues = new();
 
+        /// <summary>The node's named numbers as the panel is showing them, in author order. Every gesture
+        /// edits this list and hands the whole of it back, so the dictionary is rebuilt from a known order
+        /// rather than patched key by key — which is what would let a renamed field jump position.</summary>
+        private readonly List<KeyValuePair<string, float>> _properties = [];
+
         private AbilityCatalog? _abilities;
         private ConditionProvider? _conditions;
+        private PassiveSkillCatalog? _passives;
         private TreeCanvas? _canvas;
 
         /// <summary>Every field on this panel changes the tree through here. A control that wrote into
@@ -45,12 +69,14 @@ namespace PassiveTreeEditor.Source.View
         /// which id. Kept separate so that typing a title does not rebuild the totals per keystroke.</summary>
         public event Action? TotalsChanged;
 
-        public void Initialize(TreeCanvas canvas, TreeEditor editor, AbilityCatalog abilities, ConditionProvider conditions)
+        public void Initialize(TreeCanvas canvas, TreeEditor editor, AbilityCatalog abilities,
+            ConditionProvider conditions, PassiveSkillCatalog passives)
         {
             _canvas = canvas;
             _editor = editor;
             _abilities = abilities;
             _conditions = conditions;
+            _passives = passives;
             SizeFlagsHorizontal = SizeFlags.ExpandFill;
             AddThemeConstantOverride("separation", 6);
         }
@@ -76,8 +102,14 @@ namespace PassiveTreeEditor.Source.View
             PassiveNode? node = _canvas.SingleSelection;
             if (node is null) return;
 
+            // The panel's copy of the node's numbers, taken once per build: every property control edits
+            // this list and hands the whole of it to the editor.
+            _properties.Clear();
+            _properties.AddRange(node.PropertyRows());
+
             BuildIdentity(node);
             BuildText(node);
+            BuildPassive(node);
             BuildModifiers(node);
         }
 
@@ -282,6 +314,278 @@ namespace PassiveTreeEditor.Source.View
             AddChild(text);
         }
 
+        // ── passive ────────────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// The passive the node hands over, and the numbers it is built from. A node reaches the fighter
+        /// one way or the other, so naming a passive is shut off while the node carries lines and the line
+        /// buttons are shut off while it names one — the reader drops a node written both ways whole, and
+        /// the tool must not be able to author one at all.
+        /// </summary>
+        private void BuildPassive(PassiveNode node)
+        {
+            AddChild(EditorControls.Caption("PASSIVE"));
+
+            var grid = new GridContainer { Columns = 2, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            AddChild(grid);
+
+            grid.AddChild(new Label { Text = "Id" });
+            grid.AddChild(PassiveIdEdit(node));
+
+            grid.AddChild(new Label { Text = "Known" });
+            grid.AddChild(PassivePicker(node));
+
+            if (PassiveWarning(node) is { } warning) AddChild(Warned(warning));
+
+            BuildProperties(node);
+        }
+
+        /// <summary>The id itself, typed rather than picked: the stat family is any name under its prefix,
+        /// and a tool that only offered a list would make a fresh keystone impossible to author.</summary>
+        private LineEdit PassiveIdEdit(PassiveNode node)
+        {
+            bool blocked = node.HasLines;
+
+            var idEdit = new LineEdit
+            {
+                Text = node.PassiveId ?? string.Empty,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                Editable = !blocked,
+                PlaceholderText = blocked ? "carries lines" : StatPassiveGrammar.IdPrefix,
+                TooltipText = blocked ? LinesHoldTheNode : PassiveIdHint
+            };
+
+            idEdit.TextSubmitted += text => CommitPassiveId(node, idEdit, text);
+            idEdit.FocusExited += () => CommitPassiveId(node, idEdit, idEdit.Text);
+
+            // Leaving the field ends the run it was taking: coming back to it later is a second edit, and
+            // one step back has to take back one of them.
+            idEdit.FocusExited += _editor.Seal;
+            return idEdit;
+        }
+
+        /// <summary>The catalog as a shortcut into the field beside it. Picking writes the id and nothing
+        /// else — what the node grants stays a name the author can read and correct.</summary>
+        private OptionButton PassivePicker(PassiveNode node)
+        {
+            OptionButton picker = Sealing(EditorControls.IdPicker(_passives?.Ids ?? [], node.PassiveId ?? string.Empty,
+                id => SetPassiveId(node, id), emptyLabel: "— none"));
+
+            picker.Disabled = node.HasLines;
+            picker.TooltipText = node.HasLines ? LinesHoldTheNode : "passives a factory answers to";
+            return picker;
+        }
+
+        /// <summary>Writes the id through the door that knows the channel rule, and rebuilds: what the
+        /// property section asks for and whether the line buttons open both follow from it.</summary>
+        private void SetPassiveId(PassiveNode node, string id)
+        {
+            if (!_editor.SetPassiveId(node, id)) return;
+
+            ChangedTotals();
+            Rebuild();
+        }
+
+        private void CommitPassiveId(PassiveNode node, LineEdit idEdit, string text)
+        {
+            // A field outlives the state it was built for: a step back through the history rewrites the
+            // node and rebuilds this panel, and the control being torn down reports the focus it is
+            // losing — writing the text it still holds would put the undone edit straight back.
+            if (_canvas is null || string.Equals(text.Trim(), node.PassiveId ?? string.Empty, StringComparison.Ordinal)) return;
+
+            if (_editor.SetPassiveId(node, text))
+            {
+                ChangedTotals();
+                RebuildLater();
+                return;
+            }
+
+            idEdit.Text = node.PassiveId ?? string.Empty;
+        }
+
+        /// <summary>Rebuilds once the gesture that asked for it is over. A field commits as it loses focus,
+        /// and it loses focus while the panel is being torn down — rebuilding from inside that would leave
+        /// two rebuilds walking the same children.</summary>
+        private void RebuildLater() => Callable.From(Rebuild).CallDeferred();
+
+        /// <summary>What is wrong with the passive as it stands, or null. Never a refusal — a tree is
+        /// unfinished nearly all of the time — but an id no factory answers to is a node that will hand
+        /// the player nothing, and it is cheaper to read here than in the game's log.</summary>
+        private string? PassiveWarning(PassiveNode node)
+        {
+            // Stranded numbers are asked about whatever else the node is doing: they outlive the passive
+            // that was named and then cleared, and a node carrying lines is exactly where nobody looks.
+            if (PassiveNode.WhyChannelsCollide(node.PassiveId, node.HasLines) is { } collision) return collision;
+            if (PassiveNode.WhyPropertiesAreStranded(node.PassiveId, node.Properties.Count) is { } stranded) return stranded;
+
+            if (!node.IsPassive) return null;
+
+            // The stat family answers for itself: it is built from its fields rather than from a factory,
+            // so no catalog knows it and its fields are the only thing there is to check.
+            if (StatPassiveGrammar.Owns(node.PassiveId)) return StatFieldWarning(node);
+
+            if (_passives is null || _passives.IsEmpty) return null;
+
+            if (!_passives.Knows(node.PassiveId))
+                return $"'{node.PassiveId}' is in no passive catalog the tool read — the grant would be refused";
+
+            return MissingFields(node) is { Count: > 0 } missing
+                ? $"missing field(s): {string.Join(", ", missing)}"
+                : null;
+        }
+
+        /// <summary>What the stat family cannot read. All-or-nothing, the way the grant is: a record with
+        /// no fields is nothing at all, and one unreadable key refuses every line beside it.</summary>
+        private static string? StatFieldWarning(PassiveNode node)
+        {
+            if (node.Properties.Count == 0) return "no stat fields — a stat passive is nothing but its lines";
+
+            foreach (KeyValuePair<string, float> field in node.Properties)
+                if (!StatPassiveGrammar.TryReadLine(field.Key, field.Value, out _, out string? refusal))
+                    return $"field '{field.Key}' unreadable: {refusal}";
+
+            return null;
+        }
+
+        /// <summary>Fields the named passive's factory reads that the node does not carry. The stat family
+        /// answers with nothing: its fields are stat lines the author writes freely.</summary>
+        private List<string> MissingFields(PassiveNode node)
+        {
+            List<string> missing = [];
+            if (_passives is null) return missing;
+
+            foreach (string field in _passives.RequiredFields(node.PassiveId))
+                if (!node.Properties.ContainsKey(field))
+                    missing.Add(field);
+
+            return missing;
+        }
+
+        /// <summary>
+        /// The named numbers, one row each, in the order the file keeps them. Every gesture rewrites the
+        /// whole list rather than one key: a dictionary hands a fresh key the slot a removed one left
+        /// behind, so a field added after a removal would otherwise land where the removed one stood.
+        /// </summary>
+        private void BuildProperties(PassiveNode node)
+        {
+            AddChild(EditorControls.Caption($"PROPERTIES  {_properties.Count}"));
+
+            if (_properties.Count == 0 && !node.IsPassive)
+            {
+                AddChild(EditorControls.Wrapped("Name a passive above; the numbers it is tuned by go here."));
+                return;
+            }
+
+            for (int index = 0; index < _properties.Count; index++) AddChild(PropertyRow(node, index));
+
+            var add = new Button { Text = "+ field", SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            add.Pressed += () =>
+            {
+                _properties.Add(new KeyValuePair<string, float>(FreshFieldName(), 0f));
+                ApplyList(node);
+                ChangedTotals();
+                Rebuild();
+            };
+
+            AddChild(add);
+        }
+
+        private Control PropertyRow(PassiveNode node, int index)
+        {
+            var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+
+            var name = new LineEdit
+            {
+                Text = _properties[index].Key,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                CustomMinimumSize = new Vector2(150, 0),
+                TooltipText = FieldNameHint
+            };
+
+            name.TextSubmitted += text => CommitFieldName(node, name, index, text);
+            name.FocusExited += () => CommitFieldName(node, name, index, name.Text);
+            name.FocusExited += _editor.Seal;
+            row.AddChild(name);
+
+            SpinBox value = Sealing(EditorControls.Number(_properties[index].Value, 0.001));
+            value.ValueChanged += amount =>
+            {
+                if (index >= _properties.Count) return;
+
+                _properties[index] = new KeyValuePair<string, float>(_properties[index].Key, (float)amount);
+
+                // Each row merges on its own identity, so stepping one number and then another is two
+                // steps back rather than one.
+                ApplyProperties(node, $"{EditFields.PropertyValue} {index}");
+            };
+
+            row.AddChild(value);
+            // The button tells the totals and rebuilds for itself, so the row only says what changed.
+            row.AddChild(RemoveButton(() =>
+            {
+                _properties.RemoveAt(index);
+                ApplyList(node);
+            }));
+
+            return row;
+        }
+
+        /// <summary>A rename that would empty a name or repeat one already on the node is put back rather
+        /// than written: two rows under one name are one number, and which of the two survives is a coin
+        /// toss the author never asked for.</summary>
+        private void CommitFieldName(PassiveNode node, LineEdit field, int index, string text)
+        {
+            if (_canvas is null || index >= _properties.Count) return;
+
+            string wanted = text.Trim();
+            if (string.Equals(wanted, _properties[index].Key, StringComparison.Ordinal)) return;
+
+            if (wanted.Length == 0 || Holds(wanted))
+            {
+                field.Text = _properties[index].Key;
+                return;
+            }
+
+            // Named per row, like the value box beside it: renaming one field and then another is two
+            // steps back rather than one.
+            _properties[index] = new KeyValuePair<string, float>(wanted, _properties[index].Value);
+            ApplyProperties(node, $"{EditFields.PropertyName} {index}");
+            RebuildLater();
+        }
+
+        /// <summary>Hands the whole ordered list to the door that records it, and tells the totals.</summary>
+        private void ApplyProperties(PassiveNode node, string field)
+        {
+            _editor.SetProperties(node, _properties, field);
+            ChangedTotals();
+        }
+
+        /// <summary>A row appearing or disappearing is one gesture and one step, so the run is closed as
+        /// part of it: removing a field and then adding one are two steps back rather than one.</summary>
+        private void ApplyList(PassiveNode node)
+        {
+            _editor.SetProperties(node, _properties, EditFields.PropertyList);
+            _editor.Seal();
+        }
+
+        private bool Holds(string name) => _properties.Exists(row => string.Equals(row.Key, name, StringComparison.Ordinal));
+
+        /// <summary>A name no row is using yet, so a fresh row never collides with one already there.</summary>
+        private string FreshFieldName()
+        {
+            if (!Holds(NewFieldName)) return NewFieldName;
+
+            for (int suffix = 2; ; suffix++)
+                if (!Holds($"{NewFieldName}{suffix}")) return $"{NewFieldName}{suffix}";
+        }
+
+        private static Label Warned(string text)
+        {
+            Label label = EditorControls.Wrapped(text);
+            label.AddThemeColorOverride("font_color", CanvasStyle.Gold1);
+            return label;
+        }
+
         private void BuildModifiers(PassiveNode node)
         {
             NodeKindRule rule = NodeKindRules.For(node.Kind);
@@ -305,14 +609,17 @@ namespace PassiveTreeEditor.Source.View
             AddChild(buttons);
         }
 
-        /// <summary>Both channels share the node's line budget, so both buttons close at the same count.</summary>
+        /// <summary>Both channels share the node's line budget, so both buttons close at the same count —
+        /// and both close outright on a node that grants a passive, which is the other half of the rule
+        /// that shuts the passive field on a node carrying lines.</summary>
         private Button AddButton(string text, PassiveNode node, NodeKindRule rule, Action add)
         {
             var button = new Button
             {
                 Text = text,
-                Disabled = node.LineCount >= rule.MaxModifiers,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill
+                Disabled = node.IsPassive || node.LineCount >= rule.MaxModifiers,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                TooltipText = node.IsPassive ? PassiveHoldsTheNode : string.Empty
             };
 
             button.Pressed += () =>

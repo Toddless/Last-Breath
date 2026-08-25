@@ -189,10 +189,9 @@ namespace Core.PassiveTree
                 if (PassiveNode.WhyChannelsCollide(node.PassiveId, node.HasLines) is { } collision)
                     issues.Add($"{node.Id}: {collision}");
 
-                // Numbers tuned for a passive the node never names: no factory is ever handed them, so the
-                // balance sits in the file doing nothing. Worth saying, not worth the node.
-                if (!node.IsPassive && node.Properties.Count > 0)
-                    issues.Add($"{node.Id}: carries {node.Properties.Count} propert(ies) but names no passive — nobody reads them");
+                // Numbers tuned for a passive the node never names. Worth saying, not worth the node.
+                if (PassiveNode.WhyPropertiesAreStranded(node.PassiveId, node.Properties.Count) is { } stranded)
+                    issues.Add($"{node.Id}: {stranded}");
 
                 // Both channels count against one limit — a line is content whichever road it takes. A
                 // passive is the node's payload in place of lines, so the floor is not asked of it.

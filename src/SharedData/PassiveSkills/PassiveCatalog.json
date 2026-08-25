@@ -1,0 +1,50 @@
+{
+    "passives": [
+        { "id": "Passive_Skill_Regeneration", "fields": ["percent"] },
+        { "id": "Passive_Skill_Mana_Regeneration", "fields": ["percent"] },
+        { "id": "Passive_Skill_Current_Health_Regeneration", "fields": ["percentFromCurrentHealth"] },
+        { "id": "Passive_Skill_Mana_To_Barrier", "fields": ["percent"] },
+        { "id": "Passive_Skill_Critical_Leech", "fields": ["percent"] },
+        { "id": "Passive_Skill_Critical_Mana_Leech", "fields": ["percent"] },
+        { "id": "Passive_Skill_No_Critical_Hits", "fields": [] },
+        { "id": "Passive_Skill_Mana_On_Attack", "fields": ["amount"] },
+        { "id": "Passive_Skill_Porcupine", "fields": ["damagePercent", "armorPercent"] },
+        { "id": "Passive_Skill_Bleeding", "fields": ["percentFromDamage", "duration", "maxStacks"] },
+        { "id": "Passive_Skill_Bloodthirsty", "fields": ["stackThreshold", "healPercent"] },
+        {
+            "id": "Passive_Skill_Righteous_Wrath",
+            "fields": ["percentFromDamage", "burningDuration", "stackThreshold", "incinerationDuration"]
+        },
+        { "id": "Passive_Skill_Silent_Fury", "fields": ["chance"] },
+        {
+            "id": "Passive_Skill_Creators_Nature",
+            "fields": ["manaRecovery", "healthRecovery", "recoveryEfficiency"]
+        },
+        { "id": "Passive_Skill_Meteor", "fields": ["damage"] },
+        { "id": "Passive_Skill_Ice_Meteor", "fields": ["damage"] },
+        { "id": "Passive_Skill_Servant_Hell", "fields": ["chance"] },
+        { "id": "Passive_Skill_Execute", "fields": ["threshold"] },
+        { "id": "Passive_Skill_Vampire", "fields": ["percent"] },
+        { "id": "Passive_Skill_Poisoned_Claws", "fields": ["percentFromDamage", "duration"] },
+        { "id": "Passive_Skill_Armor_Piercing", "fields": [] },
+        { "id": "Passive_Skill_True_Strike", "fields": [] },
+        { "id": "Passive_Skill_Soulless", "fields": [] },
+        { "id": "Passive_Skill_Accelerator", "fields": ["amount"] },
+        { "id": "Passive_Skill_Decomposition", "fields": ["duration", "maxStacks", "reduceBy"] },
+        { "id": "Passive_Skill_Incineration", "fields": [] },
+        { "id": "Passive_Skill_First_Strike", "fields": ["bonus"] },
+        { "id": "Passive_Skill_Bastion", "fields": ["reduce"] },
+        { "id": "Passive_Skill_Unshackled", "fields": [] },
+        { "id": "Passive_Skill_Mana_Resonance", "fields": ["rate"] },
+        { "id": "Passive_Skill_Chain_Attack", "fields": [] },
+        { "id": "Passive_Skill_Counter_Attack", "fields": ["chance"] },
+        { "id": "Passive_Skill_Echo", "fields": ["delayedDamagePercent", "turns"] },
+        { "id": "Passive_Skill_LuckyCriticalChance", "fields": [] },
+        { "id": "Passive_Skill_Soul_Devouring", "fields": ["barrierRecoveryAmount"] },
+        { "id": "Passive_Skill_Trapped_Beast", "fields": ["healthPercent", "damageBonus"] },
+        { "id": "Passive_Skill_Mana_Burn", "fields": ["percentToBurn"] },
+        { "id": "Passive_Skill_Burning", "fields": ["percentFromDamage", "duration", "maxStacks"] },
+        { "id": "Passive_Skill_Gift_From_The_Goddess", "fields": ["chance"] },
+        { "id": "Passive_Skill_Resonance", "fields": ["spellDamagePerStack", "multicastPerStack"] }
+    ]
+}

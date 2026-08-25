@@ -48,6 +48,20 @@ namespace Core.PassiveTree
 
         public bool IsPassive => PassiveId is not null;
 
+        /// <summary>The named numbers as an ordered list — the shape an editor renames, reorders and hands
+        /// back whole.</summary>
+        public List<KeyValuePair<string, float>> PropertyRows() => [.. Properties];
+
+        /// <summary>Replaces every named number with the given ones, in the given order. Rewritten whole
+        /// rather than patched: a dictionary hands a fresh key the slot a removed one left behind, so a
+        /// field added after a removal would enumerate — and be written to file — where the removed field
+        /// stood. Duplicate names collapse; the caller is what refuses to author them.</summary>
+        public void SetProperties(IEnumerable<KeyValuePair<string, float>> rows)
+        {
+            Properties.Clear();
+            foreach (KeyValuePair<string, float> row in rows) Properties[row.Key] = row.Value;
+        }
+
         public List<ModifierLine> Modifiers { get; } = [];
 
         /// <summary>Pipeline knobs the node tunes — separate from <see cref="Modifiers"/> because the two
@@ -65,6 +79,14 @@ namespace Core.PassiveTree
         public static string? WhyChannelsCollide(string? passiveId, bool hasLines) =>
             !string.IsNullOrWhiteSpace(passiveId) && hasLines
                 ? $"grants passive '{passiveId}' and carries modifier lines — a node speaks one way or the other"
+                : null;
+
+        /// <summary>Why the node's named numbers reach nobody, or null when they do. Numbers tuned for a
+        /// passive the node never names are handed to no factory: the balance sits in the file doing
+        /// nothing. One wording for the report that says so and for every tool that shows it.</summary>
+        public static string? WhyPropertiesAreStranded(string? passiveId, int propertyCount) =>
+            string.IsNullOrWhiteSpace(passiveId) && propertyCount > 0
+                ? $"carries {propertyCount} propert(ies) but names no passive — nobody reads them"
                 : null;
 
         /// <summary>Everything the node says in lines, both channels. The per-class content limits count

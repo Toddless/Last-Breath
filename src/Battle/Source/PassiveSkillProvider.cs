@@ -103,6 +103,10 @@ namespace Battle.Source
                 => new ResonancePassiveSkill(properties.Get("spellDamagePerStack"), properties.Get("multicastPerStack")),
         };
 
+        /// <summary>Every id built by a factory of its own. The open stat family is not among them: it is
+        /// any id under its prefix, so it can only be answered by asking rather than listed.</summary>
+        public static IReadOnlyCollection<string> NamedIds => s_factories.Keys;
+
         public ISkill? CreateSkill(string id) => CreateSkill(id, RecordProperties.Empty);
 
         public ISkill? CreateSkill(string id, RecordProperties properties)

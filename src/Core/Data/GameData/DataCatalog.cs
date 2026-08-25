@@ -30,6 +30,11 @@ namespace Core.Data.GameData
         /// reader of that one parses every file in it as a tree, so a second document there would be
         /// read as a tree with no nodes and take the allocation down with it.</summary>
         public const string PassiveTreeRules = "PassiveTreeRules";
+
+        /// <summary>Which passives a tree node may name, and the fields each of them is tuned by. The
+        /// registry that builds them is battle-side and out of the authoring tool's reach, so the tool
+        /// reads this instead and a test keeps the two from drifting apart.</summary>
+        public const string PassiveSkills = "PassiveSkills";
         public const string LootTables = "LootTables";
         public const string LootConfiguration = "LootConfiguration";
         public const string Items = "Items";

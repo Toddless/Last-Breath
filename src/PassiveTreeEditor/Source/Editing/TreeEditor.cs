@@ -2,6 +2,7 @@ namespace PassiveTreeEditor.Source.Editing
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.PassiveTree;
     using History;
 
@@ -175,11 +176,47 @@ namespace PassiveTreeEditor.Source.Editing
                 value => document.Budget = value, $"{EditFields.Budget} {budget}"));
         }
 
-        // ── modifier lines ─────────────────────────────────────────────────────────────────────
+        // ── passive ────────────────────────────────────────────────────────────────────────────
 
-        public void AddModifierLine(PassiveNode node)
+        /// <summary>The passive the node grants instead of lines. Refused while the node carries any: the
+        /// two channels are alternatives, and a node written both ways is dropped whole when it is read.
+        /// False is the door saying no, so the field showing the id can put back what the node still says.</summary>
+        public bool SetPassiveId(PassiveNode node, string? id)
+        {
+            string? wanted = string.IsNullOrWhiteSpace(id) ? null : id.Trim();
+            if (_restoring || PassiveNode.WhyChannelsCollide(wanted, node.HasLines) is not null) return false;
+
+            SetNodeValue(node, EditFields.Passive, node.PassiveId, wanted, value => node.PassiveId = value);
+            return true;
+        }
+
+        /// <summary>
+        /// Rewrites the node's named numbers from an ordered list. Whole rather than key by key: the order
+        /// the author wrote them in is the order the file keeps, and a dictionary hands a fresh key the
+        /// slot a removed one left behind — patching would move a renamed field to wherever that hole is.
+        /// <para><paramref name="field"/> is what a run of edits merges on, so a name being typed and a
+        /// number being stepped stay separate steps.</para>
+        /// </summary>
+        public void SetProperties(PassiveNode node, IReadOnlyList<KeyValuePair<string, float>> rows, string field)
         {
             if (_restoring) return;
+
+            List<KeyValuePair<string, float>> before = node.PropertyRows();
+            List<KeyValuePair<string, float>> after = [.. rows];
+            if (before.SequenceEqual(after)) return;
+
+            node.SetProperties(after);
+            Record(new ValueEdit<List<KeyValuePair<string, float>>>(new EditTarget(node, field), before, after,
+                node.SetProperties, $"{node.Id}: {field}"));
+        }
+
+        // ── modifier lines ─────────────────────────────────────────────────────────────────────
+
+        /// <summary>Refused on a node that grants a passive, for the same reason the passive is refused on
+        /// a node carrying lines — one node, one channel.</summary>
+        public void AddModifierLine(PassiveNode node)
+        {
+            if (_restoring || node.IsPassive) return;
 
             var line = new ModifierLine();
             node.Modifiers.Add(line);
@@ -189,7 +226,7 @@ namespace PassiveTreeEditor.Source.Editing
 
         public void AddContextLine(PassiveNode node)
         {
-            if (_restoring) return;
+            if (_restoring || node.IsPassive) return;
 
             var line = new ContextModifierLine();
             node.ContextModifiers.Add(line);

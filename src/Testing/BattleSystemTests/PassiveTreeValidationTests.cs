@@ -16,6 +16,8 @@ namespace LastBreathTest.BattleSystemTests
     {
         private const string HubId = "hub";
 
+        private const string OrphanId = "small_orphan";
+
         private static PassiveTreeDocument ShippedTree()
         {
             var provider = new PassiveTreeProvider();
@@ -145,6 +147,57 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.IsTrue(issues.Any(issue => issue.Contains(seed.Id) && issue.Contains("ability")),
                 "a stance seed lost its ability and nothing said so: " + string.Join("; ", issues));
+        }
+
+        /// <summary>
+        /// Numbers left behind by a passive that was named and then cleared. Nothing in the game refuses
+        /// such a node — it simply hands the player less than the file looks like it promises — so the
+        /// report is the only place the author can ever find out, and the authoring tool shows the same
+        /// sentence from the same rule.
+        /// </summary>
+        [TestMethod]
+        public void PropertiesOnANodeThatNamesNoPassiveAreReported()
+        {
+            PassiveTreeDocument document = Wheel();
+            document.AddNode(Orphan());
+            document.Link(HubId, OrphanId);
+
+            List<string> issues = document.Validate();
+
+            Assert.IsTrue(issues.Any(issue => issue.Contains(OrphanId) && issue.Contains("names no passive")),
+                "stranded numbers passed unmentioned: " + string.Join("; ", issues));
+        }
+
+        /// <summary>Stranded numbers stay stranded on a node speaking in lines — the channel it speaks on
+        /// says nothing about who reads its properties, and lines are exactly where nobody looks.</summary>
+        [TestMethod]
+        public void PropertiesAreStillReportedOnANodeCarryingLines()
+        {
+            PassiveTreeDocument document = Wheel();
+            PassiveNode orphan = Orphan();
+            orphan.Modifiers.Add(new ModifierLine
+            {
+                Parameter = EntityParameter.Armor,
+                ValueType = ModifierValueType.Increase,
+                Value = 0.06f
+            });
+
+            document.AddNode(orphan);
+            document.Link(HubId, OrphanId);
+
+            List<string> issues = document.Validate();
+
+            Assert.IsTrue(issues.Any(issue => issue.Contains(OrphanId) && issue.Contains("names no passive")),
+                "lines hid the stranded numbers: " + string.Join("; ", issues));
+        }
+
+        /// <summary>A node carrying tuning numbers and naming no passive to spend them on.</summary>
+        private static PassiveNode Orphan()
+        {
+            var node = new PassiveNode { Id = OrphanId, Kind = PassiveNodeKind.Small };
+            node.Properties["percentFromDamage"] = 0.75f;
+
+            return node;
         }
 
         /// <summary>A line on the hub is still a line the class cannot carry: the centre is exempt from

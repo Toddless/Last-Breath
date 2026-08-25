@@ -26,6 +26,7 @@ namespace PassiveTreeEditor.Source.Validation
             foreach (PassiveNode node in document.Nodes)
             {
                 CheckAbilityReference(node, abilities, issues);
+                CheckPassive(node, issues);
                 CheckLineCount(node, issues);
                 CheckRuleText(node, issues);
             }
@@ -285,13 +286,29 @@ namespace PassiveTreeEditor.Source.Validation
                     $"references '{abilityId}', an internal-cast ability that never appears in a tree"));
         }
 
+        /// <summary>
+        /// What the node's passive is, said where the whole tree is swept rather than only where one node
+        /// is open in the inspector. Both rules are the ones the reader itself applies: a node written on
+        /// both channels is dropped whole when the file is read, and numbers naming no passive are handed
+        /// to no factory at all.
+        /// </summary>
+        private static void CheckPassive(PassiveNode node, List<TreeIssue> issues)
+        {
+            if (PassiveNode.WhyChannelsCollide(node.PassiveId, node.HasLines) is { } collision)
+                issues.Add(new TreeIssue(TreeIssueKind.ChannelsCollide, node.Id, collision));
+
+            if (PassiveNode.WhyPropertiesAreStranded(node.PassiveId, node.Properties.Count) is { } stranded)
+                issues.Add(new TreeIssue(TreeIssueKind.PropertiesStranded, node.Id, stranded));
+        }
+
         /// <summary>Both line channels count against one limit: a line is content whichever road it
-        /// takes to the fighter.</summary>
+        /// takes to the fighter. A passive is the node's payload in place of lines, so the floor is not
+        /// asked of it — the ceiling still is, because a node holding both is already reported.</summary>
         private static void CheckLineCount(PassiveNode node, List<TreeIssue> issues)
         {
             NodeKindRule rule = NodeKindRules.For(node.Kind);
 
-            if (node.LineCount < rule.MinModifiers)
+            if (!node.IsPassive && node.LineCount < rule.MinModifiers)
                 issues.Add(new TreeIssue(TreeIssueKind.TooFewLines, node.Id,
                     $"{node.Kind} needs at least {rule.MinModifiers} modifier line(s), has {node.LineCount}"));
 

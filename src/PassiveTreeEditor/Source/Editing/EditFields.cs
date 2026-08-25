@@ -19,6 +19,15 @@ namespace PassiveTreeEditor.Source.Editing
         public const string Ability = "ability";
         public const string Budget = "budget";
 
+        /// <summary>The passive a node grants, and the named numbers it is built from. The three property
+        /// gestures are separate fields so that typing a name and stepping a number never merge into one
+        /// undo step.</summary>
+        public const string Passive = "passive";
+
+        public const string PropertyName = "property name";
+        public const string PropertyValue = "property value";
+        public const string PropertyList = "properties";
+
         public const string Parameter = "parameter";
         public const string Knob = "knob";
         public const string ValueType = "value type";
