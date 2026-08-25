@@ -11,6 +11,7 @@
         "Accuracy": 300,
         "CriticalChance": 0.05,
         "AdditionalHitChance": 0.05,
+        "BlockChance": 0.05,
         "CriticalDamage": 1.5,
         "MulticastChance": 0,
         "PhysicalDamage": 100,

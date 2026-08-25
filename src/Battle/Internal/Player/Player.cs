@@ -658,6 +658,8 @@ namespace Battle.Internal.Player
             // base made attack series balloon to 2-3x their planned length. Items/passives are
             // the intended source of this stat.
             EntityParameter.AdditionalHitChance => 0.05f,
+            // The baseline every fighter blocks at: a blocked attack deals no damage and lays no effects.
+            EntityParameter.BlockChance => 0.05f,
             EntityParameter.CriticalDamage => 1.5f,
             EntityParameter.MulticastChance => 1f,
             EntityParameter.PhysicalDamage or EntityParameter.SpellDamage => 3000,

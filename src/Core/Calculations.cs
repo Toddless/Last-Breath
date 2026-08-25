@@ -189,6 +189,10 @@
         /// skips the branch that would stop it. Both rolls answer to the defender's luck on the parameter
         /// behind them. <paramref name="draw"/> is named rather than taken from the context because the
         /// generator an attack carries is an engine object no sandbox can build.
+        /// Evasion is contested by the attacker's accuracy; block is the defender's flat chance and is not.
+        /// Either verdict negates the attack whole — no damage and no effects, since riders and reactions
+        /// alike fire on <see cref="AttackResults.Succeed"/> only — but a series of attacks is interrupted
+        /// by an evade alone.
         /// </summary>
         public static AttackResults ResolveAttackOutcome(IAttackContext context, Func<float> draw)
         {
