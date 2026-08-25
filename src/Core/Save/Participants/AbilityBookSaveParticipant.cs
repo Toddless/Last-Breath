@@ -32,8 +32,9 @@ namespace Core.Save.Participants
     /// rolled, 5 dropped the free upgrade choices (the sockets are now the only authority over what an
     /// ability does), 6 turned the socket map into a LIST because a repointed node can leave two entries
     /// under one node id and a map could keep only one, 7 added the ornaments (an older file names none,
-    /// which is a character wearing none). Files 4 and 5 are still read, node id in the key instead of a
-    /// field. Below <see cref="OldestReadable"/> the section is refused whole
+    /// which is a character wearing none), 8 writes each augment's rarity by name instead of by ordinal.
+    /// Files 4 and 5 are still read, node id in the key instead of a field.
+    /// Below <see cref="OldestReadable"/> the section is refused whole
     /// (<see cref="RestoreWithoutSection"/>), leaving every other section untouched.</para>
     /// </summary>
     /// <param name="sockets">Optional: a composition without the battle module has no board, and the
@@ -81,7 +82,7 @@ namespace Core.Save.Participants
         private readonly List<OrnamentSaveData> _unplaceable = [];
 
         public string SectionId => "abilityBook";
-        public int Version => 7;
+        public int Version => 8;
         public int RestoreOrder => Save.RestoreOrder.Abilities;
 
         public JToken Capture()

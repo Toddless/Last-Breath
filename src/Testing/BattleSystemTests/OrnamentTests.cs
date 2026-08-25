@@ -526,9 +526,11 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void TheSectionDeclaresTheVersionThatCarriesOrnaments()
+        public void TheSectionDeclaresTheCurrentVersion()
         {
-            Assert.AreEqual(7, Participant(new AbilitySocketBoard()).Version);
+            // 7 brought the ornaments, 8 writes each augment's rarity by name. A bump nobody meant is a
+            // file the shipped build refuses, so the number is pinned rather than derived.
+            Assert.AreEqual(8, Participant(new AbilitySocketBoard()).Version);
         }
 
         [TestMethod]

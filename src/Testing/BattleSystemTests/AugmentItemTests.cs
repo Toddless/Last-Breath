@@ -155,7 +155,7 @@ namespace LastBreathTest.BattleSystemTests
             // that redrew could still land on the same rarity and prove nothing.
             JObject rewritten = JObject.Parse(participant.Capture().ToString(Formatting.None));
             var migrated = rewritten.Descendants().OfType<JObject>().First(node => node["augment"] is JValue);
-            Assert.AreEqual((int)restored.Rarity, (int?)migrated["rarity"],
+            Assert.AreEqual(restored.Rarity.ToString(), (string?)migrated["rarity"],
                 "the drawn rarity was not written down, so the next load draws again: a perpetual re-roll of the player's collection");
 
             participant.Restore(rewritten, participant.Version);

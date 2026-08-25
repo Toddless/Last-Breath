@@ -2,6 +2,7 @@ namespace Core.Data.SaveData
 {
     using System.Collections.Generic;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 
     /// <summary>
     /// One augment as a file remembers it. Neither half is the augment on its own, so the two always
@@ -22,9 +23,13 @@ namespace Core.Data.SaveData
         /// </summary>
         [JsonProperty("values")] public Dictionary<string, float> Values { get; init; } = [];
 
-        /// <summary>What this copy rolled on the rarity scale. Absent in files written before copies
-        /// carried one: those are drawn once on load, from the band their record declares now.</summary>
-        [JsonProperty("rarity")] public Enums.Rarity? Rarity { get; init; }
+        /// <summary>What this copy rolled on the rarity scale. Written by NAME, like every other persisted
+        /// enum: an ordinal would rename the rarity of every shipped copy the day a band is inserted mid-scale.
+        /// Absent in files written before copies carried one: those are drawn once on load, from the band
+        /// their record declares now.</summary>
+        [JsonProperty("rarity")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Enums.Rarity? Rarity { get; init; }
 
         /// <summary>Which effect of its record's pool this copy lays. Empty for every copy of a record
         /// that names its own effect, and for files written before pools existed — those are drawn once

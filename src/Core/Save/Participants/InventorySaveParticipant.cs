@@ -19,7 +19,7 @@ namespace Core.Save.Participants
         IAugmentItemMinter? augments = null) : ISaveParticipant
     {
         public string SectionId => "inventory";
-        public int Version => 5; // v5: augment copies in the bag
+        public int Version => 6; // v5: augment copies in the bag; v6: their rarity is written by name
         public int RestoreOrder => Save.RestoreOrder.Items;
 
         public JToken Capture()
