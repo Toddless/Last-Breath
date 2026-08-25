@@ -271,7 +271,7 @@
             "hybridStance": "Dexterity",
             "x": -75.0,
             "y": -65.0,
-            "title": "Health",
+            "title": "Health|Health Recovery",
             "modifiers": [
                 {
                     "parameter": "Health",
@@ -374,6 +374,27 @@
             ]
         },
         {
+            "id": "notable_accuracy_armor_penetration_1",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -363.0,
+            "y": -105.0,
+            "title": "Accuracy|Armor Penetration",
+            "modifiers": [
+                {
+                    "parameter": "Accuracy",
+                    "valueType": "Increase",
+                    "value": 0.25
+                },
+                {
+                    "parameter": "ArmorPenetration",
+                    "valueType": "Flat",
+                    "value": 0.12
+                }
+            ]
+        },
+        {
             "id": "notable_added_cold_damage_1",
             "kind": "Notable",
             "stance": "Intelligence",
@@ -463,6 +484,27 @@
             ]
         },
         {
+            "id": "notable_all_defence_1",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -325.0,
+            "y": -160.0,
+            "title": "All Defence|Crit Mitigation",
+            "modifiers": [
+                {
+                    "parameter": "AllDefence",
+                    "valueType": "Increase",
+                    "value": 0.18
+                },
+                {
+                    "parameter": "CriticalDamageMitigation",
+                    "valueType": "Flat",
+                    "value": 0.1
+                }
+            ]
+        },
+        {
             "id": "notable_armor_10",
             "kind": "Notable",
             "stance": "Strength",
@@ -489,6 +531,32 @@
                     "parameter": "ArmorPenetration",
                     "valueType": "Flat",
                     "value": 0.25
+                }
+            ]
+        },
+        {
+            "id": "notable_attributes_health_movespeed_1",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -485.0,
+            "y": -130.0,
+            "title": "Attributes|Health|Movespeed",
+            "modifiers": [
+                {
+                    "parameter": "AllAttribute",
+                    "valueType": "Flat",
+                    "value": 10.0
+                },
+                {
+                    "parameter": "Health",
+                    "valueType": "Increase",
+                    "value": 0.12
+                },
+                {
+                    "parameter": "MoveSpeed",
+                    "valueType": "Increase",
+                    "value": 0.15
                 }
             ]
         },
@@ -597,6 +665,32 @@
                     "valueType": "Flat",
                     "value": 1200.0,
                     "condition": "Stance_Strength"
+                }
+            ]
+        },
+        {
+            "id": "notable_block_chance_suppress_1",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -461.0,
+            "y": -64.0,
+            "title": "Block Chance|Suppress",
+            "modifiers": [
+                {
+                    "parameter": "BlockChance",
+                    "valueType": "Flat",
+                    "value": 0.04
+                },
+                {
+                    "parameter": "BlockChance",
+                    "valueType": "Increase",
+                    "value": 0.15
+                },
+                {
+                    "parameter": "Suppress",
+                    "valueType": "Flat",
+                    "value": 0.1
                 }
             ]
         },
@@ -801,6 +895,22 @@
                     "parameter": "CriticalDamage",
                     "valueType": "Flat",
                     "value": 0.5
+                }
+            ]
+        },
+        {
+            "id": "notable_dot_multiplier_1",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -256.0,
+            "y": -339.0,
+            "title": "DoT Multiplier",
+            "modifiers": [
+                {
+                    "parameter": "AllDoTDamageMultiplier",
+                    "valueType": "Flat",
+                    "value": 0.15
                 }
             ]
         },
@@ -1029,6 +1139,28 @@
             ]
         },
         {
+            "id": "notable_health_recovery_evade_1",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -292.0,
+            "y": -370.0,
+            "title": "Health Recovery|Evade",
+            "modifiers": [
+                {
+                    "parameter": "HealthRecovery",
+                    "valueType": "Increase",
+                    "value": 0.15
+                },
+                {
+                    "parameter": "Evade",
+                    "valueType": "Increase",
+                    "value": 0.2,
+                    "condition": "Health_Below_30"
+                }
+            ]
+        },
+        {
             "id": "notable_health_regen_low_life_1",
             "kind": "Notable",
             "stance": "Strength",
@@ -1234,6 +1366,27 @@
                     "parameter": "MulticastChance",
                     "valueType": "Flat",
                     "value": 0.1
+                }
+            ]
+        },
+        {
+            "id": "notable_physical_bleed_damage_1",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -267.0,
+            "y": -237.0,
+            "title": "Physical|Bleed Damage",
+            "modifiers": [
+                {
+                    "parameter": "PhysicalDamage",
+                    "valueType": "Increase",
+                    "value": 0.32
+                },
+                {
+                    "parameter": "BleedDamageMultiplier",
+                    "valueType": "Flat",
+                    "value": 0.15
                 }
             ]
         },
@@ -1589,6 +1742,70 @@
                     "parameter": "Accuracy",
                     "valueType": "Increase",
                     "value": 0.1
+                }
+            ]
+        },
+        {
+            "id": "small_accuracy_armor_penetration_1",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -364.0,
+            "y": -86.0,
+            "title": "Accuracy",
+            "modifiers": [
+                {
+                    "parameter": "Accuracy",
+                    "valueType": "Increase",
+                    "value": 0.08
+                }
+            ]
+        },
+        {
+            "id": "small_accuracy_armor_penetration_2",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -356.0,
+            "y": -66.0,
+            "title": "Accuracy",
+            "modifiers": [
+                {
+                    "parameter": "Accuracy",
+                    "valueType": "Increase",
+                    "value": 0.08
+                }
+            ]
+        },
+        {
+            "id": "small_accuracy_armor_penetration_3",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -341.0,
+            "y": -92.0,
+            "title": "Armor Penetration",
+            "modifiers": [
+                {
+                    "parameter": "ArmorPenetration",
+                    "valueType": "Flat",
+                    "value": 0.08
+                }
+            ]
+        },
+        {
+            "id": "small_accuracy_armor_penetration_4",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -346.0,
+            "y": -109.0,
+            "title": "Armor Penetration",
+            "modifiers": [
+                {
+                    "parameter": "ArmorPenetration",
+                    "valueType": "Flat",
+                    "value": 0.08
                 }
             ]
         },
@@ -2110,6 +2327,70 @@
             ]
         },
         {
+            "id": "small_all_defence_1",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -324.0,
+            "y": -139.0,
+            "title": "All Defence",
+            "modifiers": [
+                {
+                    "parameter": "AllDefence",
+                    "valueType": "Increase",
+                    "value": 0.04
+                }
+            ]
+        },
+        {
+            "id": "small_all_defence_2",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -312.0,
+            "y": -129.0,
+            "title": "All Defence",
+            "modifiers": [
+                {
+                    "parameter": "AllDefence",
+                    "valueType": "Increase",
+                    "value": 0.04
+                }
+            ]
+        },
+        {
+            "id": "small_all_defence_3",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -294.0,
+            "y": -140.0,
+            "title": "All Defence",
+            "modifiers": [
+                {
+                    "parameter": "AllDefence",
+                    "valueType": "Increase",
+                    "value": 0.04
+                }
+            ]
+        },
+        {
+            "id": "small_all_defence_4",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -309.0,
+            "y": -151.0,
+            "title": "All Defence",
+            "modifiers": [
+                {
+                    "parameter": "AllDefence",
+                    "valueType": "Increase",
+                    "value": 0.04
+                }
+            ]
+        },
+        {
             "id": "small_armor_16",
             "kind": "Small",
             "stance": "Strength",
@@ -2241,6 +2522,86 @@
                     "parameter": "ArmorPenetration",
                     "valueType": "Flat",
                     "value": 0.03
+                }
+            ]
+        },
+        {
+            "id": "small_attributes_health_movespeed_1",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -472.0,
+            "y": -140.0,
+            "title": "Attributes",
+            "modifiers": [
+                {
+                    "parameter": "AllAttribute",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_attributes_health_movespeed_2",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -445.0,
+            "y": -129.0,
+            "title": "Attributes",
+            "modifiers": [
+                {
+                    "parameter": "AllAttribute",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_attributes_health_movespeed_3",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -456.0,
+            "y": -119.0,
+            "title": "Attributes",
+            "modifiers": [
+                {
+                    "parameter": "AllAttribute",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_attributes_health_movespeed_4",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -477.0,
+            "y": -116.0,
+            "title": "Health",
+            "modifiers": [
+                {
+                    "parameter": "Health",
+                    "valueType": "Increase",
+                    "value": 0.04
+                }
+            ]
+        },
+        {
+            "id": "small_attributes_health_movespeed_5",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -499.0,
+            "y": -116.0,
+            "title": "Health",
+            "modifiers": [
+                {
+                    "parameter": "Health",
+                    "valueType": "Increase",
+                    "value": 0.04
                 }
             ]
         },
@@ -2525,6 +2886,54 @@
             ]
         },
         {
+            "id": "small_bleed_damage_6",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -258.0,
+            "y": -253.0,
+            "title": "Physical Damage|Bleed Damage",
+            "modifiers": [
+                {
+                    "parameter": "BleedDamageMultiplier",
+                    "valueType": "Increase",
+                    "value": 0.06
+                }
+            ]
+        },
+        {
+            "id": "small_bleed_damage_7",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -240.0,
+            "y": -251.0,
+            "title": "Physical Damage|Bleed Damage",
+            "modifiers": [
+                {
+                    "parameter": "BleedDamageMultiplier",
+                    "valueType": "Increase",
+                    "value": 0.06
+                }
+            ]
+        },
+        {
+            "id": "small_bleed_damage_8",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -220.0,
+            "y": -244.0,
+            "title": "Physical Damage|Bleed Damage",
+            "modifiers": [
+                {
+                    "parameter": "BleedDamageMultiplier",
+                    "valueType": "Increase",
+                    "value": 0.06
+                }
+            ]
+        },
+        {
             "id": "small_bleed_damage_taken_1",
             "kind": "Small",
             "stance": "Dexterity",
@@ -2721,6 +3130,86 @@
                     "parameter": "BlockChance",
                     "valueType": "Flat",
                     "value": 0.03
+                }
+            ]
+        },
+        {
+            "id": "small_block_chance_suppress_1",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -437.0,
+            "y": -75.0,
+            "title": "Block Chance",
+            "modifiers": [
+                {
+                    "parameter": "BlockChance",
+                    "valueType": "Flat",
+                    "value": 0.01
+                }
+            ]
+        },
+        {
+            "id": "small_block_chance_suppress_2",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -426.0,
+            "y": -70.0,
+            "title": "Block Chance",
+            "modifiers": [
+                {
+                    "parameter": "BlockChance",
+                    "valueType": "Flat",
+                    "value": 0.01
+                }
+            ]
+        },
+        {
+            "id": "small_block_chance_suppress_3",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -408.0,
+            "y": -67.0,
+            "title": "Block Chance",
+            "modifiers": [
+                {
+                    "parameter": "BlockChance",
+                    "valueType": "Flat",
+                    "value": 0.01
+                }
+            ]
+        },
+        {
+            "id": "small_block_chance_suppress_4",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -424.0,
+            "y": -54.0,
+            "title": "Suppress",
+            "modifiers": [
+                {
+                    "parameter": "Suppress",
+                    "valueType": "Flat",
+                    "value": 0.04
+                }
+            ]
+        },
+        {
+            "id": "small_block_chance_suppress_5",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -440.0,
+            "y": -55.0,
+            "title": "Suppress",
+            "modifiers": [
+                {
+                    "parameter": "Suppress",
+                    "valueType": "Flat",
+                    "value": 0.04
                 }
             ]
         },
@@ -4287,6 +4776,70 @@
             ]
         },
         {
+            "id": "small_dot_multiplier_1",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -269.0,
+            "y": -325.0,
+            "title": "DoT Multiplier",
+            "modifiers": [
+                {
+                    "parameter": "AllDoTDamageMultiplier",
+                    "valueType": "Increase",
+                    "value": 0.04
+                }
+            ]
+        },
+        {
+            "id": "small_dot_multiplier_2",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -247.0,
+            "y": -303.0,
+            "title": "DoT Multiplier",
+            "modifiers": [
+                {
+                    "parameter": "AllDoTDamageMultiplier",
+                    "valueType": "Increase",
+                    "value": 0.04
+                }
+            ]
+        },
+        {
+            "id": "small_dot_multiplier_3",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -226.0,
+            "y": -310.0,
+            "title": "DoT Multiplier",
+            "modifiers": [
+                {
+                    "parameter": "AllDoTDamageMultiplier",
+                    "valueType": "Increase",
+                    "value": 0.04
+                }
+            ]
+        },
+        {
+            "id": "small_dot_multiplier_4",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -225.0,
+            "y": -333.0,
+            "title": "DoT Multiplier",
+            "modifiers": [
+                {
+                    "parameter": "AllDoTDamageMultiplier",
+                    "valueType": "Increase",
+                    "value": 0.04
+                }
+            ]
+        },
+        {
             "id": "small_evade_1",
             "kind": "Small",
             "stance": "Dexterity",
@@ -4709,8 +5262,8 @@
             "kind": "Small",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -299.0,
-            "y": -269.0,
+            "x": -290.0,
+            "y": -266.0,
             "title": "Fire Penetration",
             "modifiers": [
                 {
@@ -5292,6 +5845,86 @@
                     "parameter": "HealthRecovery",
                     "valueType": "Increase",
                     "value": 0.5
+                }
+            ]
+        },
+        {
+            "id": "small_health_recovery_evade_1",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -300.0,
+            "y": -356.0,
+            "title": "Health Recovery",
+            "modifiers": [
+                {
+                    "parameter": "HealthRecovery",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_health_recovery_evade_2",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -310.0,
+            "y": -338.0,
+            "title": "Health Recovery",
+            "modifiers": [
+                {
+                    "parameter": "HealthRecovery",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_health_recovery_evade_3",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -328.0,
+            "y": -345.0,
+            "title": "Health Recovery",
+            "modifiers": [
+                {
+                    "parameter": "HealthRecovery",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_health_recovery_evade_4",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -326.0,
+            "y": -360.0,
+            "title": "Evade",
+            "modifiers": [
+                {
+                    "parameter": "Evade",
+                    "valueType": "Increase",
+                    "value": 0.04
+                }
+            ]
+        },
+        {
+            "id": "small_health_recovery_evade_5",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -312.0,
+            "y": -373.0,
+            "title": "Evade",
+            "modifiers": [
+                {
+                    "parameter": "Evade",
+                    "valueType": "Increase",
+                    "value": 0.04
                 }
             ]
         },
@@ -6619,6 +7252,54 @@
                     "parameter": "PhysicalDamage",
                     "valueType": "Increase",
                     "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_physical_damage_10",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -251.0,
+            "y": -210.0,
+            "title": "Physical Damage",
+            "modifiers": [
+                {
+                    "parameter": "PhysicalDamage",
+                    "valueType": "Increase",
+                    "value": 0.07
+                }
+            ]
+        },
+        {
+            "id": "small_physical_damage_11",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -268.0,
+            "y": -212.0,
+            "title": "Physical Damage",
+            "modifiers": [
+                {
+                    "parameter": "PhysicalDamage",
+                    "valueType": "Increase",
+                    "value": 0.07
+                }
+            ]
+        },
+        {
+            "id": "small_physical_damage_12",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -284.0,
+            "y": -217.0,
+            "title": "Physical Damage",
+            "modifiers": [
+                {
+                    "parameter": "PhysicalDamage",
+                    "valueType": "Increase",
+                    "value": 0.07
                 }
             ]
         },
@@ -8197,6 +8878,10 @@
             "to": "small_accuracy_14"
         },
         {
+            "from": "notable_accuracy_armor_penetration_1",
+            "to": "small_accuracy_armor_penetration_4"
+        },
+        {
             "from": "notable_added_cold_damage_1",
             "to": "small_added_cold_damage_1"
         },
@@ -8237,6 +8922,10 @@
             "to": "small_additional_hit_chance_evade_6"
         },
         {
+            "from": "notable_all_defence_1",
+            "to": "small_all_defence_4"
+        },
+        {
             "from": "notable_armor_10",
             "to": "small_armor_17"
         },
@@ -8255,6 +8944,10 @@
         {
             "from": "notable_armor_penetration_1",
             "to": "small_armor_penetration_5"
+        },
+        {
+            "from": "notable_attributes_health_movespeed_1",
+            "to": "small_attributes_health_movespeed_5"
         },
         {
             "from": "notable_barrier_1",
@@ -8287,6 +8980,10 @@
         {
             "from": "notable_block_chance_armor_1",
             "to": "small_block_chance_armor_4"
+        },
+        {
+            "from": "notable_block_chance_suppress_1",
+            "to": "small_block_chance_suppress_5"
         },
         {
             "from": "notable_burning_damage_1",
@@ -8371,6 +9068,10 @@
         {
             "from": "notable_critical_damage_1",
             "to": "small_critical_damage_5"
+        },
+        {
+            "from": "notable_dot_multiplier_1",
+            "to": "small_dot_multiplier_4"
         },
         {
             "from": "notable_evade_7",
@@ -8481,6 +9182,10 @@
             "to": "small_health_recovery_21"
         },
         {
+            "from": "notable_health_recovery_evade_1",
+            "to": "small_health_recovery_evade_5"
+        },
+        {
             "from": "notable_health_regen_low_life_1",
             "to": "small_strength_36"
         },
@@ -8567,6 +9272,10 @@
         {
             "from": "notable_multicast_chance_1",
             "to": "small_multicast_chance_5"
+        },
+        {
+            "from": "notable_physical_bleed_damage_1",
+            "to": "small_physical_damage_12"
         },
         {
             "from": "notable_physical_convert_to_fire_1",
@@ -8705,6 +9414,18 @@
             "to": "small_physical_damage_9"
         },
         {
+            "from": "small_accuracy_armor_penetration_1",
+            "to": "small_accuracy_armor_penetration_2"
+        },
+        {
+            "from": "small_accuracy_armor_penetration_2",
+            "to": "small_accuracy_armor_penetration_3"
+        },
+        {
+            "from": "small_accuracy_armor_penetration_3",
+            "to": "small_accuracy_armor_penetration_4"
+        },
+        {
             "from": "small_added_cold_damage_1",
             "to": "small_added_cold_damage_2"
         },
@@ -8809,6 +9530,18 @@
             "to": "small_additional_hit_chance_evade_6"
         },
         {
+            "from": "small_all_defence_1",
+            "to": "small_all_defence_2"
+        },
+        {
+            "from": "small_all_defence_2",
+            "to": "small_all_defence_3"
+        },
+        {
+            "from": "small_all_defence_3",
+            "to": "small_all_defence_4"
+        },
+        {
             "from": "small_armor_16",
             "to": "small_armor_17"
         },
@@ -8855,6 +9588,22 @@
         {
             "from": "small_armor_penetration_4",
             "to": "small_armor_penetration_5"
+        },
+        {
+            "from": "small_attributes_health_movespeed_1",
+            "to": "small_attributes_health_movespeed_2"
+        },
+        {
+            "from": "small_attributes_health_movespeed_2",
+            "to": "small_attributes_health_movespeed_3"
+        },
+        {
+            "from": "small_attributes_health_movespeed_3",
+            "to": "small_attributes_health_movespeed_4"
+        },
+        {
+            "from": "small_attributes_health_movespeed_4",
+            "to": "small_attributes_health_movespeed_5"
         },
         {
             "from": "small_barrier_1",
@@ -8937,6 +9686,18 @@
             "to": "small_critical_chance_additional_hit_chance_1"
         },
         {
+            "from": "small_bleed_damage_6",
+            "to": "small_bleed_damage_7"
+        },
+        {
+            "from": "small_bleed_damage_7",
+            "to": "small_bleed_damage_8"
+        },
+        {
+            "from": "small_bleed_damage_8",
+            "to": "small_physical_damage_10"
+        },
+        {
             "from": "small_bleed_damage_taken_1",
             "to": "small_bleed_damage_taken_2"
         },
@@ -8999,6 +9760,22 @@
         {
             "from": "small_block_chance_armor_6",
             "to": "sockettier3_Porcupine_1"
+        },
+        {
+            "from": "small_block_chance_suppress_1",
+            "to": "small_block_chance_suppress_2"
+        },
+        {
+            "from": "small_block_chance_suppress_2",
+            "to": "small_block_chance_suppress_3"
+        },
+        {
+            "from": "small_block_chance_suppress_3",
+            "to": "small_block_chance_suppress_4"
+        },
+        {
+            "from": "small_block_chance_suppress_4",
+            "to": "small_block_chance_suppress_5"
         },
         {
             "from": "small_burning_damage_1",
@@ -9489,6 +10266,18 @@
             "to": "sockettier3_Critical_Calculation_1"
         },
         {
+            "from": "small_dot_multiplier_1",
+            "to": "small_dot_multiplier_2"
+        },
+        {
+            "from": "small_dot_multiplier_2",
+            "to": "small_dot_multiplier_3"
+        },
+        {
+            "from": "small_dot_multiplier_3",
+            "to": "small_dot_multiplier_4"
+        },
+        {
             "from": "small_evade_1",
             "to": "small_evade_2"
         },
@@ -9699,6 +10488,22 @@
         {
             "from": "small_health_recovery_7",
             "to": "small_strength_6"
+        },
+        {
+            "from": "small_health_recovery_evade_1",
+            "to": "small_health_recovery_evade_2"
+        },
+        {
+            "from": "small_health_recovery_evade_2",
+            "to": "small_health_recovery_evade_3"
+        },
+        {
+            "from": "small_health_recovery_evade_3",
+            "to": "small_health_recovery_evade_4"
+        },
+        {
+            "from": "small_health_recovery_evade_4",
+            "to": "small_health_recovery_evade_5"
         },
         {
             "from": "small_int_str_1",
@@ -10047,6 +10852,14 @@
         {
             "from": "small_physical_damage_1",
             "to": "small_strength_2"
+        },
+        {
+            "from": "small_physical_damage_10",
+            "to": "small_physical_damage_11"
+        },
+        {
+            "from": "small_physical_damage_11",
+            "to": "small_physical_damage_12"
         },
         {
             "from": "small_physical_damage_2",
