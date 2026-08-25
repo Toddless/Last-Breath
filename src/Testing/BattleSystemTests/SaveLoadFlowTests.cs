@@ -1,10 +1,19 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using Core.Ai.World.Skirmish;
+    using Core.Ai.World.Time;
     using Core.Battle.Abilities;
     using Core.Entity;
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.MessageBus;
+    using Core.Narrative.Facts;
+    using Core.Narrative.Influence;
+    using Core.Narrative.Quests;
+    using Core.Save;
     using Core.Save.Participants;
     using Core.Services;
     using Moq;
@@ -12,6 +21,8 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class SaveLoadFlowTests
     {
+        private const string QuestPinId = "Quest_Pin";
+
         [TestMethod]
         public void PopulationResetDropsTheCounterForSceneReload()
         {
@@ -45,6 +56,39 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual("Ability_A", targetBook.GetSlotLayout(Stance.Dexterity)[0]?.Id);
             Assert.IsNull(targetBook.GetSlotLayout(Stance.Dexterity)[3]);
+        }
+
+        /// <summary>The journal of the playthrough being left behind is replaced without a single status
+        /// event, so a view that drew it in its own _Ready is never asked to draw it again. That silence
+        /// is deliberate — it is why the applied load announces itself instead.</summary>
+        [TestMethod]
+        public void RestoringTheQuestLogAnnouncesNothing()
+        {
+            var events = new GameEventBus();
+            var catalog = new SingleQuest(QuestPinId);
+            var questLog = new QuestLogService(catalog, new WorldFactsService(), Mock.Of<IInventory>(),
+                Mock.Of<IItemMinter>(), Mock.Of<IUniqueItemQuery>(), Mock.Of<IInfluenceMastery>(),
+                Mock.Of<IWorldClock>(), Mock.Of<INpcWorldRegistry>(), events, Mock.Of<IGameMessageBus>(),
+                Mock.Of<ILoadScope>());
+            int announcements = 0;
+            events.Subscribe<QuestStatusChangedEvent>(_ => announcements++);
+            events.Subscribe<QuestStageAdvancedEvent>(_ => announcements++);
+
+            questLog.RestoreState([new QuestState(QuestPinId) { Status = QuestStatus.Active }]);
+
+            Assert.AreEqual(1, questLog.States.Count, "the restored state has to reach the journal");
+            Assert.AreEqual(0, announcements, "the restore is silent by design");
+        }
+
+        /// <summary>A catalog holding one quest: the restore drops states whose quest it cannot find.</summary>
+        private sealed class SingleQuest(string questId) : IQuestProvider
+        {
+            private readonly QuestDefinition _quest = new(questId, string.Empty, null, 1, false, [],
+                DeclinePolicy.CanReturn, 0, true, 0, [], [], new QuestRewards(0, [], []), [], [], []);
+
+            public IReadOnlyCollection<QuestDefinition> All => [_quest];
+
+            public QuestDefinition? Get(string id) => id == questId ? _quest : null;
         }
 
         private static IPlayerAccessor AccessorFor(AbilityBookComponent book)

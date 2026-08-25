@@ -1,6 +1,7 @@
 namespace LastBreathTest.WorldTesting
 {
     using Core.Ai.World.Time;
+    using Core.Session;
 
     [TestClass]
     public class WorldClockTests
@@ -64,6 +65,24 @@ namespace LastBreathTest.WorldTesting
             Assert.AreEqual(DayPhase.Day, PhaseAtHour(10));
             Assert.AreEqual(DayPhase.Evening, PhaseAtHour(18));
             Assert.AreEqual(DayPhase.Night, PhaseAtHour(22));
+        }
+
+        /// <summary>The rewind that opens a restore crosses phases without a word — only the file's own
+        /// time, applied after it, announces what differs from the rewound start. So the pair of events
+        /// carries no promise that a phase change was reported at all.</summary>
+        [TestMethod]
+        public void SessionResetRewindsTheClockWithoutAnnouncingIt()
+        {
+            var clock = CreateClock(startHour: 8); // Morning
+            clock.Tick(14 * 60f); // 08:00 -> 22:00, Night
+            int announcements = 0;
+            clock.HourPassed += _ => announcements++;
+            clock.PhaseChanged += _ => announcements++;
+
+            ((ISessionResettable)clock).ResetSession();
+
+            Assert.AreEqual(DayPhase.Morning, clock.Phase);
+            Assert.AreEqual(0, announcements, "the session rewind is silent by design");
         }
 
         private static DayPhase PhaseAtHour(int hour) => CreateClock(startHour: hour).Phase;

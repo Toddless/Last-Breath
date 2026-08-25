@@ -3,6 +3,7 @@ namespace LastBreath.World
     using System;
     using System.Threading.Tasks;
     using Core;
+    using Core.Events;
     using Core.Save;
     using Godot;
     using Services;
@@ -15,10 +16,12 @@ namespace LastBreath.World
     public partial class SaveDirector : Node
     {
         private ISaveGameService? _saveGame;
+        private IGameEventBus? _gameEventBus;
 
         public override void _Ready()
         {
             _saveGame = GameServiceProvider.Instance.GetService<ISaveGameService>();
+            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             if (_saveGame is { HasPendingLoad: true }) _ = ApplyWhenSettledAsync();
         }
 
@@ -29,6 +32,9 @@ namespace LastBreath.World
                 // One frame: every node's _Ready and the deferred spawn fills have run by then.
                 await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
                 _saveGame!.ApplyPendingLoad();
+                // Until this line the scene ran on the state of the playthrough being left behind.
+                // No section announces the load itself, so whoever read that state in _Ready is told here.
+                _gameEventBus?.Publish(new GameLoadedEvent());
             }
             catch (Exception e)
             {

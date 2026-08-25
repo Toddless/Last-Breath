@@ -1,6 +1,7 @@
 namespace LastBreath.World
 {
     using Core.Ai.World.Time;
+    using Core.Events;
     using Godot;
     using Services;
 
@@ -15,19 +16,34 @@ namespace LastBreath.World
         [Export] private float _transitionSpeed = 0.5f;
 
         private IWorldClock? _clock;
+        private IGameEventBus? _gameEventBus;
 
         public override void _Ready()
         {
             _clock = GameServiceProvider.Instance.GetService<IWorldClock>();
-            // Snap, don't lerp, into the CURRENT phase: a scene reload recreates this node with
-            // the default white Color — easing from it flashed a night world into daylight.
-            if (_clock != null) Color = PhaseColor(_clock.Phase);
+            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
+            _gameEventBus?.Subscribe<GameLoadedEvent>(OnGameLoaded);
+            SnapToPhase();
         }
+
+        public override void _ExitTree() => _gameEventBus?.Unsubscribe<GameLoadedEvent>(OnGameLoaded);
 
         public override void _Process(double delta)
         {
             if (_clock == null) return;
             Color = Color.Lerp(PhaseColor(_clock.Phase), (float)delta * _transitionSpeed);
+        }
+
+        /// <summary>The snap in _Ready read the clock of the playthrough being left behind — the file's
+        /// own time arrives after it, and easing into it would hold that sky on screen for seconds.
+        /// The phase is polled, not subscribed to, so this is where the correction has to come from.</summary>
+        private void OnGameLoaded(GameLoadedEvent evnt) => SnapToPhase();
+
+        // Snap, don't lerp, into the CURRENT phase: a scene reload recreates this node with the
+        // default white Color — easing from it flashed a night world into daylight.
+        private void SnapToPhase()
+        {
+            if (_clock != null) Color = PhaseColor(_clock.Phase);
         }
 
         private static Color PhaseColor(DayPhase phase) => phase switch

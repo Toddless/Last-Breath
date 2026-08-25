@@ -32,6 +32,7 @@ namespace LastBreath.UI
 
             _events.Subscribe<QuestStatusChangedEvent>(OnQuestsChanged);
             _events.Subscribe<QuestStageAdvancedEvent>(OnStageAdvanced);
+            _events.Subscribe<GameLoadedEvent>(OnGameLoaded);
             _facts.FactChanged += OnFactChanged;
             Render();
         }
@@ -40,10 +41,15 @@ namespace LastBreath.UI
         {
             _events?.Unsubscribe<QuestStatusChangedEvent>(OnQuestsChanged);
             _events?.Unsubscribe<QuestStageAdvancedEvent>(OnStageAdvanced);
+            _events?.Unsubscribe<GameLoadedEvent>(OnGameLoaded);
             if (_facts != null) _facts.FactChanged -= OnFactChanged;
         }
 
         private void OnQuestsChanged(QuestStatusChangedEvent evnt) => Render();
+
+        /// <summary>The first render drew the journal of the playthrough being left behind — the
+        /// restore replaces it without a single status event, so nothing else would redraw this.</summary>
+        private void OnGameLoaded(GameLoadedEvent evnt) => Render();
 
         private void OnStageAdvanced(QuestStageAdvancedEvent evnt) => Render();
 

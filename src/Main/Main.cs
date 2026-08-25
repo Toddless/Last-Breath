@@ -16,6 +16,7 @@
     using Core.Events;
     using Core.Inventory;
     using Core.Items;
+    using Core.Save;
     using Core.Services;
     using Core.Views.UI;
     using Godot;
@@ -62,7 +63,11 @@
             _gameEventBus.Subscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
             _gameEventBus.Subscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
             _uiElementProvider.ChangeHud(typeof(PlayerHud));
-            if (_addTestItems) AddTestItems();
+            // A pending load owns the bag (same policy as the spawn points own the population): the
+            // restore fills it from the file, and seeding it first only mints what is about to be
+            // thrown away — and toasts a full bag over the world the player is loading into.
+            bool loadPending = _provider.GetService<ISaveGameService>()?.HasPendingLoad == true;
+            if (_addTestItems && !loadPending) AddTestItems();
         }
 
         private void AddTestItems()

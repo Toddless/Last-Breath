@@ -5,6 +5,7 @@ namespace LastBreath.Npc
     using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
     using Core.Events;
+    using Core.Save;
     using Godot;
     using Services;
 
@@ -21,9 +22,11 @@ namespace LastBreath.Npc
         private IRestRecoveryService? _restRecovery;
         private IWorldClock? _clock;
         private IGameEventBus? _gameEventBus;
+        private ISaveGameService? _saveGame;
 
         public override void _Ready()
         {
+            _saveGame = GameServiceProvider.Instance.GetService<ISaveGameService>();
             _skirmishes = GameServiceProvider.Instance.GetService<INpcSkirmishService>();
             _raids = GameServiceProvider.Instance.GetService<IRaidService>();
             _restRecovery = GameServiceProvider.Instance.GetService<IRestRecoveryService>();
@@ -42,8 +45,13 @@ namespace LastBreath.Npc
             _clock.PhaseChanged -= OnPhaseChanged;
         }
 
+        /// <summary>A pending load owns the world: this heartbeat runs a frame before the restore, and
+        /// what it ticks belongs to the playthrough being left behind — the clock would advance it, and
+        /// a raid launched from its standing would leave a squad in a world the file is about to replace.</summary>
         public override void _Process(double delta)
         {
+            if (_saveGame is { HasPendingLoad: true }) return;
+
             _clock?.Tick((float)delta);
             _skirmishes?.Tick((float)delta);
             _raids?.Tick((float)delta);
