@@ -28,6 +28,11 @@ namespace Core.Save
         /// shape the bag writes its own.</summary>
         public const int TraderShelf = 22;
 
+        /// <summary>Drops lying on the floor: the third place holding concrete item instances, written in
+        /// the shape the bag and the shelf write theirs. Neighbourhood, not dependency — the drops are
+        /// rebuilt from item data alone, so no section has to precede this one.</summary>
+        public const int GroundItems = 23;
+
         /// <summary>Quest log: after Items so restored states sit on the settled inventory
         /// (objectives are re-derived from facts + inventory, never stored).</summary>
         public const int Quests = 25;

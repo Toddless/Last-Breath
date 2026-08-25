@@ -20,7 +20,7 @@ namespace LootGeneration.Source
     /// save load produce nothing. IInventory/ILoadScope resolve lazily — the standalone
     /// LootGeneration sandbox doesn't register them.
     /// </summary>
-    public class LootOrchestrator : ILootOrchestrator
+    public class LootOrchestrator : ILootOrchestrator, IGroundItemStore
     {
         private const float PickupRange = 350f;
 
@@ -49,6 +49,22 @@ namespace LootGeneration.Source
         public IReadOnlyList<ItemOnGround> ItemsOnGround => _itemsOnGround;
 
         public void SetFloorToSpawnItems(Node2D? floor) => _floor = floor;
+
+        /// <summary>What lies on the floor right now. A drop the player already walked over left the list
+        /// at pickup and is not written down as still lying there.</summary>
+        public IReadOnlyList<GroundItemPlacement> CaptureGroundItems() =>
+        [
+            .. _itemsOnGround
+                .Where(item => GodotObject.IsInstanceValid(item) && item.Item != null)
+                .Select(item => new GroundItemPlacement(item.Item!, item.Quantity, item.Position.X, item.Position.Y))
+        ];
+
+        public void RestoreGroundItems(IReadOnlyList<GroundItemPlacement> items)
+        {
+            ClearGround();
+            foreach (var placement in items)
+                SpawnRestored(placement);
+        }
 
         public bool TryPickup(ItemOnGround item, IInventory inventory)
         {
@@ -104,11 +120,7 @@ namespace LootGeneration.Source
                 foreach (var item in pending)
                 {
                     if (!GodotObject.IsInstanceValid(item)) continue;
-                    _floor?.AddChild(item);
-                    _itemsOnGround.Add(item);
-                    // A drop can leave the tree without going through TryPickup (scene change,
-                    // debug frees) — TreeExited keeps the pickable list honest either way.
-                    item.TreeExited += () => _itemsOnGround.Remove(item);
+                    AddToFloor(item);
                     _gameEventBus.Publish(new ItemDroppedEvent(item));
                     await item.AnimateAsync();
                 }
@@ -161,12 +173,47 @@ namespace LootGeneration.Source
 
         private void CreateItemOnGround(IItem item, Vector2 initialPosition, Vector2 targetPosition, float animationDurationScale, int amount = 1)
         {
-            var onGround = ItemOnGround.Initialize().Instantiate<ItemOnGround>();
-            onGround.SetItem(item, amount);
+            var onGround = BuildItemOnGround(item, amount);
             onGround.SetPositionToTravelTo(initialPosition, targetPosition);
             onGround.SetAnimationDurationScale(animationDurationScale);
-            onGround.PickedUp += OnItemPickedUp;
             _itemOnGroundsCache.Add(onGround);
+        }
+
+        private ItemOnGround BuildItemOnGround(IItem item, int amount)
+        {
+            var onGround = ItemOnGround.Initialize().Instantiate<ItemOnGround>();
+            onGround.SetItem(item, amount);
+            onGround.PickedUp += OnItemPickedUp;
+            return onGround;
+        }
+
+        private void AddToFloor(ItemOnGround item)
+        {
+            _floor?.AddChild(item);
+            _itemsOnGround.Add(item);
+            // A drop can leave the tree without going through TryPickup (scene change,
+            // debug frees) — TreeExited keeps the pickable list honest either way.
+            item.TreeExited += () => _itemsOnGround.Remove(item);
+        }
+
+        /// <summary>A restored drop lands where it was left instead of being tossed there: the toss is the
+        /// presentation of a kill, and nothing was just killed. The spot is written BEFORE the node enters
+        /// the tree — a body placed after it joins teleports whatever it overlaps.</summary>
+        private void SpawnRestored(GroundItemPlacement placement)
+        {
+            var onGround = BuildItemOnGround(placement.Item, placement.Quantity);
+            onGround.Position = new Vector2(placement.X, placement.Y);
+            AddToFloor(onGround);
+        }
+
+        /// <summary>Empties the floor, spilled drops and the ones a battle had ready alike: the orchestrator
+        /// outlives the scene and has no session reset of its own, so nothing else would take them away.</summary>
+        private void ClearGround()
+        {
+            FreeItems([.. _itemsOnGround]);
+            FreeItems([.. _itemOnGroundsCache]);
+            _itemsOnGround.Clear();
+            _itemOnGroundsCache.Clear();
         }
 
         private void OnItemPickedUp(ItemOnGround itemOnGround)
@@ -203,12 +250,18 @@ namespace LootGeneration.Source
             _provider.GetServices<IPlayerAccessor>().FirstOrDefault()?.Player is Node2D player
             && player.GlobalPosition.DistanceTo(item.GlobalPosition) <= PickupRange;
 
-        /// <summary>A lost/fled battle leaves nothing behind; the cached nodes never reached the tree.</summary>
+        /// <summary>Takes drops out of the game for good: a lost/fled battle leaves nothing behind, a load
+        /// sweeps the floor of the playthrough being left. Leaving the tree comes BEFORE the free — a
+        /// QueueFree lands at the end of the frame, and until then the node still catches a click and hands
+        /// its item over a second time. Cached nodes never reached the tree and simply have no parent.</summary>
         private static void FreeItems(List<ItemOnGround> items)
         {
             foreach (var item in items)
-                if (GodotObject.IsInstanceValid(item))
-                    item.QueueFree();
+            {
+                if (!GodotObject.IsInstanceValid(item)) continue;
+                item.GetParent()?.RemoveChild(item);
+                item.QueueFree();
+            }
         }
 
         private bool IsLoading() => _provider.GetServices<ILoadScope>().FirstOrDefault()?.IsLoading == true;

@@ -66,7 +66,7 @@ namespace LastBreath.Services
             provider.GetService<IQuestLogService>(); // eager: lives on facts/inventory/clock subscriptions
             provider.GetService<QuestNotificationBroadcaster>();
             RegisterUiFactories(provider);
-            RegisterNarrativeSaveSections(provider);
+            RegisterProjectSaveSections(provider);
             return provider;
         }
 
@@ -203,9 +203,10 @@ namespace LastBreath.Services
                 services.AddSingleton<INarrativeActionFactory>(sp => new QuestActionFactory(sp.GetRequiredService<IQuestLogService>, kind));
         }
 
-        /// <summary>The Battle module owns the ISaveManager factory; Main-only sections are
-        /// registered on top of it here instead of editing the shared module.</summary>
-        private static void RegisterNarrativeSaveSections(IGameServiceProvider provider)
+        /// <summary>The Battle module owns the ISaveManager factory; sections this project composes —
+        /// narrative, trade, the world floor — are registered on top of it here instead of editing the
+        /// shared module.</summary>
+        private static void RegisterProjectSaveSections(IGameServiceProvider provider)
         {
             var saveManager = provider.GetService<ISaveManager>();
             saveManager.Register(new WorldFactsSaveParticipant(provider.GetService<IWorldFactsService>()));
@@ -214,6 +215,13 @@ namespace LastBreath.Services
             saveManager.Register(new WalletSaveParticipant(provider.GetService<IWalletService>())); // trade is Main-owned
             saveManager.Register(new TraderShelfSaveParticipant(
                 provider.GetService<ITraderService>(),
+                provider.GetService<IItemDataProvider>(),
+                provider.GetService<EquipItemSaveConverter>(),
+                provider.GetService<IAugmentItemMinter>()));
+            // Loot lying in the world is the player's the moment it falls: this project owns the floor
+            // the loot module spills it on, so the section that keeps it is registered here.
+            saveManager.Register(new GroundItemsSaveParticipant(
+                provider.GetService<IGroundItemStore>(),
                 provider.GetService<IItemDataProvider>(),
                 provider.GetService<EquipItemSaveConverter>(),
                 provider.GetService<IAugmentItemMinter>()));
