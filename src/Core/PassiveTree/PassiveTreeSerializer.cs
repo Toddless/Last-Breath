@@ -116,6 +116,8 @@ namespace Core.PassiveTree
             Title = NullIfBlank(node.Title),
             Description = NullIfBlank(node.Description),
             AbilityId = NullIfBlank(node.AbilityId),
+            PassiveId = node.PassiveId,
+            Properties = node.Properties.Count == 0 ? null : new Dictionary<string, float>(node.Properties),
             Modifiers = node.Modifiers.Count == 0 ? null : node.Modifiers.Select(ToDto).ToList(),
             ContextModifiers = node.ContextModifiers.Count == 0 ? null : node.ContextModifiers.Select(ToDto).ToList()
         };
@@ -170,6 +172,16 @@ namespace Core.PassiveTree
 
         private static PassiveNode? FromDto(PassiveNodeDto dto, List<string> issues)
         {
+            // Asked of the file rather than the built node: a line that failed to parse is still a line the
+            // author wrote, and a node dropping it would slip through as a passive nobody meant to author.
+            bool authoredLines = dto.Modifiers is { Count: > 0 } || dto.ContextModifiers is { Count: > 0 };
+
+            if (PassiveNode.WhyChannelsCollide(dto.PassiveId, authoredLines) is { } collision)
+            {
+                issues.Add($"node '{dto.Id}': {collision}, skipped");
+                return null;
+            }
+
             try
             {
                 var node = new PassiveNode
@@ -182,8 +194,12 @@ namespace Core.PassiveTree
                     Y = dto.Y,
                     Title = dto.Title ?? string.Empty,
                     Description = dto.Description ?? string.Empty,
-                    AbilityId = dto.AbilityId ?? string.Empty
+                    AbilityId = dto.AbilityId ?? string.Empty,
+                    PassiveId = dto.PassiveId
                 };
+
+                foreach (KeyValuePair<string, float> property in dto.Properties ?? [])
+                    node.Properties[property.Key] = property.Value;
 
                 foreach (ModifierLineDto lineDto in dto.Modifiers ?? [])
                 {

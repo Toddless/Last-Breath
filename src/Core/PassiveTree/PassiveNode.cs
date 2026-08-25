@@ -34,11 +34,38 @@ namespace Core.PassiveTree
         /// <summary>Ability this node unlocks or sockets into; empty for content nodes.</summary>
         public string AbilityId { get; set; } = string.Empty;
 
+        /// <summary>Passive skill the node hands over when it is taken, built on the spot from
+        /// <see cref="Properties"/>; null on a node that speaks in lines. A blank id normalizes to null.</summary>
+        public string? PassiveId
+        {
+            get => field;
+            set => field = string.IsNullOrWhiteSpace(value) ? null : value;
+        }
+
+        /// <summary>Named numbers the passive is built with, in the shape a record's factory reads them —
+        /// balance is authored here, never inside the skill.</summary>
+        public Dictionary<string, float> Properties { get; } = [];
+
+        public bool IsPassive => PassiveId is not null;
+
         public List<ModifierLine> Modifiers { get; } = [];
 
         /// <summary>Pipeline knobs the node tunes — separate from <see cref="Modifiers"/> because the two
         /// reach a fighter by different roads (parameter resolution vs. context pipelines).</summary>
         public List<ContextModifierLine> ContextModifiers { get; } = [];
+
+        /// <summary>The node says something in lines, on either channel. Lines and a passive are
+        /// alternatives — a node carrying both is refused whole where it is read.</summary>
+        public bool HasLines => Modifiers.Count > 0 || ContextModifiers.Count > 0;
+
+        /// <summary>Why a node carrying this payload cannot be read, or null when it can. A node reaches
+        /// the fighter one way: as a passive built from its own numbers, or as lines. Written both ways it
+        /// promises two payloads for one point and no reader can say which one it owes. One wording for the
+        /// reader that refuses such a node and the report that warns the author before he writes one.</summary>
+        public static string? WhyChannelsCollide(string? passiveId, bool hasLines) =>
+            !string.IsNullOrWhiteSpace(passiveId) && hasLines
+                ? $"grants passive '{passiveId}' and carries modifier lines — a node speaks one way or the other"
+                : null;
 
         /// <summary>Everything the node says in lines, both channels. The per-class content limits count
         /// content, not the road a line takes — and a composite is one piece of content however many

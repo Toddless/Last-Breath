@@ -46,6 +46,16 @@ namespace Core.PassiveTree
         [JsonProperty("abilityId", NullValueHandling = NullValueHandling.Ignore)]
         public string? AbilityId { get; set; }
 
+        /// <summary>Passive skill the node grants instead of lines. Absent on a node that speaks in lines,
+        /// which is every node written before the key existed.</summary>
+        [JsonProperty("passiveId", NullValueHandling = NullValueHandling.Ignore)]
+        public string? PassiveId { get; set; }
+
+        /// <summary>Numbers the passive is tuned by. Kept in authored order rather than sorted: these are
+        /// hand-balanced figures, and reordering them would re-diff a file nobody edited.</summary>
+        [JsonProperty("properties", NullValueHandling = NullValueHandling.Ignore)]
+        public Dictionary<string, float>? Properties { get; set; }
+
         [JsonProperty("modifiers", NullValueHandling = NullValueHandling.Ignore)]
         public List<ModifierLineDto>? Modifiers { get; set; }
 

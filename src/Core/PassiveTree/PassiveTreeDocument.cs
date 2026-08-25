@@ -183,8 +183,20 @@ namespace Core.PassiveTree
                 // instead of one per question.
                 List<NodeLineGroup> lines = node.LineGroups();
 
-                // Both channels count against one limit — a line is content whichever road it takes.
-                if (lines.Count < rule.MinModifiers)
+                // The reader refuses such a node whole, and the edges leaning on it go with it — said here
+                // so the author hears it before saving, instead of the next load quietly losing that
+                // corner of his tree.
+                if (PassiveNode.WhyChannelsCollide(node.PassiveId, node.HasLines) is { } collision)
+                    issues.Add($"{node.Id}: {collision}");
+
+                // Numbers tuned for a passive the node never names: no factory is ever handed them, so the
+                // balance sits in the file doing nothing. Worth saying, not worth the node.
+                if (!node.IsPassive && node.Properties.Count > 0)
+                    issues.Add($"{node.Id}: carries {node.Properties.Count} propert(ies) but names no passive — nobody reads them");
+
+                // Both channels count against one limit — a line is content whichever road it takes. A
+                // passive is the node's payload in place of lines, so the floor is not asked of it.
+                if (!node.IsPassive && lines.Count < rule.MinModifiers)
                     issues.Add($"{node.Id}: {node.Kind} needs at least {rule.MinModifiers} modifier line(s), has {lines.Count}");
 
                 if (lines.Count > rule.MaxModifiers)

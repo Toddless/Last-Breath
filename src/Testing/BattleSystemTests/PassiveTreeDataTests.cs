@@ -6,6 +6,8 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Modifiers.Conditions;
     using Core.Modifiers.Context;
     using Core.PassiveTree;
+    using Core.PassiveTree.Summary;
+    using Core.PassiveTree.View;
 
     /// <summary>
     /// The tree is authored by hand in one file and read by both the game and the editor, so the two
@@ -740,6 +742,287 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(provider.Tree.Contains("start_str"));
             // The bad node and the edge that leaned on it: reported, skipped, load still stands.
             Assert.AreEqual(2, provider.Issues.Count, string.Join("; ", provider.Issues));
+        }
+
+        /// <summary>A node that hands over a passive instead of lines: the id it names and the numbers the
+        /// passive is tuned by both survive the round trip, and the numbers keep the order they were
+        /// authored in — sorting them would re-diff a file nobody edited.</summary>
+        [TestMethod]
+        public void APassiveNodeCarriesItsIdAndItsNumbersThroughTheRoundTrip()
+        {
+            string canonical = """
+                {
+                    "version": 1,
+                    "budget": 20,
+                    "nodes": [
+                        {
+                            "id": "keystone_1",
+                            "kind": "Keystone",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "title": "Porcupine",
+                            "passiveId": "Passive_Skill_Porcupine",
+                            "properties": {
+                                "damagePercent": 0.25,
+                                "armorPercent": 0.1
+                            }
+                        }
+                    ],
+                    "edges": []
+                }
+
+                """.ReplaceLineEndings("\n");
+            List<string> issues = [];
+
+            PassiveTreeDocument document = PassiveTreeSerializer.Deserialize(canonical, issues);
+            PassiveNode? node = document.Find("keystone_1");
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            Assert.IsNotNull(node);
+            Assert.AreEqual("Passive_Skill_Porcupine", node.PassiveId);
+            Assert.IsTrue(node.IsPassive);
+            Assert.IsFalse(node.HasLines);
+            Assert.AreEqual(2, node.Properties.Count, "the numbers the passive is built with were lost at the door");
+            Assert.AreEqual(0.25f, node.Properties["damagePercent"], 0.0001f);
+            Assert.AreEqual(0.1f, node.Properties["armorPercent"], 0.0001f);
+            Assert.AreEqual(canonical, PassiveTreeSerializer.Serialize(document),
+                "load+save changed a file carrying a passive node");
+        }
+
+        /// <summary>Every tree written before the keys existed: no id, no numbers, and the writer puts
+        /// neither back — a node that never granted a passive must not start claiming one.</summary>
+        [TestMethod]
+        public void ANodeWithoutTheNewKeysReadsAndIsWrittenExactlyAsBefore()
+        {
+            const string json = """
+                {
+                    "version": 1,
+                    "budget": 10,
+                    "nodes": [
+                        {
+                            "id": "small_1",
+                            "kind": "Small",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "modifiers": [ { "parameter": "Armor", "valueType": "Increase", "value": 0.06 } ]
+                        }
+                    ],
+                    "edges": []
+                }
+                """;
+            List<string> issues = [];
+
+            PassiveTreeDocument document = PassiveTreeSerializer.Deserialize(json, issues);
+            PassiveNode? node = document.Find("small_1");
+            string rewritten = PassiveTreeSerializer.Serialize(document);
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            Assert.IsNotNull(node);
+            Assert.IsNull(node.PassiveId);
+            Assert.IsFalse(node.IsPassive);
+            Assert.AreEqual(0, node.Properties.Count);
+            Assert.AreEqual(1, node.Modifiers.Count);
+            Assert.IsFalse(rewritten.Contains("passiveId"), "a node that grants no passive was written back claiming one");
+            Assert.IsFalse(rewritten.Contains("properties"), "empty numbers were written into a file that never carried them");
+        }
+
+        /// <summary>Two payloads for one point: no reader can say which one the node owes, so it is refused
+        /// whole. The rule is "not both", not "a keystone must be a passive" — the keystone beside it says
+        /// its piece in lines and is untouched, which is how every keystone reads until it is converted.</summary>
+        [TestMethod]
+        public void ANodeCarryingAPassiveAndLinesAtOnceIsRefusedWholeAndItsNeighbourStands()
+        {
+            const string json = """
+                {
+                    "version": 1,
+                    "budget": 10,
+                    "nodes": [
+                        {
+                            "id": "keystone_1",
+                            "kind": "Keystone",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "passiveId": "Passive_Skill_Execute",
+                            "properties": { "threshold": 0.2 },
+                            "modifiers": [ { "parameter": "Armor", "valueType": "Increase", "value": 0.06 } ]
+                        },
+                        {
+                            "id": "keystone_2",
+                            "kind": "Keystone",
+                            "x": 1.0,
+                            "y": 1.0,
+                            "contextModifiers": [ { "parameter": "BleedDamage", "valueType": "Increase", "value": 0.35 } ]
+                        },
+                        {
+                            "id": "keystone_3",
+                            "kind": "Keystone",
+                            "x": 2.0,
+                            "y": 2.0,
+                            "passiveId": "Passive_Skill_Incineration",
+                            "contextModifiers": [ { "parameter": "BleedDamage", "valueType": "Increase", "value": 0.35 } ]
+                        }
+                    ],
+                    "edges": []
+                }
+                """;
+            List<string> issues = [];
+
+            PassiveTreeDocument document = PassiveTreeSerializer.Deserialize(json, issues);
+            PassiveNode? neighbour = document.Find("keystone_2");
+
+            Assert.IsNull(document.Find("keystone_1"), "a node promising a passive AND lines was kept, half of it unreadable");
+            // The pipeline channel is a road to the fighter like the other one, so a passive beside a knob
+            // is the same broken promise — the rule asks about lines, not about one list.
+            Assert.IsNull(document.Find("keystone_3"), "a passive was allowed to stand beside a context line");
+            Assert.IsNotNull(neighbour, "one refused node cost the tree the node beside it");
+            Assert.AreEqual(1, neighbour.ContextModifiers.Count, "a keystone speaking in lines alone is legal and must survive untouched");
+            Assert.AreEqual(2, issues.Count, string.Join("; ", issues));
+            StringAssert.Contains(issues[0], "keystone_1");
+            StringAssert.Contains(issues[1], "keystone_3");
+        }
+
+        /// <summary>An id that is only whitespace names no passive: the node keeps its lines, is not
+        /// refused as speaking both ways, and the blank never goes back into the file as a key.</summary>
+        [TestMethod]
+        public void ABlankPassiveIdIsNoPassiveAtAll()
+        {
+            const string json = """
+                {
+                    "version": 1,
+                    "budget": 10,
+                    "nodes": [
+                        {
+                            "id": "small_1",
+                            "kind": "Small",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "passiveId": "   ",
+                            "modifiers": [ { "parameter": "Armor", "valueType": "Increase", "value": 0.06 } ]
+                        }
+                    ],
+                    "edges": []
+                }
+                """;
+            List<string> issues = [];
+
+            PassiveTreeDocument document = PassiveTreeSerializer.Deserialize(json, issues);
+            PassiveNode? node = document.Find("small_1");
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            Assert.IsNotNull(node, "a node naming no passive was refused for speaking both ways");
+            Assert.IsNull(node.PassiveId, "a blank id came back as a passive nobody can build");
+            Assert.IsFalse(node.IsPassive);
+            Assert.AreEqual(1, node.Modifiers.Count, "the node lost the line it actually carries");
+            Assert.IsFalse(PassiveTreeSerializer.Serialize(document).Contains("passiveId"),
+                "a blank id was written back into the file as a key");
+            Assert.IsNull(new PassiveNode { PassiveId = string.Empty }.PassiveId);
+        }
+
+        /// <summary>The same rule on the author's screen. The reader throws such a node away WITH the edges
+        /// leaning on it, so a tool that saved one would cost the author a corner of his tree at the next
+        /// load — the report has to name it before it is written.</summary>
+        [TestMethod]
+        public void TheAuthoringReportNamesANodeSpeakingBothWays()
+        {
+            var document = new PassiveTreeDocument();
+            var node = new PassiveNode
+            {
+                Id = "keystone_1", Kind = PassiveNodeKind.Keystone, PassiveId = "Passive_Skill_Porcupine"
+            };
+            node.ContextModifiers.Add(new ContextModifierLine { Parameter = ContextParameter.BleedDamage, Value = 0.1f });
+            document.AddNode(node);
+
+            List<string> issues = document.Validate();
+
+            Assert.IsTrue(issues.Any(issue => issue.Contains("keystone_1") && issue.Contains("one way or the other")),
+                "the report accepted a node the reader will refuse whole: " + string.Join("; ", issues));
+        }
+
+        /// <summary>Numbers authored for a passive the node never names. The factory that would read them is
+        /// never called, so they are balance sitting dead in the file — said out loud, but not at the price
+        /// of the node: a typo in an id must not cost the player a point's worth of tree.</summary>
+        [TestMethod]
+        public void TheAuthoringReportNamesNumbersWithNoPassiveToReadThem_AndKeepsTheNode()
+        {
+            var document = new PassiveTreeDocument();
+            var node = new PassiveNode { Id = "keystone_1", Kind = PassiveNodeKind.Keystone };
+            node.Properties["damagePercent"] = 0.25f;
+            document.AddNode(node);
+
+            List<string> issues = document.Validate();
+
+            Assert.IsTrue(issues.Any(issue => issue.Contains("keystone_1") && issue.Contains("nobody reads them")),
+                "numbers nothing will ever read passed the report in silence: " + string.Join("; ", issues));
+            Assert.IsNotNull(document.Find("keystone_1"), "a report cost the author his node");
+        }
+
+        /// <summary>A passive IS the node's payload, so the per-class floor on lines has nothing to ask it —
+        /// otherwise every converted node would be reported empty for saying what it says another way.</summary>
+        [TestMethod]
+        public void APassiveNodeIsNotCalledEmptyForCarryingNoLines()
+        {
+            var document = new PassiveTreeDocument();
+            document.AddNode(new PassiveNode
+            {
+                Id = "small_1", Kind = PassiveNodeKind.Small, Stance = Stance.Strength, PassiveId = "Passive_Skill_Soulless"
+            });
+
+            List<string> issues = document.Validate();
+
+            Assert.IsFalse(issues.Any(issue => issue.Contains("small_1") && issue.Contains("at least")),
+                "a node granting a passive was reported as having nothing on it: " + string.Join("; ", issues));
+        }
+
+        /// <summary>The passive reaches the fighter by its own road, so the parametric channel has nothing
+        /// to hand over for it — a taken passive node must not add a parameter to the source, and must not
+        /// cost the node beside it its own.</summary>
+        [TestMethod]
+        public void ATakenPassiveNodeAddsNothingToTheParametricChannel()
+        {
+            var document = new PassiveTreeDocument();
+            var passive = new PassiveNode
+            {
+                Id = "keystone_1", Kind = PassiveNodeKind.Keystone, PassiveId = "Passive_Skill_Execute"
+            };
+            passive.Properties["threshold"] = 0.2f;
+            var lined = new PassiveNode { Id = "small_1", Kind = PassiveNodeKind.Small };
+            lined.Modifiers.Add(new ModifierLine { Parameter = EntityParameter.Armor, ValueType = ModifierValueType.Increase, Value = 0.06f });
+            document.AddNode(passive);
+            document.AddNode(lined);
+
+            var source = new PassiveTreeParameterSource(new ConditionProvider(ConditionParser.Default()));
+            source.Rebuild(document, ["keystone_1", "small_1"]);
+
+            CollectionAssert.AreEquivalent(new[] { EntityParameter.Armor }, source.AffectedParameters.ToArray(),
+                "the passive channel leaked into the parametric one");
+        }
+
+        /// <summary>A node with no lines is a node with nothing to print, not a reader that falls over: the
+        /// wheel's wording and the totals both have to come back empty-handed and keep standing.</summary>
+        [TestMethod]
+        public void APassiveNodeWithNoLinesPrintsAndSumsWithoutFalling()
+        {
+            var document = new PassiveTreeDocument();
+            var node = new PassiveNode
+            {
+                Id = "keystone_1",
+                Kind = PassiveNodeKind.Keystone,
+                Title = "Porcupine",
+                Description = "returns what it takes",
+                PassiveId = "Passive_Skill_Porcupine"
+            };
+            node.Properties["damagePercent"] = 0.25f;
+            document.AddNode(node);
+
+            TreeSummary summary = PassiveTreeSummary.Build(document, ["keystone_1"], NoBaseline.Instance);
+
+            Assert.AreEqual(0, node.LineCount);
+            Assert.AreEqual(0, PassiveNodeLines.Of(node, null, null, null).Count, "a node with nothing to say printed a line");
+            Assert.AreEqual("Porcupine", PassiveNodeLines.TitleOf(node, null));
+            Assert.AreEqual(0, summary.Parameters.Count);
+            Assert.AreEqual(0, summary.Context.Count);
+            Assert.AreEqual(1, summary.Keystones.Count, "a keystone granting a passive vanished from the summary");
+            Assert.IsFalse(summary.IsEmpty);
         }
 
         [TestMethod]
