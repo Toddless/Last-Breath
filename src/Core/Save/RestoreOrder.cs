@@ -23,6 +23,11 @@ namespace Core.Save
         /// <summary>Inventory + equipment: the parameter modifier sources.</summary>
         public const int Items = 20;
 
+        /// <summary>Trader shelves: after the world clock, whose game-time the restored restock deadlines
+        /// are measured against, and beside Items — a shelf holds concrete instances written in the same
+        /// shape the bag writes its own.</summary>
+        public const int TraderShelf = 22;
+
         /// <summary>Quest log: after Items so restored states sit on the settled inventory
         /// (objectives are re-derived from facts + inventory, never stored).</summary>
         public const int Quests = 25;

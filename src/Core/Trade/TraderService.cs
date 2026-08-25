@@ -16,6 +16,14 @@ namespace Core.Trade
     /// remembers the unit price the trader paid — undoing a sale costs exactly what it earned.</summary>
     public record TraderOffer(string OfferId, IItem Item, int Remaining, bool IsRandomEquip, bool IsBuyback = false, int BuybackUnitPrice = 0);
 
+    /// <summary>One trader's shelf as it stands: what is on it, what waits on its buyback row, and the
+    /// game minute it is due to restock at.</summary>
+    public record TraderShelf(string TraderId, double NextRestockMinutes, IReadOnlyList<TraderOffer> Offers, IReadOnlyList<TraderOffer> Buyback);
+
+    /// <summary>Every shelf plus the offer numbering they share — without the counter a shelf carried over
+    /// from a file and a freshly stocked one would hand the same offer id to two different things.</summary>
+    public record TraderShelves(int OfferCounter, IReadOnlyList<TraderShelf> Shelves);
+
     public interface ITraderService
     {
         /// <summary>The trader's current shelf (buyback offers included); restocks lazily when its
@@ -31,13 +39,20 @@ namespace Core.Trade
         void AddBuyback(string traderId, IItem item, int amount, int unitPrice);
 
         TraderDefinition? GetTrader(string traderId);
+
+        /// <summary>The shelves as they stand, for the save file. Reading them stocks nothing: a trader
+        /// nobody has visited has no shelf yet, and a capture must not be the visit that rolls one.</summary>
+        TraderShelves CaptureShelves();
+
+        /// <summary>Puts the stored shelves back in place of the current ones, restock deadlines and offer
+        /// numbering included — a loaded shelf is the one the player left, not a fresh roll.</summary>
+        void RestoreShelves(TraderShelves shelves);
     }
 
     /// <summary>
-    /// Hybrid stock (Todd 2026-07-24): the authored catalog rolls per restock (chance gates an
-    /// entry's appearance), the random slots mint real equip instances through the item pipeline.
-    /// Stock is session state for now — it is NOT saved (a reload restocks; revisit with the
-    /// anti-savescam pass).
+    /// Hybrid stock: the authored catalog rolls per restock (chance gates an entry's appearance), the
+    /// random slots mint real equip instances through the item pipeline. Shelves are saved whole, so a
+    /// reload is not a way to shop for a better roll — they refresh on their own game-time schedule.
     /// </summary>
     public class TraderService(
         ITraderProvider traders,
@@ -81,9 +96,7 @@ namespace Core.Trade
             var state = EnsureFreshState(traderId);
             return state == null
                 ? []
-                : state.Offers.Concat(state.Buyback).Where(offer => offer.Remaining > 0)
-                    .Select(offer => new TraderOffer(offer.OfferId, offer.Item, offer.Remaining, offer.IsRandomEquip, offer.IsBuyback, offer.BuybackUnitPrice))
-                    .ToList();
+                : state.Offers.Concat(state.Buyback).Where(Standing).Select(Described).ToList();
         }
 
         public IItem? TakeMany(string traderId, string offerId, int amount)
@@ -124,11 +137,43 @@ namespace Core.Trade
             while (state.Buyback.Count > BuybackCapacity) state.Buyback.RemoveAt(0); // oldest mistake expires first
         }
 
+        /// <summary>Only what still stands is written down: a sold-out offer is invisible, unbuyable and
+        /// replaced whole by the next restock, so carrying it would write a bought item twice — once on
+        /// the shelf it left and once in the bag it went to.</summary>
+        public TraderShelves CaptureShelves() => new(
+            _offerCounter,
+            _states.Select(pair => new TraderShelf(
+                pair.Key,
+                pair.Value.NextRestockMinutes,
+                pair.Value.Offers.Where(Standing).Select(Described).ToList(),
+                pair.Value.Buyback.Where(Standing).Select(Described).ToList())).ToList());
+
+        public void RestoreShelves(TraderShelves shelves)
+        {
+            _states.Clear();
+            _offerCounter = shelves.OfferCounter;
+            foreach (var shelf in shelves.Shelves)
+                _states[shelf.TraderId] = new TraderState
+                {
+                    NextRestockMinutes = shelf.NextRestockMinutes,
+                    Offers = [.. shelf.Offers.Select(Rebuilt)],
+                    Buyback = [.. shelf.Buyback.Select(Rebuilt)]
+                };
+        }
+
         public void ResetSession()
         {
             _states.Clear();
             _offerCounter = 0;
         }
+
+        private static bool Standing(Offer offer) => offer.Remaining > 0;
+
+        private static TraderOffer Described(Offer offer) =>
+            new(offer.OfferId, offer.Item, offer.Remaining, offer.IsRandomEquip, offer.IsBuyback, offer.BuybackUnitPrice);
+
+        private static Offer Rebuilt(TraderOffer offer) =>
+            new(offer.OfferId, offer.Item, offer.IsRandomEquip, offer.IsBuyback, offer.BuybackUnitPrice) { Remaining = offer.Remaining };
 
         private TraderState? EnsureFreshState(string traderId)
         {
