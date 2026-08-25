@@ -24,9 +24,9 @@ namespace LastBreath.UI
             ("UI_Char_Attributes", [EntityParameter.Strength, EntityParameter.Dexterity, EntityParameter.Intelligence]),
             ("UI_Char_Offense",
             [
-                EntityParameter.PhysicalDamage, EntityParameter.SpellDamage, EntityParameter.Accuracy,
-                EntityParameter.CriticalChance, EntityParameter.CriticalDamage, EntityParameter.AdditionalHitChance,
-                EntityParameter.MulticastChance, EntityParameter.ArmorPenetration,
+                EntityParameter.PhysicalDamage, EntityParameter.ColdDamage, EntityParameter.FireDamage, EntityParameter.LightningDamage,
+                EntityParameter.SpellDamage, EntityParameter.Accuracy, EntityParameter.CriticalChance, EntityParameter.CriticalDamage,
+                EntityParameter.AdditionalHitChance, EntityParameter.MulticastChance, EntityParameter.ArmorPenetration,
             ]),
             ("UI_Char_Defense",
             [
@@ -57,7 +57,7 @@ namespace LastBreath.UI
             _playerAccessor = provider.GetService<IPlayerAccessor>();
 
             _relations.PlayerReputationChanged += OnReputationChanged;
-            if (_playerAccessor.Player != null) _playerAccessor.Player.Parameters.ParameterChanged += OnParameterChanged;
+            _playerAccessor.Player?.Parameters.ParameterChanged += OnParameterChanged;
 
             RenderStats();
             RenderReputation();
@@ -67,8 +67,8 @@ namespace LastBreath.UI
 
         public override void _ExitTree()
         {
-            if (_relations != null) _relations.PlayerReputationChanged -= OnReputationChanged;
-            if (_playerAccessor?.Player != null) _playerAccessor.Player.Parameters.ParameterChanged -= OnParameterChanged;
+            _relations?.PlayerReputationChanged -= OnReputationChanged;
+            _playerAccessor?.Player?.Parameters.ParameterChanged -= OnParameterChanged;
         }
 
         private void OnReputationChanged(ReputationChangedArgs change) => RenderReputation();

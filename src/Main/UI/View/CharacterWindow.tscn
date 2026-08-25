@@ -53,6 +53,7 @@ current_tab = 0
 [node name="Stats" type="ScrollContainer" parent="Center/Panel/Margin/Layout/Tabs" unique_id=118867420]
 layout_mode = 2
 horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
 metadata/_tab_index = 0
 
 [node name="StatsBox" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Tabs/Stats" unique_id=741932011]
