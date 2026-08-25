@@ -28,11 +28,15 @@ namespace Core.Save.Participants
     /// is a character whose fourth socket quietly went missing; one the board will not take back goes to
     /// the BAG, and one that cannot even be minted stays in the file. Each comes from a quest
     /// that runs once and exists nowhere else, so no reading of the data may end with one gone.</para>
+    /// <para>The cooldowns are the one live figure the section carries. A remainder outlives the battle it
+    /// was spent in, so a load that dropped it would let the player buy every ability back by quitting to
+    /// the menu.</para>
     /// <para>Versions: 2 dropped the learned list, 3 added the sockets, 4 gave each the numbers its augment
     /// rolled, 5 dropped the free upgrade choices (the sockets are now the only authority over what an
     /// ability does), 6 turned the socket map into a LIST because a repointed node can leave two entries
     /// under one node id and a map could keep only one, 7 added the ornaments (an older file names none,
-    /// which is a character wearing none), 8 writes each augment's rarity by name instead of by ordinal.
+    /// which is a character wearing none), 8 writes each augment's rarity by name instead of by ordinal,
+    /// 9 added the cooldown remainders (an older file names none, which is a character who owes nothing).
     /// Files 4 and 5 are still read, node id in the key instead of a field.
     /// Below <see cref="OldestReadable"/> the section is refused whole
     /// (<see cref="RestoreWithoutSection"/>), leaving every other section untouched.</para>
@@ -82,7 +86,7 @@ namespace Core.Save.Participants
         private readonly List<OrnamentSaveData> _unplaceable = [];
 
         public string SectionId => "abilityBook";
-        public int Version => 8;
+        public int Version => 9;
         public int RestoreOrder => Save.RestoreOrder.Abilities;
 
         public JToken Capture()
@@ -99,6 +103,7 @@ namespace Core.Save.Participants
 
             CaptureSockets(data);
             CaptureOrnaments(data);
+            CaptureCooldowns(data, book);
             return JToken.FromObject(data);
         }
 
@@ -114,23 +119,27 @@ namespace Core.Save.Participants
             // Before the body and before any guard that could return early: the sockets carry the player's
             // property, and an unreadable body must not leave the board dressed in the previous playthrough.
             RestoreOrnaments(data);
-            RestoreLayout(data);
+
+            var saved = Body(data)?.ToObject<AbilityBookSaveData>();
+            RestoreLayout(saved);
 
             // After the slots and whether or not there is a book: the binder is what turns the restored
             // arrangement into upgrades, and it is the same one a player's own install goes through.
             augments?.Bind();
+
+            // Last of all: dress the abilities first, then hand each what it still owes. A remainder laid
+            // down before the augments are on would be measured against an ability that is not the one the
+            // player is getting back.
+            RestoreCooldowns(saved);
         }
 
         /// <summary>Puts the stances back the way the file left them. Skipped whole where there is no
         /// book to lay them onto, or where the body says nothing this build can read — neither costs the
         /// player anything, because the slots were restored before this ran.</summary>
-        private void RestoreLayout(JToken data)
+        private void RestoreLayout(AbilityBookSaveData? saved)
         {
             var book = playerAccessor.Player?.AbilityBook;
-            if (book == null) return;
-
-            var saved = Body(data)?.ToObject<AbilityBookSaveData>();
-            if (saved == null) return;
+            if (book == null || saved == null) return;
 
             foreach ((string stanceName, StanceBookSaveData stanceData) in saved.Stances)
             {
@@ -154,7 +163,8 @@ namespace Core.Save.Participants
 
         /// <summary>Clears the board explicitly: it is a singleton outliving the scene, so a file with
         /// nothing for this section would otherwise leave the slots holding the previous playthrough's
-        /// augments. The layout needs no such pass — the scene builds a fresh book.</summary>
+        /// augments. Neither the layout nor the cooldowns need such a pass — both live on the ability
+        /// instances, and the scene builds a fresh book holding fresh ones.</summary>
         public void RestoreWithoutSection()
         {
             _unplaceable.Clear();
@@ -218,6 +228,17 @@ namespace Core.Save.Participants
             // The ones this build could place nowhere: written beside the worn ones so the save does not
             // spend them. None is on the board, so no ornament is written twice.
             data.Ornaments.AddRange(_unplaceable);
+        }
+
+        /// <summary>Writes what each ability still owes before it can be cast again. Only the abilities
+        /// that owe something: a ready one is the ordinary case, and writing its zero would fill the file
+        /// with the whole book on every save. Keyed by ability id — the instance id is drawn afresh with
+        /// every book and would name nothing on the way back.</summary>
+        private static void CaptureCooldowns(AbilityBookSaveData data, IAbilityBookComponent book)
+        {
+            foreach (IAbility ability in book.AllAbilities)
+                if (ability.CooldownLeft > 0)
+                    data.Cooldowns[ability.Id] = ability.CooldownLeft;
         }
 
         /// <summary>Puts the ornaments back, and every one lands SOMEWHERE: on the ability the file names,
@@ -329,6 +350,25 @@ namespace Core.Save.Participants
                 "record is left to draw one from: the slot comes back empty.",
                 this);
             return null;
+        }
+
+        /// <summary>Hands each ability back what it still owed when the file was written. The remainder is
+        /// taken as written and not trimmed to what the ability charges today — it was spent under the
+        /// configuration the save was made with, and an augment taken off since does not refund it.
+        /// A negative figure is the one thing corrected: nothing ticks outside a battle, so it would lock
+        /// the ability shut forever. An id the book does not hold is skipped like a slot naming one, the
+        /// allocation being the only authority over which abilities the character owns.</summary>
+        private void RestoreCooldowns(AbilityBookSaveData? saved)
+        {
+            var book = playerAccessor.Player?.AbilityBook;
+            if (book == null || saved == null) return;
+
+            Dictionary<string, IAbility> known = [];
+            foreach (IAbility ability in book.AllAbilities) known.TryAdd(ability.Id, ability);
+
+            foreach ((string abilityId, int left) in saved.Cooldowns)
+                if (known.TryGetValue(abilityId, out IAbility? ability))
+                    ability.CooldownLeft = Math.Max(0, left);
         }
 
         /// <summary>Lays the slots out as the file left them. A slot naming an ability the book does

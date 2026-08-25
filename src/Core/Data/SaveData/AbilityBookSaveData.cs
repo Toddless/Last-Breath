@@ -35,6 +35,17 @@ namespace Core.Data.SaveData
         /// record's to say, and a file repeating it would be free to disagree with the catalog.
         /// </summary>
         [JsonProperty("ornaments")] public List<OrnamentSaveData> Ornaments { get; init; } = [];
+
+        /// <summary>
+        /// How many turns each ability still owes before it can be cast again, keyed by ability id.
+        /// The id and not the instance id: an instance is drawn afresh on every load and would match
+        /// nothing. Only what is still owed is written — an ability ready to cast is the ordinary case
+        /// and needs no entry, so a file says nothing about a character who has spent nothing.
+        /// The remainder is the FILE'S, not the ability's: it was measured under the configuration the
+        /// save was written with, so it comes back as written rather than trimmed to what the ability
+        /// charges today.
+        /// </summary>
+        [JsonProperty("cooldowns")] public Dictionary<string, int> Cooldowns { get; init; } = [];
     }
 
     /// <summary>One ornament and the ability wearing it. Two ids and nothing else: everything else about

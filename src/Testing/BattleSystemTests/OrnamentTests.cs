@@ -528,9 +528,10 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void TheSectionDeclaresTheCurrentVersion()
         {
-            // 7 brought the ornaments, 8 writes each augment's rarity by name. A bump nobody meant is a
-            // file the shipped build refuses, so the number is pinned rather than derived.
-            Assert.AreEqual(8, Participant(new AbilitySocketBoard()).Version);
+            // 7 brought the ornaments, 8 writes each augment's rarity by name, 9 carries what each
+            // ability still owes before it can be cast again. A bump nobody meant is a file the shipped
+            // build refuses, so the number is pinned rather than derived.
+            Assert.AreEqual(9, Participant(new AbilitySocketBoard()).Version);
         }
 
         [TestMethod]
