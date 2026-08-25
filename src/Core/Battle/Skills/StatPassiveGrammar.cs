@@ -91,6 +91,16 @@ namespace Core.Battle.Skills
             return lines;
         }
 
+        /// <summary>The key a line is written under: the same words <see cref="TryReadLine"/> reads, spelled
+        /// by the one class that knows the language. An authoring tool composing keys of its own would be a
+        /// second speaker of the grammar, free to drift from this one — and free to spell a typo no author
+        /// could see. Says nothing about whether the line is legal: the reader is what refuses a flag or a
+        /// carrier feeding itself, and it goes on being the only thing that does.</summary>
+        public static string Key(EntityParameter parameter, ModifierValueType valueType, EntityParameter? perParameter) =>
+            perParameter is null
+                ? $"{parameter}{Separator}{valueType}"
+                : $"{parameter}{Separator}{valueType}{Separator}{perParameter}";
+
         /// <summary>One field as a line, or the reason it is not one. The whole grammar lives here and
         /// nowhere else — both strictnesses above are this method plus a decision about the refusal.</summary>
         public static bool TryReadLine(string name, float value, out StatPassiveLine line, out string? refusal)

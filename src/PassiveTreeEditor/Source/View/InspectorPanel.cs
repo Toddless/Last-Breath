@@ -35,6 +35,22 @@ namespace PassiveTreeEditor.Source.View
             "field name the passive's factory reads. For the stat family: Parameter:ValueType"
             + " or Parameter:ValueType:PerParameter";
 
+        /// <summary>Said of a field the catalog names. The factory reads it by that name, so the name is
+        /// not the author's to type over and the row is not his to take away — he writes the number.</summary>
+        private const string RequiredFieldHint =
+            "the passive's factory reads this field by name — it comes with the passive and cannot be"
+            + " renamed or removed. Only its number is authored";
+
+        private const string StatLineHint =
+            "a stat line: the parameter, the bucket, and the carrier it is counted per unit of."
+            + " The field name is spelled from the dropdowns, so it cannot be mistyped";
+
+        /// <summary>Said of a key the grammar refused — one no dropdown could have spelled, so it came
+        /// from a hand-written file. Kept exactly as written until the author says otherwise.</summary>
+        private const string RawKeyHint =
+            "this field name is not a stat line the game can read. Correct it or remove the row —"
+            + " the tool writes back what it cannot read exactly as it found it";
+
         /// <summary>What a line carrying a number may be. Flag is deliberately absent: it is a switch,
         /// and a switch belongs only to the context knobs whose binding reads no value at all.</summary>
         private static readonly ModifierValueType[] s_numericValueTypes =
@@ -52,6 +68,12 @@ namespace PassiveTreeEditor.Source.View
         /// edits this list and hands the whole of it back, so the dictionary is rebuilt from a known order
         /// rather than patched key by key — which is what would let a renamed field jump position.</summary>
         private readonly List<KeyValuePair<string, float>> _properties = [];
+
+        /// <summary>The same numbers again, held apart into the words a stat line is written from — the
+        /// shape the dropdowns edit. Rebuilt from <see cref="_properties"/> whenever the section is drawn
+        /// and folded back into it after every gesture, so the file keeps seeing one ordered list of keyed
+        /// numbers and nothing about the record's format follows the panel.</summary>
+        private readonly List<StatFieldRow> _statRows = [];
 
         private AbilityCatalog? _abilities;
         private ConditionProvider? _conditions;
@@ -382,8 +404,31 @@ namespace PassiveTreeEditor.Source.View
         {
             if (!_editor.SetPassiveId(node, id)) return;
 
+            MaterializeRequired(node);
             ChangedTotals();
             Rebuild();
+        }
+
+        /// <summary>
+        /// Writes in the fields the passive just named reads and the node does not carry, each at zero.
+        /// Naming a passive is naming the numbers it is built from: leaving the author to type their names
+        /// back in is asking him to spell what the catalog already knows, and a name spelled a letter wrong
+        /// is a field the factory never sees.
+        /// <para>A step of its own, taken as part of the gesture that named the passive and closed with it,
+        /// so one step back takes the fields away and a second takes the name. Only ever additive — what
+        /// the node already carries keeps its place and its number, and nothing is written for the stat
+        /// family, whose fields are lines the author invents.</para>
+        /// </summary>
+        private void MaterializeRequired(PassiveNode node)
+        {
+            if (_passives is null || StatPassiveGrammar.Owns(node.PassiveId)) return;
+
+            IReadOnlyList<string> required = _passives.RequiredFields(node.PassiveId);
+            if (required.Count == 0) return;
+
+            _properties.Clear();
+            _properties.AddRange(PassiveFieldRows.WithRequired(required, node.PropertyRows()));
+            ApplyList(node);
         }
 
         private void CommitPassiveId(PassiveNode node, LineEdit idEdit, string text)
@@ -395,6 +440,7 @@ namespace PassiveTreeEditor.Source.View
 
             if (_editor.SetPassiveId(node, text))
             {
+                MaterializeRequired(node);
                 ChangedTotals();
                 RebuildLater();
                 return;
@@ -462,21 +508,294 @@ namespace PassiveTreeEditor.Source.View
         }
 
         /// <summary>
-        /// The named numbers, one row each, in the order the file keeps them. Every gesture rewrites the
-        /// whole list rather than one key: a dictionary hands a fresh key the slot a removed one left
-        /// behind, so a field added after a removal would otherwise land where the removed one stood.
+        /// The named numbers, one row each, in the order the file keeps them. Which editor draws them is
+        /// the id's business, not the file's: the stat family writes its keys in a grammar, so its rows are
+        /// dropdowns spelling one, while a named passive's fields are names a factory reads and its rows
+        /// stay a name and a number. Both hand the same ordered list of keyed numbers back — the panel
+        /// changes, the record does not.
         /// </summary>
         private void BuildProperties(PassiveNode node)
         {
-            AddChild(EditorControls.Caption($"PROPERTIES  {_properties.Count}"));
+            if (StatPassiveGrammar.Owns(node.PassiveId)) BuildStatLines(node);
+            else BuildFields(node);
+        }
 
-            if (_properties.Count == 0 && !node.IsPassive)
+        // ── properties: the stat family ────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// The stat family's fields as the lines they are. The author picks the three words a key is made
+        /// of instead of typing the key, which is what makes a mistyped stat line impossible to author:
+        /// every dropdown offers only what the grammar reads, and the key is spelled by the grammar itself.
+        /// <para>A key the grammar refuses cannot have come from here — only from a hand-written file — and
+        /// it gets a row of its own that shows it verbatim rather than being quietly dropped.</para>
+        /// </summary>
+        private void BuildStatLines(PassiveNode node)
+        {
+            // Taken from the numbers, once per build: the rows are a reading of the record, never a second
+            // copy of it that could drift from what the node says.
+            _statRows.Clear();
+            _statRows.AddRange(PassiveFieldRows.ReadStat(_properties));
+
+            AddChild(EditorControls.Caption($"PROPERTIES  {_statRows.Count}"));
+
+            for (int index = 0; index < _statRows.Count; index++) AddChild(StatRow(node, index));
+
+            var add = new Button
+            {
+                Text = "+ line",
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                TooltipText = StatLineHint
+            };
+
+            add.Pressed += () =>
+            {
+                _statRows.Add(PassiveFieldRows.Fresh(_statRows));
+                ApplyStatList(node);
+                ChangedTotals();
+                Rebuild();
+            };
+
+            AddChild(add);
+        }
+
+        private Control StatRow(PassiveNode node, int index) =>
+            _statRows[index].IsRaw ? RawStatRow(node, index) : PickedStatRow(node, index);
+
+        /// <summary>One stat line, in the shape a modifier line is authored in: what it feeds on top, how
+        /// it is counted underneath. The carrier picker is the third word of the key and "— none" is its
+        /// absence, which is the whole difference between a two-word key and a three-word one.</summary>
+        private Control PickedStatRow(PassiveNode node, int index)
+        {
+            StatFieldRow row = _statRows[index];
+
+            var box = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            var top = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            box.AddChild(top);
+
+            // The carrier is kept out of the list, and the parameter out of the carrier's: the grammar
+            // refuses a line measured per unit of what it feeds, so the pair is never offered at all.
+            top.AddChild(Sealing(EditorControls.Picker(PassiveFieldRows.ParametersExcept(row.PerParameter),
+                row.Parameter, parameter => Respell(node, index, line => line.Parameter = parameter))));
+
+            top.AddChild(RemoveButton(() =>
+            {
+                _statRows.RemoveAt(index);
+                ApplyStatList(node);
+            }));
+
+            var bottom = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            box.AddChild(bottom);
+
+            // Built before the pickers that write into it, the way the modifier row builds its own.
+            var hint = new Label { CustomMinimumSize = new Vector2(64, 0) };
+
+            OptionButton typePicker = Sealing(EditorControls.Picker(PassiveFieldRows.ValueTypes, row.ValueType,
+                type => Respell(node, index, line => line.ValueType = type)));
+
+            typePicker.SizeFlagsHorizontal = SizeFlags.Fill;
+            bottom.AddChild(typePicker);
+
+            SpinBox value = Sealing(EditorControls.Number(row.Value, 0.001));
+            bottom.AddChild(value);
+            bottom.AddChild(hint);
+
+            value.ValueChanged += amount =>
+            {
+                if (index >= _statRows.Count) return;
+
+                row.Value = (float)amount;
+                hint.Text = ValueHint(row.ValueType, row.Value);
+
+                // Each row merges on its own identity, so stepping one number and then another is two
+                // steps back rather than one.
+                WriteStatRows(node, $"{EditFields.PropertyValue} {index}");
+            };
+
+            hint.Text = ValueHint(row.ValueType, row.Value);
+
+            // The carrier stands on a line of its own, where a modifier row keeps its condition: it is the
+            // rarest of the three words, and the parameter names are long enough that a fourth control on
+            // the row above would push the whole panel wider than the canvas can spare.
+            var carried = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            carried.AddChild(new Label { Text = "per", CustomMinimumSize = new Vector2(28, 0) });
+
+            OptionButton perPicker = Sealing(EditorControls.OptionalPicker(
+                PassiveFieldRows.ParametersExcept(row.Parameter), row.PerParameter,
+                carrier => Respell(node, index, line => line.PerParameter = carrier), emptyLabel: "— none"));
+
+            perPicker.TooltipText = StatLineHint;
+            carried.AddChild(perPicker);
+            box.AddChild(carried);
+
+            return box;
+        }
+
+        /// <summary>A field the grammar could not read, shown as the file wrote it. Not dropped and not
+        /// guessed at: a hand-written key is the author's sentence, and the tool's part is to put it where
+        /// he can see what is wrong with it and fix or remove it.</summary>
+        private Control RawStatRow(PassiveNode node, int index)
+        {
+            StatFieldRow row = _statRows[index];
+
+            var box = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            var top = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            box.AddChild(top);
+
+            var name = new LineEdit
+            {
+                Text = row.Name,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                CustomMinimumSize = new Vector2(150, 0),
+                TooltipText = RawKeyHint
+            };
+
+            name.TextSubmitted += text => CommitRawKey(node, name, index, text);
+            name.FocusExited += () => CommitRawKey(node, name, index, name.Text);
+            name.FocusExited += _editor.Seal;
+            top.AddChild(name);
+
+            SpinBox value = Sealing(EditorControls.Number(row.Value, 0.001));
+            value.ValueChanged += amount =>
+            {
+                if (index >= _statRows.Count) return;
+
+                row.Value = (float)amount;
+                WriteStatRows(node, $"{EditFields.PropertyValue} {index}");
+            };
+
+            top.AddChild(value);
+            top.AddChild(RemoveButton(() =>
+            {
+                _statRows.RemoveAt(index);
+                ApplyStatList(node);
+            }));
+
+            StatPassiveGrammar.TryReadLine(row.Name, row.Value, out _, out string? refusal);
+            box.AddChild(Warned($"unreadable: {refusal}"));
+            return box;
+        }
+
+        /// <summary>A word of a stat line changed, and the key it spells written back. Refused when another
+        /// row already writes that key: two rows under one name are one number in the file, and which of
+        /// them survives is a coin toss nobody asked for — the dropdown snaps back instead.</summary>
+        private void Respell(PassiveNode node, int index, Action<StatFieldRow> word)
+        {
+            if (index >= _statRows.Count) return;
+
+            StatFieldRow row = _statRows[index];
+            EntityParameter parameter = row.Parameter;
+            ModifierValueType valueType = row.ValueType;
+            EntityParameter? carrier = row.PerParameter;
+
+            word(row);
+
+            if (PassiveFieldRows.Holds(_statRows, row.Name, index))
+            {
+                row.Parameter = parameter;
+                row.ValueType = valueType;
+                row.PerParameter = carrier;
+                Rebuild();
+                return;
+            }
+
+            // Named per row, like the number beside it: respelling one line and then another is two steps
+            // back rather than one.
+            WriteStatRows(node, $"{EditFields.PropertyName} {index}");
+
+            // What either picker may offer follows from what the other holds, and the hint from the bucket.
+            Rebuild();
+        }
+
+        /// <summary>A hand-written key corrected. Held to the same rule a free field's name is: never
+        /// emptied, never a repeat of a key already on the node. A correction that the grammar can read
+        /// turns the row into dropdowns on the rebuild, because the rows are read from the record.</summary>
+        private void CommitRawKey(PassiveNode node, LineEdit field, int index, string text)
+        {
+            if (_canvas is null || index >= _statRows.Count) return;
+
+            StatFieldRow row = _statRows[index];
+            string wanted = text.Trim();
+            if (string.Equals(wanted, row.Name, StringComparison.Ordinal)) return;
+
+            if (wanted.Length == 0 || PassiveFieldRows.Holds(_statRows, wanted, index))
+            {
+                field.Text = row.Name;
+                return;
+            }
+
+            row.RawName = wanted;
+            WriteStatRows(node, $"{EditFields.PropertyName} {index}");
+            RebuildLater();
+        }
+
+        /// <summary>The rows folded back into the ordered list and handed to the door. The list is what the
+        /// node is given — the rows never reach it — so nothing about how the panel shows a record can
+        /// change what is written to file.</summary>
+        private void WriteStatRows(PassiveNode node, string field)
+        {
+            _properties.Clear();
+            _properties.AddRange(PassiveFieldRows.Write(_statRows));
+            ApplyProperties(node, field);
+        }
+
+        /// <summary>The rows folded back and handed over as a list gesture — a row appearing or
+        /// disappearing is one step, and the run is closed as part of it.</summary>
+        private void ApplyStatList(PassiveNode node)
+        {
+            _properties.Clear();
+            _properties.AddRange(PassiveFieldRows.Write(_statRows));
+            ApplyList(node);
+        }
+
+        // ── properties: named passives ─────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// A named passive's numbers: the fields its factory reads, plus whatever else the node carries.
+        /// A field the catalog names wears its name as a label — the factory reads it by that name, so it
+        /// is nothing the author needs to type or is free to delete; a field beyond the catalog stays the
+        /// free pair it always was, which is what keeps a passive the tool's catalog has not heard of
+        /// authorable at all.
+        /// </summary>
+        private void BuildFields(PassiveNode node)
+        {
+            IReadOnlyList<string> required = _passives?.RequiredFields(node.PassiveId) ?? [];
+
+            // Read, not filled in: a row stands for a number the node carries. The fields it is missing are
+            // written by the gesture that names the passive, and until then the warning is what says so.
+            List<CatalogFieldRow> rows = PassiveFieldRows.ReadFields(required, _properties);
+
+            AddChild(EditorControls.Caption($"PROPERTIES  {rows.Count}"));
+
+            if (rows.Count == 0 && !node.IsPassive)
             {
                 AddChild(EditorControls.Wrapped("Name a passive above; the numbers it is tuned by go here."));
                 return;
             }
 
-            for (int index = 0; index < _properties.Count; index++) AddChild(PropertyRow(node, index));
+            for (int index = 0; index < rows.Count; index++) AddChild(PropertyRow(node, rows[index], index));
+
+            // A node written before the tool filled these in, or one whose file was edited by hand. Naming
+            // the passive is what writes them; here the author asks for it in as many words, because doing
+            // it for him while the panel is merely being drawn would put the fields back on every step back
+            // through the history and leave an undo he cannot get past.
+            if (MissingFields(node) is { Count: > 0 } missing)
+            {
+                var fill = new Button
+                {
+                    Text = $"+ {string.Join(", ", missing)}",
+                    SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                    TooltipText = RequiredFieldHint
+                };
+
+                fill.Pressed += () =>
+                {
+                    MaterializeRequired(node);
+                    ChangedTotals();
+                    Rebuild();
+                };
+
+                AddChild(fill);
+            }
 
             var add = new Button { Text = "+ field", SizeFlagsHorizontal = SizeFlags.ExpandFill };
             add.Pressed += () =>
@@ -490,24 +809,12 @@ namespace PassiveTreeEditor.Source.View
             AddChild(add);
         }
 
-        private Control PropertyRow(PassiveNode node, int index)
+        private Control PropertyRow(PassiveNode node, CatalogFieldRow field, int index)
         {
             var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            row.AddChild(field.IsRequired ? RequiredName(field.Name) : FreeName(node, index));
 
-            var name = new LineEdit
-            {
-                Text = _properties[index].Key,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                CustomMinimumSize = new Vector2(150, 0),
-                TooltipText = FieldNameHint
-            };
-
-            name.TextSubmitted += text => CommitFieldName(node, name, index, text);
-            name.FocusExited += () => CommitFieldName(node, name, index, name.Text);
-            name.FocusExited += _editor.Seal;
-            row.AddChild(name);
-
-            SpinBox value = Sealing(EditorControls.Number(_properties[index].Value, 0.001));
+            SpinBox value = Sealing(EditorControls.Number(field.Value, 0.001));
             value.ValueChanged += amount =>
             {
                 if (index >= _properties.Count) return;
@@ -520,14 +827,44 @@ namespace PassiveTreeEditor.Source.View
             };
 
             row.AddChild(value);
-            // The button tells the totals and rebuilds for itself, so the row only says what changed.
-            row.AddChild(RemoveButton(() =>
-            {
-                _properties.RemoveAt(index);
-                ApplyList(node);
-            }));
+
+            // The button tells the totals and rebuilds for itself, so the row only says what changed. A
+            // field of the catalog has none: removing it would leave the passive built without a number
+            // its factory reads, and the author would have to know the name to write it back.
+            row.AddChild(field.IsRequired
+                ? new Button { Text = "×", Disabled = true, TooltipText = RequiredFieldHint }
+                : RemoveButton(() =>
+                {
+                    _properties.RemoveAt(index);
+                    ApplyList(node);
+                }));
 
             return row;
+        }
+
+        private static Label RequiredName(string name) => new()
+        {
+            Text = name,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            CustomMinimumSize = new Vector2(150, 0),
+            ClipText = true,
+            TooltipText = RequiredFieldHint
+        };
+
+        private LineEdit FreeName(PassiveNode node, int index)
+        {
+            var name = new LineEdit
+            {
+                Text = _properties[index].Key,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                CustomMinimumSize = new Vector2(150, 0),
+                TooltipText = FieldNameHint
+            };
+
+            name.TextSubmitted += text => CommitFieldName(node, name, index, text);
+            name.FocusExited += () => CommitFieldName(node, name, index, name.Text);
+            name.FocusExited += _editor.Seal;
+            return name;
         }
 
         /// <summary>A rename that would empty a name or repeat one already on the node is put back rather

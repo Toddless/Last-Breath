@@ -160,13 +160,14 @@ namespace PassiveTreeEditor.Source.View
 
         /// <summary>The same dropdown plus an explicit "no value" entry, for a member that is
         /// optional rather than defaulted.</summary>
-        public static OptionButton OptionalPicker<T>(T? current, Action<T?> apply, string emptyLabel = "—")
+        public static OptionButton OptionalPicker<T>(IEnumerable<T> members, T? current, Action<T?> apply,
+            string emptyLabel = "—")
             where T : struct, Enum
         {
             var picker = new OptionButton { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
             picker.AddItem(emptyLabel, NoneId);
 
-            Dictionary<int, T> byId = Fill(picker, Enum.GetValues<T>(), current);
+            Dictionary<int, T> byId = Fill(picker, members, current);
 
             picker.ItemSelected += index =>
             {
@@ -176,5 +177,9 @@ namespace PassiveTreeEditor.Source.View
 
             return picker;
         }
+
+        public static OptionButton OptionalPicker<T>(T? current, Action<T?> apply, string emptyLabel = "—")
+            where T : struct, Enum =>
+            OptionalPicker(Enum.GetValues<T>(), current, apply, emptyLabel);
     }
 }
