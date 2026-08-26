@@ -41,10 +41,11 @@ namespace Core.PassiveTree
         }
 
         /// <summary>Points the player is expected to have at the mastery cap. The design range is
-        /// 60–65; 62 is the figure the cluster arithmetic in the draft is written against.</summary>
+        /// 60–65, and 65 is the figure the shipped tree is authored against. The shipped file states its
+        /// budget outright, so this constant only speaks for a tree that names none.</summary>
         public int Budget { get; set; } = DefaultBudget;
 
-        public const int DefaultBudget = 62;
+        public const int DefaultBudget = 65;
 
         /// <summary>How far apart the layout is pulled when drawn — multiplies distances only, node size
         /// unaffected. Belongs to the document, not a viewer's setting: the author composes the tree at

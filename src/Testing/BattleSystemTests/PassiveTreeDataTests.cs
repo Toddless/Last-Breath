@@ -229,6 +229,30 @@ namespace LastBreathTest.BattleSystemTests
                 "the default spread was written back into a file that never carried it");
         }
 
+        /// <summary>A file that names no budget is read at the figure the design settled on, not at
+        /// whatever the last edit of the constant happened to leave behind: the number decides how much
+        /// tree a character ever owns, so it is pinned here rather than inferred from the shipped file —
+        /// which states its own budget and would hide a drift in the fallback.</summary>
+        [TestMethod]
+        public void ADocumentWithNoBudgetFieldReadsAsTheDesignBudget()
+        {
+            const string json = """
+                {
+                    "version": 1,
+                    "nodes": [ { "id": "small_1", "kind": "Small", "x": 0.0, "y": 0.0 } ],
+                    "edges": []
+                }
+                """;
+            List<string> issues = [];
+
+            PassiveTreeDocument document = PassiveTreeSerializer.Deserialize(json, issues);
+
+            Assert.AreEqual(0, issues.Count, string.Join("; ", issues));
+            Assert.AreEqual(65, PassiveTreeDocument.DefaultBudget, "the design budget moved away from the 65 the tree is authored against");
+            Assert.AreEqual(65, document.Budget, "a file naming no budget was read at some other figure");
+            Assert.AreEqual(65, new PassiveTreeDocument().Budget, "a tree built in the tool starts at a budget nobody designed");
+        }
+
         /// <summary>A spread that is not a spread at all falls back to the default rather than clamping
         /// up to the nearest legal stop, which would be a layout nobody composed. Anything else lands on
         /// the grid the view snaps to, so the file and the picture cannot part company.</summary>
