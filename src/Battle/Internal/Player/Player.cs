@@ -23,7 +23,7 @@ namespace Battle.Internal.Player
     using Godot;
     using Source;
     using Stateless;
-    using AnimationsComponent = Components.AnimationsComponent;
+    using AnimationsComponentBase = Components.AnimationsComponentBase;
     using GameServiceProvider = Services.GameServiceProvider;
 
     public partial class Player : CharacterBody2D, IPlayer
@@ -60,7 +60,7 @@ namespace Battle.Internal.Player
         private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
         private float _baseSpeed = 500;
-        [Export] private AnimationsComponent? _animationsComponent;
+        [Export] private AnimationsComponentBase? _animationsComponent;
         [Export] private Area2D? _interactionArea;
         [Export] private Camera2D? _camera;
 

@@ -60,7 +60,7 @@ namespace LastBreath.Player
         private readonly DamageResolutionChain _damageChain = DamageResolutionChain.CreateDefault();
         private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
-        [Export] private AnimationsComponent? _animationsComponent;
+        [Export] private AnimationsComponentBase? _animationsComponent;
         [Export] private Area2D? _interactionArea;
         [Export] private Camera2D? _camera;
 

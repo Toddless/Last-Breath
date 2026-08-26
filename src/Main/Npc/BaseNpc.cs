@@ -5,6 +5,7 @@ namespace LastBreath.Npc
     using System.Linq;
     using System.Threading.Tasks;
     using Battle.Source;
+    using Battle.Source.Presentation;
     using Components;
     using Core;
     using Core.Ai;
@@ -83,7 +84,7 @@ namespace LastBreath.Npc
         private string _lastMoveAnimation = string.Empty;
 
         private readonly RandomNumberGenerator _rnd = new();
-        [Export] private AnimationsComponent? _animationsComponent;
+        [Export] private AnimationsComponentBase? _animationsComponent;
 
         /// <summary>The fighter's own roll stream behind the domain contract: defensive rolls
         /// (suppression) burn it instead of an anonymous generator built for a single hit.</summary>
@@ -305,6 +306,8 @@ namespace LastBreath.Npc
             CanTalk = definition.CanTalk;
             _definitionParameters = definition.Parameters;
 
+            ApplyVisual(definition.NpcId, provider);
+
             foreach ((EntityParameter parameter, float value) in definition.Parameters)
                 Parameters.SetBaseValueForParameter(parameter, value);
 
@@ -331,6 +334,14 @@ namespace LastBreath.Npc
             _lifecycle = NpcLifecycleFactory.Create(definition, new DefaultRandomNumberGenerator());
             if (_lifecycle is IUndeadRiseLifecycle undead) undead.ResurrectionReady += OnResurrectionReady;
             if (_lifecycle is IAliveRiseLifecycle alive) alive.ReviveReady += OnReviveReady;
+        }
+
+        /// <summary>Per-NPC art from the shared visual library; no entry — the scene's placeholder frames stay.</summary>
+        private void ApplyVisual(string npcId, IGameServiceProvider provider)
+        {
+            var config = provider.GetService<INpcVisualProvider>()?.GetVisual(npcId);
+            if (config?.Frames == null) return;
+            _animationsComponent?.ApplyVisual(config.Frames, config.Scale);
         }
 
         /// <summary>Bosses and archons get diminishing returns on hard control (CombatRules.json);

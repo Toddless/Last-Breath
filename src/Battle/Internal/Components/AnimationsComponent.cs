@@ -1,38 +1,48 @@
-﻿namespace Battle.Internal.Components
+namespace Battle.Internal.Components
 {
     using System;
     using System.Threading.Tasks;
     using Core.Entity.Components;
     using Godot;
 
+    /// <summary>
+    /// The clip animator, and the place that decides an NPC does not have one: a name the art draws
+    /// as real motion (more than a single frame) plays as a clip, everything else — a lone facing
+    /// frame, an unauthored blow, a cast pose — goes to the tween animator built on first need.
+    /// </summary>
     [GlobalClass]
-    public partial class AnimationsComponent : Node, IAnimationsComponent
+    public partial class AnimationsComponent : AnimationsComponentBase
     {
-        private const float MissingClipSeconds = 0.5f;
+        private string _previousAnimation = TweenAnimationRules.ClipFor(TweenFacing.Down);
+        private TweenAnimationsComponent? _tweens;
 
-        [Export] private AnimatedSprite2D? _animatedSprite2D;
-        private string _previousAnimation = "Idle_Down";
+        /// <summary>The stand-in for art without real clips; fully animated NPCs never build one.
+        /// A method, not a property: Godot reads properties on its own (state serialization) and
+        /// would spawn the node behind our back.</summary>
+        private TweenAnimationsComponent Tweens() => _tweens ??= CreateTweens();
 
-        public async Task PlayAnimationAsync(string animation, float speedScale = 1f)
+        public override async Task PlayAnimationAsync(string animation, float speedScale = 1f)
         {
-            if (_animatedSprite2D == null) return;
-            _previousAnimation = _animatedSprite2D.GetAnimation();
-            _animatedSprite2D.SpeedScale = speedScale;
+            if (_animatedSprite2D is not { } sprite) return;
+            if (sprite.SpriteFrames is not { } frames || !HasRealClip(animation))
+            {
+                await Tweens().PlayAnimationAsync(animation, speedScale);
+                return;
+            }
+
+            _tweens?.Suspend(); // an authored clip owns the sprite alone: no breathing, no mirror, no leftovers
+            _previousAnimation = sprite.GetAnimation();
+            sprite.SpeedScale = speedScale;
             try
             {
-                if (_animatedSprite2D.SpriteFrames is { } sf && sf.HasAnimation(animation))
-                {
-                    _animatedSprite2D.Play(animation);
-                    // Looping clips never emit animation_finished — awaiting it would hang the director
-                    // forever; they play for their computed length instead.
-                    if (sf.GetAnimationLoop(animation))
-                        await ToSignal(GetTree().CreateTimer(GetClipDuration(sf, animation) / speedScale), "timeout");
-                    else
-                        await ToSignal(_animatedSprite2D, "animation_finished");
-                    _animatedSprite2D.Play(_previousAnimation);
-                }
+                sprite.Play(animation);
+                // Looping clips never emit animation_finished — awaiting it would hang the director
+                // forever; they play for their computed length instead.
+                if (frames.GetAnimationLoop(animation))
+                    await ToSignal(GetTree().CreateTimer(TweenAnimationRules.Scaled(GetClipDuration(frames, animation), speedScale)), SceneTreeTimer.SignalName.Timeout);
                 else
-                    await ToSignal(GetTree().CreateTimer(MissingClipSeconds / speedScale), "timeout");
+                    await ToSignal(sprite, AnimatedSprite2D.SignalName.AnimationFinished);
+                sprite.Play(_previousAnimation);
             }
             catch (Exception e)
             {
@@ -40,45 +50,51 @@
             }
             finally
             {
-                _animatedSprite2D.SpeedScale = 1f;
+                sprite.SpeedScale = 1f;
             }
         }
 
-        public void PlayAnimation(string animation) => _animatedSprite2D?.Play(animation);
-
-        public bool HasClip(string animation) => _animatedSprite2D?.SpriteFrames?.HasAnimation(animation) == true;
-
-        /// <summary>
-        /// Swaps the sprite's clip set (per-NPC art from the visual library) and restarts the
-        /// current clip so the swap is seamless. Scale multiplies the scene's base sprite scale —
-        /// call once per freshly instantiated scene, not on re-application.
-        /// </summary>
-        public void ApplyVisual(SpriteFrames frames, float scale = 1f)
+        public override void PlayAnimation(string animation)
         {
-            if (_animatedSprite2D == null) return;
+            if (!HasRealClip(animation))
+            {
+                Tweens().PlayAnimation(animation);
+                return;
+            }
 
-            string current = _animatedSprite2D.GetAnimation();
-            _animatedSprite2D.SpriteFrames = frames;
-            if (scale != 1f) _animatedSprite2D.Scale *= scale;
-
-            if (frames.HasAnimation(current)) _animatedSprite2D.Play(current);
-            else if (frames.HasAnimation(_previousAnimation)) _animatedSprite2D.Play(_previousAnimation);
+            _tweens?.Suspend();
+            _animatedSprite2D?.Play(animation);
         }
 
-        public float GetClipSeconds(string animation) =>
-            _animatedSprite2D?.SpriteFrames is { } sf && sf.HasAnimation(animation)
-                ? GetClipDuration(sf, animation)
-                : MissingClipSeconds;
+        public override bool HasClip(string animation) => HasRealClip(animation) || TweenAnimationRules.Handles(animation);
 
-        private static float GetClipDuration(SpriteFrames frames, string animation)
+        public override float GetClipSeconds(string animation) =>
+            _animatedSprite2D?.SpriteFrames is { } frames && HasRealClip(animation)
+                ? GetClipDuration(frames, animation)
+                : TweenAnimationRules.Seconds(animation);
+
+        public override void ApplyVisual(SpriteFrames frames, float scale = 1f)
         {
-            float speed = (float)frames.GetAnimationSpeed(animation);
-            if (speed <= 0) return MissingClipSeconds;
+            base.ApplyVisual(frames, scale);
+            _tweens?.ResetBaseline(); // the swap scales the sprite the tweens measure from
+        }
 
-            float totalFrames = 0;
-            for (int i = 0; i < frames.GetFrameCount(animation); i++)
-                totalFrames += (float)frames.GetFrameDuration(animation, i);
-            return totalFrames / speed;
+        /// <summary>Whether the art draws this name as real motion; the rule itself is shared and pinned.
+        /// The frame count is asked for only when the clip exists — the engine complains otherwise.</summary>
+        private bool HasRealClip(string animation)
+        {
+            if (_animatedSprite2D?.SpriteFrames is not { } frames) return false;
+
+            bool authored = frames.HasAnimation(animation);
+            return TweenAnimationRules.IsAuthoredMotion(authored, authored ? frames.GetFrameCount(animation) : 0);
+        }
+
+        private TweenAnimationsComponent CreateTweens()
+        {
+            var tweens = new TweenAnimationsComponent { Name = nameof(TweenAnimationsComponent) };
+            tweens.UseSprite(_animatedSprite2D);
+            AddChild(tweens);
+            return tweens;
         }
     }
 }

@@ -81,7 +81,7 @@ namespace Battle.Internal.Npc
 
         private float _baseSpeed = 500;
         private readonly RandomNumberGenerator _rnd = new();
-        [Export] private AnimationsComponent? _animationsComponent;
+        [Export] private AnimationsComponentBase? _animationsComponent;
 
         /// <summary>The fighter's own roll stream behind the domain contract: defensive rolls
         /// (suppression) burn it instead of an anonymous generator built for a single hit.</summary>

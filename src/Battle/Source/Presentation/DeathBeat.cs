@@ -23,8 +23,9 @@ namespace Battle.Source.Presentation
         /// <summary>
         /// How long the queue waits while the corpse falls, in UNSCALED seconds — the caller divides
         /// by the current playback speed, so an abort fast-forward shortens the fall instead of
-        /// holding the quit for it. No clip (sprite-less fighters, art not authored yet) means there
-        /// is nothing to wait for: zero, never the missing-clip placeholder pause.
+        /// holding the quit for it. The animator answers for its own fall: an authored clip its
+        /// length, the tween stand-in the length of its topple. An animator with no fall at all
+        /// (sprite-less fighters) means there is nothing to wait for: zero.
         /// </summary>
         public static float HoldSeconds(IAnimationsComponent animations) =>
             animations.HasClip(Animation) ? Math.Max(animations.GetClipSeconds(Animation), 0f) : 0f;
