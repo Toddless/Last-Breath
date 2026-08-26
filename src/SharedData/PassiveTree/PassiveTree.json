@@ -205,19 +205,11 @@
             "x": -0.0,
             "y": -547.0,
             "title": "Unlimited Power",
-            "modifiers": [
-                {
-                    "parameter": "PhysicalDamage",
-                    "valueType": "Increase",
-                    "value": 0.01,
-                    "perParameter": "Strength"
-                },
-                {
-                    "parameter": "HealthRecovery",
-                    "valueType": "Multiplicative",
-                    "value": -0.25
-                }
-            ]
+            "passiveId": "Passive_Skill_Stats_Unlimited_Power",
+            "properties": {
+                "PhysicalDamage:Increase:Strength": 0.01,
+                "HealthRecovery:Multiplicative": -0.25
+            }
         },
         {
             "id": "keystone_7",
@@ -443,8 +435,8 @@
         {
             "id": "notable_added_lightning_damage_1",
             "kind": "Notable",
-            "stance": "Intelligence",
-            "hybridStance": "Dexterity",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
             "x": 132.0,
             "y": 466.0,
             "title": "Added Lightning Damage",
@@ -2040,13 +2032,13 @@
             ]
         },
         {
-            "id": "small_added_ligthning_damage_1",
+            "id": "small_added_lightning_damage_1",
             "kind": "Small",
             "stance": "Dexterity",
             "hybridStance": "Intelligence",
             "x": 63.0,
             "y": 477.0,
-            "title": "Added Ligthning Damage",
+            "title": "Added Lightning Damage",
             "modifiers": [
                 {
                     "parameter": "LightningDamage",
@@ -2063,13 +2055,13 @@
             ]
         },
         {
-            "id": "small_added_ligthning_damage_2",
+            "id": "small_added_lightning_damage_2",
             "kind": "Small",
             "stance": "Dexterity",
             "hybridStance": "Intelligence",
             "x": 94.0,
             "y": 446.0,
-            "title": "Added Ligthning Damage",
+            "title": "Added Lightning Damage",
             "modifiers": [
                 {
                     "parameter": "LightningDamage",
@@ -2086,13 +2078,13 @@
             ]
         },
         {
-            "id": "small_added_ligthning_damage_3",
+            "id": "small_added_lightning_damage_3",
             "kind": "Small",
             "stance": "Dexterity",
             "hybridStance": "Intelligence",
             "x": 155.0,
             "y": 432.0,
-            "title": "Added Ligthning Damage",
+            "title": "Added Lightning Damage",
             "modifiers": [
                 {
                     "parameter": "LightningDamage",
@@ -2109,13 +2101,13 @@
             ]
         },
         {
-            "id": "small_added_ligthning_damage_4",
+            "id": "small_added_lightning_damage_4",
             "kind": "Small",
             "stance": "Dexterity",
             "hybridStance": "Intelligence",
             "x": 224.0,
             "y": 449.0,
-            "title": "Added Ligthning Damage",
+            "title": "Added Lightning Damage",
             "modifiers": [
                 {
                     "parameter": "LightningDamage",
@@ -8899,11 +8891,11 @@
         },
         {
             "from": "notable_added_lightning_damage_1",
-            "to": "small_added_ligthning_damage_1"
+            "to": "small_added_lightning_damage_1"
         },
         {
             "from": "notable_added_lightning_damage_1",
-            "to": "small_added_ligthning_damage_4"
+            "to": "small_added_lightning_damage_4"
         },
         {
             "from": "notable_additional_hit_chance_evade_1",
@@ -9466,20 +9458,20 @@
             "to": "small_dex_strength_11"
         },
         {
-            "from": "small_added_ligthning_damage_1",
-            "to": "small_added_ligthning_damage_2"
+            "from": "small_added_lightning_damage_1",
+            "to": "small_added_lightning_damage_2"
         },
         {
-            "from": "small_added_ligthning_damage_1",
+            "from": "small_added_lightning_damage_1",
             "to": "small_dex_int_5"
         },
         {
-            "from": "small_added_ligthning_damage_2",
-            "to": "small_added_ligthning_damage_3"
+            "from": "small_added_lightning_damage_2",
+            "to": "small_added_lightning_damage_3"
         },
         {
-            "from": "small_added_ligthning_damage_3",
-            "to": "small_added_ligthning_damage_4"
+            "from": "small_added_lightning_damage_3",
+            "to": "small_added_lightning_damage_4"
         },
         {
             "from": "small_additional_hit_chance_1",
