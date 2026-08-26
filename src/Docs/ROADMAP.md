@@ -2,6 +2,8 @@
 
 *Created 2026-07-24. Target: a playable public demo (1–2 hours of gameplay). Asset strategy: AI-generated placeholders continuously, key art (hero, bosses, UI) commissioned/hand-made after mechanics freeze. Rough estimate: ~11–16 weeks.*
 
+*Updated 2026-08-26 (tracking resumed after the 2026-07-27 pause): stages 2–3 closed with named tails; the martial-arts rework interlude that consumed the pause is recorded below; stage 6 gains the tween-animation plan for NPCs.*
+
 Tracking: GitHub board #3 (Toddless/Last-Breath). This file is the stage-level view; individual items live as issues.
 
 ## Ground rules
@@ -33,7 +35,7 @@ Biggest gameplay payoff; the demo's climax. Status audit 2026-07-24: FAR more is
 - Moved to Stage 5 (polish): boss presentation iteration — stage-transition beat, "Immune!" beat + log (EffectResistedEvent), StageGuard "N prevented", shield bar over the barrier, arena-wide cast presentation ("Доработать" #66).
 - Deferred by decision: boss intro lines (silent aggro for now), world-boss spawn from bones idea.
 
-## Stage 2 — Crafting resources rework (~1–2 weeks) ← CURRENT
+## Stage 2 — Crafting resources rework ✅ (closed 2026-08-26; two named tails below)
 
 Current crafting resources are broken against the new affix model (prefix/suffix + global/local split). Design drafts: Obsidian `06_Крафт/Список ресурсов для крафта.md` and `03_Предметы/Список пулов по категориям.md` (WIP — several category sections still empty).
 
@@ -42,7 +44,7 @@ Current crafting resources are broken against the new affix model (prefix/suffix
 - [ ] Deferred to #151: new resource ids from the draft + non-line essence effects (DoT stack duration, mastery perks, max-sharpening ops).
 - [ ] Finish the empty draft sections (Todd): Fabric-Weapon, Leather-Jewellery/Weapon, Bone-Armor.
 
-## Stage 3 — Trade (~1–2 weeks) ← CURRENT
+## Stage 3 — Trade ✅ (closed 2026-08-26)
 
 Closes the economy loop (loot → gold → purchases) and activates already-built hooks. Design locked with Todd 2026-07-24: gold is a WALLET counter (not a bag item); price is an INSTANCE VALUATION (`basePrice(blueprint) × rarityMult × (1 + k × upgradeLevel) × ascension`), authored basePrice on blueprints/items + multipliers in `SharedData/Trade/TradeConfiguration.json`; loot-table prices are generator budget units, NOT gold — untouched; trader stock is a HYBRID (authored json catalog id+count+chance + a few random equip slots from the loot pipeline), restocked on game time; entry via the `StartTrade` dialogue action.
 
@@ -52,8 +54,21 @@ Closes the economy loop (loot → gold → purchases) and activates already-buil
 - [x] Buy/Sell via the bus (2026-07-24): `BuyItemRequest`/`SellItemRequest` handlers (all-or-nothing: wallet check-then-spend, full bag refunds); `TradePricing` — buy = valuation × (1 + `Perk_Price_Change`), sell = valuation × buyback × (1 − perk) — first consumer of `ReputationPerkProvider`; unpriced items refuse instead of guessing.
 - [x] Trade operations complete (2026-07-24): quantity on Buy/Sell, buyback shelf at the earned price (cap 12, survives restocks), `OpenTradeWindowMessage` + `StartTrade` dialogue action + `trade` console command; TradeWindow.cs written against a node contract (offer rows code-built, bag grid borrowed from the Inventory service, sell = RMB / Ctrl+RMB on a bag slot).
 - [x] TradeWindow.tscn + merchant NPC + StartTrade dialogue — full loop Godot-confirmed 2026-07-24 (repro also uncovered and fixed: hardcoded veteran npcId in the shared NPC scene's DialogueActor; contact battles starting with NEUTRAL NPCs — OnBodyEnter now gates on ConsidersPlayerAnEnemy, half of "Доработать" #7).
-- Trade tails → Stage 5 polish: window refinements per the final Umbral prototype (expensive-purchase confirm, compare-with-equipped, sell quantity), gold in the PlayerHud, trader stock persistence (anti-savescam), quest gold rewards (narrative action), gold pile icon.
+- Trade tails → Stage 5 polish: window refinements per the final Umbral prototype (expensive-purchase confirm, compare-with-equipped, sell quantity), gold in the PlayerHud, ~~trader stock persistence~~ (DONE `eb450c8e` — traderShelf v1, reload no longer rerolls the shelf), quest gold rewards (narrative action), gold pile icon.
 - [x] Gold entry (design Todd + sim-tuned 2026-07-24): the kill's FINAL budget leftover (after the quality swap) mints a `GoldItem` pile on the floor (normal drop channel; pickup credits the wallet, never the bag). `goldPerBudgetUnit: 4` → 10.7 gold per regular kill, 3.7 for a lvl-1, 5.8 for a boss (its budget buys items instead); `maxGoldPerKill: 300` anti-jackpot fuse (uncapped, an overfed archon minted 46.5k). Curve with the cap: Stack_3 62 → Stack_7 130 → Extreme_Archon 291. Invariant pins both ends. Still open: quest gold rewards (narrative action), pile icon art.
+
+## Interlude — Martial-arts rework & foundations (2026-07-27 … 2026-08-26, done while the roadmap was paused)
+
+The demo's core system was rebuilt and the savegame/exploit ground hardened. Highlights, all reviewed and landed (tests 1565 → 1883):
+
+- **Passive tree in game** (allocation/draft/respec, wheel rendering, popups, summary) + **ability sockets + augments as items** (minting, conversion, rivalry, ornaments as the fourth socket) — the free-upgrade system is gone.
+- **TreeUx phase** (Т-1…Т-14): wheel UX, localization pass, tooltips; **SharedUi** shared catalog + symlink restorer.
+- **Bug wave to the first playable**: effect-duration contract (N turns = N host turn-ends), freshness rule for foreign effects, death animations no longer cut, self-damage visible to taken-modifiers, crit formula trims only the surplus.
+- **Combat systems for keystones**: barrier regen at turn start, resistance maximums (default 75 / ceiling 90), block rolls only in the Strength stance (draw always burned — RNG streams stable), Unblockable registered.
+- **Savegame cluster closed** (anti-savescam): persisted-enum convention test, trader shelf (`traderShelf` v1), ground items (`groundItems` v1), ability cooldowns (`abilityBook` v9), pending-load hardening (no frame of the previous playthrough); reload no longer rerolls shelves, eats unpicked loot, or refreshes cooldowns.
+- **Keystones-as-passives wiring (#202, phases 1–3.1)**: `passiveId` + properties channel on tree nodes, on-the-fly grant service, stat-passive grammar, wheel popup speaks for passive nodes, tree editor with dropdown line authoring, passive catalog + registry sync tests, rebuilt editor exe. Phase 4 (populating keystones) is the owner's current step.
+- **Tree v1/v2 analytics**: equipment budgets per focus (mid/late), wedge inventory, ≤15-cluster proposals per wedge, three reference-build routes (Str/health, mana/cold, DoT+extra attacks) with point arithmetic.
+- Also landed earlier in the pause: reputation system with raids, narrative phase 1 (dialogues/quests/world facts), villagers foundation, NPC visual library + asset-generator pipeline, English "+X to Parameter" formatting.
 
 ## Stage 4 — Demo content & balance (~2 weeks, parallel with Stage 5)
 
@@ -75,7 +90,8 @@ Only what a new player sees in the first hour:
 
 ## Stage 6 — Assets & audio (~3–4 weeks, starts alongside Stage 4)
 
-- [ ] **AI batch continuously** (godot-asset-generator pipeline is ready): item/ability icons, regular NPC sprites, ability VFX clips (data-driven: clip in VfxFrames + config, no code), zone tiles. Each boss gets at least AI art immediately.
+- [ ] **AI batch continuously** (godot-asset-generator pipeline is ready): item/ability icons (97 augment icons landed `ba94ce6b`), regular NPC sprites, ability VFX clips (data-driven: clip in VfxFrames + config, no code), zone tiles. Each boss gets at least AI art immediately.
+- [ ] **NPC tween animation (owner decision 2026-08-26)**: full NPC animations are out of reach for the demo — each NPC gets 4 static sprites (one per facing) and a dedicated tween-based AnimationComponent (movement, attack, ability cast), swappable later for a real-animation component behind the same interface. Scouting the current AnimationsComponent contract first; implementation card to follow.
 - [ ] **Key art commissioned/hand-made near the end**: hero, three bosses, UI frame. Order only after boss mechanics freeze.
 - [ ] **Audio — do not leave for last** (nothing exists yet; half the feel of combat): minimal pass (hits, casts, UI clicks, death, 1–2 music loops — library/CC0 acceptable) before the first external playtests; polish after.
 
