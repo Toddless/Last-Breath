@@ -113,6 +113,10 @@ namespace Battle.Source
                 => new PoolConversionPassiveSkill(WindOfFreedomId, EntityParameter.Armor, EntityParameter.Evade),
             [AgnosticPassiveSkill.PassiveId] = properties
                 => new AgnosticPassiveSkill(properties.Get("costScale")),
+            [StoicismPassiveSkill.PassiveId] = _
+                => new StoicismPassiveSkill(),
+            [ViciousBitePassiveSkill.PassiveId] = properties
+                => new ViciousBitePassiveSkill(properties.Get("perOvercap"), properties.Get("resistancePenalty")),
         };
 
         /// <summary>Every id built by a factory of its own. The open stat family is not among them: it is

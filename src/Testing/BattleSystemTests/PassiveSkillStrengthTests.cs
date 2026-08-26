@@ -66,6 +66,8 @@ namespace LastBreathTest.BattleSystemTests
             // Same step, fatter bonus: the pair that separates the two fields of Trapped Beast.
             yield return Pair(new TrappedBeastPassiveSkill(0.1f, 0.4f), new TrappedBeastPassiveSkill(0.1f, 0.1f));
             yield return Pair(new VampireAttackPassiveSkill(0.3f), new VampireAttackPassiveSkill(0.1f));
+            // Both copies strike the same bargain; what separates them is what a point of reserve buys.
+            yield return Pair(new ViciousBitePassiveSkill(0.02f, -0.6f), new ViciousBitePassiveSkill(0.01f, -0.6f));
         }
 
         /// <summary>Passives without a strength field: every instance is interchangeable, so none of them
@@ -81,6 +83,8 @@ namespace LastBreathTest.BattleSystemTests
             // exactly the same.
             yield return Pair(PoolConversion(), PoolConversion());
             yield return Pair(new SoullessPassiveSkill(), new SoullessPassiveSkill());
+            // The immunity is all-or-nothing and the price is the same for everyone.
+            yield return Pair(new StoicismPassiveSkill(), new StoicismPassiveSkill());
             yield return Pair(new TrueStrikePassiveSkill(), new TrueStrikePassiveSkill());
             yield return Pair(new UnshackledPassiveSkill(), new UnshackledPassiveSkill());
         }
@@ -118,6 +122,28 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsFalse(weak.IsStronger(strong));
             Assert.AreSame(strong, Survivor(strong, weak));
             Assert.AreSame(strong, Survivor(weak, strong));
+        }
+
+        /// <summary>Vicious Bite is a bargain of two numbers pulling opposite ways: what a point of reserve
+        /// buys ranks first, and where two registrations pay the same, the one charging less for it wins.
+        /// Ranking on the bonus alone would hand the slot to a harsher price for nothing.</summary>
+        [TestMethod]
+        public void ViciousBiteRanksTheBonusFirstAndThenTheCheaperPrice()
+        {
+            var richer = new ViciousBitePassiveSkill(0.02f, -0.8f);
+            var poorer = new ViciousBitePassiveSkill(0.01f, -0.4f);
+
+            Assert.IsTrue(richer.IsStronger(poorer), "a fatter bonus must win even beside a gentler price");
+            Assert.IsFalse(poorer.IsStronger(richer));
+            Assert.AreSame(richer, Survivor(poorer, richer));
+
+            var cheap = new ViciousBitePassiveSkill(0.01f, -0.4f);
+            var dear = new ViciousBitePassiveSkill(0.01f, -0.8f);
+
+            Assert.IsTrue(cheap.IsStronger(dear), "with the same bonus the cheaper price must win");
+            Assert.IsFalse(dear.IsStronger(cheap));
+            Assert.AreSame(cheap, Survivor(cheap, dear));
+            Assert.AreSame(cheap, Survivor(dear, cheap));
         }
 
         [TestMethod]

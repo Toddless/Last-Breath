@@ -198,14 +198,33 @@
         {
             var defender = context.Target.Parameters;
 
-            if (!context.IsUnevadable && ChanceRoll.Roll(CalculateEvasionChance(defender.Evade, context.RawAccuracy), draw,
-                    defender.GetChanceLuck(EntityParameter.Evade)))
+            if (!context.IsUnevadable && RollsEvade(context, defender, draw))
                 return AttackResults.Evaded;
 
             if (!context.IsUnblockable && RollsBlock(context.Target, defender, draw))
                 return AttackResults.Blocked;
 
             return AttackResults.Succeed;
+        }
+
+        /// <summary>
+        /// The evasion roll and the denial that can take its verdict away: a defender whose evasion is denied
+        /// (Stoicism) is hit whatever his numbers say.
+        ///
+        /// The draw is taken WHATEVER the denial and only the verdict is gated — the same discipline the
+        /// block roll keeps: a roll skipped would pull every later draw of the fight one step forward, and
+        /// the same seed would play out differently for no reason but what the defender happens to carry.
+        ///
+        /// The denial is read off the defender at the moment of the roll, so a keystone taken or refunded
+        /// mid-battle is in force from the very next swing. Evasion itself stays the number it was, and
+        /// everything counted per point of it is worth exactly what it was worth before.
+        /// </summary>
+        private static bool RollsEvade(IAttackContext context, IEntityParametersComponent defender, Func<float> draw)
+        {
+            bool rolled = ChanceRoll.Roll(CalculateEvasionChance(defender.Evade, context.RawAccuracy), draw,
+                defender.GetChanceLuck(EntityParameter.Evade));
+
+            return rolled && !defender.IsChanceDenied(EntityParameter.Evade);
         }
 
         /// <summary>

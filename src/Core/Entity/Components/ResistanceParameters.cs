@@ -37,5 +37,16 @@ namespace Core.Entity.Components
             MaximumFor(resistance) is { } maximum
                 ? Effective(parameters.GetValueForParameter(resistance), parameters.GetValueForParameter(maximum))
                 : parameters.GetValueForParameter(resistance);
+
+        /// <summary>The reserve above the cap — everything the total carries that mitigates nothing and
+        /// answers to shred first. Never negative: a total under its maximum holds no reserve at all.</summary>
+        public static float Overcap(float total, float maximum) => Math.Max(0f, total - maximum);
+
+        /// <summary>The same reserve read off an entity. A parameter no maximum caps has none: nothing of it
+        /// sits above a cap, so a keystone paid per unit of reserve is paid nothing for it.</summary>
+        public static float Overcap(IEntityParametersComponent parameters, EntityParameter resistance) =>
+            MaximumFor(resistance) is { } maximum
+                ? Overcap(parameters.GetValueForParameter(resistance), parameters.GetValueForParameter(maximum))
+                : 0f;
     }
 }

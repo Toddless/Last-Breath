@@ -48,6 +48,8 @@
         { "id": "Passive_Skill_Resonance", "fields": ["spellDamagePerStack", "multicastPerStack"] },
         { "id": "Passive_Skill_Iron_Will", "fields": [] },
         { "id": "Passive_Skill_Wind_Of_Freedom", "fields": [] },
-        { "id": "Passive_Skill_Agnostic", "fields": ["costScale"] }
+        { "id": "Passive_Skill_Agnostic", "fields": ["costScale"] },
+        { "id": "Passive_Skill_Stoicism", "fields": [] },
+        { "id": "Passive_Skill_Vicious_Bite", "fields": ["perOvercap", "resistancePenalty"] }
     ]
 }

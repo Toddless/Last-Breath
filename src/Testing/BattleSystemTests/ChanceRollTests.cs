@@ -109,6 +109,23 @@ namespace LastBreathTest.BattleSystemTests
                 "luck is bought for a named chance, not for the fighter at large");
         }
 
+        /// <summary>The denial is counted, and a count that could go under zero would owe the next source a
+        /// denial it never gets: a fighter who wore a keystone he never had would be left evading beside one.</summary>
+        [TestMethod]
+        public void ADenialTakenBackWithoutOneGivenLeavesNoDebt()
+        {
+            var parameters = new EntityParametersComponent();
+
+            parameters.RemoveChanceDenial(EntityParameter.Evade);
+            Assert.IsFalse(parameters.IsChanceDenied(EntityParameter.Evade), "a denial nobody gave was taken back into effect");
+
+            parameters.AddChanceDenial(EntityParameter.Evade);
+            Assert.IsTrue(parameters.IsChanceDenied(EntityParameter.Evade), "the keystone paid off a debt instead of denying the chance");
+
+            parameters.RemoveChanceDenial(EntityParameter.Evade);
+            Assert.IsFalse(parameters.IsChanceDenied(EntityParameter.Evade));
+        }
+
         [TestMethod]
         public void EvasionIsRolledBeforeBlock()
         {
@@ -201,6 +218,48 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(2, inStance.Taken, "the resolve stopped burning the evade and block rolls");
             Assert.AreEqual(inStance.Taken, outOfStance.Taken, "leaving the Strength stance shifted the stream behind the block roll");
+        }
+
+        [TestMethod]
+        public void ADeniedEvasionNeverSavesTheDefender()
+        {
+            // Forced across the whole span of the draw: no roll wins an evasion that has been denied,
+            // whatever the fighter carries on his gear or his tree.
+            for (int step = 0; step <= 20; step++)
+            {
+                float roll = step / 20f;
+                var context = Attack(Defender(evade: EvasionScalingFactor * 1000f, block: 0f, denied: EntityParameter.Evade));
+
+                Assert.AreEqual(AttackResults.Succeed, Calculations.ResolveAttackOutcome(context, new Draws(roll, roll).RandFloat),
+                    $"a denied evasion got away on a draw of {roll}");
+            }
+        }
+
+        [TestMethod]
+        public void TheEvasionDenialGatesTheVerdictAndNeverTheStream()
+        {
+            // A gate that skipped the roll would pull every later draw of the fight one step forward, and the
+            // same seed would then play out differently for no reason but what the defender happens to carry.
+            var evading = new Draws(0f, 0f);
+            var denied = new Draws(0f, 0f);
+
+            Assert.AreEqual(AttackResults.Evaded,
+                Calculations.ResolveAttackOutcome(Attack(Defender(evade: EvasionScalingFactor, block: 0f)), evading.RandFloat));
+            Assert.AreEqual(AttackResults.Succeed,
+                Calculations.ResolveAttackOutcome(Attack(Defender(evade: EvasionScalingFactor, block: 0f, denied: EntityParameter.Evade)), denied.RandFloat));
+
+            Assert.AreEqual(1, evading.Taken, "the resolve stopped burning the evade roll");
+            Assert.AreEqual(evading.Taken + 1, denied.Taken,
+                "a denied evasion must burn its own roll and then hand the swing on to the block roll");
+        }
+
+        /// <summary>The denial is addressed to one chance: a defender who cannot evade still blocks.</summary>
+        [TestMethod]
+        public void ADeniedEvasionLeavesTheBlockAlone()
+        {
+            var context = Attack(Defender(evade: EvasionScalingFactor * 1000f, block: 1f, denied: EntityParameter.Evade));
+
+            Assert.AreEqual(AttackResults.Blocked, Calculations.ResolveAttackOutcome(context, new Draws(0f, 0f).RandFloat));
         }
 
         [TestMethod]
@@ -315,12 +374,14 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>Defaults to the Strength stance: block belongs to that guard alone, and a defender who
         /// stood anywhere else would make every block claim above pass for the wrong reason.</summary>
-        private static IFightable Defender(float evade, float block, EntityParameter? lucky = null, StanceGuard? guard = null)
+        private static IFightable Defender(float evade, float block, EntityParameter? lucky = null, StanceGuard? guard = null,
+            EntityParameter? denied = null)
         {
             var parameters = new Mock<IEntityParametersComponent>();
             parameters.SetupGet(p => p.Evade).Returns(evade);
             parameters.SetupGet(p => p.BlockChance).Returns(block);
             if (lucky != null) parameters.Setup(p => p.GetChanceLuck(lucky.Value)).Returns(ChanceLuck.Lucky);
+            if (denied != null) parameters.Setup(p => p.IsChanceDenied(denied.Value)).Returns(true);
 
             guard ??= new StanceGuard();
             var book = new Mock<IAbilityBookComponent>();

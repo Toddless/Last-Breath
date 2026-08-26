@@ -42,6 +42,17 @@
 
         /// <summary>How rolls on <paramref name="parameter"/> settle right now — what <see cref="ChanceRoll"/> asks for.</summary>
         ChanceLuck GetChanceLuck(EntityParameter parameter);
+
+        /// <summary>Denies the owner's rolls on <paramref name="parameter"/> while the source lasts: the roll
+        /// is still taken and only its verdict is lost, so a denial moves nobody's stream. Sources are counted
+        /// like luck's, so the last one to leave is what gives the chance back.
+        /// <para>The parameter itself is untouched — a denied chance is still a number every other rule reads
+        /// (a line paid per point of evasion is worth exactly what it was).</para></summary>
+        void AddChanceDenial(EntityParameter parameter);
+        void RemoveChanceDenial(EntityParameter parameter);
+
+        /// <summary>Whether rolls on <paramref name="parameter"/> can be won at all right now.</summary>
+        bool IsChanceDenied(EntityParameter parameter);
         /// <summary>The parameter counted from its own sources alone, with every pool-conversion line left
         /// out — the measure a conversion takes of the pool it takes over. Counting conversion lines would
         /// close the reading on itself: a conversion's own drain leaves it nothing to convert, and two

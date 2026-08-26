@@ -56,6 +56,11 @@
         /// one another, so the roll asks for a single verdict instead of the list.</summary>
         private readonly Dictionary<EntityParameter, int> _chanceLuck = new();
 
+        /// <summary>Denial sources per parameter, counted the same way: while any of them stands, a roll on
+        /// the parameter is taken and lost. Counted rather than flagged so two sources of one denial (an item
+        /// grant beside a tree node) hand the chance back only when both are gone.</summary>
+        private readonly Dictionary<EntityParameter, int> _chanceDenials = new();
+
         /// <summary>Pools a conversion has taken over. A parameter in here reads nothing whatever its
         /// numbers say — the verdict is categorical, so it is taken after the formula and after the
         /// decorators rather than inside either, where a multiplier or an added figure would leave part of
@@ -117,6 +122,12 @@
 
         public ChanceLuck GetChanceLuck(EntityParameter parameter) => (ChanceLuck)Math.Sign(_chanceLuck.GetValueOrDefault(parameter));
 
+        public void AddChanceDenial(EntityParameter parameter) => ShiftChanceDenial(parameter, 1);
+
+        public void RemoveChanceDenial(EntityParameter parameter) => ShiftChanceDenial(parameter, -1);
+
+        public bool IsChanceDenied(EntityParameter parameter) => _chanceDenials.GetValueOrDefault(parameter) > 0;
+
         /// <summary>The pool as it stands before any conversion touched it — deliberately blind to the mark
         /// that empties it, since this is the very measure a conversion takes of what it is taking over.</summary>
         public float GetUnconvertedValueForParameter(EntityParameter parameter) =>
@@ -137,6 +148,9 @@
         }
 
         private void ShiftChanceLuck(EntityParameter parameter, int delta) => _chanceLuck[parameter] = _chanceLuck.GetValueOrDefault(parameter) + delta;
+
+        private void ShiftChanceDenial(EntityParameter parameter, int delta) =>
+            _chanceDenials[parameter] = Math.Max(0, _chanceDenials.GetValueOrDefault(parameter) + delta);
 
         private IReadOnlyList<IModifier> ModifiersFor(EntityParameter parameter) => _getModifiersForParameter?.Invoke(parameter) ?? [];
 
