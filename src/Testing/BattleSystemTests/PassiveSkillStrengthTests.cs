@@ -8,6 +8,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Entity.Components;
+    using Core.Enums;
     using Moq;
 
     /// <summary>
@@ -24,6 +25,9 @@ namespace LastBreathTest.BattleSystemTests
         public static IEnumerable<object[]> RankedPassives()
         {
             yield return Pair(new AcceleratorPassiveSkill(3), new AcceleratorPassiveSkill(1));
+            // Both copies convert the whole pool; what separates them is the surcharge on every cast, so
+            // the cheaper one is the stronger.
+            yield return Pair(new AgnosticPassiveSkill(0.1f), new AgnosticPassiveSkill(0.4f));
             yield return Pair(new BastionPassiveSkill(0.5f), new BastionPassiveSkill(0.2f));
             yield return Pair(new BleedingPassiveSkill(0.6f, 3, 5), new BleedingPassiveSkill(0.2f, 3, 5));
             yield return Pair(new BloodthirstyPassiveSkill(3, 0.3f), new BloodthirstyPassiveSkill(3, 0.1f));
@@ -73,6 +77,9 @@ namespace LastBreathTest.BattleSystemTests
             yield return Pair(new IncinerationPassiveSkill(), new IncinerationPassiveSkill());
             yield return Pair(new LuckyCriticalChancePassiveSkill(), new LuckyCriticalChancePassiveSkill());
             yield return Pair(new NoCriticalHitsPassiveSkill(), new NoCriticalHitsPassiveSkill());
+            // A conversion is the pair of pools it names and nothing else, so two copies of one are worth
+            // exactly the same.
+            yield return Pair(PoolConversion(), PoolConversion());
             yield return Pair(new SoullessPassiveSkill(), new SoullessPassiveSkill());
             yield return Pair(new TrueStrikePassiveSkill(), new TrueStrikePassiveSkill());
             yield return Pair(new UnshackledPassiveSkill(), new UnshackledPassiveSkill());
@@ -131,6 +138,11 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         private static object[] Pair(ISkill stronger, ISkill weaker) => [stronger.GetType().Name, stronger, weaker];
+
+        /// <summary>One conversion, built the way a registration builds it — same id both times, so the
+        /// two copies collide the way every other pair here does.</summary>
+        private static PoolConversionPassiveSkill PoolConversion() =>
+            new("Passive_Skill_Iron_Will", EntityParameter.Evade, EntityParameter.Armor);
 
         /// <summary>One authored stat passive, built the way a record builds it — same id both times, so
         /// the two copies collide the way every other pair here does.</summary>

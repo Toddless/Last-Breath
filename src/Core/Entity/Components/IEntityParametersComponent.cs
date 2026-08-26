@@ -42,7 +42,11 @@
 
         /// <summary>How rolls on <paramref name="parameter"/> settle right now — what <see cref="ChanceRoll"/> asks for.</summary>
         ChanceLuck GetChanceLuck(EntityParameter parameter);
-        float CalculateForBase(EntityParameter parameter, float baseValue);
+        /// <summary>The parameter counted from its own sources alone, with every pool-conversion line left
+        /// out — the measure a conversion takes of the pool it takes over. Counting conversion lines would
+        /// close the reading on itself: a conversion's own drain leaves it nothing to convert, and two
+        /// conversions pointing at one another would feed each other without end.</summary>
+        float GetUnconvertedValueForParameter(EntityParameter parameter);
         void SetBaseValueForParameter(EntityParameter parameter, float baseValue);
         void OnParameterModifiersChange(object? sender, IModifiersChangedEventArgs args);
     }

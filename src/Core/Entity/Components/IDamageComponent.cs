@@ -12,7 +12,5 @@
         float SpellDamage { get; }
 
         event Action<EntityParameter, float> ParameterChanged;
-
-        float CalculateForBase(EntityParameter parameter, float baseValue);
     }
 }

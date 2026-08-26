@@ -16,8 +16,8 @@
         private const float ResistanceMaximumCeiling = 0.9f;
 
         /// <summary>Effective-value bounds — the single owner of every parameter cap. Applied in the
-        /// indexer, so ALL read channels (named properties, GetValueForParameter, ParameterChanged,
-        /// CalculateForBase previews) agree; decorators cannot push a value past its cap (tracker #42).
+        /// indexer, so ALL read channels (named properties, GetValueForParameter, ParameterChanged)
+        /// agree; decorators cannot push a value past its cap (tracker #42).
         /// Parameters without an entry are floored at zero: every member of the enum is a magnitude
         /// or a chance, and a negative value corrupts downstream formulas (negative armor amplifies
         /// damage). The modifier-recalc path already clamped this way; the decorator path must agree.
@@ -56,8 +56,15 @@
         /// one another, so the roll asks for a single verdict instead of the list.</summary>
         private readonly Dictionary<EntityParameter, int> _chanceLuck = new();
 
+        /// <summary>Pools a conversion has taken over. A parameter in here reads nothing whatever its
+        /// numbers say — the verdict is categorical, so it is taken after the formula and after the
+        /// decorators rather than inside either, where a multiplier or an added figure would leave part of
+        /// a pool that has already been given away alive. Kept as a set instead of asked of the modifier
+        /// list on every read: the indexer answers every parameter read of a fight.</summary>
+        private readonly HashSet<EntityParameter> _convertedPools = [];
+
         private readonly IModuleManager<EntityParameter, IParameterModule<EntityParameter>, EntityParameterModuleDecorator> _moduleManager;
-        private float this[EntityParameter type] => ApplyBounds(type, _moduleManager.GetModule(type).GetValue());
+        private float this[EntityParameter type] => Present(type, _moduleManager.GetModule(type).GetValue());
         private Func<EntityParameter, IReadOnlyList<IModifier>>? _getModifiersForParameter;
 
         public float MaxHealth => this[EntityParameter.Health];
@@ -110,33 +117,75 @@
 
         public ChanceLuck GetChanceLuck(EntityParameter parameter) => (ChanceLuck)Math.Sign(_chanceLuck.GetValueOrDefault(parameter));
 
-        public float CalculateForBase(EntityParameter parameter, float baseValue)
-        {
-            var modifiers = _getModifiersForParameter?.Invoke(parameter) ?? [];
-            float value = Calculations.CalculateFloatValue(modifiers, baseValue);
-            return ApplyBounds(parameter, _moduleManager.GetModule(parameter).ApplyDecoratorsForValue(value));
-        }
+        /// <summary>The pool as it stands before any conversion touched it — deliberately blind to the mark
+        /// that empties it, since this is the very measure a conversion takes of what it is taking over.</summary>
+        public float GetUnconvertedValueForParameter(EntityParameter parameter) =>
+            Resolve(parameter, BaseFor(parameter), [.. ModifiersFor(parameter).Where(modifier => modifier is not PoolConversionModifier)]);
 
         public void SetBaseValueForParameter(EntityParameter parameter, float baseValue)
         {
-            if (!_parameterValues.TryGetValue(parameter, out var value)) return;
-            value.Base = SeededBase(parameter, baseValue);
-            value.Current = Calculations.CalculateFloatValue(_getModifiersForParameter?.Invoke(parameter) ?? [], value.Base);
-            _parameterValues[parameter] = value;
-            RaiseParameterChanges(parameter);
+            if (!_parameterValues.ContainsKey(parameter)) return;
+
+            Recalculate(parameter, SeededBase(parameter, baseValue), ModifiersFor(parameter));
         }
 
         public void OnParameterModifiersChange(object? sender, IModifiersChangedEventArgs args)
         {
-            var parameter = args.EntityParameter;
-            if (!_parameterValues.TryGetValue(parameter, out (float Base, float Current) value)) return;
-            float newCurrent = Mathf.Max(0, Calculations.CalculateFloatValue(args.Modifiers, value.Base));
-            value.Current = newCurrent;
-            _parameterValues[parameter] = value;
-            RaiseParameterChanges(parameter);
+            if (!_parameterValues.TryGetValue(args.EntityParameter, out (float Base, float Current) value)) return;
+
+            Recalculate(args.EntityParameter, value.Base, args.Modifiers);
         }
 
         private void ShiftChanceLuck(EntityParameter parameter, int delta) => _chanceLuck[parameter] = _chanceLuck.GetValueOrDefault(parameter) + delta;
+
+        private IReadOnlyList<IModifier> ModifiersFor(EntityParameter parameter) => _getModifiersForParameter?.Invoke(parameter) ?? [];
+
+        private float BaseFor(EntityParameter parameter) =>
+            _parameterValues.TryGetValue(parameter, out (float Base, float Current) value) ? value.Base : DefaultBase(parameter);
+
+        /// <summary>The one place a parameter's stored value is rebuilt: its number, and whether a
+        /// conversion has taken the pool over — both read off the same list, so the mark and the figure can
+        /// never fall out of step.</summary>
+        private void Recalculate(EntityParameter parameter, float baseValue, IReadOnlyList<IModifier> modifiers)
+        {
+            _parameterValues[parameter] = (baseValue, Calculations.CalculateFloatValue(modifiers, baseValue));
+            MarkConverted(parameter, CarriesConversionMark(modifiers));
+            RaiseParameterChanges(parameter);
+        }
+
+        private void MarkConverted(EntityParameter parameter, bool converted)
+        {
+            if (converted) _convertedPools.Add(parameter);
+            else _convertedPools.Remove(parameter);
+        }
+
+        /// <summary>Whether a conversion has taken this pool over. Walked by hand rather than asked with a
+        /// predicate: every modifier change of a fight comes through here, and the closure and enumerator a
+        /// query allocates are not worth a single type test.</summary>
+        private static bool CarriesConversionMark(IReadOnlyList<IModifier> modifiers)
+        {
+            for (int index = 0; index < modifiers.Count; index++)
+                if (modifiers[index] is PoolConversionModifier { IsDrain: true }) return true;
+
+            return false;
+        }
+
+        /// <summary>The formula and then the parameter's own bounds — what a list of modifiers is worth,
+        /// without the categorical verdict the indexer adds.
+        /// <para>Decorators are asked but count for nothing: every decorator in the game overrides the
+        /// value it hands UP the chain and leaves this pass-through alone, so the measure is the modifier
+        /// list alone. Deliberate on the one road that uses it — a conversion hands over the pool the
+        /// character's own sources built, and a temporary buff riding a decorator does not swell the gift.</para></summary>
+        private float Resolve(EntityParameter parameter, float baseValue, IReadOnlyList<IModifier> modifiers) =>
+            ApplyBounds(parameter, _moduleManager.GetModule(parameter).ApplyDecoratorsForValue(Calculations.CalculateFloatValue(modifiers, baseValue)));
+
+        /// <summary>What every reader of a parameter is given: a pool a conversion has taken over is
+        /// nothing, whatever the numbers under it say, and then the parameter's own bounds. The verdict is
+        /// taken here — past the formula and past the decorators — because it is categorical: an emptying
+        /// written as a −1 multiplier would share the <c>1 + Σ</c> bucket with every other multiplicative
+        /// line on the pool, and a pool that had already been given away would live on at half strength.</summary>
+        private float Present(EntityParameter parameter, float value) =>
+            ApplyBounds(parameter, _convertedPools.Contains(parameter) ? 0f : value);
 
         private void RaiseParameterChanges(EntityParameter args) =>
             ParameterChanged?.Invoke(args, this[args]);

@@ -5,6 +5,7 @@ namespace Battle.Source
     using Core;
     using Core.Battle;
     using Core.Battle.Skills;
+    using Core.Enums;
     using PassiveSkills;
 
     /// <summary>Battle-side skill factory for item grants and passive-tree nodes: maps a skill id to a
@@ -18,6 +19,11 @@ namespace Battle.Source
     /// hardcoded static, so that precedence cannot be shown by a test until the registry is data-driven.</para></summary>
     public class PassiveSkillProvider : ISkillProvider
     {
+        /// <summary>Conversions whose whole content is a pair of parameters: one class answers for them, so
+        /// the pairing lives in the registration and neither gets a class of its own.</summary>
+        private const string IronWillId = "Passive_Skill_Iron_Will";
+        private const string WindOfFreedomId = "Passive_Skill_Wind_Of_Freedom";
+
         private static readonly Dictionary<string, Func<RecordProperties, ISkill>> s_factories = new()
         {
             ["Passive_Skill_Regeneration"] =
@@ -101,6 +107,12 @@ namespace Battle.Source
                 => new GiftFromTheGoddessPassiveSkill(properties.Get("chance")),
             ["Passive_Skill_Resonance"] = properties
                 => new ResonancePassiveSkill(properties.Get("spellDamagePerStack"), properties.Get("multicastPerStack")),
+            [IronWillId] = _
+                => new PoolConversionPassiveSkill(IronWillId, EntityParameter.Evade, EntityParameter.Armor),
+            [WindOfFreedomId] = _
+                => new PoolConversionPassiveSkill(WindOfFreedomId, EntityParameter.Armor, EntityParameter.Evade),
+            [AgnosticPassiveSkill.PassiveId] = properties
+                => new AgnosticPassiveSkill(properties.Get("costScale")),
         };
 
         /// <summary>Every id built by a factory of its own. The open stat family is not among them: it is

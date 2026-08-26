@@ -45,6 +45,9 @@
         { "id": "Passive_Skill_Mana_Burn", "fields": ["percentToBurn"] },
         { "id": "Passive_Skill_Burning", "fields": ["percentFromDamage", "duration", "maxStacks"] },
         { "id": "Passive_Skill_Gift_From_The_Goddess", "fields": ["chance"] },
-        { "id": "Passive_Skill_Resonance", "fields": ["spellDamagePerStack", "multicastPerStack"] }
+        { "id": "Passive_Skill_Resonance", "fields": ["spellDamagePerStack", "multicastPerStack"] },
+        { "id": "Passive_Skill_Iron_Will", "fields": [] },
+        { "id": "Passive_Skill_Wind_Of_Freedom", "fields": [] },
+        { "id": "Passive_Skill_Agnostic", "fields": ["costScale"] }
     ]
 }
