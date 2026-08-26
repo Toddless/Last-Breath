@@ -64,9 +64,11 @@ namespace Battle.Source.Effects
                 Source = InstanceId,
                 Damage = evt.Context.FinalDamage,
                 IsCritical = evt.Context.IsCritical,
-                // The coating lays the poison, so the poison lands as hard as the cast that put the
-                // coating on — and belongs to that cast, which may therefore go on prolonging it.
-                Effectiveness = Effectiveness,
+                // The coating lays the poison, so the poison lands as hard as the CAST that put the
+                // coating on — and belongs to that cast, which may therefore go on prolonging it. The
+                // cast's own claim and not what the coating grew to: the poison runs the applier's
+                // knobs itself, as a damaging effect, and must not also carry what those knobs gave a buff.
+                Effectiveness = CastEffectiveness,
                 Trace = Trace
             };
             _ = poison.Apply(applyContext);

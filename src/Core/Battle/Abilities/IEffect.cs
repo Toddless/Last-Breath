@@ -15,8 +15,20 @@
         string Source { get; }
 
         /// <summary>Effectiveness of the cast that laid this instance, stamped on application; one for
-        /// anything not laid by a cast. Multiplies every number of the effect except duration and stacks.</summary>
-        float Effectiveness { get; }
+        /// anything not laid by a cast. Multiplies every number of the effect except duration and stacks.
+        /// <para>Settable for the same reason <see cref="Duration"/> is: the caster-side application
+        /// pipeline tunes the instance before the stacking rules see it, and the owner's own
+        /// effectiveness knobs multiply what the cast stamped there.</para></summary>
+        float Effectiveness { get; set; }
+
+        /// <summary>Which of the three kinds of effect this one is, read off the instance: what nothing
+        /// flagged and nothing ticks is a buff, what is flagged harmful is a debuff, and anything ticking
+        /// damage over turns is damaging whether or not it was flagged. Decided here rather than by the
+        /// record that laid it, because a passive, an item grant and a boss stage lay effects with no
+        /// record at all.</summary>
+        EffectGenus Genus => this is IDamageOverTurnEffect ? EffectGenus.Damaging
+            : IsHarmful ? EffectGenus.Debuff
+            : EffectGenus.Buff;
 
         /// <summary>The cast that laid this instance; nothing at all for a passive, an item grant or a
         /// boss stage. What a rule reading "only what is MINE" would be decided on.

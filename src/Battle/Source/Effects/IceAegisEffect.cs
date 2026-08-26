@@ -83,11 +83,13 @@ namespace Battle.Source.Effects
 
             if (attackerEffectFactory != null)
                 // The stack the aegis puts on its attacker is content the AEGIS lays, so it lands as
-                // hard as the cast that raised the aegis did: the effectiveness travels on, one step
+                // hard as the cast that raised the aegis did: the cast's own claim travels on, one step
                 // further from the ability, exactly as it would if the cast had applied it directly.
+                // What the aegis grew to under the bearer's knobs stays with the aegis — the stack runs
+                // those knobs itself, and for its own kind.
                 _ = attackerEffectFactory().Apply(new EffectApplyingContext
                 {
-                    Caster = Target, Target = attacker, Source = InstanceId, Effectiveness = Effectiveness, Trace = Trace
+                    Caster = Target, Target = attacker, Source = InstanceId, Effectiveness = CastEffectiveness, Trace = Trace
                 });
 
             float reflected = context.AbsorbedByBarrier * Effective(reflectPercent);

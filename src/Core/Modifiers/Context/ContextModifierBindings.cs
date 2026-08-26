@@ -81,6 +81,10 @@
             ContextParameter.BurningDamageTakenReduction => DotTakenReduction(entry, views, DamageType.Burning),
             ContextParameter.PoisonDamageTakenReduction => DotTakenReduction(entry, views, DamageType.Poison),
             ContextParameter.BleedDamageTakenReduction => DotTakenReduction(entry, views, DamageType.Bleed),
+            ContextParameter.EffectEffectivenessScale => EffectEffectiveness(entry, views, genus: null),
+            ContextParameter.BuffEffectivenessScale => EffectEffectiveness(entry, views, EffectGenus.Buff),
+            ContextParameter.DebuffEffectivenessScale => EffectEffectiveness(entry, views, EffectGenus.Debuff),
+            ContextParameter.DamagingEffectEffectivenessScale => EffectEffectiveness(entry, views, EffectGenus.Damaging),
             _ => throw new NotSupportedException($"No binding for context parameter '{entry.Parameter}'")
         };
 
@@ -115,6 +119,12 @@
 
         private static IContextModifierBinding DamageTakenReduction(ContextModifierEntry entry, ValueViews views, DamageCause cause) =>
             Damage(entry, views, (owner, value) => new IncomingDamageReductionContextModifier(owner, value, cause));
+
+        /// <summary>The effectiveness axis of what the owner applies, over every effect or over one kind
+        /// of them. Nothing is gated on the owner — the modifier is handed the effect being applied — so
+        /// the instance is built here like every other unfiltered application knob.</summary>
+        private static IContextModifierBinding EffectEffectiveness(ContextModifierEntry entry, ValueViews views, EffectGenus? genus) =>
+            new EffectApplicationBinding(new EffectEffectivenessContextModifier(genus, views.Of(entry)));
 
         private static IContextModifierBinding DotTakenReduction(ContextModifierEntry entry, ValueViews views, DamageType status) =>
             Damage(entry, views, (owner, value) => new DotDamageTakenReductionContextModifier(owner, value, status));

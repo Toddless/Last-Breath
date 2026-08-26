@@ -735,6 +735,30 @@ msgstr ""
 msgid "Context_Modifier_BleedDamageTakenReduction_Range"
 msgstr ""
 
+msgid "Context_Modifier_EffectEffectivenessScale"
+msgstr ""
+
+msgid "Context_Modifier_EffectEffectivenessScale_Range"
+msgstr ""
+
+msgid "Context_Modifier_BuffEffectivenessScale"
+msgstr ""
+
+msgid "Context_Modifier_BuffEffectivenessScale_Range"
+msgstr ""
+
+msgid "Context_Modifier_DebuffEffectivenessScale"
+msgstr ""
+
+msgid "Context_Modifier_DebuffEffectivenessScale_Range"
+msgstr ""
+
+msgid "Context_Modifier_DamagingEffectEffectivenessScale"
+msgstr ""
+
+msgid "Context_Modifier_DamagingEffectEffectivenessScale_Range"
+msgstr ""
+
 msgid "UI_Craft_Recipes"
 msgstr ""
 

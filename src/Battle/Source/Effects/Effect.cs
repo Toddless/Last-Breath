@@ -107,8 +107,21 @@
         public string Source { get; private set; } = string.Empty;
 
         /// <summary>Effectiveness of the cast that laid this instance; one for anything not laid by a
-        /// cast. Descendants that derive numbers BEFORE <c>base.Apply</c> stamp it themselves.</summary>
-        public float Effectiveness { get; protected set; } = 1f;
+        /// cast. Descendants that derive numbers BEFORE <c>base.Apply</c> stamp it themselves.
+        /// Open to the outside like <see cref="Duration"/> and for the same reason: the caster-side
+        /// application pipeline runs over the instance and the owner's effectiveness knobs multiply it.</summary>
+        public float Effectiveness { get; set; } = 1f;
+
+        /// <summary>
+        /// The effectiveness the CAST stamped, before the applier's own knobs multiplied it — and the one
+        /// figure an effect laying ANOTHER effect hands on (a coating laying its poison, an aegis marking
+        /// its attacker, a fury laying its burn).
+        /// <para>The child goes through the applier's pipeline itself, so handing over the grown figure
+        /// would apply those knobs twice along the chain, and would apply them by the PARENT's kind: a
+        /// buff knob would end up raising the poison a coating lays. What the chain carries is the cast's
+        /// own claim; every knob of the owner is answered once, by each effect, for what that effect is.</para>
+        /// </summary>
+        protected float CastEffectiveness { get; private set; } = 1f;
 
         /// <summary>The cast that laid this instance; nothing at all when a passive, a grant or a stage
         /// did. Stamped beside <see cref="Effectiveness"/> and read by the records that prolong or
@@ -124,8 +137,11 @@
         public virtual Task Apply(EffectApplyingContext context)
         {
             // Stamped before anything reads a number off this instance — including the mutator
-            // pipelines below, which see the effect as it will actually land.
+            // pipelines below, which see the effect as it will actually land. The cast's own claim is
+            // kept apart from what those pipelines make of it: it is what this effect hands on when it
+            // lays another (see CastEffectiveness).
             Effectiveness = context.Effectiveness;
+            CastEffectiveness = context.Effectiveness;
             Trace = context.Trace;
 
             // Caster-side application pipeline: item/passive mutators tune the instance

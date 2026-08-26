@@ -170,9 +170,9 @@
             && effect.Power <= strength
             && (scope == DispelScope.Target) == IsBuff(effect);
 
-        /// <summary>Buffs are what neither harms nor damages: an effect ticking damage belongs with the
-        /// debuffs whether or not it was flagged harmful, and anything unflagged is a buff.</summary>
-        private static bool IsBuff(IEffect effect) => !effect.IsHarmful && effect is not IDamageOverTurnEffect;
+        /// <summary>Buffs are what neither harms nor damages — the classification the effect answers for
+        /// itself, so a dispel and the effectiveness knobs read one and the same split.</summary>
+        private static bool IsBuff(IEffect effect) => effect.Genus == EffectGenus.Buff;
 
         private async Task ApplyDotDamage()
         {

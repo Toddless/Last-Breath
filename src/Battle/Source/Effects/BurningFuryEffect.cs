@@ -36,8 +36,10 @@ namespace Battle.Source.Effects
         protected override void OnAfterAttack(AfterAttackEvent evt)
         {
             if (Target == null) return;
-            // The share goes over AUTHORED and the effectiveness travels with it: the burn multiplies it
-            // once, on its own side, the way every laid-content-inside-laid-content hand-off works here.
+            // The share goes over AUTHORED and the CAST's effectiveness travels with it: the burn
+            // multiplies it once, on its own side, the way every laid-content-inside-laid-content
+            // hand-off works here. What the fury grew to under the bearer's knobs is the fury's own —
+            // the burn answers those knobs itself, as the damaging effect it is.
             var burnEffect = new DamageOverTurnEffect(
                 BurningDuration,
                 StatusEffects.Burning,
@@ -51,7 +53,7 @@ namespace Battle.Source.Effects
                 // The burn feeds on the health the fury spent, not on a blow.
                 Damage = DamageSnapshot.Of(DamageType.Fire, HealthBurned),
                 Source = InstanceId,
-                Effectiveness = Effectiveness,
+                Effectiveness = CastEffectiveness,
                 Trace = Trace,
                 IsCritical = false
             });

@@ -13,6 +13,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Localization;
     using Core.MessageBus.Requests;
     using Core.Modifiers;
+    using Core.Modifiers.Context;
     using Core.PassiveTree;
     using Core.PassiveTree.View;
     using Core.Views;
@@ -172,6 +173,33 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.AreEqual(0, unworded.Count,
                 $"en.po words no name for {unworded.Count} tag(s) an augment record declares: {string.Join(", ", unworded)}");
+        }
+
+        /// <summary>
+        /// The wording twin of <see cref="ContextModifierBindingTests.EveryContextParameter_HasABinding"/>:
+        /// that one keeps a knob from reaching no pipeline, this one keeps a knob from reaching the player
+        /// as its own internal spelling. A context line is worded through Context_Modifier_&lt;Parameter&gt;
+        /// (see <see cref="ContextModifierFormatter"/>), so a knob the catalog never worded prints
+        /// "Context_Modifier_BuffEffectivenessScale" on a tree node and on an item card alike.
+        /// <para>The _Range twin belongs to every knob that carries a NUMBER, because that is what an
+        /// unrolled pool spread renders through; a switch has no spread to word and is asked for the plain
+        /// key alone. Which knobs are switches is read off the binding table rather than listed here.</para>
+        /// </summary>
+        [TestMethod]
+        public void EveryContextKnobIsWordedInEnglishAndSoIsItsSpread()
+        {
+            Dictionary<string, string> en = ReadEntries("en.po");
+            var unworded = new List<string>();
+
+            foreach (ContextParameter knob in Enum.GetValues<ContextParameter>())
+            {
+                if (string.IsNullOrEmpty(en.GetValueOrDefault($"Context_Modifier_{knob}"))) unworded.Add($"Context_Modifier_{knob}");
+                if (ContextKnobs.IsFlag(knob)) continue;
+                if (string.IsNullOrEmpty(en.GetValueOrDefault($"Context_Modifier_{knob}_Range"))) unworded.Add($"Context_Modifier_{knob}_Range");
+            }
+
+            Assert.AreEqual(0, unworded.Count,
+                $"en.po words no template for {unworded.Count} context key(s), so the line prints the raw key: {string.Join(", ", unworded.Order(StringComparer.Ordinal))}");
         }
 
         /// <summary>

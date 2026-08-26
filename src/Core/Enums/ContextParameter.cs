@@ -74,5 +74,18 @@ namespace Core.Enums
         BurningDamageTakenReduction,
         PoisonDamageTakenReduction,
         BleedDamageTakenReduction,
+
+        /// <summary>Scales how strongly EVERY effect the owner applies lands — the entity-side twin of
+        /// the cast's own effectiveness, and the only one of the four that also reaches what no cast laid
+        /// (a passive, an item grant, a boss stage). Duration and stacks are separate axes and no
+        /// effectiveness knob moves them.</summary>
+        EffectEffectivenessScale,
+
+        /// <summary>The same axis narrowed to one kind of effect: what neither harms nor ticks damage,
+        /// what harms without ticking, and what ticks damage over turns. A kind knob reaches only its own
+        /// kind, and it compounds with <see cref="EffectEffectivenessScale"/> where both stand.</summary>
+        BuffEffectivenessScale,
+        DebuffEffectivenessScale,
+        DamagingEffectEffectivenessScale,
     }
 }

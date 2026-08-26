@@ -434,10 +434,39 @@ namespace LastBreathTest.BattleSystemTests
             var pool = CreateParser().ParseEquipItemModifierPools(json)["Test_Pool"];
 
             // Enum.TryParse accepts a comma-separated list of names for ANY enum, not only a [Flags] one,
-            // and ORs them together: these two make 28, a number no member has. Neither name exists in
-            // EntityParameter, so the entry walks past that branch and arrives here as a knob that cannot
-            // exist — an ordinary data file minting a member with no binding, which throws not here but on
-            // equip. Only the knob's own refusal stops it; nothing downstream would.
+            // and ORs them together: these two make 28, which is a member of the enum — a THIRD knob the
+            // file never named, indistinguishable downstream from one an author wrote. Whether the number
+            // the bits add up to lands on a member or in a hole between them is luck that changes with
+            // every knob appended, so the refusal is the parser's: a member of an ordinary enum is one name.
+            var line = (ContextDescriptor)pool.Single();
+            Assert.AreEqual(Core.Enums.ContextParameter.AttackSacredConversion, line.Parameter);
+        }
+
+        [TestMethod]
+        public void ParsePool_ParameterWrittenAsANumber_IsRefused()
+        {
+            const string json = """
+            {
+                "pools": [
+                    {
+                        "id": "Test_Pool",
+                        "modifiersPool": [
+                            { "parameter": "28", "modifierType": "inc", "value": 0.35, "weight": 40, "affix": "Suffix" },
+                            { "parameter": "999", "modifierType": "inc", "value": 0.35, "weight": 40, "affix": "Suffix" },
+                            { "parameter": "AttackSacredConversion", "modifierType": "inc", "value": 0.35, "weight": 40, "affix": "Suffix" }
+                        ]
+                    }
+                ]
+            }
+            """;
+
+            var pool = CreateParser().ParseEquipItemModifierPools(json)["Test_Pool"];
+
+            // The other half of what Enum.TryParse takes that an author never writes: a bare number. "28"
+            // comes back as whichever member sits on twenty-eight today — a knob nobody named, and one that
+            // MOVES the day a member is appended above it — while "999" comes back true carrying a value no
+            // member has at all, which reaches the pipelines as an ordinary parameter and matches nothing.
+            // Both are refused where the names are read; only the authored line survives.
             var line = (ContextDescriptor)pool.Single();
             Assert.AreEqual(Core.Enums.ContextParameter.AttackSacredConversion, line.Parameter);
         }

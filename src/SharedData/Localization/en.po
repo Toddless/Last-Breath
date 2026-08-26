@@ -1670,6 +1670,30 @@ msgstr "Reduces bleed damage taken by {value}"
 
 msgid "Context_Modifier_BleedDamageTakenReduction_Range"
 msgstr "Reduces bleed damage taken by {min}–{max}"
+
+msgid "Context_Modifier_EffectEffectivenessScale"
+msgstr "Increases the effect of everything you apply by {value}"
+
+msgid "Context_Modifier_EffectEffectivenessScale_Range"
+msgstr "Increases the effect of everything you apply by {min}–{max}"
+
+msgid "Context_Modifier_BuffEffectivenessScale"
+msgstr "Increases the effect of buffs you apply by {value}"
+
+msgid "Context_Modifier_BuffEffectivenessScale_Range"
+msgstr "Increases the effect of buffs you apply by {min}–{max}"
+
+msgid "Context_Modifier_DebuffEffectivenessScale"
+msgstr "Increases the effect of debuffs you apply by {value}"
+
+msgid "Context_Modifier_DebuffEffectivenessScale_Range"
+msgstr "Increases the effect of debuffs you apply by {min}–{max}"
+
+msgid "Context_Modifier_DamagingEffectEffectivenessScale"
+msgstr "Increases the effect of damaging effects you apply by {value}"
+
+msgid "Context_Modifier_DamagingEffectEffectivenessScale_Range"
+msgstr "Increases the effect of damaging effects you apply by {min}–{max}"
 # ------------------------------
 # Modifier templates: {value} = formatted number, {parameter} = localized parameter name
 # The flat twins name their parameter with "to" ("+15% to Bleed Damage Multiplier"): without it the
