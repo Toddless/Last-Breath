@@ -79,10 +79,13 @@ namespace Battle.Source.PassiveSkills
         public override bool IsStronger(ISkill skill) => skill is StatPassiveSkill other && Magnitude > other.Magnitude;
 
         /// <summary>The modifier a line becomes. A fixed amount resolves the same for everyone; a line
-        /// counted per unit of a carrier has to read the fighter, and is inert until it is bound to one.</summary>
+        /// counted per unit of a carrier has to read the fighter, and is inert until it is bound to one.
+        /// <para>A scaled modifier is worth its number for ONE unit of the carrier, so a line written per a
+        /// step of them is divided by it here — the step is a way of writing the same per-unit number, and
+        /// nothing below this point knows the word.</para></summary>
         private static IModifierInstance Mint(string source, StatPassiveLine line) =>
             line.PerParameter is { } carrier
-                ? new ScaledByParameterModifier(line.ValueType, line.Parameter, carrier, line.Value, condition: null, source)
+                ? new ScaledByParameterModifier(line.ValueType, line.Parameter, carrier, line.Value / line.Step, condition: null, source)
                 : new SimpleModifier(line.Parameter, line.ValueType, line.Value, source);
     }
 }

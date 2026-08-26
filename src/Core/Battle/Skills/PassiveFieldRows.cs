@@ -26,13 +26,17 @@ namespace Core.Battle.Skills
         /// outright, which is what makes the key two words instead of three.</summary>
         public EntityParameter? PerParameter { get; set; }
 
+        /// <summary>How many units of the carrier the value is worth once. One unless the author says
+        /// otherwise, and a one is never spelled into the key — an untouched row rewrites its own line.</summary>
+        public int Step { get; set; } = StatPassiveGrammar.DefaultStep;
+
         public float Value { get; set; }
 
         public bool IsRaw => RawName is not null;
 
         /// <summary>The key this row is written under: the raw one it came in as, or the one its words
         /// spell through the grammar.</summary>
-        public string Name => RawName ?? StatPassiveGrammar.Key(Parameter, ValueType, PerParameter);
+        public string Name => RawName ?? StatPassiveGrammar.Key(Parameter, ValueType, PerParameter, Step);
     }
 
     /// <summary>One row of a named passive's field editor: a number under a name. A required row is one
@@ -82,6 +86,7 @@ namespace Core.Battle.Skills
                         Parameter = line.Parameter,
                         ValueType = line.ValueType,
                         PerParameter = line.PerParameter,
+                        Step = line.Step,
                         Value = line.Value
                     }
                     : new StatFieldRow { RawName = property.Key, Value = property.Value });

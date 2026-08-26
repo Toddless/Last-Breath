@@ -65,6 +65,65 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(ModifierValueType.Increase, read[0].ValueType);
         }
 
+        /// <summary>The trip with the step picked as well — the word that decides how many of the carrier
+        /// one value buys, and the one a composer that forgot it would silently turn into a hundredth of
+        /// the line the author wrote.</summary>
+        [TestMethod]
+        public void ASteppedLineKeepsTheCountItIsMeasuredIn()
+        {
+            var written = new StatFieldRow
+            {
+                Parameter = EntityParameter.CriticalDamage,
+                ValueType = ModifierValueType.Increase,
+                PerParameter = EntityParameter.Evade,
+                Step = 100,
+                Value = 0.02f
+            };
+
+            List<StatFieldRow> read = PassiveFieldRows.ReadStat(PassiveFieldRows.Write([written]));
+
+            Assert.AreEqual("CriticalDamage:Increase:Evade:100", read[0].Name);
+            Assert.AreEqual(100, read[0].Step, "the step is a word of the key, and a key written without it is a different line");
+            Assert.AreEqual(EntityParameter.Evade, read[0].PerParameter);
+            Assert.AreEqual(0.02f, read[0].Value);
+        }
+
+        /// <summary>A step of one is what every key without one already says, so it is never spelled: an
+        /// authored file must not be re-diffed by a word the tool added and the grammar ignores.</summary>
+        [TestMethod]
+        public void AStepOfOneIsNeverWrittenIntoTheKey()
+        {
+            List<KeyValuePair<string, float>> record = [new("PhysicalDamage:Increase:Strength", 0.01f)];
+
+            List<StatFieldRow> rows = PassiveFieldRows.ReadStat(record);
+
+            Assert.AreEqual(1, rows[0].Step, "a key naming no step means one unit of the carrier");
+            CollectionAssert.AreEqual(record, PassiveFieldRows.Write(rows),
+                "the record came back with a word the file never carried");
+
+            Assert.AreEqual("HealthRecovery:Multiplicative",
+                new StatFieldRow { Parameter = EntityParameter.HealthRecovery, ValueType = ModifierValueType.Multiplicative }.Name,
+                "a line with no carrier at all grew a step it has nowhere to put");
+        }
+
+        /// <summary>Two lines over one carrier differing only in their step are two keys, and dropping one
+        /// of them onto the other's step is the collision the panel refuses.</summary>
+        [TestMethod]
+        public void TwoStepsOverOneCarrierAreTwoLines()
+        {
+            List<StatFieldRow> rows = PassiveFieldRows.ReadStat(
+            [
+                new KeyValuePair<string, float>("CriticalDamage:Increase:Evade", 0.0002f),
+                new KeyValuePair<string, float>("CriticalDamage:Increase:Evade:100", 0.02f)
+            ]);
+
+            Assert.AreEqual(2, PassiveFieldRows.Write(rows).Count, "the record folded two lines into one key");
+
+            rows[1].Step = 1;
+            Assert.IsTrue(PassiveFieldRows.Holds(rows, rows[1].Name, exceptIndex: 1),
+                "the second row stepping onto the first row's key was not recognised as taking it");
+        }
+
         /// <summary>Every line the dropdowns can offer is a line the grant will read. The pairing the
         /// grammar refuses — a line measured per unit of what it feeds — is not on offer at all.</summary>
         [TestMethod]
@@ -107,7 +166,9 @@ namespace LastBreathTest.BattleSystemTests
                 new("PhysicalDamage:Increase", 0.1f),
                 new("PhysicalDamage:Incraese", 0.2f),
                 new("HealthRecovery:Flag", 1f),
-                new("Strength:Flat:Strength", 3f)
+                new("Strength:Flat:Strength", 3f),
+                new("Armor:Flat:Strength:0", 4f),
+                new("Armor:Flat:100", 5f)
             ];
 
             List<StatFieldRow> rows = PassiveFieldRows.ReadStat(record);
@@ -116,6 +177,8 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(rows[1].IsRaw, "a misspelled parameter is nothing the dropdowns could have spelled");
             Assert.IsTrue(rows[2].IsRaw, "a flag is refused by the grammar, so it is not a line the panel owns");
             Assert.IsTrue(rows[3].IsRaw, "a line measured per unit of itself is refused the same way");
+            Assert.IsTrue(rows[4].IsRaw, "a step of zero is no step the dropdowns could have spelled");
+            Assert.IsTrue(rows[5].IsRaw, "a step with no carrier to count is refused the same way");
 
             CollectionAssert.AreEqual(record, PassiveFieldRows.Write(rows),
                 "the record comes back key for key, number for number, and in the order it was written");

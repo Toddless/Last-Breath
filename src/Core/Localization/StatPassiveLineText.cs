@@ -21,15 +21,15 @@ namespace Core.Localization
         /// and the number and nothing else — but a nameless source in a debugger is a puzzle.</summary>
         private const string Source = "StatPassive";
 
-        /// <summary>One field as a sentence. A line measured per unit of a carrier hands that carrier to
-        /// the formatter, which words it — the number alone would read as an outright bonus. With no
-        /// formatter behind it the parts are printed raw rather than dropped, the way every other reader
-        /// of a modifier line falls back.</summary>
+        /// <summary>One field as a sentence. A line measured per unit of a carrier hands that carrier and
+        /// the step it is counted in to the formatter, which words them — the number alone would read as an
+        /// outright bonus. With no formatter behind it the parts are printed raw rather than dropped, the
+        /// way every other reader of a modifier line falls back.</summary>
         public static string Line(StatPassiveLine line, ModifierFormatter? formatter, TextFormat format = TextFormat.Plain) =>
             formatter is null
-                ? $"{line.Parameter} {line.ValueType} {line.Value}{(line.PerParameter is { } carrier ? $" per {carrier}" : string.Empty)}"
+                ? $"{line.Parameter} {line.ValueType} {line.Value}{Carrier(line)}"
                 : formatter.Format(
-                    new SimpleModifier(line.Parameter, line.ValueType, line.Value, Source), format, line.PerParameter);
+                    new SimpleModifier(line.Parameter, line.ValueType, line.Value, Source), format, line.PerParameter, line.Step);
 
         /// <summary>The whole record as sentences, in authored order — and nothing at all when one field
         /// of it will not parse, because that is exactly what the grant hands over. See
@@ -41,6 +41,15 @@ namespace Core.Localization
             foreach (StatPassiveLine line in StatPassiveGrammar.ReadWhole(fields)) lines.Add(Line(line, formatter, format));
 
             return lines;
+        }
+
+        /// <summary>The carrier tail of the raw fallback, step and all — the same words the templates say
+        /// with a formatter behind them.</summary>
+        private static string Carrier(StatPassiveLine line)
+        {
+            if (line.PerParameter is not { } carrier) return string.Empty;
+
+            return line.Step == StatPassiveGrammar.DefaultStep ? $" per {carrier}" : $" per {line.Step} {carrier}";
         }
     }
 

@@ -2,16 +2,19 @@ namespace Core.Battle.Skills
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using Data;
     using Enums;
 
-    /// <summary>One stat line of a record: which parameter, which value bucket, how much, and the carrier
-    /// it is counted per unit of — null when it is worth its number outright.</summary>
+    /// <summary>One stat line of a record: which parameter, which value bucket, how much, the carrier it is
+    /// counted per unit of — null when it is worth its number outright — and how many units of that carrier
+    /// the value is worth once ("+2% per 100 Evade").</summary>
     public readonly record struct StatPassiveLine(
         EntityParameter Parameter,
         ModifierValueType ValueType,
         EntityParameter? PerParameter,
-        float Value);
+        float Value,
+        int Step = StatPassiveGrammar.DefaultStep);
 
     /// <summary>
     /// The field language a stat passive is written in, and the ONE place that reads it. The skill that
@@ -19,12 +22,14 @@ namespace Core.Battle.Skills
     /// so a node can never promise a line the grant would refuse — or word it differently.
     ///
     /// <para><b>Field grammar.</b> A key is <c>Parameter:ValueType</c>, or
-    /// <c>Parameter:ValueType:PerParameter</c> for a line measured per unit of a carrier; the value is the
+    /// <c>Parameter:ValueType:PerParameter</c> for a line measured per unit of a carrier, which may name a
+    /// <c>:Step</c> after it — a whole number of carrier units the value is worth once. The value is the
     /// modifier's number on the game's own scale (a fraction for Increase/Multiplicative, a raw amount for
-    /// Flat). The three words are the fields of a tree modifier line spelled into one key:</para>
+    /// Flat). The words are the fields of a tree modifier line spelled into one key:</para>
     /// <code>
-    /// "PhysicalDamage:Increase:Strength": 0.01   // +1% physical damage per point of Strength
-    /// "HealthRecovery:Multiplicative": -0.25     // −25% health recovery
+    /// "PhysicalDamage:Increase:Strength": 0.01     // +1% physical damage per point of Strength
+    /// "CriticalDamage:Increase:Evade:100": 0.02    // +2% critical damage per 100 Evade
+    /// "HealthRecovery:Multiplicative": -0.25       // −25% health recovery
     /// </code>
     ///
     /// <para>The reading comes in two shapes and they answer the same question. <see cref="Read"/> is what
@@ -47,7 +52,16 @@ namespace Core.Battle.Skills
         /// <c>Passive_Skill_Statsomething</c> written later belongs to whoever writes it.</para></summary>
         public const string IdPrefix = "Passive_Skill_Stats_";
 
+        /// <summary>The step a line takes when its key names none: one unit of the carrier. Keys written
+        /// before steps existed mean exactly this, and the writer leaves it unspelled for the same reason —
+        /// a file must not be re-diffed by a word that changes nothing.</summary>
+        public const int DefaultStep = 1;
+
         private const char Separator = ':';
+
+        private const string Shapes =
+            "expected 'Parameter:ValueType', 'Parameter:ValueType:PerParameter'"
+            + " or 'Parameter:ValueType:PerParameter:Step'";
 
         /// <summary>Whether an id is one the family answers for. A node naming no passive at all is not
         /// one of them — the null is answered here so no caller has to ask twice.</summary>
@@ -96,10 +110,15 @@ namespace Core.Battle.Skills
         /// second speaker of the grammar, free to drift from this one — and free to spell a typo no author
         /// could see. Says nothing about whether the line is legal: the reader is what refuses a flag or a
         /// carrier feeding itself, and it goes on being the only thing that does.</summary>
-        public static string Key(EntityParameter parameter, ModifierValueType valueType, EntityParameter? perParameter) =>
-            perParameter is null
-                ? $"{parameter}{Separator}{valueType}"
-                : $"{parameter}{Separator}{valueType}{Separator}{perParameter}";
+        public static string Key(EntityParameter parameter, ModifierValueType valueType, EntityParameter? perParameter,
+            int step = DefaultStep)
+        {
+            // A step counts a carrier, so a key naming no carrier has nowhere to put one.
+            if (perParameter is not { } carrier) return $"{parameter}{Separator}{valueType}";
+
+            string carried = $"{parameter}{Separator}{valueType}{Separator}{carrier}";
+            return step == DefaultStep ? carried : $"{carried}{Separator}{step.ToString(CultureInfo.InvariantCulture)}";
+        }
 
         /// <summary>One field as a line, or the reason it is not one. The whole grammar lives here and
         /// nowhere else — both strictnesses above are this method plus a decision about the refusal.</summary>
@@ -108,9 +127,9 @@ namespace Core.Battle.Skills
             line = default;
 
             string[] words = name.Split(Separator);
-            if (words.Length is < 2 or > 3)
+            if (words.Length is < 2 or > 4)
             {
-                refusal = "expected 'Parameter:ValueType' or 'Parameter:ValueType:PerParameter'";
+                refusal = Shapes;
                 return false;
             }
 
@@ -141,7 +160,12 @@ namespace Core.Battle.Skills
 
             if (!Word(words[2], out EntityParameter carrier))
             {
-                refusal = $"'{words[2]}' is not a {nameof(EntityParameter)}";
+                // A number in the carrier's place is a step written without the carrier it counts — the
+                // shape an author reaches for first, and worth naming as that rather than as a bad enum.
+                refusal = ReadStep(words[2], out _)
+                    ? $"'{words[2]}' is a step with no carrier to count — {Shapes}"
+                    : $"'{words[2]}' is not a {nameof(EntityParameter)}";
+
                 return false;
             }
 
@@ -151,9 +175,21 @@ namespace Core.Battle.Skills
                 return false;
             }
 
-            line = new StatPassiveLine(parameter, valueType, carrier, value);
+            int step = DefaultStep;
+            if (words.Length == 4 && !ReadStep(words[3], out step))
+            {
+                refusal = $"'{words[3]}' is not a step — a whole number of {carrier} above zero";
+                return false;
+            }
+
+            line = new StatPassiveLine(parameter, valueType, carrier, value, step);
             return true;
         }
+
+        /// <summary>One word of a key as the step it names: whole, positive, and written plainly. A sign, a
+        /// point or a space would be a second spelling of a number the writer never produces.</summary>
+        private static bool ReadStep(string word, out int step) =>
+            int.TryParse(word, NumberStyles.None, CultureInfo.InvariantCulture, out step) && step > 0;
 
         /// <summary>One word of a key as the enum member it names. Strict on purpose, and a number is not a
         /// name: enum parsing accepts the underlying value, so "1" would quietly become a member nobody

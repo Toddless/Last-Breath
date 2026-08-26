@@ -28,11 +28,18 @@ namespace LastBreathTest.BattleSystemTests
 
         private const string ArmorLine = "Armor:Flat";
 
+        /// <summary>The third shape: a line counted in a step of its carrier rather than per unit of it.</summary>
+        private const string PerHundredEvade = "CriticalDamage:Increase:Evade:100";
+
         /// <summary>The author meant PhysicalDamage. The grant refuses the whole passive over it; the popup
         /// must not go down with it.</summary>
         private const string Typo = "PhysicalDamge:Increase";
 
         private const string ScaledSentence = "+1% increased Physical Damage per Strength";
+
+        /// <summary>The step stands where the carrier's name alone used to, and nowhere else in the
+        /// sentence — the wording is the shipped template with a longer {per}.</summary>
+        private const string SteppedSentence = "+2% increased Critical Damage per 100 Evade";
 
         /// <summary>The flat twin names its parameter with "to" — without it the number and the name
         /// collide into one noun phrase.</summary>
@@ -52,6 +59,32 @@ namespace LastBreathTest.BattleSystemTests
 
             CollectionAssert.AreEqual(new[] { ScaledSentence, FlatSentence }, lines,
                 $"the stat node reads: {string.Join(" | ", lines)}");
+        }
+
+        /// <summary>
+        /// A line counted in a step of its carrier says so: the count stands in front of the carrier's name,
+        /// inside the very "per {per}" tail the wording already had, so no template was written twice.
+        /// </summary>
+        [TestMethod]
+        public void ASteppedLineNamesTheCountOfItsCarrier()
+        {
+            var node = new PassiveNode { Id = "keystone_stats", Kind = PassiveNodeKind.Keystone, PassiveId = StatId };
+            node.Properties[PerHundredEvade] = 0.02f;
+
+            string[] lines = Lines(node);
+
+            CollectionAssert.AreEqual(new[] { SteppedSentence }, lines, $"the stepped node reads: {string.Join(" | ", lines)}");
+        }
+
+        /// <summary>The regression a step must not cause: a line that names none reads exactly as it always
+        /// did, down to the word.</summary>
+        [TestMethod]
+        public void ALineWithNoStepReadsAsItAlwaysDid()
+        {
+            var node = new PassiveNode { Id = "keystone_stats", Kind = PassiveNodeKind.Keystone, PassiveId = StatId };
+            node.Properties[PerStrength] = 0.01f;
+
+            CollectionAssert.AreEqual(new[] { ScaledSentence }, Lines(node));
         }
 
         /// <summary>

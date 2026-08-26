@@ -35,6 +35,11 @@ namespace LastBreathTest.BattleSystemTests
 
         private const string StatId = "Passive_Skill_Stats_Unlimited_Power";
         private const string PerStrength = "PhysicalDamage:Increase:Strength";
+
+        /// <summary>The same line written per a STEP of the carrier — the shape an author reaches for when
+        /// the per-unit number is too small to read.</summary>
+        private const string PerHundredStrength = "PhysicalDamage:Increase:Strength:100";
+
         private const string RecoveryCut = "HealthRecovery:Multiplicative";
 
         /// <summary>A second stat passive, so a refund has a neighbour to leave alone.</summary>
@@ -360,9 +365,9 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage"] = 0.1f }),
                 "a key naming no value bucket was read anyway");
             // Every word of it names something real, so what is refused here is the COUNT and nothing else:
-            // a fourth word with a bad name in it would be refused for the name and leave the ceiling untested.
-            Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage:Increase:Strength:Extra"] = 0.1f }),
-                "a key of four words was read as a line, so the grammar has no ceiling");
+            // a fifth word with a bad name in it would be refused for the name and leave the ceiling untested.
+            Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage:Increase:Strength:100:5"] = 0.1f }),
+                "a key of five words was read as a line, so the grammar has no ceiling");
             Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage:Flag"] = 1f }),
                 "a pipeline switch was read as a parametric line");
             Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["Strength:Increase:Strength"] = 0.1f }),
@@ -371,6 +376,59 @@ namespace LastBreathTest.BattleSystemTests
                 "a number was read as the name of an enum member");
             Assert.IsNull(Build(TypoId, new Dictionary<string, float>()),
                 "a stat passive with no fields is a passive with nothing to give");
+        }
+
+        /// <summary>The step is the fourth word and nothing else may stand there. A key with no carrier has
+        /// nowhere to put one; a step that is not a whole count above zero is not a step at all — and every
+        /// one of these refuses the whole record, the way any other unreadable field does.</summary>
+        [TestMethod]
+        public void OnlyAWholeCountAboveZeroIsReadAsTheStep()
+        {
+            Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage:Increase:100"] = 0.1f }),
+                "a step was read without the carrier it counts");
+            Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage:Increase:Strength:Extra"] = 0.1f }),
+                "a word that names no number was read as a step");
+            Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage:Increase:Strength:0"] = 0.1f }),
+                "a step of zero was read, and the mint would divide the line by it");
+            Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage:Increase:Strength:-5"] = 0.1f }),
+                "a negative step was read, and the line would come out the wrong way round");
+            Assert.IsNull(Build(TypoId, new Dictionary<string, float> { ["PhysicalDamage:Increase:Strength:2.5"] = 0.1f }),
+                "a fractional step was read, so a step has two spellings and the writer only knows one");
+
+            Assert.IsNotNull(Build(StatId, new Dictionary<string, float> { [PerHundredStrength] = 0.01f }),
+                "a step the writer spells is a step the grant refuses");
+        }
+
+        /// <summary>What the step IS: a way of writing the same per-unit number the grammar always took. The
+        /// modifier a stepped line mints has to be the one its per-unit twin mints, or the wheel would sell
+        /// two different lines under one sentence.</summary>
+        [TestMethod]
+        public void AStepIsOnlyAnotherSpellingOfThePerUnitNumber()
+        {
+            var stepped = new Carrier();
+            var perUnit = new Carrier();
+            Grant(stepped, PerHundredStrength, 1f);
+            Grant(perUnit, PerStrength, 0.01f);
+
+            stepped.Parameters.SetBaseValueForParameter(EntityParameter.Strength, 250f);
+            perUnit.Parameters.SetBaseValueForParameter(EntityParameter.Strength, 250f);
+
+            Assert.AreEqual(350f, stepped.Value(EntityParameter.PhysicalDamage), 0.001f,
+                "'+1 per 100 Strength' on a carrier holding 250 is +2.5, and the mint did not divide by the step");
+
+            Assert.AreEqual(perUnit.Value(EntityParameter.PhysicalDamage), stepped.Value(EntityParameter.PhysicalDamage), 0.001f,
+                "the stepped line and its per-unit twin hand over different numbers");
+        }
+
+        /// <summary>A step of one is the step every key without one already means, so writing it changes
+        /// nothing about what the character wears.</summary>
+        [TestMethod]
+        public void AStepOfOneIsTheLineTheGrammarAlwaysRead()
+        {
+            var written = new Carrier();
+            Grant(written, "PhysicalDamage:Increase:Strength:1", 0.01f);
+
+            Assert.AreEqual(110f, written.Value(EntityParameter.PhysicalDamage), 0.001f);
         }
 
         /// <summary>An id outside the family is built by the factory that names it, not read as fields.
@@ -433,6 +491,12 @@ namespace LastBreathTest.BattleSystemTests
 
         private static ISkill? Build(string passiveId, IReadOnlyDictionary<string, float> properties) =>
             new PassiveSkillProvider().CreateSkill(passiveId, new RecordProperties(passiveId, properties));
+
+        /// <summary>One stat field on a character, through the road a passive actually reaches him by, so
+        /// what is measured is the modifier the mint produced rather than the line the record wrote.</summary>
+        private static void Grant(Carrier carrier, string field, float value) =>
+            carrier.Skills.AddSkill(StatPassiveSkill.Create(StatId,
+                new RecordProperties(StatId, new Dictionary<string, float> { [field] = value })));
 
         private static PassiveTreeDocument ShippedTree()
         {

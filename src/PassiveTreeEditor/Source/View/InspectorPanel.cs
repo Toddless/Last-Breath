@@ -32,8 +32,19 @@ namespace PassiveTreeEditor.Source.View
             + "<Name> is built from the stat fields below and needs no code";
 
         private const string FieldNameHint =
-            "field name the passive's factory reads. For the stat family: Parameter:ValueType"
-            + " or Parameter:ValueType:PerParameter";
+            "field name the passive's factory reads. For the stat family: Parameter:ValueType,"
+            + " Parameter:ValueType:PerParameter or Parameter:ValueType:PerParameter:Step";
+
+        private const string StepHint =
+            "how many units of the carrier the value is worth once: 100 reads \"per 100 Evade\"."
+            + " A step counts a carrier, so it is shut while none is picked";
+
+        /// <summary>The step box counts whole units of the carrier, one at a time.</summary>
+        private const int StepIncrement = 1;
+
+        /// <summary>Room for the numbers a step is written in and no more: the carrier picker beside it
+        /// wears parameter names long enough to push the panel past the canvas as it is.</summary>
+        private const int StepWidth = 64;
 
         /// <summary>Said of a field the catalog names. The factory reads it by that name, so the name is
         /// not the author's to type over and the row is not his to take away — he writes the number.</summary>
@@ -618,16 +629,59 @@ namespace PassiveTreeEditor.Source.View
             // the row above would push the whole panel wider than the canvas can spare.
             var carried = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             carried.AddChild(new Label { Text = "per", CustomMinimumSize = new Vector2(28, 0) });
+            carried.AddChild(StepBox(node, index, row));
 
             OptionButton perPicker = Sealing(EditorControls.OptionalPicker(
                 PassiveFieldRows.ParametersExcept(row.Parameter), row.PerParameter,
-                carrier => Respell(node, index, line => line.PerParameter = carrier), emptyLabel: "— none"));
+                carrier => Respell(node, index, line => Carry(line, carrier)), emptyLabel: "— none"));
 
             perPicker.TooltipText = StatLineHint;
             carried.AddChild(perPicker);
             box.AddChild(carried);
 
             return box;
+        }
+
+        /// <summary>
+        /// How many units of the carrier the line's number buys. Part of the key like the words around it,
+        /// so it is written through the same collision check and merges into the same undo step — but
+        /// without the rebuild a dropdown asks for: nothing on the row changes what is on offer, and a panel
+        /// torn down between keystrokes could never be typed a three-digit number.
+        /// <para>Shown at one rather than hidden there. It is the only way a step is authored at all, and a
+        /// box that appeared once the number was already something else would be a control nobody can find.</para>
+        /// </summary>
+        private SpinBox StepBox(PassiveNode node, int index, StatFieldRow row)
+        {
+            SpinBox step = EditorControls.Number(row.Step, StepIncrement);
+            step.MinValue = StatPassiveGrammar.DefaultStep;
+            step.Rounded = true;
+            step.CustomMinimumSize = new Vector2(StepWidth, 0);
+            step.SizeFlagsHorizontal = SizeFlags.Fill;
+            step.TooltipText = StepHint;
+
+            // A step with nothing to count is a key the grammar refuses, so the box is shut rather than
+            // able to author one.
+            step.Editable = row.PerParameter is not null;
+
+            step.ValueChanged += amount =>
+            {
+                int wanted = (int)amount;
+                if (index >= _statRows.Count || wanted == row.Step) return;
+
+                // Putting the number back raises this again, and the guard above ends that second pass.
+                if (!TryRespell(node, index, line => line.Step = wanted)) step.Value = row.Step;
+            };
+
+            return Sealing(step);
+        }
+
+        /// <summary>The carrier a line is counted by. Clearing it puts the step back to one: a key naming no
+        /// carrier has nowhere to write a step, and one kept out of sight would come back the moment another
+        /// carrier was picked.</summary>
+        private static void Carry(StatFieldRow row, EntityParameter? carrier)
+        {
+            row.PerParameter = carrier;
+            if (carrier is null) row.Step = StatPassiveGrammar.DefaultStep;
         }
 
         /// <summary>A field the grammar could not read, shown as the file wrote it. Not dropped and not
@@ -680,12 +734,24 @@ namespace PassiveTreeEditor.Source.View
         /// them survives is a coin toss nobody asked for — the dropdown snaps back instead.</summary>
         private void Respell(PassiveNode node, int index, Action<StatFieldRow> word)
         {
-            if (index >= _statRows.Count) return;
+            TryRespell(node, index, word);
+
+            // What either picker may offer follows from what the other holds, and the hint from the bucket.
+            Rebuild();
+        }
+
+        /// <summary>The respell itself, without the rebuild: the row edited, the key it now spells checked
+        /// against its neighbours and written, or every word of the row put back exactly as it was. Says
+        /// whether the change stood, so a control that has to snap its own value back can.</summary>
+        private bool TryRespell(PassiveNode node, int index, Action<StatFieldRow> word)
+        {
+            if (index >= _statRows.Count) return false;
 
             StatFieldRow row = _statRows[index];
             EntityParameter parameter = row.Parameter;
             ModifierValueType valueType = row.ValueType;
             EntityParameter? carrier = row.PerParameter;
+            int step = row.Step;
 
             word(row);
 
@@ -694,16 +760,14 @@ namespace PassiveTreeEditor.Source.View
                 row.Parameter = parameter;
                 row.ValueType = valueType;
                 row.PerParameter = carrier;
-                Rebuild();
-                return;
+                row.Step = step;
+                return false;
             }
 
             // Named per row, like the number beside it: respelling one line and then another is two steps
             // back rather than one.
             WriteStatRows(node, $"{EditFields.PropertyName} {index}");
-
-            // What either picker may offer follows from what the other holds, and the hint from the bucket.
-            Rebuild();
+            return true;
         }
 
         /// <summary>A hand-written key corrected. Held to the same rule a free field's name is: never

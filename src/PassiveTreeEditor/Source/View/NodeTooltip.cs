@@ -166,13 +166,9 @@ namespace PassiveTreeEditor.Source.View
             return lines;
         }
 
-        private string Describe(StatPassiveLine line) =>
-            _formatter is null
-                ? $"{line.Parameter} {line.ValueType} {line.Value}"
-                  + (line.PerParameter is { } carrier ? $" per {carrier}" : string.Empty)
-                : _formatter.Format(
-                    new SimpleModifier(line.Parameter, line.ValueType, line.Value, PassiveTreeDocument.ModifierSource),
-                    TextFormat.Plain, line.PerParameter);
+        /// <summary>Worded by the game's own reading of a stat line rather than by a second one here: a card
+        /// spelling the same record differently from the wheel is the drift this tool exists to prevent.</summary>
+        private string Describe(StatPassiveLine line) => StatPassiveLineText.Line(line, _formatter);
 
         private string Translate(string key) => _localization?.Translate(key) ?? key;
     }
