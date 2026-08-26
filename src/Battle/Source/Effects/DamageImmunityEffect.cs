@@ -33,6 +33,10 @@ namespace Battle.Source.Effects
 
         public override IEffect Copy() => new DamageImmunityEffect(Duration);
 
+        /// <summary>Zeroing every component is what <see cref="ContextModifierPriority.Denial"/> is named
+        /// for, and this one stays at <see cref="ContextModifierPriority.Absolute"/> on purpose: that step
+        /// orders OUTGOING denials against the shares conversions take out of one component, while this runs
+        /// in the receiver's own pass and empties the whole dictionary, with nobody to be ordered against.</summary>
         private sealed class DamageImmunityModifier()
             : ContextModifier(ContextModifierPriority.Absolute, id: "Context_Modifier_Damage_Immunity"), IDamageModifier
         {

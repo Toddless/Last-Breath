@@ -50,6 +50,11 @@
         { "id": "Passive_Skill_Wind_Of_Freedom", "fields": [] },
         { "id": "Passive_Skill_Agnostic", "fields": ["costScale"] },
         { "id": "Passive_Skill_Stoicism", "fields": [] },
-        { "id": "Passive_Skill_Vicious_Bite", "fields": ["perOvercap", "resistancePenalty"] }
+        { "id": "Passive_Skill_Vicious_Bite", "fields": ["perOvercap", "resistancePenalty"] },
+        { "id": "Passive_Skill_Gift_Of_Nature", "fields": ["elementalBonus"] },
+        {
+            "id": "Passive_Skill_Strength_Of_Spirit",
+            "fields": ["chance", "percentOfMaxMana", "recoveryPenalty"]
+        }
     ]
 }

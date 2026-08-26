@@ -24,9 +24,19 @@ namespace Core.Enums
         /// <summary>Runs after the bulk: reads what Normal produced (e.g. "always crit" flags).</summary>
         Late = 100,
 
-        /// <summary>The very last word. Damage CONVERSIONS ("X% of physical dealt as fire") belong
-        /// here when they arrive: a conversion must see the final number, so nothing may run after it.
+        /// <summary>The last word on a NUMBER. Damage CONVERSIONS ("X% of physical dealt as fire") belong
+        /// here: a conversion must see the final number, so nothing that shapes one may run after it.
         /// Also home of hard rule overrides (unblockable/unevadable).</summary>
         Absolute = 1000,
+
+        /// <summary>Past the last word: an OUTGOING rule that ENDS a damage component instead of shaping it
+        /// ("attacks deal no physical damage"), and so a step of the SOURCE's lists. Every rule entitled to a
+        /// share of a component takes it at <see cref="Absolute"/> or earlier, so what a conversion has
+        /// already carried into another type survives and only the untouched remainder is denied. A denial
+        /// may not share the conversions' slot: ties there are ordered by nothing.
+        /// <para>An incoming immunity of the RECEIVER zeroes components too and still belongs at
+        /// <see cref="Absolute"/>: it empties the whole dictionary in a pass of its own, where there is
+        /// nobody left to argue with about shares.</para></summary>
+        Denial = 2000,
     }
 }

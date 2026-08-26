@@ -44,6 +44,9 @@ namespace LastBreathTest.BattleSystemTests
             yield return Pair(new ExecutePassiveSkill(0.4f), new ExecutePassiveSkill(0.15f));
             yield return Pair(new FirstStrikePassiveSkill(0.6f), new FirstStrikePassiveSkill(0.25f));
             yield return Pair(new GiftFromTheGoddessPassiveSkill(0.3f), new GiftFromTheGoddessPassiveSkill(0.1f));
+            // The price is the same for everyone — an attack deals no physical damage or it does — so the
+            // copy paying more for the elements is the stronger.
+            yield return Pair(new GiftOfNaturePassiveSkill(0.5f), new GiftOfNaturePassiveSkill(0.2f));
             yield return Pair(new IceMeteorPassiveSkill(120f), new IceMeteorPassiveSkill(40f));
             yield return Pair(new ManaBurnPassiveSkill(0.25f), new ManaBurnPassiveSkill(0.05f));
             yield return Pair(new ManaOnAttackPassiveSkill(15f), new ManaOnAttackPassiveSkill(5f));
@@ -60,6 +63,9 @@ namespace LastBreathTest.BattleSystemTests
             yield return Pair(new ServantHellPassiveSkill(0.4f), new ServantHellPassiveSkill(0.15f));
             yield return Pair(new SilentFuryPassive(0.4f), new SilentFuryPassive(0.15f));
             yield return Pair(new SoulDevouringPassiveSkill(40f), new SoulDevouringPassiveSkill(10f));
+            // Both copies charge the same for the bargain; what separates them is what a blow returns.
+            yield return Pair(new StrengthOfSpiritPassiveSkill(0.5f, 0.05f, -0.25f),
+                new StrengthOfSpiritPassiveSkill(0.2f, 0.05f, -0.25f));
             // Two copies of one authored stat passive, told apart only by how far their lines move: the
             // numbers are the record's, so copies differ only where a scaling hand has been.
             yield return Pair(StatPassive(0.4f), StatPassive(0.1f));
@@ -141,6 +147,29 @@ namespace LastBreathTest.BattleSystemTests
             var dear = new ViciousBitePassiveSkill(0.01f, -0.8f);
 
             Assert.IsTrue(cheap.IsStronger(dear), "with the same bonus the cheaper price must win");
+            Assert.IsFalse(dear.IsStronger(cheap));
+            Assert.AreSame(cheap, Survivor(cheap, dear));
+            Assert.AreSame(cheap, Survivor(dear, cheap));
+        }
+
+        /// <summary>Strength of Spirit is a bargain of two sides: what a blow is EXPECTED to return ranks
+        /// first — the chance and the share are worth only what they are worth together — and where two
+        /// registrations return the same, the one charging less for it wins. Ranking on the chance alone
+        /// would hand the slot to a copy that pays more often and for less.</summary>
+        [TestMethod]
+        public void StrengthOfSpiritRanksTheExpectedReturnFirstAndThenTheCheaperPrice()
+        {
+            var richer = new StrengthOfSpiritPassiveSkill(0.5f, 0.05f, -0.5f);
+            var poorer = new StrengthOfSpiritPassiveSkill(0.2f, 0.05f, -0.1f);
+
+            Assert.IsTrue(richer.IsStronger(poorer), "a fatter return must win even beside a gentler price");
+            Assert.IsFalse(poorer.IsStronger(richer));
+            Assert.AreSame(richer, Survivor(poorer, richer));
+
+            var cheap = new StrengthOfSpiritPassiveSkill(0.35f, 0.05f, -0.1f);
+            var dear = new StrengthOfSpiritPassiveSkill(0.35f, 0.05f, -0.5f);
+
+            Assert.IsTrue(cheap.IsStronger(dear), "with the same expected return the cheaper price must win");
             Assert.IsFalse(dear.IsStronger(cheap));
             Assert.AreSame(cheap, Survivor(cheap, dear));
             Assert.AreSame(cheap, Survivor(dear, cheap));

@@ -117,6 +117,11 @@ namespace Battle.Source
                 => new StoicismPassiveSkill(),
             [ViciousBitePassiveSkill.PassiveId] = properties
                 => new ViciousBitePassiveSkill(properties.Get("perOvercap"), properties.Get("resistancePenalty")),
+            [GiftOfNaturePassiveSkill.PassiveId] = properties
+                => new GiftOfNaturePassiveSkill(properties.Get("elementalBonus")),
+            [StrengthOfSpiritPassiveSkill.PassiveId] = properties
+                => new StrengthOfSpiritPassiveSkill(properties.Get("chance"), properties.Get("percentOfMaxMana"),
+                    properties.Get("recoveryPenalty")),
         };
 
         /// <summary>Every id built by a factory of its own. The open stat family is not among them: it is

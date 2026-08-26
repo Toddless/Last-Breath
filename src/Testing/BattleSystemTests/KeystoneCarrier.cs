@@ -1,5 +1,6 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using System;
     using Battle.Source;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
@@ -23,6 +24,10 @@ namespace LastBreathTest.BattleSystemTests
             Parameters.Initialize(Modifiers.GetModifiers);
             Modifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
 
+            // Identity, because a keystone that mutates a blow gates on whose blow it is: a carrier who
+            // cannot answer to his own id is a carrier none of his own lines ever recognise.
+            mock.SetupGet(fighter => fighter.InstanceId).Returns(InstanceId);
+            mock.Setup(fighter => fighter.IsSame(It.IsAny<string>())).Returns<string>(other => other == InstanceId);
             mock.SetupGet(fighter => fighter.PassiveSkills).Returns(Skills);
             mock.SetupGet(fighter => fighter.ParameterModifiers).Returns(Modifiers);
             mock.SetupGet(fighter => fighter.Parameters).Returns(Parameters);
@@ -31,6 +36,8 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         public IPlayer Fighter { get; }
+
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
 
         public IPassiveSkillsComponent Skills { get; }
 
@@ -47,6 +54,17 @@ namespace LastBreathTest.BattleSystemTests
         public void Wear(ISkill skill) => Skills.AddSkill(skill);
 
         public void TakeOff(ISkill skill) => Skills.RemoveSkill(skill);
+
+        /// <summary>One blow the fighter DEALS, run through his own outgoing pipeline — the pass where a
+        /// keystone that reshapes what a hit is made of gets its say.</summary>
+        public IDamageContext Dealt(DamageCause cause, params (DamageType Type, float Amount)[] components)
+        {
+            var context = new DamageContext { Source = Fighter, Cause = cause };
+            foreach ((DamageType type, float amount) in components) context.Add(type, amount);
+            Handler.Apply(context);
+
+            return context;
+        }
 
         /// <summary>One effect offered to the fighter's own incoming pipeline — the pass that decides whether
         /// what was laid on him lands at all.</summary>

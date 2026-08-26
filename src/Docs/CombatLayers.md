@@ -56,7 +56,7 @@
 
 | | `ContextModifierPriority` | `Priority` |
 |---|---|---|
-| Значения | `Early −100`, `Normal 0`, `Late 100`, `Absolute 1000` | `Base 0`, `Weak 1`, `Strong 2`, `Absolute 3` |
+| Значения | `Early −100`, `Innate −50`, `Normal 0`, `Late 100`, `Absolute 1000`, `Denial 2000` | `Base 0`, `Weak 1`, `Strong 2`, `Absolute 3` |
 | Что упорядочивает | мутаторы контекстов (7 пайплайнов) | декораторы параметров сущности и способностей |
 | Кто сортирует | `ModifierHandlerComponent.ModifierList.Add:52` — `Sort` при каждом `Add` | `ModuleManager.AddDecorator:62` |
 
@@ -271,7 +271,7 @@ advantage = max(0, evade − accuracy)
 
 Тем же гейтом получателя живут кодовые `DamageTypeTaken` (Обморожение/Слабость) и `BastionPassiveSkill`. `CritDamageTaken` и `DamageImmunityEffect` гейта не имеют вовсе — на самоуроне они применялись дважды, теперь один раз.
 
-Приоритеты: конверсии — `Absolute`; добавленный элементальный — `Late`; шансовые активационные — `Late`; остальные — `Normal`.
+Приоритеты: конверсии — `Absolute`; отказ компоненты (`DamageTypeDenialContextModifier`, «атаки не наносят физический урон») — `Denial`, после конверсий: конвертированная доля уже принадлежит своему типу и переживает отказ, гасится только неконвертированный остаток; добавленный элементальный — `Late`; шансовые активационные — `Late`; остальные — `Normal`.
 
 ### 7.2 Ручки без записи в данных
 `BleedDuration`, `BurningStacks`, `BurningDamageTakenReduction`, `PoisonDamageTakenReduction`, `BleedDamageTakenReduction` — код есть, данных нет.
