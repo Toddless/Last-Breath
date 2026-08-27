@@ -264,6 +264,21 @@
             HoverTooltip.Attach(bar, () => ShowInspectCard(bar));
         }
 
+        /// <summary>
+        /// The counterpart of <see cref="CreateEntityBarsWithInitialValues"/>: the fighter's body has
+        /// left the battle for good (a dissolved summon) and both the bar and the cached body
+        /// reference go with it. Ownership, not a symptom patch: the per-frame check in
+        /// <see cref="_Process"/> is defence in depth only — a body freed under a still-cached
+        /// reference has been seen passing IsInstanceValid, and the projection then reads a dangling
+        /// native pointer. Freeing the bar also lets its hover tooltip die with it (the handle
+        /// listens to the bar's TreeExiting).
+        /// </summary>
+        public void RemoveEntityBars(string instanceId)
+        {
+            _barBodies.Remove(instanceId);
+            if (_characterBars.Remove(instanceId, out var bar) && IsInstanceValid(bar)) bar.QueueFree();
+        }
+
         /// <summary>Full-rect transparent host under the HUD panels: bars position themselves
         /// absolutely, so the host must be a plain Control, never a container.</summary>
         private Control EnsureBarsOverlay()
@@ -276,6 +291,10 @@
             return _npcBarsOverlay;
         }
 
+        /// <summary>Defence in depth, not the lifetime owner: a body that leaves the battle for good
+        /// is dropped from both dictionaries at that moment (<see cref="RemoveEntityBars"/>), so this
+        /// loop never projects onto a freed node. The guard stays for the in-between frames — a body
+        /// briefly out of the tree while it reparents (spot → arena on death, arena → world at the end).</summary>
         public override void _Process(double delta)
         {
             foreach ((string id, var bar) in _characterBars)

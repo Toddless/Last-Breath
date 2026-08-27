@@ -618,6 +618,12 @@
                 spot.QueueFree();
             }
 
+            // Announced BEFORE the free, while the body is still a valid node: whoever cached it for
+            // the battle (the HUD's over-head bar) drops the reference in this same beat. A holder
+            // left to notice the death by polling reads a dangling native pointer for a frame —
+            // IsInstanceValid does not reliably catch a body freed this way.
+            _battleEventBus?.Publish(new SummonRemovedEvent(summon));
+
             // A freed body must not hear the later BattleEndEvent — its handler touches the native side.
             summon.RemoveBattleEventBus();
             _summonSpawner?.Despawn(summon);

@@ -39,6 +39,7 @@
             // Summons enter mid-battle from the arena's side; the context only mirrors the
             // latecomer path's HUD bars (the summon never reaches the return-to-world list).
             _localBus.Subscribe<SummonSpawnedEvent>(OnSummonSpawned);
+            _localBus.Subscribe<SummonRemovedEvent>(OnSummonRemoved);
             parent.CallDeferred(Node.MethodName.AddChild, _battleArena);
             _player.SetupBattleEventBus(_localBus);
             // The context owns the fighting status: the flag goes up synchronously inside the
@@ -117,12 +118,22 @@
             ReturnParticipantsToWorld();
             _battleExperienceProcessor.Dispose();
             _localBus.Unsubscribe<SummonSpawnedEvent>(OnSummonSpawned);
+            _localBus.Unsubscribe<SummonRemovedEvent>(OnSummonRemoved);
             _battleArena.QueueFree();
             _localBus.Dispose();
         }
 
         private void OnSummonSpawned(SummonSpawnedEvent evt) =>
             _battleHud?.CreateEntityBarsWithInitialValues(evt.Summon);
+
+        /// <summary>The mirror of <see cref="OnSummonSpawned"/>: the body is leaving the field for
+        /// good, so the bars created for it go now — while its node is still alive. The hud is
+        /// checked for validity because the removal can also arrive from the arena's teardown.</summary>
+        private void OnSummonRemoved(SummonRemovedEvent evt)
+        {
+            if (_battleHud == null || !GodotObject.IsInstanceValid(_battleHud)) return;
+            _battleHud.RemoveEntityBars(evt.Summon.InstanceId);
+        }
 
         private void ReturnParticipantsToWorld()
         {
