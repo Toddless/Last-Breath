@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://pqu2nd75843f" path="res://Addons/Battle/Presentation/NpcVisualLibrary.cs" id="2_lib"]
 [ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/Robber.tres" id="3"]
 [ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/Assasin.tres" id="4"]
+[ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/Direwolf.tres" id="5"]
 
 [sub_resource type="Resource" id="Resource_Robber"]
 script = ExtResource("1_cfg")
@@ -15,6 +16,11 @@ script = ExtResource("1_cfg")
 NpcId = "Npc_Bandit_Veteran"
 Frames = ExtResource("4")
 
+[sub_resource type="Resource" id="Resource_Direwolf"]
+script = ExtResource("1_cfg")
+NpcId = "Npc_Direwolf"
+Frames = ExtResource("5")
+
 [resource]
 script = ExtResource("2_lib")
-Configs = Array[ExtResource("1_cfg")]([SubResource("Resource_Robber"), SubResource("Resource_Assasin")])
+Configs = Array[ExtResource("1_cfg")]([SubResource("Resource_Robber"), SubResource("Resource_Assasin"), SubResource("Resource_Direwolf")])
