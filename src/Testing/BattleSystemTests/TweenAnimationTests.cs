@@ -132,6 +132,44 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0.5f, step.Seconds, 0.0001f);
         }
 
+        // ---------- three static facings are a complete art set ----------
+
+        [TestMethod]
+        public void EveryName_TheDirectorPlays_ResolvesToAnAuthoredFacingFrame()
+        {
+            // The beast art (Direwolf/Wolf/Bear/Deer) draws Idle_Down, Idle_Up and Idle_Left and
+            // nothing else. The stand-in animator shows the step's Clip on the sprite, so a name that
+            // resolved to anything outside that set would ask the engine for a clip that does not
+            // exist. Right is the mirrored left frame, blows and the fall keep the facing they had.
+            string[] authored = [FrontClip, BackClip, SideClip];
+            string[] played =
+            [
+                "Idle_Down", "Idle_Up", "Idle_Left", "Idle_Right",
+                "Walk_Down", "Walk_Up", "Walk_Left", "Walk_Right",
+                TweenAnimationRules.AttackAnimation,
+                TweenAnimationRules.HurtAnimation,
+                TweenAnimationRules.DeathAnimation,
+                TweenAnimationRules.StunAnimation,
+                "Ability_Armageddon", // a cast pose: the id is never a clip name
+            ];
+
+            var state = new TweenAnimationState();
+            foreach (string animation in played)
+                CollectionAssert.Contains(authored, state.Next(animation).Clip, animation);
+        }
+
+        [TestMethod]
+        public void AimingABlow_AlsoResolvesToAnAuthoredFacingFrame()
+        {
+            // The blow turns toward what it strikes (the arena's approach offset picks the side);
+            // the turn must land on the mirrored left frame, never on a drawn "Idle_Right".
+            var state = new TweenAnimationState();
+            var blow = state.Next(TweenAnimationRules.AttackAnimation);
+
+            Assert.AreEqual(SideClip, state.Turn(TweenFacing.Right, blow).Clip);
+            Assert.AreEqual(SideClip, state.Turn(TweenFacing.Left, blow).Clip);
+        }
+
         // ---------- what counts as a real clip ----------
 
         [TestMethod]

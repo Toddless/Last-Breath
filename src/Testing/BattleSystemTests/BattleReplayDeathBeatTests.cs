@@ -55,6 +55,20 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void Hold_ForArtWithoutADeadClip_LastsTheTopple()
+        {
+            // Art drawn as three static facings has no Dead clip at all; the stand-in animator
+            // answers for its own fall, so the queue still holds while the body topples. A zero here
+            // would let the turn gate — and the end of the battle behind it — outrun the corpse.
+            var animations = new Mock<IAnimationsComponent>();
+            animations.Setup(a => a.HasClip(DeadClip)).Returns(TweenAnimationRules.Handles(DeadClip));
+            animations.Setup(a => a.GetClipSeconds(DeadClip)).Returns(TweenAnimationRules.Seconds(DeadClip));
+
+            Assert.AreEqual(TweenAnimationRules.DeathSeconds, DeathBeat.HoldSeconds(animations.Object), 0.0001f);
+            Assert.IsTrue(DeathBeat.HoldSeconds(animations.Object) > 0f);
+        }
+
+        [TestMethod]
         public void Hold_NeverGoesNegative()
         {
             var animations = Animations(hasDeadClip: true, seconds: -2f);

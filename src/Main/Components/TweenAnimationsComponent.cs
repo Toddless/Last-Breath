@@ -54,6 +54,36 @@ namespace LastBreath.Components
 
         public override void _Ready() => ResetBaseline();
 
+        /// <summary>
+        /// Leaving the tree ends everything this node still owns: both tweens are killed and any
+        /// wait still counting down is disowned. Without it a motion outlives its animator — the
+        /// body of a summon is torn down one turn after its death beat, and a tween or a resumed
+        /// wait that still wanted to settle the sprite would be writing through freed nodes.
+        /// </summary>
+        public override void _ExitTree()
+        {
+            _generation++;
+            Stop(ref _motion);
+            Stop(ref _breath);
+        }
+
+        /// <summary>
+        /// Back in a tree — carried into the arena, or carried home after the battle — the figure
+        /// starts breathing again, the symmetric half of what <see cref="_ExitTree"/> put out.
+        /// Deferred because entering walks top-down: the sprite is a sibling of this animator's
+        /// owner and is not in the tree yet when this fires.
+        /// </summary>
+        public override void _EnterTree() => CallDeferred(MethodName.ResumeBreathing);
+
+        /// <summary>A body that already fell keeps lying, and a motion in flight settles itself when
+        /// it ends — only an idle, standing figure is picked back up.</summary>
+        private void ResumeBreathing()
+        {
+            if (!IsInsideTree() || _state.IsFallen || IsLive(_motion)) return;
+
+            Settle();
+        }
+
         public override void PlayAnimation(string animation) => StartMotion(_state.Next(animation), speedScale: 1f);
 
         /// <summary>
@@ -78,7 +108,8 @@ namespace LastBreath.Components
             }
             finally
             {
-                if (generation == _generation && step.Kind != TweenAnimationKind.Death) Settle();
+                // _ExitTree bumps the generation too, so a body torn down mid-motion settles nothing.
+                if (generation == _generation && IsInsideTree() && step.Kind != TweenAnimationKind.Death) Settle();
             }
         }
 
@@ -103,13 +134,13 @@ namespace LastBreath.Components
             Stop(ref _motion);
             Stop(ref _breath);
             RestTransform();
-            if (_animatedSprite2D is { } sprite) sprite.FlipH = false;
+            if (Sprite is { } sprite) sprite.FlipH = false;
         }
 
         /// <summary>Re-reads the sprite's rest transform: dressing an NPC in library art scales it.</summary>
         public void ResetBaseline()
         {
-            if (_animatedSprite2D is not { } sprite) return;
+            if (Sprite is not { } sprite) return;
 
             _restPosition = sprite.Position;
             _restScale = sprite.Scale;
@@ -120,7 +151,7 @@ namespace LastBreath.Components
         /// there was nothing to play (a facing swap, or a corpse asked to fall twice).</summary>
         private float StartMotion(TweenAnimationStep step, float speedScale)
         {
-            if (_animatedSprite2D is not { } sprite || !sprite.IsInsideTree()) return 0f;
+            if (Sprite is not { } sprite || !IsInsideTree() || !sprite.IsInsideTree()) return 0f;
 
             var aimed = step.Kind is TweenAnimationKind.Attack or TweenAnimationKind.Cast ? AimAtTarget(step) : step;
             ShowFacing(aimed);
@@ -137,7 +168,9 @@ namespace LastBreath.Components
             Stop(ref _motion);
             Stop(ref _breath);
             float seconds = TweenAnimationRules.Scaled(aimed.Seconds, speedScale);
-            var tween = sprite.CreateTween().SetParallel();
+            // Bound to THIS node, not to the sprite: the motion ends with the animator that owns the
+            // Settle callback and the rest transform, instead of outliving it on a sibling.
+            var tween = CreateTween().SetParallel();
             BuildMotion(tween, sprite, aimed, seconds);
             if (aimed.Kind != TweenAnimationKind.Death) tween.Chain().TweenCallback(Callable.From(Settle));
             _motion = tween;
@@ -151,7 +184,7 @@ namespace LastBreath.Components
         /// </summary>
         private TweenAnimationStep AimAtTarget(TweenAnimationStep step)
         {
-            if (_animatedSprite2D?.GetParent() is not Node2D body || body.Position == Vector2.Zero) return step;
+            if (Sprite?.GetParent() is not Node2D body || body.Position == Vector2.Zero) return step;
 
             var offset = body.Position;
             // TODO: turn up/down as well once an arena puts spots above one another.
@@ -161,7 +194,7 @@ namespace LastBreath.Components
 
         private void ShowFacing(TweenAnimationStep step)
         {
-            if (_animatedSprite2D is not { } sprite) return;
+            if (Sprite is not { } sprite) return;
 
             sprite.FlipH = step.FlipHorizontally;
             if (sprite.SpriteFrames?.HasAnimation(step.Clip) != true || sprite.GetAnimation() == step.Clip) return;
@@ -275,7 +308,7 @@ namespace LastBreath.Components
 
         private void RestTransform()
         {
-            if (_animatedSprite2D is not { } sprite) return;
+            if (Sprite is not { } sprite) return;
 
             sprite.Position = _restPosition;
             sprite.Scale = _restScale;
@@ -284,10 +317,12 @@ namespace LastBreath.Components
 
         private void StartBreathing()
         {
-            if (_animatedSprite2D is not { } sprite || !sprite.IsInsideTree()) return;
-            if (_breath is { } running && GodotObject.IsInstanceValid(running) && running.IsRunning()) return;
+            if (Sprite is not { } sprite || !IsInsideTree() || !sprite.IsInsideTree()) return;
+            if (IsLive(_breath)) return;
 
-            var breath = sprite.CreateTween().SetLoops().SetParallel();
+            // Endless by design, so the binding matters most here: on this node it dies with the
+            // animator, on the sprite it would keep squashing a body nobody owns any more.
+            var breath = CreateTween().SetLoops().SetParallel();
             breath.TweenProperty(sprite, ScalePath, new Vector2(_restScale.X, _restScale.Y * (1f - BreathSquash)), BreathSeconds)
                 .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
             breath.TweenProperty(sprite, PositionPath, _restPosition - new Vector2(0f, BreathRise), BreathSeconds)
@@ -311,8 +346,12 @@ namespace LastBreath.Components
 
         private static void Stop(ref Tween? tween)
         {
-            if (tween is { } running && GodotObject.IsInstanceValid(running) && running.IsValid()) running.Kill();
+            if (tween is { } running && IsInstanceValid(running) && running.IsValid()) running.Kill();
             tween = null;
         }
+
+        /// <summary>A tween that is still playing: alive on both sides and not yet spent.</summary>
+        private static bool IsLive(Tween? tween) =>
+            tween is { } running && IsInstanceValid(running) && running.IsValid() && running.IsRunning();
     }
 }

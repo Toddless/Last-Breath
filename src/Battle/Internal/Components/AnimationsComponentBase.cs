@@ -16,6 +16,15 @@ namespace Battle.Internal.Components
 
         [Export] protected AnimatedSprite2D? _animatedSprite2D;
 
+        /// <summary>
+        /// The sprite while it is still a LIVE engine object. Freeing a node leaves its C# wrapper
+        /// in place, so a plain null check is no proof of life: a tween callback or a wait that
+        /// outlived the body would reach through the stale wrapper into freed native memory — an
+        /// access violation, not a catchable exception. Every native touch of the sprite in both
+        /// animators goes through here, so the whole contour has one life check instead of none.
+        /// </summary>
+        protected AnimatedSprite2D? Sprite => IsInstanceValid(_animatedSprite2D) ? _animatedSprite2D : null;
+
         public abstract Task PlayAnimationAsync(string animation, float speedScale = 1f);
 
         public abstract void PlayAnimation(string animation);
@@ -31,14 +40,14 @@ namespace Battle.Internal.Components
         /// </summary>
         public virtual void ApplyVisual(SpriteFrames frames, float scale = 1f)
         {
-            if (_animatedSprite2D == null) return;
+            if (Sprite is not { } sprite) return;
 
-            string current = _animatedSprite2D.GetAnimation();
-            _animatedSprite2D.SpriteFrames = frames;
-            if (scale != 1f) _animatedSprite2D.Scale *= scale;
+            string current = sprite.GetAnimation();
+            sprite.SpriteFrames = frames;
+            if (scale != 1f) sprite.Scale *= scale;
 
             string shown = frames.HasAnimation(current) ? current : TweenAnimationRules.ClipFor(TweenFacing.Down);
-            if (frames.HasAnimation(shown)) _animatedSprite2D.Play(shown);
+            if (frames.HasAnimation(shown)) sprite.Play(shown);
         }
 
         /// <summary>Wiring for an animator built in code; a scene fills the export instead.</summary>
