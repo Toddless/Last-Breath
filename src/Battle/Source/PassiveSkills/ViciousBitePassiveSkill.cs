@@ -29,13 +29,12 @@ namespace Battle.Source.PassiveSkills
         /// <summary>Poison damage multiplier bought by one point of reserve (0.01 = +1%).</summary>
         public float PerOvercap { get; }
 
-        /// <summary>What the bargain costs, as a multiplicative share of the poison resistance (−0.6 = −60%).</summary>
+        /// <summary>What the bargain costs, as a multiplicative share of the poison resistance (−0.6 = −60%).
+        /// <para>The card states that price as a MAGNITUDE — the sentence around it already carries the
+        /// direction ("60% less") — and the turning-around belongs to <see cref="PassiveDisplayValues"/>,
+        /// where the card and the authoring tool both read it from. A second spelling of it here would be
+        /// the same arithmetic in two places, which is how the two readings drift apart.</para></summary>
         public float ResistancePenalty { get; }
-
-        /// <summary>The same price as a CARD states it — a magnitude, because the sentence around it already
-        /// carries the direction ("60% less"). Rendering the signed share there would read "−60% less", which
-        /// is the cost written twice and pointing both ways.</summary>
-        public float ResistanceCut => -ResistancePenalty;
 
         public ViciousBitePassiveSkill(float perOvercap, float resistancePenalty) : base(PassiveId)
         {
@@ -44,12 +43,11 @@ namespace Battle.Source.PassiveSkills
             _penalty = new SimpleModifier(EntityParameter.PoisonResistance, ModifierValueType.Multiplicative, resistancePenalty, PassiveId);
             _bonus = new ScaledByOvercapModifier(ModifierValueType.Flat, EntityParameter.PoisonDamageMultiplier,
                 EntityParameter.PoisonResistance, perOvercap / ResistancePoint, condition: null, PassiveId);
-            DescriptionValues = new Dictionary<string, object?>
+            DescriptionValues = PassiveDisplayValues.Of(PassiveId, new Dictionary<string, float>
             {
-                [nameof(PerOvercap)] = perOvercap,
-                [nameof(ResistancePenalty)] = resistancePenalty,
-                [nameof(ResistanceCut)] = -resistancePenalty
-            };
+                ["perOvercap"] = perOvercap,
+                ["resistancePenalty"] = resistancePenalty
+            });
         }
 
         /// <summary>The price is written on first so the reserve is measured off the total the bearer will

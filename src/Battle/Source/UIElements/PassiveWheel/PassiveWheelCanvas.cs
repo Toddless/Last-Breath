@@ -192,6 +192,11 @@ namespace Battle.Source.UIElements.PassiveWheel
         private ModifierFormatter? _modifiers;
         private ContextModifierFormatter? _knobs;
         private ILocalizationProvider? _localization;
+
+        /// <summary>The registry the GRANT builds a named passive with. The popup builds the same passive
+        /// from the same node, so what it promises is the card of the very instance a purchase hands over.</summary>
+        private Core.Battle.Skills.ISkillProvider? _skills;
+
         private HoverTooltipHandle? _tooltip;
 
         /// <summary>Where the wheel was left last time it was open. It lives in the container because this
@@ -268,6 +273,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             _modifiers = provider.Optional<ModifierFormatter>();
             _knobs = provider.Optional<ContextModifierFormatter>();
             _localization = provider.Optional<ILocalizationProvider>();
+            _skills = provider.Optional<Core.Battle.Skills.ISkillProvider>();
             _memory = provider.Optional<PassiveWheelViewMemory>();
 
             if (_tree != null) _tree.AllocationChanged += OnAllocationChanged;
@@ -1114,7 +1120,7 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (_windows.ShowPopup(typeof(TextTooltipPopup)) is not TextTooltipPopup popup) return null;
 
             var body = new StringBuilder();
-            foreach (PassiveNodeLine line in PassiveNodeLines.Of(node, _modifiers, _knobs, _localization, TextFormat.Rich))
+            foreach (PassiveNodeLine line in PassiveNodeLines.Of(node, _modifiers, _knobs, _localization, TextFormat.Rich, _skills))
                 Append(body, line.Text);
 
             AppendOwnedSlot(body, node);

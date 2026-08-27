@@ -148,8 +148,13 @@ namespace PassiveTreeEditor.Source.View
         /// through the game's own grammar and worded by the same formatter a modifier line goes through —
         /// the card and the wheel say the same sentence. All of them or none: one unreadable field refuses
         /// the whole grant, and a card printing the readable half would promise lines the game withholds.
-        /// <para>Everything else is a factory living in the game, out of this tool's reach: the id and the
-        /// numbers it is tuned by are the whole of what can honestly be shown.</para>
+        /// <para>Everything else is a factory living in the game, out of this tool's reach — but its
+        /// SENTENCE is not: the rule text is a catalog key and the numbers are on the node, so the tool
+        /// renders the same template off the same rules the game fills it from
+        /// (<see cref="PassiveDisplayValues"/>) and shows what the wheel will show. Plain, so a keyword
+        /// arrives as the bare word it names: there are no tooltip windows here to click one open.</para>
+        /// <para>The raw id and its fields are what is left for a passive nobody worded — a node still
+        /// under construction — and that listing is the honest answer rather than a blank card.</para>
         /// </summary>
         private List<string> PassiveLines(PassiveNode node)
         {
@@ -158,6 +163,15 @@ namespace PassiveTreeEditor.Source.View
                 : [];
 
             if (stats.Count > 0) return stats.ConvertAll(Describe);
+
+            if (node.PassiveId is { Length: > 0 } passiveId && _localization != null)
+            {
+                // Two ways a catalog says it has no wording for the passive, and both fall through to the
+                // listing: a provider that echoes the key back, and one that answers with nothing at all.
+                string sentence = PassiveDisplayValues.Describe(passiveId, node.Properties, _localization);
+                if (!string.IsNullOrWhiteSpace(sentence) && sentence != passiveId + LocalizationService.DescriptionSuffix)
+                    return [sentence];
+            }
 
             List<string> lines = [node.PassiveId ?? string.Empty];
             foreach (KeyValuePair<string, float> property in node.Properties)

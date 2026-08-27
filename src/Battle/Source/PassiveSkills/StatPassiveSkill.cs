@@ -49,8 +49,11 @@ namespace Battle.Source.PassiveSkills
 
         /// <summary>Its own lines, worded the way the node that grants them words them. A stat passive has
         /// no rule text of its own to render values into — the values ARE the text.</summary>
-        public override string Description =>
-            string.Join(StatPassiveLineText.LineSeparator, Lines.Select(line => Localization.Format(line, TextFormat.Rich)));
+        public override string Description => Describe(TextFormat.Rich);
+
+        /// <summary>Its lines in the reader's format — the same wording either way, tinted or bare.</summary>
+        public override string Describe(TextFormat format) =>
+            string.Join(StatPassiveLineText.LineSeparator, Lines.Select(line => Localization.Format(line, format)));
 
         /// <summary>Reads the record whole. Refuses rather than trims: see
         /// <see cref="StatPassiveGrammar"/> for the field grammar and what it will not read.</summary>

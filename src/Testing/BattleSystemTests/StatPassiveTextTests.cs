@@ -135,9 +135,10 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0, Lines(node).Length);
         }
 
-        /// <summary>A passive written as a class carries hand-written rule text, and the node reads that
-        /// out: its numbers live inside the class, and a node guessing at them would print a second,
-        /// unrelated set.</summary>
+        /// <summary>A passive written as a class carries hand-written rule text, and a reader with no
+        /// registry to build the passive with reads that text out as it stands. With one, the node builds
+        /// the very passive the grant would hand over and prints ITS numbers into the template — see
+        /// <see cref="PassiveNodeCardTextTests"/>, which is where that reading is pinned.</summary>
         [TestMethod]
         public void ANamedPassiveNodeReadsOutTheCatalogsDescription()
         {

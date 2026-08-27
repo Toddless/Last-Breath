@@ -1,6 +1,7 @@
 namespace Core.PassiveTree.View
 {
     using System.Collections.Generic;
+    using Battle;
     using Battle.Skills;
     using Localization;
     using Modifiers;
@@ -36,16 +37,20 @@ namespace Core.PassiveTree.View
         /// <see cref="OfPassive"/>. The two are alternatives in the data (a node carrying both is refused
         /// where it is read), so the passive is asked about first and the line channel is left alone.</para>
         /// </summary>
+        /// <param name="skills">The registry the GRANT builds a named passive with. Handed in so the popup
+        /// promises the very instance the click hands over — the numbers of THIS node, through the passive's
+        /// own card. Optional: a reader with no registry behind it falls back to the untouched wording.</param>
         public static List<PassiveNodeLine> Of(
             PassiveNode node,
             ModifierFormatter? modifiers,
             ContextModifierFormatter? knobs,
             ILocalizationProvider? localization,
-            TextFormat format = TextFormat.Plain)
+            TextFormat format = TextFormat.Plain,
+            ISkillProvider? skills = null)
         {
             List<PassiveNodeLine> lines = [];
 
-            if (node.PassiveId is { } passiveId) return OfPassive(passiveId, node, modifiers, localization, format);
+            if (node.PassiveId is { } passiveId) return OfPassive(passiveId, node, modifiers, localization, format, skills);
 
             foreach (NodeLineGroup group in node.LineGroups())
                 lines.Add(new PassiveNodeLine(Describe(group, modifiers, knobs, localization, format), group.IsConditional));
@@ -62,8 +67,11 @@ namespace Core.PassiveTree.View
         /// formatter an ordinary node line goes through, and the wheel and the passive's own card cannot
         /// disagree;</item>
         /// <item>a passive written as a CLASS has a hand-written description under its own
-        /// <c>&lt;Id&gt;_Description</c> key, and the node reads it out rather than guessing at the
-        /// numbers it was tuned with.</item>
+        /// <c>&lt;Id&gt;_Description</c> key, and the node BUILDS that passive from its own properties —
+        /// the same pair the grant is made from — so the card the popup shows is the card of the very
+        /// instance the click hands over, numbers and all. Reading the key out raw was the older shape of
+        /// this branch and printed the template itself: "{PercentFromDamage:%}" where a player wanted 75%.
+        /// Without a registry to build with, that older reading is what is left.</item>
         /// </list>
         /// <para>Nothing here is gated: a gate lives on a node's parametric records, and a passive carries
         /// none.</para>
@@ -76,14 +84,14 @@ namespace Core.PassiveTree.View
             PassiveNode node,
             ModifierFormatter? modifiers,
             ILocalizationProvider? localization,
-            TextFormat format)
+            TextFormat format,
+            ISkillProvider? skills)
         {
             List<PassiveNodeLine> lines = [];
 
             if (!StatPassiveGrammar.Owns(passiveId))
             {
-                lines.Add(new PassiveNodeLine(
-                    Translate(localization, passiveId + LocalizationService.DescriptionSuffix), IsConditional: false));
+                lines.Add(new PassiveNodeLine(NamedPassive(passiveId, node, localization, format, skills), IsConditional: false));
 
                 return lines;
             }
@@ -93,6 +101,24 @@ namespace Core.PassiveTree.View
 
             return lines;
         }
+
+        /// <summary>
+        /// What a passive written as a CLASS says on this node. The passive is built from the pair the
+        /// grant is built from — the id and the node's own properties — and then asked for its card, so
+        /// the popup and the card cannot word one keystone two ways, and a second node of the same passive
+        /// tuned differently reads with ITS numbers rather than with anybody's defaults.
+        /// <para>A registry that cannot build the id has already said why; the wording is read out
+        /// untouched rather than left blank, which is the reading this branch had before it could build.</para>
+        /// </summary>
+        private static string NamedPassive(
+            string passiveId,
+            PassiveNode node,
+            ILocalizationProvider? localization,
+            TextFormat format,
+            ISkillProvider? skills) =>
+            skills?.CreateSkill(passiveId, new RecordProperties(passiveId, node.Properties)) is { } skill
+                ? skill.Describe(format)
+                : Translate(localization, passiveId + LocalizationService.DescriptionSuffix);
 
         /// <summary>The node's headline: its title, or what it is about when it was never titled — the
         /// passive it hands over, the ability it unlocks, and its own id when it is none of those.</summary>

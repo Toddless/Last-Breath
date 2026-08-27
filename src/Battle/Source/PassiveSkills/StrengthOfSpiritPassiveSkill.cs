@@ -36,13 +36,12 @@ namespace Battle.Source.PassiveSkills
         public float PercentOfMaxMana { get; }
 
         /// <summary>What the bargain costs, as a multiplicative share of the per-turn mana recovery
-        /// (−0.25 = −25%).</summary>
+        /// (−0.25 = −25%).
+        /// <para>The card states that price as a MAGNITUDE — the sentence around it already carries the
+        /// direction ("25% less") — and the turning-around belongs to <see cref="PassiveDisplayValues"/>,
+        /// where the card and the authoring tool both read it from. A second spelling of it here would be
+        /// the same arithmetic in two places, which is how the two readings drift apart.</para></summary>
         public float RecoveryPenalty { get; }
-
-        /// <summary>The same price as a CARD states it — a magnitude, because the sentence around it already
-        /// carries the direction ("25% less"). Rendering the signed share there would read "−25% less", which
-        /// is the cost written twice and pointing both ways.</summary>
-        public float RecoveryCut => -RecoveryPenalty;
 
         public StrengthOfSpiritPassiveSkill(float chance, float percentOfMaxMana, float recoveryPenalty) : base(PassiveId)
         {
@@ -50,13 +49,12 @@ namespace Battle.Source.PassiveSkills
             PercentOfMaxMana = percentOfMaxMana;
             RecoveryPenalty = recoveryPenalty;
             _penalty = new SimpleModifier(EntityParameter.ManaRecovery, ModifierValueType.Multiplicative, recoveryPenalty, PassiveId);
-            DescriptionValues = new Dictionary<string, object?>
+            DescriptionValues = PassiveDisplayValues.Of(PassiveId, new Dictionary<string, float>
             {
-                [nameof(Chance)] = chance,
-                [nameof(PercentOfMaxMana)] = percentOfMaxMana,
-                [nameof(RecoveryPenalty)] = recoveryPenalty,
-                [nameof(RecoveryCut)] = -recoveryPenalty
-            };
+                ["chance"] = chance,
+                ["percentOfMaxMana"] = percentOfMaxMana,
+                ["recoveryPenalty"] = recoveryPenalty
+            });
         }
 
         public override void Attach(IFightable owner)

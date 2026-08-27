@@ -30,23 +30,21 @@ namespace Battle.Source.PassiveSkills
 
         protected override IReadOnlyDictionary<string, object?> DescriptionValues { get; }
 
-        /// <summary>What the bargain costs, as a multiplicative share of every resistance (−0.45 = −45%).</summary>
+        /// <summary>What the bargain costs, as a multiplicative share of every resistance (−0.45 = −45%).
+        /// <para>The card states that price as a MAGNITUDE — the sentence around it already carries the
+        /// direction ("45% less") — and the turning-around belongs to <see cref="PassiveDisplayValues"/>,
+        /// where the card and the authoring tool both read it from. A second spelling of it here would be
+        /// the same arithmetic in two places, which is how the two readings drift apart.</para></summary>
         public float ResistancePenalty { get; }
-
-        /// <summary>The same price as a CARD states it — a magnitude, because the sentence around it already
-        /// carries the direction ("45% less"). Rendering the signed share there would read "−45% less", which
-        /// is the cost written twice and pointing both ways.</summary>
-        public float ResistanceCut => -ResistancePenalty;
 
         public ElementalFuryPassiveSkill(float resistancePenalty) : base(PassiveId)
         {
             ResistancePenalty = resistancePenalty;
             _penalty = new SimpleModifier(EntityParameter.AllResistance, ModifierValueType.Multiplicative, resistancePenalty, PassiveId);
-            DescriptionValues = new Dictionary<string, object?>
+            DescriptionValues = PassiveDisplayValues.Of(PassiveId, new Dictionary<string, float>
             {
-                [nameof(ResistancePenalty)] = resistancePenalty,
-                [nameof(ResistanceCut)] = -resistancePenalty
-            };
+                ["resistancePenalty"] = resistancePenalty
+            });
         }
 
         public override void Attach(IFightable owner)
