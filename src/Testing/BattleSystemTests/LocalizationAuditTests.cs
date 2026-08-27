@@ -284,11 +284,112 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsFalse(card.Body.Contains('{'), $"the card keeps a placeholder nobody fills: {card.Body}");
         }
 
+        /// <summary>
+        /// The keystone wave read the way its popup reads it: the shipped list of ids, the real registry,
+        /// the real wording — in BOTH catalogs, because a key worded in English and forgotten in Russian
+        /// reaches half the players as its own internal spelling.
+        /// <para>Three failures, one guard. A key nobody worded prints itself ("Passive_Skill_Trinity"); a
+        /// key worded empty prints nothing at all; and a template naming a value the passive never hands it
+        /// keeps the token, so the card reads "60% less" as "{ResistanceCut} less". The last is the one that
+        /// only shows up here — it needs the wording and the skill in the same room.</para>
+        /// </summary>
+        [TestMethod]
+        public void EveryKeystoneOfTheWaveIsNamedAndWordedInBothCatalogs()
+        {
+            var provider = new Battle.Source.PassiveSkillProvider();
+            Core.Battle.Skills.PassiveSkillCatalog shipped = ShippedPassiveCatalog();
+            var complaints = new List<string>();
+
+            foreach (string po in new[] { "en.po", "ru.po" })
+            {
+                UseCatalog(po);
+
+                foreach (string id in s_keystoneWave)
+                {
+                    Core.Battle.Skills.ISkill? skill = provider.CreateSkill(id, KeystoneFields(id, shipped));
+                    Assert.IsNotNull(skill, $"the registry no longer builds '{id}' from the fields the catalog declares");
+
+                    string name = skill.DisplayName;
+                    string description = skill.Description;
+
+                    if (string.IsNullOrWhiteSpace(name) || name == id)
+                        complaints.Add($"{po}: '{id}' has no name — the popup shows the raw key");
+                    if (string.IsNullOrWhiteSpace(description) || description == id + LocalizationService.DescriptionSuffix)
+                        complaints.Add($"{po}: '{id}' has no description — the popup shows the raw key");
+                    else if (description.Contains('{'))
+                        complaints.Add($"{po}: '{id}' keeps a placeholder the passive does not fill: {description}");
+                }
+            }
+
+            UseEnglishCatalog();
+            Assert.AreEqual(0, complaints.Count, string.Join("\n", complaints));
+        }
+
+        /// <summary>
+        /// The sign of a price, pinned on the one keystone the shipped tree already tunes. Every penalty of
+        /// the wave is stored as the negative share its modifier is built from (−0.6), and a card rendering
+        /// that share into a sentence that already says "less" reads "-60% less Poison Resistance" — a cost
+        /// stated twice and pointing both ways. The wording asks for the magnitude instead, and this is what
+        /// holds it there.
+        /// </summary>
+        [TestMethod]
+        public void TheKeystonesPriceReachesTheCardAsAMagnitudeAndNotAsASignedShare()
+        {
+            const float perOvercap = 0.01f;
+            const float resistancePenalty = -0.6f;
+            const string sentence =
+                "+1% to Poison Damage Multiplier per point of Poison Resistance above the cap. 60% less Poison Resistance.";
+
+            UseEnglishCatalog();
+
+            var skill = new Battle.Source.PassiveSkills.ViciousBitePassiveSkill(perOvercap, resistancePenalty);
+
+            Assert.AreEqual(sentence, WithoutMarkup(skill.Description));
+        }
+
+        /// <summary>The keystone wave of the pass, by the ids its factories answer to.</summary>
+        private static readonly string[] s_keystoneWave =
+        [
+            "Passive_Skill_Iron_Will",
+            "Passive_Skill_Wind_Of_Freedom",
+            Battle.Source.PassiveSkills.AgnosticPassiveSkill.PassiveId,
+            Battle.Source.PassiveSkills.StoicismPassiveSkill.PassiveId,
+            Battle.Source.PassiveSkills.ViciousBitePassiveSkill.PassiveId,
+            Battle.Source.PassiveSkills.GiftOfNaturePassiveSkill.PassiveId,
+            Battle.Source.PassiveSkills.StrengthOfSpiritPassiveSkill.PassiveId,
+            Battle.Source.PassiveSkills.ElementalFuryPassiveSkill.PassiveId,
+            Battle.Source.PassiveSkills.TrinityPassiveSkill.PassiveId,
+        ];
+
+        /// <summary>A share the eye reads as a share: 0.5 renders as "50%" under <c>{X:%}</c> and as "0.5"
+        /// plain, so neither shape of placeholder can pass by rendering an empty string.</summary>
+        private static RecordProperties KeystoneFields(string id, Core.Battle.Skills.PassiveSkillCatalog catalog)
+        {
+            var values = new Dictionary<string, float>(StringComparer.Ordinal);
+            foreach (string field in catalog.RequiredFields(id)) values[field] = 0.5f;
+
+            return new RecordProperties(id, values);
+        }
+
+        private static Core.Battle.Skills.PassiveSkillCatalog ShippedPassiveCatalog()
+        {
+            string path = Path.Combine(LastBreathTest.SharedData.Catalog(DataCatalog.PassiveSkills), "PassiveCatalog.json");
+            Assert.IsTrue(File.Exists(path), $"the passive catalog ships at {path}");
+
+            return Core.Battle.Skills.PassiveSkillCatalog.Read(File.ReadAllText(path));
+        }
+
+        /// <summary>A rendered description without its BBCode tint — the sentence a player reads.</summary>
+        private static string WithoutMarkup(string text) =>
+            System.Text.RegularExpressions.Regex.Replace(text, @"\[/?[^\[\]]*\]", string.Empty);
+
         /// <summary>The shipped wording, pinned to the static facade every card reads through.</summary>
-        private static void UseEnglishCatalog()
+        private static void UseEnglishCatalog() => UseCatalog("en.po");
+
+        private static void UseCatalog(string poFileName)
         {
             var catalog = new FakeLocalizationProvider();
-            foreach ((string key, string wording) in ReadEntries("en.po")) catalog.Strings[key] = wording;
+            foreach ((string key, string wording) in ReadEntries(poFileName)) catalog.Strings[key] = wording;
 
             Localization.Override(new LocalizationService(catalog,
                 new ModifierFormatter(catalog, new ParameterFormatProvider()),

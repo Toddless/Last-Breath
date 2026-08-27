@@ -32,6 +32,11 @@ namespace Battle.Source.PassiveSkills
         /// <summary>What the bargain costs, as a multiplicative share of the poison resistance (−0.6 = −60%).</summary>
         public float ResistancePenalty { get; }
 
+        /// <summary>The same price as a CARD states it — a magnitude, because the sentence around it already
+        /// carries the direction ("60% less"). Rendering the signed share there would read "−60% less", which
+        /// is the cost written twice and pointing both ways.</summary>
+        public float ResistanceCut => -ResistancePenalty;
+
         public ViciousBitePassiveSkill(float perOvercap, float resistancePenalty) : base(PassiveId)
         {
             PerOvercap = perOvercap;
@@ -42,7 +47,8 @@ namespace Battle.Source.PassiveSkills
             DescriptionValues = new Dictionary<string, object?>
             {
                 [nameof(PerOvercap)] = perOvercap,
-                [nameof(ResistancePenalty)] = resistancePenalty
+                [nameof(ResistancePenalty)] = resistancePenalty,
+                [nameof(ResistanceCut)] = -resistancePenalty
             };
         }
 

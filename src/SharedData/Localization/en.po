@@ -4781,3 +4781,61 @@ msgstr "Fury"
 
 msgid "Tag_stage"
 msgstr "Stage"
+
+# ------------------------------
+# Keystone passives — the conversions and the bargains
+# ------------------------------
+
+msgid "Passive_Skill_Iron_Will"
+msgstr "Iron Will"
+
+msgid "Passive_Skill_Iron_Will_Description"
+msgstr "All of your Evade becomes Armor. Your Evade is reduced to nothing."
+
+msgid "Passive_Skill_Wind_Of_Freedom"
+msgstr "Wind of Freedom"
+
+msgid "Passive_Skill_Wind_Of_Freedom_Description"
+msgstr "All of your Armor becomes Evade. Your Armor is reduced to nothing."
+
+msgid "Passive_Skill_Agnostic"
+msgstr "Agnostic"
+
+msgid "Passive_Skill_Agnostic_Description"
+msgstr "All of your Mana becomes Health, one for one. Abilities are paid for with Health and cost {CostScale:%} more."
+
+msgid "Passive_Skill_Stoicism"
+msgstr "Stoicism"
+
+msgid "Passive_Skill_Stoicism_Description"
+msgstr "Immune to control. You cannot evade attacks."
+
+msgid "Passive_Skill_Vicious_Bite"
+msgstr "Vicious Bite"
+
+msgid "Passive_Skill_Vicious_Bite_Description"
+msgstr "+{PerOvercap:%} to Poison Damage Multiplier per point of Poison Resistance above the cap. {ResistanceCut:%} less Poison Resistance."
+
+msgid "Passive_Skill_Gift_Of_Nature"
+msgstr "Gift of Nature"
+
+msgid "Passive_Skill_Gift_Of_Nature_Description"
+msgstr "{ElementalBonus:%} more All Elemental Damage. Attacks deal no Physical Damage."
+
+msgid "Passive_Skill_Strength_Of_Spirit"
+msgstr "Strength of Spirit"
+
+msgid "Passive_Skill_Strength_Of_Spirit_Description"
+msgstr "{Chance:%} chance to restore {PercentOfMaxMana:%} of maximum Mana when struck. {RecoveryCut:%} less Mana Recovery."
+
+msgid "Passive_Skill_Elemental_Fury"
+msgstr "Elemental Fury"
+
+msgid "Passive_Skill_Elemental_Fury_Description"
+msgstr "Attacks penetrate each Elemental Resistance by whatever you carry above its cap. {ResistanceCut:%} less All Resistances."
+
+msgid "Passive_Skill_Trinity"
+msgstr "Trinity"
+
+msgid "Passive_Skill_Trinity_Description"
+msgstr "Attacks deal 100% of their Physical Damage as Cold, Fire and Lightning."

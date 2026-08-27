@@ -39,6 +39,11 @@ namespace Battle.Source.PassiveSkills
         /// (−0.25 = −25%).</summary>
         public float RecoveryPenalty { get; }
 
+        /// <summary>The same price as a CARD states it — a magnitude, because the sentence around it already
+        /// carries the direction ("25% less"). Rendering the signed share there would read "−25% less", which
+        /// is the cost written twice and pointing both ways.</summary>
+        public float RecoveryCut => -RecoveryPenalty;
+
         public StrengthOfSpiritPassiveSkill(float chance, float percentOfMaxMana, float recoveryPenalty) : base(PassiveId)
         {
             Chance = chance;
@@ -49,7 +54,8 @@ namespace Battle.Source.PassiveSkills
             {
                 [nameof(Chance)] = chance,
                 [nameof(PercentOfMaxMana)] = percentOfMaxMana,
-                [nameof(RecoveryPenalty)] = recoveryPenalty
+                [nameof(RecoveryPenalty)] = recoveryPenalty,
+                [nameof(RecoveryCut)] = -recoveryPenalty
             };
         }
 

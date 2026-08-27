@@ -33,11 +33,20 @@ namespace Battle.Source.PassiveSkills
         /// <summary>What the bargain costs, as a multiplicative share of every resistance (−0.45 = −45%).</summary>
         public float ResistancePenalty { get; }
 
+        /// <summary>The same price as a CARD states it — a magnitude, because the sentence around it already
+        /// carries the direction ("45% less"). Rendering the signed share there would read "−45% less", which
+        /// is the cost written twice and pointing both ways.</summary>
+        public float ResistanceCut => -ResistancePenalty;
+
         public ElementalFuryPassiveSkill(float resistancePenalty) : base(PassiveId)
         {
             ResistancePenalty = resistancePenalty;
             _penalty = new SimpleModifier(EntityParameter.AllResistance, ModifierValueType.Multiplicative, resistancePenalty, PassiveId);
-            DescriptionValues = new Dictionary<string, object?> { [nameof(ResistancePenalty)] = resistancePenalty };
+            DescriptionValues = new Dictionary<string, object?>
+            {
+                [nameof(ResistancePenalty)] = resistancePenalty,
+                [nameof(ResistanceCut)] = -resistancePenalty
+            };
         }
 
         public override void Attach(IFightable owner)

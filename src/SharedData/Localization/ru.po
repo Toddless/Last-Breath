@@ -4848,3 +4848,61 @@ msgstr ""
 
 msgid "Tag_stage"
 msgstr ""
+
+# ------------------------------
+# Keystone passives — the conversions and the bargains
+# ------------------------------
+
+msgid "Passive_Skill_Iron_Will"
+msgstr "Железная воля"
+
+msgid "Passive_Skill_Iron_Will_Description"
+msgstr "Всё уклонение становится бронёй. Уклонение обнуляется."
+
+msgid "Passive_Skill_Wind_Of_Freedom"
+msgstr "Ветер свободы"
+
+msgid "Passive_Skill_Wind_Of_Freedom_Description"
+msgstr "Вся броня становится уклонением. Броня обнуляется."
+
+msgid "Passive_Skill_Agnostic"
+msgstr "Агностик"
+
+msgid "Passive_Skill_Agnostic_Description"
+msgstr "Вся мана становится здоровьем один к одному. Способности оплачиваются здоровьем, их стоимость увеличена на {CostScale:%}."
+
+msgid "Passive_Skill_Stoicism"
+msgstr "Стоицизм"
+
+msgid "Passive_Skill_Stoicism_Description"
+msgstr "Не подвержен контролю. От атак невозможно уклониться."
+
+msgid "Passive_Skill_Vicious_Bite"
+msgstr "Яростный укус"
+
+msgid "Passive_Skill_Vicious_Bite_Description"
+msgstr "+{PerOvercap:%} множителя урона ядом за каждую единицу сопротивления яду свыше потолка. Сопротивление яду снижено на {ResistanceCut:%}."
+
+msgid "Passive_Skill_Gift_Of_Nature"
+msgstr "Дар природы"
+
+msgid "Passive_Skill_Gift_Of_Nature_Description"
+msgstr "Весь элементальный урон увеличен на {ElementalBonus:%}. Атаки не наносят физический урон."
+
+msgid "Passive_Skill_Strength_Of_Spirit"
+msgstr "Сила духа"
+
+msgid "Passive_Skill_Strength_Of_Spirit_Description"
+msgstr "{Chance:%} шанс восстановить {PercentOfMaxMana:%} от максимума маны при получении удара. Восстановление маны снижено на {RecoveryCut:%}."
+
+msgid "Passive_Skill_Elemental_Fury"
+msgstr "Ярость стихий"
+
+msgid "Passive_Skill_Elemental_Fury_Description"
+msgstr "Атаки пробивают элементальные сопротивления на значения свыше потолка. Сопротивления снижены на {ResistanceCut:%}."
+
+msgid "Passive_Skill_Trinity"
+msgstr "Триединство"
+
+msgid "Passive_Skill_Trinity_Description"
+msgstr "Атаки наносят 100% физического урона как холод, огонь и молния."
