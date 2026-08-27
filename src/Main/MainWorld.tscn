@@ -63,6 +63,9 @@ font_size = 56
 [sub_resource type="LabelSettings" id="LabelSettings_m67ao"]
 font_size = 38
 
+[sub_resource type="LabelSettings" id="LabelSettings_6ghlw"]
+font_size = 35
+
 [node name="MainWorld" type="Node2D" unique_id=1612394780]
 script = ExtResource("1_4xxmu")
 
@@ -318,3 +321,17 @@ offset_right = 38.0
 offset_bottom = 48.0
 text = "Trial"
 label_settings = SubResource("LabelSettings_m67ao")
+
+[node name="Direwolf" type="Node2D" parent="." unique_id=639762622]
+position = Vector2(-2532, 1369)
+script = ExtResource("8_hv00y")
+_npcIds = PackedStringArray("Npc_Direwolf")
+_maxCount = 1
+_spawnRadius = 50.0
+metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="Label" type="Label" parent="Direwolf" unique_id=469200051]
+offset_right = 40.0
+offset_bottom = 22.0
+text = "Direwolf"
+label_settings = SubResource("LabelSettings_6ghlw")
