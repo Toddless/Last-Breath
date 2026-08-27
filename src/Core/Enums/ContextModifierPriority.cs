@@ -24,14 +24,22 @@ namespace Core.Enums
         /// <summary>Runs after the bulk: reads what Normal produced (e.g. "always crit" flags).</summary>
         Late = 100,
 
-        /// <summary>The last word on a NUMBER. Damage CONVERSIONS ("X% of physical dealt as fire") belong
-        /// here: a conversion must see the final number, so nothing that shapes one may run after it.
-        /// Also home of hard rule overrides (unblockable/unevadable).</summary>
+        /// <summary>The last word on a NUMBER. Damage CONVERSIONS that take a SHARE of a component
+        /// ("X% of physical dealt as fire") belong here: a conversion must see the final number, so nothing
+        /// that shapes one may run after it. Also home of hard rule overrides (unblockable/unevadable).</summary>
         Absolute = 1000,
 
+        /// <summary>The last word among conversions: a rule that takes what is LEFT of a component rather
+        /// than a share of it ("attacks deal all their physical damage as the three elements"). Behind
+        /// <see cref="Absolute"/>, so every rule owed a share has taken it first and the remainder is what
+        /// is honestly left over; ahead of <see cref="Denial"/>, so what it carried into another type
+        /// survives. A slot of its own rather than a place in the conversions': ties there are ordered by
+        /// nothing, and the split of a blow may not depend on the order its rules were hung in.</summary>
+        Remainder = 1500,
+
         /// <summary>Past the last word: an OUTGOING rule that ENDS a damage component instead of shaping it
-        /// ("attacks deal no physical damage"), and so a step of the SOURCE's lists. Every rule entitled to a
-        /// share of a component takes it at <see cref="Absolute"/> or earlier, so what a conversion has
+        /// ("attacks deal no physical damage"), and so a step of the SOURCE's lists. Every rule entitled to
+        /// any part of a component takes it at <see cref="Remainder"/> or earlier, so what a conversion has
         /// already carried into another type survives and only the untouched remainder is denied. A denial
         /// may not share the conversions' slot: ties there are ordered by nothing.
         /// <para>An incoming immunity of the RECEIVER zeroes components too and still belongs at

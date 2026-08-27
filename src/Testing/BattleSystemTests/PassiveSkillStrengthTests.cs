@@ -41,6 +41,9 @@ namespace LastBreathTest.BattleSystemTests
                 new CurrentHealthRegenerationPassiveSkill(0.03f));
             yield return Pair(new DecompositionPassiveSkill(3, 5, 0.1f), new DecompositionPassiveSkill(3, 5, 0.05f));
             yield return Pair(new EchoPassiveSkill(0.5f, 2), new EchoPassiveSkill(0.2f, 2));
+            // Both copies pierce by the same rule — the reserve, one for one — so only the price separates
+            // them, and the copy charging less for it is the stronger.
+            yield return Pair(new ElementalFuryPassiveSkill(-0.2f), new ElementalFuryPassiveSkill(-0.6f));
             yield return Pair(new ExecutePassiveSkill(0.4f), new ExecutePassiveSkill(0.15f));
             yield return Pair(new FirstStrikePassiveSkill(0.6f), new FirstStrikePassiveSkill(0.25f));
             yield return Pair(new GiftFromTheGoddessPassiveSkill(0.3f), new GiftFromTheGoddessPassiveSkill(0.1f));
@@ -91,6 +94,8 @@ namespace LastBreathTest.BattleSystemTests
             yield return Pair(new SoullessPassiveSkill(), new SoullessPassiveSkill());
             // The immunity is all-or-nothing and the price is the same for everyone.
             yield return Pair(new StoicismPassiveSkill(), new StoicismPassiveSkill());
+            // The whole physical part goes and the three elements share it evenly: nothing to be worth more of.
+            yield return Pair(new TrinityPassiveSkill(), new TrinityPassiveSkill());
             yield return Pair(new TrueStrikePassiveSkill(), new TrueStrikePassiveSkill());
             yield return Pair(new UnshackledPassiveSkill(), new UnshackledPassiveSkill());
         }

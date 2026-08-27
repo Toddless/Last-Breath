@@ -30,6 +30,17 @@
         private static readonly (EntityParameter Resistance, EntityParameter Penetration) s_poisonResistance =
             (EntityParameter.PoisonResistance, EntityParameter.PoisonResistancePenetration);
 
+        /// <summary>The published face of the mitigation table: a read-only view, taken once, so that
+        /// handing the table out cannot hand out the right to rewrite it and a rule asking on every blow
+        /// pays nothing for asking.</summary>
+        private static readonly IReadOnlyDictionary<DamageType, (EntityParameter Resistance, EntityParameter Penetration)> s_elementalChannels =
+            s_resistanceByType.AsReadOnly();
+
+        /// <summary>The elements, each with the resistance that stops it and the penetration that answers
+        /// that resistance. Published from the mitigation table itself so that a rule speaking of "the
+        /// elements" and the rules that mitigate them can never come to hold two different lists.</summary>
+        public static IReadOnlyDictionary<DamageType, (EntityParameter Resistance, EntityParameter Penetration)> ElementalChannels => s_elementalChannels;
+
         public static float CalculateFloatValue(IReadOnlyList<IModifier> modifiers, float baseValue = 0)
             => Math.Max(0, CalculateModifiers(modifiers, baseValue));
 
@@ -144,12 +155,12 @@
         private static float MitigateComponent(DamageType type, float damage, IDamageContext context, IFightable target)
         {
             if (s_resistanceByType.TryGetValue(type, out (EntityParameter Resistance, EntityParameter Penetration) elemental))
-                return context.IgnoreResistances ? damage : ApplyResistance(damage, context.Source, target, elemental);
+                return context.IgnoreResistances ? damage : ApplyResistance(damage, context, target, elemental);
 
             return type switch
             {
-                DamageType.Burning => ApplyResistance(damage, context.Source, target, s_resistanceByType[DamageType.Fire]),
-                DamageType.Poison => ApplyResistance(damage, context.Source, target, s_poisonResistance),
+                DamageType.Burning => ApplyResistance(damage, context, target, s_resistanceByType[DamageType.Fire]),
+                DamageType.Poison => ApplyResistance(damage, context, target, s_poisonResistance),
                 DamageType.Physical or DamageType.Bleed => ApplyArmor(damage, context.Source, target),
                 // Sacred ignores armor and resistances by design; Blight damages health directly and neither cuts it.
                 DamageType.Sacred or DamageType.Blight => damage,
@@ -165,14 +176,20 @@
             return damage;
         }
 
-        private static float ApplyResistance(float damage, IFightable source, IFightable target, (EntityParameter Resistance, EntityParameter Penetration) elemental)
+        private static float ApplyResistance(float damage, IDamageContext context, IFightable target, (EntityParameter Resistance, EntityParameter Penetration) elemental)
         {
             // The target mitigates with its resistance cut down to its own maximum, and the source's
             // penetration bites into that: an overcap is a reserve against shred, never against penetration.
             float effective = ResistanceParameters.Effective(target.Parameters, elemental.Resistance);
-            float resist = effective * (1 - source.Parameters.GetValueForParameter(elemental.Penetration));
+            float resist = effective * (1 - Penetration(context, elemental.Penetration));
             return damage * (1 - resist);
         }
+
+        /// <summary>What the source pierces of one resistance: the line he always wears and the rule written
+        /// for this one blow, added and then capped whole. The cap belongs on the sum — past the resistance
+        /// itself, penetration would turn mitigation into amplification.</summary>
+        private static float Penetration(IDamageContext context, EntityParameter penetration) =>
+            Mathf.Clamp(context.Source.Parameters.GetValueForParameter(penetration) + context.ResistancePenetrationOf(penetration), 0f, 1f);
 
         private static float ApplyArmor(float damage, IFightable source, IFightable target)
         {

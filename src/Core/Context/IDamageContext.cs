@@ -47,6 +47,15 @@ namespace Core.Context
         /// <summary>Overkill prevented by a staged boss's transition floor (anti-oneshot).</summary>
         float PreventedByStageGuard { get; set; }
 
+        /// <summary>Resistance penetration THIS hit carries, beyond what the source's own parameter holds,
+        /// asked for by the penetration parameter answering the resistance. Mitigation adds the two and caps
+        /// the sum, so a rule written for one blow and a line the fighter always wears reach the target's
+        /// resistance as one figure rather than two.</summary>
+        float ResistancePenetrationOf(EntityParameter penetration);
+
+        /// <summary>Adds to what this hit penetrates, additively — the way the parameter it joins is built.</summary>
+        void AddResistancePenetration(EntityParameter penetration, float amount);
+
         void Add(DamageType type, float amount);
         void Convert(DamageType from, DamageType to, float fraction);
         void Set(DamageType type, float amount);

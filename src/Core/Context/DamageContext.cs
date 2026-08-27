@@ -10,6 +10,10 @@
     public record DamageContext : IDamageContext
     {
         private readonly Dictionary<DamageType, float> _damageComponents = [];
+
+        /// <summary>What this one blow pierces on top of the source's own parameters. Empty for the hits
+        /// nobody wrote a per-blow rule for, which is nearly all of them.</summary>
+        private readonly Dictionary<EntityParameter, float> _resistancePenetration = [];
         private IFightable? _target;
         public IReadOnlyDictionary<DamageType, float> DamageComponents => _damageComponents;
         public required IFightable Source { get; init; }
@@ -31,6 +35,11 @@
         public float AbsorbedByBarrier { get; set; }
         public float AbsorbedByShield { get; set; }
         public float PreventedByStageGuard { get; set; }
+
+        public float ResistancePenetrationOf(EntityParameter penetration) => _resistancePenetration.GetValueOrDefault(penetration);
+
+        public void AddResistancePenetration(EntityParameter penetration, float amount) =>
+            _resistancePenetration[penetration] = ResistancePenetrationOf(penetration) + amount;
 
         public void Add(DamageType type, float amount) => _damageComponents[type] = _damageComponents.GetValueOrDefault(type, 0f) + amount;
 

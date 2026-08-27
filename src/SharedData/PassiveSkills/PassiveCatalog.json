@@ -55,6 +55,8 @@
         {
             "id": "Passive_Skill_Strength_Of_Spirit",
             "fields": ["chance", "percentOfMaxMana", "recoveryPenalty"]
-        }
+        },
+        { "id": "Passive_Skill_Elemental_Fury", "fields": ["resistancePenalty"] },
+        { "id": "Passive_Skill_Trinity", "fields": [] }
     ]
 }
