@@ -121,6 +121,39 @@ namespace LastBreathTest.BattleSystemTests
                 Assert.IsTrue(replacement.DistanceTo(slot) > 25f, "the replacement slot landed on an earlier one");
         }
 
+        /// <summary>
+        /// The arena frames the battlefield by pointing its camera AT THE ANCHOR (offset zero —
+        /// BattleArena.FocusCameraOnFormation). That is only honest while the clusters stay balanced
+        /// around it: a formation growing off to one side would leave the camera staring at its corner,
+        /// which is exactly how the line ended up pressed into the top-left of the screen.
+        /// </summary>
+        [TestMethod]
+        public void Clusters_StayBalancedAroundTheAnchor_SoTheCameraCanFrameThem()
+        {
+            foreach (int groupCount in new[] { 2, 3, 4 })
+            {
+                var formation = new ArenaFormation(s_settings);
+                var keys = new List<object>();
+                for (int i = 0; i < groupCount; i++)
+                    keys.Add(new object());
+                formation.PlanGroups(keys);
+
+                var slots = new List<Vector2>();
+                for (int i = 0; i < keys.Count; i++)
+                    slots.AddRange(ReserveMany(formation, keys[i], i + 1)); // deliberately uneven sides
+
+                float minX = slots.Min(slot => slot.X), maxX = slots.Max(slot => slot.X);
+                float minY = slots.Min(slot => slot.Y), maxY = slots.Max(slot => slot.Y);
+                Assert.IsTrue(minX <= 0f && maxX >= 0f && minY <= 0f && maxY >= 0f,
+                    $"{groupCount} groups: the anchor fell outside the formation's bounds x[{minX};{maxX}] y[{minY};{maxY}]");
+
+                float radius = slots.Max(slot => slot.Length());
+                var boundsCenter = new Vector2((minX + maxX) / 2f, (minY + maxY) / 2f);
+                Assert.IsTrue(boundsCenter.Length() < radius * 0.5f,
+                    $"{groupCount} groups: the formation grew off-anchor by {boundsCenter.Length()} of its {radius} reach");
+            }
+        }
+
         private static List<Vector2> ReserveMany(ArenaFormation formation, object groupKey, int count)
         {
             var slots = new List<Vector2>();

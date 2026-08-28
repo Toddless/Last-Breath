@@ -27,8 +27,9 @@
     {
         private const string UID = "uid://bcj35twqggu1d";
 
-        // Anchor of the slot formation in arena space: the scene's player spot sits one
-        // ClusterDistance to its left, so the classic 1-group battle keeps today's look.
+        // Anchor of the slot formation in arena space: clusters are arranged AROUND it, so this
+        // point is the geometric centre of the whole battlefield — and therefore the point the
+        // battle camera has to frame (FocusCameraOnFormation). One constant, both users.
         private static readonly Vector2 s_formationCenter = new(1000f, 550f);
         private readonly RandomNumberGenerator _rnd = new();
         private readonly ICombatTurnPlanner _turnPlanner = new UtilityTurnPlanner(new DefaultRandomNumberGenerator());
@@ -154,7 +155,10 @@
         }
 
         public void RemovePlayerFromArenaSpot() => _playerSpot?.RemoveEntityFromSpot();
-        public Vector2 GetCameraPosition() => GlobalPosition;
+
+        /// <summary>ICameraFocus: an outside camera must look at the fight, not at the arena node's
+        /// origin — the formation is laid out around <see cref="s_formationCenter"/>, not around zero.</summary>
+        public Vector2 GetCameraPosition() => GlobalPosition + s_formationCenter;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
@@ -390,7 +394,13 @@
             }
 
             _playerSpot?.SetBattleEventBus(_battleEventBus);
-            if (_camera is { Enabled: true } && _camera.IsInsideTree()) _camera.MakeCurrent();
+            FocusCameraOnFormation();
+            if (_camera is { Enabled: true } && _camera.IsInsideTree())
+            {
+                _camera.MakeCurrent();
+                _camera.ResetSmoothing(); // the camera just jumped onto the formation — no easing tail
+            }
+
             SetupTargetSelectionController();
             SetupCombatTextPresenter(_battleEventBus);
             StartTimelineRecording();
@@ -402,6 +412,26 @@
             var fightersQueue = _queueScheduler.AddFighters(_fighters);
             _battleEventBus.Publish<BattleQueueDefinedEvent>(new(fightersQueue));
             return true;
+        }
+
+        /// <summary>
+        /// Points the battle camera at the formation's centre, whatever its zoom is.
+        /// The camera is authored FIXED_TOP_LEFT, so its position is the TOP-LEFT corner of the view
+        /// and the visible centre is position + viewport / (2 * zoom): sitting at the arena origin it
+        /// framed <see cref="s_formationCenter"/> for exactly one combination of window size and zoom
+        /// (1920x1080 at zoom 1 puts the centre at (960, 540) ≈ (1000, 550)). Any zoom-out doubles the
+        /// visible rect while the fighters stay put, which pushed the whole battle line into the
+        /// top-left corner. Centre anchoring ties the framing to the formation constant instead of to
+        /// the zoom and the window size. Drag margins belong to a camera that CHASES something; on a
+        /// static one they only let the view settle a margin away from the point it must frame.
+        /// </summary>
+        private void FocusCameraOnFormation()
+        {
+            if (_camera == null) return;
+            _camera.AnchorMode = Camera2D.AnchorModeEnum.DragCenter;
+            _camera.DragHorizontalEnabled = false;
+            _camera.DragVerticalEnabled = false;
+            _camera.Position = s_formationCenter;
         }
 
         /// <summary>Distinct group keys in encounter order, the player's side first.</summary>
