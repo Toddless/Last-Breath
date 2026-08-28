@@ -1,6 +1,7 @@
 namespace LastBreathTest.LootSimulation
 {
     using Core;
+    using Core.Data.NpcData;
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
@@ -66,7 +67,7 @@ namespace LastBreathTest.LootSimulation
                     foreach ((int tier, int amount) in tierEvent.ChosenTiersAmount)
                         tierDistribution[tier] = tierDistribution.GetValueOrDefault(tier) + amount;
 
-                killRecords.Add(new KillRecord(ExpectedBudget(archetype, difficulty), difficulty, drops));
+                killRecords.Add(new KillRecord(ExpectedBudget(archetype, difficulty), difficulty, modifiers.Count, drops));
 
                 // Flush the per-battle caches (_tableCache/_diedEntities) exactly as a won battle would.
                 pipeline.Events.Publish(new BattleEndEvent(BattleResults.PlayerWon));
@@ -88,17 +89,40 @@ namespace LastBreathTest.LootSimulation
             return baseBudget * (1 + configuration.LvlCoefficient * f) * rarityMultiplier * (1 + totalDifficulty);
         }
 
+        /// <summary>Mirror of NpcProvider.RollModifiers (issue #223), which the game spawner runs.
+        /// Kept line-for-line equivalent on purpose: an authored count is an absolute and rolls no
+        /// dice on the count; a cascade spawn walks the type × rarity slot ceiling and offers each
+        /// slot to the falling chance of the NpcSpawnRolls catalog, stopping at the first refusal.
+        /// Either way the composition is a weighted pick WITHOUT replacement over the id-ordered
+        /// catalog — the pre-#223 sim sampled WITH replacement, which the game never did after the
+        /// rework. If NpcProvider grows a seam this mirror cannot follow, stop and report it.</summary>
         private List<INpcModifier> ResolveModifiers(NpcArchetype archetype)
         {
             var modifiers = archetype.ModifierIds.Select(pipeline.ModifierProvider.GetModifier).ToList();
-            if (archetype.RandomModifierCount <= 0) return modifiers;
 
-            // Weighted sampling with replacement — the same roll the game spawner makes.
-            (var weighted, float totalWeight) = WeightedRandomPicker.CalculateWeights(pipeline.ModifierProvider.GetAllModifiers());
-            for (int i = 0; i < archetype.RandomModifierCount; i++)
-                modifiers.Add(WeightedRandomPicker.PickRandom(weighted, totalWeight, pipeline.Rnd).Copy());
+            int? authoredCount = archetype.RandomModifierCount > 0 ? archetype.RandomModifierCount : null;
+            if (authoredCount == null && !archetype.CascadeRolled) return modifiers;
 
+            int slots = authoredCount ?? NpcTypeDefaults.ModifierCount(archetype.EntityType, archetype.Rarity);
+            var pool = pipeline.ModifierProvider.GetAllModifiers().ToList();
+
+            List<INpcModifier> rolled = [];
+            while (rolled.Count < slots && pool.Count > 0)
+            {
+                if (authoredCount == null && !FillsSlot(pipeline.SpawnRolls.ModifierSlotChance(archetype.EntityType, archetype.Rarity, rolled.Count))) break;
+
+                long index = pipeline.Rnd.RandWeighted(pool.Select(modifier => modifier.Weight).ToArray());
+                var picked = pool[Math.Max(0, (int)index)];
+                pool.Remove(picked);
+                rolled.Add(pipeline.ModifierProvider.GetModifier(picked.Id));
+            }
+
+            modifiers.AddRange(rolled);
             return modifiers;
         }
+
+        /// <summary>Same certainty rule as NpcProvider.FillsSlot: a chance of 1 (or 0) is decided,
+        /// not rolled, and spends no dice — part of the seeded-stream contract of the catalog.</summary>
+        private bool FillsSlot(float chance) => chance >= 1f || (chance > 0f && pipeline.Rnd.RandFloat() < chance);
     }
 }

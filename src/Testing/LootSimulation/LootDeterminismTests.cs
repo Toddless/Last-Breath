@@ -21,13 +21,19 @@ namespace LastBreathTest.LootSimulation
         /// (<c>LOOT_SIMULATION_REPORT=1 dotnet test</c>), commit it, and paste the value the failure prints.</summary>
         private const string BossDropsFingerprint = "29566E2A16D2B21FBD0FAF4D989001612C1F9D635A4E3140C0F4E297AEC2012C";
 
-        /// <summary>The same for <see cref="RolledModifiers"/>. Moved by issue #222, which changed what five
-        /// random modifiers are worth on the same seed in three ways: tier upgrades now STACK instead of the
-        /// strongest one winning; a rolled set keeps only one unique modifier per catalog section, the
-        /// stronger taking the slot; and the scaling section is exempt from that (uniqueScope "id"), so
-        /// different scalers still pile up. <see cref="BossDropsFingerprint"/> did NOT move, which is the
-        /// check that only the modifier side changed.</summary>
-        private const string RolledModifiersFingerprint = "58A94C5E5AD4EA0759D61EA0970E1DDA9AAB119BDF9CD926BC22C09F1E148135";
+        /// <summary>The same for <see cref="RolledModifiers"/>. Moved by issue #222 (tier upgrades stack,
+        /// one unique per section, scaling exempt) and again by the #224 sim rework: the simulator's
+        /// modifier roll now mirrors NpcProvider.RollModifiers of issue #223 — weighted pick WITHOUT
+        /// replacement over the id-ordered catalog via RandWeighted — where the old sim sampled WITH
+        /// replacement through WeightedRandomPicker. Same seed, different draw path, different set.
+        /// <see cref="BossDropsFingerprint"/> did NOT move either time, which is the check that only the
+        /// modifier side changed.</summary>
+        private const string RolledModifiersFingerprint = "F66DDC87B57FF558D2CC08CEC7373185D3DC64A632EF102CAD93801EB1B14FF9";
+
+        /// <summary>The cascade spawn of issue #223 (ceiling + falling slot chances), pinned the same way:
+        /// this is the path every non-authored spawn takes in the game now, so the report is only worth
+        /// reading if it reproduces too.</summary>
+        private const string CascadeSpawnFingerprint = "8FA4B615850FC4082F17318F1CE7EB8D4A3B5488EF4C1E4FB7483C23E30EAC22";
 
         /// <summary>The boss carries the paths a regular kill never reaches — equip affix rolls, grant
         /// rolls and augment seats — which is where a run stops repeating itself first.</summary>
@@ -41,10 +47,18 @@ namespace LastBreathTest.LootSimulation
             RandomModifierCount = 5,
         };
 
+        /// <summary>Rolls the modifier COUNT too — the slot cascade the other two never enter: FillsSlot
+        /// burns its own dice, so this is the only scenario that can catch the cascade drifting off the
+        /// seeded stream (a ladder chance crossing 1.0/0.0, a reordered draw).</summary>
+        private static NpcArchetype CascadeSpawn => new("Determinism_Cascade", EntityType.Elit, Rarity.Epic, 30, Fractions.Undead)
+        {
+            CascadeRolled = true,
+        };
+
         [TestMethod]
         public async Task SameSeedRepeatsWithinOneProcess()
         {
-            foreach (var archetype in (NpcArchetype[])[BossDrops, RolledModifiers])
+            foreach (var archetype in (NpcArchetype[])[BossDrops, RolledModifiers, CascadeSpawn])
             {
                 string first = await FingerprintAsync(archetype);
                 string second = await FingerprintAsync(archetype);
@@ -75,6 +89,16 @@ namespace LastBreathTest.LootSimulation
             Assert.AreEqual(RolledModifiersFingerprint, actual,
                 "The modifiers a seeded kill rolls have changed. If the change was intended, " +
                 $"regenerate the report and record the new fingerprint: {actual}");
+        }
+
+        [TestMethod]
+        public async Task TheSpawnCascadeIsPinnedAcrossProcesses()
+        {
+            string actual = await FingerprintAsync(CascadeSpawn);
+
+            Assert.AreEqual(CascadeSpawnFingerprint, actual,
+                "The #223 spawn cascade no longer rolls the same counts on the same seed. If the change " +
+                $"was intended, regenerate the report and record the new fingerprint: {actual}");
         }
 
         /// <summary>A scenario run reduced to what a kill rolled and what it dropped. It is a canary on a

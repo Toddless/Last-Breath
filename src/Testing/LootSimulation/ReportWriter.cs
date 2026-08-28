@@ -18,12 +18,12 @@ namespace LastBreathTest.LootSimulation
 
             sb.AppendLine("## Summary");
             sb.AppendLine();
-            sb.AppendLine("| Scenario | Kills | Difficulty | Items/kill | Value/kill | p95 value | Budget | Value/difficulty | Gold/kill |");
-            sb.AppendLine("|---|---|---|---|---|---|---|---|---|");
+            sb.AppendLine("| Scenario | Kills | Mods/kill | Difficulty | Items/kill | Value/kill | p95 value | Budget | Value/difficulty | Gold/kill |");
+            sb.AppendLine("|---|---|---|---|---|---|---|---|---|---|");
             foreach (var result in results)
             {
                 sb.AppendLine(
-                    $"| {result.Archetype.Name} | {result.Kills} | {F(result.MeanDifficulty)} | {F(result.MeanItemsPerKill)} " +
+                    $"| {result.Archetype.Name} | {result.Kills} | {F(result.MeanModifierCount)} | {F(result.MeanDifficulty)} | {F(result.MeanItemsPerKill)} " +
                     $"| {F(result.MeanValuePerKill)} | {F(result.Percentile(kill => kill.TotalValue, 95))} " +
                     $"| {F(result.MeanExpectedBudget)} | {F(result.ValuePerDifficultyPoint)} | {F(result.MeanGoldPerKill)} |");
             }
@@ -39,7 +39,8 @@ namespace LastBreathTest.LootSimulation
             sb.AppendLine();
             sb.AppendLine($"{result.Archetype.EntityType}/{result.Archetype.Rarity}/lvl {result.Archetype.Level}, " +
                           $"modifiers: [{string.Join(", ", result.Archetype.ModifierIds)}]" +
-                          (result.Archetype.RandomModifierCount > 0 ? $" + {result.Archetype.RandomModifierCount} random" : string.Empty));
+                          (result.Archetype.RandomModifierCount > 0 ? $" + {result.Archetype.RandomModifierCount} rolled (authored count)" : string.Empty) +
+                          (result.Archetype.CascadeRolled ? $" + spawn cascade (mean {F(result.MeanModifierCount)} of the ceiling)" : string.Empty));
             sb.AppendLine();
 
             int tierTotal = Math.Max(1, result.TierDistribution.Values.Sum());

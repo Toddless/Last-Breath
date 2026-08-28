@@ -17,6 +17,11 @@ namespace LastBreathTest.LootSimulation
     {
         public required LootGenerationService LootService { get; init; }
         public required INpcModifierProvider ModifierProvider { get; init; }
+
+        /// <summary>The chance ladders of issue #223: how many of an NPC's modifier slots actually
+        /// fill. Loaded from the same NpcSpawnRolls catalog the game reads, so the simulator's spawn
+        /// cascade (see <see cref="LootSimulator.ResolveModifiers"/>) runs on production data.</summary>
+        public required Core.Data.INpcSpawnRollsProvider SpawnRolls { get; init; }
         public required IItemDataProvider ItemProvider { get; init; }
         public required ILootConfiguration Configuration { get; init; }
         public required SimEventBus Events { get; init; }
@@ -39,6 +44,7 @@ namespace LastBreathTest.LootSimulation
             var parser = new DataParser(factory);
             var itemProvider = new ItemDataProvider(parser);
             var modifierProvider = new NpcModifierProvider();
+            var spawnRolls = new NpcSpawnRollsProvider();
             var tableProvider = new LootTableProvider(parser);
             var configurationProvider = new LootConfigurationProvider(parser);
             var effectCatalog = new Core.Crafting.CraftingEffectProvider();
@@ -52,7 +58,7 @@ namespace LastBreathTest.LootSimulation
             var dataService = new GameDataService(
                 new FileSystemDataSource(dataRoot),
                 [
-                    itemProvider, modifierProvider, tableProvider, configurationProvider, effectCatalog, combatRules,
+                    itemProvider, modifierProvider, spawnRolls, tableProvider, configurationProvider, effectCatalog, combatRules,
                     .. shared.GetServices<IGameDataParticipant>()
                 ]);
             var loadFailures = new List<string>();
@@ -82,6 +88,7 @@ namespace LastBreathTest.LootSimulation
             {
                 LootService = lootService,
                 ModifierProvider = modifierProvider,
+                SpawnRolls = spawnRolls,
                 ItemProvider = itemProvider,
                 Configuration = configurationProvider,
                 Events = events,

@@ -4,7 +4,7 @@ namespace LastBreathTest.LootSimulation
 
     internal sealed record DropRecord(string ItemId, Rarity Rarity, int Stack, int Tier, float Price, bool IsGuaranteed, bool IsEquip, bool IsCurrency = false);
 
-    internal sealed record KillRecord(float ExpectedBudget, float Difficulty, IReadOnlyList<DropRecord> Drops)
+    internal sealed record KillRecord(float ExpectedBudget, float Difficulty, int ModifierCount, IReadOnlyList<DropRecord> Drops)
     {
         /// <summary>Real items only — the gold pile is budget leftover, not an item.</summary>
         public int ItemCount => Drops.Where(drop => !drop.IsCurrency).Sum(drop => drop.Stack);
@@ -34,6 +34,9 @@ namespace LastBreathTest.LootSimulation
         public float MeanExpectedBudget => KillRecords.Average(kill => kill.ExpectedBudget);
 
         public float MeanDifficulty => KillRecords.Average(kill => kill.Difficulty);
+
+        /// <summary>Average modifiers actually worn per kill — the #223 cascade's direct output.</summary>
+        public float MeanModifierCount => (float)KillRecords.Average(kill => kill.ModifierCount);
 
         /// <summary>Average gold per kill — the goldPerBudgetUnit coefficient is tuned against this.</summary>
         public float MeanGoldPerKill => (float)KillRecords.Average(kill => kill.GoldDropped);

@@ -1,5 +1,6 @@
 namespace LastBreathTest.LootSimulation
 {
+    using Core.Data.NpcData;
     using Core.Enums;
 
     /// <summary>The scenario matrix for the full report run. Axis scenarios isolate one modifier
@@ -43,6 +44,26 @@ namespace LastBreathTest.LootSimulation
                 RandomModifierCount = 11,
             };
             yield return Baseline with { Name = "Extreme_Lvl1", Level = 1 };
+
+            // The #223 before/after pairs: Rolled_ is the live spawn — modifier count decided by the
+            // slot cascade (NpcSpawnRolls ladders on the type × rarity ceiling); Ceiling_ is the same
+            // NPC under the pre-#223 promise, every slot of the formula filled. One column against the
+            // other is the loot-budget cost of the rework, per type.
+            (EntityType Type, Rarity Rarity, int Level, Fractions Fraction)[] rolledMatrix =
+            [
+                (EntityType.Regular, Rarity.Uncommon, 5, Fractions.Human),
+                (EntityType.Special, Rarity.Rare, 15, Fractions.Human),
+                (EntityType.Elit, Rarity.Epic, 30, Fractions.Undead),
+                (EntityType.Unique, Rarity.Legendary, 45, Fractions.Demon),
+            ];
+            foreach ((var type, var rarity, int level, var fraction) in rolledMatrix)
+            {
+                yield return new NpcArchetype($"Rolled_{type}_{rarity}", type, rarity, level, fraction) { CascadeRolled = true };
+                yield return new NpcArchetype($"Ceiling_{type}_{rarity}", type, rarity, level, fraction)
+                {
+                    RandomModifierCount = NpcTypeDefaults.ModifierCount(type, rarity),
+                };
+            }
         }
     }
 }
