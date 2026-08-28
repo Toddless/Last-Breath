@@ -21,8 +21,13 @@ namespace LastBreathTest.LootSimulation
         /// (<c>LOOT_SIMULATION_REPORT=1 dotnet test</c>), commit it, and paste the value the failure prints.</summary>
         private const string BossDropsFingerprint = "29566E2A16D2B21FBD0FAF4D989001612C1F9D635A4E3140C0F4E297AEC2012C";
 
-        /// <summary>The same for <see cref="RolledModifiers"/>.</summary>
-        private const string RolledModifiersFingerprint = "2113525D3DFC485735235ED303BE9DB4DB16A56E7F5E82C1C6B51A7B7A26D288";
+        /// <summary>The same for <see cref="RolledModifiers"/>. Moved by issue #222, which changed what five
+        /// random modifiers are worth on the same seed in three ways: tier upgrades now STACK instead of the
+        /// strongest one winning; a rolled set keeps only one unique modifier per catalog section, the
+        /// stronger taking the slot; and the scaling section is exempt from that (uniqueScope "id"), so
+        /// different scalers still pile up. <see cref="BossDropsFingerprint"/> did NOT move, which is the
+        /// check that only the modifier side changed.</summary>
+        private const string RolledModifiersFingerprint = "58A94C5E5AD4EA0759D61EA0970E1DDA9AAB119BDF9CD926BC22C09F1E148135";
 
         /// <summary>The boss carries the paths a regular kill never reaches — equip affix rolls, grant
         /// rolls and augment seats — which is where a run stops repeating itself first.</summary>

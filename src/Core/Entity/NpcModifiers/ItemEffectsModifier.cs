@@ -17,6 +17,6 @@ namespace Core.Entity.NpcModifiers
         // listed ids instead of the whole catalog (payload still comes from the ItemEffects entry).
         public override void ApplyModifier(IModifierApplyingContext context) => context.AdditionalItemEffects.Add(EffectId);
 
-        public override INpcModifier Copy() => new ItemEffectsModifier(Id, Weight, BaseDifficultyMultiplier, IsUnique, NpcBuffId, EffectId);
+        public override INpcModifier Copy() => new ItemEffectsModifier(Id, Weight, BaseDifficultyMultiplier, IsUnique, NpcBuffId, EffectId) { Group = Group, UniqueScope = UniqueScope };
     }
 }

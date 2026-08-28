@@ -16,6 +16,6 @@ namespace Core.Entity.NpcModifiers
 
         public override void ApplyModifier(IModifierApplyingContext context) => context.GuaranteedItems.AddRange(Items);
 
-        public override INpcModifier Copy() => new GuaranteedItemsModifier(Id, Weight, BaseDifficultyMultiplier, IsUnique, NpcBuffId, Items);
+        public override INpcModifier Copy() => new GuaranteedItemsModifier(Id, Weight, BaseDifficultyMultiplier, IsUnique, NpcBuffId, Items) { Group = Group, UniqueScope = UniqueScope };
     }
 }

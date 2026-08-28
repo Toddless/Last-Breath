@@ -37,7 +37,7 @@ namespace Core.Entity.NpcModifiers
         {
         }
 
-        public override INpcModifier Copy() => new ScaleModifier(Id, Weight, BaseDifficultyMultiplier, ScaleFactor, IsUnique, NpcBuffId);
+        public override INpcModifier Copy() => new ScaleModifier(Id, Weight, BaseDifficultyMultiplier, ScaleFactor, IsUnique, NpcBuffId) { Group = Group, UniqueScope = UniqueScope };
 
         private void OnModifierAdded(INpcModifier modifier)
         {

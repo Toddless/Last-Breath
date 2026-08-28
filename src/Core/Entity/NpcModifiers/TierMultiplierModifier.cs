@@ -15,6 +15,6 @@ namespace Core.Entity.NpcModifiers
         public float Multiplier => BaseMultiplier * TotalScale;
         public int[] ChancesAffected { get; } = affectedTiers;
 
-        public override INpcModifier Copy() => new TierMultiplierModifier(Id, Weight, BaseDifficultyMultiplier, IsUnique, NpcBuffId, BaseMultiplier, ChancesAffected);
+        public override INpcModifier Copy() => new TierMultiplierModifier(Id, Weight, BaseDifficultyMultiplier, IsUnique, NpcBuffId, BaseMultiplier, ChancesAffected) { Group = Group, UniqueScope = UniqueScope };
     }
 }

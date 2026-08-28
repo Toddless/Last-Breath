@@ -35,10 +35,15 @@ namespace LastBreath.Npc
             ApplyData(data);
         }
 
+        public bool HasBuff(string buffId) => _buffs.ContainsKey(buffId);
+
+        public IReadOnlyList<NpcBuffGrantData> GetGrants(string buffId) =>
+            _buffs.GetValueOrDefault(buffId)?.Grants ?? (IReadOnlyList<NpcBuffGrantData>)[];
+
         public IReadOnlyList<IModifierInstance> CreateModifiers(string buffId, string source)
         {
             var buff = _buffs.GetValueOrDefault(buffId);
-            if (buff == null) return []; // loot-only buff ids have no parameter side
+            if (buff == null) return []; // an unknown id: HasBuff is where the caller notices, not here
 
             return buff.Modifiers
                 .Select(entry => ModifiersCreator.CreateModifierInstance(

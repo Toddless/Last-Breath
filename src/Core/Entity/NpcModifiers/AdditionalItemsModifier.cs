@@ -32,6 +32,6 @@ namespace Core.Entity.NpcModifiers
             }
         }
 
-        public override INpcModifier Copy() => new AdditionalItemsModifier(Id, Weight, BaseDifficultyMultiplier, Items, IsUnique, NpcBuffId);
+        public override INpcModifier Copy() => new AdditionalItemsModifier(Id, Weight, BaseDifficultyMultiplier, Items, IsUnique, NpcBuffId) { Group = Group, UniqueScope = UniqueScope };
     }
 }

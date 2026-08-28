@@ -2,6 +2,7 @@
     "mods": [
         {
             "key": "scale",
+            "uniqueScope": "id",
             "modifiers": [
                 {
                     "id": "Npc_Modifier_Scale_Double_Health",

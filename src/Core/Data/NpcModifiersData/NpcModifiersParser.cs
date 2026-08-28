@@ -29,7 +29,11 @@ namespace Core.Data.NpcModifiersData
                     "rarityUpgrade" => Deserialize<RarityUpgradeModifierData>(npcModifiers.Modifiers),
                     _ => []
                 };
-                modifiers.Add(npcModifiers.Key, mods);
+
+                // The section's uniqueScope belongs to every entry under it: absent means Group, a present
+                // value is parsed strictly (a typo fails the file rather than quietly meaning "group").
+                var scope = EnumParser.ParseEnumOrDefault<Enums.NpcUniqueScope>(npcModifiers.UniqueScope);
+                modifiers.Add(npcModifiers.Key, [.. mods.Select(mod => mod with { UniqueScope = scope })]);
             }
 
             return modifiers;

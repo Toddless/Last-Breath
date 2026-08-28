@@ -15,6 +15,6 @@ namespace Core.Entity.NpcModifiers
         public float Multiplier => BaseMultiplier * TotalScale;
         public int[] ChancesAffected { get; set; } = affectedRarity;
 
-        public override INpcModifier Copy() => new RarityUpgradeModifier(Id, Weight, BaseDifficultyMultiplier, IsUnique, NpcBuffId, ChancesAffected, BaseMultiplier);
+        public override INpcModifier Copy() => new RarityUpgradeModifier(Id, Weight, BaseDifficultyMultiplier, IsUnique, NpcBuffId, ChancesAffected, BaseMultiplier) { Group = Group, UniqueScope = UniqueScope };
     }
 }

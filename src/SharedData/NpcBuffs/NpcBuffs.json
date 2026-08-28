@@ -25,6 +25,158 @@
             "modifiers": [
                 { "parameter": "HealthRecovery", "type": "Increase", "value": 1.0 }
             ]
+        },
+
+        {
+            "id": "Npc_Buff_Tier_Upgrade_To_Maximum",
+            "modifiers": [
+                { "parameter": "CriticalChance", "type": "Flat", "value": 0.15 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Tier_Upgrade_By_Two",
+            "modifiers": [
+                { "parameter": "CriticalChance", "type": "Flat", "value": 0.10 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Tier_Upgrade_By_One",
+            "modifiers": [
+                { "parameter": "CriticalChance", "type": "Flat", "value": 0.05 }
+            ]
+        },
+
+        {
+            "id": "Npc_Buff_Guaranteed_Items_Crafting_Resource",
+            "modifiers": [
+                { "parameter": "Armor", "type": "Flat", "value": 500 },
+                { "parameter": "Evade", "type": "Flat", "value": 500 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Guaranteed_Items_Crafting_Upgrade",
+            "modifiers": [
+                { "parameter": "Health", "type": "Flat", "value": 200 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Guaranteed_Items_Equip",
+            "modifiers": [
+                { "parameter": "PhysicalDamage", "type": "Flat", "value": 50 },
+                { "parameter": "SpellDamage", "type": "Flat", "value": 50 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Guaranteed_Items_Essence",
+            "modifiers": [
+                { "parameter": "Barrier", "type": "Flat", "value": 100 }
+            ]
+        },
+
+        {
+            "id": "Npc_Buff_Tier_Multiplier_Huge",
+            "modifiers": [
+                { "parameter": "AdditionalHitChance", "type": "Flat", "value": 0.15 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Tier_Multiplier_Big",
+            "modifiers": [
+                { "parameter": "AdditionalHitChance", "type": "Flat", "value": 0.10 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Tier_Multiplier_Mid",
+            "modifiers": [
+                { "parameter": "AdditionalHitChance", "type": "Flat", "value": 0.07 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Tier_Multiplier_Small",
+            "modifiers": [
+                { "parameter": "AdditionalHitChance", "type": "Flat", "value": 0.04 }
+            ]
+        },
+
+        {
+            "id": "Npc_Buff_Item_Effect_Execution",
+            "modifiers": [],
+            "grants": [
+                { "kind": "Passive", "id": "Passive_Skill_Execute", "properties": { "threshold": 0.3 } }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Item_Effect_Vampire",
+            "modifiers": [],
+            "grants": [
+                { "kind": "Passive", "id": "Passive_Skill_Vampire", "properties": { "percent": 0.15 } }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Item_Effect_Poisoned_Claw",
+            "modifiers": [],
+            "grants": [
+                {
+                    "kind": "Passive",
+                    "id": "Passive_Skill_Poisoned_Claws",
+                    "properties": { "percentFromDamage": 0.75, "duration": 3 }
+                }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Item_Effect_Burning",
+            "modifiers": [],
+            "grants": [
+                {
+                    "kind": "Passive",
+                    "id": "Passive_Skill_Burning",
+                    "properties": { "percentFromDamage": 0.80, "duration": 3, "maxStacks": 999 }
+                }
+            ]
+        },
+
+        {
+            "id": "Npc_Buff_Rarity_Upgrade_Huge",
+            "modifiers": [
+                { "parameter": "AllResistance", "type": "Flat", "value": 0.5 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Rarity_Upgrade_Big",
+            "modifiers": [
+                { "parameter": "AllResistance", "type": "Flat", "value": 0.35 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Rarity_Upgrade_Mid",
+            "modifiers": [
+                { "parameter": "AllResistance", "type": "Flat", "value": 0.20 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Rarity_Upgrade_Small",
+            "modifiers": [
+                { "parameter": "AllResistance", "type": "Flat", "value": 0.10 }
+            ]
+        },
+
+        {
+            "id": "Npc_Buff_Min_Rarity_Legend",
+            "modifiers": [
+                { "parameter": "AllAttribute", "type": "Flat", "value": 50 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Min_Rarity_Epic",
+            "modifiers": [
+                { "parameter": "AllAttribute", "type": "Flat", "value": 30 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Min_Rarity_Rare",
+            "modifiers": [
+                { "parameter": "AllAttribute", "type": "Flat", "value": 10 }
+            ]
         }
     ]
 }

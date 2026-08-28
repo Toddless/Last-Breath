@@ -9,5 +9,10 @@ namespace Core.Data.NpcModifiersData
         [JsonProperty("weight")] public float Weight { get; init; }
         [JsonProperty("difficulty")] public float Difficulty { get; init; }
         [JsonProperty("isUnique")] public bool IsUnique { get; init; }
+
+        /// <summary>Stamped by the parser from the section this entry sat in — the section's uniqueScope,
+        /// carried down so the factory can hand it to the modifier without re-reading the file.
+        /// Not a JSON field of the entry itself.</summary>
+        [JsonIgnore] public Enums.NpcUniqueScope UniqueScope { get; init; }
     }
 }

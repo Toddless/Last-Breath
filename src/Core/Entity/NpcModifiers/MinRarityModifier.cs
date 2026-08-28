@@ -19,6 +19,6 @@ namespace Core.Entity.NpcModifiers
             if (context.AtLeast > MinRarity) context.AtLeast = MinRarity;
         }
 
-        public override INpcModifier Copy() => new MinRarityModifier(Id, Weight, BaseDifficultyMultiplier, IsUnique, NpcBuffId, MinRarity);
+        public override INpcModifier Copy() => new MinRarityModifier(Id, Weight, BaseDifficultyMultiplier, IsUnique, NpcBuffId, MinRarity) { Group = Group, UniqueScope = UniqueScope };
     }
 }

@@ -317,7 +317,10 @@ namespace Battle.Internal.Npc
             // A staged boss opens weakened: stage 0 scales the just-written bases and owns the ability set.
             if (Stages.Count > 0) ApplyStage(0, provider);
 
-            // Loot-side today (difficulty/budget); parameter buffs come when NpcBuffId gets a consumer.
+            // Both sides of a modifier at once: loot (difficulty/budget) and the bearer's own power. The
+            // binder goes in FIRST so the whole batch binds in one settled pass — a scaling modifier
+            // arriving later raises everyone's TotalScale, and this is the only point where it is final.
+            AttachModifierBuffs(provider);
             NpcModifiers.AddModifiers(definition.Modifiers.ToList());
 
             GrantControlResistance(provider);
@@ -333,6 +336,17 @@ namespace Battle.Internal.Npc
             _lifecycle = NpcLifecycleFactory.Create(definition, new DefaultRandomNumberGenerator());
             if (_lifecycle is IUndeadRiseLifecycle undead) undead.ResurrectionReady += OnResurrectionReady;
             if (_lifecycle is IAliveRiseLifecycle alive) alive.ReviveReady += OnReviveReady;
+        }
+
+        /// <summary>The single place NpcBuffId becomes real: the binder pulls each modifier's buff out of
+        /// NpcBuffs.json and puts it on this body — parameter lines into <see cref="ParameterModifiers"/>,
+        /// granted passives through the item-grant factory. A composition without the buff catalog (a
+        /// sandbox, the drop stand) keeps the old behaviour: modifiers stay loot-side and nothing throws.</summary>
+        private void AttachModifierBuffs(IGameServiceProvider provider)
+        {
+            var catalog = provider.TryGet<INpcBuffProvider>();
+            if (catalog == null) return;
+            NpcModifiers.UseBuffs(new NpcBuffBinder(catalog, provider.TryGet<Core.Items.Grants.IGrantFactory>()));
         }
 
         /// <summary>Per-NPC art from the shared visual library; no entry — the scene's placeholder frames stay.</summary>
