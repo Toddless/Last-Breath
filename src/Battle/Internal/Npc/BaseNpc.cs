@@ -349,12 +349,15 @@ namespace Battle.Internal.Npc
             NpcModifiers.UseBuffs(new NpcBuffBinder(catalog, provider.TryGet<Core.Items.Grants.IGrantFactory>()));
         }
 
-        /// <summary>Per-NPC art from the shared visual library; no entry — the scene's placeholder frames stay.</summary>
+        /// <summary>Per-NPC art from the shared visual library; no entry — the scene's placeholder frames
+        /// AND the scene's placeholder collision shapes stay. With art applied, the humanoid-authored
+        /// collision is refitted to the new silhouette (a deer is not shaped like the placeholder).</summary>
         private void ApplyVisual(string npcId, IGameServiceProvider provider)
         {
             var config = provider.GetService<INpcVisualProvider>()?.GetVisual(npcId);
             if (config?.Frames == null) return;
             _animationsComponent?.ApplyVisual(config.Frames, config.Scale);
+            NpcCollisionFitter.Fit(this, _interactionArea); // after ApplyVisual: reads the sprite's final scale
         }
 
         /// <summary>Bosses and archons get diminishing returns on hard control (CombatRules.json);
