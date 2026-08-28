@@ -26,8 +26,13 @@ namespace Core.Data.NpcData
         /// <summary>Per-level fraction added to every base parameter: value * (1 + (level - 1) * levelScaling).</summary>
         [JsonProperty("levelScaling")] public float LevelScaling { get; init; }
 
-        /// <summary>Learned ability count; 0 = derive from entity type (2/3/4/5, bosses take all).</summary>
-        [JsonProperty("abilityCount")] public int AbilityCount { get; init; }
+        /// <summary>Learned ability count, authored. ABSENT = nothing authored: the entity type gives the
+        /// number of slots and the NpcSpawnRolls ladder decides how many of them fill. PRESENT = the whole
+        /// answer, dice excluded — including 0, which is a training dummy with no casts at all and not a
+        /// record that forgot to say. Reads the same way as
+        /// <see cref="NpcAuthoredData.ModifierCount"/>, deliberately: the two fields answer the same shape
+        /// of question and a zero that means two opposite things in one file is a trap.</summary>
+        [JsonProperty("abilityCount")] public int? AbilityCount { get; init; }
 
         /// <summary>Fixed rarity name (bosses/uniques). Empty = rolled by weight at spawn.</summary>
         [JsonProperty("rarity")] public string? Rarity { get; init; }

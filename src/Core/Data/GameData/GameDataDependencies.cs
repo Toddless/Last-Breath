@@ -5,6 +5,7 @@ namespace Core.Data.GameData
     using Localization;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
+    using Services;
 
     public static class GameDataDependencies
     {
@@ -23,6 +24,9 @@ namespace Core.Data.GameData
             // Shared for the same reason as the augment records: an ornament id turns up in a quest
             // reward, a bag and a save entry, and those are read by compositions holding no battle module.
             services.AddGameDataParticipant<IOrnamentCatalog, OrnamentCatalog>();
+            // Shared because the thing that asks it is: every project that can spawn an NPC rolls how
+            // many modifiers and abilities that NPC comes out with, and the answer has to be one file.
+            services.AddGameDataParticipant<INpcSpawnRollsProvider, NpcSpawnRollsProvider>();
             return services;
         }
 

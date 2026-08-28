@@ -20,8 +20,18 @@ namespace Core.Entity
     /// archetype pool. Every project spawning NPCs binds <see cref="INpcProvider"/> to this class.
     /// A record carrying an "authored" section (<see cref="NpcAuthoredData"/>) replaces the rolls it
     /// names with the values the data states — that is how a named villager is placed by hand.
+    /// <para>
+    /// HOW MANY modifiers and abilities come out is a roll of its own: the type × rarity tables give
+    /// the number of SLOTS, and <see cref="INpcSpawnRollsProvider"/> gives each slot its falling
+    /// chance of being filled (see <see cref="RollModifiers"/>). <paramref name="rollSeed"/> exists so
+    /// a test can hold that distribution still; nothing in the game passes it.
+    /// </para>
     /// </summary>
-    public class NpcProvider(IAbilityProvider abilityProvider, INpcModifierProvider modifierProvider) : INpcProvider, IGameDataParticipant
+    public class NpcProvider(
+        IAbilityProvider abilityProvider,
+        INpcModifierProvider modifierProvider,
+        INpcSpawnRollsProvider spawnRolls,
+        int? rollSeed = null) : INpcProvider, IGameDataParticipant
     {
         private static readonly (Rarity Rarity, float Weight)[] s_rarityWeights =
         [
@@ -34,7 +44,7 @@ namespace Core.Entity
 
         private readonly Dictionary<string, NpcData> _npcs = [];
         private readonly Dictionary<Stance, NpcBehaviorData> _behaviors = [];
-        private readonly IRandomNumberGenerator _rnd = new DefaultRandomNumberGenerator();
+        private readonly IRandomNumberGenerator _rnd = new DefaultRandomNumberGenerator(rollSeed);
 
         public IReadOnlyList<string> Catalogs => [DataCatalog.Npc, DataCatalog.NpcBehaviors];
 
@@ -77,7 +87,7 @@ namespace Core.Entity
                 Stance = stance,
                 Parameters = ScaleParameters(data, level),
                 // Staged bosses learn per-stage sets via ApplyStage — a rolled/authored list would be discarded.
-                Abilities = stages.Count > 0 ? [] : PickAbilities(data, behaviorData, entityType),
+                Abilities = stages.Count > 0 ? [] : PickAbilities(data, behaviorData, entityType, rarity),
                 Behavior = BuildProfile(behaviorData, EnumParser.ParseEnum<AiIntellect>(data.AiIntellect), data.FleeHealthThreshold, data.AbilityBehaviors),
                 World = BuildWorldConfig(data.World),
                 LifecycleKind = ParseLifecycleKind(data.Lifecycle),
@@ -194,20 +204,26 @@ namespace Core.Entity
         private static int? AuthoredModifierCount(NpcAuthoredData? data) =>
             data?.ModifierCount is int count ? Math.Max(0, count) : null;
 
-        /// <summary>Weighted pick without replacement from the shared modifier pool; count = the number
-        /// the "authored" section names, else type × rarity. An authored 0 leaves the loop unentered,
-        /// so the npc comes out bare and no weighted pick happens at all — which is the point of the
-        /// field: an authored villager is allowed to be a person and not a rolled encounter. WHICH
-        /// modifiers a spawn wears stays rolled either way; overrides carry none, so nothing above
-        /// this line has an opinion about the count.</summary>
+        /// <summary>Weighted pick without replacement from the shared modifier pool. The count the
+        /// "authored" section names is an ABSOLUTE — a hand-placed villager gets exactly what the file
+        /// says and no dice touch it; an authored 0 leaves the loop unentered, so the npc comes out bare
+        /// and no weighted pick happens at all. With no authored count, type × rarity gives the number
+        /// of SLOTS and each slot is then offered to the dice at a chance that falls off slot by slot
+        /// (<see cref="INpcSpawnRollsProvider"/>): the formula became a ceiling instead of a promise, so
+        /// two elites of one record no longer come out identically loaded. WHICH modifiers a spawn wears
+        /// stays rolled either way; overrides carry none, so nothing above this line has an opinion
+        /// about the count.</summary>
         private List<INpcModifier> RollModifiers(EntityType entityType, Rarity rarity, NpcAuthoredData? authored)
         {
-            int count = AuthoredModifierCount(authored) ?? NpcTypeDefaults.ModifierCount(entityType, rarity);
+            int? authoredCount = AuthoredModifierCount(authored);
+            int slots = authoredCount ?? NpcTypeDefaults.ModifierCount(entityType, rarity);
             var pool = modifierProvider.GetAllModifiers().ToList();
 
             List<INpcModifier> rolled = [];
-            while (rolled.Count < count && pool.Count > 0)
+            while (rolled.Count < slots && pool.Count > 0)
             {
+                if (authoredCount == null && !FillsSlot(spawnRolls.ModifierSlotChance(entityType, rarity, rolled.Count))) break;
+
                 long index = _rnd.RandWeighted(pool.Select(modifier => modifier.Weight).ToArray());
                 var picked = pool[Math.Max(0, (int)index)];
                 pool.Remove(picked);
@@ -216,6 +232,16 @@ namespace Core.Entity
 
             return rolled;
         }
+
+        /// <summary>Whether one slot is taken. A certainty (and an impossibility) costs no dice, which is
+        /// what let this catalog arrive without moving a single seeded result for the types that have no
+        /// ladder — but read the consequence the right way round: how many dice a spawn spends is part of
+        /// the balance file now. Moving a chance ACROSS 1.0 or 0.0 in either direction adds or removes a
+        /// draw, and every later draw of that spawn shifts one step along the stream with it — not just
+        /// how many modifiers and abilities come out, but WHICH ones. Seeded runs and saved worlds
+        /// rebuilt from a seed will not reproduce across such an edit; changing a chance strictly inside
+        /// the open interval never has that effect.</summary>
+        private bool FillsSlot(float chance) => chance >= 1f || (chance > 0f && _rnd.RandFloat() < chance);
 
         private Dictionary<EntityParameter, float> ScaleParameters(NpcData data, int level)
         {
@@ -231,17 +257,30 @@ namespace Core.Entity
         }
 
         /// <summary>Authored list ("abilities" field, bosses) is exact and deterministic; otherwise a
-        /// weighted pick without replacement from the archetype pool, capped by the book's slots upstream.</summary>
-        private List<IAbility> PickAbilities(NpcData data, NpcBehaviorData behavior, EntityType entityType)
+        /// weighted pick without replacement from the archetype pool. The count is the number of SLOTS
+        /// and each is offered to the dice on the ability ladder of the type, exactly as modifiers are
+        /// (see <see cref="RollModifiers"/>): on a Regular a cast is an event, on an Elit one or two is
+        /// the norm. Two counts stay absolute and roll no dice — the one a record names in "abilityCount"
+        /// (0 included: a training dummy is allowed to have no casts at all), and
+        /// <see cref="NpcTypeDefaults.AllAbilities"/>, which is the boss promise that the whole stance pool
+        /// is his and not a number to whittle at.</summary>
+        private List<IAbility> PickAbilities(NpcData data, NpcBehaviorData behavior, EntityType entityType, Rarity rarity)
         {
             if (data.Abilities.Count > 0) return CreateAuthoredAbilities(data);
 
-            int count = data.AbilityCount > 0 ? data.AbilityCount : NpcTypeDefaults.DefaultAbilityCount(entityType);
+            // Absent, not zero, is what "nothing authored" looks like — same reading as the modifier count
+            // (AuthoredModifierCount), and a negative number floors to none for the same reason it does there.
+            int? authoredCount = data.AbilityCount is int named ? Math.Max(0, named) : null;
+            bool absolute = authoredCount != null;
+            int slots = authoredCount ?? NpcTypeDefaults.DefaultAbilityCount(entityType);
+            if (slots == NpcTypeDefaults.AllAbilities) absolute = true;
             var pool = behavior.Abilities.Where(entry => abilityProvider.KnownAbilityIds.Contains(entry.Id)).ToList();
 
             List<IAbility> picked = [];
-            while (picked.Count < count && pool.Count > 0)
+            while (picked.Count < slots && pool.Count > 0)
             {
+                if (!absolute && !FillsSlot(spawnRolls.AbilitySlotChance(entityType, rarity, picked.Count))) break;
+
                 long index = _rnd.RandWeighted(pool.Select(entry => entry.Weight).ToArray());
                 var entry = pool[Math.Max(0, (int)index)];
                 pool.Remove(entry);

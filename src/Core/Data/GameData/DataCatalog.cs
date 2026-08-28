@@ -12,6 +12,11 @@ namespace Core.Data.GameData
         public const string NpcBehaviors = "NpcBehaviors";
         public const string NpcBuffs = "NpcBuffs";
         public const string NpcModifiers = "NpcModifiers";
+
+        /// <summary>How MANY modifiers and abilities a rolled NPC ends up with. Kept out of
+        /// NpcModifiers, whose reader parses every file in it as a modifier document and which answers
+        /// the other half of the question — WHICH modifiers there are to pick from.</summary>
+        public const string NpcSpawnRolls = "NpcSpawnRolls";
         public const string Factions = "Factions";
         public const string ReputationDeeds = "ReputationDeeds";
         public const string ReputationPerks = "ReputationPerks";

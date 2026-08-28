@@ -72,9 +72,14 @@ namespace Core.Data.NpcData
 
         public static int MaxLevel(EntityType type) => s_maxLevel.GetValueOrDefault(type, 15);
 
+        /// <summary>How many ability SLOTS a spawn is offered — a ceiling on the same terms as
+        /// <see cref="ModifierCount"/>, with <see cref="AllAbilities"/> as the boss exception that rolls
+        /// no dice at all.</summary>
         public static int DefaultAbilityCount(EntityType type) => s_abilityCount.GetValueOrDefault(type, 2);
 
-        /// <summary>NPC-modifier count = base by type + rarity bonus (согласованная таблица «тип × редкость»).</summary>
+        /// <summary>How many modifier SLOTS a spawn is offered = base by type + rarity bonus (согласованная
+        /// таблица «тип × редкость»). Since issue #223 this is a ceiling and not a promise: each slot is then
+        /// offered to the falling chances of the NpcSpawnRolls catalog, so most spawns come out under it.</summary>
         public static int ModifierCount(EntityType type, Rarity rarity) =>
             s_modifierCount.GetValueOrDefault(type, 1) + s_rarityModifierBonus.GetValueOrDefault(rarity, 0);
 

@@ -57,7 +57,6 @@
             ],
             "levelMin": 1,
             "levelScaling": 0.03,
-            "abilityCount": 2,
             "baseParameters": {
                 "Health": 900,
                 "Barrier": 0,
@@ -114,7 +113,6 @@
             ],
             "levelMin": 10,
             "levelScaling": 0.05,
-            "abilityCount": 4,
             "baseParameters": {
                 "Health": 1600,
                 "Barrier": 300,
@@ -155,7 +153,6 @@
             ],
             "levelMin": 3,
             "levelScaling": 0.04,
-            "abilityCount": 2,
             "baseParameters": {
                 "Health": 200,
                 "Barrier": 100,
@@ -207,7 +204,6 @@
             ],
             "levelMin": 25,
             "levelScaling": 0.06,
-            "abilityCount": 5,
             "baseParameters": {
                 "Health": 2800,
                 "Barrier": 800,
@@ -282,7 +278,6 @@
             ],
             "levelMin": 1,
             "levelScaling": 0.04,
-            "abilityCount": 1,
             "baseParameters": {
                 "Health": 700,
                 "Barrier": 0,
@@ -320,7 +315,6 @@
             ],
             "levelMin": 1,
             "levelScaling": 0.04,
-            "abilityCount": 1,
             "baseParameters": {
                 "Health": 1100,
                 "Barrier": 0,
@@ -358,7 +352,6 @@
             ],
             "levelMin": 1,
             "levelScaling": 0.03,
-            "abilityCount": 1,
             "baseParameters": {
                 "Health": 500,
                 "Barrier": 0,
@@ -396,7 +389,6 @@
             ],
             "levelMin": 8,
             "levelScaling": 0.05,
-            "abilityCount": 2,
             "baseParameters": {
                 "Health": 2400,
                 "Barrier": 0,
@@ -434,7 +426,6 @@
             ],
             "levelMin": 5,
             "levelScaling": 0.05,
-            "abilityCount": 2,
             "baseParameters": {
                 "Health": 1300,
                 "Barrier": 0,
@@ -484,7 +475,6 @@
             ],
             "levelMin": 1,
             "levelScaling": 0.03,
-            "abilityCount": 1,
             "baseParameters": {
                 "Health": 600,
                 "Barrier": 0,
@@ -545,7 +535,6 @@
             ],
             "levelMin": 3,
             "levelScaling": 0.04,
-            "abilityCount": 2,
             "baseParameters": {
                 "Health": 850,
                 "Barrier": 0,
@@ -596,7 +585,6 @@
             ],
             "levelMin": 2,
             "levelScaling": 0.04,
-            "abilityCount": 2,
             "baseParameters": {
                 "Health": 700,
                 "Barrier": 0,
@@ -646,7 +634,6 @@
             ],
             "levelMin": 4,
             "levelScaling": 0.05,
-            "abilityCount": 2,
             "baseParameters": {
                 "Health": 900,
                 "Barrier": 0,
@@ -694,7 +681,6 @@
             ],
             "levelMin": 5,
             "levelScaling": 0.05,
-            "abilityCount": 3,
             "baseParameters": {
                 "Health": 800,
                 "Barrier": 100,
@@ -733,7 +719,6 @@
             ],
             "levelMin": 8,
             "levelScaling": 0.05,
-            "abilityCount": 3,
             "baseParameters": {
                 "Health": 500,
                 "Barrier": 400,
@@ -773,7 +758,6 @@
             ],
             "levelMin": 5,
             "levelScaling": 0.05,
-            "abilityCount": 2,
             "baseParameters": {
                 "Health": 1300,
                 "Barrier": 0,
@@ -812,7 +796,6 @@
             ],
             "levelMin": 5,
             "levelScaling": 0.05,
-            "abilityCount": 2,
             "baseParameters": {
                 "Health": 900,
                 "Barrier": 0,
@@ -852,7 +835,6 @@
             ],
             "levelMin": 6,
             "levelScaling": 0.05,
-            "abilityCount": 2,
             "baseParameters": {
                 "Health": 600,
                 "Barrier": 300,
@@ -889,7 +871,6 @@
             ],
             "levelMin": 12,
             "levelScaling": 0.06,
-            "abilityCount": 3,
             "baseParameters": {
                 "Health": 2800,
                 "Barrier": 200,
@@ -921,6 +902,9 @@
             "fraction": "Undead",
             "entityType": "Boss",
             "rarity": "Unique",
+            "authored": {
+                "modifierCount": 7
+            },
             "aiIntellect": "Mastermind",
             "stances": [
                 "Dexterity"
@@ -973,6 +957,9 @@
             "fraction": "Undead",
             "entityType": "Boss",
             "rarity": "Unique",
+            "authored": {
+                "modifierCount": 7
+            },
             "aiIntellect": "Mastermind",
             "stances": [
                 "Strength"
@@ -1025,6 +1012,9 @@
             "fraction": "Animal",
             "entityType": "Archon",
             "rarity": "Mythic",
+            "authored": {
+                "modifierCount": 8
+            },
             "aiIntellect": "Mastermind",
             "stances": [
                 "Dexterity"
@@ -1105,6 +1095,9 @@
             "fraction": "Undead",
             "entityType": "Boss",
             "rarity": "Unique",
+            "authored": {
+                "modifierCount": 7
+            },
             "aiIntellect": "Mastermind",
             "stances": [
                 "Dexterity"
@@ -1171,7 +1164,6 @@
             "levelMin": 1,
             "levelMax": 1,
             "levelScaling": 0,
-            "abilityCount": 1,
             "baseParameters": {
                 "Health": 500,
                 "Barrier": 0,
@@ -1200,7 +1192,6 @@
             "levelMin": 5,
             "levelMax": 8,
             "levelScaling": 0,
-            "abilityCount": 2,
             "baseParameters": {
                 "Health": 900,
                 "Barrier": 100,
