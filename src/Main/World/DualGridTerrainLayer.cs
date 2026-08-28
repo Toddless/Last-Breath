@@ -11,8 +11,14 @@ namespace LastBreath.World
     /// layer is shifted half a cell up and left of the world layer, so each of its tiles covers the corners of
     /// four world cells and is picked by their 4-bit mask: borders run between world cells instead of through
     /// them, and the gameplay grid stays the honest world one. Both layers must sit under the same parent
-    /// transform. Runtime only — the component has no editor preview.
+    /// transform.
     /// </summary>
+    /// <remarks>
+    /// The component also runs in the editor, where two things it does at runtime are off limits: the world
+    /// layer keeps whatever visibility its author gave it, and a display layer that belongs to the saved scene
+    /// is left untouched — cells written into it would be serialised on the next save.
+    /// </remarks>
+    [Tool]
     [GlobalClass]
     public partial class DualGridTerrainLayer : Node2D
     {
@@ -31,6 +37,10 @@ namespace LastBreath.World
 
         private bool _repaintQueued;
 
+        /// <summary>Whether the world layer's change signal is actually hooked up — a pair that never started
+        /// painting must not try to unhook on the way out.</summary>
+        private bool _watchingWorld;
+
         /// <summary>
         /// Wires the pair from code, for a container that builds the display layer at runtime instead of
         /// carrying it in a scene. Call it before the node enters the tree: <see cref="_Ready"/> is where the
@@ -45,18 +55,25 @@ namespace LastBreath.World
 
         public override void _Ready()
         {
-            if (!LayersAssigned()) return;
+            if (!LayersAssigned() || !MayPaint()) return;
 
-            _world!.Visible = false;
+            // Only outside the editor: a hidden world layer would be written into the scene as hidden, and the
+            // author paints on that layer.
+            if (!Engine.IsEditorHint()) _world!.Visible = false;
+
             AlignDisplay();
             _display!.Clear();
             Repaint();
-            _world.Changed += QueueRepaint;
+            _world!.Changed += QueueRepaint;
+            _watchingWorld = true;
         }
 
         public override void _ExitTree()
         {
-            if (_world is not null) _world.Changed -= QueueRepaint;
+            if (!_watchingWorld || !IsInstanceValid(_world)) return;
+
+            _world!.Changed -= QueueRepaint;
+            _watchingWorld = false;
         }
 
         private bool LayersAssigned()
@@ -66,6 +83,12 @@ namespace LastBreath.World
 
             return _world is not null && _display is not null;
         }
+
+        /// <summary>
+        /// The editor may paint only into a display layer built from code. A layer carried by the scene is
+        /// saved with everything written into it, so a preview would leave its tiles behind in the .tscn.
+        /// </summary>
+        private bool MayPaint() => !Engine.IsEditorHint() || _display!.Owner is null;
 
         /// <summary>Half-cell shift, measured from the world layer so a moved world layer takes the display with it.</summary>
         private void AlignDisplay()

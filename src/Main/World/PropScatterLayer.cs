@@ -16,7 +16,12 @@ namespace LastBreath.World
     /// Props are anchored at their root and placed in a Y-sorted container, which is what lets a character wade
     /// through them: a tuft rooted lower on the screen than the character's feet draws over them, one rooted
     /// higher draws behind. The container therefore has to be the same Y-sort pool the characters live in.
+    /// <para>
+    /// The scatter also grows in the editor. Its props are marked and unowned, so the scene never saves them,
+    /// and the container — a scene node the preview only borrows — is not written to there.
+    /// </para>
     /// </remarks>
+    [Tool]
     [GlobalClass]
     public partial class PropScatterLayer : Node2D
     {
@@ -81,7 +86,7 @@ namespace LastBreath.World
             if (!SourcesAssigned()) return;
 
             _container ??= this;
-            _container.YSortEnabled = true;
+            EnableSorting();
             // Deferred, not synchronous: this _Ready can fire while the container's own parent (e.g. TerrainRoot
             // being added under MainWorld) is still busy setting up its children, and a synchronous AddChild of
             // a grown prop into it would fail. QueueRescatter already exists for the same reason on Changed.
@@ -92,6 +97,18 @@ namespace LastBreath.World
         public override void _ExitTree()
         {
             if (_world is not null) _world.Changed -= QueueRescatter;
+        }
+
+        /// <summary>
+        /// Switches the props' pool into Y-sorting. A borrowed container belongs to the scene, so in the editor
+        /// the setting stays its author's to make: writing it there would edit the scene the preview only draws
+        /// over.
+        /// </summary>
+        private void EnableSorting()
+        {
+            if (Engine.IsEditorHint() && _container != this) return;
+
+            _container!.YSortEnabled = true;
         }
 
         private bool SourcesAssigned()
@@ -117,9 +134,7 @@ namespace LastBreath.World
         private void Rescatter()
         {
             _rescatterQueued = false;
-            // The deferred call outlives the node: an edit and a QueueFree in the same frame land here on
-            // freed nodes.
-            if (!IsInstanceValid(_world) || !IsInstanceValid(_container)) return;
+            if (!CanGrow()) return;
 
             HashSet<GridCoordinate> painted = [];
             foreach (Vector2I cell in _world!.GetUsedCells()) painted.Add(cell.ToGridCoordinate());
@@ -137,6 +152,14 @@ namespace LastBreath.World
                 if (!_grown.ContainsKey(cell)) Grow(cell);
             }
         }
+
+        /// <summary>
+        /// The deferred rescatter outlives the layer: an edit and a QueueFree in the same frame land on freed
+        /// nodes, and a preview swept away by a rebuild is off the tree while its call is still in the queue —
+        /// growing then would leave props behind with nobody to take them away.
+        /// </summary>
+        private bool CanGrow() =>
+            IsInstanceValid(this) && IsInsideTree() && IsInstanceValid(_world) && IsInstanceValid(_container);
 
         private void Grow(GridCoordinate cell)
         {
@@ -163,6 +186,9 @@ namespace LastBreath.World
                     Position = corner + new Vector2(placement.OffsetX, placement.OffsetY)
                 };
 
+                // Marked and left without an Owner: the editor neither saves the prop into the borrowed
+                // container's scene nor loses track of it when the next build sweeps the previous one away.
+                GeneratedTerrainNodes.Mark(prop);
                 _container!.AddChild(prop);
                 props[index] = prop;
             }

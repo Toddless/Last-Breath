@@ -17,7 +17,13 @@ namespace LastBreath.World
     /// Terrains are drawn in child order, so the layer list is the layer stack: earlier children lie under later
     /// ones. The container is expected to sit below the character sort pool (z_index -1), which is why scattered
     /// props are parented outside it — see <see cref="_propContainer"/>.
+    /// <para>
+    /// The same machinery runs in the editor, so a brush stroke on a data layer shows the assembled terrain at
+    /// once. Nothing it builds is owned by the scene and nothing it builds is saved; the data layers themselves
+    /// are read and never written, their visibility included.
+    /// </para>
     /// </remarks>
+    [Tool]
     [GlobalClass]
     public partial class TerrainRoot : Node2D
     {
@@ -33,7 +39,51 @@ namespace LastBreath.World
         /// </summary>
         [Export] private Node2D? _propContainer;
 
+        /// <summary>
+        /// Whether the editor assembles the terrains over the data layers. Off leaves the editor with the bare
+        /// painted layers and nothing else; the running game is not affected either way.
+        /// </summary>
+        [Export]
+        public bool PreviewInEditor
+        {
+            get;
+            set
+            {
+                field = value;
+                if (Engine.IsEditorHint() && IsNodeReady()) RebuildPreview();
+            }
+        } = true;
+
+        public override void _EnterTree()
+        {
+            // A tool node can leave the tree and come back on a scene or assembly reload without _Ready firing
+            // again; asking for it makes every entry a full sweep-and-build instead of half a preview.
+            if (Engine.IsEditorHint()) RequestReady();
+        }
+
         public override void _Ready()
+        {
+            if (Engine.IsEditorHint())
+            {
+                RebuildPreview();
+                return;
+            }
+
+            BuildTerrains();
+        }
+
+        /// <summary>Editor pass: whatever the last build left is swept away first, so a reload never doubles it.</summary>
+        private void RebuildPreview()
+        {
+            GeneratedTerrainNodes.Purge(this);
+
+            Node2D props = PropContainer();
+            if (props != this) GeneratedTerrainNodes.Purge(props);
+
+            if (PreviewInEditor) BuildTerrains();
+        }
+
+        private void BuildTerrains()
         {
             if (_config is null)
             {
@@ -51,13 +101,13 @@ namespace LastBreath.World
             }
         }
 
-        /// <summary>Children painted on by the owner — read before anything is built, so only they are seen.</summary>
+        /// <summary>Children painted on by the owner: scene layers only, never a display built by a past pass.</summary>
         private List<TileMapLayer> DataLayers()
         {
             List<TileMapLayer> layers = [];
             foreach (Node child in GetChildren())
             {
-                if (child is TileMapLayer layer) layers.Add(layer);
+                if (child is TileMapLayer layer && !GeneratedTerrainNodes.IsGenerated(layer)) layers.Add(layer);
             }
 
             return layers;
@@ -108,6 +158,9 @@ namespace LastBreath.World
                 TileSet = tileSet
             };
 
+            // Marked and left without an Owner: the editor neither saves it into the scene nor mistakes it for
+            // a data layer on the next build.
+            GeneratedTerrainNodes.Mark(display);
             // The display layer goes in as a child of the container, next to the data layers and after every
             // display built before it: the draw order of the terrains is the order of the entries.
             AddChild(display);
@@ -115,12 +168,14 @@ namespace LastBreath.World
             DualGridTerrainLayer painter = new() { Name = $"{data.Name}Painter" };
             // Bound before it enters the tree: its _Ready aligns the pair and paints what is already drawn.
             painter.Bind(data, display, DisplaySourceId);
+            GeneratedTerrainNodes.Mark(painter);
             AddChild(painter);
 
             if (!entry.Scatters) return;
 
             PropScatterLayer scatter = new() { Name = $"{data.Name}Scatter" };
             scatter.Bind(data, PropContainer(), entry.Prop!, entry.PropHeight, entry.ScatterSettings());
+            GeneratedTerrainNodes.Mark(scatter);
             AddChild(scatter);
         }
 
