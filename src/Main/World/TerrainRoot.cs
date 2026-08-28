@@ -58,7 +58,7 @@ namespace LastBreath.World
             set
             {
                 field = value;
-                if (Engine.IsEditorHint() && IsNodeReady()) RebuildPreview();
+                if (Engine.IsEditorHint() && IsNodeReady()) QueueRebuildPreview();
             }
         } = true;
 
@@ -73,11 +73,39 @@ namespace LastBreath.World
         {
             if (Engine.IsEditorHint())
             {
-                RebuildPreview();
+                QueueRebuildPreview();
                 return;
             }
 
             BuildTerrains();
+        }
+
+        private bool _rebuildQueued;
+
+        /// <summary>
+        /// Editor rebuilds are coalesced to the end of the frame instead of running where they were asked for.
+        /// The <see cref="PreviewInEditor"/> setter fires in the middle of things: an assembly reload restores
+        /// the exports one at a time, and a synchronous rebuild from the setter would run before
+        /// <see cref="_config"/> is back — the purge would sweep the old preview and the build would then fail
+        /// on a config that is only null for the rest of the restoration. One deferred pass sees every export
+        /// restored, and the flag keeps several triggers in one frame down to a single sweep-and-build.
+        /// </summary>
+        private void QueueRebuildPreview()
+        {
+            if (_rebuildQueued) return;
+
+            _rebuildQueued = true;
+            Callable.From(RebuildPreviewDeferred).CallDeferred();
+        }
+
+        private void RebuildPreviewDeferred()
+        {
+            _rebuildQueued = false;
+            // The deferred call can outlive its moment: the node may have been freed or pulled off the tree
+            // since it was queued, and a rebuild would then purge and parent against nothing.
+            if (!IsInstanceValid(this) || !IsInsideTree()) return;
+
+            RebuildPreview();
         }
 
         /// <summary>Editor pass: whatever the last build left is swept away first, so a reload never doubles it.</summary>

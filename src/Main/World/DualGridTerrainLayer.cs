@@ -72,8 +72,13 @@ namespace LastBreath.World
         {
             if (!_watchingWorld || !IsInstanceValid(_world)) return;
 
-            _world!.Changed -= QueueRepaint;
             _watchingWorld = false;
+            // The flag says this pair once started watching; whether the connection still exists is a separate
+            // question. An editor assembly reload kills the subscribed delegate with its unloaded ALC, and a
+            // fresh Callable no longer matches it — unsubscribing then only raises "nonexistent connection".
+            if (!_world!.IsConnected(TileMapLayer.SignalName.Changed, Callable.From(QueueRepaint))) return;
+
+            _world.Changed -= QueueRepaint;
         }
 
         private bool LayersAssigned()

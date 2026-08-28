@@ -96,7 +96,13 @@ namespace LastBreath.World
 
         public override void _ExitTree()
         {
-            if (_world is not null) _world.Changed -= QueueRescatter;
+            if (!IsInstanceValid(_world)) return;
+
+            // An editor assembly reload kills the subscribed delegate with its unloaded ALC, and a fresh
+            // Callable no longer matches it — unsubscribing then only raises "nonexistent connection".
+            if (!_world!.IsConnected(TileMapLayer.SignalName.Changed, Callable.From(QueueRescatter))) return;
+
+            _world.Changed -= QueueRescatter;
         }
 
         /// <summary>
