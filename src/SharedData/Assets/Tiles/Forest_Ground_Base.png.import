@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b016t4s5vu2ja"
-path="res://.godot/imported/Tile_Water.png-d24a2a9d077174e8974e53895bba5ff0.ctex"
+uid="uid://bchq17nf6to1i"
+path="res://.godot/imported/Forest_Ground_Base.png-2747d4566a9af6b8c04345bc2aff2e10.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Data/Shared/Assets/Tiles/_prototype/Tile_Water.png"
-dest_files=["res://.godot/imported/Tile_Water.png-d24a2a9d077174e8974e53895bba5ff0.ctex"]
+source_file="res://Data/Shared/Assets/Tiles/Forest_Ground_Base.png"
+dest_files=["res://.godot/imported/Forest_Ground_Base.png-2747d4566a9af6b8c04345bc2aff2e10.ctex"]
 
 [params]
 
