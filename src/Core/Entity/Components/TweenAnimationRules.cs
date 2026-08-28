@@ -24,7 +24,8 @@ namespace Core.Entity.Components
 
     /// <summary>
     /// One animation name turned into work: the static frame that carries the facing, whether it is
-    /// mirrored, which motion plays, for how long, and whether the fall already happened.
+    /// mirrored, which motion plays, for how long, whether the fall already happened, and whether
+    /// the frame being shown is a pose the artist drew for this state rather than the facing art.
     /// </summary>
     public readonly record struct TweenAnimationStep(
         TweenAnimationKind Kind,
@@ -32,7 +33,8 @@ namespace Core.Entity.Components
         string Clip,
         bool FlipHorizontally,
         float Seconds,
-        bool IsRepeat);
+        bool IsRepeat,
+        bool HasAuthoredFrame = false);
 
     /// <summary>
     /// The naming convention behind the tween animator: which motion a name asks for, how long that
@@ -107,6 +109,39 @@ namespace Core.Entity.Components
         /// <summary>Whether an authored clip is real MOTION: a lone frame is art for a facing and the
         /// tween animator is what moves it, an empty or missing clip is nothing at all.</summary>
         public static bool IsAuthoredMotion(bool hasClip, int frameCount) => hasClip && frameCount > 1;
+
+        /// <summary>
+        /// The clip a state's own art would be drawn under — the motion names double as clip names.
+        /// A facing swap and a cast pose name nothing: neither has a pose of its own to look for.
+        /// </summary>
+        public static string? StateClipFor(TweenAnimationKind kind) => kind switch
+        {
+            TweenAnimationKind.Attack => AttackAnimation,
+            TweenAnimationKind.Hurt => HurtAnimation,
+            TweenAnimationKind.Death => DeathAnimation,
+            TweenAnimationKind.Stun => StunAnimation,
+            _ => null,
+        };
+
+        /// <summary>Whether the art draws a state as a single authored FRAME: not motion the engine
+        /// can play, but the pose the tween animator has to show while it does the moving itself.</summary>
+        public static bool IsAuthoredStateFrame(bool hasClip, int frameCount) => hasClip && frameCount == 1;
+
+        /// <summary>
+        /// Puts the drawn pose into the step: the state's own frame replaces the facing frame, and
+        /// the mirror stays whatever the facing asked for — the pose is drawn to the left exactly
+        /// like the idle art, so the right side is still that frame flipped. Art that draws no such
+        /// pose leaves the step untouched, which is the whole of the behaviour NPCs had before.
+        /// </summary>
+        public static TweenAnimationStep WithStateArt(TweenAnimationStep step, bool hasClip, int frameCount) =>
+            StateClipFor(step.Kind) is { } clip && IsAuthoredStateFrame(hasClip, frameCount)
+                ? step with { Clip = clip, HasAuthoredFrame = true }
+                : step;
+
+        /// <summary>Whether the fall topples the sprite. Art that already draws the body on the
+        /// ground is only settled into it: rotating a lying frame would stand the corpse back up.</summary>
+        public static bool TopplesOnDeath(TweenAnimationStep step) =>
+            step.Kind == TweenAnimationKind.Death && !step.HasAuthoredFrame;
 
         private static bool CarriesFacing(string animation)
         {

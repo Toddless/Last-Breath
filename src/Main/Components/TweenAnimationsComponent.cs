@@ -26,6 +26,10 @@ namespace LastBreath.Components
         private const float CastPulse = 1.08f;
         private const float FallDegrees = 82f;
         private const float FallDrop = 12f;
+
+        /// <summary>How far a body whose art is already drawn lying settles into the ground.</summary>
+        private const float CollapseDrop = 8f;
+
         private const float StunDegrees = 9f;
         private const float HurtDegrees = 6f;
         private const int StunSwings = 4;
@@ -153,7 +157,9 @@ namespace LastBreath.Components
         {
             if (Sprite is not { } sprite || !IsInsideTree() || !sprite.IsInsideTree()) return 0f;
 
-            var aimed = step.Kind is TweenAnimationKind.Attack or TweenAnimationKind.Cast ? AimAtTarget(step) : step;
+            var turned = step.Kind is TweenAnimationKind.Attack or TweenAnimationKind.Cast ? AimAtTarget(step) : step;
+            // After the turn, never before it: the aim rewrites the clip back to the facing frame.
+            var aimed = WithStateArt(turned);
             ShowFacing(aimed);
 
             if (aimed.Kind == TweenAnimationKind.Facing)
@@ -192,6 +198,20 @@ namespace LastBreath.Components
             return _state.Turn(offset.X >= 0 ? TweenFacing.Right : TweenFacing.Left, step);
         }
 
+        /// <summary>
+        /// Swaps in the pose the artist drew for this state, when there is one: a clip under the
+        /// state's own name holding exactly one frame. The frame count is asked for only once the
+        /// clip is known to exist — the engine complains about the count of a clip it has not got.
+        /// </summary>
+        private TweenAnimationStep WithStateArt(TweenAnimationStep step)
+        {
+            if (TweenAnimationRules.StateClipFor(step.Kind) is not { } clip) return step;
+            if (Sprite?.SpriteFrames is not { } frames) return step;
+
+            bool drawn = frames.HasAnimation(clip);
+            return TweenAnimationRules.WithStateArt(step, drawn, drawn ? frames.GetFrameCount(clip) : 0);
+        }
+
         private void ShowFacing(TweenAnimationStep step)
         {
             if (Sprite is not { } sprite) return;
@@ -213,7 +233,8 @@ namespace LastBreath.Components
                     BuildRecoil(tween, sprite, direction, seconds);
                     break;
                 case TweenAnimationKind.Death:
-                    BuildFall(tween, sprite, step.Facing, seconds);
+                    if (TweenAnimationRules.TopplesOnDeath(step)) BuildFall(tween, sprite, step.Facing, seconds);
+                    else BuildCollapse(tween, sprite, seconds);
                     break;
                 case TweenAnimationKind.Stun:
                     BuildWobble(tween, sprite, seconds);
@@ -269,6 +290,21 @@ namespace LastBreath.Components
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.In);
         }
 
+        /// <summary>
+        /// The fall for art that already draws the body on the ground: no topple — the drawn corpse
+        /// only sinks and spreads into the floor. Whatever rotation the interrupted motion left
+        /// behind is unwound here, since nothing settles a corpse afterwards.
+        /// </summary>
+        private void BuildCollapse(Tween tween, Node2D sprite, float seconds)
+        {
+            tween.TweenProperty(sprite, PositionPath, _restPosition + new Vector2(0f, CollapseDrop), seconds)
+                .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
+            tween.TweenProperty(sprite, ScalePath, Squashed(), seconds)
+                .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
+            tween.TweenProperty(sprite, RotationPath, _restRotation, seconds)
+                .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
+        }
+
         /// <summary>The skipped turn: a finite sway that ends upright, never an endless loop.</summary>
         private void BuildWobble(Tween tween, Node2D sprite, float seconds)
         {
@@ -303,7 +339,26 @@ namespace LastBreath.Components
         private void Settle()
         {
             RestTransform();
+            ShowRestingFacing();
             StartBreathing();
+        }
+
+        /// <summary>
+        /// Hands the sprite back to the frame that carries the facing. A motion that borrowed the
+        /// art's own pose — a drawn blow, a drawn stagger — would otherwise freeze the figure
+        /// mid-strike; art without such poses was already showing this frame, so nothing moves.
+        /// The fall never comes here: a corpse keeps the frame it died on.
+        /// </summary>
+        private void ShowRestingFacing()
+        {
+            var facing = _state.Facing;
+            ShowFacing(new TweenAnimationStep(
+                TweenAnimationKind.Facing,
+                facing,
+                TweenAnimationRules.ClipFor(facing),
+                TweenAnimationRules.FlipsFor(facing),
+                Seconds: 0f,
+                IsRepeat: false));
         }
 
         private void RestTransform()

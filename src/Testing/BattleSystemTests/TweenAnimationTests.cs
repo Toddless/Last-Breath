@@ -137,10 +137,12 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void EveryName_TheDirectorPlays_ResolvesToAnAuthoredFacingFrame()
         {
-            // The beast art (Direwolf/Wolf/Bear/Deer) draws Idle_Down, Idle_Up and Idle_Left and
-            // nothing else. The stand-in animator shows the step's Clip on the sprite, so a name that
-            // resolved to anything outside that set would ask the engine for a clip that does not
-            // exist. Right is the mirrored left frame, blows and the fall keep the facing they had.
+            // Before any state pose is drawn for it, beast art (Bear/Deer, and Wolf/Direwolf until
+            // their fight frames were drawn) is Idle_Down, Idle_Up and Idle_Left and nothing else.
+            // The stand-in animator shows the step's Clip on the sprite, so a name that resolved to
+            // anything outside that set would ask the engine for a clip that does not exist. Right is
+            // the mirrored left frame, blows and the fall keep the facing they had. Art that DOES
+            // draw a state pose gets it laid over this step afterwards — see the state-art pins.
             string[] authored = [FrontClip, BackClip, SideClip];
             string[] played =
             [
@@ -179,6 +181,135 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsFalse(TweenAnimationRules.IsAuthoredMotion(hasClip: true, frameCount: 1), "a lone frame is a facing the tweens move");
             Assert.IsFalse(TweenAnimationRules.IsAuthoredMotion(hasClip: true, frameCount: 0), "an empty clip shows nothing");
             Assert.IsFalse(TweenAnimationRules.IsAuthoredMotion(hasClip: false, frameCount: 8));
+        }
+
+        [TestMethod]
+        public void AuthoredFrame_IsExactlyTheLoneFrameAuthoredMotionRefuses()
+        {
+            // The two rules split the same art between the two animators; a clip must belong to
+            // exactly one of them, and a missing clip to neither.
+            Assert.IsTrue(TweenAnimationRules.IsAuthoredStateFrame(hasClip: true, frameCount: 1));
+            Assert.IsFalse(TweenAnimationRules.IsAuthoredStateFrame(hasClip: true, frameCount: 2), "real motion is the clip animator's");
+            Assert.IsFalse(TweenAnimationRules.IsAuthoredStateFrame(hasClip: true, frameCount: 0));
+            Assert.IsFalse(TweenAnimationRules.IsAuthoredStateFrame(hasClip: false, frameCount: 1));
+        }
+
+        // ---------- a drawn pose for a state: one frame the tween shows instead of the facing ----------
+
+        [TestMethod]
+        public void StateArt_ADrawnPose_ReplacesTheFacingFrame()
+        {
+            // Wolf and Direwolf draw a single Fight_Attack frame. One frame is not motion the engine
+            // can play, so the tween animator must show THAT frame and lunge with it — showing the
+            // idle frame instead is what made the drawn pose invisible.
+            var state = new TweenAnimationState();
+            var blow = state.Next(TweenAnimationRules.AttackAnimation);
+
+            var drawn = TweenAnimationRules.WithStateArt(blow, hasClip: true, frameCount: 1);
+
+            Assert.AreEqual(TweenAnimationRules.AttackAnimation, drawn.Clip);
+            Assert.IsTrue(drawn.HasAuthoredFrame);
+            Assert.AreEqual(TweenAnimationKind.Attack, drawn.Kind, "the motion still plays over the drawn pose");
+            Assert.AreEqual(blow.Seconds, drawn.Seconds, 0.0001f);
+        }
+
+        [TestMethod]
+        public void StateArt_KeepsTheMirrorTheAimAskedFor()
+        {
+            // The pose is drawn facing left, exactly like the idle art: aiming the blow right must
+            // still mirror it, or a wolf striking to its right would bite backwards.
+            var state = new TweenAnimationState();
+            var aimed = state.Turn(TweenFacing.Right, state.Next(TweenAnimationRules.AttackAnimation));
+
+            var drawn = TweenAnimationRules.WithStateArt(aimed, hasClip: true, frameCount: 1);
+
+            Assert.AreEqual(TweenAnimationRules.AttackAnimation, drawn.Clip);
+            Assert.IsTrue(drawn.FlipHorizontally);
+            Assert.IsFalse(TweenAnimationRules.WithStateArt(
+                state.Turn(TweenFacing.Left, aimed), hasClip: true, frameCount: 1).FlipHorizontally);
+        }
+
+        [TestMethod]
+        public void StateArt_WithoutADrawnPose_LeavesTheStepAlone()
+        {
+            // Every beast that has no fight frames must keep the exact step it had before: facing
+            // frame, facing mirror, no authored pose.
+            var state = new TweenAnimationState();
+            var blow = state.Next(TweenAnimationRules.AttackAnimation);
+
+            Assert.AreEqual(blow, TweenAnimationRules.WithStateArt(blow, hasClip: false, frameCount: 0));
+            Assert.AreEqual(blow, TweenAnimationRules.WithStateArt(blow, hasClip: true, frameCount: 0), "an empty clip draws nothing");
+            Assert.AreEqual(blow, TweenAnimationRules.WithStateArt(blow, hasClip: true, frameCount: 6), "real motion is the clip animator's, not the tween's");
+        }
+
+        [TestMethod]
+        public void StateArt_IsLookedForOnlyUnderTheStatesOwnName()
+        {
+            Assert.AreEqual(TweenAnimationRules.AttackAnimation, TweenAnimationRules.StateClipFor(TweenAnimationKind.Attack));
+            Assert.AreEqual(TweenAnimationRules.HurtAnimation, TweenAnimationRules.StateClipFor(TweenAnimationKind.Hurt));
+            Assert.AreEqual(TweenAnimationRules.DeathAnimation, TweenAnimationRules.StateClipFor(TweenAnimationKind.Death));
+            Assert.AreEqual(TweenAnimationRules.StunAnimation, TweenAnimationRules.StateClipFor(TweenAnimationKind.Stun));
+            Assert.IsNull(TweenAnimationRules.StateClipFor(TweenAnimationKind.Facing), "a turn has no pose of its own");
+            Assert.IsNull(TweenAnimationRules.StateClipFor(TweenAnimationKind.Cast), "an ability id is never a clip name");
+        }
+
+        [TestMethod]
+        public void StateArt_ACastPose_NeverBorrowsADrawnFrame()
+        {
+            // A cast is named by its ability id; there is no clip called after it, and it must not
+            // pick up the blow's frame just because one exists.
+            var pose = new TweenAnimationState().Next("Ability_Armageddon");
+
+            var drawn = TweenAnimationRules.WithStateArt(pose, hasClip: true, frameCount: 1);
+
+            Assert.AreEqual(pose, drawn);
+            Assert.IsFalse(drawn.HasAuthoredFrame);
+        }
+
+        // ---------- the fall: a corpse the artist already laid down is not toppled ----------
+
+        [TestMethod]
+        public void Fall_WithoutADrawnCorpse_StillTopples()
+        {
+            var fall = new TweenAnimationState().Next(TweenAnimationRules.DeathAnimation);
+
+            Assert.IsTrue(TweenAnimationRules.TopplesOnDeath(fall), "a standing facing frame has to be rotated down");
+        }
+
+        [TestMethod]
+        public void Fall_WithADrawnCorpse_DoesNotTopple()
+        {
+            // The drawn Dead frame is already a body lying horizontally: rotating it eighty degrees
+            // on top of that would stand the corpse back up on its head.
+            var fall = new TweenAnimationState().Next(TweenAnimationRules.DeathAnimation);
+
+            var drawn = TweenAnimationRules.WithStateArt(fall, hasClip: true, frameCount: 1);
+
+            Assert.AreEqual(TweenAnimationRules.DeathAnimation, drawn.Clip);
+            Assert.IsFalse(TweenAnimationRules.TopplesOnDeath(drawn));
+        }
+
+        [TestMethod]
+        public void Fall_WithADrawnCorpse_StillPlaysOnceAndHoldsTheBeat()
+        {
+            var state = new TweenAnimationState();
+
+            var first = TweenAnimationRules.WithStateArt(state.Next(TweenAnimationRules.DeathAnimation), hasClip: true, frameCount: 1);
+            var second = TweenAnimationRules.WithStateArt(state.Next(TweenAnimationRules.DeathAnimation), hasClip: true, frameCount: 1);
+
+            Assert.IsFalse(first.IsRepeat);
+            Assert.IsTrue(second.IsRepeat, "a drawn corpse must not be dropped a second time");
+            Assert.IsTrue(state.IsFallen);
+            Assert.AreEqual(TweenAnimationRules.DeathSeconds, first.Seconds, 0.0001f, "the beat queue still holds for the whole fall");
+        }
+
+        [TestMethod]
+        public void Toppling_IsOnlyEverAskedOfTheFall()
+        {
+            var state = new TweenAnimationState();
+            var blow = TweenAnimationRules.WithStateArt(state.Next(TweenAnimationRules.AttackAnimation), hasClip: true, frameCount: 1);
+
+            Assert.IsFalse(TweenAnimationRules.TopplesOnDeath(blow), "a blow is not a fall, drawn or not");
         }
 
         [TestMethod]
