@@ -30,7 +30,15 @@ namespace LastBreath.World
         /// <summary>Tile source the assembled display tilesets put their transition atlas at.</summary>
         private const int DisplaySourceId = 0;
 
-        [Export] private TerrainRootConfig? _config;
+        /// <summary>
+        /// Declared as the base <see cref="Resource"/> on purpose: after an editor assembly reload, a
+        /// [Tool]-script's exported custom resource can arrive as a live instance wrapped by a stale, unloaded
+        /// ALC, and Godot-mono's generated property setter throws <see cref="System.InvalidCastException"/>
+        /// casting it to <see cref="TerrainRootConfig"/> even though the object is a real config. The base type
+        /// always marshals; <see cref="ReadEntries"/> below is where the actual reading happens, with a duck-typed
+        /// fallback for exactly this situation.
+        /// </summary>
+        [Export] private Resource? _config;
 
         /// <summary>
         /// Node scattered props are parented to. Empty falls back to this container's parent, which is the
@@ -91,14 +99,138 @@ namespace LastBreath.World
                 return;
             }
 
-            List<TileMapLayer> dataLayers = DataLayers();
-            Report(TerrainRoster.Match(NamesOf(dataLayers), _config.Keys()));
+            List<TerrainEntryData>? entries = ReadEntries(_config);
+            if (entries is null)
+            {
+                Fail("TerrainRoot config is assigned but could not be read, neither as TerrainRootConfig nor through its Entries property: none of its layers can be painted");
+                return;
+            }
 
-            Dictionary<string, TerrainEntry> byLayer = _config.ByLayer();
+            List<TileMapLayer> dataLayers = DataLayers();
+            List<string> keys = new(entries.Count);
+            foreach (TerrainEntryData entry in entries) keys.Add(entry.Layer);
+            Report(TerrainRoster.Match(NamesOf(dataLayers), keys));
+
+            Dictionary<string, TerrainEntryData> byLayer = [];
+            foreach (TerrainEntryData entry in entries)
+            {
+                if (!string.IsNullOrWhiteSpace(entry.Layer)) byLayer.TryAdd(entry.Layer, entry);
+            }
+
             foreach (TileMapLayer data in dataLayers)
             {
-                if (byLayer.TryGetValue(data.Name.ToString(), out TerrainEntry? entry)) Build(data, entry);
+                if (byLayer.TryGetValue(data.Name.ToString(), out TerrainEntryData entry)) Build(data, entry);
             }
+        }
+
+        /// <summary>
+        /// One terrain's data, read off <see cref="_config"/> through whichever path reaches it: a plain
+        /// <see cref="TerrainEntry"/> in the healthy case, or Variant-level duck typing when the editor handed
+        /// back a stale-ALC wrapper that fails the C# cast. The rest of <see cref="TerrainRoot"/> only ever sees
+        /// this DTO.
+        /// </summary>
+        private readonly record struct TerrainEntryData(
+            string Layer,
+            Texture2D? Transitions,
+            Texture2D? Prop,
+            float PropHeight,
+            PropScatterSettings ScatterSettings)
+        {
+            public bool Scatters => Prop is not null;
+        }
+
+        /// <summary>Blank slot: an empty array element, same as a null <see cref="TerrainEntry"/> reference.</summary>
+        private static readonly TerrainEntryData BlankEntry = new("", null, null, 96f, new PropScatterSettings());
+
+        /// <summary>
+        /// Reads the table behind <paramref name="config"/>. Null means the resource is assigned but unreadable
+        /// by either path — a genuine mismatch, not the missing-config case, which the caller already handles.
+        /// </summary>
+        private static List<TerrainEntryData>? ReadEntries(Resource config)
+        {
+            // Healthy editor and every runtime load: the cast just works.
+            if (config is TerrainRootConfig typed) return FromTyped(typed);
+
+            // Godot-mono tool bug: after an assembly reload, a live TerrainRootConfig instance can arrive here
+            // wrapped by a stale, unloaded ALC, so `as`/`is` against the current type fails. Variant access goes
+            // through Godot's own property table rather than the C# type system, so it still reaches the values.
+            Variant entriesVariant = config.Get("Entries");
+            if (entriesVariant.VariantType != Variant.Type.Array) return null;
+
+            Godot.Collections.Array raw = entriesVariant.AsGodotArray();
+            List<TerrainEntryData> entries = new(raw.Count);
+            foreach (Variant item in raw) entries.Add(ReadEntryDuck(item));
+
+            return entries;
+        }
+
+        private static List<TerrainEntryData> FromTyped(TerrainRootConfig config)
+        {
+            List<TerrainEntryData> entries = new(config.Entries.Count);
+            foreach (TerrainEntry? entry in config.Entries) entries.Add(FromTypedEntry(entry));
+
+            return entries;
+        }
+
+        private static TerrainEntryData FromTypedEntry(TerrainEntry? entry)
+        {
+            if (entry is null) return BlankEntry;
+
+            return new TerrainEntryData(entry.Layer, entry.Transitions, entry.Prop, entry.PropHeight, entry.ScatterSettings());
+        }
+
+        /// <summary>
+        /// Duck-reads one array element by property name, matching <see cref="TerrainEntry"/>'s own [Export]
+        /// names and defaults exactly. A property that Get cannot find comes back as a nil Variant, so every
+        /// read is type-checked and falls back to the same default the healthy path would have used.
+        /// </summary>
+        private static TerrainEntryData ReadEntryDuck(Variant item)
+        {
+            GodotObject? obj = item.AsGodotObject();
+            if (obj is TerrainEntry typed) return FromTypedEntry(typed);
+            if (obj is null) return BlankEntry;
+
+            string layer = VariantString(obj, "Layer", "");
+            Texture2D? transitions = VariantTexture(obj, "Transitions");
+            Texture2D? prop = VariantTexture(obj, "Prop");
+            float propHeight = VariantFloat(obj, "PropHeight", 96f);
+
+            PropScatterSettings settings = new()
+            {
+                Seed = VariantInt(obj, "Seed", 0),
+                MinPropsPerCell = VariantInt(obj, "MinPropsPerCell", 2),
+                MaxPropsPerCell = VariantInt(obj, "MaxPropsPerCell", 4),
+                EdgeMargin = VariantFloat(obj, "EdgeMargin", 24f),
+                MinScale = VariantFloat(obj, "MinScale", 0.9f),
+                MaxScale = VariantFloat(obj, "MaxScale", 1.1f),
+                TintJitter = VariantFloat(obj, "TintJitter", 0.08f)
+            };
+
+            return new TerrainEntryData(layer, transitions, prop, propHeight, settings);
+        }
+
+        private static string VariantString(GodotObject obj, string property, string fallback)
+        {
+            Variant value = obj.Get(property);
+            return value.VariantType == Variant.Type.String ? value.AsString() : fallback;
+        }
+
+        private static float VariantFloat(GodotObject obj, string property, float fallback)
+        {
+            Variant value = obj.Get(property);
+            return value.VariantType is Variant.Type.Float or Variant.Type.Int ? (float)value.AsDouble() : fallback;
+        }
+
+        private static int VariantInt(GodotObject obj, string property, int fallback)
+        {
+            Variant value = obj.Get(property);
+            return value.VariantType is Variant.Type.Int or Variant.Type.Float ? value.AsInt32() : fallback;
+        }
+
+        private static Texture2D? VariantTexture(GodotObject obj, string property)
+        {
+            Variant value = obj.Get(property);
+            return value.VariantType == Variant.Type.Object ? value.As<Texture2D>() : null;
         }
 
         /// <summary>Children painted on by the owner: scene layers only, never a display built by a past pass.</summary>
@@ -142,7 +274,7 @@ namespace LastBreath.World
                 Fail($"TerrainRoot config holds {report.UnnamedEntries} entry(ies) with no layer name: they can never match a layer");
         }
 
-        private void Build(TileMapLayer data, TerrainEntry entry)
+        private void Build(TileMapLayer data, TerrainEntryData entry)
         {
             if (entry.Transitions is null)
             {
@@ -174,7 +306,7 @@ namespace LastBreath.World
             if (!entry.Scatters) return;
 
             PropScatterLayer scatter = new() { Name = $"{data.Name}Scatter" };
-            scatter.Bind(data, PropContainer(), entry.Prop!, entry.PropHeight, entry.ScatterSettings());
+            scatter.Bind(data, PropContainer(), entry.Prop!, entry.PropHeight, entry.ScatterSettings);
             GeneratedTerrainNodes.Mark(scatter);
             AddChild(scatter);
         }
