@@ -82,7 +82,10 @@ namespace LastBreath.World
 
             _container ??= this;
             _container.YSortEnabled = true;
-            Rescatter();
+            // Deferred, not synchronous: this _Ready can fire while the container's own parent (e.g. TerrainRoot
+            // being added under MainWorld) is still busy setting up its children, and a synchronous AddChild of
+            // a grown prop into it would fail. QueueRescatter already exists for the same reason on Changed.
+            QueueRescatter();
             _world!.Changed += QueueRescatter;
         }
 
