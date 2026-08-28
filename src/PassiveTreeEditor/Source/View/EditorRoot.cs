@@ -26,6 +26,22 @@ namespace PassiveTreeEditor.Source.View
     /// </summary>
     public partial class EditorRoot : Control
     {
+        private const Key SaveKey = Key.S;
+        private const Key SelectModeKey = Key.S;
+        private const Key AddModeKey = Key.A;
+        private const Key LinkModeKey = Key.D;
+
+        /// <summary>The bare letter that turns each mode on. Modes absent from the map have no key.</summary>
+        private static readonly Dictionary<Key, EditorMode> s_modeKeys = new()
+        {
+            [SelectModeKey] = EditorMode.Select,
+            [AddModeKey] = EditorMode.Add,
+            [LinkModeKey] = EditorMode.Link
+        };
+
+        /// <summary>The toolbar button of every mode, so a key press moves the same toggle a click does.</summary>
+        private readonly Dictionary<EditorMode, Button> _modeButtons = [];
+
         private readonly AbilityCatalog _abilities = new();
 
         // Which passives a node may name. The registry that builds them is battle-side, out of this tool's
@@ -108,6 +124,9 @@ namespace PassiveTreeEditor.Source.View
         /// and neither has anything else to mean here. Held keys repeat and history steps deliberately
         /// do not follow the repeat: one press is one step, so leaning on the key cannot unwind a
         /// session faster than it can be read.</para>
+        /// <para>Ctrl+S saves and is answered from anywhere, a focused field included: writing the tree
+        /// out is safe at any moment and a save that only works in some corners of the window is a save
+        /// nobody trusts.</para>
         /// </summary>
         public override void _Input(InputEvent @event)
         {
@@ -115,6 +134,9 @@ namespace PassiveTreeEditor.Source.View
 
             switch (key.Keycode)
             {
+                case SaveKey:
+                    SaveTree();
+                    break;
                 case Key.F:
                     OpenFind();
                     break;
@@ -131,6 +153,31 @@ namespace PassiveTreeEditor.Source.View
 
             GetViewport().SetInputAsHandled();
         }
+
+        /// <summary>
+        /// The bare letters that switch modes, answered only after every control has passed on the key.
+        /// <para>Unhandled input rather than plain input, because these keys are also letters: a title
+        /// being typed in the inspector or a path in the header consumes them first, and the mode has no
+        /// business changing under a caret. The focus check behind it covers the fields that let a key
+        /// through — the spin boxes keep their number in a line edit of their own.</para>
+        /// </summary>
+        public override void _UnhandledKeyInput(InputEvent @event)
+        {
+            if (@event is not InputEventKey
+                {
+                    Pressed: true, Echo: false, CtrlPressed: false, AltPressed: false, ShiftPressed: false,
+                    MetaPressed: false
+                } key) return;
+
+            if (IsTypingFocused()) return;
+            if (!s_modeKeys.TryGetValue(key.Keycode, out EditorMode mode)) return;
+
+            ActivateMode(mode);
+            GetViewport().SetInputAsHandled();
+        }
+
+        /// <summary>Whether the focus sits in something that takes letters as text.</summary>
+        private bool IsTypingFocused() => GetViewport().GuiGetFocusOwner() is LineEdit or TextEdit;
 
         // ── layout ─────────────────────────────────────────────────────────────────────────────
 
@@ -195,13 +242,15 @@ namespace PassiveTreeEditor.Source.View
                 {
                     Text = mode.ToString(),
                     ToggleMode = true,
-                    ButtonGroup = group
+                    ButtonGroup = group,
+                    TooltipText = ModeTooltip(mode)
                 };
 
                 if (mode == EditorMode.Select) button.ButtonPressed = true;
 
                 EditorMode captured = mode;
                 button.Pressed += () => SetMode(captured);
+                _modeButtons[mode] = button;
                 bar.AddChild(button);
             }
 
@@ -256,6 +305,17 @@ namespace PassiveTreeEditor.Source.View
             bar.AddChild(ToolbarButton("Check", RunValidation));
 
             return bar;
+        }
+
+        /// <summary>Names the key that turns a mode on, so the only place the shortcut is written down is
+        /// the map it is read from.</summary>
+        private static string ModeTooltip(EditorMode mode)
+        {
+            foreach (KeyValuePair<Key, EditorMode> pair in s_modeKeys)
+                if (pair.Value == mode)
+                    return $"{mode} mode ({OS.GetKeycodeString(pair.Key)})";
+
+            return $"{mode} mode";
         }
 
         private static Button ToolbarButton(string text, Action action)
@@ -610,6 +670,17 @@ namespace PassiveTreeEditor.Source.View
         private void ShowTab(Control panel) => _tabs.CurrentTab = _tabs.GetTabIdxFromControl(panel);
 
         // ── glue ───────────────────────────────────────────────────────────────────────────────
+
+        /// <summary>Turns a mode on from a key. The toolbar toggle moves with it — the mode is a visible
+        /// state, and a shortcut that changed what a click means while the buttons said otherwise would
+        /// take that away. Moving the toggle does not re-enter here: a button raises Pressed only when it
+        /// is clicked.</summary>
+        private void ActivateMode(EditorMode mode)
+        {
+            if (_modeButtons.TryGetValue(mode, out Button? button)) button.ButtonPressed = true;
+
+            SetMode(mode);
+        }
 
         private void SetMode(EditorMode mode)
         {
