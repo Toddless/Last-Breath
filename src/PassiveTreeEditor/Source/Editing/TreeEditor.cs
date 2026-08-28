@@ -4,6 +4,7 @@ namespace PassiveTreeEditor.Source.Editing
     using System.Collections.Generic;
     using System.Linq;
     using Core.PassiveTree;
+    using Core.PassiveTree.Editing;
     using History;
 
     /// <summary>
@@ -174,6 +175,61 @@ namespace PassiveTreeEditor.Source.Editing
             document.Budget = budget;
             Record(new ValueEdit<int>(new EditTarget(document, EditFields.Budget), from, budget,
                 value => document.Budget = value, $"{EditFields.Budget} {budget}"));
+        }
+
+        // ── groups ─────────────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// One field of every node in a selection, set to one value and written down as one step. Nodes
+        /// already holding the value take no part: a step that claimed to have changed them would put
+        /// nothing back, and the status line would name a count the author cannot see.
+        /// <para><paramref name="group"/> is what a run of keystrokes merges on, standing in for the node a
+        /// single edit merges on. It has to be the same object for as long as the selection and the panel
+        /// are — the caller owns it, so that a rebuilt panel starts a step of its own.</para>
+        /// </summary>
+        public int SetNodeValues<T>(IReadOnlyList<PassiveNode> nodes, object group, string field,
+            Func<PassiveNode, T> read, T value, Action<PassiveNode, T> write)
+        {
+            if (_restoring) return 0;
+
+            return RecordBatch(NodeBatch.Plan(nodes, read, value), group, field, write);
+        }
+
+        /// <summary>One named number of every node in the selection, set together. Each node keeps its own
+        /// record — the key is rewritten where it stands and nothing else about the file moves.</summary>
+        public int SetGroupProperty(IReadOnlyList<PassiveNode> nodes, object group, string field, string key, float value)
+        {
+            if (_restoring) return 0;
+
+            return RecordBatch(NodeBatch.PlanPropertyValue(nodes, key, value), group, field, WriteProperties);
+        }
+
+        /// <summary>The same number under another name across the selection — what a stat row's dropdowns
+        /// spell. Zero when the batch was refused: a node already writing the new key would lose a row to
+        /// it, so nothing at all is written and the control puts itself back.</summary>
+        public int RespellGroupProperty(IReadOnlyList<PassiveNode> nodes, object group, string field,
+            string fromKey, string toKey)
+        {
+            if (_restoring) return 0;
+
+            return RecordBatch(NodeBatch.PlanPropertyKey(nodes, fromKey, toKey), group, field, WriteProperties);
+        }
+
+        private static void WriteProperties(PassiveNode node, List<KeyValuePair<string, float>> rows) =>
+            node.SetProperties(rows);
+
+        /// <summary>Applies a planned group edit and files the whole of it as one command. An empty plan is
+        /// not a step: nothing changed, so there is nothing to take back.</summary>
+        private int RecordBatch<T>(List<NodeValueChange<T>> changes, object group, string field,
+            Action<PassiveNode, T> write)
+        {
+            if (changes.Count == 0) return 0;
+
+            NodeBatch.Apply(changes, write, forward: true);
+            Record(new BatchEdit<T>(new EditTarget(group, field), changes, write,
+                $"{changes.Count} node(s): {field}"));
+
+            return changes.Count;
         }
 
         // ── passive ────────────────────────────────────────────────────────────────────────────

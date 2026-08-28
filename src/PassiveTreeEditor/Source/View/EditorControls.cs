@@ -20,8 +20,16 @@ namespace PassiveTreeEditor.Source.View
         /// </summary>
         private const int NoneId = 100;
 
+        /// <summary>Item id of the "the selected nodes do not agree" entry, kept clear of both the enum
+        /// range and <see cref="NoneId"/>: mixed is not a value a node can be given.</summary>
+        private const int MixedId = 101;
+
         /// <summary>A typo guard, not a design bound — the canvas itself is unbounded.</summary>
         private const double InputLimit = 100000;
+
+        /// <summary>How a field several nodes disagree on says so, in a picker and in a number box alike —
+        /// one wording, so the author learns the marker once.</summary>
+        public const string MixedLabel = "—  mixed";
 
         /// <summary>Shared body of both pickers: one item per member, keyed by the member's numeric
         /// value, with the item matching <paramref name="current"/> preselected.</summary>
@@ -181,5 +189,92 @@ namespace PassiveTreeEditor.Source.View
         public static OptionButton OptionalPicker<T>(T? current, Action<T?> apply, string emptyLabel = "—")
             where T : struct, Enum =>
             OptionalPicker(Enum.GetValues<T>(), current, apply, emptyLabel);
+
+        /// <summary>
+        /// Dropdown over enum members for a field of several nodes at once. When they disagree it opens on
+        /// a marker entry instead of on somebody's value: a picker showing the first node's class as if it
+        /// were everybody's is how a group edit writes a change nobody asked for. The marker cannot be
+        /// chosen back into — "mixed" is a state the nodes are in, not a value they can be given.
+        /// </summary>
+        public static OptionButton MixedPicker<T>(IEnumerable<T> members, T? common, Action<T> apply,
+            string mixedLabel = MixedLabel) where T : struct, Enum
+        {
+            var picker = new OptionButton { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
+            if (common is null) picker.AddItem(mixedLabel, MixedId);
+
+            Dictionary<int, T> byId = Fill(picker, members, common);
+            if (common is null) picker.Selected = 0;
+
+            picker.ItemSelected += index =>
+            {
+                int id = picker.GetItemId((int)index);
+                if (id != MixedId) apply(byId[id]);
+            };
+
+            return picker;
+        }
+
+        /// <summary>The same for a member that is optional, where "none" is a value the author may pick and
+        /// "mixed" still is not — three states the author has to be able to tell apart, because giving
+        /// every selected node "none" and leaving them as they are look identical otherwise.</summary>
+        public static OptionButton MixedOptionalPicker<T>(IEnumerable<T> members, T? common, bool mixed,
+            Action<T?> apply, string emptyLabel = "—", string mixedLabel = MixedLabel) where T : struct, Enum
+        {
+            var picker = new OptionButton { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
+            if (mixed) picker.AddItem(mixedLabel, MixedId);
+
+            picker.AddItem(emptyLabel, NoneId);
+
+            Dictionary<int, T> byId = Fill(picker, members, mixed ? null : common);
+            if (mixed || common is null) picker.Selected = 0;
+
+            picker.ItemSelected += index =>
+            {
+                int id = picker.GetItemId((int)index);
+                if (id == MixedId) return;
+
+                apply(id == NoneId ? null : byId[id]);
+            };
+
+            return picker;
+        }
+
+        /// <summary>
+        /// A number several nodes hold, where they may not hold the same one. A spin box cannot say "these
+        /// differ" — it always shows a number, and the one it would show is the first node's — so a mixed
+        /// field is an empty box under a placeholder instead: untouched it writes nothing, and a number
+        /// typed into it is the author saying that all of them are that now.
+        /// </summary>
+        public static LineEdit MixedNumber(float? common, Action<float> apply, string mixedPlaceholder = MixedLabel)
+        {
+            var field = new LineEdit
+            {
+                Text = common is { } value ? value.ToString("0.####", CultureInfo.InvariantCulture) : string.Empty,
+                PlaceholderText = common is null ? mixedPlaceholder : string.Empty,
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+            };
+
+            void Commit(string text)
+            {
+                string wanted = text.Trim();
+
+                // An empty box is the field being left alone, whether it started mixed or was cleared by
+                // hand: there is no number in it to write, and guessing at one would be the group edit
+                // inventing a value.
+                if (wanted.Length == 0) return;
+
+                if (!float.TryParse(wanted, NumberStyles.Float, CultureInfo.InvariantCulture, out float number))
+                {
+                    field.Text = common is { } original ? original.ToString("0.####", CultureInfo.InvariantCulture) : string.Empty;
+                    return;
+                }
+
+                apply(number);
+            }
+
+            field.TextSubmitted += Commit;
+            field.FocusExited += () => Commit(field.Text);
+            return field;
+        }
     }
 }

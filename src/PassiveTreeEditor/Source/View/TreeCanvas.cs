@@ -148,6 +148,19 @@ namespace PassiveTreeEditor.Source.View
         public PassiveNode? SingleSelection =>
             _selected.Count == 1 ? Document.Find(FirstSelected()) : null;
 
+        /// <summary>The selected nodes in the order the document holds them, which is the order the file
+        /// was written in. Read off the document rather than out of the selection set: a hash set has no
+        /// order at all, and a group panel whose rows moved between rebuilds would be unusable.</summary>
+        public List<PassiveNode> SelectedNodes()
+        {
+            List<PassiveNode> nodes = [];
+            foreach (PassiveNode node in Document.Nodes)
+                if (_selected.Contains(node.Id))
+                    nodes.Add(node);
+
+            return nodes;
+        }
+
         public override void _Ready()
         {
             FocusMode = FocusModeEnum.All;

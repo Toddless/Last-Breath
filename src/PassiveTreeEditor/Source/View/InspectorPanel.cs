@@ -7,6 +7,7 @@ namespace PassiveTreeEditor.Source.View
     using Core.Modifiers.Conditions;
     using Core.Modifiers.Context;
     using Core.PassiveTree;
+    using Core.PassiveTree.Editing;
     using Editing;
     using Godot;
     using Io;
@@ -38,6 +39,27 @@ namespace PassiveTreeEditor.Source.View
         private const string StepHint =
             "how many units of the carrier the value is worth once: 100 reads \"per 100 Evade\"."
             + " A step counts a carrier, so it is shut while none is picked";
+
+        /// <summary>Said of a selection of one kind of node carrying one set of fields: everything on the
+        /// panel is written to all of them.</summary>
+        private const string SameNodesHint =
+            "The same class and the same fields on every node — what you change here is written to all of"
+            + " them as one step. A field they disagree on shows \"" + EditorControls.MixedLabel
+            + "\" and is left alone until you put a value in it.";
+
+        /// <summary>Said of a selection the tool will not edit whole: different classes, or different field
+        /// names, so a row would mean something else on each node.</summary>
+        private const string MixedNodesHint =
+            "Different classes or different fields. Only what every node means the same thing by is offered"
+            + " — parameters and the passive are edited one node at a time.";
+
+        private const string GroupTitleHint =
+            "the title of every selected node. Typing replaces all of them; an empty box on a mixed"
+            + " selection leaves each node's own title where it is";
+
+        private const string GroupRowsHint =
+            "Rows are the fields every selected node carries. Adding or removing one is a single node's job:"
+            + " the group is edited through what its nodes already have in common.";
 
         /// <summary>The step box counts whole units of the carrier, one at a time.</summary>
         private const int StepIncrement = 1;
@@ -86,6 +108,13 @@ namespace PassiveTreeEditor.Source.View
         /// numbers and nothing about the record's format follows the panel.</summary>
         private readonly List<StatFieldRow> _statRows = [];
 
+        /// <summary>Identity of the group section as it now stands, and what a run of group keystrokes
+        /// merges on — the stand-in for the node a single edit merges on. Rotated at the head of every
+        /// rebuild, before the old controls are torn down: a field commits as it loses focus, and it loses
+        /// focus while the panel is being cleared, so this is how such a field can tell that what it holds
+        /// belongs to a selection that is no longer on screen.</summary>
+        private object _group = new();
+
         private AbilityCatalog? _abilities;
         private ConditionProvider? _conditions;
         private PassiveSkillCatalog? _passives;
@@ -116,19 +145,22 @@ namespace PassiveTreeEditor.Source.View
 
         public void Rebuild()
         {
+            // Before anything is torn down: a control committing on its way out has to be able to see that
+            // the group it was built for is not the one on screen any more.
+            _group = new object();
             this.ClearContent();
 
             if (_canvas is null) return;
 
             if (_canvas.Selection.Count == 0)
             {
-                AddChild(EditorControls.Wrapped("Nothing selected.\n\nSelect mode: click a node, drag to move, box-drag to\nmulti-select, Delete removes. Middle or right mouse\ndrag pans, wheel zooms, F frames the tree."));
+                AddChild(EditorControls.Wrapped("Nothing selected.\n\nSelect mode: click a node, drag to move, shift-click adds\nto the selection, box-drag multi-selects, Delete removes.\nMiddle or right mouse drag pans, wheel zooms, F frames."));
                 return;
             }
 
             if (_canvas.Selection.Count > 1)
             {
-                AddChild(EditorControls.Wrapped($"{_canvas.Selection.Count} nodes selected.\nDrag moves them together; Delete removes them."));
+                BuildGroup(_canvas.SelectedNodes());
                 return;
             }
 
@@ -345,6 +377,298 @@ namespace PassiveTreeEditor.Source.View
 
             text.FocusExited += _editor.Seal;
             AddChild(text);
+        }
+
+        // ── group ──────────────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Several nodes edited as one. What is offered follows from what they have in common: nodes of one
+        /// class carrying one passive family and one set of field names are the same node several times over
+        /// and everything about them can be written at once, while a selection of different things is only
+        /// safe to touch where every node means the same thing by the field.
+        /// <para>A field the nodes disagree on shows the mixed marker and writes nothing until the author
+        /// puts a value in it. That is the whole discipline of the section: nothing here may quietly hand one
+        /// node's value to the rest, because the author cannot see what he did not choose.</para>
+        /// </summary>
+        private void BuildGroup(List<PassiveNode> nodes)
+        {
+            if (nodes.Count == 0) return;
+
+            bool uniform = NodeGroups.Uniform(nodes);
+
+            AddChild(EditorControls.Caption($"GROUP  {nodes.Count} nodes"));
+            AddChild(EditorControls.Wrapped(uniform ? SameNodesHint : MixedNodesHint));
+
+            var grid = new GridContainer { Columns = 2, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            AddChild(grid);
+
+            // The class decides which fields a node has at all, so it is only offered where the nodes
+            // already agree on one — changing it across a mixed selection would be authoring the very
+            // difference that keeps the rest of the panel shut.
+            if (uniform)
+            {
+                grid.AddChild(new Label { Text = "Kind" });
+                grid.AddChild(GroupKind(nodes));
+            }
+
+            grid.AddChild(new Label { Text = "Stance" });
+            grid.AddChild(GroupRay(nodes, EditFields.Stance, node => node.Stance, (node, value) => node.Stance = value));
+
+            // The second ray means nothing on a node that has no first one, exactly as on a single node.
+            if (nodes.TrueForAll(node => node.Stance is not null))
+            {
+                grid.AddChild(new Label { Text = "Hybrid" });
+                grid.AddChild(GroupRay(nodes, EditFields.Hybrid, node => node.HybridStance,
+                    (node, value) => node.HybridStance = value));
+            }
+
+            grid.AddChild(new Label { Text = "Title" });
+            grid.AddChild(GroupTitle(nodes));
+
+            if (uniform) BuildGroupProperties(nodes);
+        }
+
+        /// <summary>Whether a control is still speaking for what is on screen. A field commits as it loses
+        /// focus and it loses focus while the panel is being cleared — a step back through the history
+        /// rebuilds this panel, and a stale box writing its old text would put the undone edit back on
+        /// every selected node at once.</summary>
+        private bool Stale(object token) => _canvas is null || !ReferenceEquals(token, _group);
+
+        private OptionButton GroupKind(List<PassiveNode> nodes)
+        {
+            MergedValue<PassiveNodeKind> merged = NodeGroups.Merge(nodes, node => node.Kind);
+
+            return Sealing(EditorControls.MixedPicker(Enum.GetValues<PassiveNodeKind>(),
+                merged.Mixed ? null : (PassiveNodeKind?)merged.Value, kind =>
+                {
+                    _editor.SetNodeValues(nodes, _group, EditFields.Kind, node => node.Kind, kind,
+                        (node, value) => node.Kind = value);
+
+                    ChangedTotals();
+                    Rebuild();
+                }));
+        }
+
+        /// <summary>Either ray of the group: both are an optional stance, and "none" is a value the author
+        /// may give them while "mixed" is only a state they are in.</summary>
+        private OptionButton GroupRay(List<PassiveNode> nodes, string field, Func<PassiveNode, Stance?> read,
+            Action<PassiveNode, Stance?> write)
+        {
+            MergedValue<Stance?> merged = NodeGroups.Merge(nodes, read);
+
+            return Sealing(EditorControls.MixedOptionalPicker(Enum.GetValues<Stance>(), merged.Value, merged.Mixed,
+                value =>
+                {
+                    _editor.SetNodeValues(nodes, _group, field, read, value, write);
+                    Changed();
+                    Rebuild();
+                }));
+        }
+
+        /// <summary>The title of every selected node. Typed rather than committed, like a single node's, so
+        /// the run of keystrokes is one step back for the whole group.</summary>
+        private LineEdit GroupTitle(List<PassiveNode> nodes)
+        {
+            MergedValue<string> merged = NodeGroups.Merge(nodes, node => node.Title, StringComparer.Ordinal);
+            object token = _group;
+
+            var field = new LineEdit
+            {
+                Text = merged.Mixed ? string.Empty : merged.Value,
+                PlaceholderText = merged.Mixed ? EditorControls.MixedLabel : string.Empty,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                TooltipText = GroupTitleHint
+            };
+
+            field.TextChanged += text =>
+            {
+                if (Stale(token)) return;
+
+                _editor.SetNodeValues(nodes, _group, EditFields.Title, node => node.Title, text,
+                    (node, value) => node.Title = value);
+
+                Changed();
+            };
+
+            field.FocusExited += _editor.Seal;
+            return field;
+        }
+
+        /// <summary>The named numbers every node in the group carries, in the order the first of them wrote
+        /// them. Which editor draws a row is the passive family's business here as it is for one node — the
+        /// stat family in dropdowns, a named passive's fields under their catalog names.</summary>
+        private void BuildGroupProperties(List<PassiveNode> nodes)
+        {
+            List<MergedProperty> merged = NodeGroups.MergeProperties(nodes);
+            if (merged.Count == 0 && !nodes[0].IsPassive) return;
+
+            AddChild(EditorControls.Caption($"PROPERTIES  {merged.Count}"));
+
+            bool stat = StatPassiveGrammar.Owns(nodes[0].PassiveId);
+
+            for (int index = 0; index < merged.Count; index++)
+                AddChild(stat ? GroupStatRow(nodes, merged[index], index) : GroupFieldRow(nodes, merged[index], index));
+
+            AddChild(EditorControls.Wrapped(GroupRowsHint));
+        }
+
+        /// <summary>One stat line of the group, in the same three words a single node's row is written in.
+        /// The words respell the key on every node at once; the number beside them is each node's own until
+        /// one is typed in.</summary>
+        private Control GroupStatRow(List<PassiveNode> nodes, MergedProperty merged, int index)
+        {
+            StatFieldRow row = PassiveFieldRows.ReadStat([new KeyValuePair<string, float>(merged.Key, merged.Value)])[0];
+            if (row.IsRaw) return GroupRawRow(nodes, row, merged, index);
+
+            var box = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            var top = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            box.AddChild(top);
+
+            top.AddChild(Sealing(EditorControls.Picker(PassiveFieldRows.ParametersExcept(row.PerParameter), row.Parameter,
+                parameter => GroupRespell(nodes, row, index, line => line.Parameter = parameter))));
+
+            var bottom = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            box.AddChild(bottom);
+
+            OptionButton typePicker = Sealing(EditorControls.Picker(PassiveFieldRows.ValueTypes, row.ValueType,
+                type => GroupRespell(nodes, row, index, line => line.ValueType = type)));
+
+            typePicker.SizeFlagsHorizontal = SizeFlags.Fill;
+            bottom.AddChild(typePicker);
+            bottom.AddChild(GroupValue(nodes, () => row.Name, merged, index));
+            bottom.AddChild(new Label
+            {
+                Text = merged.Mixed ? EditorControls.MixedLabel : ValueHint(row.ValueType, row.Value),
+                CustomMinimumSize = new Vector2(64, 0)
+            });
+
+            var carried = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            carried.AddChild(new Label { Text = "per", CustomMinimumSize = new Vector2(28, 0) });
+            carried.AddChild(GroupStepBox(nodes, row, index));
+
+            OptionButton perPicker = Sealing(EditorControls.OptionalPicker(PassiveFieldRows.ParametersExcept(row.Parameter),
+                row.PerParameter, carrier => GroupRespell(nodes, row, index, line => Carry(line, carrier)),
+                emptyLabel: "— none"));
+
+            perPicker.TooltipText = StatLineHint;
+            carried.AddChild(perPicker);
+            box.AddChild(carried);
+
+            return box;
+        }
+
+        /// <summary>A key no dropdown could have spelled, on every node of the group. Shown as written and
+        /// not corrected from here: a hand-written key is one node's sentence, and rewriting it across a
+        /// selection is a repair the author makes where he can read what he is repairing.</summary>
+        private Control GroupRawRow(List<PassiveNode> nodes, StatFieldRow row, MergedProperty merged, int index)
+        {
+            var box = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            var top = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            box.AddChild(top);
+
+            top.AddChild(new Label
+            {
+                Text = row.Name,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                CustomMinimumSize = new Vector2(150, 0),
+                ClipText = true,
+                TooltipText = RawKeyHint
+            });
+
+            top.AddChild(GroupValue(nodes, () => row.Name, merged, index));
+
+            StatPassiveGrammar.TryReadLine(row.Name, row.Value, out _, out string? refusal);
+            box.AddChild(Warned($"unreadable: {refusal}"));
+            return box;
+        }
+
+        /// <summary>A named passive's field across the group: the catalog's own name, and the number under
+        /// it. The name is never typed here — the factory reads it, and renaming it on five nodes at once is
+        /// five grants quietly losing a field.</summary>
+        private Control GroupFieldRow(List<PassiveNode> nodes, MergedProperty merged, int index)
+        {
+            var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            row.AddChild(RequiredName(merged.Key));
+            row.AddChild(GroupValue(nodes, () => merged.Key, merged, index));
+            return row;
+        }
+
+        /// <summary>
+        /// The number of one field on every selected node. Empty while they disagree, and empty is the field
+        /// being left alone — the one rule that lets a group of five be edited at all without the author
+        /// having to check what he overwrote afterwards.
+        /// <para>The key is read when the number is written, not when the box is built: the words above it
+        /// can respell the line without the panel being torn down, and a box holding the key from a moment
+        /// ago would write its number into a field nobody carries any more.</para>
+        /// </summary>
+        private LineEdit GroupValue(List<PassiveNode> nodes, Func<string> key, MergedProperty merged, int index)
+        {
+            object token = _group;
+
+            LineEdit field = EditorControls.MixedNumber(merged.Mixed ? null : merged.Value, amount =>
+            {
+                if (Stale(token)) return;
+                if (_editor.SetGroupProperty(nodes, _group, $"{EditFields.PropertyValue} {index}", key(), amount) == 0) return;
+
+                ChangedTotals();
+                RebuildLater();
+            });
+
+            field.FocusExited += _editor.Seal;
+            return field;
+        }
+
+        /// <summary>How many units of the carrier the line is worth, across the group. Part of the key like
+        /// the words around it, so it goes through the same respell — and like a single node's step box it
+        /// asks for no rebuild, or a three-digit number could never be typed into it.</summary>
+        private SpinBox GroupStepBox(List<PassiveNode> nodes, StatFieldRow row, int index)
+        {
+            SpinBox step = EditorControls.Number(row.Step, StepIncrement);
+            step.MinValue = StatPassiveGrammar.DefaultStep;
+            step.Rounded = true;
+            step.CustomMinimumSize = new Vector2(StepWidth, 0);
+            step.SizeFlagsHorizontal = SizeFlags.Fill;
+            step.TooltipText = StepHint;
+            step.Editable = row.PerParameter is not null;
+
+            object token = _group;
+
+            step.ValueChanged += amount =>
+            {
+                int wanted = (int)amount;
+                if (Stale(token) || wanted == row.Step) return;
+
+                int before = row.Step;
+                string fromKey = row.Name;
+                row.Step = wanted;
+
+                if (_editor.RespellGroupProperty(nodes, _group, $"{EditFields.PropertyName} {index}", fromKey, row.Name) > 0)
+                {
+                    ChangedTotals();
+                    return;
+                }
+
+                // Refused, so the row says what the nodes say again. Putting the number back raises this
+                // once more, and the guard above ends that second pass.
+                row.Step = before;
+                step.Value = before;
+            };
+
+            return Sealing(step);
+        }
+
+        /// <summary>A word of a stat line changed on every node of the group. Whether it stood or was
+        /// refused, the rows are read back off the nodes: what either picker may offer follows from what the
+        /// key now says, and a refusal has to leave the dropdown showing the key that is still written.</summary>
+        private void GroupRespell(List<PassiveNode> nodes, StatFieldRow row, int index, Action<StatFieldRow> word)
+        {
+            string fromKey = row.Name;
+            word(row);
+
+            if (_editor.RespellGroupProperty(nodes, _group, $"{EditFields.PropertyName} {index}", fromKey, row.Name) > 0)
+                ChangedTotals();
+
+            Rebuild();
         }
 
         // ── passive ────────────────────────────────────────────────────────────────────────────
