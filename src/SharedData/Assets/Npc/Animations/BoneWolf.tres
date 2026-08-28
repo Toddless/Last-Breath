@@ -1,11 +1,11 @@
 [gd_resource type="SpriteFrames" load_steps=7 format=3]
 
-[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/Deer/Animation/Front - Idle/Front - Idle_000.png" id="1"]
-[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/Deer/Animation/Left - Idle/Left - Idle_000.png" id="2"]
-[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/Deer/Animation/Back - Idle/Back - Idle_000.png" id="3"]
-[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/Deer/Animation/Left - Attacking/Left - Attacking_000.png" id="4"]
-[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/Deer/Animation/Left - Hurt/Left - Hurt_000.png" id="5"]
-[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/Deer/Animation/Dying/Dying_000.png" id="6"]
+[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/BoneWolf/Animation/Front - Idle/Front - Idle_000.png" id="1"]
+[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/BoneWolf/Animation/Left - Idle/Left - Idle_000.png" id="2"]
+[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/BoneWolf/Animation/Back - Idle/Back - Idle_000.png" id="3"]
+[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/BoneWolf/Animation/Left - Attacking/Left - Attacking_000.png" id="4"]
+[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/BoneWolf/Animation/Left - Hurt/Left - Hurt_000.png" id="5"]
+[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Npc/BoneWolf/Animation/Dying/Dying_000.png" id="6"]
 
 [resource]
 animations = [{
