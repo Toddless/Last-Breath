@@ -55,6 +55,27 @@ namespace LastBreath.World
 
         private bool _rescatterQueued;
 
+        /// <summary>
+        /// Wires the scatter from code, for a container that builds it at runtime instead of carrying it in a
+        /// scene. Call it before the node enters the tree: <see cref="_Ready"/> is where the first scatter runs.
+        /// <see cref="PropScatterSettings.CellSize"/> is ignored — the cell is measured off the world layer's
+        /// own tileset. Scene-authored layers keep using the exports untouched.
+        /// </summary>
+        public void Bind(TileMapLayer world, Node2D? container, Texture2D prop, float propHeight, PropScatterSettings settings)
+        {
+            _world = world;
+            _container = container;
+            _prop = prop;
+            _propHeight = propHeight;
+            _seed = settings.Seed;
+            _minPropsPerCell = settings.MinPropsPerCell;
+            _maxPropsPerCell = settings.MaxPropsPerCell;
+            _edgeMargin = settings.EdgeMargin;
+            _minScale = settings.MinScale;
+            _maxScale = settings.MaxScale;
+            _tintJitter = settings.TintJitter;
+        }
+
         public override void _Ready()
         {
             if (!SourcesAssigned()) return;

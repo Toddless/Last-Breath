@@ -31,6 +31,18 @@ namespace LastBreath.World
 
         private bool _repaintQueued;
 
+        /// <summary>
+        /// Wires the pair from code, for a container that builds the display layer at runtime instead of
+        /// carrying it in a scene. Call it before the node enters the tree: <see cref="_Ready"/> is where the
+        /// pair is aligned and first painted. Scene-authored layers keep using the exports untouched.
+        /// </summary>
+        public void Bind(TileMapLayer world, TileMapLayer display, int displaySourceId = 0)
+        {
+            _world = world;
+            _display = display;
+            _displaySourceId = displaySourceId;
+        }
+
         public override void _Ready()
         {
             if (!LayersAssigned()) return;
