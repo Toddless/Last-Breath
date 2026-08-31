@@ -245,6 +245,9 @@ namespace LastBreath.Services
             uiElements.RegisterWindowFactory(typeof(GameOverWindow), () => GameOverWindow.Initialize().Instantiate<GameOverWindow>());
             uiElements.RegisterPopupFactory(typeof(IKeywordTooltipPopup), () => KeywordTooltipPopup.Initialize().Instantiate<KeywordTooltipPopup>());
             uiElements.RegisterPopupFactory(typeof(ItemTooltipPopup), () => ItemTooltipPopup.Initialize().Instantiate<ItemTooltipPopup>());
+            // The same card under its Core contract: modules that cannot name the Main class
+            // (the crafting equip picker) open the framed item tooltip through the interface.
+            uiElements.RegisterPopupFactory(typeof(Core.Views.IItemTooltipPopup), () => ItemTooltipPopup.Initialize().Instantiate<ItemTooltipPopup>());
             provider.AddCraftingWindowFactories();
             provider.AddBattleUiElementsFactory();
             provider.AddSharedUiFactories();

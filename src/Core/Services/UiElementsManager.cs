@@ -83,6 +83,8 @@ namespace Core.Services
 
         public bool RegisterPopupFactory(Type popupType, Func<IPopup> factory) => _popupFactories.TryAdd(popupType, factory);
 
+        public bool HasPopupFactory(Type popupType) => _popupFactories.ContainsKey(popupType);
+
         private IWindow? OpenFreshWindow(Type windowType)
         {
             if (!IsAllowedNow(windowType)) return null; // silent by design (Todd)

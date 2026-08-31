@@ -29,8 +29,9 @@ namespace SharedUi
         [Export] private ItemList? _list;
         [Export] private Button? _cancel;
 
-        private readonly List<string> _ids = [];
+        private readonly List<PickerEntry> _entries = [];
         private Action<string>? _onPicked;
+        private HoverTooltipHandle? _preview;
 
         public PopupLifetime Lifetime => PopupLifetime.Pinned;
 
@@ -39,7 +40,17 @@ namespace SharedUi
         public override void _Ready()
         {
             _cancel?.Pressed += Close;
-            _list?.ItemSelected += OnItemSelected;
+            if (_list != null)
+            {
+                _list.ItemSelected += OnItemSelected;
+                // Entries carrying a Preview open their own popup (the full item card) instead of the
+                // engine tooltip. ItemList rows are not controls, so the picker reads the hovered row
+                // off the mouse itself and the shared handle owns the delay and the lifetime.
+                _preview = HoverTooltip.Follow(this, ShowPreview);
+                _list.GuiInput += OnListGuiInput;
+                _list.MouseExited += () => _preview?.Target(null);
+            }
+
             // ShowPopup hands the instance out before the deferred AddChild lands it in the tree,
             // so the actual placement waits for _Ready (+ one frame for the panel's layout pass).
             Callable.From(Place).CallDeferred();
@@ -57,14 +68,16 @@ namespace SharedUi
         {
             _onPicked = onPicked;
             _title?.Text = title;
-            _ids.Clear();
+            _entries.Clear();
+            _preview?.Cancel();
             _list?.Clear();
             foreach (var entry in entries)
             {
-                _ids.Add(entry.Id);
+                _entries.Add(entry);
                 if (_list == null) continue;
                 int index = _list.AddItem(entry.Label, entry.Icon);
-                if (!string.IsNullOrEmpty(entry.Tooltip)) _list.SetItemTooltip(index, entry.Tooltip);
+                // The engine tooltip only where no Preview popup takes the hover instead.
+                if (entry.Preview == null && !string.IsNullOrEmpty(entry.Tooltip)) _list.SetItemTooltip(index, entry.Tooltip);
                 if (entry.LabelColor is { } color) _list.SetItemCustomFgColor(index, color);
             }
         }
@@ -75,12 +88,25 @@ namespace SharedUi
 
         private void OnItemSelected(long index)
         {
-            if (index < 0 || index >= _ids.Count) return;
+            if (index < 0 || index >= _entries.Count) return;
             var callback = _onPicked;
-            string picked = _ids[(int)index];
+            string picked = _entries[(int)index].Id;
             Close();
             callback?.Invoke(picked);
         }
+
+        /// <summary>Retargets the preview handle to the row under the cursor (rows without a Preview
+        /// count as nothing hovered — their engine tooltip does the talking).</summary>
+        private void OnListGuiInput(InputEvent @event)
+        {
+            if (@event is not InputEventMouseMotion motion || _list == null || _preview == null) return;
+            int index = _list.GetItemAtPosition(motion.Position, exact: true);
+            bool hasPreview = index >= 0 && index < _entries.Count && _entries[index].Preview != null;
+            _preview.Target(hasPreview ? index : (object?)null);
+        }
+
+        private IPopup? ShowPreview(object? key) =>
+            key is int index && index >= 0 && index < _entries.Count ? _entries[index].Preview?.Invoke() : null;
 
         private void Place()
         {

@@ -49,5 +49,10 @@ namespace Core.Views.UI
         bool RegisterWindowFactory(Type windowType, Func<IWindow> factory, UiContext allowedIn = UiContext.All);
 
         bool RegisterPopupFactory(Type popupType, Func<IPopup> factory);
+
+        /// <summary>Whether a popup factory is registered for the type — <see cref="ShowPopup"/> of an
+        /// unregistered type throws. Lets an OPTIONAL consumer (a picker's item preview) fall back to a
+        /// plainer rendering in a project that never registered the richer popup.</summary>
+        bool HasPopupFactory(Type popupType);
     }
 }

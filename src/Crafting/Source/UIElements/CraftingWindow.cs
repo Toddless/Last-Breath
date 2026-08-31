@@ -201,9 +201,13 @@ namespace Crafting.Source.UIElements
         }
 
         /// <summary>Equipment picker for an item mode: bag pieces the mode can actually work on.
-        /// The tooltip previews the piece's full line list, the label carries its rarity colour.</summary>
+        /// Hovering a row opens the SAME framed item card the bag slots show (through the Core
+        /// contract — this module cannot name the game's popup class); a project that never
+        /// registered that card (the standalone crafting sandbox) falls back to the plain text
+        /// tooltip. The label carries the piece's rarity colour.</summary>
         private void OpenEquipPicker(CraftingMode mode)
         {
+            bool framedCard = _uiElements?.HasPopupFactory(typeof(Core.Views.IItemTooltipPopup)) == true;
             var entries = (_inventory?.GetContents() ?? [])
                 .Select(entry => entry.Item)
                 .OfType<IEquipItem>()
@@ -212,8 +216,9 @@ namespace Crafting.Source.UIElements
                     item.InstanceId,
                     item.UpdateLevel > 0 ? $"{item.DisplayName} +{item.UpdateLevel}" : item.DisplayName,
                     item.Icon,
-                    EquipPickerTooltip(item),
-                    Color.FromHtml(TextPalette.RarityColor(item.Rarity))))
+                    framedCard ? null : EquipPickerTooltip(item),
+                    Color.FromHtml(TextPalette.RarityColor(item.Rarity)),
+                    framedCard ? () => ShowItemCard(item) : null))
                 .ToList();
 
             _pickerPopup = _uiElements?.ShowPopup(typeof(IPickerPopup)) as IPickerPopup;
@@ -233,6 +238,17 @@ namespace Crafting.Source.UIElements
             _ => false,
         };
 
+        /// <summary>The full framed item tooltip for a hovered picker row — the same card the bag
+        /// slots open, resolved through the Core contract.</summary>
+        private IPopup? ShowItemCard(IEquipItem item)
+        {
+            if (_uiElements?.ShowPopup(typeof(Core.Views.IItemTooltipPopup)) is not Core.Views.IItemTooltipPopup popup) return null;
+            popup.ShowItem(item);
+            return popup;
+        }
+
+        /// <summary>Plain-text fallback of the picker row hover, kept for projects without the framed
+        /// item card (the standalone crafting sandbox).</summary>
         private string EquipPickerTooltip(IEquipItem item)
         {
             var lines = new List<string> { $"{Localization.Localize(item.Rarity.ToString())} · {Localization.Localize(item.EquipmentPiece.ToString())}" };

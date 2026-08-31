@@ -20,7 +20,7 @@ namespace LastBreath.UI
     /// (40–60)"). Plain items show name, icon and description only.
     /// </summary>
     [GlobalClass]
-    public partial class ItemTooltipPopup : Control, IHoverTooltipPopup
+    public partial class ItemTooltipPopup : Control, IHoverTooltipPopup, Core.Views.IItemTooltipPopup
     {
         private const string ScenePath = "uid://di3yh40oyvjhe";
 

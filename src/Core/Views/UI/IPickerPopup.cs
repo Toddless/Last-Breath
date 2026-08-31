@@ -6,13 +6,20 @@ namespace Core.Views.UI
 
     /// <summary>One row of a picker: what it is called, what it looks like, and the id it hands back
     /// when it is chosen. The id is opaque to the popup — an item instance for one caller, a record id
-    /// for another — because the list is the only thing a picker knows about what it is picking.</summary>
+    /// for another — because the list is the only thing a picker knows about what it is picking.
+    /// <para>
+    /// Hover preview, richest wins: a <paramref name="Preview"/> callback builds and returns the row's
+    /// own popup (an item row opens the full framed item card) and the plain <paramref name="Tooltip"/>
+    /// text is ignored then; rows without one keep the engine tooltip. Null from the callback means
+    /// nothing to show.
+    /// </para></summary>
     public readonly record struct PickerEntry(
         string Id,
         string Label,
         Texture2D? Icon,
         string? Tooltip = null,
-        Color? LabelColor = null);
+        Color? LabelColor = null,
+        Func<IPopup?>? Preview = null);
 
     /// <summary>
     /// A list of candidates at the cursor: one click picks, everything else closes. Declared beside the
