@@ -210,6 +210,77 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0.15f, Crit(owner), 0.0001f, "taking the scaler off did not give the scaled-up value back");
         }
 
+        /// <summary>#224: a flat buff keeps its relative weight as the bearer levels — every bound line is
+        /// worth base × levelFactor × totalScale, where levelFactor is the very 1 + (level − 1) × levelScaling
+        /// the provider applied to the base parameters. Level 25 at scaling 0.05 is the owner's calibration
+        /// point: ×2.2.</summary>
+        [TestMethod]
+        public void TheLevelFactorMultipliesEveryBoundLine()
+        {
+            var owner = new BuffTarget();
+            var component = owner.NpcModifiers;
+            component.UseBuffs(new NpcBuffBinder(new NpcBuffProvider(ShippedBuffs()), levelFactor: 2.2f));
+
+            component.AddModifier(ShippedModifiers().First(modifier => modifier.Id == "Npc_Modifier_Tier_Upgrade_To_Maximum"));
+
+            Assert.AreEqual(0.15f * 2.2f, Crit(owner), 0.0001f, "the bearer's level factor did not reach the bound line");
+        }
+
+        /// <summary>A level factor of exactly 1 — every level-1 spawn — leaves the values standing where
+        /// they always stood: the feature changes nothing until the bearer actually outgrows level 1.</summary>
+        [TestMethod]
+        public void ALevelFactorOfOneChangesNothing()
+        {
+            var owner = new BuffTarget();
+            var component = owner.NpcModifiers;
+            component.UseBuffs(new NpcBuffBinder(new NpcBuffProvider(ShippedBuffs()), levelFactor: 1f));
+
+            component.AddModifier(ShippedModifiers().First(modifier => modifier.Id == "Npc_Modifier_Tier_Upgrade_To_Maximum"));
+
+            Assert.AreEqual(0.15f, Crit(owner), 0.0001f, "a level factor of 1 moved a value it must leave alone");
+        }
+
+        /// <summary>The two scalars stack multiplicatively and the order cannot matter — the whole line is
+        /// base × levelFactor × totalScale whichever side arrives first.</summary>
+        [TestMethod]
+        public void TheLevelFactorAndTheScaleMultiplyTogether()
+        {
+            var owner = new BuffTarget();
+            var component = owner.NpcModifiers;
+            component.UseBuffs(new NpcBuffBinder(new NpcBuffProvider(ShippedBuffs()), levelFactor: 2.2f));
+
+            List<INpcModifier> shipped = ShippedModifiers();
+            component.AddModifiers(
+            [
+                shipped.First(modifier => modifier.Id == "Npc_Modifier_Tier_Upgrade_To_Maximum"),
+                shipped.First(modifier => modifier.Id == "Npc_Modifier_Scale_Double_Health"),
+            ]);
+
+            Assert.AreEqual(0.15f * 2.2f * 2.5f, Crit(owner), 0.0001f,
+                "level factor and TotalScale did not multiply into one line");
+        }
+
+        /// <summary>Granted passives stay WHOLE under the level factor for the same magnitude reason
+        /// TotalScale never touches them: their properties are thresholds and durations, and 0.3 × 2.2
+        /// would turn Execute into a kill-on-hit. The factory must see the authored properties untouched.</summary>
+        [TestMethod]
+        public void TheLevelFactorNeverTouchesAGrant()
+        {
+            IReadOnlyDictionary<string, float>? handed = null;
+            var grants = new Mock<IGrantFactory>();
+            grants.Setup(factory => factory.Create(
+                    It.IsAny<GrantKind>(), It.IsAny<string>(), It.IsAny<List<IModifier>>(), It.IsAny<IReadOnlyDictionary<string, float>>()))
+                .Callback((GrantKind _, string _, List<IModifier> _, IReadOnlyDictionary<string, float> properties) => handed = properties)
+                .Returns(Mock.Of<Core.Items.IItemGrant>());
+
+            var owner = new BuffTarget();
+            new NpcBuffBinder(new NpcBuffProvider(ShippedBuffs()), grants.Object, levelFactor: 2.2f)
+                .Rebuild(owner.Fighter, [ShippedModifiers().First(modifier => modifier.Id == "Npc_Modifier_Item_Effect_Execution")]);
+
+            Assert.IsNotNull(handed, "the execution grant never reached the factory");
+            Assert.AreEqual(0.3f, handed["threshold"], 0.0001f, "the level factor leaked into a grant's properties");
+        }
+
         /// <summary>The vault gives the scaling section its own reading of "unique": several DIFFERENT
         /// scalers on one NPC, and that is authored as uniqueScope on the section, not decided by code.</summary>
         [TestMethod]

@@ -9,10 +9,10 @@
     "goldPerBudgetUnit": 4,
     "maxGoldPerKill": 300,
     "baseBudget": {
-        "Regular": 5,
-        "Special": 10,
-        "Elit": 20,
-        "Unique": 50,
+        "Regular": 6,
+        "Special": 14,
+        "Elit": 28,
+        "Unique": 68,
         "Boss": 100,
         "Archon": 180
     },

@@ -320,7 +320,7 @@ namespace Battle.Internal.Npc
             // Both sides of a modifier at once: loot (difficulty/budget) and the bearer's own power. The
             // binder goes in FIRST so the whole batch binds in one settled pass — a scaling modifier
             // arriving later raises everyone's TotalScale, and this is the only point where it is final.
-            AttachModifierBuffs(provider);
+            AttachModifierBuffs(provider, definition.LevelFactor);
             NpcModifiers.AddModifiers(definition.Modifiers.ToList());
 
             GrantControlResistance(provider);
@@ -341,12 +341,14 @@ namespace Battle.Internal.Npc
         /// <summary>The single place NpcBuffId becomes real: the binder pulls each modifier's buff out of
         /// NpcBuffs.json and puts it on this body — parameter lines into <see cref="ParameterModifiers"/>,
         /// granted passives through the item-grant factory. A composition without the buff catalog (a
-        /// sandbox, the drop stand) keeps the old behaviour: modifiers stay loot-side and nothing throws.</summary>
-        private void AttachModifierBuffs(IGameServiceProvider provider)
+        /// sandbox, the drop stand) keeps the old behaviour: modifiers stay loot-side and nothing throws.
+        /// The definition's level factor rides along so flat buff lines grow with the bearer exactly as
+        /// its base parameters did (base × levelFactor × totalScale); grants are exempt by design.</summary>
+        private void AttachModifierBuffs(IGameServiceProvider provider, float levelFactor)
         {
             var catalog = provider.TryGet<INpcBuffProvider>();
             if (catalog == null) return;
-            NpcModifiers.UseBuffs(new NpcBuffBinder(catalog, provider.TryGet<Core.Items.Grants.IGrantFactory>()));
+            NpcModifiers.UseBuffs(new NpcBuffBinder(catalog, provider.TryGet<Core.Items.Grants.IGrantFactory>(), levelFactor: levelFactor));
         }
 
         /// <summary>Per-NPC art from the shared visual library; no entry — the scene's placeholder frames

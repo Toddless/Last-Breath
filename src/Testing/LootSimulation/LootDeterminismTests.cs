@@ -22,18 +22,21 @@ namespace LastBreathTest.LootSimulation
         private const string BossDropsFingerprint = "29566E2A16D2B21FBD0FAF4D989001612C1F9D635A4E3140C0F4E297AEC2012C";
 
         /// <summary>The same for <see cref="RolledModifiers"/>. Moved by issue #222 (tier upgrades stack,
-        /// one unique per section, scaling exempt) and again by the #224 sim rework: the simulator's
-        /// modifier roll now mirrors NpcProvider.RollModifiers of issue #223 — weighted pick WITHOUT
-        /// replacement over the id-ordered catalog via RandWeighted — where the old sim sampled WITH
-        /// replacement through WeightedRandomPicker. Same seed, different draw path, different set.
-        /// <see cref="BossDropsFingerprint"/> did NOT move either time, which is the check that only the
-        /// modifier side changed.</summary>
-        private const string RolledModifiersFingerprint = "F66DDC87B57FF558D2CC08CEC7373185D3DC64A632EF102CAD93801EB1B14FF9";
+        /// one unique per section, scaling exempt), by the #224 sim rework (the modifier roll mirrors
+        /// NpcProvider.RollModifiers of #223 — weighted pick WITHOUT replacement instead of the old
+        /// WITH-replacement sampling), and by the #224 balance data pass: the guaranteedItems difficulties
+        /// aligned to 0.4 shrink the budget of every kill that rolls one, and Rarity_Upgrade_Huge now
+        /// boosts the legendary channel instead of the epic one — different budget, different chances,
+        /// different drops on the same dice. <see cref="BossDropsFingerprint"/> did NOT move any of these
+        /// times, which is the check that only the modifier side changed.</summary>
+        private const string RolledModifiersFingerprint = "732561A22669BB130820B103743C5D0D86C94BBD6E1EFE8F730EA7DA3402F8FC";
 
         /// <summary>The cascade spawn of issue #223 (ceiling + falling slot chances), pinned the same way:
         /// this is the path every non-authored spawn takes in the game now, so the report is only worth
-        /// reading if it reproduces too.</summary>
-        private const string CascadeSpawnFingerprint = "8FA4B615850FC4082F17318F1CE7EB8D4A3B5488EF4C1E4FB7483C23E30EAC22";
+        /// reading if it reproduces too. Moved by the #224 balance pass — the Elit baseBudget went 20 → 28
+        /// on top of the same modifier-data changes that moved <see cref="RolledModifiersFingerprint"/>;
+        /// the count cascade itself spends the same dice as before.</summary>
+        private const string CascadeSpawnFingerprint = "417C5582B45066F4904D0C7600F30656729B49A181EF8279FB82B8034F3BDF59";
 
         /// <summary>The boss carries the paths a regular kill never reaches — equip affix rolls, grant
         /// rolls and augment seats — which is where a run stops repeating itself first.</summary>

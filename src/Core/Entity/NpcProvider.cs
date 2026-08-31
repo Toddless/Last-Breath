@@ -75,6 +75,7 @@ namespace Core.Entity
             // Authored rarity (bosses/uniques) beats the weighted roll; explicit overrides beat both.
             var rarity = overrides?.Rarity ?? ParseAuthoredRarity(data.Authored) ?? ParseFixedRarity(data) ?? RollRarity();
             var stages = NpcStageParser.Parse(data.Id, data.Stages);
+            float levelFactor = 1f + (level - 1) * data.LevelScaling;
 
             return new NpcDefinition
             {
@@ -85,7 +86,8 @@ namespace Core.Entity
                 EntityType = entityType,
                 Fraction = EnumParser.ParseEnum<Fractions>(data.Fraction),
                 Stance = stance,
-                Parameters = ScaleParameters(data, level),
+                Parameters = ScaleParameters(data, levelFactor),
+                LevelFactor = levelFactor,
                 // Staged bosses learn per-stage sets via ApplyStage — a rolled/authored list would be discarded.
                 Abilities = stages.Count > 0 ? [] : PickAbilities(data, behaviorData, entityType, rarity),
                 Behavior = BuildProfile(behaviorData, EnumParser.ParseEnum<AiIntellect>(data.AiIntellect), data.FleeHealthThreshold, data.AbilityBehaviors),
@@ -243,10 +245,9 @@ namespace Core.Entity
         /// the open interval never has that effect.</summary>
         private bool FillsSlot(float chance) => chance >= 1f || (chance > 0f && _rnd.RandFloat() < chance);
 
-        private Dictionary<EntityParameter, float> ScaleParameters(NpcData data, int level)
+        private static Dictionary<EntityParameter, float> ScaleParameters(NpcData data, float levelFactor)
         {
             var parameters = new Dictionary<EntityParameter, float>();
-            float levelFactor = 1f + (level - 1) * data.LevelScaling;
             foreach ((string key, float value) in data.BaseParameters)
             {
                 var parameter = EnumParser.ParseEnum<EntityParameter>(key);

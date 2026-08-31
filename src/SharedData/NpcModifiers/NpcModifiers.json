@@ -90,7 +90,7 @@
                     "id": "Npc_Modifier_Guaranteed_Items_Crafting_Upgrade",
                     "npcBuffId": "Npc_Buff_Guaranteed_Items_Crafting_Upgrade",
                     "weight": 25,
-                    "difficulty": 0.5,
+                    "difficulty": 0.4,
                     "items": [
                         "Upgrade_Resource_Weapon_Rune",
                         "Upgrade_Resource_Jeweler_Rune",
@@ -102,7 +102,7 @@
                     "id": "Npc_Modifier_Guaranteed_Items_Equip",
                     "npcBuffId": "Npc_Buff_Guaranteed_Items_Equip",
                     "weight": 15,
-                    "difficulty": 0.6,
+                    "difficulty": 0.4,
                     "items": [
                         "Body_Stoneheart",
                         "Gloves_Stoneheart",
@@ -114,7 +114,7 @@
                     "id": "Npc_Modifier_Guaranteed_Items_Essence",
                     "npcBuffId": "Npc_Buff_Guaranteed_Items_Essence",
                     "weight": 5,
-                    "difficulty": 0.7,
+                    "difficulty": 0.4,
                     "items": [
                         "Crafting_Resource_Essence_Barrier",
                         "Crafting_Resource_Essence_Evade",
@@ -222,7 +222,7 @@
                     "difficulty": 0.3,
                     "multiplier": 0.6,
                     "affectedRarity": [
-                        1
+                        0
                     ],
                     "isUnique": false
                 },
