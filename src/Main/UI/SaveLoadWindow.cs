@@ -16,7 +16,7 @@ namespace LastBreath.UI
         private const string ScenePath = "uid://cserxppd6wiui";
 
         [Export] private VBoxContainer? _slotsContainer;
-        [Export] private Button? _closeButton;
+        [Export] private SharedUi.WindowHeader? _header;
 
         private ISaveGameService? _saveGame;
         private System.Action? _menuLoad;
@@ -30,7 +30,11 @@ namespace LastBreath.UI
 
         public override void _Ready()
         {
-            if (_closeButton != null) _closeButton.Pressed += Close;
+            if (_header != null)
+            {
+                _header.SetTitle(Core.Localization.Localization.Localize("SaveLoadLabel"));
+                _header.Closed += Close;
+            }
             Rebuild();
         }
 

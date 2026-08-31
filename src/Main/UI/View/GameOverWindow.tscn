@@ -2,9 +2,6 @@
 
 [ext_resource type="Script" uid="uid://c1ysmylqm2ucq" path="res://Source/UIElements/GameOverWindow.cs" id="1"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_title"]
-font_size = 48
-
 [node name="GameOverWindow" type="MarginContainer" unique_id=270650430 node_paths=PackedStringArray("_loadButton", "_quitButton")]
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,6 +18,7 @@ layout_mode = 2
 [node name="Panel" type="PanelContainer" parent="Center" unique_id=979230683]
 custom_minimum_size = Vector2(480, 320)
 layout_mode = 2
+theme_type_variation = &"UmbralWindowPanel"
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=48176380]
 layout_mode = 2
@@ -36,8 +34,8 @@ theme_override_constants/separation = 24
 [node name="Title" type="Label" parent="Center/Panel/Margin/Layout" unique_id=777930353]
 layout_mode = 2
 size_flags_vertical = 3
+theme_type_variation = &"TitleLabel"
 text = "Game Over"
-label_settings = SubResource("LabelSettings_title")
 horizontal_alignment = 1
 vertical_alignment = 1
 
