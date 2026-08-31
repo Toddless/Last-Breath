@@ -41,6 +41,12 @@ namespace LastBreath.World
         /// painting must not try to unhook on the way out.</summary>
         private bool _watchingWorld;
 
+        /// <summary>The repaint hook, connected explicitly instead of through the C# event: Godot-mono keeps
+        /// its own ledger of event subscriptions and, after an editor assembly reload unloads them with their
+        /// ALC, disconnects each dead entry itself — pushing "nonexistent connection" errors. An explicit
+        /// Connect never enters that ledger.</summary>
+        private Callable _repaintCallable;
+
         /// <summary>
         /// Wires the pair from code, for a container that builds the display layer at runtime instead of
         /// carrying it in a scene. Call it before the node enters the tree: <see cref="_Ready"/> is where the
@@ -64,7 +70,8 @@ namespace LastBreath.World
             AlignDisplay();
             _display!.Clear();
             Repaint();
-            _world!.Changed += QueueRepaint;
+            _repaintCallable = Callable.From(QueueRepaint);
+            _world!.Connect(TileMapLayer.SignalName.Changed, _repaintCallable);
             _watchingWorld = true;
         }
 
@@ -74,11 +81,10 @@ namespace LastBreath.World
 
             _watchingWorld = false;
             // The flag says this pair once started watching; whether the connection still exists is a separate
-            // question. An editor assembly reload kills the subscribed delegate with its unloaded ALC, and a
-            // fresh Callable no longer matches it — unsubscribing then only raises "nonexistent connection".
-            if (!_world!.IsConnected(TileMapLayer.SignalName.Changed, Callable.From(QueueRepaint))) return;
+            // question — an editor assembly reload can have swept it away already.
+            if (!_world!.IsConnected(TileMapLayer.SignalName.Changed, _repaintCallable)) return;
 
-            _world.Changed -= QueueRepaint;
+            _world.Disconnect(TileMapLayer.SignalName.Changed, _repaintCallable);
         }
 
         private bool LayersAssigned()

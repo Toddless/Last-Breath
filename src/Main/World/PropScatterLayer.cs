@@ -60,6 +60,16 @@ namespace LastBreath.World
 
         private bool _rescatterQueued;
 
+        /// <summary>Whether the world layer's change signal is actually hooked up — a scatter that never
+        /// started must not try to unhook on the way out.</summary>
+        private bool _watchingWorld;
+
+        /// <summary>The rescatter hook, connected explicitly instead of through the C# event: Godot-mono keeps
+        /// its own ledger of event subscriptions and, after an editor assembly reload unloads them with their
+        /// ALC, disconnects each dead entry itself — pushing "nonexistent connection" errors. An explicit
+        /// Connect never enters that ledger.</summary>
+        private Callable _rescatterCallable;
+
         /// <summary>
         /// Wires the scatter from code, for a container that builds it at runtime instead of carrying it in a
         /// scene. Call it before the node enters the tree: <see cref="_Ready"/> is where the first scatter runs.
@@ -91,18 +101,21 @@ namespace LastBreath.World
             // being added under MainWorld) is still busy setting up its children, and a synchronous AddChild of
             // a grown prop into it would fail. QueueRescatter already exists for the same reason on Changed.
             QueueRescatter();
-            _world!.Changed += QueueRescatter;
+            _rescatterCallable = Callable.From(QueueRescatter);
+            _world!.Connect(TileMapLayer.SignalName.Changed, _rescatterCallable);
+            _watchingWorld = true;
         }
 
         public override void _ExitTree()
         {
-            if (!IsInstanceValid(_world)) return;
+            if (!_watchingWorld || !IsInstanceValid(_world)) return;
 
-            // An editor assembly reload kills the subscribed delegate with its unloaded ALC, and a fresh
-            // Callable no longer matches it — unsubscribing then only raises "nonexistent connection".
-            if (!_world!.IsConnected(TileMapLayer.SignalName.Changed, Callable.From(QueueRescatter))) return;
+            _watchingWorld = false;
+            // The flag says this scatter once started watching; whether the connection still exists is a
+            // separate question — an editor assembly reload can have swept it away already.
+            if (!_world!.IsConnected(TileMapLayer.SignalName.Changed, _rescatterCallable)) return;
 
-            _world.Changed -= QueueRescatter;
+            _world.Disconnect(TileMapLayer.SignalName.Changed, _rescatterCallable);
         }
 
         /// <summary>
