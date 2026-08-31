@@ -14,6 +14,7 @@ namespace SharedUi
 
         [Export] private Label? _caption;
         [Export] private Label? _value;
+        private RichTextLabel? _richValue;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
@@ -28,6 +29,55 @@ namespace SharedUi
             _value.Text = value;
             if (valueColor is { } color) _value.AddThemeColorOverride("font_color", color);
             else _value.RemoveThemeColorOverride("font_color");
+        }
+
+        /// <summary>
+        /// Same row, but the value side is bbcode (the forecast's struck-through "was → now").
+        /// The plain value Label hides behind a lazily created RichTextLabel; a min width keeps
+        /// the value column stable across rows.
+        /// </summary>
+        public void SetRich(string caption, string valueBbcode, float valueMinWidth = 0f)
+        {
+            _caption?.Text = caption;
+            _value?.Visible = false;
+            _richValue ??= CreateRichValue();
+            _richValue.Text = valueBbcode;
+            _richValue.CustomMinimumSize = new Vector2(valueMinWidth, 0);
+        }
+
+        /// <summary>Regular label tone for the caption instead of the dim one; a tint (an affix
+        /// family colour) overrides further.</summary>
+        public void SetPlainCaption(Color? tint = null)
+        {
+            if (_caption == null) return;
+            _caption.ThemeTypeVariation = "";
+            if (tint is { } color) _caption.AddThemeColorOverride("font_color", color);
+            else _caption.RemoveThemeColorOverride("font_color");
+        }
+
+        /// <summary>Regular label tone for the value instead of the ValueLabel accent (the
+        /// character sheet's stat numbers).</summary>
+        public void UsePlainValue() => _value?.ThemeTypeVariation = "";
+
+        /// <summary>Long captions (modifier pool lines) wrap instead of stretching the window;
+        /// the value then centers vertically beside the taller caption.</summary>
+        public void EnableCaptionAutowrap()
+        {
+            _caption?.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+            _value?.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+        }
+
+        private RichTextLabel CreateRichValue()
+        {
+            var rich = new RichTextLabel
+            {
+                BbcodeEnabled = true,
+                FitContent = true,
+                AutowrapMode = TextServer.AutowrapMode.Off,
+                SizeFlagsVertical = SizeFlags.ShrinkCenter,
+            };
+            AddChild(rich);
+            return rich;
         }
     }
 }

@@ -84,35 +84,36 @@ namespace LastBreath.UI
             RenderVitals(player);
             foreach ((string titleKey, EntityParameter[] parameters) in s_sections)
             {
-                var grid = BeginSection(titleKey);
+                var rows = BeginSection(titleKey);
                 foreach (var parameter in parameters)
-                    AddRow(grid, Localization.Localize(parameter.ToString()), FormatValue(parameter, player));
+                    AddRow(rows, Localization.Localize(parameter.ToString()), FormatValue(parameter, player));
             }
         }
 
         private void RenderVitals(IPlayer player)
         {
-            var grid = BeginSection("UI_Char_Vitals");
-            AddRow(grid, Localization.Localize("Health"), $"{Mathf.CeilToInt(player.CurrentHealth)} / {Mathf.CeilToInt(player.Parameters.MaxHealth)}");
-            AddRow(grid, Localization.Localize("Mana"), $"{Mathf.CeilToInt(player.CurrentMana)} / {Mathf.CeilToInt(player.Parameters.MaxMana)}");
+            var rows = BeginSection("UI_Char_Vitals");
+            AddRow(rows, Localization.Localize("Health"), $"{Mathf.CeilToInt(player.CurrentHealth)} / {Mathf.CeilToInt(player.Parameters.MaxHealth)}");
+            AddRow(rows, Localization.Localize("Mana"), $"{Mathf.CeilToInt(player.CurrentMana)} / {Mathf.CeilToInt(player.Parameters.MaxMana)}");
         }
 
-        private GridContainer BeginSection(string titleKey)
+        private VBoxContainer BeginSection(string titleKey)
         {
             var header = new Label { Text = Localization.Localize(titleKey), ThemeTypeVariation = "HeaderLabel" };
             _stats!.AddChild(header);
 
-            var grid = new GridContainer { Columns = 2 };
-            grid.AddThemeConstantOverride("h_separation", 60);
-            grid.AddThemeConstantOverride("v_separation", 4);
-            _stats.AddChild(grid);
-            return grid;
+            var rows = new VBoxContainer();
+            rows.AddThemeConstantOverride("separation", 4);
+            _stats.AddChild(rows);
+            return rows;
         }
 
-        private static void AddRow(GridContainer grid, string name, string value)
+        private static void AddRow(VBoxContainer rows, string name, string value)
         {
-            grid.AddChild(new Label { Text = name, ThemeTypeVariation = "DimLabel", SizeFlagsHorizontal = SizeFlags.ExpandFill });
-            grid.AddChild(new Label { Text = value, HorizontalAlignment = HorizontalAlignment.Right });
+            var row = SharedUi.KeyValueRow.Initialize().Instantiate<SharedUi.KeyValueRow>();
+            row.Set(name, value);
+            row.UsePlainValue(); // the sheet's numbers keep the regular label tone, not the gold accent
+            rows.AddChild(row);
         }
 
         private string FormatValue(EntityParameter parameter, IPlayer player) =>

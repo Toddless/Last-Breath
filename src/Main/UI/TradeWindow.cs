@@ -136,46 +136,32 @@ namespace LastBreath.UI
         }
 
         /// <summary>Row: icon · name (rarity-colored) · unit price · xRemaining · [qty] · Buy.
-        /// Built in code like the crafting requirement lines — the scene owns only the containers.</summary>
+        /// The shared IconLabelRow carries the icon and name; price, counter, quantity spinner and
+        /// the Buy button ride behind as trailing controls.</summary>
         private Control BuildOfferRow(TraderOffer offer, Fractions traderFaction)
         {
-            var row = new HBoxContainer();
-            row.AddThemeConstantOverride("separation", 8);
-
-            var icon = new TextureRect
-            {
-                Texture = offer.Item.Icon,
-                CustomMinimumSize = new Vector2(32, 32),
-                ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-                StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-            };
-            row.AddChild(icon);
-
-            var name = new Label
-            {
-                Text = offer.Item.DisplayName,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis,
-            };
-            name.AddThemeColorOverride("font_color", Color.FromHtml(TextPalette.RarityColor(offer.Item.Rarity)));
-            row.AddChild(name);
+            var row = SharedUi.IconLabelRow.Initialize().Instantiate<SharedUi.IconLabelRow>();
+            row.IconSize = 32;
+            row.Set(offer.Item.Icon, offer.Item.DisplayName, Color.FromHtml(TextPalette.RarityColor(offer.Item.Rarity)));
+            row.UseEllipsis();
 
             int unitPrice = offer.IsBuyback
                 ? offer.BuybackUnitPrice
                 : _pricing?.BuyPrice(offer.Item, traderFaction) ?? 0;
-            row.AddChild(new Label { Text = Localization.Render("UI_Trade_Price", new System.Collections.Generic.Dictionary<string, object?> { ["Amount"] = unitPrice }) });
-            row.AddChild(new Label { Text = $"x{offer.Remaining}" });
+            row.SetTrailing(
+                new Label { Text = Localization.Render("UI_Trade_Price", new System.Collections.Generic.Dictionary<string, object?> { ["Amount"] = unitPrice }) },
+                new Label { Text = $"x{offer.Remaining}" });
 
             SpinBox? quantity = null;
             if (offer.Item.MaxStackSize > 1 && offer.Remaining > 1)
             {
                 quantity = new SpinBox { MinValue = 1, MaxValue = offer.Remaining, Value = 1 };
-                row.AddChild(quantity);
+                row.SetTrailing(quantity);
             }
 
             var buy = new Button { Text = Localization.Localize("UI_Trade_Buy"), Disabled = unitPrice <= 0 };
             buy.Pressed += () => _ = BuyAsync(offer.OfferId, quantity == null ? 1 : (int)quantity.Value);
-            row.AddChild(buy);
+            row.SetTrailing(buy);
 
             // The full item tooltip (rolled equips show their lines) — same pipeline as the bag slots.
             HoverTooltip.Attach(row, () => ShowOfferTooltip(offer.Item));

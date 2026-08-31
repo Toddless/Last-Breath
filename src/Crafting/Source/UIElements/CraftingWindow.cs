@@ -30,7 +30,6 @@ namespace Crafting.Source.UIElements
     {
         private const string UID = "uid://betq124kfglyy";
         private const int AdditiveSlots = 3;
-        private static readonly Vector2 s_cardIconSize = new(28, 28);
         private static readonly Vector2 s_cardMinSize = new(0, 44);
         private const int ForecastValueWidth = 130;
         private const int GrantDescriptionMinWidth = 320;
@@ -626,20 +625,10 @@ namespace Crafting.Source.UIElements
 
         private static Control SplitRow(string name, string value, Color? tint, bool muted = false)
         {
-            var row = new HBoxContainer();
-            row.AddThemeConstantOverride("separation", 8);
-            var nameLabel = new Label
-            {
-                Text = name,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                AutowrapMode = TextServer.AutowrapMode.WordSmart,
-            };
-            if (tint is { } color) nameLabel.AddThemeColorOverride("font_color", color);
-            row.AddChild(nameLabel);
-
-            var valueLabel = new Label { Text = value, SizeFlagsVertical = SizeFlags.ShrinkCenter };
-            valueLabel.AddThemeColorOverride("font_color", muted ? Color.FromHtml(TextPalette.System) : Color.FromHtml(TextPalette.Number));
-            row.AddChild(valueLabel);
+            var row = SharedUi.KeyValueRow.Initialize().Instantiate<SharedUi.KeyValueRow>();
+            row.Set(name, value, Color.FromHtml(muted ? TextPalette.System : TextPalette.Number));
+            row.SetPlainCaption(tint);
+            row.EnableCaptionAutowrap();
             return row;
         }
 
@@ -713,19 +702,9 @@ namespace Crafting.Source.UIElements
 
         private static Control ForecastRow(string name, string valueBbcode)
         {
-            var row = new HBoxContainer();
-            row.AddThemeConstantOverride("separation", 8);
-            row.AddChild(new Label
-            {
-                Text = name,
-                ThemeTypeVariation = "DimLabel",
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                AutowrapMode = TextServer.AutowrapMode.WordSmart,
-            });
-            var value = RichText(valueBbcode, TextServer.AutowrapMode.Off);
-            value.CustomMinimumSize = new Vector2(ForecastValueWidth, 0);
-            value.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-            row.AddChild(value);
+            var row = SharedUi.KeyValueRow.Initialize().Instantiate<SharedUi.KeyValueRow>();
+            row.SetRich(name, valueBbcode, ForecastValueWidth);
+            row.EnableCaptionAutowrap();
             return row;
         }
 
@@ -1086,7 +1065,8 @@ namespace Crafting.Source.UIElements
         };
 
         /// <summary>Compact horizontal slot-row content (owner request 2026-07-24 — the tall square
-        /// cards ate the bench): icon on the left, name, have/need on the right.</summary>
+        /// cards ate the bench): icon on the left, name, have/need on the right. The row itself is
+        /// the shared IconLabelRow; the margin and mouse transparency stay this card's concerns.</summary>
         private static Control CardContent(Texture2D? icon, string name, string? count, bool countMet)
         {
             var margin = new MarginContainer { MouseFilter = MouseFilterEnum.Ignore };
@@ -1096,48 +1076,22 @@ namespace Crafting.Source.UIElements
             margin.AddThemeConstantOverride("margin_top", 4);
             margin.AddThemeConstantOverride("margin_bottom", 4);
 
-            var content = new HBoxContainer
-            {
-                MouseFilter = MouseFilterEnum.Ignore,
-                // The empty additive slot is a lone "+" — center it; real rows read left to right.
-                Alignment = icon == null && count == null ? BoxContainer.AlignmentMode.Center : BoxContainer.AlignmentMode.Begin,
-            };
-            content.AddThemeConstantOverride("separation", 8);
-            margin.AddChild(content);
-
-            if (icon != null)
-            {
-                content.AddChild(new TextureRect
-                {
-                    Texture = icon,
-                    CustomMinimumSize = s_cardIconSize,
-                    ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-                    StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-                    SizeFlagsVertical = SizeFlags.ShrinkCenter,
-                    MouseFilter = MouseFilterEnum.Ignore,
-                });
-            }
-
-            content.AddChild(new Label
-            {
-                Text = name,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                VerticalAlignment = VerticalAlignment.Center,
-                AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                MouseFilter = MouseFilterEnum.Ignore,
-            });
-
+            var row = SharedUi.IconLabelRow.Initialize().Instantiate<SharedUi.IconLabelRow>();
+            // The empty additive slot is a lone "+" — center it; real rows read left to right.
+            row.Alignment = icon == null && count == null ? BoxContainer.AlignmentMode.Center : BoxContainer.AlignmentMode.Begin;
+            row.Set(icon, name);
             if (count != null)
             {
-                content.AddChild(new Label
+                row.SetTrailing(new Label
                 {
                     Text = count,
                     VerticalAlignment = VerticalAlignment.Center,
                     ThemeTypeVariation = countMet ? null : "DimLabel",
-                    MouseFilter = MouseFilterEnum.Ignore,
                 });
             }
 
+            row.MakeMouseTransparent();
+            margin.AddChild(row);
             return margin;
         }
 

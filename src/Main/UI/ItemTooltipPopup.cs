@@ -226,17 +226,9 @@ namespace LastBreath.UI
                 ? $"{FormatParameter(parameter, baseValue)} {(localBonus >= 0 ? "+" : "−")} {FormatParameter(parameter, System.MathF.Abs(localBonus))}"
                 : FormatParameter(parameter, baseValue + localBonus);
 
-            var row = new HBoxContainer();
-            row.AddChild(new Label
-            {
-                Text = Localization.Localize(parameter.ToString()),
-                ThemeTypeVariation = "DimLabel",
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            });
-            var valueLabel = new Label { Text = text, HorizontalAlignment = HorizontalAlignment.Right };
-            valueLabel.AddThemeColorOverride("font_color",
+            var row = SharedUi.KeyValueRow.Initialize().Instantiate<SharedUi.KeyValueRow>();
+            row.Set(Localization.Localize(parameter.ToString()), text,
                 locallyModified ? Color.FromHtml(TextPalette.Number) : s_baseStatColor);
-            row.AddChild(valueLabel);
             _baseStats?.AddChild(row);
         }
 
