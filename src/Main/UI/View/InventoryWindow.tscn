@@ -3,18 +3,6 @@
 [ext_resource type="Script" uid="uid://bi6bbowdumghk" path="res://Inventory/InventoryWindow.cs" id="1_plih6"]
 [ext_resource type="Script" uid="uid://b0dwbj6fjdgce" path="res://Inventory/EquipmentSlot.cs" id="2_eqslt"]
 
-[sub_resource type="StyleBoxFlat" id="doll_slot"]
-content_margin_left = 4.0
-content_margin_top = 4.0
-content_margin_right = 4.0
-content_margin_bottom = 4.0
-bg_color = Color(0.055, 0.05, 0.042, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.23, 0.2, 0.16, 1)
-
 [node name="InventoryWindow" type="Control" unique_id=1634708058 node_paths=PackedStringArray("_craftingButton", "_allStatsButton", "_sortButton", "_destroyButton", "_inventoryGrid", "_doll", "_stats", "_resists", "_search", "_typeFilter", "_chips", "_title", "_equipHeader", "_statsHeader")]
 layout_mode = 3
 anchors_preset = 15
@@ -51,6 +39,7 @@ mouse_filter = 2
 [node name="Panel" type="PanelContainer" parent="Center" unique_id=918931418]
 custom_minimum_size = Vector2(1620, 840)
 layout_mode = 2
+theme_type_variation = &"UmbralWindowPanel"
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=569449233]
 layout_mode = 2
@@ -131,7 +120,7 @@ offset_left = 16.0
 offset_top = 14.0
 offset_right = 80.0
 offset_bottom = 162.0
-theme_override_styles/panel = SubResource("doll_slot")
+theme_type_variation = &"DollSlotPanel"
 script = ExtResource("2_eqslt")
 Piece = 7
 _icon = NodePath("Icon")
@@ -158,7 +147,7 @@ offset_left = 116.0
 offset_top = 14.0
 offset_right = 180.0
 offset_bottom = 78.0
-theme_override_styles/panel = SubResource("doll_slot")
+theme_type_variation = &"DollSlotPanel"
 script = ExtResource("2_eqslt")
 Piece = 4
 _icon = NodePath("Icon")
@@ -186,7 +175,7 @@ offset_left = 212.0
 offset_top = 14.0
 offset_right = 276.0
 offset_bottom = 78.0
-theme_override_styles/panel = SubResource("doll_slot")
+theme_type_variation = &"DollSlotPanel"
 script = ExtResource("2_eqslt")
 Piece = 6
 _icon = NodePath("Icon")
@@ -214,7 +203,7 @@ offset_left = 116.0
 offset_top = 90.0
 offset_right = 180.0
 offset_bottom = 238.0
-theme_override_styles/panel = SubResource("doll_slot")
+theme_type_variation = &"DollSlotPanel"
 script = ExtResource("2_eqslt")
 _icon = NodePath("Icon")
 
@@ -241,7 +230,7 @@ offset_left = 184.0
 offset_top = 104.0
 offset_right = 220.0
 offset_bottom = 140.0
-theme_override_styles/panel = SubResource("doll_slot")
+theme_type_variation = &"DollSlotPanel"
 script = ExtResource("2_eqslt")
 Piece = 5
 _icon = NodePath("Icon")
@@ -269,7 +258,7 @@ offset_left = 80.0
 offset_top = 192.0
 offset_right = 116.0
 offset_bottom = 228.0
-theme_override_styles/panel = SubResource("doll_slot")
+theme_type_variation = &"DollSlotPanel"
 script = ExtResource("2_eqslt")
 Piece = 8
 _icon = NodePath("Icon")
@@ -297,7 +286,7 @@ offset_left = 184.0
 offset_top = 192.0
 offset_right = 220.0
 offset_bottom = 228.0
-theme_override_styles/panel = SubResource("doll_slot")
+theme_type_variation = &"DollSlotPanel"
 script = ExtResource("2_eqslt")
 Piece = 9
 _icon = NodePath("Icon")
@@ -325,7 +314,7 @@ offset_left = 16.0
 offset_top = 258.0
 offset_right = 80.0
 offset_bottom = 322.0
-theme_override_styles/panel = SubResource("doll_slot")
+theme_type_variation = &"DollSlotPanel"
 script = ExtResource("2_eqslt")
 Piece = 2
 _icon = NodePath("Icon")
@@ -353,7 +342,7 @@ offset_left = 116.0
 offset_top = 262.0
 offset_right = 180.0
 offset_bottom = 294.0
-theme_override_styles/panel = SubResource("doll_slot")
+theme_type_variation = &"DollSlotPanel"
 script = ExtResource("2_eqslt")
 Piece = 1
 _icon = NodePath("Icon")
@@ -381,7 +370,7 @@ offset_left = 212.0
 offset_top = 258.0
 offset_right = 276.0
 offset_bottom = 322.0
-theme_override_styles/panel = SubResource("doll_slot")
+theme_type_variation = &"DollSlotPanel"
 script = ExtResource("2_eqslt")
 Piece = 3
 _icon = NodePath("Icon")

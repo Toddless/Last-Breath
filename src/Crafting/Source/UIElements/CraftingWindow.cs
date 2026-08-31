@@ -37,10 +37,11 @@ namespace Crafting.Source.UIElements
 
         [Export] private Tree? _tree;
         [Export] private LineEdit? _search;
-        [Export] private Button? _close, _actionButton;
+        [Export] private SharedUi.WindowHeader? _header;
+        [Export] private Button? _actionButton;
         [Export] private Button? _modeCreate, _modeUpgrade, _modeRecraft, _modeAscend;
         [Export] private TextureRect? _itemIcon;
-        [Export] private Label? _title, _listTitle, _itemName, _itemSubtitle, _previewTag, _requirementsHeader, _additivesHeader, _ascendWarning;
+        [Export] private Label? _listTitle, _itemName, _itemSubtitle, _previewTag, _requirementsHeader, _additivesHeader, _ascendWarning;
         [Export] private VBoxContainer? _mods;
         [Export] private VBoxContainer? _requirements, _additives;
         [Export] private Label? _masteryLevel, _masteryXpLabel, _masteryTitle, _forecastHeader, _forecastHint;
@@ -77,7 +78,7 @@ namespace Crafting.Source.UIElements
         {
             _tree?.ItemSelected += OnRecipeSelected;
             _search?.TextChanged += _ => BuildTree();
-            _close?.Pressed += Close;
+            _header?.Closed += Close;
             _actionButton?.Pressed += OnActionPressed;
 
             _modeCreate?.Pressed += () => SwitchMode(CraftingMode.Create);
@@ -150,7 +151,7 @@ namespace Crafting.Source.UIElements
 
         private void LocalizeStaticLabels()
         {
-            _title?.Text = Localization.Localize("UI_Crafting");
+            _header?.SetTitle(Localization.Localize("UI_Crafting"));
             _requirementsHeader?.Text = Localization.Localize("UI_Craft_Requirements");
             _additivesHeader?.Text = Localization.Localize("UI_Craft_Additives");
             _ascendWarning?.Text = Localization.Localize("UI_Craft_AscendWarning");

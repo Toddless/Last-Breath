@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://betq124kfglyy"]
 
 [ext_resource type="Script" uid="uid://d3hl0n4arn8et" path="res://Addons/Crafting/UIElements/CraftingWindow.cs" id="1_1mud6"]
+[ext_resource type="PackedScene" uid="uid://q1mb3d00x8m8" path="res://Addons/SharedUi/WindowHeader.tscn" id="2_whead"]
 
-[node name="CraftingWindow" type="Control" unique_id=1206026266 node_paths=PackedStringArray("_tree", "_search", "_close", "_actionButton", "_modeCreate", "_modeUpgrade", "_modeRecraft", "_modeAscend", "_itemIcon", "_title", "_listTitle", "_itemName", "_itemSubtitle", "_previewTag", "_requirementsHeader", "_additivesHeader", "_ascendWarning", "_mods", "_requirements", "_additives", "_masteryLevel", "_masteryXpLabel", "_masteryTitle", "_forecastHeader", "_forecastHint", "_masteryXpBar", "_masteryChips", "_forecastBox", "_forecastRows", "_itemHeader", "_poolBox", "_poolHeader", "_poolCounter", "_poolList")]
+[node name="CraftingWindow" type="Control" unique_id=1206026266 node_paths=PackedStringArray("_tree", "_search", "_header", "_actionButton", "_modeCreate", "_modeUpgrade", "_modeRecraft", "_modeAscend", "_itemIcon", "_listTitle", "_itemName", "_itemSubtitle", "_previewTag", "_requirementsHeader", "_additivesHeader", "_ascendWarning", "_mods", "_requirements", "_additives", "_masteryLevel", "_masteryXpLabel", "_masteryTitle", "_forecastHeader", "_forecastHint", "_masteryXpBar", "_masteryChips", "_forecastBox", "_forecastRows", "_itemHeader", "_poolBox", "_poolHeader", "_poolCounter", "_poolList")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,14 +14,13 @@ mouse_filter = 2
 script = ExtResource("1_1mud6")
 _tree = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/RecipeTree")
 _search = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/Search")
-_close = NodePath("Center/Panel/Margin/Layout/Header/CloseBtn")
+_header = NodePath("Center/Panel/Margin/Layout/Header")
 _actionButton = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar/ActionBtn")
 _modeCreate = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ModeTabs/ModeCreate")
 _modeUpgrade = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ModeTabs/ModeUpgrade")
 _modeRecraft = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ModeTabs/ModeRecraft")
 _modeAscend = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ModeTabs/ModeAscend")
 _itemIcon = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Preview/ItemHeader/ItemIcon")
-_title = NodePath("Center/Panel/Margin/Layout/Header/Title")
 _listTitle = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/ListTitle")
 _itemName = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Preview/ItemHeader/ItemInfo/ItemName")
 _itemSubtitle = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Preview/ItemHeader/ItemInfo/ItemSubtitle")
@@ -58,6 +58,7 @@ mouse_filter = 2
 [node name="Panel" type="PanelContainer" parent="Center" unique_id=170032292]
 custom_minimum_size = Vector2(1460, 860)
 layout_mode = 2
+theme_type_variation = &"UmbralWindowPanel"
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=402062292]
 layout_mode = 2
@@ -70,20 +71,8 @@ theme_override_constants/margin_bottom = 16
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/Layout" unique_id=818249052]
+[node name="Header" parent="Center/Panel/Margin/Layout" instance=ExtResource("2_whead")]
 layout_mode = 2
-
-[node name="Title" type="Label" parent="Center/Panel/Margin/Layout/Header" unique_id=958686701]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"HeaderLabel"
-text = "Crafting"
-
-[node name="CloseBtn" type="Button" parent="Center/Panel/Margin/Layout/Header" unique_id=710509801]
-custom_minimum_size = Vector2(36, 36)
-layout_mode = 2
-focus_mode = 0
-text = "X"
 
 [node name="Body" type="HBoxContainer" parent="Center/Panel/Margin/Layout" unique_id=438175333]
 layout_mode = 2
@@ -316,8 +305,7 @@ layout_mode = 2
 [node name="ForecastHeader" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox/ForecastMargin/ForecastLayout/ForecastHeaderRow" unique_id=1444729737]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.6, 0.5, 0.27, 1)
-theme_override_font_sizes/font_size = 11
+theme_type_variation = &"SectionLabel"
 
 [node name="ForecastHint" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox/ForecastMargin/ForecastLayout/ForecastHeaderRow" unique_id=1737436143]
 layout_mode = 2
@@ -347,8 +335,7 @@ layout_mode = 2
 [node name="PoolHeader" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn/PoolHeaderRow" unique_id=1789236129]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.6, 0.5, 0.27, 1)
-theme_override_font_sizes/font_size = 11
+theme_type_variation = &"SectionLabel"
 
 [node name="PoolCounter" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn/PoolHeaderRow" unique_id=1901773430]
 layout_mode = 2

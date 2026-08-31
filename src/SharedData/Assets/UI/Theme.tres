@@ -107,6 +107,18 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.541, 0.169, 0.2, 1)
 
+[sub_resource type="StyleBoxFlat" id="doll_slot_panel"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.055, 0.05, 0.042, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.341, 0.188, 1)
+
 [sub_resource type="StyleBoxFlat" id="hp_fill"]
 bg_color = Color(0.48, 0.11, 0.07, 1)
 
@@ -242,6 +254,8 @@ DangerButton/styles/normal = SubResource("danger_normal")
 DangerButton/styles/pressed = SubResource("danger_pressed")
 DimLabel/base_type = &"Label"
 DimLabel/colors/font_color = Color(0.55, 0.51, 0.44, 1)
+DollSlotPanel/base_type = &"PanelContainer"
+DollSlotPanel/styles/panel = SubResource("doll_slot_panel")
 HeaderLabel/base_type = &"Label"
 HeaderLabel/colors/font_color = Color(0.71, 0.54, 0.24, 1)
 HeaderLabel/font_sizes/font_size = 20
