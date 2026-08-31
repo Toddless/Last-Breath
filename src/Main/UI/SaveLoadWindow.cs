@@ -13,7 +13,7 @@ namespace LastBreath.UI
     [GlobalClass]
     public partial class SaveLoadWindow : Control, IWindow
     {
-        private const string ScenePath = "uid://cua8akmbr326r";
+        private const string ScenePath = "uid://cserxppd6wiui";
 
         [Export] private VBoxContainer? _slotsContainer;
         [Export] private Button? _closeButton;

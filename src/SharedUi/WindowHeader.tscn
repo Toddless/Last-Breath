@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://q1mb3d00x8m8"]
+
+[ext_resource type="Script" uid="uid://b4ahg8by1i5t2" path="res://Addons/SharedUi/WindowHeader.cs" id="1_whead"]
+
+[node name="WindowHeader" type="HBoxContainer" unique_id=1806345121 node_paths=PackedStringArray("_title", "_close")]
+theme_override_constants/separation = 8
+script = ExtResource("1_whead")
+_title = NodePath("Title")
+_close = NodePath("CloseBtn")
+
+[node name="Title" type="Label" parent="." unique_id=904471226]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"HeaderLabel"
+
+[node name="CloseBtn" type="Button" parent="." unique_id=1214117830]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+text = "X"

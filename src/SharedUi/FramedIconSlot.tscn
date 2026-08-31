@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://c6jc6tqvd4kk7"]
+
+[ext_resource type="Script" uid="uid://ct65yacne42er" path="res://Addons/SharedUi/FramedIconSlot.cs" id="1_ficon"]
+
+[node name="FramedIconSlot" type="PanelContainer" unique_id=602114887 node_paths=PackedStringArray("_icon")]
+theme_type_variation = &"TierFrame"
+script = ExtResource("1_ficon")
+_icon = NodePath("Icon")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1055132900]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5

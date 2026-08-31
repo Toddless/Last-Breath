@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://3eq8b8du6pr5"]
+
+[ext_resource type="Script" uid="uid://bkapy527mcjy1" path="res://Addons/SharedUi/KeyValueRow.cs" id="1_kvrow"]
+
+[node name="KeyValueRow" type="HBoxContainer" unique_id=1113550241 node_paths=PackedStringArray("_caption", "_value")]
+theme_override_constants/separation = 12
+script = ExtResource("1_kvrow")
+_caption = NodePath("Caption")
+_value = NodePath("Value")
+
+[node name="Caption" type="Label" parent="." unique_id=707446881]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"DimLabel"
+
+[node name="Value" type="Label" parent="." unique_id=1902337509]
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+horizontal_alignment = 2

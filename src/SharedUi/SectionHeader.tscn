@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://buwn6bbogk42v"]
+
+[ext_resource type="Script" uid="uid://cp3fj135ku8ps" path="res://Addons/SharedUi/SectionHeader.cs" id="1_shead"]
+
+[sub_resource type="Gradient" id="grad_fade"]
+colors = PackedColorArray(0.42, 0.341, 0.188, 1, 0.42, 0.341, 0.188, 0)
+
+[sub_resource type="GradientTexture2D" id="grad_line"]
+gradient = SubResource("grad_fade")
+width = 256
+height = 1
+
+[node name="SectionHeader" type="HBoxContainer" unique_id=1084227311 node_paths=PackedStringArray("_title")]
+theme_override_constants/separation = 8
+script = ExtResource("1_shead")
+_title = NodePath("Title")
+
+[node name="Title" type="Label" parent="." unique_id=1204553921]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+
+[node name="Line" type="TextureRect" parent="." unique_id=1585220468]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+texture = SubResource("grad_line")
+expand_mode = 1
