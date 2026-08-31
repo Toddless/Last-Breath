@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://dcfjvgbwrdkh"]
+[gd_scene format=3 uid="uid://dcfjvgbwrdkh"]
 
 [ext_resource type="Script" uid="uid://d0kjadxy0k5uy" path="res://Addons/SharedUi/TagRow.cs" id="1_tagrw"]
 

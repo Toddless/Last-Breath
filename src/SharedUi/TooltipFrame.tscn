@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://bkfc46l6wnkxy"]
+[gd_scene format=3 uid="uid://bkfc46l6wnkxy"]
 
 [ext_resource type="Script" uid="uid://d0taptoo3su1t" path="res://Addons/SharedUi/TooltipFrame.cs" id="1_tframe"]
 

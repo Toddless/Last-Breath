@@ -1966,6 +1966,55 @@ msgstr "Cost: {Value} {Resource}"
 msgid "UI_AbilityCooldown"
 msgstr "Cooldown: {Value|turn|turns}"
 
+# Ability tooltip card (Umbral scroll): captions, bare values, target wording
+msgid "UI_AbilityCostValue"
+msgstr "{Value} {Resource}"
+
+msgid "UI_AbilityCooldownValue"
+msgstr "{Value|turn|turns}"
+
+msgid "UI_AbilityTarget"
+msgstr "Target"
+
+msgid "UI_AbilityCostCaption"
+msgstr "Cost"
+
+msgid "UI_AbilityCooldownCaption"
+msgstr "Cooldown"
+
+msgid "UI_AbilityTags"
+msgstr "Tags"
+
+msgid "UI_AbilityStages"
+msgstr "Stages"
+
+msgid "UI_AbilityTargetSelf"
+msgstr "Self"
+
+msgid "UI_AbilityTargetEnemy"
+msgstr "Enemy"
+
+msgid "UI_AbilityTargetAlly"
+msgstr "Ally"
+
+msgid "UI_AbilityTargetEnemies"
+msgstr "Up to {Value} enemies"
+
+msgid "UI_AbilityTargetAllies"
+msgstr "Up to {Value} allies"
+
+msgid "UI_AbilityTargetRandomEnemy"
+msgstr "Random enemy"
+
+msgid "UI_AbilityTargetRandomAlly"
+msgstr "Random ally"
+
+msgid "UI_AbilityTargetRandomEnemies"
+msgstr "{Value} random enemies"
+
+msgid "UI_AbilityTargetRandomAllies"
+msgstr "{Value} random allies"
+
 # ------------------------------
 # Notifications
 # ------------------------------

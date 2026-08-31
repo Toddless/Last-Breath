@@ -84,17 +84,17 @@ namespace Battle.Source.UIElements
         }
 
         /// <summary>The ability's own card on hover — the same one the wheel's node popup and the battle
-        /// bar print. The row itself has no field for the tags, so they are shown here and only here; the
-        /// meta stays the subtitle it already is beside the name.</summary>
+        /// bar print, on the card's own popup. A row whose card says nothing beyond its name (an unowned
+        /// husk holding augments, tagless and descriptionless) still shows none.</summary>
         private IPopup? ShowAbilityTooltip()
         {
             if (_view == null || _windows == null) return null;
 
             AbilityCard card = AbilityText.Card(_view);
             if (card.Details.Length == 0) return null;
-            if (_windows.ShowPopup(typeof(TextTooltipPopup)) is not TextTooltipPopup popup) return null;
+            if (_windows.ShowPopup(typeof(AbilityTooltipPopup)) is not AbilityTooltipPopup popup) return null;
 
-            popup.Show(card.Name, card.MetaLine, card.Details);
+            popup.Show(card, _view.Icon);
             return popup;
         }
     }

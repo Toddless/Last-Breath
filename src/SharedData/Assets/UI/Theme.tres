@@ -59,6 +59,54 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.3, 0.23, 0.14, 1)
 
+[sub_resource type="StyleBoxFlat" id="danger_disabled"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.11, 0.06, 0.065, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.13, 0.15, 1)
+
+[sub_resource type="StyleBoxFlat" id="danger_hover"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.29, 0.11, 0.13, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.65, 0.23, 0.26, 1)
+
+[sub_resource type="StyleBoxFlat" id="danger_normal"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.227, 0.078, 0.094, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.541, 0.169, 0.2, 1)
+
+[sub_resource type="StyleBoxFlat" id="danger_pressed"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.16, 0.055, 0.067, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.541, 0.169, 0.2, 1)
+
 [sub_resource type="StyleBoxFlat" id="hp_fill"]
 bg_color = Color(0.48, 0.11, 0.07, 1)
 
@@ -122,30 +170,6 @@ border_width_top = 1
 border_width_right = 1
 border_color = Color(0.22, 0.17, 0.11, 1)
 
-[sub_resource type="StyleBoxFlat" id="tooltip_panel"]
-content_margin_left = 16.0
-content_margin_top = 16.0
-content_margin_right = 16.0
-content_margin_bottom = 16.0
-bg_color = Color(0.078, 0.063, 0.047, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.42, 0.341, 0.188, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-
-[sub_resource type="StyleBoxFlat" id="umbral_window_panel"]
-bg_color = Color(0.063, 0.051, 0.039, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.42, 0.341, 0.188, 1)
-
 [sub_resource type="StyleBoxFlat" id="tag_plate"]
 content_margin_left = 6.0
 content_margin_top = 2.0
@@ -170,53 +194,29 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.42, 0.341, 0.188, 1)
 
-[sub_resource type="StyleBoxFlat" id="danger_normal"]
-content_margin_left = 14.0
-content_margin_top = 6.0
-content_margin_right = 14.0
-content_margin_bottom = 6.0
-bg_color = Color(0.227, 0.078, 0.094, 1)
+[sub_resource type="StyleBoxFlat" id="tooltip_panel"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.078, 0.063, 0.047, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.541, 0.169, 0.2, 1)
+border_color = Color(0.42, 0.341, 0.188, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
-[sub_resource type="StyleBoxFlat" id="danger_hover"]
-content_margin_left = 14.0
-content_margin_top = 6.0
-content_margin_right = 14.0
-content_margin_bottom = 6.0
-bg_color = Color(0.29, 0.11, 0.13, 1)
+[sub_resource type="StyleBoxFlat" id="umbral_window_panel"]
+bg_color = Color(0.063, 0.051, 0.039, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.65, 0.23, 0.26, 1)
-
-[sub_resource type="StyleBoxFlat" id="danger_pressed"]
-content_margin_left = 14.0
-content_margin_top = 6.0
-content_margin_right = 14.0
-content_margin_bottom = 6.0
-bg_color = Color(0.16, 0.055, 0.067, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.541, 0.169, 0.2, 1)
-
-[sub_resource type="StyleBoxFlat" id="danger_disabled"]
-content_margin_left = 14.0
-content_margin_top = 6.0
-content_margin_right = 14.0
-content_margin_bottom = 6.0
-bg_color = Color(0.11, 0.06, 0.065, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.3, 0.13, 0.15, 1)
+border_color = Color(0.42, 0.341, 0.188, 1)
 
 [resource]
 default_font_size = 15

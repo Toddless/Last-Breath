@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://buwn6bbogk42v"]
+[gd_scene format=3 uid="uid://buwn6bbogk42v"]
 
 [ext_resource type="Script" uid="uid://cp3fj135ku8ps" path="res://Addons/SharedUi/SectionHeader.cs" id="1_shead"]
 

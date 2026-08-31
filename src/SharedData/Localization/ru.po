@@ -1713,6 +1713,55 @@ msgstr ""
 msgid "UI_AbilityCooldown"
 msgstr ""
 
+# Карточка способности (свиток Umbral): подписи, голые значения, словарь цели
+msgid "UI_AbilityCostValue"
+msgstr ""
+
+msgid "UI_AbilityCooldownValue"
+msgstr ""
+
+msgid "UI_AbilityTarget"
+msgstr ""
+
+msgid "UI_AbilityCostCaption"
+msgstr ""
+
+msgid "UI_AbilityCooldownCaption"
+msgstr ""
+
+msgid "UI_AbilityTags"
+msgstr ""
+
+msgid "UI_AbilityStages"
+msgstr ""
+
+msgid "UI_AbilityTargetSelf"
+msgstr ""
+
+msgid "UI_AbilityTargetEnemy"
+msgstr ""
+
+msgid "UI_AbilityTargetAlly"
+msgstr ""
+
+msgid "UI_AbilityTargetEnemies"
+msgstr ""
+
+msgid "UI_AbilityTargetAllies"
+msgstr ""
+
+msgid "UI_AbilityTargetRandomEnemy"
+msgstr ""
+
+msgid "UI_AbilityTargetRandomAlly"
+msgstr ""
+
+msgid "UI_AbilityTargetRandomEnemies"
+msgstr ""
+
+msgid "UI_AbilityTargetRandomAllies"
+msgstr ""
+
 # ------------------------------
 # Способности (тексты Todd, 2026-07-07)
 # ------------------------------

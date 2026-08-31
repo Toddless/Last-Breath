@@ -5,6 +5,7 @@ namespace Core.Views.UI
     using System.Linq;
     using Battle.Abilities;
     using Enums;
+    using Godot;
     using Localization;
 
     /// <summary>
@@ -22,6 +23,14 @@ namespace Core.Views.UI
 
         /// <summary>The wait between casts, templated.</summary>
         public const string CooldownKey = "UI_AbilityCooldown";
+
+        /// <summary>The cast price as a bare value ("30 Mana") — the wording of a card that already
+        /// carries its own "cost" caption and must not say the word twice.</summary>
+        public const string CostValueKey = "UI_AbilityCostValue";
+
+        /// <summary>The wait as a bare value ("3 turns") — the twin of <see cref="CostValueKey"/> for a
+        /// card whose caption already says "cooldown".</summary>
+        public const string CooldownValueKey = "UI_AbilityCooldownValue";
 
         /// <summary>The placeholder both templates put their number in.</summary>
         public const string ValuePlaceholder = "Value";
@@ -48,10 +57,60 @@ namespace Core.Views.UI
             AbilityTags.Cost, AbilityTags.Cooldown, AbilityTags.Scale, AbilityTags.Effect, AbilityTags.Activation,
         };
 
+        /// <summary>The two genus tags a card's subtitle is allowed to read as "what this cast IS", in
+        /// the order they win when an ability carries both.</summary>
+        private static readonly string[] s_kindTags = [AbilityTags.Spell, AbilityTags.Attack];
+
         /// <summary>The whole card of one ability, read off the answer the socket sheet gives — the one
         /// place cost, cooldown, tags and the live description are decided.</summary>
         public static AbilityCard Card(AbilitySocketRowView view) =>
-            new(view.DisplayName, MetaLine(view.Cost, view.Cooldown), TagText.Line(Printed(view.Tags)), view.Description);
+            new(view.DisplayName, MetaLine(view.Cost, view.Cooldown), TagText.Line(Printed(view.Tags)), view.Description)
+            {
+                Kind = KindOf(view.Tags),
+                Target = view.Target,
+                CostValue = view.CostValue,
+                CostPool = view.CostPool,
+                CooldownTurns = view.CooldownTurns,
+                Tags = TagText.Words(Printed(view.Tags)),
+                Icon = view.Icon,
+            };
+
+        /// <summary>The same card read off a LIVE ability — the battle bar holds the instance itself and
+        /// has no sheet answer to go through. The two assemblies word every field through the same lines,
+        /// so the bar's tooltip and the sheet's cannot drift apart.</summary>
+        /// <param name="target">Whom the cast lands on, already worded — the wording knows the concrete
+        /// targeting strategies, which live beside them and not here. Empty hides the line.</param>
+        public static AbilityCard Card(IAbility ability, string target = "") =>
+            new(ability.DisplayName,
+                MetaLine(CostLine(ability.CostValue, ability.CostType), CooldownLine(ability.Cooldown)),
+                TagText.Line(Printed(ability.Tags)),
+                ability.Description)
+            {
+                Kind = KindOf(ability.Tags),
+                Target = target,
+                CostValue = ability.CostValue,
+                CostPool = ability.CostType,
+                CooldownTurns = ability.Cooldown,
+                Tags = TagText.Words(Printed(ability.Tags)),
+                Icon = ability.Icon,
+            };
+
+        /// <summary>What the cast IS, in one word — the genus the card prints as its subtitle. Read off
+        /// the tags rather than declared anew: an ability already says whether it is a spell or an
+        /// attack, and a second declaration would be free to disagree. Scanned in the author's tag order
+        /// so an ability carrying both genera is what its author put first; nothing at all for a cast
+        /// that is neither, and the subtitle then hides.</summary>
+        public static string KindOf(IReadOnlyList<string>? tags)
+        {
+            if (tags is not { Count: > 0 }) return string.Empty;
+
+            foreach (string tag in tags)
+                foreach (string kind in s_kindTags)
+                    if (string.Equals(tag, kind, StringComparison.OrdinalIgnoreCase))
+                        return Localization.Localize(TagText.KeyOf(kind));
+
+            return string.Empty;
+        }
 
         /// <summary>The cast price, worded.</summary>
         public static string CostLine(int value, Costs resource) =>
@@ -69,6 +128,25 @@ namespace Core.Views.UI
             turns <= 0f
                 ? string.Empty
                 : Localization.Render(CooldownKey, new Dictionary<string, object?>
+                {
+                    [ValuePlaceholder] = turns,
+                });
+
+        /// <summary>The cast price as a bare value ("30 Mana"), for the card that captions the line
+        /// itself.</summary>
+        public static string CostValueText(int value, Costs resource) =>
+            Localization.Render(CostValueKey, new Dictionary<string, object?>
+            {
+                [ValuePlaceholder] = value,
+                [ResourcePlaceholder] = Localization.Localize(resource.ToString()),
+            });
+
+        /// <summary>The wait as a bare value ("3 turns"), for the card that captions the line itself —
+        /// and nothing for a cast that has none, same as <see cref="CooldownLine"/>.</summary>
+        public static string CooldownValueText(float turns) =>
+            turns <= 0f
+                ? string.Empty
+                : Localization.Render(CooldownValueKey, new Dictionary<string, object?>
                 {
                     [ValuePlaceholder] = turns,
                 });
@@ -109,6 +187,11 @@ namespace Core.Views.UI
             tags is not { Count: > 0 }
                 ? string.Empty
                 : string.Join(Separator, tags.Select(tag => Localization.Localize(KeyOf(tag))));
+
+        /// <summary>The same words as a list — for a surface drawing each tag as a plate of its own
+        /// rather than gluing them into a sentence.</summary>
+        public static IReadOnlyList<string> Words(IReadOnlyList<string>? tags) =>
+            tags is not { Count: > 0 } ? [] : [.. tags.Select(tag => Localization.Localize(KeyOf(tag)))];
     }
 
     /// <summary>
@@ -122,6 +205,40 @@ namespace Core.Views.UI
     /// <param name="Description">What it does, with everything seated on it already counted in.</param>
     public readonly record struct AbilityCard(string Name, string MetaLine, string TagsLine, string Description)
     {
+        /// <summary>What the cast IS in one word ("Spell", "Attack"), for the subtitle under the name.
+        /// Empty where the tags name no genus — the subtitle then hides. The glued lines above do not
+        /// carry it and did not change.</summary>
+        public string Kind { get; init; } = string.Empty;
+
+        /// <summary>Whom the cast lands on, worded. Empty where nobody worded it (a surface built off
+        /// the sheet's answer before the answer learned targets, or a strategy the wording does not
+        /// know), and the line then hides.</summary>
+        public string Target { get; init; } = string.Empty;
+
+        /// <summary>The bare cast price. Meaningless without <see cref="CostPool"/> — a card with no
+        /// pool has no price to print.</summary>
+        public int CostValue { get; init; } = 0;
+
+        /// <summary>What the price is paid in, or null for a card that knows no price (an unowned row
+        /// with no instance behind it). The pool is what tints the printed value.</summary>
+        public Costs? CostPool { get; init; } = null;
+
+        /// <summary>The wait between casts in whole turns; zero for a cast that has none, and the line
+        /// then hides.</summary>
+        public float CooldownTurns { get; init; } = 0f;
+
+        /// <summary>The printed tags as worded WORDS, one per plate — the same set
+        /// <see cref="TagsLine"/> glues into its sentence.</summary>
+        public IReadOnlyList<string> Tags { get; init; } = [];
+
+        /// <summary>The staged readings of a cast that escalates by stages, one line per stage, in
+        /// stage order. Empty until the domain words stages structurally — no ability does today, and
+        /// the block then hides.</summary>
+        public IReadOnlyList<string> Tiers { get; init; } = [];
+
+        /// <summary>The ability's art; null where it has none — the frame is drawn either way.</summary>
+        public Texture2D? Icon { get; init; } = null;
+
         /// <summary>Everything under the name as one stretch of text, for a surface carrying a single text
         /// field — the popup of a node on the wheel, whose subtitle is already spoken for. A missing part
         /// leaves no blank line behind it.</summary>

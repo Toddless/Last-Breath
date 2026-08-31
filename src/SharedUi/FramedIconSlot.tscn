@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://c6jc6tqvd4kk7"]
+[gd_scene format=3 uid="uid://c6jc6tqvd4kk7"]
 
 [ext_resource type="Script" uid="uid://ct65yacne42er" path="res://Addons/SharedUi/FramedIconSlot.cs" id="1_ficon"]
 

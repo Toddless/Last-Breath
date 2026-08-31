@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://bwqrh1s43klrj"]
+[gd_scene format=3 uid="uid://bwqrh1s43klrj"]
 
 [ext_resource type="Script" uid="uid://d2y25lx5n5r70" path="res://Addons/SharedUi/TierRow.cs" id="1_tierr"]
 

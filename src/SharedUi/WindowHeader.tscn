@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://q1mb3d00x8m8"]
+[gd_scene format=3 uid="uid://q1mb3d00x8m8"]
 
 [ext_resource type="Script" uid="uid://b4ahg8by1i5t2" path="res://Addons/SharedUi/WindowHeader.cs" id="1_whead"]
 

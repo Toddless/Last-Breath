@@ -124,7 +124,12 @@ namespace Battle.Source.RequestHandlers
                 _art(abilityId),
                 abilities.GetAbilityStance(abilityId),
                 owned != null,
-                [.. sockets.SocketsOf(abilityId).Select(socket => ToCell(owned, socket))]);
+                [.. sockets.SocketsOf(abilityId).Select(socket => ToCell(owned, socket))],
+                CostValue: reading?.CostValue ?? 0,
+                CostPool: reading?.CostType,
+                CooldownTurns: reading?.Cooldown ?? 0f,
+                // The strategy is nullable in practice (a stub instance in a walk); no strategy is no line.
+                Target: reading?.Targeting is { } targeting ? UIElements.AbilityTargetText.LineOf(targeting) : string.Empty);
         }
 
         /// <summary>

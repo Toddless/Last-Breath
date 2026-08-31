@@ -1,0 +1,106 @@
+[gd_scene format=3 uid="uid://bd4hw6yj2p8ka"]
+
+[ext_resource type="Script" uid="uid://bqv7atx3km2ne" path="res://Addons/Battle/UIElements/AbilityTooltipPopup.cs" id="1_abtip"]
+[ext_resource type="PackedScene" uid="uid://c6jc6tqvd4kk7" path="res://Addons/SharedUi/FramedIconSlot.tscn" id="2_icon"]
+[ext_resource type="PackedScene" uid="uid://3eq8b8du6pr5" path="res://Addons/SharedUi/KeyValueRow.tscn" id="3_kvrow"]
+[ext_resource type="PackedScene" uid="uid://buwn6bbogk42v" path="res://Addons/SharedUi/SectionHeader.tscn" id="4_shead"]
+[ext_resource type="PackedScene" uid="uid://dcfjvgbwrdkh" path="res://Addons/SharedUi/TagRow.tscn" id="5_tagrw"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_name"]
+font_size = 20
+font_color = Color(0.788, 0.659, 0.376, 1)
+
+[node name="AbilityTooltipPopup" type="Control" unique_id=1874203519 node_paths=PackedStringArray("_panel", "_iconSlot", "_name", "_kind", "_target", "_cost", "_cooldown", "_tagsHeader", "_tags", "_description", "_stagesHeader", "_stages", "_footnote")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_abtip")
+_panel = NodePath("Panel")
+_iconSlot = NodePath("Panel/Layout/Header/IconSlot")
+_name = NodePath("Panel/Layout/Header/Titles/Name")
+_kind = NodePath("Panel/Layout/Header/Titles/Kind")
+_target = NodePath("Panel/Layout/TargetRow")
+_cost = NodePath("Panel/Layout/CostRow")
+_cooldown = NodePath("Panel/Layout/CooldownRow")
+_tagsHeader = NodePath("Panel/Layout/TagsHeader")
+_tags = NodePath("Panel/Layout/Tags")
+_description = NodePath("Panel/Layout/Description")
+_stagesHeader = NodePath("Panel/Layout/StagesHeader")
+_stages = NodePath("Panel/Layout/Stages")
+_footnote = NodePath("Panel/Layout/Footnote")
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=1092837465]
+custom_minimum_size = Vector2(348, 0)
+layout_mode = 0
+mouse_filter = 2
+theme_type_variation = &"TooltipPanel"
+
+[node name="Layout" type="VBoxContainer" parent="Panel" unique_id=1550982371]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="Panel/Layout" unique_id=1310457286]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="IconSlot" parent="Panel/Layout/Header" instance=ExtResource("2_icon")]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="Titles" type="VBoxContainer" parent="Panel/Layout/Header" unique_id=1731205948]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="Name" type="Label" parent="Panel/Layout/Header/Titles" unique_id=1177093426]
+layout_mode = 2
+text = "Name"
+label_settings = SubResource("LabelSettings_name")
+autowrap_mode = 2
+
+[node name="Kind" type="Label" parent="Panel/Layout/Header/Titles" unique_id=1421745063]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Kind"
+
+[node name="TargetRow" parent="Panel/Layout" instance=ExtResource("3_kvrow")]
+layout_mode = 2
+
+[node name="CostRow" parent="Panel/Layout" instance=ExtResource("3_kvrow")]
+layout_mode = 2
+
+[node name="CooldownRow" parent="Panel/Layout" instance=ExtResource("3_kvrow")]
+layout_mode = 2
+
+[node name="TagsHeader" parent="Panel/Layout" instance=ExtResource("4_shead")]
+layout_mode = 2
+
+[node name="Tags" parent="Panel/Layout" instance=ExtResource("5_tagrw")]
+layout_mode = 2
+
+[node name="Description" type="RichTextLabel" parent="Panel/Layout" unique_id=1662230944]
+custom_minimum_size = Vector2(316, 0)
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = "Description"
+fit_content = true
+
+[node name="StagesHeader" parent="Panel/Layout" instance=ExtResource("4_shead")]
+layout_mode = 2
+
+[node name="Stages" type="VBoxContainer" parent="Panel/Layout" unique_id=1284391057]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Footnote" type="RichTextLabel" parent="Panel/Layout" unique_id=1935028467]
+custom_minimum_size = Vector2(316, 0)
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+fit_content = true

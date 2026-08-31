@@ -11,6 +11,9 @@ namespace Battle.Source.Abilities.Targeting
         public int MaxTargets => 1;
         public bool RequiresManualSelection => true;
 
+        /// <summary>Whose side the click lands on — read by the tooltip wording, decided here.</summary>
+        public TargetRelation Relation => relation;
+
         public IReadOnlyList<IFightable> GetValidTargets(IFightable caster, IBattleField field) =>
             relation.Resolve(caster, field);
     }

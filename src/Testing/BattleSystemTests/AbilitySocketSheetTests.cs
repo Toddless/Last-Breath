@@ -1,7 +1,9 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source.Abilities;
+    using Battle.Source.Abilities.Targeting;
     using Battle.Source.RequestHandlers;
+    using Battle.Source.UIElements;
     using Battle.Source.UIElements.PassiveWheel;
     using Core.Battle;
     using Core.Battle.Abilities;
@@ -264,6 +266,106 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual("Cost: 5 Mana", card.MetaLine, "an absent cooldown left its separator dangling");
             Assert.AreEqual(string.Empty, card.TagsLine);
             Assert.AreEqual($"Cost: 5 Mana\n{card.Description}", card.Body);
+        }
+
+        [TestMethod]
+        public void TheStructuredFieldsRideBesideTheGluedLinesWithoutMovingThem()
+        {
+            // The scroll popup reads the card's structured half; the wheel's node body and the old glued
+            // surfaces read the lines. One card serves both, so filling the first must not move the second.
+            AbilitySocketRowView view = Row("Cost: 5 Mana", "Cooldown: 3 turns", [AbilityTags.Spell, AbilityTags.Fire]) with
+            {
+                CostValue = 5,
+                CostPool = Costs.Mana,
+                CooldownTurns = 3f,
+                Target = "worded_target",
+            };
+
+            AbilityCard card = AbilityText.Card(view);
+
+            // The glued lines are exactly what they were before the structured half existed.
+            Assert.AreEqual("Cost: 5 Mana · Cooldown: 3 turns", card.MetaLine, "the structured half moved the meta line");
+            Assert.AreEqual($"{TagText.KeyOf(AbilityTags.Spell)}, {TagText.KeyOf(AbilityTags.Fire)}", card.TagsLine,
+                "the structured half moved the tags line");
+            Assert.AreEqual($"{card.MetaLine}\n{card.TagsLine}\n{card.Description}", card.Body,
+                "the structured half moved the body the wheel prints");
+
+            // The structured half carries what the scroll draws.
+            Assert.AreEqual(5, card.CostValue);
+            Assert.AreEqual(Costs.Mana, card.CostPool);
+            Assert.AreEqual(3f, card.CooldownTurns);
+            Assert.AreEqual("worded_target", card.Target);
+            Assert.AreEqual(TagText.KeyOf(AbilityTags.Spell), card.Kind, "the genus tag does not reach the subtitle");
+            CollectionAssert.AreEqual(
+                new[] { TagText.KeyOf(AbilityTags.Spell), TagText.KeyOf(AbilityTags.Fire) }, card.Tags.ToArray(),
+                "the plates carry different words than the line");
+            Assert.AreEqual(0, card.Tiers.Count, "nobody words stages structurally yet, and inventing them is worse than hiding the block");
+        }
+
+        [TestMethod]
+        public void ACardThatKnowsNoPriceAndNoGenusHidesRatherThanInvents()
+        {
+            // The unowned husk: worded halves empty, structured halves absent. Null pool is how the
+            // scroll tells "costs nothing" from "knows no cost", and no genus tag is no subtitle.
+            AbilityCard card = AbilityText.Card(Row(string.Empty, string.Empty, [AbilityTags.Poison]));
+
+            Assert.IsNull(card.CostPool, "a row with no instance behind it invented a pool");
+            Assert.AreEqual(0f, card.CooldownTurns);
+            Assert.AreEqual(string.Empty, card.Target);
+            Assert.AreEqual(string.Empty, card.Kind, "a cast that is neither spell nor attack wears a genus anyway");
+        }
+
+        [TestMethod]
+        public void TheLiveCardOfTheBattleBarIsTheSheetsCardToTheLetter()
+        {
+            // The battle bar assembles its card from the live instance; the sheet assembles the same
+            // ability through its row. Two assemblies, one wording — this is the drift guard between them.
+            IAbility live = new SheetAbilityProvider().CreateAbility(OwnedAbility);
+
+            AbilityCard fromInstance = AbilityText.Card(live, target: "worded_target");
+            AbilityCard fromRow = AbilityText.Card(new AbilitySocketRowView(
+                OwnedAbility, live.DisplayName, live.Description,
+                AbilityText.CostLine(live.CostValue, live.CostType), AbilityText.CooldownLine(live.Cooldown),
+                live.Tags, null, Stance.Dexterity, IsOwned: true, [],
+                CostValue: live.CostValue, CostPool: live.CostType, CooldownTurns: live.Cooldown, Target: "worded_target"));
+
+            Assert.AreEqual(fromRow, fromInstance with { Icon = fromRow.Icon, Tags = fromRow.Tags },
+                "the bar's card and the sheet's card read the same cast two ways");
+            CollectionAssert.AreEqual(fromRow.Tags.ToArray(), fromInstance.Tags.ToArray());
+        }
+
+        [TestMethod]
+        public void TheTargetLineWordsTheStrategiesItKnowsAndNothingItDoesNot()
+        {
+            // The wording knows the four shipped strategies by type; anything else — an authored NPC
+            // trick, a stub — reads as nothing, and the scroll then hides the line instead of guessing.
+            Assert.AreEqual(AbilityTargetText.SelfKey, AbilityTargetText.LineOf(new SelfTargeting()));
+            Assert.AreEqual(AbilityTargetText.EnemyKey, AbilityTargetText.LineOf(new SingleTargetTargeting(TargetRelation.Enemies)));
+            Assert.AreEqual(AbilityTargetText.AllyKey, AbilityTargetText.LineOf(new SingleTargetTargeting(TargetRelation.Allies)));
+            Assert.AreEqual(AbilityTargetText.EnemiesKey, AbilityTargetText.LineOf(new FewTargetsTargeting(TargetRelation.Enemies, 3)));
+            Assert.AreEqual(AbilityTargetText.EnemyKey, AbilityTargetText.LineOf(new FewTargetsTargeting(TargetRelation.Enemies, 1)),
+                "a 'few' of one reads as 'up to 1' instead of as a single pick");
+            Assert.AreEqual(AbilityTargetText.RandomEnemyKey, AbilityTargetText.LineOf(new RandomTargetsTargeting(TargetRelation.Enemies, 1)));
+            Assert.AreEqual(AbilityTargetText.RandomAlliesKey, AbilityTargetText.LineOf(new RandomTargetsTargeting(TargetRelation.Allies, 2)));
+            Assert.AreEqual(string.Empty, AbilityTargetText.LineOf(new Mock<ITargetingStrategy>().Object),
+                "a strategy the wording does not know got a label anyway");
+            Assert.AreEqual(string.Empty, AbilityTargetText.LineOf(null));
+        }
+
+        [TestMethod]
+        public async Task TheRowCarriesTheStructuredPriceBesideTheWordedOne()
+        {
+            // The handler is where the structured half is read off the instance; a stub without a
+            // targeting strategy words no target rather than falling over.
+            var bench = new Bench();
+            bench.Own(OwnedAbility);
+
+            AbilitySocketRowView row = (await bench.Rows()).Single();
+
+            Assert.AreEqual(CostValue, row.CostValue);
+            Assert.AreEqual(Costs.Mana, row.CostPool);
+            Assert.AreEqual(0f, row.CooldownTurns);
+            Assert.AreEqual(string.Empty, row.Target, "a stub without a strategy worded a target anyway");
         }
 
         [TestMethod]

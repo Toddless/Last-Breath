@@ -1117,6 +1117,7 @@ namespace Battle.Source.UIElements.PassiveWheel
 
             PassiveNode? node = _document.Find(id);
             if (node == null) return null;
+            if (ShowAbilityCardTooltip(node) is { } abilityPopup) return abilityPopup;
             if (_windows.ShowPopup(typeof(TextTooltipPopup)) is not TextTooltipPopup popup) return null;
 
             var body = new StringBuilder();
@@ -1130,6 +1131,29 @@ namespace Battle.Source.UIElements.PassiveWheel
             popup.Show(PassiveNodeLines.TitleOf(node, _localization),
                 Localization.Localize($"{PassiveWheelText.KindPrefix}{node.Kind}"), body.ToString());
 
+            return popup;
+        }
+
+        /// <summary>
+        /// The card popup for the one node of an ability's constellation that reads the ability out —
+        /// the unlock node with a known card (see <see cref="WheelAbilityText.AbilityBodyOf"/> for whose
+        /// border that is). What the NODE has to say beyond the ability — its own lines and, while a
+        /// return is being planned, the refund arithmetic — rides under the card as the footnote, so the
+        /// new popup loses nothing the old one printed. Null where this is not that node, or where the
+        /// cards have not arrived (the battle sandbox): the caller then walks the old text road.
+        /// </summary>
+        private IPopup? ShowAbilityCardTooltip(PassiveNode node)
+        {
+            if (string.IsNullOrWhiteSpace(node.AbilityId) || !NodeKindRules.UnlocksAbility(node.Kind)) return null;
+            if (!_abilityCards.TryGetValue(node.AbilityId, out AbilityCard card)) return null;
+            if (_windows?.ShowPopup(typeof(AbilityTooltipPopup)) is not AbilityTooltipPopup popup) return null;
+
+            var footnote = new StringBuilder();
+            foreach (PassiveNodeLine line in PassiveNodeLines.Of(node, _modifiers, _knobs, _localization, TextFormat.Rich, _skills))
+                Append(footnote, line.Text);
+            AppendReturn(footnote, node);
+
+            popup.Show(card, card.Icon, footnote.Length == 0 ? null : footnote.ToString());
             return popup;
         }
 

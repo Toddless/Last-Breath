@@ -157,6 +157,8 @@
             uiElementManager.RegisterWindowFactory(typeof(MartialArtMasteryWindow), () => MartialArtMasteryWindow.Initialize().Instantiate<MartialArtMasteryWindow>(), UiContext.World);
             RegisterPassiveWheel(uiElementManager);
             uiElementManager.RegisterPopupFactory(typeof(TextTooltipPopup), () => TextTooltipPopup.Initialize().Instantiate<TextTooltipPopup>());
+            // The ability card's own popup; everything that is not an ability stays on the text one above.
+            uiElementManager.RegisterPopupFactory(typeof(AbilityTooltipPopup), () => AbilityTooltipPopup.Initialize().Instantiate<AbilityTooltipPopup>());
             uiElementManager.RegisterPopupFactory(typeof(NpcInspectPopup), () => new NpcInspectPopup()); // thin wrapper; the card inside is the shared CharacterBar scene
         }
 

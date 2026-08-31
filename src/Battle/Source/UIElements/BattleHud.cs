@@ -125,21 +125,16 @@
 
         private static string SpeedLabel(float speed) => $"×{speed:0}";
 
+        /// <summary>The ability card of the cast under the cursor, on the card's own popup — assembled
+        /// from the LIVE instance the button holds, augments and all, through the same card the socket
+        /// sheet and the passive wheel print. The icon is the very texture the button draws.</summary>
         private IPopup? ShowAbilityTooltip(AbilityButton slot)
         {
             if (slot.CurrentAbility is not { } ability) return null;
-            var popup = _uiElementProvider?.ShowPopup(typeof(TextTooltipPopup)) as TextTooltipPopup;
-            popup?.Show(ability.DisplayName, AbilityInfoLine(ability), ability.Description);
+            var popup = _uiElementProvider?.ShowPopup(typeof(AbilityTooltipPopup)) as AbilityTooltipPopup;
+            popup?.Show(AbilityText.Card(ability, AbilityTargetText.LineOf(ability.Targeting)), ability.Icon);
             return popup;
         }
-
-        /// <summary>The price and the wait of the cast under the cursor, worded by the same card the socket
-        /// sheet and the passive wheel print — the bar used to spell both out for itself and read a resource
-        /// out in English wherever the game was translated.</summary>
-        private static string AbilityInfoLine(Core.Battle.Abilities.IAbility ability) =>
-            AbilityText.MetaLine(
-                AbilityText.CostLine(ability.CostValue, ability.CostType),
-                AbilityText.CooldownLine(ability.Cooldown));
 
         private IPopup? ShowStanceTooltip(Stance stance)
         {

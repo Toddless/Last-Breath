@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://dh4wepgj3g1sw"]
+[gd_scene format=3 uid="uid://dh4wepgj3g1sw"]
 
 [ext_resource type="Script" uid="uid://4jpi11uj83ct" path="res://Addons/SharedUi/TagPlate.cs" id="1_tagpl"]
 

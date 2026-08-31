@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://3eq8b8du6pr5"]
+[gd_scene format=3 uid="uid://3eq8b8du6pr5"]
 
 [ext_resource type="Script" uid="uid://bkapy527mcjy1" path="res://Addons/SharedUi/KeyValueRow.cs" id="1_kvrow"]
 
