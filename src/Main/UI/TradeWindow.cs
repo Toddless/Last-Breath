@@ -27,11 +27,10 @@ namespace LastBreath.UI
     {
         private const string UID = "uid://cix0yesodqrxr";
 
-        [Export] private Label? _title;
+        [Export] private SharedUi.WindowHeader? _header;
         [Export] private Label? _goldLabel;
         [Export] private VBoxContainer? _offersContainer;
         [Export] private GridContainer? _inventoryGrid;
-        [Export] private Button? _closeButton;
 
         private IGameMessageBus? _messageBus;
         private IInventory? _inventory;
@@ -54,7 +53,7 @@ namespace LastBreath.UI
 
         public override void _Ready()
         {
-            _closeButton?.Pressed += Close;
+            _header?.Closed += Close;
             Active = this;
         }
 
@@ -101,7 +100,7 @@ namespace LastBreath.UI
         public void SetTrader(string traderId)
         {
             _traderId = traderId;
-            _title?.Text = Localization.Localize(traderId);
+            _header?.SetTitle(Localization.Localize(traderId));
             RefreshStock();
         }
 

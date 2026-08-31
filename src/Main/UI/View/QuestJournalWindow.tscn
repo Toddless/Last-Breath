@@ -23,6 +23,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"UmbralWindowPanel"
 
 [node name="Margin" type="MarginContainer" parent="Panel" unique_id=966532530]
 layout_mode = 2
@@ -47,7 +48,7 @@ theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="Panel/Margin/HBox/Details" unique_id=1805600201]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"TitleLabel"
 
 [node name="Body" type="RichTextLabel" parent="Panel/Margin/HBox/Details" unique_id=560004060]
 layout_mode = 2

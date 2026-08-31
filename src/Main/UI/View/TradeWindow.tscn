@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://cix0yesodqrxr"]
 
 [ext_resource type="Script" uid="uid://b4rx6pujdtcga" path="res://UI/TradeWindow.cs" id="1_jmo3o"]
+[ext_resource type="PackedScene" uid="uid://q1mb3d00x8m8" path="res://Addons/SharedUi/WindowHeader.tscn" id="2_whead"]
 
-[node name="TradeWindow" type="Control" unique_id=989308892 node_paths=PackedStringArray("_title", "_goldLabel", "_offersContainer", "_inventoryGrid", "_closeButton")]
+[node name="TradeWindow" type="Control" unique_id=989308892 node_paths=PackedStringArray("_header", "_goldLabel", "_offersContainer", "_inventoryGrid")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,11 +11,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_jmo3o")
-_title = NodePath("Center/Panel/Margin/Layout/Header/Title")
+_header = NodePath("Center/Panel/Margin/Layout/Header")
 _goldLabel = NodePath("Center/Panel/Margin/Layout/Header/Gold")
 _offersContainer = NodePath("Center/Panel/Margin/Layout/Body/ShelfPane/ShelfScroll/Offers")
 _inventoryGrid = NodePath("Center/Panel/Margin/Layout/Body/BagPane/BagScroll/InventorySlots")
-_closeButton = NodePath("Center/Panel/Margin/Layout/Header/CloseBtn")
 
 [node name="Center" type="CenterContainer" parent="." unique_id=2038737203]
 layout_mode = 1
@@ -27,6 +27,7 @@ grow_vertical = 2
 [node name="Panel" type="PanelContainer" parent="Center" unique_id=90690975]
 custom_minimum_size = Vector2(1180, 680)
 layout_mode = 2
+theme_type_variation = &"UmbralWindowPanel"
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=516706558]
 layout_mode = 2
@@ -39,24 +40,14 @@ theme_override_constants/margin_bottom = 16
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/Layout" unique_id=1723135757]
+[node name="Header" parent="Center/Panel/Margin/Layout" instance=ExtResource("2_whead")]
 layout_mode = 2
-theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="Center/Panel/Margin/Layout/Header" unique_id=2038887799]
+[node name="Gold" type="Label" parent="Center/Panel/Margin/Layout/Header" unique_id=777915067 index="1"]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"HeaderLabel"
-text = "Trader"
-
-[node name="Gold" type="Label" parent="Center/Panel/Margin/Layout/Header" unique_id=777915067]
-layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ValueLabel"
 text = "Gold: 0"
-
-[node name="CloseBtn" type="Button" parent="Center/Panel/Margin/Layout/Header" unique_id=1965692330]
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-text = "X"
 
 [node name="Body" type="HBoxContainer" parent="Center/Panel/Margin/Layout" unique_id=1443991966]
 layout_mode = 2
