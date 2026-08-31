@@ -87,7 +87,6 @@ namespace Core.Entity
                 Fraction = EnumParser.ParseEnum<Fractions>(data.Fraction),
                 Stance = stance,
                 Parameters = ScaleParameters(data, levelFactor),
-                LevelFactor = levelFactor,
                 // Staged bosses learn per-stage sets via ApplyStage — a rolled/authored list would be discarded.
                 Abilities = stages.Count > 0 ? [] : PickAbilities(data, behaviorData, entityType, rarity),
                 Behavior = BuildProfile(behaviorData, EnumParser.ParseEnum<AiIntellect>(data.AiIntellect), data.FleeHealthThreshold, data.AbilityBehaviors),

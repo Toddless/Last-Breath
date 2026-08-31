@@ -30,71 +30,71 @@
         {
             "id": "Npc_Buff_Tier_Upgrade_To_Maximum",
             "modifiers": [
-                { "parameter": "CriticalChance", "type": "Flat", "value": 0.15 }
+                { "parameter": "CriticalChance", "type": "Increase", "value": 0.15 }
             ]
         },
         {
             "id": "Npc_Buff_Tier_Upgrade_By_Two",
             "modifiers": [
-                { "parameter": "CriticalChance", "type": "Flat", "value": 0.10 }
+                { "parameter": "CriticalChance", "type": "Increase", "value": 0.10 }
             ]
         },
         {
             "id": "Npc_Buff_Tier_Upgrade_By_One",
             "modifiers": [
-                { "parameter": "CriticalChance", "type": "Flat", "value": 0.05 }
+                { "parameter": "CriticalChance", "type": "Increase", "value": 0.05 }
             ]
         },
 
         {
             "id": "Npc_Buff_Guaranteed_Items_Crafting_Resource",
             "modifiers": [
-                { "parameter": "Armor", "type": "Flat", "value": 500 },
-                { "parameter": "Evade", "type": "Flat", "value": 500 }
+                { "parameter": "Armor", "type": "Increase", "value": 0.15 },
+                { "parameter": "Evade", "type": "Increase", "value": 0.15 }
             ]
         },
         {
             "id": "Npc_Buff_Guaranteed_Items_Crafting_Upgrade",
             "modifiers": [
-                { "parameter": "Health", "type": "Flat", "value": 200 }
+                { "parameter": "Health", "type": "Increase", "value": 0.15 }
             ]
         },
         {
             "id": "Npc_Buff_Guaranteed_Items_Equip",
             "modifiers": [
-                { "parameter": "PhysicalDamage", "type": "Flat", "value": 50 },
-                { "parameter": "SpellDamage", "type": "Flat", "value": 50 }
+                { "parameter": "PhysicalDamage", "type": "Increase", "value": 0.15 },
+                { "parameter": "SpellDamage", "type": "Increase", "value": 0.15 }
             ]
         },
         {
             "id": "Npc_Buff_Guaranteed_Items_Essence",
             "modifiers": [
-                { "parameter": "Barrier", "type": "Flat", "value": 100 }
+                { "parameter": "Barrier", "type": "Increase", "value": 0.15 }
             ]
         },
 
         {
             "id": "Npc_Buff_Tier_Multiplier_Huge",
             "modifiers": [
-                { "parameter": "AdditionalHitChance", "type": "Flat", "value": 0.15 }
+                { "parameter": "AdditionalHitChance", "type": "Increase", "value": 0.15 }
             ]
         },
         {
             "id": "Npc_Buff_Tier_Multiplier_Big",
             "modifiers": [
-                { "parameter": "AdditionalHitChance", "type": "Flat", "value": 0.10 }
+                { "parameter": "AdditionalHitChance", "type": "Increase", "value": 0.10 }
             ]
         },
         {
             "id": "Npc_Buff_Tier_Multiplier_Mid",
             "modifiers": [
-                { "parameter": "AdditionalHitChance", "type": "Flat", "value": 0.07 }
+                { "parameter": "AdditionalHitChance", "type": "Increase", "value": 0.07 }
             ]
         },
         {
             "id": "Npc_Buff_Tier_Multiplier_Small",
             "modifiers": [
-                { "parameter": "AdditionalHitChance", "type": "Flat", "value": 0.04 }
+                { "parameter": "AdditionalHitChance", "type": "Increase", "value": 0.04 }
             ]
         },
 
@@ -138,44 +138,44 @@
         {
             "id": "Npc_Buff_Rarity_Upgrade_Huge",
             "modifiers": [
-                { "parameter": "AllResistance", "type": "Flat", "value": 0.5 }
+                { "parameter": "AllResistance", "type": "Increase", "value": 0.15 }
             ]
         },
         {
             "id": "Npc_Buff_Rarity_Upgrade_Big",
             "modifiers": [
-                { "parameter": "AllResistance", "type": "Flat", "value": 0.35 }
+                { "parameter": "AllResistance", "type": "Increase", "value": 0.10 }
             ]
         },
         {
             "id": "Npc_Buff_Rarity_Upgrade_Mid",
             "modifiers": [
-                { "parameter": "AllResistance", "type": "Flat", "value": 0.20 }
+                { "parameter": "AllResistance", "type": "Increase", "value": 0.06 }
             ]
         },
         {
             "id": "Npc_Buff_Rarity_Upgrade_Small",
             "modifiers": [
-                { "parameter": "AllResistance", "type": "Flat", "value": 0.10 }
+                { "parameter": "AllResistance", "type": "Increase", "value": 0.03 }
             ]
         },
 
         {
             "id": "Npc_Buff_Min_Rarity_Legend",
             "modifiers": [
-                { "parameter": "AllAttribute", "type": "Flat", "value": 50 }
+                { "parameter": "AllAttribute", "type": "Increase", "value": 0.15 }
             ]
         },
         {
             "id": "Npc_Buff_Min_Rarity_Epic",
             "modifiers": [
-                { "parameter": "AllAttribute", "type": "Flat", "value": 30 }
+                { "parameter": "AllAttribute", "type": "Increase", "value": 0.09 }
             ]
         },
         {
             "id": "Npc_Buff_Min_Rarity_Rare",
             "modifiers": [
-                { "parameter": "AllAttribute", "type": "Flat", "value": 10 }
+                { "parameter": "AllAttribute", "type": "Increase", "value": 0.03 }
             ]
         }
     ]

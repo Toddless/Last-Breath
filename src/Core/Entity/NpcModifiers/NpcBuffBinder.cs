@@ -17,13 +17,12 @@ namespace Core.Entity.NpcModifiers
     /// <para>Everything runs through <see cref="Rebuild"/> rather than at attach time: a scaling modifier
     /// raises TotalScale of every peer as it arrives, and a value bound before it landed would keep the
     /// scale it happened to see.</para>
-    /// <para><paramref name="levelFactor"/> is the bearer's level growth — the same
-    /// 1 + (level − 1) × levelScaling the provider applied to the base parameters — so a flat buff keeps
-    /// its relative weight as the bearer levels. Every bound line is worth base × levelFactor × totalScale
-    /// (both are plain scalars, so the order is a statement, not a necessity); grants stay whole for the
-    /// same magnitude reason TotalScale never touches them (see <see cref="BindGrant"/>).</para>
+    /// <para>Every bound line is worth base × totalScale and nothing else. The bearer's level never
+    /// multiplies a line here: the catalog speaks in Increase percentages, which self-scale with the
+    /// level-grown base parameters, so a level factor on top would count the growth twice. Grants stay
+    /// whole for the same magnitude reason TotalScale never touches them (see <see cref="BindGrant"/>).</para>
     /// </summary>
-    public sealed class NpcBuffBinder(INpcBuffProvider buffs, IGrantFactory? grants = null, Action<string>? report = null, float levelFactor = 1f) : INpcBuffBinder
+    public sealed class NpcBuffBinder(INpcBuffProvider buffs, IGrantFactory? grants = null, Action<string>? report = null) : INpcBuffBinder
     {
         private const float ScaleEpsilon = 0.0001f;
 
@@ -65,7 +64,7 @@ namespace Core.Entity.NpcModifiers
 
             foreach (var line in buffs.CreateModifiers(modifier.NpcBuffId, modifier.InstanceId))
             {
-                line.Value *= levelFactor * scale; // deliberately spelled out: base × levelFactor × totalScale
+                line.Value *= scale;
                 owner.ParameterModifiers.AddModifier(line);
             }
 

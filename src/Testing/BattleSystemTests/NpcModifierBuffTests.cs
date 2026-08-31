@@ -210,61 +210,28 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0.15f, Crit(owner), 0.0001f, "taking the scaler off did not give the scaled-up value back");
         }
 
-        /// <summary>#224: a flat buff keeps its relative weight as the bearer levels — every bound line is
-        /// worth base × levelFactor × totalScale, where levelFactor is the very 1 + (level − 1) × levelScaling
-        /// the provider applied to the base parameters. Level 25 at scaling 0.05 is the owner's calibration
-        /// point: ×2.2.</summary>
+        /// <summary>#224, the revert of the level-factor thread: the catalog speaks in Increase percentages
+        /// now, and an Increase self-scales with the level-grown base it multiplies — a level factor in the
+        /// binder would count that growth TWICE. So the pin is the absence: a bound line is worth exactly
+        /// base × totalScale, its authored value when no scaler stands beside it, and nothing about the
+        /// bearer's level can reach it (the definition no longer even carries the factor).</summary>
         [TestMethod]
-        public void TheLevelFactorMultipliesEveryBoundLine()
+        public void ABoundLineIsWorthItsAuthoredValueWithNoLevelFactorOnTop()
         {
             var owner = new BuffTarget();
             var component = owner.NpcModifiers;
-            component.UseBuffs(new NpcBuffBinder(new NpcBuffProvider(ShippedBuffs()), levelFactor: 2.2f));
+            component.UseBuffs(new NpcBuffBinder(new NpcBuffProvider(ShippedBuffs())));
 
             component.AddModifier(ShippedModifiers().First(modifier => modifier.Id == "Npc_Modifier_Tier_Upgrade_To_Maximum"));
 
-            Assert.AreEqual(0.15f * 2.2f, Crit(owner), 0.0001f, "the bearer's level factor did not reach the bound line");
+            Assert.AreEqual(0.15f, Crit(owner), 0.0001f, "a bound line moved away from base × totalScale — something multiplied it");
         }
 
-        /// <summary>A level factor of exactly 1 — every level-1 spawn — leaves the values standing where
-        /// they always stood: the feature changes nothing until the bearer actually outgrows level 1.</summary>
+        /// <summary>Granted passives stay WHOLE for the magnitude reason TotalScale never touches them:
+        /// their properties are thresholds and durations, and scaling 0.3 would turn Execute into a
+        /// kill-on-hit. The factory must see the authored properties untouched.</summary>
         [TestMethod]
-        public void ALevelFactorOfOneChangesNothing()
-        {
-            var owner = new BuffTarget();
-            var component = owner.NpcModifiers;
-            component.UseBuffs(new NpcBuffBinder(new NpcBuffProvider(ShippedBuffs()), levelFactor: 1f));
-
-            component.AddModifier(ShippedModifiers().First(modifier => modifier.Id == "Npc_Modifier_Tier_Upgrade_To_Maximum"));
-
-            Assert.AreEqual(0.15f, Crit(owner), 0.0001f, "a level factor of 1 moved a value it must leave alone");
-        }
-
-        /// <summary>The two scalars stack multiplicatively and the order cannot matter — the whole line is
-        /// base × levelFactor × totalScale whichever side arrives first.</summary>
-        [TestMethod]
-        public void TheLevelFactorAndTheScaleMultiplyTogether()
-        {
-            var owner = new BuffTarget();
-            var component = owner.NpcModifiers;
-            component.UseBuffs(new NpcBuffBinder(new NpcBuffProvider(ShippedBuffs()), levelFactor: 2.2f));
-
-            List<INpcModifier> shipped = ShippedModifiers();
-            component.AddModifiers(
-            [
-                shipped.First(modifier => modifier.Id == "Npc_Modifier_Tier_Upgrade_To_Maximum"),
-                shipped.First(modifier => modifier.Id == "Npc_Modifier_Scale_Double_Health"),
-            ]);
-
-            Assert.AreEqual(0.15f * 2.2f * 2.5f, Crit(owner), 0.0001f,
-                "level factor and TotalScale did not multiply into one line");
-        }
-
-        /// <summary>Granted passives stay WHOLE under the level factor for the same magnitude reason
-        /// TotalScale never touches them: their properties are thresholds and durations, and 0.3 × 2.2
-        /// would turn Execute into a kill-on-hit. The factory must see the authored properties untouched.</summary>
-        [TestMethod]
-        public void TheLevelFactorNeverTouchesAGrant()
+        public void ScalingNeverTouchesAGrantsProperties()
         {
             IReadOnlyDictionary<string, float>? handed = null;
             var grants = new Mock<IGrantFactory>();
@@ -274,11 +241,11 @@ namespace LastBreathTest.BattleSystemTests
                 .Returns(Mock.Of<Core.Items.IItemGrant>());
 
             var owner = new BuffTarget();
-            new NpcBuffBinder(new NpcBuffProvider(ShippedBuffs()), grants.Object, levelFactor: 2.2f)
+            new NpcBuffBinder(new NpcBuffProvider(ShippedBuffs()), grants.Object)
                 .Rebuild(owner.Fighter, [ShippedModifiers().First(modifier => modifier.Id == "Npc_Modifier_Item_Effect_Execution")]);
 
             Assert.IsNotNull(handed, "the execution grant never reached the factory");
-            Assert.AreEqual(0.3f, handed["threshold"], 0.0001f, "the level factor leaked into a grant's properties");
+            Assert.AreEqual(0.3f, handed["threshold"], 0.0001f, "a scale factor leaked into a grant's properties");
         }
 
         /// <summary>The vault gives the scaling section its own reading of "unique": several DIFFERENT
@@ -472,7 +439,7 @@ namespace LastBreathTest.BattleSystemTests
             component.AddModifier(shipped.First(modifier => modifier.Id == "Npc_Modifier_Min_Rarity_Legend"));
 
             float attributes = owner.Modifiers.EntityModifiers[EntityParameter.AllAttribute].Sum(line => line.Value);
-            Assert.AreEqual(50f, attributes, 0.0001f, "the replaced floor's attributes stayed on the bearer");
+            Assert.AreEqual(0.15f, attributes, 0.0001f, "the replaced floor's attributes stayed on the bearer");
         }
 
         /// <summary>A modifier built by hand carries no group: uniqueness falls back to the id it always

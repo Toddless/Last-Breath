@@ -107,26 +107,6 @@ namespace LastBreathTest.WorldTesting
             }
         }
 
-        /// <summary>#224: the definition carries the very growth factor its parameters were scaled by —
-        /// 1 + (level − 1) × levelScaling — so the buff binder can put the same growth on flat buff lines.
-        /// Level 25 at scaling 0.05 is the calibration point (×2.2); a level-1 spawn carries exactly 1,
-        /// which is the promise that nothing changes until the bearer outgrows level 1.</summary>
-        [TestMethod]
-        public void TheDefinitionCarriesTheLevelFactorItsParametersWereScaledBy()
-        {
-            var provider = LoadedProvider(Npc() with { LevelMin = 25, LevelMax = 25, LevelScaling = 0.05f });
-
-            Assert.AreEqual(2.2f, provider.CreateDefinition(TestNpcId).LevelFactor, 0.0001f);
-        }
-
-        [TestMethod]
-        public void ALevelOneSpawnCarriesALevelFactorOfExactlyOne()
-        {
-            var provider = LoadedProvider(Npc() with { LevelMin = 1, LevelMax = 1, LevelScaling = 0.05f });
-
-            Assert.AreEqual(1f, provider.CreateDefinition(TestNpcId).LevelFactor, 0f);
-        }
-
         /// <summary>The one shipped record that names a count of zero, now that zero means what it says.
         /// A training dummy is a sack to hit: it stands there, it does not cast. Before the two zeroes were
         /// read alike it quietly learned two casts from the Regular rule, which nobody asked it for.</summary>

@@ -34,11 +34,6 @@ namespace Core.Data.NpcData
         public Fractions Fraction { get; init; }
         public Stance Stance { get; init; }
         public required IReadOnlyDictionary<EntityParameter, float> Parameters { get; init; }
-
-        /// <summary>The very factor <see cref="Parameters"/> were scaled by — 1 + (level − 1) × levelScaling
-        /// of the record. Carried so the bearer side can scale its FLAT modifier buffs by the same growth
-        /// (NpcBuffBinder); 1 for a level-1 spawn and for anything built outside the provider.</summary>
-        public float LevelFactor { get; init; } = 1f;
         public required IReadOnlyList<IAbility> Abilities { get; init; }
 
         /// <summary>Rolled NPC modifiers (count = type × rarity); copies, ready to attach.</summary>

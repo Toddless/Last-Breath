@@ -64,14 +64,14 @@
                 "Strength": 3,
                 "Dexterity": 4,
                 "Intelligence": 1,
-                "Armor": 150,
+                "Armor": 450,
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.5,
                 "PhysicalDamage": 120,
                 "SpellDamage": 40,
                 "Accuracy": 300,
-                "Evade": 250
+                "Evade": 750
             },
             "world": {
                 "visionRadius": 320,
@@ -120,14 +120,14 @@
                 "Strength": 6,
                 "Dexterity": 7,
                 "Intelligence": 2,
-                "Armor": 350,
+                "Armor": 1200,
                 "CriticalChance": 0.25,
                 "AdditionalHitChance": 0.2,
                 "CriticalDamage": 1.6,
                 "PhysicalDamage": 220,
                 "SpellDamage": 60,
                 "Accuracy": 550,
-                "Evade": 450
+                "Evade": 1600
             },
             "world": {
                 "visionRadius": 700,
@@ -160,14 +160,14 @@
                 "Strength": 1,
                 "Dexterity": 2,
                 "Intelligence": 6,
-                "Armor": 100,
+                "Armor": 350,
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.5,
                 "PhysicalDamage": 80,
                 "SpellDamage": 200,
                 "Accuracy": 350,
-                "Evade": 200
+                "Evade": 675
             },
             "world": {
                 "visionRadius": 280,
@@ -211,14 +211,14 @@
                 "Strength": 9,
                 "Dexterity": 5,
                 "Intelligence": 12,
-                "Armor": 500,
+                "Armor": 1200,
                 "CriticalChance": 0.3,
                 "AdditionalHitChance": 0.25,
                 "CriticalDamage": 1.8,
                 "PhysicalDamage": 300,
                 "SpellDamage": 380,
                 "Accuracy": 800,
-                "Evade": 600
+                "Evade": 1400
             },
             "world": {
                 "visionRadius": 500,
@@ -285,14 +285,14 @@
                 "Strength": 2,
                 "Dexterity": 5,
                 "Intelligence": 1,
-                "Armor": 80,
+                "Armor": 175,
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.15,
                 "CriticalDamage": 1.5,
                 "PhysicalDamage": 110,
                 "SpellDamage": 0,
                 "Accuracy": 350,
-                "Evade": 350
+                "Evade": 725
             },
             "world": {
                 "visionRadius": 380,
@@ -322,14 +322,14 @@
                 "Strength": 5,
                 "Dexterity": 2,
                 "Intelligence": 1,
-                "Armor": 220,
+                "Armor": 725,
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.6,
                 "PhysicalDamage": 130,
                 "SpellDamage": 0,
                 "Accuracy": 250,
-                "Evade": 120
+                "Evade": 400
             },
             "world": {
                 "visionRadius": 250,
@@ -359,14 +359,14 @@
                 "Strength": 1,
                 "Dexterity": 4,
                 "Intelligence": 1,
-                "Armor": 40,
+                "Armor": 65,
                 "CriticalChance": 0.05,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.3,
                 "PhysicalDamage": 40,
                 "SpellDamage": 0,
                 "Accuracy": 200,
-                "Evade": 450
+                "Evade": 750
             },
             "world": {
                 "visionRadius": 400,
@@ -396,14 +396,14 @@
                 "Strength": 8,
                 "Dexterity": 3,
                 "Intelligence": 1,
-                "Armor": 400,
+                "Armor": 1700,
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.7,
                 "PhysicalDamage": 260,
                 "SpellDamage": 0,
                 "Accuracy": 450,
-                "Evade": 150
+                "Evade": 625
             },
             "world": {
                 "visionRadius": 320,
@@ -433,14 +433,14 @@
                 "Strength": 3,
                 "Dexterity": 7,
                 "Intelligence": 2,
-                "Armor": 150,
+                "Armor": 325,
                 "CriticalChance": 0.25,
                 "AdditionalHitChance": 0.2,
                 "CriticalDamage": 1.7,
                 "PhysicalDamage": 180,
                 "SpellDamage": 0,
                 "Accuracy": 500,
-                "Evade": 500
+                "Evade": 1100
             },
             "world": {
                 "visionRadius": 450,
@@ -482,14 +482,14 @@
                 "Strength": 2,
                 "Dexterity": 2,
                 "Intelligence": 1,
-                "Armor": 60,
+                "Armor": 300,
                 "CriticalChance": 0.05,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.3,
                 "PhysicalDamage": 60,
                 "SpellDamage": 0,
                 "Accuracy": 200,
-                "Evade": 150
+                "Evade": 750
             },
             "world": {
                 "visionRadius": 300,
@@ -542,14 +542,14 @@
                 "Strength": 3,
                 "Dexterity": 5,
                 "Intelligence": 1,
-                "Armor": 120,
+                "Armor": 275,
                 "CriticalChance": 0.2,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.5,
                 "PhysicalDamage": 130,
                 "SpellDamage": 0,
                 "Accuracy": 450,
-                "Evade": 300
+                "Evade": 675
             },
             "world": {
                 "visionRadius": 400,
@@ -592,14 +592,14 @@
                 "Strength": 4,
                 "Dexterity": 2,
                 "Intelligence": 1,
-                "Armor": 250,
+                "Armor": 700,
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.5,
                 "PhysicalDamage": 130,
                 "SpellDamage": 0,
                 "Accuracy": 300,
-                "Evade": 150
+                "Evade": 425
             },
             "world": {
                 "visionRadius": 280,
@@ -641,14 +641,14 @@
                 "Strength": 3,
                 "Dexterity": 6,
                 "Intelligence": 1,
-                "Armor": 120,
+                "Armor": 175,
                 "CriticalChance": 0.2,
                 "AdditionalHitChance": 0.15,
                 "CriticalDamage": 1.6,
                 "PhysicalDamage": 150,
                 "SpellDamage": 0,
                 "Accuracy": 400,
-                "Evade": 400
+                "Evade": 625
             },
             "world": {
                 "visionRadius": 350,
@@ -688,14 +688,14 @@
                 "Strength": 2,
                 "Dexterity": 7,
                 "Intelligence": 3,
-                "Armor": 130,
+                "Armor": 175,
                 "CriticalChance": 0.25,
                 "AdditionalHitChance": 0.15,
                 "CriticalDamage": 1.6,
                 "PhysicalDamage": 160,
                 "SpellDamage": 60,
                 "Accuracy": 600,
-                "Evade": 450
+                "Evade": 600
             },
             "world": {
                 "visionRadius": 450,
@@ -726,14 +726,14 @@
                 "Strength": 1,
                 "Dexterity": 3,
                 "Intelligence": 8,
-                "Armor": 90,
+                "Armor": 275,
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.5,
                 "PhysicalDamage": 70,
                 "SpellDamage": 280,
                 "Accuracy": 450,
-                "Evade": 300
+                "Evade": 950
             },
             "world": {
                 "visionRadius": 400,
@@ -765,14 +765,14 @@
                 "Strength": 6,
                 "Dexterity": 2,
                 "Intelligence": 1,
-                "Armor": 450,
+                "Armor": 600,
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.6,
                 "PhysicalDamage": 170,
                 "SpellDamage": 0,
                 "Accuracy": 400,
-                "Evade": 100
+                "Evade": 125
             },
             "world": {
                 "visionRadius": 320,
@@ -803,14 +803,14 @@
                 "Strength": 4,
                 "Dexterity": 5,
                 "Intelligence": 1,
-                "Armor": 300,
+                "Armor": 600,
                 "CriticalChance": 0.2,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.6,
                 "PhysicalDamage": 190,
                 "SpellDamage": 0,
                 "Accuracy": 550,
-                "Evade": 250
+                "Evade": 500
             },
             "world": {
                 "visionRadius": 380,
@@ -842,14 +842,14 @@
                 "Strength": 1,
                 "Dexterity": 4,
                 "Intelligence": 6,
-                "Armor": 100,
+                "Armor": 175,
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.5,
                 "PhysicalDamage": 60,
                 "SpellDamage": 240,
                 "Accuracy": 400,
-                "Evade": 350
+                "Evade": 575
             },
             "world": {
                 "visionRadius": 380,
@@ -878,14 +878,14 @@
                 "Strength": 10,
                 "Dexterity": 3,
                 "Intelligence": 3,
-                "Armor": 500,
+                "Armor": 1400,
                 "CriticalChance": 0.2,
                 "AdditionalHitChance": 0.15,
                 "CriticalDamage": 1.8,
                 "PhysicalDamage": 320,
                 "SpellDamage": 100,
                 "Accuracy": 650,
-                "Evade": 200
+                "Evade": 550
             },
             "world": {
                 "visionRadius": 420,
@@ -1071,14 +1071,14 @@
                 "Strength": 8,
                 "Dexterity": 15,
                 "Intelligence": 5,
-                "Armor": 600,
+                "Armor": 1500,
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.3,
                 "CriticalDamage": 1.9,
                 "PhysicalDamage": 200,
                 "SpellDamage": 100,
                 "Accuracy": 700,
-                "Evade": 1600
+                "Evade": 4100
             },
             "world": {
                 "visionRadius": 450,
@@ -1134,14 +1134,14 @@
                 "Strength": 5,
                 "Dexterity": 25,
                 "Intelligence": 10,
-                "Armor": 300,
+                "Armor": 775,
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.35,
                 "CriticalDamage": 2,
                 "PhysicalDamage": 200,
                 "SpellDamage": 50,
                 "Accuracy": 700,
-                "Evade": 1500
+                "Evade": 3900
             },
             "world": {
                 "visionRadius": 450,
@@ -1171,14 +1171,14 @@
                 "Strength": 2,
                 "Dexterity": 6,
                 "Intelligence": 1,
-                "Armor": 75,
+                "Armor": 150,
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.5,
                 "PhysicalDamage": 50,
                 "SpellDamage": 15,
                 "Accuracy": 175,
-                "Evade": 375
+                "Evade": 800
             }
         },
         {
@@ -1199,14 +1199,14 @@
                 "Strength": 5,
                 "Dexterity": 3,
                 "Intelligence": 3,
-                "Armor": 200,
+                "Armor": 650,
                 "CriticalChance": 0.05,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.5,
                 "PhysicalDamage": 120,
                 "SpellDamage": 40,
                 "Accuracy": 350,
-                "Evade": 250
+                "Evade": 800
             },
             "world": {
                 "visionRadius": 350,
@@ -1238,14 +1238,14 @@
                 "Strength": 7,
                 "Dexterity": 3,
                 "Intelligence": 2,
-                "Armor": 300,
+                "Armor": 800,
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.5,
                 "PhysicalDamage": 150,
                 "SpellDamage": 0,
                 "Accuracy": 400,
-                "Evade": 180
+                "Evade": 475
             },
             "world": {
                 "visionRadius": 320,
