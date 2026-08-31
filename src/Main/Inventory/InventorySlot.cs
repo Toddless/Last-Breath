@@ -12,6 +12,10 @@ namespace LastBreath.Inventory
     {
         private const string UID = "uid://bqlqfsqoepfhs";
 
+        // Slot_Frame.png is a neutral gray (#4a4e56); this over-unity modulate lands it on the
+        // Umbral GoldBorder (#6b5730), so an empty slot wears the same hairline as the rest of the UI.
+        private static readonly Color s_neutralFrameTint = new(1.447f, 1.115f, 0.557f);
+
         [Export] protected Label? QuantityLabel;
 
         public Func<string, IItem?>? GetItemInstance;
@@ -45,7 +49,7 @@ namespace LastBreath.Inventory
         private void UpdateRarityFrame()
         {
             var item = CurrentItem == null ? null : GetItemInstance?.Invoke(CurrentItem.InstanceId);
-            Frame?.Modulate = item == null ? Colors.White : Color.FromHtml(TextPalette.RarityColor(item.Rarity));
+            Frame?.Modulate = item == null ? s_neutralFrameTint : Color.FromHtml(TextPalette.RarityColor(item.Rarity));
         }
 
         private static MouseInteractions ToInteraction(InputEventMouseButton mb) => mb switch

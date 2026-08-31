@@ -2,22 +2,6 @@
 
 [ext_resource type="Script" uid="uid://bpfdq820pvg6v" path="res://Addons/Battle/UIElements/AugmentCell.cs" id="1_cell"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cell"]
-content_margin_left = 3.0
-content_margin_top = 3.0
-content_margin_right = 3.0
-content_margin_bottom = 3.0
-bg_color = Color(0.11, 0.098, 0.082, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.27, 0.21, 0.13, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_highlight"]
 bg_color = Color(1, 1, 1, 0.11)
 border_width_left = 2
@@ -25,10 +9,6 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(1, 1, 1, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
 
 [sub_resource type="Gradient" id="Gradient_mark"]
 offsets = PackedFloat32Array(0)
@@ -42,7 +22,7 @@ custom_minimum_size = Vector2(56, 56)
 offset_right = 56.0
 offset_bottom = 56.0
 mouse_filter = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_cell")
+theme_type_variation = &"ItemSlotPanel"
 script = ExtResource("1_cell")
 _empty = NodePath("Content/Empty")
 _icon = NodePath("Content/Icon")

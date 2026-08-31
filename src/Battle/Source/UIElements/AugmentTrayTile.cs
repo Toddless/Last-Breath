@@ -21,7 +21,7 @@ namespace Battle.Source.UIElements
     public partial class AugmentTrayTile : PanelContainer
     {
         /// <summary>Filled in when the scene is built.</summary>
-        private const string UID = "uid://dp4ta9cn1mh8k";
+        private const string UID = "uid://dp4tbacn1mh8k";
 
         private const float DragPreviewSize = 60f;
 
