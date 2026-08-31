@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://0otvsvrl8yag"]
+
+[ext_resource type="Script" uid="uid://b31h7w21kyvsa" path="res://Addons/Crafting/UIElements/Modules/ActionBar.cs" id="1_abar"]
+
+[node name="ActionBar" type="HBoxContainer" node_paths=PackedStringArray("_action")]
+script = ExtResource("1_abar")
+_action = NodePath("ActionBtn")
+
+[node name="ActionSpacer" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ActionBtn" type="Button" parent="."]
+custom_minimum_size = Vector2(220, 46)
+layout_mode = 2
+focus_mode = 0
+text = "Craft"

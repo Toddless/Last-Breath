@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://b6iwmadxemkek"]
+
+[ext_resource type="Script" uid="uid://c7aowmww6itq7" path="res://Addons/Crafting/UIElements/Modules/RecipeTreePanel.cs" id="1_rtreep"]
+
+[node name="RecipeTreePanel" type="PanelContainer" node_paths=PackedStringArray("_listTitle", "_search", "_tree")]
+custom_minimum_size = Vector2(384, 0)
+script = ExtResource("1_rtreep")
+_listTitle = NodePath("LeftMargin/LeftLayout/ListTitle")
+_search = NodePath("LeftMargin/LeftLayout/Search")
+_tree = NodePath("LeftMargin/LeftLayout/RecipeTree")
+
+[node name="LeftMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="LeftLayout" type="VBoxContainer" parent="LeftMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ListTitle" type="Label" parent="LeftMargin/LeftLayout"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Recipes"
+
+[node name="Search" type="LineEdit" parent="LeftMargin/LeftLayout"]
+layout_mode = 2
+placeholder_text = "Search..."
+clear_button_enabled = true
+
+[node name="RecipeTree" type="Tree" parent="LeftMargin/LeftLayout"]
+layout_mode = 2
+size_flags_vertical = 3
+allow_reselect = true
+hide_root = true

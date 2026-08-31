@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://kcpax5nvfyof"]
+
+[ext_resource type="Script" uid="uid://t8itqlnxdai5" path="res://Addons/Crafting/UIElements/Modules/MasteryRail.cs" id="1_mrail"]
+
+[node name="MasteryRail" type="HBoxContainer" node_paths=PackedStringArray("_title", "_level", "_xpBar", "_xpLabel", "_chips")]
+theme_override_constants/separation = 18
+script = ExtResource("1_mrail")
+_title = NodePath("LevelBox/MasteryTitle")
+_level = NodePath("LevelBox/LevelValue")
+_xpBar = NodePath("LevelBox/MasteryXpBar")
+_xpLabel = NodePath("LevelBox/MasteryXpLabel")
+_chips = NodePath("MasteryChips")
+
+[node name="LevelBox" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="MasteryTitle" type="Label" parent="LevelBox"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 11
+
+[node name="LevelValue" type="Label" parent="LevelBox"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+theme_override_font_sizes/font_size = 24
+
+[node name="MasteryXpBar" type="ProgressBar" parent="LevelBox"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+max_value = 1.0
+step = 0.001
+show_percentage = false
+
+[node name="MasteryXpLabel" type="Label" parent="LevelBox"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 10
+
+[node name="MasteryChips" type="GridContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 8
+columns = 6

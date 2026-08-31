@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://ci5gv1783dnl7"]
+
+[ext_resource type="Script" uid="uid://b7cht8gursxcn" path="res://Addons/Crafting/UIElements/Modules/RequirementsPanel.cs" id="1_reqsp"]
+[ext_resource type="PackedScene" uid="uid://bf64pfcqaqrge" path="res://Addons/Crafting/UIElements/Modules/ForecastPanel.tscn" id="2_fcast"]
+
+[node name="RequirementsPanel" type="VBoxContainer" node_paths=PackedStringArray("_header", "_requirements", "_additivesHeader", "_additives", "_forecast", "_ascendWarning")]
+custom_minimum_size = Vector2(320, 0)
+theme_override_constants/separation = 8
+script = ExtResource("1_reqsp")
+_header = NodePath("ReqsHeader")
+_requirements = NodePath("ReqsScroll/ReqsContent/Requirements")
+_additivesHeader = NodePath("ReqsScroll/ReqsContent/AdditivesHeader")
+_additives = NodePath("ReqsScroll/ReqsContent/Additives")
+_forecast = NodePath("ReqsScroll/ReqsContent/ForecastPanel")
+_ascendWarning = NodePath("ReqsScroll/ReqsContent/AscendWarning")
+
+[node name="ReqsHeader" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Requirements"
+
+[node name="ReqsScroll" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ReqsContent" type="VBoxContainer" parent="ReqsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Requirements" type="VBoxContainer" parent="ReqsScroll/ReqsContent"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="AdditivesHeader" type="Label" parent="ReqsScroll/ReqsContent"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Additives"
+
+[node name="Additives" type="VBoxContainer" parent="ReqsScroll/ReqsContent"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ForecastPanel" parent="ReqsScroll/ReqsContent" instance=ExtResource("2_fcast")]
+layout_mode = 2
+
+[node name="AscendWarning" type="Label" parent="ReqsScroll/ReqsContent"]
+visible = false
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+autowrap_mode = 3

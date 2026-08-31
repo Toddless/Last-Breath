@@ -15,42 +15,31 @@ namespace Crafting.Source.UIElements
     using Core.Modifiers;
     using Core.Results;
     using Core.Views.UI;
+    using Crafting.Source.UIElements.Modules;
     using Godot;
+    using SharedUi;
 
     /// <summary>
-    /// The one crafting screen, composed after the bench layout of the crafting UI kit:
-    /// recipe tree with search on the left; on the right a mode tab row (Create / Upgrade /
-    /// Reroll / Ascend), a bench of result preview (icon, name, modifier lines — recipe results
-    /// render their blueprint descriptors with value spreads) next to requirement/additive slot
-    /// cards, and an action bar at the bottom. Reads go straight to the services; only the
-    /// crafting COMMANDS travel the bus. Cards and rows are code-built — the scene holds
-    /// containers, not slots.
+    /// The one crafting screen, a thin composer over module scenes: recipe tree on the left; mastery
+    /// rail, mode tabs, the bench (preview / requirement slots / pool column) and the action bar on
+    /// the right. The window owns the mode, the picked recipe/item and the slot choices, turns child
+    /// events into pickers and bus commands, and pushes fresh view data back down. Reads go straight
+    /// to the services; only the crafting COMMANDS travel the bus.
     /// </summary>
     public partial class CraftingWindow : Control, IWindow
     {
         private const string UID = "uid://betq124kfglyy";
         private const int AdditiveSlots = 3;
-        private static readonly Vector2 s_cardMinSize = new(0, 44);
-        private const int ForecastValueWidth = 130;
-        private const int GrantDescriptionMinWidth = 320;
+        private const string EssenceCategoryId = "Category_Essence";
 
-        [Export] private Tree? _tree;
-        [Export] private LineEdit? _search;
-        [Export] private SharedUi.WindowHeader? _header;
-        [Export] private Button? _actionButton;
-        [Export] private Button? _modeCreate, _modeUpgrade, _modeRecraft, _modeAscend;
-        [Export] private TextureRect? _itemIcon;
-        [Export] private Label? _listTitle, _itemName, _itemSubtitle, _previewTag, _requirementsHeader, _additivesHeader, _ascendWarning;
-        [Export] private VBoxContainer? _mods;
-        [Export] private VBoxContainer? _requirements, _additives;
-        [Export] private Label? _masteryLevel, _masteryXpLabel, _masteryTitle, _forecastHeader, _forecastHint;
-        [Export] private ProgressBar? _masteryXpBar;
-        [Export] private GridContainer? _masteryChips;
-        [Export] private Control? _forecastBox;
-        [Export] private VBoxContainer? _forecastRows;
-        [Export] private Control? _itemHeader, _poolBox;
-        [Export] private Label? _poolHeader, _poolCounter;
-        [Export] private VBoxContainer? _poolList;
+        [Export] private WindowHeader? _header;
+        [Export] private RecipeTreePanel? _recipeTree;
+        [Export] private MasteryRail? _masteryRail;
+        [Export] private ModeTabs? _modeTabs;
+        [Export] private ItemPreviewPane? _preview;
+        [Export] private RequirementsPanel? _requirements;
+        [Export] private PoolColumn? _pool;
+        [Export] private ActionBar? _actionBar;
 
         private readonly Dictionary<string, string> _categoryChoices = [];
         private readonly string?[] _additiveChoices = new string?[AdditiveSlots];
@@ -72,21 +61,18 @@ namespace Crafting.Source.UIElements
         private IEquipItem? _item;
         private string? _selectedModifierInstanceId;
 
-
         public override void _Ready()
         {
-            _tree?.ItemSelected += OnRecipeSelected;
-            _search?.TextChanged += _ => BuildTree();
             _header?.Closed += Close;
-            _actionButton?.Pressed += OnActionPressed;
+            _header?.SetTitle(Localization.Localize("UI_Crafting"));
 
-            _modeCreate?.Pressed += () => SwitchMode(CraftingMode.Create);
-            _modeUpgrade?.Pressed += () => SwitchMode(CraftingMode.Upgrade);
-            _modeRecraft?.Pressed += () => SwitchMode(CraftingMode.Recraft);
-            _modeAscend?.Pressed += () => SwitchMode(CraftingMode.Ascend);
-            _itemHeader?.GuiInput += OnItemHeaderInput;
-
-            LocalizeStaticLabels();
+            _recipeTree?.RecipeSelected += OnRecipeSelected;
+            _modeTabs?.ModeChanged += SwitchMode;
+            _preview?.ChangeItemRequested += () => OpenEquipPicker(_mode);
+            _preview?.ModifierPicked += OnModifierPicked;
+            _requirements?.CategorySlotClicked += OnCategorySlotClicked;
+            _requirements?.AdditiveSlotClicked += OnAdditiveSlotClicked;
+            _actionBar?.ActionPressed += OnActionPressed;
         }
 
         public override void _ExitTree()
@@ -124,13 +110,15 @@ namespace Crafting.Source.UIElements
                 _mastery.BonusLevelChange += OnMasteryLevelChanged;
             }
 
-            BuildTree();
+            _preview?.SetFormatter(_modifierFormatter);
+            _pool?.SetFormatter(_modifierFormatter);
+            _recipeTree?.SetCatalog(_dataProvider, _inventory, _knowledge);
             RefreshDetails();
         }
 
-        private void OnRecipeLearned(string recipeId) => BuildTree();
+        private void OnRecipeLearned(string recipeId) => _recipeTree?.Rebuild();
 
-        private void OnMasteryLevelChanged(int level) => BuildTree();
+        private void OnMasteryLevelChanged(int level) => _recipeTree?.Rebuild();
 
         public void Close() => QueueFree();
 
@@ -144,35 +132,20 @@ namespace Crafting.Source.UIElements
             _recipeId = null;
             _selectedModifierInstanceId = null;
             ResetChoices();
-            _tree?.DeselectAll();
+            _recipeTree?.Deselect();
             RefreshDetails();
         }
 
-        private void LocalizeStaticLabels()
-        {
-            _header?.SetTitle(Localization.Localize("UI_Crafting"));
-            _requirementsHeader?.Text = Localization.Localize("UI_Craft_Requirements");
-            _additivesHeader?.Text = Localization.Localize("UI_Craft_Additives");
-            _ascendWarning?.Text = Localization.Localize("UI_Craft_AscendWarning");
-            _modeCreate?.Text = Localization.Localize("UI_Crafting_Create");
-            _modeUpgrade?.Text = Localization.Localize("UI_Crafting_Upgrade");
-            _modeRecraft?.Text = Localization.Localize("UI_Crafting_Recraft");
-            _modeAscend?.Text = Localization.Localize("UI_Crafting_Ascend");
-            _masteryTitle?.Text = Localization.Localize("UI_Craft_Mastery").ToUpper();
-            _forecastHeader?.Text = Localization.Localize("UI_Craft_Forecast").ToUpper();
-            _forecastHint?.Text = Localization.Localize("UI_Craft_Forecast_Hint");
-        }
-
-        // ---------------------------------------------------------------- mode tabs
+        // ---------------------------------------------------------------- child events
 
         /// <summary>Create always leads back to recipe browsing; an item mode entered with an empty
         /// bench opens the equipment picker instead of refusing — the mode flips once a piece is picked.</summary>
         private void SwitchMode(CraftingMode mode)
         {
-            if (_mode == mode) { RefreshModeTabs(); return; }
+            if (_mode == mode) { _modeTabs?.SetMode(_mode); return; }
             if (mode != CraftingMode.Create && _item == null)
             {
-                RefreshModeTabs();
+                _modeTabs?.SetMode(_mode);
                 OpenEquipPicker(mode);
                 return;
             }
@@ -184,21 +157,50 @@ namespace Crafting.Source.UIElements
             RefreshDetails();
         }
 
-        private void RefreshModeTabs()
+        private void OnRecipeSelected(string recipeId)
         {
-            SyncTab(_modeCreate, CraftingMode.Create);
-            SyncTab(_modeUpgrade, CraftingMode.Upgrade);
-            SyncTab(_modeRecraft, CraftingMode.Recraft);
-            SyncTab(_modeAscend, CraftingMode.Ascend);
+            if (recipeId == _recipeId) return;
+
+            _recipeId = recipeId;
+            _item = null;
+            _mode = CraftingMode.Create;
+            _selectedModifierInstanceId = null;
+            ResetChoices();
+            RefreshDetails();
         }
 
-        /// <summary>The bench item header doubles as a "change item" button in the item modes.</summary>
-        private void OnItemHeaderInput(InputEvent @event)
+        private void OnModifierPicked(string instanceId)
         {
-            if (_mode == CraftingMode.Create) return;
-            if (@event is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left }) return;
-            OpenEquipPicker(_mode);
+            _selectedModifierInstanceId = instanceId;
+            RefreshDetails();
         }
+
+        private void OnCategorySlotClicked(string categoryId) => OpenPicker(
+            Localization.Localize(categoryId),
+            CategoryResourceIds(categoryId),
+            picked =>
+            {
+                _categoryChoices[categoryId] = picked;
+                RefreshDetails();
+            });
+
+        private void OnAdditiveSlotClicked(int slot)
+        {
+            if (_additiveChoices[slot] != null)
+            {
+                _additiveChoices[slot] = null; // click on a filled slot empties it
+                RefreshDetails();
+                return;
+            }
+
+            OpenPicker(Localization.Localize("UI_Craft_Additives"), AvailableAdditiveIds(), picked =>
+            {
+                _additiveChoices[slot] = picked;
+                RefreshDetails();
+            });
+        }
+
+        // ---------------------------------------------------------------- equipment picker
 
         /// <summary>Equipment picker for an item mode: bag pieces the mode can actually work on.
         /// Hovering a row opens the SAME framed item card the bag slots show (through the Core
@@ -266,224 +268,161 @@ namespace Crafting.Source.UIElements
             return string.Join("\n", lines);
         }
 
-        /// <summary>Shared BBCode label defaults; callers add size flags/minimums on top.</summary>
-        private static RichTextLabel RichText(string text, TextServer.AutowrapMode autowrap = TextServer.AutowrapMode.WordSmart) =>
-            new() { Text = text, BbcodeEnabled = true, FitContent = true, AutowrapMode = autowrap };
-
-        private void SyncTab(Button? tab, CraftingMode mode) => tab?.SetPressedNoSignal(_mode == mode);
-
-        // ---------------------------------------------------------------- tree
-
-        private void BuildTree()
-        {
-            if (_tree == null || _dataProvider == null) return;
-
-            string query = _search?.Text?.Trim() ?? string.Empty;
-            _tree.Clear();
-            _tree.HideRoot = true;
-            var root = _tree.CreateItem();
-            int totalShown = 0;
-
-            foreach (var group in _dataProvider.GetCraftingRecipes()
-                         .GroupBy(RecipeCategory)
-                         .OrderBy(entry => entry.Key.ToString()))
-            {
-                var matching = group
-                    .Where(recipe => query.Length == 0 || Localization.Localize(recipe.Id).Contains(query, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-                if (matching.Count == 0) continue;
-
-                var category = _tree.CreateItem(root);
-                category.SetText(0, Localization.Localize(group.Key.ToString()));
-                category.SetSelectable(0, false);
-                totalShown += matching.Count;
-
-                foreach (var recipe in matching)
-                {
-                    var entry = _tree.CreateItem(category);
-                    int amount = CraftableAmount(recipe.Id);
-                    entry.SetText(0, amount > 0 ? $"{Localization.Localize(recipe.Id)} ({amount})" : Localization.Localize(recipe.Id));
-                    entry.SetMetadata(0, recipe.Id);
-
-                    // Unknown recipes stay visible but locked — the hint says how to get them.
-                    bool known = _knowledge?.IsKnown(recipe.Id) ?? true;
-                    entry.SetSelectable(0, known);
-                    if (known) continue;
-                    entry.SetCustomColor(0, Color.FromHtml(TextPalette.System));
-                    entry.SetTooltipText(0, recipe.UnlockAtMastery is { } gate
-                        ? Localization.Render("UI_Recipe_Locked_Mastery", new Dictionary<string, object?> { ["Level"] = gate })
-                        : Localization.Localize("UI_Recipe_Locked_Scroll"));
-                }
-            }
-
-            _listTitle?.Text = $"{Localization.Localize("UI_Craft_Recipes")} ({totalShown})";
-        }
-
-        private static RecipeCategories RecipeCategory(ICraftingRecipe recipe) =>
-            Enum.GetValues<RecipeCategories>()
-                .FirstOrDefault(category => recipe.Tags.Contains(category.ToString(), StringComparer.OrdinalIgnoreCase));
-
-        private int CraftableAmount(string recipeId)
-        {
-            var requirements = _dataProvider?.GetRecipeRequirements(recipeId) ?? [];
-            int amount = int.MaxValue;
-            foreach (var requirement in requirements)
-            {
-                int owned = requirement.Type switch
-                {
-                    RequirementType.Resource => _inventory?.GetTotalItemAmount(requirement.Id) ?? 0,
-                    // The optimistic ceiling: any owned member of the category counts toward the slot.
-                    RequirementType.ResourceCategory => CategoryOwnedTotal(requirement.Id),
-                    _ => -1,
-                };
-                if (owned < 0) continue;
-                amount = Math.Min(amount, owned / requirement.Amount);
-            }
-
-            return amount == int.MaxValue ? 0 : amount;
-        }
-
-        private int CategoryOwnedTotal(string categoryId)
-        {
-            var members = _dataProvider?.GetResourceIdsInCategory(categoryId) ?? [];
-            var ownedIds = members.Count > 0 ? members : _inventory?.GetAllItemIdsWithTag(categoryId) ?? [];
-            return ownedIds.Distinct().Sum(id => _inventory?.GetTotalItemAmount(id) ?? 0);
-        }
-
-        private void OnRecipeSelected()
-        {
-            string recipeId = _tree?.GetSelected()?.GetMetadata(0).AsString() ?? string.Empty;
-            if (recipeId.Length == 0 || recipeId == _recipeId) return;
-
-            _recipeId = recipeId;
-            _item = null;
-            _mode = CraftingMode.Create;
-            _selectedModifierInstanceId = null;
-            ResetChoices();
-            RefreshDetails();
-        }
-
-        // ---------------------------------------------------------------- details
+        // ---------------------------------------------------------------- refresh
 
         private void RefreshDetails()
         {
             ClosePicker();
-            RefreshModeTabs();
-            RenderMasteryRail();
-            RenderItemHeader();
-            RenderModifiers();
-            RenderRequirements();
-            RenderAdditives();
-            RenderPool();
-            RenderForecast();
-            RenderAction();
+            _modeTabs?.SetMode(_mode);
+            if (_mastery != null) _masteryRail?.Refresh(_mastery);
+            RefreshPreview();
+            RefreshRequirements();
+            RefreshAdditives();
+            RefreshPool();
+            RefreshForecast();
+            RefreshAction();
         }
 
-        // ---------------------------------------------------------------- mastery rail and forecast
-
-        /// <summary>The always-visible mastery strip over the mode tabs (kit's mastery rail):
-        /// level with the XP progress to the next one, then the six bonus channels as chips.
-        /// Every channel lerps on the same level factor, so each chip's mini bar IS that factor.</summary>
-        private void RenderMasteryRail()
+        private void RefreshPreview()
         {
-            if (_mastery == null || _masteryChips == null) return;
-
-            _masteryLevel?.Text = _mastery.BonusLevel > 0
-                ? $"{_mastery.CurrentLevel}+{_mastery.BonusLevel} / {_mastery.MaximumLevel}"
-                : $"{_mastery.CurrentLevel} / {_mastery.MaximumLevel}";
-
-            int expTotal = _mastery.ExpToNextLevelTotal();
-            _masteryXpBar?.Value = expTotal > 0 ? _mastery.CurrentExperience / (float)expTotal : 1f;
-            _masteryXpLabel?.Text = expTotal > 0
-                ? $"{_mastery.CurrentExperience} / {expTotal}"
-                : Localization.Localize("UI_Mastery_Max");
-
-            _masteryChips.QueueFreeChildren();
-
-            float progress = _mastery.MaximumLevel <= 0
-                ? 0f
-                : Mathf.Clamp((_mastery.CurrentLevel + _mastery.BonusLevel) / (float)_mastery.MaximumLevel, 0f, 1f);
-            foreach ((string key, float bonus) in MasteryChannels())
-                _masteryChips.AddChild(MasteryChip(Localization.Localize(key), bonus, progress));
+            if (_preview == null) return;
+            if (_item != null) { _preview.ShowItem(_item, _mode, _selectedModifierInstanceId); return; }
+            if (_recipeId == null) { _preview.ShowEmpty(); return; }
+            _preview.ShowRecipe(Localization.Localize(_recipeId), RecipeResultIcon(), SelectedBlueprint());
         }
 
-        private IEnumerable<(string Key, float Bonus)> MasteryChannels() =>
-        [
-            ("UI_Mastery_Channel_Upgrade", _mastery!.GetUpgradeChanceBonus()),
-            ("UI_Mastery_Channel_Values", _mastery.GetCurrentValueMultiplier() - 1f),
-            ("UI_Mastery_Channel_Rarity", _mastery.GetRarityChanceBonus()),
-            ("UI_Mastery_Channel_Effect", _mastery.GetExtraEffectChanceBonus()),
-            ("UI_Mastery_Channel_Mythic", _mastery.GetMythicModifierChanceBonus()),
-            ("UI_Mastery_Channel_Salvage", _mastery.GetResourceReturnBonus()),
-        ];
-
-        private static Control MasteryChip(string name, float bonus, float progress)
+        private Texture2D? RecipeResultIcon()
         {
-            var chip = new PanelContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-            var margin = new MarginContainer();
-            margin.AddThemeConstantOverride("margin_left", 8);
-            margin.AddThemeConstantOverride("margin_top", 6);
-            margin.AddThemeConstantOverride("margin_right", 8);
-            margin.AddThemeConstantOverride("margin_bottom", 6);
-            chip.AddChild(margin);
+            string resultId = _recipeId == null ? string.Empty : _dataProvider?.GetRecipeResultItemId(_recipeId) ?? string.Empty;
+            return resultId.Length > 0 ? _dataProvider?.GetItemIcon(resultId) : null;
+        }
 
-            var content = new VBoxContainer();
-            content.AddThemeConstantOverride("separation", 2);
-            margin.AddChild(content);
+        private EquipItemBlueprint? SelectedBlueprint()
+        {
+            if (_recipeId == null || _dataProvider == null) return null;
+            string resultId = _dataProvider.GetRecipeResultItemId(_recipeId);
+            return resultId.Length == 0 ? null : _dataProvider.GetBlueprint(resultId);
+        }
 
-            var title = new Label
+        // ---------------------------------------------------------------- requirement / additive cards
+
+        private void RefreshRequirements()
+        {
+            var cards = CurrentRequirements()
+                .Select(requirement => requirement.Type == RequirementType.ResourceCategory
+                    ? CategoryCardView(requirement)
+                    : StaticCardView(requirement))
+                .ToList();
+            _requirements?.SetRequirements(cards, ascendWarningVisible: _mode == CraftingMode.Ascend && _item != null);
+        }
+
+        /// <summary>Fixed requirement row: mastery reads the level, resources read the bag.</summary>
+        private RequirementCardView StaticCardView(Core.Interfaces.IRequirement requirement)
+        {
+            int have = requirement.Type == RequirementType.MasteryLevel
+                ? _mastery?.CurrentLevel ?? 0
+                : _inventory?.GetTotalItemAmount(requirement.Id) ?? 0;
+            var icon = requirement.Type == RequirementType.Resource ? _dataProvider?.GetItemIcon(requirement.Id) : null;
+            return new RequirementCardView(icon, Localization.Localize(requirement.Id), $"{have} / {requirement.Amount}", have >= requirement.Amount);
+        }
+
+        /// <summary>A category requirement is a slot: unfilled it invites a pick, filled it shows the choice.</summary>
+        private RequirementCardView CategoryCardView(Core.Interfaces.IRequirement requirement)
+        {
+            if (!_categoryChoices.TryGetValue(requirement.Id, out string? resourceId))
+                return new RequirementCardView(null, $"{Localization.Localize("UI_Craft_Choose")}: {Localization.Localize(requirement.Id)}", null, CountMet: true, requirement.Id);
+
+            int have = _inventory?.GetTotalItemAmount(resourceId) ?? 0;
+            return new RequirementCardView(_dataProvider?.GetItemIcon(resourceId), Localization.Localize(resourceId), $"{have} / {requirement.Amount}", have >= requirement.Amount, requirement.Id);
+        }
+
+        /// <summary>Owned candidates of one category slot. Membership comes from the resources'
+        /// material data when the id names a real category; legacy bare-tag requirements fall back
+        /// to the inventory tag lookup.</summary>
+        private List<string> CategoryResourceIds(string categoryId)
+        {
+            var members = _dataProvider?.GetResourceIdsInCategory(categoryId) ?? [];
+            var owned = members.Count > 0
+                ? members.Where(id => (_inventory?.GetTotalItemAmount(id) ?? 0) > 0)
+                : _inventory?.GetAllItemIdsWithTag(categoryId) ?? [];
+            return owned
+                .Distinct()
+                .Where(id => !_categoryChoices.ContainsValue(id))
+                .ToList();
+        }
+
+        private void RefreshAdditives()
+        {
+            // Nothing to offer while the CraftingAdditives catalog is empty — the block hides entirely.
+            bool visible = (_additiveProvider?.KnownAdditiveIds.Count ?? 0) > 0 && (_item != null || _recipeId != null);
+            List<AdditiveSlotView> slots = visible
+                ? _additiveChoices
+                    .Select(choice => choice == null
+                        ? new AdditiveSlotView(null, null)
+                        : new AdditiveSlotView(_dataProvider?.GetItemIcon(choice), Localization.Localize(choice)))
+                    .ToList()
+                : [];
+            _requirements?.SetAdditives(slots);
+        }
+
+        /// <summary>Catalog additives that actually DO something in the current mode, plus plain
+        /// essences (resources with own descriptors) where the operation's pool consumes them
+        /// (creation and reroll). A rarity-floor rune in a reroll used to show up and silently eat
+        /// resources for nothing — the picker now mirrors the domain's honest scope.</summary>
+        private List<string> AvailableAdditiveIds() =>
+            (_additiveProvider?.KnownAdditiveIds ?? []).Where(AdditiveServesMode)
+            .Concat(_mode is CraftingMode.Create or CraftingMode.Recraft ? EssenceResourceIds() : [])
+            .Distinct()
+            .Where(id => (_inventory?.GetTotalItemAmount(id) ?? 0) > 0 && !_additiveChoices.Contains(id))
+            .ToList();
+
+        /// <summary>Which catalog effects matter where: sharpening bonuses in Upgrade, rarity
+        /// floors in Create, per-operation pools in Recraft. Ascension takes no additives.</summary>
+        private bool AdditiveServesMode(string id)
+        {
+            var effects = _additiveProvider?.GetEffects(id);
+            if (effects == null) return false;
+            return _mode switch
             {
-                Text = name,
-                ThemeTypeVariation = "DimLabel",
-                AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                SizeFlagsVertical = SizeFlags.ExpandFill,
+                CraftingMode.Upgrade => effects.UpgradeChanceBonus > 0f || effects.ExtraUpgradeLevelChance > 0f,
+                CraftingMode.Create => effects.MinRarity != null,
+                CraftingMode.Recraft => !string.IsNullOrEmpty(effects.RecraftPoolId),
+                _ => false,
             };
-            title.AddThemeFontSizeOverride("font_size", 10);
-            content.AddChild(title);
-
-            var value = new Label { Text = $"+{PercentText(bonus)}" };
-            value.AddThemeFontSizeOverride("font_size", 16);
-            content.AddChild(value);
-
-            content.AddChild(new ProgressBar
-            {
-                CustomMinimumSize = new Vector2(0, 3),
-                MaxValue = 1.0,
-                Step = 0.001,
-                Value = progress,
-                ShowPercentage = false,
-            });
-            return chip;
         }
 
-        /// <summary>The "possible modifiers" column (Umbral mockup 2026-07-25): sections per slot
-        /// family with entry counts. Create rows split into "kind + parameter" left and the roll
-        /// interval right; the ascension gift pool keeps FULL sentence rows (owner: the split view
-        /// broke the mythic entries) with the Mythic tint. Reroll shows the item's LIVE pool with
-        /// additives folded in; entries the dedup/slot rules would refuse right now render muted.
-        /// Upgrade keeps the column hidden.</summary>
-        private void RenderPool()
+        /// <summary>Essences: resources of the essence category carrying their own descriptors.
+        /// Ores/hides also feed pools, but they live in the RECIPE slots — offering them here too
+        /// would flood the picker without adding a choice the recipe doesn't already give.</summary>
+        private IEnumerable<string> EssenceResourceIds() =>
+            (_dataProvider?.GetAllResources() ?? [])
+                .OfType<Core.Crafting.ICraftingResource>()
+                .Where(resource => resource.Material?.MaterialCategory?.Id == EssenceCategoryId && resource.Material.Modifiers.Count > 0)
+                .Select(resource => resource.Id);
+
+        // ---------------------------------------------------------------- pool and forecast
+
+        /// <summary>Which descriptors the pool column shows per mode: creation and reroll split into
+        /// "kind + parameter" rows, the ascension gift pool keeps full sentence rows with the Mythic
+        /// tint, Upgrade keeps the column hidden.</summary>
+        private void RefreshPool()
         {
-            if (_poolBox == null || _poolList == null) return;
-            _poolList.QueueFreeChildren();
-
-            int entryCount = 0;
-            var rows = _mode switch
+            switch (_mode)
             {
-                CraftingMode.Create => DescriptorSections(CreationPoolDescriptors(), tint: null, splitRows: true, out entryCount),
-                CraftingMode.Recraft => DescriptorSections(RecraftPoolDescriptors(), tint: null, splitRows: true, out entryCount, RecraftIneligible()),
-                CraftingMode.Ascend => DescriptorSections(AscensionPoolDescriptors(),
-                    Color.FromHtml(TextPalette.RarityColor(Rarity.Mythic)), splitRows: false, out entryCount),
-                _ => [],
-            };
-
-            _poolBox.Visible = rows.Count > 0;
-            if (rows.Count == 0) return;
-
-            _poolHeader?.Text = Localization.Localize("UI_Craft_Pool").ToUpper();
-            _poolCounter?.Text = Localization.Render("UI_Pool_Counter", new Dictionary<string, object?> { ["Count"] = entryCount });
-            foreach (var row in rows)
-                _poolList.AddChild(row);
+                case CraftingMode.Create:
+                    _pool?.SetPool(CreationPoolDescriptors(), tint: null, splitRows: true, ineligible: null);
+                    break;
+                case CraftingMode.Recraft:
+                    _pool?.SetPool(RecraftPoolDescriptors(), tint: null, splitRows: true, RecraftIneligible());
+                    break;
+                case CraftingMode.Ascend:
+                    _pool?.SetPool(AscensionPoolDescriptors(),
+                        Color.FromHtml(TextPalette.RarityColor(Rarity.Mythic)), splitRows: false, ineligible: null);
+                    break;
+                default:
+                    _pool?.SetPool([], tint: null, splitRows: false, ineligible: null);
+                    break;
+            }
         }
 
         private IEnumerable<Core.Modifiers.IModifierDescriptor> CreationPoolDescriptors()
@@ -537,132 +476,15 @@ namespace Crafting.Source.UIElements
                 : EquipItemLines.ComposeRolled(_item)
                     .FirstOrDefault(line => line.InstanceId == _selectedModifierInstanceId)?.Affix;
 
-        /// <summary>Pool rows grouped by slot family (prefixes / suffixes / tail / mythic), each block
-        /// opened by the shared affix caption with its entry count. A parameter descriptor splits into
-        /// "kind + name" and the gold roll interval; sentence-shaped entries (context, composites) and
-        /// grants keep their single-line form. Duplicates (same visible row) collapse.</summary>
-        private List<Control> DescriptorSections(IEnumerable<Core.Modifiers.IModifierDescriptor> descriptors, Color? tint, bool splitRows, out int entryCount,
-            Func<Core.Modifiers.IModifierDescriptor, bool>? ineligible = null)
-        {
-            var rows = new List<Control>();
-            entryCount = 0;
-            foreach (var family in descriptors
-                         .GroupBy(descriptor => descriptor.Affix)
-                         .OrderBy(group => FamilyRank(group.Key)))
-            {
-                var familyRows = new List<Control>();
-                var seen = new HashSet<string>();
-                foreach (var descriptor in OrderForDisplay(family))
-                {
-                    var row = DescriptorRow(descriptor, tint, splitRows, seen, ineligible?.Invoke(descriptor) == true);
-                    if (row != null) familyRows.Add(row);
-                }
+        private void RefreshForecast() =>
+            _requirements?.Forecast?.SetForecast(ForecastLines()
+                .Select(line => new ForecastLineView(Localization.Localize(line.Key), line.Value))
+                .ToList());
 
-                if (familyRows.Count == 0) continue;
-                entryCount += familyRows.Count;
-                var header = ItemLineRows.AffixHeader(family.Key, familyRows.Count);
-                if (header != null) rows.Add(header);
-                rows.AddRange(familyRows);
-            }
-
-            return rows;
-        }
-
-        /// <summary>Same block order the item line lists use: prefixes, suffixes, the tail, mythic last.</summary>
-        private static int FamilyRank(AffixKind affix) => affix switch
-        {
-            AffixKind.Prefix => 0,
-            AffixKind.Suffix => 1,
-            AffixKind.Mythic => 3,
-            _ => 2,
-        };
-
-        /// <summary>Inside a family block the rollable lines group by their stat (shown name), flats
-        /// before increases before multipliers, each run high to low — "+ PhysicalDamage" entries sit
-        /// together from the biggest roll down. Sentence-shaped entries follow in authored order.</summary>
-        private static IEnumerable<Core.Modifiers.IModifierDescriptor> OrderForDisplay(IEnumerable<Core.Modifiers.IModifierDescriptor> family)
-        {
-            var parameters = new List<Core.Modifiers.ParameterDescriptor>();
-            var sentences = new List<Core.Modifiers.IModifierDescriptor>();
-            foreach (var descriptor in family)
-            {
-                if (descriptor is Core.Modifiers.ParameterDescriptor parameter) parameters.Add(parameter);
-                else sentences.Add(descriptor);
-            }
-
-            return parameters
-                .OrderBy(parameter => Localization.Localize(parameter.Parameter.ToString()))
-                .ThenBy(parameter => KindRank(parameter.ValueType))
-                .ThenByDescending(parameter => parameter.Value.Max)
-                .ThenByDescending(parameter => parameter.Value.Min)
-                .Cast<Core.Modifiers.IModifierDescriptor>()
-                .Concat(sentences);
-        }
-
-        private static int KindRank(Core.Enums.ModifierValueType valueType) => valueType switch
-        {
-            Core.Enums.ModifierValueType.Increase => 1,
-            Core.Enums.ModifierValueType.Multiplicative => 2,
-            _ => 0,
-        };
-
-        private Control? DescriptorRow(Core.Modifiers.IModifierDescriptor descriptor, Color? tint, bool splitRows, HashSet<string> seen, bool muted = false)
-        {
-            var mutedColor = Color.FromHtml(TextPalette.System);
-            if (splitRows && descriptor is Core.Modifiers.ParameterDescriptor parameter && _modifierFormatter != null)
-            {
-                string name = $"{Localization.Localize(KindKey(parameter.ValueType))} {Localization.Localize(parameter.Parameter.ToString())}";
-                string range = _modifierFormatter.FormatDescriptorRange(parameter);
-                return seen.Add($"{name}|{range}") ? SplitRow(name, range, muted ? mutedColor : tint, muted) : null;
-            }
-
-            string text = descriptor switch
-            {
-                Core.Modifiers.GrantDescriptor grant => Localization.Localize(grant.GrantId),
-                Core.Modifiers.UpgradeLevelsDescriptor levels => Localization.Render("UI_Pool_Extra_Levels",
-                    new Dictionary<string, object?> { ["Min"] = levels.Min, ["Max"] = levels.Max }),
-                _ => Localization.Format(descriptor),
-            };
-            if (string.IsNullOrEmpty(text) || !seen.Add(text)) return null;
-
-            var label = new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart };
-            if (muted) label.AddThemeColorOverride("font_color", mutedColor);
-            else if (tint is { } color) label.AddThemeColorOverride("font_color", color);
-            return label;
-        }
-
-        /// <summary>How a rollable line announces its shape: "+ Health", "+% incr. Evade", "+% more Armor".</summary>
-        private static string KindKey(Core.Enums.ModifierValueType valueType) => valueType switch
-        {
-            Core.Enums.ModifierValueType.Increase => "UI_Mod_Kind_Increase",
-            Core.Enums.ModifierValueType.Multiplicative => "UI_Mod_Kind_Multiplicative",
-            _ => "UI_Mod_Kind_Flat",
-        };
-
-        private static Control SplitRow(string name, string value, Color? tint, bool muted = false)
-        {
-            var row = SharedUi.KeyValueRow.Initialize().Instantiate<SharedUi.KeyValueRow>();
-            row.Set(name, value, Color.FromHtml(muted ? TextPalette.System : TextPalette.Number));
-            row.SetPlainCaption(tint);
-            row.EnableCaptionAutowrap();
-            return row;
-        }
-
-        /// <summary>The kit's craft forecast under the resource slots: for the current operation the
-        /// abstract mastery channels turn into concrete odds — data base struck through, the real
-        /// chance (mastery + chosen additives, the exact numbers the handlers roll) next to it.
-        /// Only lines the mode actually rolls are shown; a reroll is deterministic — no box.</summary>
-        private void RenderForecast()
-        {
-            if (_forecastBox == null || _forecastRows == null) return;
-            _forecastRows.QueueFreeChildren();
-
-            var lines = ForecastLines();
-            _forecastBox.Visible = lines.Count > 0;
-            foreach ((string key, string value) in lines)
-                _forecastRows.AddChild(ForecastRow(Localization.Localize(key), value));
-        }
-
+        /// <summary>For the current operation the abstract mastery channels turn into concrete odds —
+        /// data base struck through, the real chance (mastery + chosen additives, the exact numbers
+        /// the handlers roll) next to it. Only lines the mode actually rolls are shown; a reroll is
+        /// deterministic — no lines.</summary>
         private List<(string Key, string Value)> ForecastLines()
         {
             if (_mastery == null) return [];
@@ -681,13 +503,13 @@ namespace Crafting.Source.UIElements
             var lines = new List<(string, string)>
             {
                 ("UI_Mastery_Channel_Upgrade",
-                    WasNow(_upgrader!.GetBaseUpgradeChance(item), _upgrader.GetUpgradeChance(item, BuildCost().Keys))),
+                    CraftingFormat.WasNow(_upgrader!.GetBaseUpgradeChance(item), _upgrader.GetUpgradeChance(item, BuildCost().Keys))),
             };
 
             float extraLevel = _additiveChoices.Where(id => id != null)
                 .Sum(id => _additiveProvider?.GetEffects(id!)?.ExtraUpgradeLevelChance ?? 0f);
             if (extraLevel > 0f)
-                lines.Add(("UI_Forecast_Extra_Level", Highlight(PercentText(extraLevel))));
+                lines.Add(("UI_Forecast_Extra_Level", CraftingFormat.Highlight(CraftingFormat.PercentText(extraLevel))));
             return lines;
         }
 
@@ -697,8 +519,8 @@ namespace Crafting.Source.UIElements
             float effectBase = effectNow / (1f + _mastery.GetExtraEffectChanceBonus());
             var lines = new List<(string, string)>
             {
-                ("UI_Mastery_Channel_Values", Highlight($"×{_mastery.GetCurrentValueMultiplier():0.00}")),
-                ("UI_Mastery_Channel_Effect", WasNow(effectBase, effectNow)),
+                ("UI_Mastery_Channel_Values", CraftingFormat.Highlight($"×{_mastery.GetCurrentValueMultiplier():0.00}")),
+                ("UI_Mastery_Channel_Effect", CraftingFormat.WasNow(effectBase, effectNow)),
             };
 
             var floorRarity = _additiveChoices.Where(id => id != null)
@@ -714,453 +536,17 @@ namespace Crafting.Source.UIElements
 
         private List<(string, string)> AscendForecast() =>
             [("UI_Mastery_Channel_Mythic",
-                WasNow(_mastery!.GetMythicGiftChance() / (1f + _mastery.GetMythicModifierChanceBonus()), _mastery.GetMythicGiftChance()))];
+                CraftingFormat.WasNow(_mastery!.GetMythicGiftChance() / (1f + _mastery.GetMythicModifierChanceBonus()), _mastery.GetMythicGiftChance()))];
 
-        private static Control ForecastRow(string name, string valueBbcode)
-        {
-            var row = SharedUi.KeyValueRow.Initialize().Instantiate<SharedUi.KeyValueRow>();
-            row.SetRich(name, valueBbcode, ForecastValueWidth);
-            row.EnableCaptionAutowrap();
-            return row;
-        }
-
-        private static string WasNow(float before, float now) =>
-            $"[s][color={TextPalette.Muted}]{PercentText(before)}[/color][/s] → {Highlight(PercentText(now))}";
-
-        private static string Highlight(string text) => $"[color={TextPalette.Number}]{text}[/color]";
-
-        /// <summary>Sub-10% chances keep one decimal, so early mastery does not round to a flat lie.</summary>
-        private static string PercentText(float value) =>
-            (value * 100f).ToString(value < 0.095f ? "0.#" : "0", System.Globalization.CultureInfo.InvariantCulture) + "%";
-
-        private EquipItemBlueprint? SelectedBlueprint()
-        {
-            if (_recipeId == null || _dataProvider == null) return null;
-            string resultId = _dataProvider.GetRecipeResultItemId(_recipeId);
-            return resultId.Length == 0 ? null : _dataProvider.GetBlueprint(resultId);
-        }
-
-        private void RenderItemHeader()
-        {
-            if (_item != null)
-            {
-                _itemIcon?.Texture = _item.Icon;
-                SetItemName(_item.DisplayName, _item.Rarity);
-                _itemSubtitle?.Text = $"{Localization.Localize(_item.Rarity.ToString())}   +{_item.UpdateLevel} / {_item.MaxUpdateLevel}";
-                return;
-            }
-
-            string resultId = _recipeId == null ? string.Empty : _dataProvider?.GetRecipeResultItemId(_recipeId) ?? string.Empty;
-            var blueprint = SelectedBlueprint();
-            _itemIcon?.Texture = resultId.Length > 0 ? _dataProvider?.GetItemIcon(resultId) : null;
-            SetItemName(
-                _recipeId == null ? Localization.Localize("UI_Craft_PickRecipe") : Localization.Localize(_recipeId),
-                blueprint?.Rarity);
-            _itemSubtitle?.Text = blueprint == null ? string.Empty : BlueprintSubtitle(blueprint);
-        }
-
-        /// <summary>A weapon recipe names the actual weapon (type + grip) next to the rarity,
-        /// mirroring the item tooltip's subtitle; everything else shows the bare rarity.</summary>
-        private static string BlueprintSubtitle(EquipItemBlueprint blueprint) =>
-            blueprint.Weapon is { } weapon
-                ? $"{Localization.Localize(blueprint.Rarity.ToString())} · {Localization.Localize($"WeaponType_{weapon.WeaponType}")} · {Localization.Localize($"Handedness_{weapon.Handedness}")}"
-                : Localization.Localize(blueprint.Rarity.ToString());
-
-        private void SetItemName(string text, Rarity? rarity)
-        {
-            if (_itemName == null) return;
-            _itemName.Text = text;
-            if (rarity == null) _itemName.RemoveThemeColorOverride("font_color");
-            else _itemName.AddThemeColorOverride("font_color", Color.FromHtml(TextPalette.RarityColor(rarity.Value)));
-        }
-
-        private void RenderModifiers()
-        {
-            if (_mods == null) return;
-            _mods.QueueFreeChildren();
-
-            var blueprint = _item == null ? SelectedBlueprint() : null;
-            bool visible = _item != null || blueprint != null;
-            _previewTag?.Visible = visible;
-            _mods.Visible = visible;
-            _previewTag?.Text = Localization.Localize(_item != null ? "UI_Craft_Modifiers" : "UI_Craft_Result");
-
-            if (_item != null) RenderItemModifiers(_item);
-            else if (blueprint != null) RenderBlueprintModifiers(blueprint);
-        }
-
-        /// <summary>Live item lines: parts of one composite roll present as a single row (the row's
-        /// id is the first part — the group-reroll target). The rolled rows arrive grouped by slot family
-        /// (prefixes, suffixes, leftovers, the ascension gift) and each family announces itself — the bench
-        /// shows the same blocks as the tooltip, just without its framing. Grants show their full
-        /// description below the name. Upgrade mode appends the sharpening preview to every scaling
-        /// part — "+193.5 Evade → 203.2 (+9.7)", projected value gold, gain green.</summary>
-        private void RenderItemModifiers(IEquipItem item)
-        {
-            if (item is IWeaponItem weapon)
-            {
-                AddWeaponStatRow(EntityParameter.PhysicalDamage, weapon);
-                AddWeaponStatRow(EntityParameter.CriticalChance, weapon);
-                AddWeaponStatRow(EntityParameter.CriticalDamage, weapon);
-            }
-
-            // The typed base channel, folded with its locals — same convention as the item tooltip.
-            foreach (var parameter in item.BaseStats.Keys)
-            {
-                (float baseValue, float localBonus) = item.GetBaseStatBreakdown(parameter);
-                AddBaseStatRow(parameter, baseValue + localBonus, highlighted: Mathf.Abs(localBonus) > 0.0001f);
-            }
-
-
-            float? previewScale = _mode == CraftingMode.Upgrade && !item.IsSealed && item.UpdateLevel < item.MaxUpdateLevel
-                ? item.NextUpgradeValueScale
-                : null;
-            var format = previewScale == null ? TextFormat.Plain : TextFormat.Rich;
-
-            foreach (var line in EquipItemLines.ComposeImplicits(item, format, previewScale))
-                _mods?.AddChild(LineRow(line.Text, rich: previewScale != null, dim: true));
-
-            AffixKind? block = null;
-            foreach (var line in EquipItemLines.ComposeRolled(item, format, previewScale))
-            {
-                if (line.Affix != block)
-                {
-                    block = line.Affix;
-                    var header = ItemLineRows.AffixHeader(line.Affix);
-                    if (header != null) _mods?.AddChild(header);
-                }
-
-                _mods?.AddChild(previewScale != null
-                    ? LineRow(line.Text, rich: true, dim: false)
-                    : RerollableOrLabel(line.InstanceId, line.Text));
-            }
-
-            foreach (var grant in item.Grants)
-                AddGrantBlock(grant);
-        }
-
-        /// <summary>An item line row: a plain Label normally, a RichTextLabel when the text carries
-        /// the colored upgrade preview (BBCode). Dim rows keep their tone via a default_color override —
-        /// theme variations only target Label.</summary>
-        private static Control LineRow(string text, bool rich, bool dim)
-        {
-            if (!rich)
-                return new Label { Text = text, ThemeTypeVariation = dim ? "DimLabel" : null, AutowrapMode = TextServer.AutowrapMode.WordSmart };
-
-            var row = RichText(text);
-            row.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            if (dim) row.AddThemeColorOverride("default_color", Color.FromHtml(TextPalette.Muted));
-            return row;
-        }
-
-        /// <summary>A grant on the bench mirrors the tooltip's Effect block: the name, then the rendered
-        /// rich description below (a plain Label would print the raw BBCode tags).</summary>
-        private void AddGrantBlock(IItemGrant grant)
-        {
-            _mods?.AddChild(new Label { Text = Localization.Localize(grant.Id), AutowrapMode = TextServer.AutowrapMode.WordSmart });
-            if (string.IsNullOrEmpty(grant.Description)) return;
-            var description = RichText(grant.Description);
-            description.CustomMinimumSize = new Vector2(GrantDescriptionMinWidth, 0);
-            description.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _mods?.AddChild(description);
-        }
-
-        /// <summary>Recipe result preview straight from the blueprint: a weapon opens with its base
-        /// combat stats (the numbers the minted item is born with), then descriptors with value
-        /// spreads render through the range templates ("+40–60 Strength"), fixed lines as usual.</summary>
-        private void RenderBlueprintModifiers(EquipItemBlueprint blueprint)
-        {
-            if (blueprint.Weapon is { } weapon)
-            {
-                AddBaseStatRow(EntityParameter.PhysicalDamage, weapon.Damage);
-                AddBaseStatRow(EntityParameter.CriticalChance, weapon.CriticalChance);
-                AddBaseStatRow(EntityParameter.CriticalDamage, weapon.CriticalDamage);
-            }
-
-            // Unrolled base stats show their roll spread; a fixed base shows the single value.
-            foreach (var stat in blueprint.BaseStats)
-                AddBaseStatSpreadRow(stat);
-
-            foreach (var descriptor in blueprint.Implicits)
-                _mods?.AddChild(new Label { Text = Localization.Format(descriptor), ThemeTypeVariation = "DimLabel", AutowrapMode = TextServer.AutowrapMode.WordSmart });
-
-            foreach (var descriptor in blueprint.Modifiers)
-                _mods?.AddChild(new Label { Text = Localization.Format(descriptor), AutowrapMode = TextServer.AutowrapMode.WordSmart });
-
-            foreach (var grant in blueprint.Grants)
-                _mods?.AddChild(new Label { Text = Localization.Localize(grant.Id), AutowrapMode = TextServer.AutowrapMode.WordSmart });
-        }
-
-        /// <summary>A bench-item weapon stat: the effective value with local lines folded in; a
-        /// locally modified stat glows brighter — same convention as the item tooltip.</summary>
-        private void AddWeaponStatRow(EntityParameter parameter, IWeaponItem weapon)
-        {
-            (float baseValue, float localBonus) = weapon.GetStatBreakdown(parameter);
-            AddBaseStatRow(parameter, baseValue + localBonus, highlighted: Mathf.Abs(localBonus) > 0.0001f);
-        }
-
-        /// <summary>Blueprint base-stat row: the roll spread ("500–900") instead of a value — the
-        /// bench previews what the mint can produce, not a concrete roll.</summary>
-        private void AddBaseStatSpreadRow(BaseStatBlueprint stat)
-        {
-            string Bound(float value) =>
-                _modifierFormatter?.FormatValue(ModifierValueType.Flat, stat.Parameter, value)
-                ?? value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
-
-            var row = new HBoxContainer();
-            row.AddChild(new Label
-            {
-                Text = Localization.Localize(stat.Parameter.ToString()),
-                ThemeTypeVariation = "DimLabel",
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            });
-            var valueLabel = new Label
-            {
-                Text = stat.Value.IsFixed ? Bound(stat.Value.Min) : $"{Bound(stat.Value.Min)}–{Bound(stat.Value.Max)}",
-                HorizontalAlignment = HorizontalAlignment.Right,
-            };
-            valueLabel.AddThemeColorOverride("font_color", Color.FromHtml(TextPalette.BaseStat));
-            row.AddChild(valueLabel);
-            _mods?.AddChild(row);
-        }
-
-        /// <summary>One base-stat row: dim parameter name, unit-aware value on the right.</summary>
-        private void AddBaseStatRow(EntityParameter parameter, float value, bool highlighted = false)
-        {
-            var row = new HBoxContainer();
-            row.AddChild(new Label
-            {
-                Text = Localization.Localize(parameter.ToString()),
-                ThemeTypeVariation = "DimLabel",
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            });
-            var valueLabel = new Label
-            {
-                Text = _modifierFormatter?.FormatValue(ModifierValueType.Flat, parameter, value) ?? value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture),
-                HorizontalAlignment = HorizontalAlignment.Right,
-            };
-            valueLabel.AddThemeColorOverride("font_color", Color.FromHtml(highlighted ? TextPalette.Number : TextPalette.BaseStat));
-            row.AddChild(valueLabel);
-            _mods?.AddChild(row);
-        }
-
-        /// <summary>In Recraft every additional row — entity, context or grouped — is pickable; the chosen
-        /// one gets rerolled. A sealed item (unique/mythic) offers no rows at all — nothing on it rerolls.</summary>
-        private Control RerollableOrLabel(string instanceId, string text) =>
-            _mode == CraftingMode.Recraft && _item is { IsSealed: false }
-                ? RerollableRow(instanceId, text)
-                : new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart };
-
-        private Button RerollableRow(string instanceId, string text)
-        {
-            var row = new Button
-            {
-                Text = (_selectedModifierInstanceId == instanceId ? "» " : string.Empty) + text,
-                Alignment = HorizontalAlignment.Left,
-                FocusMode = FocusModeEnum.None,
-                ClipText = true,
-            };
-            row.Pressed += () =>
-            {
-                _selectedModifierInstanceId = instanceId;
-                RefreshDetails();
-            };
-            return row;
-        }
-
-        // ---------------------------------------------------------------- requirement / additive cards
-
-        private void RenderRequirements()
-        {
-            if (_requirements == null) return;
-            _requirements.QueueFreeChildren();
-
-            foreach (var requirement in CurrentRequirements())
-            {
-                if (requirement.Type == RequirementType.ResourceCategory)
-                    _requirements.AddChild(CategoryCard(requirement));
-                else
-                    _requirements.AddChild(StaticCard(requirement));
-            }
-
-            _ascendWarning?.Visible = _mode == CraftingMode.Ascend && _item != null;
-        }
-
-        private Control StaticCard(Core.Interfaces.IRequirement requirement)
-        {
-            int have = requirement.Type == RequirementType.MasteryLevel
-                ? _mastery?.CurrentLevel ?? 0
-                : _inventory?.GetTotalItemAmount(requirement.Id) ?? 0;
-            var icon = requirement.Type == RequirementType.Resource ? _dataProvider?.GetItemIcon(requirement.Id) : null;
-
-            var card = new PanelContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, CustomMinimumSize = s_cardMinSize };
-            card.AddChild(CardContent(icon, Localization.Localize(requirement.Id), $"{have} / {requirement.Amount}", have >= requirement.Amount));
-            return card;
-        }
-
-        /// <summary>A category requirement is a slot: click → pick a concrete resource carrying the tag.</summary>
-        private Control CategoryCard(Core.Interfaces.IRequirement requirement)
-        {
-            bool chosen = _categoryChoices.TryGetValue(requirement.Id, out string? resourceId);
-            int have = chosen ? _inventory?.GetTotalItemAmount(resourceId!) ?? 0 : 0;
-
-            var card = SlotButton();
-            card.AddChild(chosen
-                ? CardContent(_dataProvider?.GetItemIcon(resourceId!), Localization.Localize(resourceId!), $"{have} / {requirement.Amount}", have >= requirement.Amount)
-                : CardContent(null, $"{Localization.Localize("UI_Craft_Choose")}: {Localization.Localize(requirement.Id)}", null, countMet: true));
-            card.Pressed += () => OpenPicker(
-                Localization.Localize(requirement.Id),
-                CategoryResourceIds(requirement.Id),
-                picked =>
-                {
-                    _categoryChoices[requirement.Id] = picked;
-                    RefreshDetails();
-                });
-            return card;
-        }
-
-        /// <summary>Owned candidates of one category slot. Membership comes from the resources'
-        /// material data when the id names a real category; legacy bare-tag requirements fall back
-        /// to the inventory tag lookup.</summary>
-        private List<string> CategoryResourceIds(string categoryId)
-        {
-            var members = _dataProvider?.GetResourceIdsInCategory(categoryId) ?? [];
-            var owned = members.Count > 0
-                ? members.Where(id => (_inventory?.GetTotalItemAmount(id) ?? 0) > 0)
-                : _inventory?.GetAllItemIdsWithTag(categoryId) ?? [];
-            return owned
-                .Distinct()
-                .Where(id => !_categoryChoices.ContainsValue(id))
-                .ToList();
-        }
-
-        private void RenderAdditives()
-        {
-            if (_additives == null) return;
-            _additives.QueueFreeChildren();
-
-            // Nothing to offer while the CraftingAdditives catalog is empty — hide the block entirely.
-            bool visible = (_additiveProvider?.KnownAdditiveIds.Count ?? 0) > 0 && (_item != null || _recipeId != null);
-            _additivesHeader?.Visible = visible;
-            _additives.Visible = visible;
-            if (!visible) return;
-
-            for (int slot = 0; slot < AdditiveSlots; slot++)
-            {
-                int index = slot;
-                string? choice = _additiveChoices[slot];
-                var card = SlotButton();
-                card.AddChild(choice == null
-                    ? CardContent(null, "+", null, countMet: true)
-                    : CardContent(_dataProvider?.GetItemIcon(choice), Localization.Localize(choice), null, countMet: true));
-                card.Pressed += () =>
-                {
-                    if (_additiveChoices[index] != null)
-                    {
-                        _additiveChoices[index] = null; // click on a filled slot empties it
-                        RefreshDetails();
-                        return;
-                    }
-
-                    OpenPicker(Localization.Localize("UI_Craft_Additives"), AvailableAdditiveIds(), picked =>
-                    {
-                        _additiveChoices[index] = picked;
-                        RefreshDetails();
-                    });
-                };
-                _additives.AddChild(card);
-            }
-        }
-
-        /// <summary>Clickable slot card: the button is the frame, the content overlays it mouse-transparently.</summary>
-        private static Button SlotButton() => new()
-        {
-            SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            CustomMinimumSize = s_cardMinSize,
-            FocusMode = FocusModeEnum.None,
-        };
-
-        /// <summary>Compact horizontal slot-row content (owner request 2026-07-24 — the tall square
-        /// cards ate the bench): icon on the left, name, have/need on the right. The row itself is
-        /// the shared IconLabelRow; the margin and mouse transparency stay this card's concerns.</summary>
-        private static Control CardContent(Texture2D? icon, string name, string? count, bool countMet)
-        {
-            var margin = new MarginContainer { MouseFilter = MouseFilterEnum.Ignore };
-            margin.SetAnchorsPreset(LayoutPreset.FullRect);
-            margin.AddThemeConstantOverride("margin_left", 8);
-            margin.AddThemeConstantOverride("margin_right", 8);
-            margin.AddThemeConstantOverride("margin_top", 4);
-            margin.AddThemeConstantOverride("margin_bottom", 4);
-
-            var row = SharedUi.IconLabelRow.Initialize().Instantiate<SharedUi.IconLabelRow>();
-            // The empty additive slot is a lone "+" — center it; real rows read left to right.
-            row.Alignment = icon == null && count == null ? BoxContainer.AlignmentMode.Center : BoxContainer.AlignmentMode.Begin;
-            row.Set(icon, name);
-            if (count != null)
-            {
-                row.SetTrailing(new Label
-                {
-                    Text = count,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    ThemeTypeVariation = countMet ? null : "DimLabel",
-                });
-            }
-
-            row.MakeMouseTransparent();
-            margin.AddChild(row);
-            return margin;
-        }
-
-        /// <summary>Catalog additives that actually DO something in the current mode, plus plain
-        /// essences (resources with own descriptors) where the operation's pool consumes them
-        /// (creation and reroll). A rarity-floor rune in a reroll used to show up and silently eat
-        /// resources for nothing — the picker now mirrors the domain's honest scope.</summary>
-        private List<string> AvailableAdditiveIds() =>
-            (_additiveProvider?.KnownAdditiveIds ?? []).Where(AdditiveServesMode)
-            .Concat(_mode is CraftingMode.Create or CraftingMode.Recraft ? EssenceResourceIds() : [])
-            .Distinct()
-            .Where(id => (_inventory?.GetTotalItemAmount(id) ?? 0) > 0 && !_additiveChoices.Contains(id))
-            .ToList();
-
-        /// <summary>Which catalog effects matter where: sharpening bonuses in Upgrade, rarity
-        /// floors in Create, per-operation pools in Recraft. Ascension takes no additives.</summary>
-        private bool AdditiveServesMode(string id)
-        {
-            var effects = _additiveProvider?.GetEffects(id);
-            if (effects == null) return false;
-            return _mode switch
-            {
-                CraftingMode.Upgrade => effects.UpgradeChanceBonus > 0f || effects.ExtraUpgradeLevelChance > 0f,
-                CraftingMode.Create => effects.MinRarity != null,
-                CraftingMode.Recraft => !string.IsNullOrEmpty(effects.RecraftPoolId),
-                _ => false,
-            };
-        }
-
-        private const string EssenceCategoryId = "Category_Essence";
-
-        /// <summary>Essences: resources of the essence category carrying their own descriptors.
-        /// Ores/hides also feed pools, but they live in the RECIPE slots — offering them here too
-        /// would flood the picker without adding a choice the recipe doesn't already give.</summary>
-        private IEnumerable<string> EssenceResourceIds() =>
-            (_dataProvider?.GetAllResources() ?? [])
-                .OfType<Core.Crafting.ICraftingResource>()
-                .Where(resource => resource.Material?.MaterialCategory?.Id == EssenceCategoryId && resource.Material.Modifiers.Count > 0)
-                .Select(resource => resource.Id);
-
-        private void RenderAction()
-        {
-            if (_actionButton == null) return;
-
-            _actionButton.Text = Localization.Localize(_mode switch
+        private void RefreshAction() => _actionBar?.SetAction(
+            Localization.Localize(_mode switch
             {
                 CraftingMode.Upgrade => "UI_Craft_Upgrade",
                 CraftingMode.Recraft => "UI_Craft_Reroll",
                 CraftingMode.Ascend => "UI_Craft_Ascend",
                 _ => "UI_Craft_Create",
-            });
-            _actionButton.Disabled = !CanExecute();
-        }
+            }),
+            CanExecute());
 
         // ---------------------------------------------------------------- costs and execution
 
@@ -1338,7 +724,7 @@ namespace Crafting.Source.UIElements
 
         private void OnItemAmountChanged(string itemId, int amount)
         {
-            BuildTree();
+            _recipeTree?.Rebuild();
             RefreshDetails();
         }
     }

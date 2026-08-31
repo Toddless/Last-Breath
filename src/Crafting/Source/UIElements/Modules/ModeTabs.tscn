@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://uv7bxccexbnt"]
+
+[ext_resource type="Script" uid="uid://cbpvb4jeg6gm5" path="res://Addons/Crafting/UIElements/Modules/ModeTabs.cs" id="1_mtabs"]
+
+[node name="ModeTabs" type="HBoxContainer" node_paths=PackedStringArray("_create", "_upgrade", "_recraft", "_ascend")]
+theme_override_constants/separation = 6
+script = ExtResource("1_mtabs")
+_create = NodePath("ModeCreate")
+_upgrade = NodePath("ModeUpgrade")
+_recraft = NodePath("ModeRecraft")
+_ascend = NodePath("ModeAscend")
+
+[node name="ModeCreate" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+text = "Create"
+
+[node name="ModeUpgrade" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+text = "Upgrade"
+
+[node name="ModeRecraft" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+text = "Reroll"
+
+[node name="ModeAscend" type="Button" parent="."]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+text = "Ascend"

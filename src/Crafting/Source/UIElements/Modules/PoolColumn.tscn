@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://bv1qj54mfjrwv"]
+
+[ext_resource type="Script" uid="uid://7bbuop0apw0x" path="res://Addons/Crafting/UIElements/Modules/PoolColumn.cs" id="1_poolc"]
+
+[node name="PoolColumn" type="VBoxContainer" node_paths=PackedStringArray("_header", "_counter", "_list")]
+visible = false
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+script = ExtResource("1_poolc")
+_header = NodePath("PoolHeaderRow/PoolHeader")
+_counter = NodePath("PoolHeaderRow/PoolCounter")
+_list = NodePath("PoolScroll/PoolList")
+
+[node name="PoolHeaderRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="PoolHeader" type="Label" parent="PoolHeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SectionLabel"
+
+[node name="PoolCounter" type="Label" parent="PoolHeaderRow"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 11
+
+[node name="PoolScroll" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="PoolList" type="VBoxContainer" parent="PoolScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4

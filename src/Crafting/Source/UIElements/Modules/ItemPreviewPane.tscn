@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://cxrv3eonf510w"]
+
+[ext_resource type="Script" uid="uid://ce7nc610053jh" path="res://Addons/Crafting/UIElements/Modules/ItemPreviewPane.cs" id="1_iprev"]
+
+[node name="ItemPreviewPane" type="VBoxContainer" node_paths=PackedStringArray("_tag", "_itemHeader", "_icon", "_name", "_subtitle", "_mods")]
+custom_minimum_size = Vector2(372, 0)
+theme_override_constants/separation = 8
+script = ExtResource("1_iprev")
+_tag = NodePath("PreviewTag")
+_itemHeader = NodePath("ItemHeader")
+_icon = NodePath("ItemHeader/ItemIcon")
+_name = NodePath("ItemHeader/ItemInfo/ItemName")
+_subtitle = NodePath("ItemHeader/ItemInfo/ItemSubtitle")
+_mods = NodePath("PreviewScroll/Mods")
+
+[node name="PreviewTag" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Result"
+
+[node name="ItemHeader" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ItemIcon" type="TextureRect" parent="ItemHeader"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ItemInfo" type="VBoxContainer" parent="ItemHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ItemName" type="Label" parent="ItemHeader/ItemInfo"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+
+[node name="ItemSubtitle" type="Label" parent="ItemHeader/ItemInfo"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+
+[node name="PreviewScroll" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Mods" type="VBoxContainer" parent="PreviewScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
