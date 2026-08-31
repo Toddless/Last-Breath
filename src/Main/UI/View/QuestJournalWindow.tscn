@@ -4,11 +4,13 @@
 
 [node name="QuestJournalWindow" type="Control" unique_id=1898115200 node_paths=PackedStringArray("_questList", "_title", "_details", "_abandonButton")]
 layout_mode = 3
-anchor_left = 0.25
+anchor_left = 0.5
 anchor_top = 0.15
-anchor_right = 0.75
+anchor_right = 1.0
 anchor_bottom = 0.85
-grow_horizontal = 2
+offset_left = -16.0
+offset_right = -16.0
+grow_horizontal = 0
 grow_vertical = 2
 script = ExtResource("1_qstjr")
 _questList = NodePath("Panel/Margin/HBox/Quests")

@@ -31,6 +31,8 @@ namespace LastBreath.UI
         [Export] private Label? _goldLabel;
         [Export] private VBoxContainer? _offersContainer;
         [Export] private GridContainer? _inventoryGrid;
+        [Export] private Label? _goodsLabel;
+        [Export] private Label? _bagLabel;
 
         private IGameMessageBus? _messageBus;
         private IInventory? _inventory;
@@ -54,6 +56,8 @@ namespace LastBreath.UI
         public override void _Ready()
         {
             _header?.Closed += Close;
+            _goodsLabel?.Text = Localization.Localize("UI_Trade_Stock");
+            _bagLabel?.Text = Localization.Localize("UI_Inventory");
             Active = this;
         }
 
@@ -116,8 +120,9 @@ namespace LastBreath.UI
             var trader = _traderService.GetTrader(_traderId);
             if (trader == null) return;
 
+            // The shelf's zone header ("Goods") lives in the scene — the list itself opens with
+            // the offers and only the buyback section announces itself.
             var stock = _traderService.GetStock(_traderId);
-            AddSectionHeader(Localization.Localize("UI_Trade_Stock"));
             foreach (var offer in stock.Where(entry => !entry.IsBuyback))
                 _offersContainer.AddChild(BuildOfferRow(offer, trader.Fraction));
 
@@ -130,9 +135,8 @@ namespace LastBreath.UI
 
         private void AddSectionHeader(string text)
         {
-            var header = new Label { Text = text };
-            header.AddThemeColorOverride("font_color", new Color(0.72f, 0.62f, 0.4f));
-            _offersContainer?.AddChild(header);
+            // Same variation as the zone headers — one caption style across the window.
+            _offersContainer?.AddChild(new Label { Text = text, ThemeTypeVariation = "SectionLabel" });
         }
 
         /// <summary>Row: icon · name (rarity-colored) · unit price · xRemaining · [qty] · Buy.

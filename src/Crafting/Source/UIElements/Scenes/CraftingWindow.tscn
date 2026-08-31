@@ -46,18 +46,21 @@ _poolHeader = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/Ri
 _poolCounter = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn/PoolHeaderRow/PoolCounter")
 _poolList = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn/PoolScroll/PoolList")
 
-[node name="Center" type="CenterContainer" parent="." unique_id=145418391]
+[node name="Center" type="HBoxContainer" parent="." unique_id=145418391]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = -16.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+alignment = 2
 
 [node name="Panel" type="PanelContainer" parent="Center" unique_id=170032292]
 custom_minimum_size = Vector2(1460, 860)
 layout_mode = 2
+size_flags_vertical = 4
 theme_type_variation = &"UmbralWindowPanel"
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=402062292]

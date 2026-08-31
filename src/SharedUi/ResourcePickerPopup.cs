@@ -76,8 +76,11 @@ namespace SharedUi
                 _entries.Add(entry);
                 if (_list == null) continue;
                 int index = _list.AddItem(entry.Label, entry.Icon);
-                // The engine tooltip only where no Preview popup takes the hover instead.
-                if (entry.Preview == null && !string.IsNullOrEmpty(entry.Tooltip)) _list.SetItemTooltip(index, entry.Tooltip);
+                // The engine tooltip only where no Preview popup takes the hover instead. A Preview
+                // row disables it OUTRIGHT — ItemList otherwise floats the row's own label as a
+                // native tooltip right next to the full item card.
+                if (entry.Preview != null) _list.SetItemTooltipEnabled(index, false);
+                else if (!string.IsNullOrEmpty(entry.Tooltip)) _list.SetItemTooltip(index, entry.Tooltip);
                 if (entry.LabelColor is { } color) _list.SetItemCustomFgColor(index, color);
             }
         }

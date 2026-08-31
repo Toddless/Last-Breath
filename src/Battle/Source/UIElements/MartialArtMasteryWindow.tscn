@@ -21,17 +21,20 @@ _pointsLabel = NodePath("Center/Panel/Margin/Layout/Header/PointsLabel")
 _waitingLabel = NodePath("Center/Panel/Margin/Layout/Header/WaitingLabel")
 _close = NodePath("Center/Panel/Margin/Layout/Header/CloseBtn")
 
-[node name="Center" type="CenterContainer" parent="." unique_id=1451750057]
+[node name="Center" type="HBoxContainer" parent="." unique_id=1451750057]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = -16.0
 grow_horizontal = 2
 grow_vertical = 2
+alignment = 2
 
 [node name="Panel" type="PanelContainer" parent="Center" unique_id=1964963954]
 custom_minimum_size = Vector2(1180, 760)
 layout_mode = 2
+size_flags_vertical = 4
 theme_type_variation = &"UmbralWindowPanel"
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=1872651953]

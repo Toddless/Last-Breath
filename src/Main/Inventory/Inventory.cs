@@ -39,8 +39,13 @@
         {
             EnsureSlots();
             foreach (var slot in Slots)
-                if (slot is Node node && node.GetParent() == null)
-                    container.AddChild(node);
+            {
+                if (slot is not Slot node) continue;
+                if (node.GetParent() == null) container.AddChild(node);
+                // A held instance may have mutated in place since the bag was last shown
+                // (ascension flips the rarity) — the borrowed views redraw from the live item.
+                node.RefreshView();
+            }
         }
 
         /// <summary>Fresh-instance windows die on close; the slots must not die with them.</summary>
@@ -134,9 +139,20 @@
 
             FitItemsInSlots(item.Id, item.InstanceId, amount, item.MaxStackSize);
 
-            ItemAmountChanges?.Invoke(item.Id, GetTotalItemAmount(item.Id));
+            AnnounceAmountChange(item.Id);
 
             return true;
+        }
+
+        /// <summary>Every announced change also redraws ALL borrowed slot views: a craft operation
+        /// spends resources through here while it mutates an equip instance in place (ascension),
+        /// and the mutated item's own slot never sees an event of its own.</summary>
+        private void AnnounceAmountChange(string itemId)
+        {
+            ItemAmountChanges?.Invoke(itemId, GetTotalItemAmount(itemId));
+            foreach (var slot in Slots)
+                if (slot is Slot node)
+                    node.RefreshView();
         }
 
         /// <summary>Whether the whole amount fits: what the stacks already held can still take, plus
@@ -214,7 +230,7 @@
 
             _itemInstances[item.InstanceId] = item;
             slot.SetItem(new(item.Id, item.InstanceId, item.MaxStackSize));
-            ItemAmountChanges?.Invoke(item.Id, GetTotalItemAmount(item.Id));
+            AnnounceAmountChange(item.Id);
             return true;
         }
 
@@ -239,7 +255,7 @@
             }
             if (remainToDelete > 0) NotifyToast(MissingItemsKey, DisplayNameOf(itemId));
 
-            ItemAmountChanges?.Invoke(itemId, GetTotalItemAmount(itemId));
+            AnnounceAmountChange(itemId);
         }
 
         public void RemoveItemByInstanceId(string instanceId)
@@ -254,7 +270,7 @@
             foreach (var slot in Slots.Where(x => x.CurrentItem?.InstanceId == instanceId).ToList())
                 slot.ClearSlot(isDeleted: true);
 
-            if (itemId != null) ItemAmountChanges?.Invoke(itemId, GetTotalItemAmount(itemId));
+            if (itemId != null) AnnounceAmountChange(itemId);
         }
 
         public void Clear()

@@ -25,7 +25,14 @@ namespace LastBreath.Inventory
         [Export] public EquipmentPiece Piece { get; set; }
         [Export] private TextureRect? _icon;
 
-        public override void _Ready() => _emptyStyle = GetThemeStylebox("panel");
+        /// <summary>A fresh-instance window fills the doll during InjectServices — BEFORE the tree
+        /// entry, when the neutral stylebox is not captured yet and ApplyStyle bails. Re-applying
+        /// here puts the rarity edge on whatever was equipped into the not-yet-ready slot.</summary>
+        public override void _Ready()
+        {
+            _emptyStyle = GetThemeStylebox("panel");
+            ApplyStyle();
+        }
 
         public void Bind(Func<string, bool> canAcceptInstance, Action<string> acceptInstance, Action<EquipmentPiece> unequip)
         {

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://b4rx6pujdtcga" path="res://UI/TradeWindow.cs" id="1_jmo3o"]
 [ext_resource type="PackedScene" uid="uid://q1mb3d00x8m8" path="res://Addons/SharedUi/WindowHeader.tscn" id="2_whead"]
 
-[node name="TradeWindow" type="Control" unique_id=989308892 node_paths=PackedStringArray("_header", "_goldLabel", "_offersContainer", "_inventoryGrid")]
+[node name="TradeWindow" type="Control" unique_id=989308892 node_paths=PackedStringArray("_header", "_goldLabel", "_offersContainer", "_inventoryGrid", "_goodsLabel", "_bagLabel")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,18 +15,23 @@ _header = NodePath("Center/Panel/Margin/Layout/Header")
 _goldLabel = NodePath("Center/Panel/Margin/Layout/Header/Gold")
 _offersContainer = NodePath("Center/Panel/Margin/Layout/Body/ShelfPane/ShelfScroll/Offers")
 _inventoryGrid = NodePath("Center/Panel/Margin/Layout/Body/BagPane/BagScroll/InventorySlots")
+_goodsLabel = NodePath("Center/Panel/Margin/Layout/Body/ShelfPane/GoodsLabel")
+_bagLabel = NodePath("Center/Panel/Margin/Layout/Body/BagPane/BagLabel")
 
-[node name="Center" type="CenterContainer" parent="." unique_id=2038737203]
+[node name="Center" type="HBoxContainer" parent="." unique_id=2038737203]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = -16.0
 grow_horizontal = 2
 grow_vertical = 2
+alignment = 2
 
 [node name="Panel" type="PanelContainer" parent="Center" unique_id=90690975]
 custom_minimum_size = Vector2(1180, 680)
 layout_mode = 2
+size_flags_vertical = 4
 theme_type_variation = &"UmbralWindowPanel"
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=516706558]
@@ -59,6 +64,11 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
+[node name="GoodsLabel" type="Label" parent="Center/Panel/Margin/Layout/Body/ShelfPane" unique_id=1585223094]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Goods"
+
 [node name="ShelfScroll" type="ScrollContainer" parent="Center/Panel/Margin/Layout/Body/ShelfPane" unique_id=337930083]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -71,19 +81,19 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
 [node name="BagPane" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body" unique_id=216164444]
-custom_minimum_size = Vector2(560, 0)
 layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="BagLabel" type="Label" parent="Center/Panel/Margin/Layout/Body/BagPane" unique_id=877351766]
 layout_mode = 2
-theme_type_variation = &"HeaderLabel"
+theme_type_variation = &"SectionLabel"
 text = "Inventory"
 
 [node name="BagScroll" type="ScrollContainer" parent="Center/Panel/Margin/Layout/Body/BagPane" unique_id=341743278]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
 
 [node name="InventorySlots" type="GridContainer" parent="Center/Panel/Margin/Layout/Body/BagPane/BagScroll" unique_id=432871310]
 layout_mode = 2

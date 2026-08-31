@@ -42,6 +42,16 @@
 
         public event Action<string>? ItemDeleted;
 
+        /// <summary>The empty look is code-driven (neutral frame tint, no background), and the
+        /// property setters only redraw on CHANGE — a freshly instantiated slot would otherwise
+        /// keep the scene's raw defaults until an item first passes through it.</summary>
+        public override void _Ready() => RefreshUi();
+
+        /// <summary>Redraws the slot from its current state. For the owners of live items: a craft
+        /// operation (ascension) mutates the held instance in place — nothing on the slot itself
+        /// changes, so nobody else would trigger the redraw.</summary>
+        public void RefreshView() => RefreshUi();
+
         public override Variant _GetDragData(Vector2 atPosition)
         {
             if (CurrentItem == null) return new Variant();
