@@ -1,0 +1,35 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://c1j4f2ua6r2ca"]
+
+[ext_resource type="Shader" uid="uid://baai8ltcgc55h" path="res://World/Shaders/TerrainBreakup.gdshader" id="1_shader"]
+
+[sub_resource type="FastNoiseLite" id="Noise_Grain"]
+frequency = 0.0048
+
+[sub_resource type="NoiseTexture2D" id="Tex_Grain"]
+noise = SubResource("Noise_Grain")
+seamless = true
+
+[sub_resource type="FastNoiseLite" id="Noise_Macro"]
+frequency = 0.008
+fractal_octaves = 4
+domain_warp_enabled = true
+domain_warp_amplitude = 40.0
+
+[sub_resource type="NoiseTexture2D" id="Tex_Macro"]
+noise = SubResource("Noise_Macro")
+seamless = true
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/macro_noise = SubResource("Tex_Macro")
+shader_parameter/grain_noise = SubResource("Tex_Grain")
+shader_parameter/show_noise = true
+shader_parameter/macro_size = 929.3930380661676
+shader_parameter/macro_strength = 0.18
+shader_parameter/tint_strength = 0.5
+shader_parameter/warm_tint = Color(1.05, 1.02, 0.95, 1)
+shader_parameter/cool_tint = Color(0.94, 0.97, 1.04, 1)
+shader_parameter/grain_size = 96.0
+shader_parameter/grain_strength = 0.07
+shader_parameter/edge_roughen = 0.0
+shader_parameter/edge_noise_size = 160.0
