@@ -12,6 +12,7 @@ namespace Crafting.Source.UIElements
     using Core.MessageBus.Messages;
     using Core.Views.UI;
     using Godot;
+    using Modules;
 
     public partial class InventorySlotTooltipButtons : Control, IInitializable, IRequireServices
     {
@@ -34,9 +35,9 @@ namespace Crafting.Source.UIElements
             _favorite?.Pressed += OnFavoritePressed;
             _use?.Pressed += OnUsePressed;
 
-            _update?.Text = Localization.Localize("UI_Crafting_Upgrade");
-            _recraft?.Text = Localization.Localize("UI_Crafting_Recraft");
-            _ascend?.Text = Localization.Localize("UI_Crafting_Ascend");
+            _update?.Text = Localization.Localize(ModeTabs.UpgradeTabKey);
+            _recraft?.Text = Localization.Localize(ModeTabs.RecraftTabKey);
+            _ascend?.Text = Localization.Localize(ModeTabs.AscendTabKey);
         }
 
         public override void _ExitTree()

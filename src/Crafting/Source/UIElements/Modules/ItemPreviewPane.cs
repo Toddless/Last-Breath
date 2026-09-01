@@ -15,6 +15,13 @@ namespace Crafting.Source.UIElements.Modules
     public partial class ItemPreviewPane : VBoxContainer
     {
         private const int GrantDescriptionMinWidth = 320;
+        private const string ModifiersTagKey = "UI_Craft_Modifiers";
+        private const string ResultTagKey = "UI_Craft_Result";
+        private const string PickRecipeKey = "UI_Craft_PickRecipe";
+        private const string SelectedLineMarker = "» ";
+
+        /// <summary>Below this a local bonus counts as zero and the stat row keeps its plain tone.</summary>
+        private const float LocalBonusEpsilon = 0.0001f;
 
         [Export] private Label? _tag;
         [Export] private Control? _itemHeader;
@@ -43,7 +50,7 @@ namespace Crafting.Source.UIElements.Modules
             _icon?.Texture = item.Icon;
             SetTitle(item.DisplayName, item.Rarity);
             _subtitle?.Text = $"{Localization.Localize(item.Rarity.ToString())}   +{item.UpdateLevel} / {item.MaxUpdateLevel}";
-            BeginLines(visible: true, tagKey: "UI_Craft_Modifiers");
+            BeginLines(visible: true, tagKey: ModifiersTagKey);
             RenderItemModifiers(item, mode, selectedModifierInstanceId);
         }
 
@@ -54,7 +61,7 @@ namespace Crafting.Source.UIElements.Modules
             _icon?.Texture = icon;
             SetTitle(title, blueprint?.Rarity);
             _subtitle?.Text = blueprint == null ? string.Empty : BlueprintSubtitle(blueprint);
-            BeginLines(visible: blueprint != null, tagKey: "UI_Craft_Result");
+            BeginLines(visible: blueprint != null, tagKey: ResultTagKey);
             if (blueprint != null) RenderBlueprintModifiers(blueprint);
         }
 
@@ -63,9 +70,9 @@ namespace Crafting.Source.UIElements.Modules
         {
             _showsItem = false;
             _icon?.Texture = null;
-            SetTitle(Localization.Localize("UI_Craft_PickRecipe"), rarity: null);
+            SetTitle(Localization.Localize(PickRecipeKey), rarity: null);
             _subtitle?.Text = string.Empty;
-            BeginLines(visible: false, tagKey: "UI_Craft_Result");
+            BeginLines(visible: false, tagKey: ResultTagKey);
         }
 
         /// <summary>The bench item header doubles as a "change item" button in the item modes.</summary>
@@ -88,7 +95,7 @@ namespace Crafting.Source.UIElements.Modules
         /// mirroring the item tooltip's subtitle; everything else shows the bare rarity.</summary>
         private static string BlueprintSubtitle(EquipItemBlueprint blueprint) =>
             blueprint.Weapon is { } weapon
-                ? $"{Localization.Localize(blueprint.Rarity.ToString())} · {Localization.Localize($"WeaponType_{weapon.WeaponType}")} · {Localization.Localize($"Handedness_{weapon.Handedness}")}"
+                ? EquipItemText.WeaponSubtitle(Localization.Localize(blueprint.Rarity.ToString()), weapon.WeaponType, weapon.Handedness)
                 : Localization.Localize(blueprint.Rarity.ToString());
 
         /// <summary>Clears the line list and shows/hides the tagged block under the header.</summary>
@@ -117,7 +124,7 @@ namespace Crafting.Source.UIElements.Modules
             foreach (var parameter in item.BaseStats.Keys)
             {
                 (float baseValue, float localBonus) = item.GetBaseStatBreakdown(parameter);
-                AddBaseStatRow(parameter, baseValue + localBonus, highlighted: Mathf.Abs(localBonus) > 0.0001f);
+                AddBaseStatRow(parameter, baseValue + localBonus, highlighted: Mathf.Abs(localBonus) > LocalBonusEpsilon);
             }
 
             float? previewScale = mode == CraftingMode.Upgrade && !item.IsSealed && item.UpdateLevel < item.MaxUpdateLevel
@@ -204,36 +211,28 @@ namespace Crafting.Source.UIElements.Modules
         private void AddWeaponStatRow(EntityParameter parameter, IWeaponItem weapon)
         {
             (float baseValue, float localBonus) = weapon.GetStatBreakdown(parameter);
-            AddBaseStatRow(parameter, baseValue + localBonus, highlighted: Mathf.Abs(localBonus) > 0.0001f);
+            AddBaseStatRow(parameter, baseValue + localBonus, highlighted: Mathf.Abs(localBonus) > LocalBonusEpsilon);
         }
 
         /// <summary>Blueprint base-stat row: the roll spread ("500–900") instead of a value — the
         /// bench previews what the mint can produce, not a concrete roll.</summary>
         private void AddBaseStatSpreadRow(BaseStatBlueprint stat)
         {
-            string Bound(float value) =>
-                _formatter?.FormatValue(ModifierValueType.Flat, stat.Parameter, value)
-                ?? value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
-
-            var row = new HBoxContainer();
-            row.AddChild(new Label
-            {
-                Text = Localization.Localize(stat.Parameter.ToString()),
-                ThemeTypeVariation = "DimLabel",
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            });
-            var valueLabel = new Label
-            {
-                Text = stat.Value.IsFixed ? Bound(stat.Value.Min) : $"{Bound(stat.Value.Min)}–{Bound(stat.Value.Max)}",
-                HorizontalAlignment = HorizontalAlignment.Right,
-            };
-            valueLabel.AddThemeColorOverride("font_color", Color.FromHtml(TextPalette.BaseStat));
-            row.AddChild(valueLabel);
-            _mods?.AddChild(row);
+            string Bound(float value) => FormatStatValue(stat.Parameter, value);
+            AddStatRow(stat.Parameter,
+                stat.Value.IsFixed ? Bound(stat.Value.Min) : $"{Bound(stat.Value.Min)}–{Bound(stat.Value.Max)}",
+                TextPalette.BaseStat);
         }
 
         /// <summary>One base-stat row: dim parameter name, unit-aware value on the right.</summary>
-        private void AddBaseStatRow(EntityParameter parameter, float value, bool highlighted = false)
+        private void AddBaseStatRow(EntityParameter parameter, float value, bool highlighted = false) =>
+            AddStatRow(parameter, FormatStatValue(parameter, value), highlighted ? TextPalette.Number : TextPalette.BaseStat);
+
+        private string FormatStatValue(EntityParameter parameter, float value) =>
+            _formatter?.FormatValue(ModifierValueType.Flat, parameter, value) ?? CraftingFormat.PlainNumber(value);
+
+        /// <summary>The shared stat-row shell: dim parameter name on the left, the colored value on the right.</summary>
+        private void AddStatRow(EntityParameter parameter, string valueText, string valueColor)
         {
             var row = new HBoxContainer();
             row.AddChild(new Label
@@ -244,10 +243,10 @@ namespace Crafting.Source.UIElements.Modules
             });
             var valueLabel = new Label
             {
-                Text = _formatter?.FormatValue(ModifierValueType.Flat, parameter, value) ?? value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture),
+                Text = valueText,
                 HorizontalAlignment = HorizontalAlignment.Right,
             };
-            valueLabel.AddThemeColorOverride("font_color", Color.FromHtml(highlighted ? TextPalette.Number : TextPalette.BaseStat));
+            valueLabel.AddThemeColorOverride("font_color", Color.FromHtml(valueColor));
             row.AddChild(valueLabel);
             _mods?.AddChild(row);
         }
@@ -263,7 +262,7 @@ namespace Crafting.Source.UIElements.Modules
         {
             var row = new Button
             {
-                Text = (selectedModifierInstanceId == instanceId ? "» " : string.Empty) + text,
+                Text = (selectedModifierInstanceId == instanceId ? SelectedLineMarker : string.Empty) + text,
                 Alignment = HorizontalAlignment.Left,
                 FocusMode = FocusModeEnum.None,
                 ClipText = true,

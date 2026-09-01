@@ -173,8 +173,7 @@ namespace LastBreath.UI
         /// "Weapon" piece; everything else keeps its equipment piece or the bare rarity.</summary>
         private static string Subtitle(IItem item) => item switch
         {
-            IWeaponItem weapon =>
-                $"{item.Rarity} · {Localization.Localize($"WeaponType_{weapon.WeaponType}")} · {Localization.Localize($"Handedness_{weapon.Handedness}")}",
+            IWeaponItem weapon => EquipItemText.WeaponSubtitle(item.Rarity.ToString(), weapon.WeaponType, weapon.Handedness),
             IEquipItem equip => $"{item.Rarity} · {equip.EquipmentPiece}",
             _ => item.Rarity.ToString(),
         };

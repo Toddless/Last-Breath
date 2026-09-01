@@ -10,16 +10,22 @@ namespace Crafting.Source.UIElements.Modules
     [GlobalClass]
     public partial class ModeTabs : HBoxContainer
     {
+        /// <summary>Tab captions, shared with the tooltip buttons that open the same modes.</summary>
+        public const string CreateTabKey = "UI_Crafting_Create";
+        public const string UpgradeTabKey = "UI_Crafting_Upgrade";
+        public const string RecraftTabKey = "UI_Crafting_Recraft";
+        public const string AscendTabKey = "UI_Crafting_Ascend";
+
         [Export] private Button? _create, _upgrade, _recraft, _ascend;
 
         public event Action<CraftingMode>? ModeChanged;
 
         public override void _Ready()
         {
-            _create?.Text = Localization.Localize("UI_Crafting_Create");
-            _upgrade?.Text = Localization.Localize("UI_Crafting_Upgrade");
-            _recraft?.Text = Localization.Localize("UI_Crafting_Recraft");
-            _ascend?.Text = Localization.Localize("UI_Crafting_Ascend");
+            _create?.Text = Localization.Localize(CreateTabKey);
+            _upgrade?.Text = Localization.Localize(UpgradeTabKey);
+            _recraft?.Text = Localization.Localize(RecraftTabKey);
+            _ascend?.Text = Localization.Localize(AscendTabKey);
 
             _create?.Pressed += () => ModeChanged?.Invoke(CraftingMode.Create);
             _upgrade?.Pressed += () => ModeChanged?.Invoke(CraftingMode.Upgrade);

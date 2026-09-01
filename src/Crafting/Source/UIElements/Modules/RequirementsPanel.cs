@@ -5,6 +5,7 @@ namespace Crafting.Source.UIElements.Modules
     using Core.Localization;
     using Core.Views.UI;
     using Godot;
+    using SharedUi;
 
     /// <summary>One requirement card: a fixed row shows have/need; a card carrying a category id is
     /// a clickable slot inviting a concrete resource pick.</summary>
@@ -19,6 +20,12 @@ namespace Crafting.Source.UIElements.Modules
     [GlobalClass]
     public partial class RequirementsPanel : VBoxContainer
     {
+        /// <summary>Additives caption, shared with the window's additive picker title.</summary>
+        public const string AdditivesKey = "UI_Craft_Additives";
+
+        private const string HeaderKey = "UI_Craft_Requirements";
+        private const string AscendWarningKey = "UI_Craft_AscendWarning";
+
         private static readonly Vector2 s_cardMinSize = new(0, 44);
 
         [Export] private Label? _header;
@@ -39,9 +46,9 @@ namespace Crafting.Source.UIElements.Modules
 
         public override void _Ready()
         {
-            _header?.Text = Localization.Localize("UI_Craft_Requirements");
-            _additivesHeader?.Text = Localization.Localize("UI_Craft_Additives");
-            _ascendWarning?.Text = Localization.Localize("UI_Craft_AscendWarning");
+            _header?.Text = Localization.Localize(HeaderKey);
+            _additivesHeader?.Text = Localization.Localize(AdditivesKey);
+            _ascendWarning?.Text = Localization.Localize(AscendWarningKey);
         }
 
         /// <summary>Repaints the requirement cards top to bottom.</summary>
@@ -114,9 +121,9 @@ namespace Crafting.Source.UIElements.Modules
             margin.AddThemeConstantOverride("margin_top", 4);
             margin.AddThemeConstantOverride("margin_bottom", 4);
 
-            var row = SharedUi.IconLabelRow.Initialize().Instantiate<SharedUi.IconLabelRow>();
+            var row = IconLabelRow.Initialize().Instantiate<IconLabelRow>();
             // The empty additive slot is a lone "+" — center it; real rows read left to right.
-            row.Alignment = icon == null && count == null ? BoxContainer.AlignmentMode.Center : BoxContainer.AlignmentMode.Begin;
+            row.Alignment = icon == null && count == null ? AlignmentMode.Center : AlignmentMode.Begin;
             row.Set(icon, name);
             if (count != null)
             {
@@ -124,7 +131,7 @@ namespace Crafting.Source.UIElements.Modules
                 {
                     Text = count,
                     VerticalAlignment = VerticalAlignment.Center,
-                    ThemeTypeVariation = countMet ? null : "DimLabel",
+                    ThemeTypeVariation = countMet ? string.Empty : "DimLabel",
                 });
             }
 

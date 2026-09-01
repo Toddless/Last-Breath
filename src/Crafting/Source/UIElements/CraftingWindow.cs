@@ -14,8 +14,9 @@ namespace Crafting.Source.UIElements
     using Core.MessageBus.Requests;
     using Core.Modifiers;
     using Core.Results;
+    using Core.Views;
     using Core.Views.UI;
-    using Crafting.Source.UIElements.Modules;
+    using Modules;
     using Godot;
     using SharedUi;
 
@@ -31,6 +32,16 @@ namespace Crafting.Source.UIElements
         private const string UID = "uid://betq124kfglyy";
         private const int AdditiveSlots = 3;
         private const string EssenceCategoryId = "Category_Essence";
+
+        private const string TitleKey = "UI_Crafting";
+        private const string PickItemKey = "UI_Craft_PickItem";
+        private const string ChooseCategoryKey = "UI_Craft_Choose";
+        private const string ExtraLevelForecastKey = "UI_Forecast_Extra_Level";
+        private const string MinRarityForecastKey = "UI_Forecast_Min_Rarity";
+        private const string UpgradeActionKey = "UI_Craft_Upgrade";
+        private const string RerollActionKey = "UI_Craft_Reroll";
+        private const string AscendActionKey = "UI_Craft_Ascend";
+        private const string CreateActionKey = "UI_Craft_Create";
 
         [Export] private WindowHeader? _header;
         [Export] private RecipeTreePanel? _recipeTree;
@@ -64,7 +75,7 @@ namespace Crafting.Source.UIElements
         public override void _Ready()
         {
             _header?.Closed += Close;
-            _header?.SetTitle(Localization.Localize("UI_Crafting"));
+            _header?.SetTitle(Localization.Localize(TitleKey));
 
             _recipeTree?.RecipeSelected += OnRecipeSelected;
             _modeTabs?.ModeChanged += SwitchMode;
@@ -79,13 +90,10 @@ namespace Crafting.Source.UIElements
         {
             // The picker lives in the Overlay layer — a window closed by hotkey must not orphan it.
             ClosePicker();
-            if (_inventory != null) _inventory.ItemAmountChanges -= OnItemAmountChanged;
-            if (_knowledge != null) _knowledge.RecipeLearned -= OnRecipeLearned;
-            if (_mastery != null)
-            {
-                _mastery.CurrentLevelChange -= OnMasteryLevelChanged;
-                _mastery.BonusLevelChange -= OnMasteryLevelChanged;
-            }
+            _inventory?.ItemAmountChanges -= OnItemAmountChanged;
+            _knowledge?.RecipeLearned -= OnRecipeLearned;
+            _mastery?.CurrentLevelChange -= OnMasteryLevelChanged;
+            _mastery?.BonusLevelChange -= OnMasteryLevelChanged;
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -103,22 +111,15 @@ namespace Crafting.Source.UIElements
 
             _inventory.ItemAmountChanges += OnItemAmountChanged;
             // Knowledge is live: scroll learns and mastery levels both unlock tree entries in place.
-            if (_knowledge != null) _knowledge.RecipeLearned += OnRecipeLearned;
-            if (_mastery != null)
-            {
-                _mastery.CurrentLevelChange += OnMasteryLevelChanged;
-                _mastery.BonusLevelChange += OnMasteryLevelChanged;
-            }
+            _knowledge.RecipeLearned += OnRecipeLearned;
+            _mastery.CurrentLevelChange += OnMasteryLevelChanged;
+            _mastery.BonusLevelChange += OnMasteryLevelChanged;
 
             _preview?.SetFormatter(_modifierFormatter);
             _pool?.SetFormatter(_modifierFormatter);
             _recipeTree?.SetCatalog(_dataProvider, _inventory, _knowledge);
             RefreshDetails();
         }
-
-        private void OnRecipeLearned(string recipeId) => _recipeTree?.Rebuild();
-
-        private void OnMasteryLevelChanged(int level) => _recipeTree?.Rebuild();
 
         public void Close() => QueueFree();
 
@@ -136,13 +137,22 @@ namespace Crafting.Source.UIElements
             RefreshDetails();
         }
 
+        private void OnRecipeLearned(string recipeId) => _recipeTree?.Rebuild();
+
+        private void OnMasteryLevelChanged(int level) => _recipeTree?.Rebuild();
+
         // ---------------------------------------------------------------- child events
 
         /// <summary>Create always leads back to recipe browsing; an item mode entered with an empty
         /// bench opens the equipment picker instead of refusing — the mode flips once a piece is picked.</summary>
         private void SwitchMode(CraftingMode mode)
         {
-            if (_mode == mode) { _modeTabs?.SetMode(_mode); return; }
+            if (_mode == mode)
+            {
+                _modeTabs?.SetMode(_mode);
+                return;
+            }
+
             if (mode != CraftingMode.Create && _item == null)
             {
                 _modeTabs?.SetMode(_mode);
@@ -193,7 +203,7 @@ namespace Crafting.Source.UIElements
                 return;
             }
 
-            OpenPicker(Localization.Localize("UI_Craft_Additives"), AvailableAdditiveIds(), picked =>
+            OpenPicker(Localization.Localize(RequirementsPanel.AdditivesKey), AvailableAdditiveIds(), picked =>
             {
                 _additiveChoices[slot] = picked;
                 RefreshDetails();
@@ -209,7 +219,7 @@ namespace Crafting.Source.UIElements
         /// tooltip. The label carries the piece's rarity colour.</summary>
         private void OpenEquipPicker(CraftingMode mode)
         {
-            bool framedCard = _uiElements?.HasPopupFactory(typeof(Core.Views.IItemTooltipPopup)) == true;
+            bool framedCard = _uiElements?.HasPopupFactory(typeof(IItemTooltipPopup)) == true;
             var entries = (_inventory?.GetContents() ?? [])
                 .Select(entry => entry.Item)
                 .OfType<IEquipItem>()
@@ -224,7 +234,7 @@ namespace Crafting.Source.UIElements
                 .ToList();
 
             _pickerPopup = _uiElements?.ShowPopup(typeof(IPickerPopup)) as IPickerPopup;
-            _pickerPopup?.Present(Localization.Localize("UI_Craft_PickItem"), entries, instanceId =>
+            _pickerPopup?.Present(Localization.Localize(PickItemKey), entries, instanceId =>
             {
                 if (_inventory?.GetItem<IEquipItem>(instanceId) is { } picked) SetItem(picked, mode);
             });
@@ -244,7 +254,7 @@ namespace Crafting.Source.UIElements
         /// slots open, resolved through the Core contract.</summary>
         private IPopup? ShowItemCard(IEquipItem item)
         {
-            if (_uiElements?.ShowPopup(typeof(Core.Views.IItemTooltipPopup)) is not Core.Views.IItemTooltipPopup popup) return null;
+            if (_uiElements?.ShowPopup(typeof(IItemTooltipPopup)) is not IItemTooltipPopup popup) return null;
             popup.ShowItem(item);
             return popup;
         }
@@ -258,7 +268,7 @@ namespace Crafting.Source.UIElements
             {
                 (float baseValue, float localBonus) = item.GetBaseStatBreakdown(parameter);
                 string value = _modifierFormatter?.FormatValue(ModifierValueType.Flat, parameter, baseValue + localBonus)
-                    ?? (baseValue + localBonus).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+                               ?? CraftingFormat.PlainNumber(baseValue + localBonus);
                 lines.Add($"{Localization.Localize(parameter.ToString())}: {value}");
             }
 
@@ -286,8 +296,18 @@ namespace Crafting.Source.UIElements
         private void RefreshPreview()
         {
             if (_preview == null) return;
-            if (_item != null) { _preview.ShowItem(_item, _mode, _selectedModifierInstanceId); return; }
-            if (_recipeId == null) { _preview.ShowEmpty(); return; }
+            if (_item != null)
+            {
+                _preview.ShowItem(_item, _mode, _selectedModifierInstanceId);
+                return;
+            }
+
+            if (_recipeId == null)
+            {
+                _preview.ShowEmpty();
+                return;
+            }
+
             _preview.ShowRecipe(Localization.Localize(_recipeId), RecipeResultIcon(), SelectedBlueprint());
         }
 
@@ -330,26 +350,20 @@ namespace Crafting.Source.UIElements
         private RequirementCardView CategoryCardView(Core.Interfaces.IRequirement requirement)
         {
             if (!_categoryChoices.TryGetValue(requirement.Id, out string? resourceId))
-                return new RequirementCardView(null, $"{Localization.Localize("UI_Craft_Choose")}: {Localization.Localize(requirement.Id)}", null, CountMet: true, requirement.Id);
+                return new RequirementCardView(null, $"{Localization.Localize(ChooseCategoryKey)}: {Localization.Localize(requirement.Id)}", null, CountMet: true, requirement.Id);
 
             int have = _inventory?.GetTotalItemAmount(resourceId) ?? 0;
-            return new RequirementCardView(_dataProvider?.GetItemIcon(resourceId), Localization.Localize(resourceId), $"{have} / {requirement.Amount}", have >= requirement.Amount, requirement.Id);
+            return new RequirementCardView(_dataProvider?.GetItemIcon(resourceId), Localization.Localize(resourceId), $"{have} / {requirement.Amount}", have >= requirement.Amount,
+                requirement.Id);
         }
 
-        /// <summary>Owned candidates of one category slot. Membership comes from the resources'
-        /// material data when the id names a real category; legacy bare-tag requirements fall back
-        /// to the inventory tag lookup.</summary>
-        private List<string> CategoryResourceIds(string categoryId)
-        {
-            var members = _dataProvider?.GetResourceIdsInCategory(categoryId) ?? [];
-            var owned = members.Count > 0
-                ? members.Where(id => (_inventory?.GetTotalItemAmount(id) ?? 0) > 0)
-                : _inventory?.GetAllItemIdsWithTag(categoryId) ?? [];
-            return owned
+        /// <summary>Owned candidates of one category slot, minus resources already occupying another slot.</summary>
+        private List<string> CategoryResourceIds(string categoryId) =>
+            CategoryResources.CandidateIds(_dataProvider, _inventory, categoryId)
+                .Where(id => (_inventory?.GetTotalItemAmount(id) ?? 0) > 0)
                 .Distinct()
                 .Where(id => !_categoryChoices.ContainsValue(id))
                 .ToList();
-        }
 
         private void RefreshAdditives()
         {
@@ -365,10 +379,8 @@ namespace Crafting.Source.UIElements
             _requirements?.SetAdditives(slots);
         }
 
-        /// <summary>Catalog additives that actually DO something in the current mode, plus plain
-        /// essences (resources with own descriptors) where the operation's pool consumes them
-        /// (creation and reroll). A rarity-floor rune in a reroll used to show up and silently eat
-        /// resources for nothing — the picker now mirrors the domain's honest scope.</summary>
+        /// <summary>Only additives that give an effect in the current mode are offered, plus plain
+        /// essences (resources with own descriptors) where the operation's pool consumes them (creation and reroll).</summary>
         private List<string> AvailableAdditiveIds() =>
             (_additiveProvider?.KnownAdditiveIds ?? []).Where(AdditiveServesMode)
             .Concat(_mode is CraftingMode.Create or CraftingMode.Recraft ? EssenceResourceIds() : [])
@@ -396,9 +408,9 @@ namespace Crafting.Source.UIElements
         /// would flood the picker without adding a choice the recipe doesn't already give.</summary>
         private IEnumerable<string> EssenceResourceIds() =>
             (_dataProvider?.GetAllResources() ?? [])
-                .OfType<Core.Crafting.ICraftingResource>()
-                .Where(resource => resource.Material?.MaterialCategory?.Id == EssenceCategoryId && resource.Material.Modifiers.Count > 0)
-                .Select(resource => resource.Id);
+            .OfType<ICraftingResource>()
+            .Where(resource => resource.Material?.MaterialCategory?.Id == EssenceCategoryId && resource.Material.Modifiers.Count > 0)
+            .Select(resource => resource.Id);
 
         // ---------------------------------------------------------------- pool and forecast
 
@@ -425,7 +437,7 @@ namespace Crafting.Source.UIElements
             }
         }
 
-        private IEnumerable<Core.Modifiers.IModifierDescriptor> CreationPoolDescriptors()
+        private IEnumerable<IModifierDescriptor> CreationPoolDescriptors()
         {
             if (_dataProvider == null || _mastery == null || _recipeId == null || SelectedBlueprint() is not { } blueprint)
                 return [];
@@ -436,17 +448,17 @@ namespace Crafting.Source.UIElements
                     .SelectMany(_dataProvider.GetResourceDescriptors)
                     .ForCategory(blueprint.Piece.ConvertEquipmentPartToCategory()))
                 .Where(descriptor => descriptor.Affix != AffixKind.Mythic)
-                .Select(descriptor => Core.Modifiers.DescriptorOperations.Scale(descriptor, _mastery.GetCurrentValueMultiplier()));
+                .Select(descriptor => DescriptorOperations.Scale(descriptor, _mastery.GetCurrentValueMultiplier()));
         }
 
-        private IEnumerable<Core.Modifiers.IModifierDescriptor> AscensionPoolDescriptors() =>
+        private IEnumerable<IModifierDescriptor> AscensionPoolDescriptors() =>
             _item is { Rarity: Rarity.Legendary } item && _ascender != null
                 ? _ascender.GetGiftPool(item.EquipmentPiece.ConvertEquipmentPartToCategory())
                 : [];
 
         /// <summary>The item's live reroll pool with the chosen additives folded in — straight from
         /// the upgrader, so the preview and the actual roll share one composition.</summary>
-        private IEnumerable<Core.Modifiers.IModifierDescriptor> RecraftPoolDescriptors() =>
+        private IEnumerable<IModifierDescriptor> RecraftPoolDescriptors() =>
             _item is { IsSealed: false } item && _upgrader != null
                 ? _upgrader.GetRerollPreviewPool(item, ChosenAdditiveIds())
                 : [];
@@ -457,7 +469,7 @@ namespace Crafting.Source.UIElements
         /// line identity (grant/operation, a composite hiding one), an identity already occupying a line —
         /// atoms by key, composites by their whole part set (the picked line's own identity stays legal) —
         /// or, once a line is picked, the other slot family.</summary>
-        private Func<Core.Modifiers.IModifierDescriptor, bool>? RecraftIneligible()
+        private Func<IModifierDescriptor, bool>? RecraftIneligible()
         {
             if (_item == null) return null;
 
@@ -466,7 +478,7 @@ namespace Crafting.Source.UIElements
             return descriptor =>
             {
                 if (targetAffix is { } affix && affix != AffixKind.None && descriptor.Affix != affix) return true;
-                return !Core.Modifiers.LineIdentity.TryFrom(descriptor, out var identity) || occupied.Contains(identity);
+                return !LineIdentity.TryFrom(descriptor, out var identity) || occupied.Contains(identity);
             };
         }
 
@@ -502,14 +514,14 @@ namespace Crafting.Source.UIElements
         {
             var lines = new List<(string, string)>
             {
-                ("UI_Mastery_Channel_Upgrade",
+                (MasteryRail.UpgradeChannelKey,
                     CraftingFormat.WasNow(_upgrader!.GetBaseUpgradeChance(item), _upgrader.GetUpgradeChance(item, BuildCost().Keys))),
             };
 
             float extraLevel = _additiveChoices.Where(id => id != null)
                 .Sum(id => _additiveProvider?.GetEffects(id!)?.ExtraUpgradeLevelChance ?? 0f);
             if (extraLevel > 0f)
-                lines.Add(("UI_Forecast_Extra_Level", CraftingFormat.Highlight(CraftingFormat.PercentText(extraLevel))));
+                lines.Add((ExtraLevelForecastKey, CraftingFormat.Highlight(CraftingFormat.PercentText(extraLevel))));
             return lines;
         }
 
@@ -519,8 +531,8 @@ namespace Crafting.Source.UIElements
             float effectBase = effectNow / (1f + _mastery.GetExtraEffectChanceBonus());
             var lines = new List<(string, string)>
             {
-                ("UI_Mastery_Channel_Values", CraftingFormat.Highlight($"×{_mastery.GetCurrentValueMultiplier():0.00}")),
-                ("UI_Mastery_Channel_Effect", CraftingFormat.WasNow(effectBase, effectNow)),
+                (MasteryRail.ValuesChannelKey, CraftingFormat.Highlight($"×{_mastery.GetCurrentValueMultiplier():0.00}")),
+                (MasteryRail.EffectChannelKey, CraftingFormat.WasNow(effectBase, effectNow)),
             };
 
             var floorRarity = _additiveChoices.Where(id => id != null)
@@ -529,22 +541,24 @@ namespace Crafting.Source.UIElements
                 .OrderBy(rarity => rarity!.Value) // lower enum value = rarer; the best floor wins
                 .FirstOrDefault();
             if (floorRarity != null)
-                lines.Add(("UI_Forecast_Min_Rarity",
+                lines.Add((MinRarityForecastKey,
                     $"[color={TextPalette.RarityColor(floorRarity.Value)}]{Localization.Localize(floorRarity.Value.ToString())}[/color]"));
             return lines;
         }
 
         private List<(string, string)> AscendForecast() =>
-            [("UI_Mastery_Channel_Mythic",
-                CraftingFormat.WasNow(_mastery!.GetMythicGiftChance() / (1f + _mastery.GetMythicModifierChanceBonus()), _mastery.GetMythicGiftChance()))];
+        [
+            (MasteryRail.MythicChannelKey,
+                CraftingFormat.WasNow(_mastery!.GetMythicGiftChance() / (1f + _mastery.GetMythicModifierChanceBonus()), _mastery.GetMythicGiftChance()))
+        ];
 
         private void RefreshAction() => _actionBar?.SetAction(
             Localization.Localize(_mode switch
             {
-                CraftingMode.Upgrade => "UI_Craft_Upgrade",
-                CraftingMode.Recraft => "UI_Craft_Reroll",
-                CraftingMode.Ascend => "UI_Craft_Ascend",
-                _ => "UI_Craft_Create",
+                CraftingMode.Upgrade => UpgradeActionKey,
+                CraftingMode.Recraft => RerollActionKey,
+                CraftingMode.Ascend => AscendActionKey,
+                _ => CreateActionKey,
             }),
             CanExecute());
 

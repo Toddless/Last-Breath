@@ -16,6 +16,10 @@ namespace Crafting.Source.UIElements.Modules
     [GlobalClass]
     public partial class RecipeTreePanel : PanelContainer
     {
+        private const string LockedByMasteryKey = "UI_Recipe_Locked_Mastery";
+        private const string LockedByScrollKey = "UI_Recipe_Locked_Scroll";
+        private const string RecipesTitleKey = "UI_Craft_Recipes";
+
         [Export] private Label? _listTitle;
         [Export] private LineEdit? _search;
         [Export] private Tree? _tree;
@@ -79,12 +83,12 @@ namespace Crafting.Source.UIElements.Modules
                     if (known) continue;
                     entry.SetCustomColor(0, Color.FromHtml(TextPalette.System));
                     entry.SetTooltipText(0, recipe.UnlockAtMastery is { } gate
-                        ? Localization.Render("UI_Recipe_Locked_Mastery", new Dictionary<string, object?> { ["Level"] = gate })
-                        : Localization.Localize("UI_Recipe_Locked_Scroll"));
+                        ? Localization.Render(LockedByMasteryKey, new Dictionary<string, object?> { ["Level"] = gate })
+                        : Localization.Localize(LockedByScrollKey));
                 }
             }
 
-            _listTitle?.Text = $"{Localization.Localize("UI_Craft_Recipes")} ({totalShown})";
+            _listTitle?.Text = $"{Localization.Localize(RecipesTitleKey)} ({totalShown})";
         }
 
         public void Deselect() => _tree?.DeselectAll();
@@ -120,11 +124,9 @@ namespace Crafting.Source.UIElements.Modules
             return amount == int.MaxValue ? 0 : amount;
         }
 
-        private int CategoryOwnedTotal(string categoryId)
-        {
-            var members = _dataProvider?.GetResourceIdsInCategory(categoryId) ?? [];
-            var ownedIds = members.Count > 0 ? members : _inventory?.GetAllItemIdsWithTag(categoryId) ?? [];
-            return ownedIds.Distinct().Sum(id => _inventory?.GetTotalItemAmount(id) ?? 0);
-        }
+        private int CategoryOwnedTotal(string categoryId) =>
+            CategoryResources.CandidateIds(_dataProvider, _inventory, categoryId)
+                .Distinct()
+                .Sum(id => _inventory?.GetTotalItemAmount(id) ?? 0);
     }
 }

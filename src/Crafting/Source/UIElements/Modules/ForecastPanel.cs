@@ -4,6 +4,7 @@ namespace Crafting.Source.UIElements.Modules
     using Core.Localization;
     using Core.Views.UI;
     using Godot;
+    using SharedUi;
 
     /// <summary>One forecast row: an already localized channel name and its BBCode value.</summary>
     public sealed record ForecastLineView(string Name, string ValueBbcode);
@@ -14,6 +15,8 @@ namespace Crafting.Source.UIElements.Modules
     [GlobalClass]
     public partial class ForecastPanel : PanelContainer
     {
+        private const string HeaderKey = "UI_Craft_Forecast";
+        private const string HintKey = "UI_Craft_Forecast_Hint";
         private const int ValueWidth = 130;
 
         [Export] private Label? _header;
@@ -22,8 +25,8 @@ namespace Crafting.Source.UIElements.Modules
 
         public override void _Ready()
         {
-            _header?.Text = Localization.Localize("UI_Craft_Forecast").ToUpper();
-            _hint?.Text = Localization.Localize("UI_Craft_Forecast_Hint");
+            _header?.Text = Localization.Localize(HeaderKey).ToUpper();
+            _hint?.Text = Localization.Localize(HintKey);
         }
 
         /// <summary>Repaints the forecast rows; an empty list hides the whole box.</summary>
@@ -39,7 +42,7 @@ namespace Crafting.Source.UIElements.Modules
 
         private static Control Row(string name, string valueBbcode)
         {
-            var row = SharedUi.KeyValueRow.Initialize().Instantiate<SharedUi.KeyValueRow>();
+            var row = KeyValueRow.Initialize().Instantiate<KeyValueRow>();
             row.SetRich(name, valueBbcode, ValueWidth);
             row.EnableCaptionAutowrap();
             return row;
