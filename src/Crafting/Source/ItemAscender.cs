@@ -72,7 +72,7 @@ namespace Crafting.Source
 
             // The "+Min..Max sharpening levels" entry (present in every mark's pool) is an operation,
             // not a line: raise the cap from the current (full) level and run the STANDARD upgrade
-            // path, so every line scales exactly like a manual sharpen. No InstanceIds to report.
+            // path, so the base channel scales exactly like a manual sharpen. No InstanceIds to report.
             if (picked is UpgradeLevelsDescriptor extraLevels)
             {
                 int rolled = rnd.RandIntRange(extraLevels.Min, extraLevels.Max);

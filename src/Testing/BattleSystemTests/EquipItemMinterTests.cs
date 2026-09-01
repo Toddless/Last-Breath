@@ -80,7 +80,8 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void Mint_FixedContent_MatchesLegacyTemplateScaling()
         {
-            // Bit-for-bit with the pre-blueprint template parse: level 3 -> multiplier 1.3 on every line.
+            // Level 3 -> multiplier 1.15, and it reaches the BASE channel only: the implicit grows,
+            // the rolled line keeps the value data wrote.
             var item = CreateMinter(FixedItemJson, seed: 42).Mint("Test_Chest");
 
             Assert.AreEqual(Rarity.Rare, item.Rarity);
@@ -90,7 +91,7 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(50f * 1.15f, item.Implicits[0].Value, 0.001f);
             var health = item.Modifiers.Single();
             Assert.AreEqual(100f, health.BaseValue, 0.001f);
-            Assert.AreEqual(100f * 1.15f, health.Value, 0.001f);
+            Assert.AreEqual(100f, health.Value, 0.001f);
         }
 
         [TestMethod]
@@ -143,8 +144,10 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsFalse(item.IsSealed, "Data-born mythics are NOT sealed (only ascension seals).");
             Assert.AreEqual(item.MaxUpdateLevel, item.UpdateLevel, "Rolled level IS the mythic's cap.");
             Assert.IsTrue(item.UpdateLevel is >= 1 and <= 69, $"Rolled level {item.UpdateLevel} escapes [1..69].");
-            var line = item.Modifiers.Single();
-            Assert.AreEqual(100f * (1f + item.UpdateLevel * 0.05f), line.Value, 0.01f);
+            // The rolled level IS the progression, and it spends itself on the base channel: the weapon's
+            // damage carries the whole of it while the rolled line keeps the value data wrote.
+            Assert.AreEqual(220f * (1f + item.UpdateLevel * 0.05f), ((IWeaponItem)item).GetStatBreakdown(EntityParameter.PhysicalDamage).Base, 0.01f);
+            Assert.AreEqual(100f, item.Modifiers.Single().Value, 0.01f);
             Assert.IsFalse(item.Upgrade(), "A mythic minted at its rolled cap must not sharpen further.");
         }
 

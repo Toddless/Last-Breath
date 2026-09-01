@@ -10,8 +10,9 @@
         IReadOnlyList<IModifierInstance> Implicits { get; }
         IReadOnlyList<IModifierInstance> Modifiers { get; }
 
-        /// <summary>Context lines ("healing efficiency +15%", "+1 bleed duration"): scale with upgrades
-        /// like regular lines, but attach to the owner's pipelines on equip instead of parameter resolution.</summary>
+        /// <summary>Context lines ("healing efficiency +15%", "+1 bleed duration"): implicits ride the base
+        /// channel, rolled ones answer to the ascension alone; both attach to the owner's pipelines on equip
+        /// instead of parameter resolution.</summary>
         IReadOnlyList<ContextModifierEntry> ContextImplicits { get; }
         IReadOnlyList<ContextModifierEntry> ContextModifiers { get; }
         IReadOnlyList<IItemGrant> Grants { get; }
@@ -22,8 +23,9 @@
         int UpdateLevel { get; }
         int MaxUpdateLevel { get; set; }
 
-        /// <summary>Value scale of the NEXT sharpening level relative to now — the UI "before → after"
-        /// preview multiplies current line values by this (ascension cancels out of the ratio).</summary>
+        /// <summary>Value scale of the NEXT sharpening level relative to now, for the UI "before → after"
+        /// preview of the BASE channel only — rolled lines do not move with it (ascension cancels out of
+        /// the ratio).</summary>
         float NextUpgradeValueScale { get; }
 
         /// <summary>Sealed items (ascended to Mythic) can never be modified again: no upgrades, rerolls or new grants.</summary>
@@ -61,8 +63,8 @@
         /// upgrader and fire ONLY on a reroll that took place (a refusal is free and does not count).</summary>
         int RecraftCount { get; set; }
 
-        /// <summary>Ascension's "everything +15%": a separate factor on top of the sharpening scale —
-        /// every line of both channels recomputes as Base × UpdateMultiplier × AscensionMultiplier.
+        /// <summary>Ascension's "everything +15%": the one scale that reaches BOTH channels — the base one
+        /// recomputes as Base × UpdateMultiplier × AscensionMultiplier, the rolled one as Base × AscensionMultiplier.
         /// Defaults to 1; the ascender sets it (from data) right before the seal, the save restores it.</summary>
         float AscensionMultiplier { get; set; }
 

@@ -25,7 +25,7 @@ namespace LastBreathTest.BattleSystemTests
                 new Dictionary<string, int> { ["Crafting_Resource_Essence_Health"] = 1 });
             item.PowerMultiplier = 1.75f; // the item's caliber must survive the trip — the live reroll pool rescales by it
             item.RecraftCount = 4; // the growing recraft price must survive the trip
-            item.Upgrade(3); // multiplier 1.3: restored Values must match, not just BaseValues
+            item.Upgrade(3); // multiplier 1.15 on the base channel: restored Values must match, not just BaseValues
             item.Rarity = Rarity.Epic;
 
             var restored = _converter.FromData(_converter.ToData(item));
@@ -46,7 +46,7 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(50f * 1.15f, restored.Implicits[0].Value, 0.001f);
             Assert.AreEqual(2, restored.Modifiers.Count);
             var health = restored.Modifiers.First(m => m.EntityParameter == EntityParameter.Health);
-            Assert.AreEqual(120f * 1.15f, health.Value, 0.001f);
+            Assert.AreEqual(120f, health.Value, 0.001f); // rolled: sharpening does not reach it
             Assert.AreEqual(120f, health.BaseValue, 0.001f);
         }
 
@@ -97,8 +97,8 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.IsTrue(restored.IsSealed);
             Assert.AreEqual(1.15f, restored.AscensionMultiplier, 0.0001f);
-            // The full formula survives the trip: Base × UpdateMultiplier × AscensionMultiplier.
-            Assert.AreEqual(10f * 1.6f * 1.15f, restored.Modifiers.Single().Value, 0.001f);
+            // The rolled channel survives the trip: ascension reaches it, sharpening does not.
+            Assert.AreEqual(10f * 1.15f, restored.Modifiers.Single().Value, 0.001f);
         }
 
         [TestMethod]

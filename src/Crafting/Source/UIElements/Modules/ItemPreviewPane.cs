@@ -9,9 +9,10 @@ namespace Crafting.Source.UIElements.Modules
     using SharedUi;
 
     /// <summary>The bench preview: item (or recipe result) header with icon, name and subtitle, and
-    /// the modifier line list below. A live item prints its rolled blocks (pickable in Reroll, with
-    /// the sharpening preview in Upgrade); a recipe prints its blueprint descriptors with value
-    /// spreads. Clicks travel up as events — the window opens pickers and refreshes the pane.</summary>
+    /// the modifier line list below. A live item prints its rolled blocks (pickable in Reroll; the
+    /// sharpening preview in Upgrade sits on the stat rows and implicits, not on the rolls); a recipe
+    /// prints its blueprint descriptors with value spreads. Clicks travel up as events — the window
+    /// opens pickers and refreshes the pane.</summary>
     [GlobalClass]
     public partial class ItemPreviewPane : VBoxContainer
     {
@@ -23,6 +24,9 @@ namespace Crafting.Source.UIElements.Modules
 
         /// <summary>Below this a local bonus counts as zero and the stat row keeps its plain tone.</summary>
         private const float LocalBonusEpsilon = 0.0001f;
+
+        /// <summary>Width of the value column on a forecast row — keeps the "was → now" numbers aligned.</summary>
+        private const int ForecastValueWidth = 130;
 
         [Export] private Label? _tag;
         [Export] private Control? _itemHeader;
@@ -111,33 +115,31 @@ namespace Crafting.Source.UIElements.Modules
         /// <summary>Live item lines: parts of one composite roll present as a single row (the row's
         /// id is the first part — the group-reroll target). The rolled rows arrive grouped by slot family
         /// and each family announces itself. Grants show their full description below the name.
-        /// Upgrade mode appends the sharpening preview to every scaling part.</summary>
+        /// Upgrade mode appends the sharpening preview to what sharpening actually moves: the weapon
+        /// triple, the base stats and the implicits. Rolled lines print their plain value.</summary>
         private void RenderItemModifiers(IEquipItem item, CraftingMode mode, string? selectedModifierInstanceId)
         {
+            var sharpened = UpgradePreview(item, mode);
             if (item is IWeaponItem weapon)
             {
-                AddWeaponStatRow(EntityParameter.PhysicalDamage, weapon);
-                AddWeaponStatRow(EntityParameter.CriticalChance, weapon);
-                AddWeaponStatRow(EntityParameter.CriticalDamage, weapon);
+                var forecast = sharpened as IWeaponItem;
+                AddWeaponStatRow(EntityParameter.PhysicalDamage, weapon, forecast);
+                AddWeaponStatRow(EntityParameter.CriticalChance, weapon, forecast);
+                AddWeaponStatRow(EntityParameter.CriticalDamage, weapon, forecast);
             }
 
             // The typed base channel, folded with its locals — same convention as the item tooltip.
             foreach (var parameter in item.BaseStats.Keys)
-            {
-                (float baseValue, float localBonus) = item.GetBaseStatBreakdown(parameter);
-                AddBaseStatRow(parameter, baseValue + localBonus, highlighted: Mathf.Abs(localBonus) > LocalBonusEpsilon);
-            }
+                AddBaseStatRow(parameter, item.GetBaseStatBreakdown(parameter), sharpened?.GetBaseStatBreakdown(parameter));
 
-            float? previewScale = mode == CraftingMode.Upgrade && !item.IsSealed && item.UpdateLevel < item.MaxUpdateLevel
-                ? item.NextUpgradeValueScale
-                : null;
+            float? previewScale = sharpened == null ? null : item.NextUpgradeValueScale;
             var format = previewScale == null ? TextFormat.Plain : TextFormat.Rich;
 
             foreach (var line in EquipItemLines.ComposeImplicits(item, format, previewScale))
-                _mods?.AddChild(LineRow(line.Text, rich: previewScale != null, dim: true));
+                _mods?.AddChild(ImplicitRow(line.Text, rich: previewScale != null));
 
             AffixKind? block = null;
-            foreach (var line in EquipItemLines.ComposeRolled(item, format, previewScale))
+            foreach (var line in EquipItemLines.ComposeRolled(item))
             {
                 if (line.Affix != block)
                 {
@@ -146,26 +148,35 @@ namespace Crafting.Source.UIElements.Modules
                     if (header != null) _mods?.AddChild(header);
                 }
 
-                _mods?.AddChild(previewScale != null
-                    ? LineRow(line.Text, rich: true, dim: false)
-                    : RerollableOrLabel(item, mode, line.InstanceId, selectedModifierInstanceId, line.Text));
+                _mods?.AddChild(RerollableOrLabel(item, mode, line.InstanceId, selectedModifierInstanceId, line.Text));
             }
 
             foreach (var grant in item.Grants)
                 AddGrantBlock(grant);
         }
 
-        /// <summary>An item line row: a plain Label normally, a RichTextLabel when the text carries
-        /// the colored upgrade preview (BBCode). Dim rows keep their tone via a default_color override —
-        /// theme variations only target Label.</summary>
-        private static Control LineRow(string text, bool rich, bool dim)
+        /// <summary>The item as the next sharpening level would leave it, or null when there is nothing to
+        /// forecast (another mode, a sealed item, the cap already reached). The forecast is read off a real
+        /// upgraded copy rather than re-derived here, so it can never drift from the operation it previews.</summary>
+        private static IEquipItem? UpgradePreview(IEquipItem item, CraftingMode mode)
+        {
+            if (mode != CraftingMode.Upgrade || item.IsSealed || item.UpdateLevel >= item.MaxUpdateLevel) return null;
+            var preview = item.Copy<IEquipItem>();
+            preview.Upgrade();
+            return preview;
+        }
+
+        /// <summary>An implicit row — always dim: a plain Label normally, a RichTextLabel when the text
+        /// carries the colored sharpening preview (BBCode). The rich variant keeps its tone via a
+        /// default_color override — theme variations only target Label.</summary>
+        private static Control ImplicitRow(string text, bool rich)
         {
             if (!rich)
-                return new Label { Text = text, ThemeTypeVariation = dim ? "DimLabel" : null, AutowrapMode = TextServer.AutowrapMode.WordSmart };
+                return new Label { Text = text, ThemeTypeVariation = "DimLabel", AutowrapMode = TextServer.AutowrapMode.WordSmart };
 
             var row = RichText(text);
             row.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            if (dim) row.AddThemeColorOverride("default_color", Color.FromHtml(TextPalette.Muted));
+            row.AddThemeColorOverride("default_color", Color.FromHtml(TextPalette.Muted));
             return row;
         }
 
@@ -209,11 +220,34 @@ namespace Crafting.Source.UIElements.Modules
 
         /// <summary>A bench-item weapon stat: the effective value with local lines folded in; a
         /// locally modified stat glows brighter — same convention as the item tooltip.</summary>
-        private void AddWeaponStatRow(EntityParameter parameter, IWeaponItem weapon)
+        private void AddWeaponStatRow(EntityParameter parameter, IWeaponItem weapon, IWeaponItem? sharpened) =>
+            AddBaseStatRow(parameter, weapon.GetStatBreakdown(parameter), sharpened?.GetStatBreakdown(parameter));
+
+        /// <summary>A folded stat row — the base with its local bucket around it, a locally modified stat
+        /// glowing brighter in either shape. Given the same stat off the sharpened copy, the row prints the
+        /// forecast instead of the bare value.</summary>
+        private void AddBaseStatRow(EntityParameter parameter, (float Base, float LocalBonus) stat, (float Base, float LocalBonus)? sharpened)
         {
-            (float baseValue, float localBonus) = weapon.GetStatBreakdown(parameter);
-            AddBaseStatRow(parameter, baseValue + localBonus, highlighted: Mathf.Abs(localBonus) > LocalBonusEpsilon);
+            float value = stat.Base + stat.LocalBonus;
+            string tone = Mathf.Abs(stat.LocalBonus) > LocalBonusEpsilon ? TextPalette.Number : TextPalette.BaseStat;
+            if (sharpened is not { } forecast)
+            {
+                AddStatRow(parameter, FormatStatValue(parameter, value), tone);
+                return;
+            }
+
+            var row = KeyValueRow.Initialize().Instantiate<KeyValueRow>();
+            row.SetRich(Localization.Localize(parameter.ToString()),
+                StatForecast(parameter, value, forecast.Base + forecast.LocalBonus, tone), ForecastValueWidth);
+            _mods?.AddChild(row);
         }
+
+        /// <summary>Value side of a forecast row: the current number in its own tone, what the next sharpening
+        /// level makes of it and the gain — the same "→ after (+delta)" shape the line rows carry.</summary>
+        private string StatForecast(EntityParameter parameter, float value, float sharpened, string tone) =>
+            $"{TextPalette.Colorize(FormatStatValue(parameter, value), tone)} " +
+            $"→ {TextPalette.Colorize(FormatStatValue(parameter, sharpened), TextPalette.Number)} " +
+            $"{TextPalette.Colorize($"(+{FormatStatValue(parameter, sharpened - value)})", TextPalette.Heal)}";
 
         /// <summary>Blueprint base-stat row: the roll spread ("500–900") instead of a value — the
         /// bench previews what the mint can produce, not a concrete roll.</summary>

@@ -12,13 +12,14 @@ namespace Core.Items
 
     public class EquipItem : IEquipItem, IAscendable
     {
-        // Design reference: each sharpening level adds +5% to every line value.
+        // Design reference: each sharpening level adds +5% to the BASE channel — base stats, the weapon
+        // triple and the flat implicits.
         private const float UpgradeBonusPerLevel = 0.05f;
 
         private readonly List<IModifierInstance> _implicits = [];
         private readonly List<IModifierInstance> _modifiers = [];
         // The piece's typed base channel (armor's evade, a ring's health), rolled once by the minter.
-        // Stored UNSCALED: sharpening/ascension apply on read, exactly like line values.
+        // Stored UNSCALED: the base channel applies on read, exactly like the implicit line values.
         private readonly Dictionary<EntityParameter, float> _baseStats = [];
         private readonly List<ContextModifierEntry> _implicitsContextModifier = [];
         private readonly List<ContextModifierEntry> _contextModifiers = [];
@@ -34,10 +35,14 @@ namespace Core.Items
         private Dictionary<EntityParameter, List<IModifierInstance>>? _resolvedModifiers;
         private IFightable? _owner;
 
-        // THE line-value formula: every stored line (both channels, implicit or rolled) is worth
-        // Base × sharpening scale × ascension scale. All five write paths go through this; the base
-        // stat channel and the weapon's BaseDamage read it too (ascension's "+15% to everything").
-        protected float LineMultiplier => UpdateMultiplier * AscensionMultiplier;
+        // The ROLLED channel — affixes and everything a recraft puts on the item. Only ascension's
+        // "+15% to everything" reaches it: sharpening does not, because a rolled value was already
+        // scaled once by the item's caliber (PowerMultiplier) at the moment it was rolled.
+        private float RolledChannelMultiplier => AscensionMultiplier;
+
+        // The BASE channel — what the piece itself is worth: the typed base stats, the weapon triple
+        // and the flat IMPLICIT lines. Both scales reach it: Base × sharpening × ascension.
+        protected float BaseChannelMultiplier => UpdateMultiplier * AscensionMultiplier;
         protected float UpdateMultiplier { get; private set; } = 1f;
 
         public EquipmentPiece EquipmentPiece { get; }
@@ -63,8 +68,7 @@ namespace Core.Items
         // Successful rerolls only (the upgrader increments): drives the growing recraft price.
         public int RecraftCount { get; set; }
 
-        // Ascension's "everything +15%": a factor on top of the sharpening scale, part of the one
-        // line-value formula (Base × UpdateMultiplier × AscensionMultiplier). Assigning recomputes
+        // Ascension's "everything +15%": the one scale that reaches BOTH channels. Assigning recomputes
         // every line so the multiplier can never desync from the values; sealed items refuse like
         // every other mutation (restore assigns it BEFORE the seal replay).
         public float AscensionMultiplier
@@ -108,6 +112,9 @@ namespace Core.Items
         }
         public bool IsAscendable => Rarity == Rarity.Legendary && UpdateLevel >= MaxUpdateLevel;
 
+        /// <summary>What the next sharpening level does to the BASE channel — base stats, the weapon
+        /// triple and the flat implicits. Rolled lines do not move with it (ascension cancels out of
+        /// the ratio, so the scale is the same before and after an ascension).</summary>
         public float NextUpgradeValueScale => (UpdateMultiplier + UpgradeBonusPerLevel) / UpdateMultiplier;
 
         public EquipItem(EquipmentPiece piece, string id, string[] tags)
@@ -131,7 +138,7 @@ namespace Core.Items
             UpdateLevel = source.UpdateLevel;
             MaxUpdateLevel = source.MaxUpdateLevel;
             UpdateMultiplier = source.UpdateMultiplier;
-            AscensionMultiplier = source.AscensionMultiplier; // before the lines: Set* below scale by it
+            AscensionMultiplier = source.AscensionMultiplier; // before the lines: both channels below scale by it
             foreach (var stat in source._baseStats) _baseStats[stat.Key] = stat.Value;
 
             SetImplicits(CopyModifiers(source._implicits));
@@ -167,12 +174,12 @@ namespace Core.Items
             _resolvedModifiers = null;
         }
 
-        /// <summary>The weapon-damage convention generalized: base × sharpening/ascension scale,
-        /// then the whole local bucket folds around it — (scaledBase + flat) × (1 + increase) ×
-        /// (1 + multiplier). LocalBonus is everything on top of the scaled base.</summary>
+        /// <summary>The weapon-damage convention generalized: base × the BASE channel scale, then the
+        /// whole local bucket folds around it — (scaledBase + flat) × (1 + increase) × (1 + multiplier).
+        /// LocalBonus is everything on top of the scaled base, each line already scaled by its own channel.</summary>
         public (float Base, float LocalBonus) GetBaseStatBreakdown(EntityParameter parameter)
         {
-            float scaledBase = _baseStats.GetValueOrDefault(parameter) * LineMultiplier;
+            float scaledBase = _baseStats.GetValueOrDefault(parameter) * BaseChannelMultiplier;
             (float flat, float increase, float multiplier) = LocalBucket(parameter);
             float effective = (scaledBase + flat) * (1f + increase) * (1f + multiplier);
             return (scaledBase, effective - scaledBase);
@@ -181,25 +188,25 @@ namespace Core.Items
         public void SetImplicits(IEnumerable<IModifier> modifiers)
         {
             if (IsSealed) return;
-            SetModifiers(_implicits, modifiers);
+            SetModifiers(_implicits, modifiers, BaseChannelMultiplier);
         }
 
         public void SetModifiers(IEnumerable<IModifier> modifiers)
         {
             if (IsSealed) return;
-            SetModifiers(_modifiers, modifiers);
+            SetModifiers(_modifiers, modifiers, RolledChannelMultiplier);
         }
 
         public void SetContextImplicits(IEnumerable<ContextModifierEntry> entries)
         {
             if (IsSealed) return;
-            SetContextModifiers(_implicitsContextModifier, entries);
+            SetContextModifiers(_implicitsContextModifier, entries, BaseChannelMultiplier);
         }
 
         public void SetContextModifiers(IEnumerable<ContextModifierEntry> entries)
         {
             if (IsSealed) return;
-            SetContextModifiers(_contextModifiers, entries);
+            SetContextModifiers(_contextModifiers, entries, RolledChannelMultiplier);
         }
 
         public void AddAdditionalModifier(IModifierInstance modifier) => InsertAdditionalModifier(_modifiers.Count, modifier);
@@ -219,7 +226,7 @@ namespace Core.Items
                 return;
             }
 
-            modifier.Value = Scaled(modifier.BaseValue, modifier.ModifierValueType);
+            modifier.Value = Scaled(modifier.BaseValue, modifier.ModifierValueType, RolledChannelMultiplier);
             _modifiers.Insert(Math.Clamp(index, 0, _modifiers.Count), modifier);
             _resolvedModifiers = null;
         }
@@ -227,7 +234,7 @@ namespace Core.Items
         public void InsertAdditionalContextModifier(int index, ContextModifierEntry entry)
         {
             if (IsSealed) return;
-            entry.Value = Scaled(entry.BaseValue, entry.ValueType);
+            entry.Value = Scaled(entry.BaseValue, entry.ValueType, RolledChannelMultiplier);
             _contextModifiers.Insert(Math.Clamp(index, 0, _contextModifiers.Count), entry);
         }
 
@@ -361,12 +368,12 @@ namespace Core.Items
 
 
 
-        /// <summary>The scaled value of one line — FLAT lines ONLY. A percent line (increase/multiplicative)
-        /// already multiplies a value the scales have raised, so scaling it too would stack a multiplier on a
-        /// multiplier; a flag line ("attacks ignore elemental resistances") is a switch, not a number. Both
-        /// stay exactly as data wrote them.</summary>
-        private float Scaled(float baseValue, ModifierValueType type) =>
-            type == ModifierValueType.Flat ? baseValue * LineMultiplier : baseValue;
+        /// <summary>The scaled value of one line — FLAT lines ONLY, by the multiplier of the channel the line
+        /// belongs to. A percent line (increase/multiplicative) already multiplies a value the scales have
+        /// raised, so scaling it too would stack a multiplier on a multiplier; a flag line ("attacks ignore
+        /// elemental resistances") is a switch, not a number. Both stay exactly as data wrote them.</summary>
+        private static float Scaled(float baseValue, ModifierValueType type, float channelMultiplier) =>
+            type == ModifierValueType.Flat ? baseValue * channelMultiplier : baseValue;
 
         protected virtual EquipItem CreateCopy() => new(this);
 
@@ -386,26 +393,33 @@ namespace Core.Items
 
         private IEnumerable<ContextModifierEntry> AllContextModifiers => _implicitsContextModifier.Concat(_contextModifiers);
 
-        private void SetContextModifiers(List<ContextModifierEntry> itemEntries, IEnumerable<ContextModifierEntry> newEntries)
+        private void SetContextModifiers(List<ContextModifierEntry> itemEntries, IEnumerable<ContextModifierEntry> newEntries, float channelMultiplier)
         {
             itemEntries.Clear();
-            foreach (var entry in newEntries)
-            {
-                entry.Value = Scaled(entry.BaseValue, entry.ValueType);
-                itemEntries.Add(entry);
-            }
+            itemEntries.AddRange(newEntries);
+            RescaleContext(itemEntries, channelMultiplier);
         }
 
-        private void SetModifiers(List<IModifierInstance> itemModifiers, IEnumerable<IModifier> newModifiers)
+        private void SetModifiers(List<IModifierInstance> itemModifiers, IEnumerable<IModifier> newModifiers, float channelMultiplier)
         {
             itemModifiers.Clear();
-            foreach (var instance in newModifiers.SelectMany(ToInstances))
-            {
-                instance.Value = Scaled(instance.BaseValue, instance.ModifierValueType);
-                itemModifiers.Add(instance);
-            }
-
+            itemModifiers.AddRange(newModifiers.SelectMany(ToInstances));
+            Rescale(itemModifiers, channelMultiplier);
             _resolvedModifiers = null;
+        }
+
+        /// <summary>Re-reads a whole list off its unscaled bases through the given channel. Single-line
+        /// placements write the same value through <see cref="Scaled"/> directly.</summary>
+        private static void Rescale(IEnumerable<IModifierInstance> lines, float channelMultiplier)
+        {
+            foreach (var line in lines)
+                line.Value = Scaled(line.BaseValue, line.ModifierValueType, channelMultiplier);
+        }
+
+        private static void RescaleContext(IEnumerable<ContextModifierEntry> entries, float channelMultiplier)
+        {
+            foreach (var entry in entries)
+                entry.Value = Scaled(entry.BaseValue, entry.ValueType, channelMultiplier);
         }
 
         // Everything stored on the item is an instance: the stable InstanceId is the reroll identity (variant B),
@@ -469,13 +483,15 @@ namespace Core.Items
             _owner?.ParameterModifiers.RefreshParameter(parameter);
         }
 
+        /// <summary>Every stored line back to its channel's current scale. Sharpening moves only the base
+        /// channel, ascension moves both — so both are recomputed on every scale change and neither can
+        /// drift out of step with the multipliers.</summary>
         private void UpdateModifiersValue()
         {
-            foreach (var modifier in _implicits.Concat(_modifiers))
-                modifier.Value = Scaled(modifier.BaseValue, modifier.ModifierValueType);
-            foreach (var entry in AllContextModifiers)
-                entry.Value = Scaled(entry.BaseValue, entry.ValueType);
-
+            Rescale(_implicits, BaseChannelMultiplier);
+            Rescale(_modifiers, RolledChannelMultiplier);
+            RescaleContext(_implicitsContextModifier, BaseChannelMultiplier);
+            RescaleContext(_contextModifiers, RolledChannelMultiplier);
             _resolvedModifiers = null;
         }
 

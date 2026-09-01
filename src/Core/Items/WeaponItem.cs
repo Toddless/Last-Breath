@@ -31,9 +31,9 @@ namespace Core.Items
 
         public float Damage => FoldAroundBase(EntityParameter.PhysicalDamage, BaseDamage);
 
-        /// <summary>Every weapon base scales by the ONE multiplier (sharpening × ascension) — the
-        /// owner's rule: the scales raise every numeric value, bases included — and every base folds
-        /// its whole LOCAL bucket the same way: (base + flat) × (1 + inc) × (1 + multi). A local
+        /// <summary>The weapon triple is the piece's own base channel: sharpening and ascension both raise
+        /// it. Every base then folds its whole LOCAL bucket around itself: (base + flat) × (1 + inc) ×
+        /// (1 + multi), where each local line already carries the scale of ITS channel. A local
         /// "+X% increased crit" therefore amplifies the weapon's own crit base, exactly like local
         /// damage lines always amplified the damage.</summary>
         public (float Base, float LocalBonus) GetStatBreakdown(EntityParameter parameter)
@@ -47,14 +47,14 @@ namespace Core.Items
             };
             if (float.IsNaN(rawBase)) return (0f, 0f);
 
-            float scaledBase = rawBase * LineMultiplier;
+            float scaledBase = rawBase * BaseChannelMultiplier;
             return (scaledBase, FoldAroundBase(parameter, rawBase) - scaledBase);
         }
 
         private float FoldAroundBase(EntityParameter parameter, float baseValue)
         {
             (float flat, float increase, float multiplier) = LocalBucket(parameter);
-            return ((baseValue * LineMultiplier) + flat) * (1f + increase) * (1f + multiplier);
+            return ((baseValue * BaseChannelMultiplier) + flat) * (1f + increase) * (1f + multiplier);
         }
 
         protected override EquipItem CreateCopy() => new WeaponItem(this);

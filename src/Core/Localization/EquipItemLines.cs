@@ -29,11 +29,10 @@ namespace Core.Localization
 
         /// <summary>Rolled rows in DISPLAY order: prefixes, suffixes, the family-less leftovers (legacy saves,
         /// authored fodder), then the ascension gift last. The sort is stable, so inside a block the rows keep
-        /// the item's own order — a rerolled line reappears in the slot it was rerolled from.
-        /// <paramref name="previewValueScale"/> appends the sharpening preview to every scaling part
-        /// ("+193.5 Evade → 203.2 (+9.7)"); flags stay bare.</summary>
-        public static List<EquipItemLine> ComposeRolled(IEquipItem item, TextFormat format = TextFormat.Plain, float? previewValueScale = null) =>
-            Compose(item.Modifiers, item.ContextModifiers, format, previewValueScale)
+        /// the item's own order — a rerolled line reappears in the slot it was rerolled from. Sharpening does
+        /// not reach these lines, so there is no forecast to append.</summary>
+        public static List<EquipItemLine> ComposeRolled(IEquipItem item, TextFormat format = TextFormat.Plain) =>
+            Compose(item.Modifiers, item.ContextModifiers, format)
                 .OrderBy(line => DisplayRank(line.Affix))
                 .ToList();
 

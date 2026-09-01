@@ -87,7 +87,7 @@ namespace LastBreathTest.CraftingSystemTests
             item.SetContextModifiers([contextLine]);
             item.AddGrant(new PassiveSkillGrant("grant_skill", "Skill_Regeneration", new Dictionary<string, float> { ["percent"] = 0.05f }, () => null));
             item.AddGrant(new ModifierGrant("grant_str", [new SimpleModifier(EntityParameter.Strength, ModifierValueType.Flat, 5f, "test")]));
-            item.Upgrade(item.MaxUpdateLevel); // fully sharpened +12, multiplier 2.2
+            item.Upgrade(item.MaxUpdateLevel); // fully sharpened +12, multiplier 1.6
 
             var result = ascender.TryAscendItem(item);
 
@@ -99,10 +99,11 @@ namespace LastBreathTest.CraftingSystemTests
             Assert.AreEqual(12, item.MaxUpdateLevel);
             Assert.AreEqual(item.MaxUpdateLevel, item.UpdateLevel, "An ascended item is fully sharpened by definition.");
 
-            // Every FLAT line of BOTH channels = Base × UpdateMultiplier × 1.15 (implicits included).
+            // The +15% reaches every FLAT line of BOTH channels; sharpening reaches only the base one,
+            // so the implicit also carries the update multiplier and the rolled line does not.
             float updateMultiplier = 1f + (12 * 0.05f);
             Assert.AreEqual(100f * updateMultiplier * 1.15f, implicitLine.Value, 0.01f);
-            Assert.AreEqual(10f * updateMultiplier * 1.15f, modifierLine.Value, 0.01f);
+            Assert.AreEqual(10f * 1.15f, modifierLine.Value, 0.01f);
 
             // A percent line already multiplies values the scales have raised: scaling it too would stack a
             // multiplier on a multiplier, so sharpening and ascension leave it exactly as data wrote it.
@@ -149,9 +150,9 @@ namespace LastBreathTest.CraftingSystemTests
             Assert.IsTrue(extra is >= 1 and <= 69, $"Extra levels {extra} escaped the entry bounds 1..69.");
             Assert.AreEqual(item.MaxUpdateLevel, item.UpdateLevel, "Re-sharpened to the raised cap before the seal.");
             Assert.IsTrue(item.IsSealed);
-            // The lines rode the standard upgrade path: Base × (1 + levels × 5%) × the ascension 1.15.
-            float expected = 10f * (1f + (item.UpdateLevel * 0.05f)) * 1.15f;
-            Assert.AreEqual(expected, item.Modifiers.Single().Value, 0.01f);
+            // However many levels the gift added, they raise the BASE channel: the rolled line answers
+            // to the ascension alone.
+            Assert.AreEqual(10f * 1.15f, item.Modifiers.Single().Value, 0.01f);
         }
 
         [TestMethod]
@@ -169,7 +170,7 @@ namespace LastBreathTest.CraftingSystemTests
             item.AscensionMultiplier = 1.15f;
 
             Assert.AreEqual(1f, flag.Value, 0.001f, "A flag line must stay exactly as data wrote it.");
-            Assert.AreEqual(10f * 1.6f * 1.15f, line.Value, 0.01f, "The ordinary line still rides the full formula.");
+            Assert.AreEqual(10f * 1.15f, line.Value, 0.01f, "The ordinary rolled line still rides its own channel.");
         }
 
         [TestMethod]

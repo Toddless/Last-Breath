@@ -47,7 +47,7 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void Sharpening_ScalesTheBase_LikeEveryLine()
+        public void Sharpening_ScalesTheBase_LikeTheRestOfTheBaseChannel()
         {
             var item = new EquipItem(EquipmentPiece.Helmet, "Helm", []);
             item.SetBaseStats([new(EntityParameter.Evade, 500f)]);
@@ -109,7 +109,8 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void SharpeningAndAscension_ScaleEveryWeaponBase()
         {
-            // The owner's rule: the scales raise EVERY numeric value — damage and the crit pair alike.
+            // The weapon triple belongs to the base channel, so BOTH scales reach it — damage and the
+            // crit pair alike.
             var weapon = new WeaponItem(WeaponType.Axe, Handedness.OneHanded, 100f, 0.05f, 1.5f, "Axe", []);
             weapon.Upgrade(2); // ×1.1
             weapon.AscensionMultiplier = 1.15f;
