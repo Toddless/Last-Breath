@@ -23,7 +23,7 @@ namespace LastBreath.World
     /// </remarks>
     [Tool]
     [GlobalClass]
-    public partial class PropScatterLayer : Node2D
+    public partial class PropScatterLayer : Node2D, IReloadUnhookable
     {
         /// <summary>Invisible layer holding the painted cells. Read only — this node never writes to it.</summary>
         [Export] private TileMapLayer? _world;
@@ -64,10 +64,9 @@ namespace LastBreath.World
         /// started must not try to unhook on the way out.</summary>
         private bool _watchingWorld;
 
-        /// <summary>The rescatter hook, connected explicitly instead of through the C# event: Godot-mono keeps
-        /// its own ledger of event subscriptions and, after an editor assembly reload unloads them with their
-        /// ALC, disconnects each dead entry itself — pushing "nonexistent connection" errors. An explicit
-        /// Connect never enters that ledger.</summary>
+        /// <summary>The rescatter hook, kept so the exact same Callable can be disconnected later. It is still
+        /// a managed callable in Godot-mono's ledger, so an editor assembly reload would sweep it off the signal
+        /// itself; <see cref="EditorReloadUnhook"/> disconnects it first to keep that sweep quiet.</summary>
         private Callable _rescatterCallable;
 
         /// <summary>
@@ -104,9 +103,19 @@ namespace LastBreath.World
             _rescatterCallable = Callable.From(QueueRescatter);
             _world!.Connect(TileMapLayer.SignalName.Changed, _rescatterCallable);
             _watchingWorld = true;
+            EditorReloadUnhook.Register(this);
         }
 
         public override void _ExitTree()
+        {
+            EditorReloadUnhook.Unregister(this);
+            Unhook();
+        }
+
+        /// <summary>Drops the world subscription: from <see cref="_ExitTree"/> in ordinary life, and from
+        /// <see cref="EditorReloadUnhook"/> before an editor assembly reload sweeps managed callables off
+        /// their signals. The guards make a second call a no-op.</summary>
+        public void Unhook()
         {
             if (!_watchingWorld || !IsInstanceValid(_world)) return;
 
