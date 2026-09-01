@@ -31,17 +31,21 @@ namespace Core.Localization
         public const string Death = "#e05555";
         public const string Muted = "#b8b8b8";
 
+        // One color per damage type, everywhere the type shows itself: battle log, fly numbers,
+        // keyword links and their reference cards. Muted-but-readable on the Umbral dark ground:
+        // Fire is orange while its Burning DoT leans red-orange, Lightning is electric yellow,
+        // Sacred sits in the gold-white family and Blight is a murky swamp violet.
         private static readonly Dictionary<DamageType, string> s_damageColors = new()
         {
-            [DamageType.Sacred] = "#F5B64C",
+            [DamageType.Sacred] = "#E6CF95",
             [DamageType.Physical] = "#B5AEAE",
-            [DamageType.Fire] = "#E3562B",
+            [DamageType.Fire] = "#E88836",
             [DamageType.Cold] = "#43A4E5",
-            [DamageType.Lightning] = "#8D6FF7",
+            [DamageType.Lightning] = "#EDE05F",
             [DamageType.Poison] = "#55D458",
             [DamageType.Burning] = "#E35924",
             [DamageType.Bleed] = "#E82E2E",
-            [DamageType.Blight] = "#7A4B78",
+            [DamageType.Blight] = "#8E5D93",
         };
 
         private static readonly Dictionary<Rarity, string> s_rarityColors = new()

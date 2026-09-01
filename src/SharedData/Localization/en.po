@@ -1225,19 +1225,19 @@ msgid "Effect_Porcupine"
 msgstr "Porcupine"
 
 msgid "Effect_Porcupine_Description"
-msgstr "Retaliate against every attacker with sacred damage based on the hit taken and your armor, for {Duration|turn|turns}."
+msgstr "Retaliate against every attacker with {@Sacred} damage based on the hit taken and your armor, for {Duration|turn|turns}."
 
 msgid "Effect_Poison_Coating"
 msgstr "Poison Coating"
 
 msgid "Effect_Poison_Coating_Description"
-msgstr "While active, each of your attacks applies a stack of poison for {Duration|turn|turns}."
+msgstr "While active, each of your attacks applies a stack of {@Poison} for {Duration|turn|turns}."
 
 msgid "Effect_Sacrifice_Charge"
 msgstr "Sacrifice"
 
 msgid "Effect_Sacrifice_Charge_Description"
-msgstr "The next activated abilities deal additional sacred damage."
+msgstr "The next activated abilities deal additional {@Sacred} damage."
 
 msgid "Effect_Shield"
 msgstr "Shield"
@@ -1293,7 +1293,7 @@ msgid "Effect_Incineration"
 msgstr "Incineration"
 
 msgid "Effect_Incineration_Description"
-msgstr "A burning target dies when critically hit. Lasts {Duration|turn|turns}."
+msgstr "A {@Burning} target dies when critically hit. Lasts {Duration|turn|turns}."
 
 msgid "Effect_Fury"
 msgstr "Fury"
@@ -1317,19 +1317,19 @@ msgid "Effect_Damage_Over_Turn_Bleed"
 msgstr "Bleed"
 
 msgid "Effect_Damage_Over_Turn_Bleed_Description"
-msgstr "Deal {Damage} damage as [color=#d6152f]Bleed[/color] per Turn."
+msgstr "Deal {Damage} damage as {@Bleed} per Turn."
 
 msgid "Effect_Damage_Over_Turn_Burning"
 msgstr "Burning"
 
 msgid "Effect_Damage_Over_Turn_Burning_Description"
-msgstr "Deal {Damage} damage as [color=#de5931]Burning[/color] per Turn."
+msgstr "Deal {Damage} damage as {@Burning} per Turn."
 
 msgid "Effect_Damage_Over_Turn_Poison"
 msgstr "Poison"
 
 msgid "Effect_Damage_Over_Turn_Poison_Description"
-msgstr "Deal {Damage} damage as [color=#63ad18]Poison[/color] per Turn."
+msgstr "Deal {Damage} damage as {@Poison} per Turn."
 
 msgid "Effect_Life_Giving_Shade"
 msgstr "Life Giving Shade"
@@ -1359,7 +1359,7 @@ msgid "Effect_Frostbite"
 msgstr "Frostbite"
 
 msgid "Effect_Frostbite_Description"
-msgstr "Takes more cold damage with every stack."
+msgstr "Takes more {@Cold} damage with every stack."
 
 msgid "Effect_Frostbite_Tooltip"
 msgstr "Increases the cold damage taken."
@@ -1368,7 +1368,7 @@ msgid "Effect_Charge"
 msgstr "Charge"
 
 msgid "Effect_Charge_Description"
-msgstr "A static mark. At {DetonationStacks} stacks it detonates with lightning damage."
+msgstr "A static mark. At {DetonationStacks} stacks it detonates with {@Lightning} damage."
 
 msgid "Effect_Charge_Tooltip"
 msgstr "Detonates with lightning damage at full stacks."
@@ -1389,7 +1389,7 @@ msgid "Effect_Sacred_Conversion_Charge"
 msgstr "Sacred Current"
 
 msgid "Effect_Sacred_Conversion_Charge_Description"
-msgstr "The next activated ability deals part of its damage as sacred."
+msgstr "The next activated ability deals part of its damage as {@Sacred}."
 
 msgid "Effect_Next_Ability_Cooldown"
 msgstr "Chilled Mind"
@@ -2708,13 +2708,13 @@ msgid "Ability_Poison_Coating"
 msgstr "Poison Coating"
 
 msgid "Ability_Poison_Coating_Description"
-msgstr "For {Duration|turn|turns} every attack applies a poison stack. Each stack deals {PoisonMultiplier:%} of the damage dealt over {PoisonDuration|turn|turns}."
+msgstr "For {Duration|turn|turns} every attack applies a {@Poison} stack. Each stack deals {PoisonMultiplier:%} of the damage dealt over {PoisonDuration|turn|turns}."
 
 msgid "Ability_Poison_Explosion"
 msgstr "Poison Explosion"
 
 msgid "Ability_Poison_Explosion_Description"
-msgstr "Consumes every poison stack on the target and deals their total damage at once. Executes the target at {ExecutionThreshold} or more stacks."
+msgstr "Consumes every {@Poison} stack on the target and deals their total damage at once. Executes the target at {ExecutionThreshold} or more stacks."
 
 msgid "Ability_Critical_Calculation"
 msgstr "Critical Calculation"
@@ -2729,7 +2729,7 @@ msgid "Ability_Jar_Of_Poison"
 msgstr "Jar of Poison"
 
 msgid "Ability_Jar_Of_Poison_Description"
-msgstr "Applies a poison stack dealing a share of {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) as damage each turn for {PoisonDuration|turn|turns}."
+msgstr "Applies a {@Poison} stack dealing a share of {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) as damage each turn for {PoisonDuration|turn|turns}."
 
 msgid "Ability_Increasing_Pressure_Description"
 msgstr "A series of up to {Attacks} escalating attacks. Each attack deals an additional {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) base damage. Every successful hit empowers the next one by {AttackDamageStepMultiplier:%}."
@@ -2771,7 +2771,7 @@ msgid "Ability_Ares_Blessing_Description"
 msgstr "Increases maximum health by {HealthBonus:%} and health recovery by {RecoveryBonus:%} for {Duration|turn|turns}."
 
 msgid "Ability_Sacrifice_Description"
-msgstr "Sacrifices {SacrificePercent:%} of current health. For every 100 health lost, the next activated ability gains {RatePerHundred:%} as sacred damage. Charges: {Charges}."
+msgstr "Sacrifices {SacrificePercent:%} of current health. For every 100 health lost, the next activated ability gains {RatePerHundred:%} as {@Sacred} damage. Charges: {Charges}."
 
 msgid "Ability_Ice_Shards"
 msgstr "Ice Shards"
@@ -2875,13 +2875,13 @@ msgid "Augment_Next_Cast_Sacred"
 msgstr "Next Cast Sacred"
 
 msgid "Augment_Next_Cast_Sacred_Description"
-msgstr "The next activated ability deals {fraction:%} of its damage as sacred."
+msgstr "The next activated ability deals {fraction:%} of its damage as {@Sacred}."
 
 msgid "Augment_Chain_Lightning_Ignore_Resistances"
 msgstr "Ignore Resistances"
 
 msgid "Augment_Chain_Lightning_Ignore_Resistances_Description"
-msgstr "Lightning ignores resistances."
+msgstr "{@Lightning} ignores resistances."
 
 # ------------------------------
 # Keyword reference cards  (<Id>_Tooltip = static text, no placeholders)
@@ -2966,13 +2966,62 @@ msgid "Incineration_Tooltip"
 msgstr "Getting an critical attack cause instant death."
 
 msgid "Burning_Tooltip"
-msgstr "Fire damage over time."
+msgstr "Fire damage over time, dealt at the start of the turn. Reduced by fire resistance; a tick is not an attack, so attack effects that ignore resistances do not apply to it."
 
 msgid "Bleed_Tooltip"
-msgstr "Physical damage over time."
+msgstr "Physical damage over time, dealt at the start of the turn. Reduced by armor, which the attacker's armor penetration weakens."
 
 msgid "Poison_Tooltip"
-msgstr "Poison damage over time."
+msgstr "Poison damage over time, dealt at the start of the turn. Reduced by poison resistance; a tick is not an attack, so attack effects that ignore resistances do not apply to it."
+
+# ------------------------------
+# Damage-type keywords ({@Physical}, {@Fire}... in descriptions) and their reference cards
+# ------------------------------
+
+msgid "Physical"
+msgstr "Physical"
+
+msgid "Physical_Tooltip"
+msgstr "Plain bodily harm. Reduced by the target's armor, which the attacker's armor penetration weakens."
+
+msgid "Fire"
+msgstr "Fire"
+
+msgid "Fire_Tooltip"
+msgstr "Elemental fire damage. Reduced by fire resistance; the attacker's fire penetration pierces part of that resistance."
+
+msgid "Cold"
+msgstr "Cold"
+
+msgid "Cold_Tooltip"
+msgstr "Elemental cold damage. Reduced by cold resistance; the attacker's cold penetration pierces part of that resistance."
+
+msgid "Lightning"
+msgstr "Lightning"
+
+msgid "Lightning_Tooltip"
+msgstr "Elemental lightning damage. Reduced by lightning resistance; the attacker's lightning penetration pierces part of that resistance."
+
+msgid "Sacred"
+msgstr "Sacred"
+
+msgid "Sacred_Tooltip"
+msgstr "Holy power that ignores armor and every resistance — nothing reduces it."
+
+msgid "Blight"
+msgstr "Blight"
+
+msgid "Blight_Tooltip"
+msgstr "Corruption that gnaws at health itself — neither armor nor any resistance reduces it."
+
+msgid "Bleed"
+msgstr "Bleed"
+
+msgid "Burning"
+msgstr "Burning"
+
+msgid "Poison"
+msgstr "Poison"
 
 msgid "Lucky_Tooltip"
 msgstr "The odds are calculated twice, and the best outcome is selected."
@@ -2985,7 +3034,7 @@ msgid "Augment_Poison_Attack_Series"
 msgstr "Poison On Hit"
 
 msgid "Augment_Poison_Attack_Series_Description"
-msgstr "Attacks apply a stack of poison for {poisonDuration|turn|turns}."
+msgstr "Attacks apply a stack of {@Poison} for {poisonDuration|turn|turns}."
 
 msgid "Augment_Apply_Buff_Critical_Chance"
 msgstr "Apply Buff Critical Chance"
@@ -3039,7 +3088,7 @@ msgid "Augment_Extend_Poison"
 msgstr "Extend Poison"
 
 msgid "Augment_Extend_Poison_Description"
-msgstr "A successful attack extends poison by {poisonDuration|turn|turns}."
+msgstr "A successful attack extends {@Poison} by {poisonDuration|turn|turns}."
 
 msgid "Augment_Additional_Projectiles"
 msgstr "Additional Projectiles"
@@ -3075,7 +3124,7 @@ msgid "Augment_Poison_Duration"
 msgstr "Poison Duration"
 
 msgid "Augment_Poison_Duration_Description"
-msgstr "+{poisonDuration|turn|turns} poison duration."
+msgstr "+{poisonDuration|turn|turns} {@Poison} duration."
 
 msgid "Augment_Dark_Shroud_Immortality"
 msgstr "Immortality"
@@ -3129,7 +3178,7 @@ msgid "Augment_Poison_Explosion_Spread_Poison"
 msgstr "Spread Poison"
 
 msgid "Augment_Poison_Explosion_Spread_Poison_Description"
-msgstr "Spreads the poison to every enemy."
+msgstr "Spreads the {@Poison} to every enemy."
 
 msgid "Augment_Reduce_Execution_Threshold"
 msgstr "Reduce Execution Threshold"
@@ -3141,7 +3190,7 @@ msgid "Augment_Poison_Explosion_Transfer_Poison_On_Death"
 msgstr "Transfer Poison On Death"
 
 msgid "Augment_Poison_Explosion_Transfer_Poison_On_Death_Description"
-msgstr "On the target's death, the poison transfers to another enemy."
+msgstr "On the target's death, the {@Poison} transfers to another enemy."
 
 msgid "Augment_Attacks_Reduce_Incoming_Heal"
 msgstr "Attacks Reduce Incoming Heal"
@@ -3159,7 +3208,7 @@ msgid "Augment_Poison_Coating_Apply_Poison_For_Each_Enemy"
 msgstr "Apply Stack For Each Enemy"
 
 msgid "Augment_Poison_Coating_Apply_Poison_For_Each_Enemy_Description"
-msgstr "Applies a poison stack for each enemy on the battlefield."
+msgstr "Applies a {@Poison} stack for each enemy on the battlefield."
 
 # ------------------------------
 # Ability upgrades — Strength stance
@@ -3175,7 +3224,7 @@ msgid "Augment_Armageddon_Burning"
 msgstr "Stage3 Burning"
 
 msgid "Augment_Armageddon_Burning_Description"
-msgstr "Stage 3 applies {stacks} burning {stacks|stack|stacks} (×{damageMultiplier}, {duration|turn|turns})."
+msgstr "Stage 3 applies {stacks} {@Burning} {stacks|stack|stacks} (×{damageMultiplier}, {duration|turn|turns})."
 
 msgid "Augment_Porcupine_Echo"
 msgstr "Echo"
@@ -3413,7 +3462,7 @@ msgid "Passive_Skill_Incineration"
 msgstr "Incineration"
 
 msgid "Passive_Skill_Incineration_Description"
-msgstr "A critical strike kills a burning target."
+msgstr "A critical strike kills a {@Burning} target."
 
 msgid "Passive_Skill_First_Strike"
 msgstr "First Right"
@@ -3969,19 +4018,19 @@ msgid "Ability_Deep_Freeze"
 msgstr "Deep Freeze"
 
 msgid "Ability_Deep_Freeze_Description"
-msgstr "Deals {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) cold damage, freezes the target for {FreezeDuration|turn|turns} and applies a stack of {@Effect_Frostbite} for {FrostbiteDuration|turn|turns}.\nActivation level 2: reduces the target's cold resistance by {ColdResistanceShred:%}.\nActivation level 3: reduces the target's healing by {HealReductionValue:%}.\nActivation level 4: freezes every enemy on the battlefield."
+msgstr "Deals {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) {@Cold} damage, freezes the target for {FreezeDuration|turn|turns} and applies a stack of {@Effect_Frostbite} for {FrostbiteDuration|turn|turns}.\nActivation level 2: reduces the target's cold resistance by {ColdResistanceShred:%}.\nActivation level 3: reduces the target's healing by {HealReductionValue:%}.\nActivation level 4: freezes every enemy on the battlefield."
 
 msgid "Ability_Discharge"
 msgstr "Discharge"
 
 msgid "Ability_Discharge_Description"
-msgstr "Consumes the caster's entire barrier and strikes with lightning: absorbed barrier × {BarrierMultiplier} + {SpellDamageScale:%} spell damage.\nActivation level 2: the multiplier is increased by {StageTwoMultiplierBonus}.\nActivation level 3: restores {StageThreeBarrierRestore:%} of the damage dealt as barrier.\nActivation level 4: the damage becomes sacred."
+msgstr "Consumes the caster's entire barrier and strikes with {@Lightning}: absorbed barrier × {BarrierMultiplier} + {SpellDamageScale:%} spell damage.\nActivation level 2: the multiplier is increased by {StageTwoMultiplierBonus}.\nActivation level 3: restores {StageThreeBarrierRestore:%} of the damage dealt as barrier.\nActivation level 4: the damage becomes {@Sacred}."
 
 msgid "Ability_Static_Armor"
 msgstr "Static Armor"
 
 msgid "Ability_Static_Armor_Description"
-msgstr "For {Duration|turn|turns} your attacks put a stack of {@Effect_Charge} on their target; at {RequiredStacks} stacks the charge detonates for {DetonationDamage} + ({DetonationWeaponScale:%} + {DetonationSpellScale:%}) lightning damage.\nActivation level 2: restores {StageTwoBarrierRestore:%} of detonation damage as barrier.\nActivation level 3: the detonation hits an additional target for {StageThreeSplashDamage:%} of its damage.\nActivation level 4: taking a hit puts a Charge stack on the attacker."
+msgstr "For {Duration|turn|turns} your attacks put a stack of {@Effect_Charge} on their target; at {RequiredStacks} stacks the charge detonates for {DetonationDamage} + ({DetonationWeaponScale:%} + {DetonationSpellScale:%}) {@Lightning} damage.\nActivation level 2: restores {StageTwoBarrierRestore:%} of detonation damage as barrier.\nActivation level 3: the detonation hits an additional target for {StageThreeSplashDamage:%} of its damage.\nActivation level 4: taking a hit puts a Charge stack on the attacker."
 
 # Ice Block upgrades
 
@@ -4081,7 +4130,7 @@ msgid "Augment_Ice_Aegis_Shield_Reflect_Damage"
 msgstr "Reflect"
 
 msgid "Augment_Ice_Aegis_Shield_Reflect_Damage_Description"
-msgstr "The shield reflects {amount:%} of absorbed damage as cold."
+msgstr "The shield reflects {amount:%} of absorbed damage as {@Cold}."
 
 msgid "Augment_Ice_Aegis_Turn_End_Heal_Under_Shield"
 msgstr "Turn End Heal"
@@ -4914,7 +4963,7 @@ msgid "Passive_Skill_Gift_Of_Nature"
 msgstr "Gift of Nature"
 
 msgid "Passive_Skill_Gift_Of_Nature_Description"
-msgstr "{ElementalBonus:%} more All Elemental Damage. Attacks deal no Physical Damage."
+msgstr "{ElementalBonus:%} more All Elemental Damage. Attacks deal no {@Physical} Damage."
 
 msgid "Passive_Skill_Strength_Of_Spirit"
 msgstr "Strength of Spirit"
@@ -4932,4 +4981,4 @@ msgid "Passive_Skill_Trinity"
 msgstr "Trinity"
 
 msgid "Passive_Skill_Trinity_Description"
-msgstr "Attacks deal 100% of their Physical Damage as Cold, Fire and Lightning."
+msgstr "Attacks deal 100% of their {@Physical} Damage as {@Cold}, {@Fire} and {@Lightning}."

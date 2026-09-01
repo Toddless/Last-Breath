@@ -64,9 +64,13 @@ namespace Core.Localization
         private string RenderKeyword(string key, TextFormat format)
         {
             string name = localization.Translate(key);
-            return format == TextFormat.Rich
-                ? $"[url={key}]{TextPalette.Colorize(name, TextPalette.Keyword)}[/url]"
-                : name;
+            if (format != TextFormat.Rich) return name;
+
+            // A damage-type keyword wears its type's color; every other keyword keeps the shared accent.
+            string color = DamageKeywords.TryParse(key, out var damageType)
+                ? TextPalette.DamageColor(damageType)
+                : TextPalette.Keyword;
+            return $"[url={key}]{TextPalette.Colorize(name, color)}[/url]";
         }
 
         private string RenderPlural(object value, string singularKey, string pluralKey, TextFormat format)

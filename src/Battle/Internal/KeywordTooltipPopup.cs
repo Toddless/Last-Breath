@@ -42,6 +42,7 @@
         public void ShowKeyword(KeywordTooltipView view, Vector2 globalPosition)
         {
             _title?.Text = view.Name;
+            TintTitle(view.TitleColorHex);
             _description?.Text = view.Description;
             _pendingPosition = globalPosition;
             Visible = true;
@@ -49,6 +50,22 @@
         }
 
         public void Close() => QueueFree();
+
+        /// <summary>Damage-type cards title themselves in their type's color; a null hex leaves the
+        /// themed title alone (Effect_* cards look as they always did). A LabelSettings resource is
+        /// duplicated before tinting — it is shared by every instance of the scene.</summary>
+        private void TintTitle(string? colorHex)
+        {
+            if (_title == null || colorHex == null) return;
+            var color = new Color(colorHex);
+            if (_title.LabelSettings is { } settings)
+            {
+                var tinted = (LabelSettings)settings.Duplicate();
+                tinted.FontColor = color;
+                _title.LabelSettings = tinted;
+            }
+            else _title.AddThemeColorOverride("font_color", color);
+        }
 
         private void Place()
         {

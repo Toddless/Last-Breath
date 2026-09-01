@@ -86,7 +86,6 @@ layout_mode = 2
 [node name="Description" type="RichTextLabel" parent="Panel/Layout" unique_id=1662230944]
 custom_minimum_size = Vector2(316, 0)
 layout_mode = 2
-mouse_filter = 2
 bbcode_enabled = true
 text = "Description"
 fit_content = true

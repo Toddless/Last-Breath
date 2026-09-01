@@ -1,5 +1,6 @@
 namespace Battle.Source.UIElements
 {
+    using Core;
     using Core.Enums;
     using Core.Localization;
     using Core.Views.UI;
@@ -53,7 +54,13 @@ namespace Battle.Source.UIElements
 
         public bool IsPinned { get; private set; }
 
-        public override void _Ready() => HoverTooltipMotion.Setup(this, _panel);
+        // Keyword links in the description ({@Sacred}, {@Bleed}, {@Effect_X}...) open the reference
+        // card — reachable once the tooltip is Alt-pinned, same as the item tooltip's grant links.
+        public override void _Ready()
+        {
+            HoverTooltipMotion.Setup(this, _panel);
+            KeywordLinks.Attach(_description);
+        }
 
         public override void _Process(double delta)
         {

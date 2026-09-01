@@ -11,7 +11,10 @@ namespace Core.Localization
         {
             string name = localization.Translate(key);
             string description = Translated(key + "_Tooltip") ?? Translated(key + "_Description") ?? string.Empty;
-            view = new KeywordTooltipView(key, name, description);
+            // A damage-type card carries its type's color for the title — the same tint the
+            // link in the description wore, so the card visibly answers the word that opened it.
+            string? titleColor = DamageKeywords.TryParse(key, out var damageType) ? TextPalette.DamageColor(damageType) : null;
+            view = new KeywordTooltipView(key, name, description, titleColor);
             return name != key || description.Length > 0;
         }
 

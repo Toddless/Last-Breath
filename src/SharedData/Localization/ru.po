@@ -1937,6 +1937,55 @@ msgstr ""
 msgid "Poison_Tooltip"
 msgstr ""
 
+# ------------------------------
+# Damage-type keywords ({@Physical}, {@Fire}... in descriptions) and their reference cards
+# ------------------------------
+
+msgid "Physical"
+msgstr "Физический"
+
+msgid "Physical_Tooltip"
+msgstr ""
+
+msgid "Fire"
+msgstr "Огонь"
+
+msgid "Fire_Tooltip"
+msgstr ""
+
+msgid "Cold"
+msgstr "Холод"
+
+msgid "Cold_Tooltip"
+msgstr ""
+
+msgid "Lightning"
+msgstr "Молния"
+
+msgid "Lightning_Tooltip"
+msgstr ""
+
+msgid "Sacred"
+msgstr "Священный"
+
+msgid "Sacred_Tooltip"
+msgstr ""
+
+msgid "Blight"
+msgstr "Скверна"
+
+msgid "Blight_Tooltip"
+msgstr ""
+
+msgid "Bleed"
+msgstr "Кровотечение"
+
+msgid "Burning"
+msgstr "Горение"
+
+msgid "Poison"
+msgstr "Яд"
+
 msgid "Lucky_Tooltip"
 msgstr ""
 
@@ -2583,7 +2632,7 @@ msgid "Augment_Extend_Poison"
 msgstr "Продление длительности яда"
 
 msgid "Augment_Extend_Poison_Description"
-msgstr "Успешная атака продлевает яд на {poisonDuration|turn|turns}."
+msgstr "Успешная атака продлевает {@Poison} на {poisonDuration|turn|turns}."
 
 msgid "Augment_Additional_Projectiles"
 msgstr "Дополнительные снаряды"
@@ -2673,7 +2722,7 @@ msgid "Augment_Poison_Explosion_Spread_Poison"
 msgstr "Распространение"
 
 msgid "Augment_Poison_Explosion_Spread_Poison_Description"
-msgstr "Распространяет яд на всех врагов."
+msgstr "Распространяет {@Poison} на всех врагов."
 
 msgid "Augment_Reduce_Execution_Threshold"
 msgstr "Порог казни"
@@ -2685,7 +2734,7 @@ msgid "Augment_Poison_Explosion_Transfer_Poison_On_Death"
 msgstr "Предсмертный перенос яда"
 
 msgid "Augment_Poison_Explosion_Transfer_Poison_On_Death_Description"
-msgstr "При смерти цели яд переносится на другого врага."
+msgstr "При смерти цели {@Poison} переносится на другого врага."
 
 msgid "Augment_Attacks_Reduce_Incoming_Heal"
 msgstr "Гниющие раны"
