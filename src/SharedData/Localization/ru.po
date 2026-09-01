@@ -3988,6 +3988,51 @@ msgstr "Золото: {Amount}"
 msgid "UI_Trade_SellQuote"
 msgstr ""
 
+msgid "UI_Trade_Showcase"
+msgstr ""
+
+msgid "UI_Trade_Deal"
+msgstr ""
+
+msgid "UI_Trade_Consumables"
+msgstr ""
+
+msgid "UI_Trade_Equipment"
+msgstr ""
+
+msgid "UI_Trade_Specials"
+msgstr ""
+
+msgid "UI_Trade_Rotation"
+msgstr ""
+
+msgid "UI_Trade_Restock"
+msgstr ""
+
+msgid "UI_Trade_PickHint"
+msgstr ""
+
+msgid "UI_Trade_DirectionHint"
+msgstr ""
+
+msgid "UI_Trade_ClickToSell"
+msgstr ""
+
+msgid "UI_Trade_GoldSuffix"
+msgstr ""
+
+msgid "UI_Trade_Sell"
+msgstr ""
+
+msgid "UI_Trade_Total"
+msgstr ""
+
+msgid "UI_Trade_NotEnoughGold"
+msgstr ""
+
+msgid "UI_Trade_NoPrice"
+msgstr ""
+
 msgid "Npc_Human_Merchant"
 msgstr "Странствующий торговец"
 

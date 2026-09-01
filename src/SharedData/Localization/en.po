@@ -4126,6 +4126,51 @@ msgstr "Gold: {Amount}"
 msgid "UI_Trade_SellQuote"
 msgstr "Sells for {Amount} g"
 
+msgid "UI_Trade_Showcase"
+msgstr "Showcase"
+
+msgid "UI_Trade_Deal"
+msgstr "Deal"
+
+msgid "UI_Trade_Consumables"
+msgstr "Consumables"
+
+msgid "UI_Trade_Equipment"
+msgstr "Equipment"
+
+msgid "UI_Trade_Specials"
+msgstr "Special deliveries"
+
+msgid "UI_Trade_Rotation"
+msgstr "Rotation {Time}"
+
+msgid "UI_Trade_Restock"
+msgstr "New stock in {Time}"
+
+msgid "UI_Trade_PickHint"
+msgstr "Pick goods on the showcase - or one of your own items to sell"
+
+msgid "UI_Trade_DirectionHint"
+msgstr "The chosen item sets the deal's direction"
+
+msgid "UI_Trade_ClickToSell"
+msgstr "click an item to sell it"
+
+msgid "UI_Trade_GoldSuffix"
+msgstr "{Amount} GOLD"
+
+msgid "UI_Trade_Sell"
+msgstr "Sell"
+
+msgid "UI_Trade_Total"
+msgstr "Total: {Amount} g"
+
+msgid "UI_Trade_NotEnoughGold"
+msgstr "Not enough gold"
+
+msgid "UI_Trade_NoPrice"
+msgstr "The trader has no price for this"
+
 msgid "Npc_Human_Merchant"
 msgstr "Wandering Merchant"
 

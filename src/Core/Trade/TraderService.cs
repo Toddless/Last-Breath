@@ -40,6 +40,11 @@ namespace Core.Trade
 
         TraderDefinition? GetTrader(string traderId);
 
+        /// <summary>The absolute game minute the trader's shelf refreshes at; null while no shelf
+        /// has been rolled yet. Reading schedules nothing — the visit that shows the shelf
+        /// (GetStock) is what stocks it.</summary>
+        double? GetNextRestockMinutes(string traderId);
+
         /// <summary>The shelves as they stand, for the save file. Reading them stocks nothing: a trader
         /// nobody has visited has no shelf yet, and a capture must not be the visit that rolls one.</summary>
         TraderShelves CaptureShelves();
@@ -90,6 +95,11 @@ namespace Core.Trade
         private double NowMinutes => clock != null ? clock.Day * 1440 + clock.MinuteOfDay : 0;
 
         public TraderDefinition? GetTrader(string traderId) => traders.GetTrader(traderId);
+
+        public double? GetNextRestockMinutes(string traderId) =>
+            _states.TryGetValue(traderId, out var state) && state.NextRestockMinutes != double.MinValue
+                ? state.NextRestockMinutes
+                : null;
 
         public IReadOnlyList<TraderOffer> GetStock(string traderId)
         {

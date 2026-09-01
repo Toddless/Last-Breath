@@ -19,6 +19,7 @@ namespace Core.Ai.World.Time
         public int Minute => (int)(_secondsOfDay % 3600 / 60);
         public int MinuteOfDay => (int)(_secondsOfDay / 60);
         public float NormalizedTimeOfDay => (float)(_secondsOfDay / GameDaySeconds);
+        public float RealSecondsPerGameMinute => _config.RealMinutesPerGameDay * 60f / (24f * 60f);
         public DayPhase Phase => PhaseOf(Hour);
 
         public event Action<int>? HourPassed;

@@ -43,6 +43,7 @@ namespace LastBreath.Services
     using Trade;
     using UI;
     using World;
+    using Bag = Inventory.Inventory;
 
     /// <summary>Project bootstrap: the shared Core provider + Main registrations. The only place touching the static root.</summary>
     public static class GameServiceProvider
@@ -113,7 +114,12 @@ namespace LastBreath.Services
             services.AddSaveSystem();
             services.AddSessionReset();
             services.AddGameData("res://Data/", "res://Data/Shared/");
-            services.AddSingleton<IInventory, Inventory>();
+            // The bag registers once; its Core seams (contents, slot lending, click reports) all
+            // resolve to the same instance, so windows never name the concrete service.
+            services.AddSingleton<Bag>();
+            services.AddSingleton<IInventory>(sp => sp.GetRequiredService<Bag>());
+            services.AddSingleton<ISlotLender>(sp => sp.GetRequiredService<Bag>());
+            services.AddSingleton<IItemInteractionSource>(sp => sp.GetRequiredService<Bag>());
             services.AddSingleton<ISettingsHandler, SettingsHandler>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             RegisterTradeServices(services);

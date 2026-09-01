@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://cq5m8w3nde2lp"]
+
+[ext_resource type="Script" uid="uid://b7fs2k9wqdc4m" path="res://UI/Modules/DealColumn.cs" id="1_dealc"]
+
+[node name="DealColumn" type="VBoxContainer" node_paths=PackedStringArray("_emptyState", "_dealState", "_pickHint", "_directionHint", "_icon", "_name", "_unitPrice", "_total", "_reason", "_amount", "_confirm")]
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+script = ExtResource("1_dealc")
+_emptyState = NodePath("EmptyState")
+_dealState = NodePath("DealState")
+_pickHint = NodePath("EmptyState/PickHint")
+_directionHint = NodePath("EmptyState/DirectionHint")
+_icon = NodePath("DealState/IconCenter/Icon")
+_name = NodePath("DealState/Name")
+_unitPrice = NodePath("DealState/UnitPrice")
+_total = NodePath("DealState/Total")
+_reason = NodePath("DealState/Reason")
+_amount = NodePath("DealState/AmountRow/Amount")
+_confirm = NodePath("DealState/Confirm")
+
+[node name="EmptyState" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="TopSpacer" type="Control" parent="EmptyState"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="PickHint" type="Label" parent="EmptyState"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="BottomSpacer" type="Control" parent="EmptyState"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="DirectionHint" type="Label" parent="EmptyState"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="DealState" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="StateTopSpacer" type="Control" parent="DealState"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="IconCenter" type="CenterContainer" parent="DealState"]
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="DealState/IconCenter"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="DealState"]
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="UnitPrice" type="Label" parent="DealState"]
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+horizontal_alignment = 1
+
+[node name="AmountRow" type="HBoxContainer" parent="DealState"]
+layout_mode = 2
+alignment = 1
+
+[node name="Amount" type="SpinBox" parent="DealState/AmountRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+
+[node name="Total" type="Label" parent="DealState"]
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+horizontal_alignment = 1
+
+[node name="Reason" type="Label" parent="DealState"]
+visible = false
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Confirm" type="Button" parent="DealState"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+focus_mode = 0
+text = "Buy"

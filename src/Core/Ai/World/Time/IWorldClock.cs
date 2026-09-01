@@ -19,6 +19,11 @@ namespace Core.Ai.World.Time
         /// <summary>Time of day as 0..1 (midnight to midnight) — handy for visuals.</summary>
         float NormalizedTimeOfDay { get; }
 
+        /// <summary>How many real seconds one game minute lasts — UI countdowns render game-time
+        /// deadlines in wall-clock terms through this. Defaults to 1:1 for hosts (test fakes)
+        /// that never configure a day length.</summary>
+        float RealSecondsPerGameMinute => 1f;
+
         DayPhase Phase { get; }
 
         event Action<int>? HourPassed;
