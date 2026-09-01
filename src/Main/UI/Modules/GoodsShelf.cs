@@ -27,17 +27,12 @@ namespace LastBreath.UI.Modules
     /// </summary>
     public partial class GoodsShelf : ScrollContainer
     {
-        public const string ConsumablesKey = "UI_Trade_Consumables";
-        public const string EquipmentKey = "UI_Trade_Equipment";
-        public const string SpecialsKey = "UI_Trade_Specials";
-        public const string BuybackKey = "UI_Trade_Buyback";
-        private const string PriceKey = "UI_Trade_Price";
+        private const string ConsumablesKey = "UI_Trade_Consumables";
+        private const string EquipmentKey = "UI_Trade_Equipment";
+        private const string SpecialsKey = "UI_Trade_Specials";
+        private const string BuybackKey = "UI_Trade_Buyback";
 
         private const int BuybackSockets = 12;
-        private const float IconSide = 48f;
-        private static readonly Vector2 s_tileSize = new(118, 124);
-        private static readonly Color s_tileBg = new(0.055f, 0.05f, 0.042f); // ItemSlotPanel ground
-        private static readonly Color s_neutralBorder = new(0.42f, 0.341f, 0.188f); // Umbral GoldBorder
 
         [Export] private SectionHeader? _consumablesHeader, _equipmentHeader, _specialsHeader, _buybackHeader;
         [Export] private Control? _specialsRow;
@@ -91,136 +86,25 @@ namespace LastBreath.UI.Modules
                 flow.AddChild(BuildTile(tile, dashed, report));
         }
 
-        /// <summary>Card tile: rarity-tinted ItemSlotPanel frame, icon centered, name in the rarity
-        /// color, price at the bottom, the stack counter in the corner (only when it counts).</summary>
+        /// <summary>Card tile: the <see cref="ShelfTileCard"/> scene filled with the offer — the
+        /// rarity color tints the name and the frame, dashed for the rotation slots.</summary>
         private Control BuildTile(ShelfTile tile, bool dashed, Action<string> report)
         {
-            var rarityColor = Color.FromHtml(TextPalette.RarityColor(tile.Item.Rarity));
-            var panel = BuildFrame(dashed ? null : rarityColor);
-            if (dashed) panel.AddChild(new DashedFrame { Line = rarityColor, MouseFilter = MouseFilterEnum.Ignore });
-
-            var layout = new VBoxContainer { MouseFilter = MouseFilterEnum.Ignore };
-            layout.AddThemeConstantOverride("separation", 2);
-            layout.AddChild(BuildIcon(tile.Item.Icon));
-            layout.AddChild(BuildCaption(tile.Item.DisplayName, rarityColor));
-            layout.AddChild(BuildPrice(tile.UnitPrice));
-            panel.AddChild(layout);
-
-            if (tile.Count > 1) panel.AddChild(BuildCountCorner(tile.Count));
-
-            panel.GuiInput += @event =>
-            {
-                if (@event is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left }) return;
-                report(tile.OfferId);
-                panel.AcceptEvent();
-            };
-            HoverTooltip.Attach(panel, () => ShowTooltip?.Invoke(tile.Item));
-            return panel;
+            var card = ShelfTileCard.Initialize().Instantiate<ShelfTileCard>();
+            card.SetOffer(tile.Item.Icon, tile.Item.DisplayName,
+                Color.FromHtml(TextPalette.RarityColor(tile.Item.Rarity)), tile.UnitPrice, tile.Count);
+            card.SetDashed(dashed);
+            card.Clicked += () => report(tile.OfferId);
+            HoverTooltip.Attach(card, () => ShowTooltip?.Invoke(tile.Item));
+            return card;
         }
 
         /// <summary>An empty buyback socket: the dashed outline of a sale that has not happened.</summary>
         private static Control BuildPlaceholder()
         {
-            var panel = BuildFrame(border: null);
-            panel.MouseFilter = MouseFilterEnum.Ignore;
-            panel.AddChild(new DashedFrame { Line = s_neutralBorder, MouseFilter = MouseFilterEnum.Ignore });
-            return panel;
-        }
-
-        /// <summary>The ItemSlotPanel look built by hand — the border color is per-tile (rarity),
-        /// which a shared theme stylebox cannot carry.</summary>
-        private static PanelContainer BuildFrame(Color? border)
-        {
-            var style = new StyleBoxFlat { BgColor = s_tileBg };
-            style.SetContentMarginAll(6);
-            if (border is { } color)
-            {
-                style.SetBorderWidthAll(1);
-                style.BorderColor = color;
-            }
-
-            var panel = new PanelContainer { CustomMinimumSize = s_tileSize };
-            panel.AddThemeStyleboxOverride("panel", style);
-            return panel;
-        }
-
-        private static Control BuildIcon(Texture2D? icon)
-        {
-            var center = new CenterContainer { SizeFlagsVertical = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore };
-            center.AddChild(new TextureRect
-            {
-                Texture = icon,
-                CustomMinimumSize = new Vector2(IconSide, IconSide),
-                ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-                StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-                MouseFilter = MouseFilterEnum.Ignore,
-            });
-            return center;
-        }
-
-        private static Label BuildCaption(string name, Color rarityColor)
-        {
-            var caption = new Label
-            {
-                Text = name,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis,
-                MouseFilter = MouseFilterEnum.Ignore,
-            };
-            caption.AddThemeColorOverride("font_color", rarityColor);
-            caption.AddThemeFontSizeOverride("font_size", 12);
-            return caption;
-        }
-
-        private static Label BuildPrice(int unitPrice)
-        {
-            var price = new Label
-            {
-                Text = Localization.Render(PriceKey, new Dictionary<string, object?> { ["Amount"] = unitPrice }),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                ThemeTypeVariation = "ValueLabel",
-                MouseFilter = MouseFilterEnum.Ignore,
-            };
-            price.AddThemeFontSizeOverride("font_size", 12);
-            return price;
-        }
-
-        /// <summary>The xN counter riding the tile's top-right corner.</summary>
-        private static Control BuildCountCorner(int count)
-        {
-            var corner = new Label
-            {
-                Text = $"x{count}",
-                ThemeTypeVariation = "SlotCountLabel",
-                GrowHorizontal = GrowDirection.Begin,
-                GrowVertical = GrowDirection.End,
-                MouseFilter = MouseFilterEnum.Ignore,
-            };
-            var overlay = new Control { MouseFilter = MouseFilterEnum.Ignore };
-            overlay.AddChild(corner);
-            corner.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopRight, Control.LayoutPresetMode.KeepSize, 2);
-            return overlay;
-        }
-
-        /// <summary>The hairline the theme cannot draw: a dashed border, drawn by hand for the
-        /// rotation slots and the empty buyback sockets.</summary>
-        private sealed partial class DashedFrame : Control
-        {
-            public Color Line { get; init; } = s_neutralBorder;
-
-            public override void _Notification(int what)
-            {
-                if (what == NotificationResized) QueueRedraw();
-            }
-
-            public override void _Draw()
-            {
-                var end = Size - Vector2.One;
-                DrawDashedLine(Vector2.One, new Vector2(end.X, 1), Line);
-                DrawDashedLine(new Vector2(end.X, 1), end, Line);
-                DrawDashedLine(end, new Vector2(1, end.Y), Line);
-                DrawDashedLine(new Vector2(1, end.Y), Vector2.One, Line);
-            }
+            var card = ShelfTileCard.Initialize().Instantiate<ShelfTileCard>();
+            card.SetEmpty();
+            return card;
         }
     }
 }

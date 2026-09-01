@@ -5,6 +5,7 @@ namespace LastBreath.UI.Modules
     using Core.Localization;
     using Core.Views.UI;
     using Godot;
+    using SharedUi;
 
     /// <summary>
     /// The key-stat readout under the paperdoll: header, the stat rows and the resist chips. The
@@ -21,15 +22,9 @@ namespace LastBreath.UI.Modules
             EntityParameter.Evade
         ];
 
-        private static readonly EntityParameter[] s_resistParameters =
-        [
-            EntityParameter.FireResistance, EntityParameter.ColdResistance, EntityParameter.LightningResistance,
-            EntityParameter.PoisonResistance
-        ];
-
         [Export] private Label? _header;
         [Export] private VBoxContainer? _stats;
-        [Export] private Container? _resists;
+        [Export] private Label? _fireResist, _coldResist, _lightningResist, _poisonResist;
 
         private IParameterFormatProvider? _formats;
 
@@ -54,30 +49,26 @@ namespace LastBreath.UI.Modules
                 AddStatRow(Localization.Localize(parameter.ToString()), FormatValue(parameter, player));
         }
 
+        /// <summary>One stat row — the shared <see cref="KeyValueRow"/> scene in its plain-value tone.</summary>
         private void AddStatRow(string name, string value)
         {
-            var row = new HBoxContainer();
-            row.AddChild(new Label { Text = name, ThemeTypeVariation = "DimLabel", SizeFlagsHorizontal = SizeFlags.ExpandFill });
-            row.AddChild(new Label { Text = value, HorizontalAlignment = HorizontalAlignment.Right });
+            var row = KeyValueRow.Initialize().Instantiate<KeyValueRow>();
+            row.Set(name, value);
+            row.UsePlainValue();
             _stats?.AddChild(row);
         }
 
+        /// <summary>The four resist chips are authored in the scene — only their texts update.</summary>
         private void RenderResists(IPlayer player)
         {
-            if (_resists == null) return;
-            _resists.QueueFreeChildren();
-
-            foreach (var parameter in s_resistParameters)
-            {
-                var chip = new PanelContainer();
-                chip.AddChild(new Label
-                {
-                    Text = $"{Localization.Localize(parameter.ToString())} {FormatValue(parameter, player)}",
-                    ThemeTypeVariation = "DimLabel",
-                });
-                _resists.AddChild(chip);
-            }
+            SetResist(_fireResist, EntityParameter.FireResistance, player);
+            SetResist(_coldResist, EntityParameter.ColdResistance, player);
+            SetResist(_lightningResist, EntityParameter.LightningResistance, player);
+            SetResist(_poisonResist, EntityParameter.PoisonResistance, player);
         }
+
+        private void SetResist(Label? label, EntityParameter parameter, IPlayer player) =>
+            label?.Text = $"{Localization.Localize(parameter.ToString())} {FormatValue(parameter, player)}";
 
         private string FormatValue(EntityParameter parameter, IPlayer player) =>
             ParameterValueText.Format(_formats, parameter, player.Parameters);

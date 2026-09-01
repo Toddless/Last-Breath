@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://creqcard5tv2n"]
+
+[ext_resource type="Script" uid="uid://dreqcs8kx4m3b" path="res://Addons/Crafting/UIElements/Modules/RequirementCard.cs" id="1_reqcd"]
+[ext_resource type="PackedScene" uid="uid://cfg3sk27iolr4" path="res://Addons/SharedUi/IconLabelRow.tscn" id="2_ilrow"]
+
+[node name="RequirementCard" type="MarginContainer" node_paths=PackedStringArray("_row", "_count")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+script = ExtResource("1_reqcd")
+_row = NodePath("Row")
+_count = NodePath("Row/Count")
+
+[node name="Row" parent="." instance=ExtResource("2_ilrow")]
+layout_mode = 2
+
+[node name="Count" type="Label" parent="Row"]
+visible = false
+layout_mode = 2
+vertical_alignment = 1

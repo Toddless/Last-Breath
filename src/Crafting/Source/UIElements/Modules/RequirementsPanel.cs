@@ -5,7 +5,6 @@ namespace Crafting.Source.UIElements.Modules
     using Core.Localization;
     using Core.Views.UI;
     using Godot;
-    using SharedUi;
 
     /// <summary>One requirement card: a fixed row shows have/need; a card carrying a category id is
     /// a clickable slot inviting a concrete resource pick.</summary>
@@ -109,35 +108,13 @@ namespace Crafting.Source.UIElements.Modules
             FocusMode = FocusModeEnum.None,
         };
 
-        /// <summary>Compact horizontal slot-row content: icon on the left, name, have/need on the
-        /// right. The row itself is the shared IconLabelRow; the margin and mouse transparency stay
-        /// this card's concerns.</summary>
+        /// <summary>Compact horizontal slot-row content — the <see cref="RequirementCard"/> scene:
+        /// icon on the left, name, have/need on the right.</summary>
         private static Control CardContent(Texture2D? icon, string name, string? count, bool countMet)
         {
-            var margin = new MarginContainer { MouseFilter = MouseFilterEnum.Ignore };
-            margin.SetAnchorsPreset(LayoutPreset.FullRect);
-            margin.AddThemeConstantOverride("margin_left", 8);
-            margin.AddThemeConstantOverride("margin_right", 8);
-            margin.AddThemeConstantOverride("margin_top", 4);
-            margin.AddThemeConstantOverride("margin_bottom", 4);
-
-            var row = IconLabelRow.Initialize().Instantiate<IconLabelRow>();
-            // The empty additive slot is a lone "+" — center it; real rows read left to right.
-            row.Alignment = icon == null && count == null ? AlignmentMode.Center : AlignmentMode.Begin;
-            row.Set(icon, name);
-            if (count != null)
-            {
-                row.SetTrailing(new Label
-                {
-                    Text = count,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    ThemeTypeVariation = countMet ? string.Empty : "DimLabel",
-                });
-            }
-
-            row.MakeMouseTransparent();
-            margin.AddChild(row);
-            return margin;
+            var card = RequirementCard.Initialize().Instantiate<RequirementCard>();
+            card.Set(icon, name, count, countMet);
+            return card;
         }
     }
 }

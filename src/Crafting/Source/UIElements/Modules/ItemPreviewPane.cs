@@ -6,6 +6,7 @@ namespace Crafting.Source.UIElements.Modules
     using Core.Localization;
     using Core.Views.UI;
     using Godot;
+    using SharedUi;
 
     /// <summary>The bench preview: item (or recipe result) header with icon, name and subtitle, and
     /// the modifier line list below. A live item prints its rolled blocks (pickable in Reroll, with
@@ -231,23 +232,12 @@ namespace Crafting.Source.UIElements.Modules
         private string FormatStatValue(EntityParameter parameter, float value) =>
             _formatter?.FormatValue(ModifierValueType.Flat, parameter, value) ?? CraftingFormat.PlainNumber(value);
 
-        /// <summary>The shared stat-row shell: dim parameter name on the left, the colored value on the right.</summary>
+        /// <summary>The shared stat-row shell — a <see cref="KeyValueRow"/>: dim parameter name on
+        /// the left, the colored value on the right.</summary>
         private void AddStatRow(EntityParameter parameter, string valueText, string valueColor)
         {
-            var row = new HBoxContainer();
-            row.AddChild(new Label
-            {
-                Text = Localization.Localize(parameter.ToString()),
-                ThemeTypeVariation = "DimLabel",
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            });
-            var valueLabel = new Label
-            {
-                Text = valueText,
-                HorizontalAlignment = HorizontalAlignment.Right,
-            };
-            valueLabel.AddThemeColorOverride("font_color", Color.FromHtml(valueColor));
-            row.AddChild(valueLabel);
+            var row = KeyValueRow.Initialize().Instantiate<KeyValueRow>();
+            row.Set(Localization.Localize(parameter.ToString()), valueText, Color.FromHtml(valueColor));
             _mods?.AddChild(row);
         }
 

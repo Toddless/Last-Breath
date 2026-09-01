@@ -52,7 +52,11 @@ namespace Crafting.Source.UIElements.Modules
                 ? 0f
                 : Mathf.Clamp((mastery.CurrentLevel + mastery.BonusLevel) / (float)mastery.MaximumLevel, 0f, 1f);
             foreach ((string key, float bonus) in Channels(mastery))
-                _chips.AddChild(Chip(Localization.Localize(key), bonus, progress));
+            {
+                var chip = MasteryChip.Initialize().Instantiate<MasteryChip>();
+                chip.Set(Localization.Localize(key), $"+{CraftingFormat.PercentText(bonus)}", progress);
+                _chips.AddChild(chip);
+            }
         }
 
         private static IEnumerable<(string Key, float Bonus)> Channels(ICraftingMastery mastery) =>
@@ -65,43 +69,5 @@ namespace Crafting.Source.UIElements.Modules
             (SalvageChannelKey, mastery.GetResourceReturnBonus()),
         ];
 
-        private static Control Chip(string name, float bonus, float progress)
-        {
-            var chip = new PanelContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-            var margin = new MarginContainer();
-            margin.AddThemeConstantOverride("margin_left", 8);
-            margin.AddThemeConstantOverride("margin_top", 6);
-            margin.AddThemeConstantOverride("margin_right", 8);
-            margin.AddThemeConstantOverride("margin_bottom", 6);
-            chip.AddChild(margin);
-
-            var content = new VBoxContainer();
-            content.AddThemeConstantOverride("separation", 2);
-            margin.AddChild(content);
-
-            var title = new Label
-            {
-                Text = name,
-                ThemeTypeVariation = "DimLabel",
-                AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                SizeFlagsVertical = SizeFlags.ExpandFill,
-            };
-            title.AddThemeFontSizeOverride("font_size", 10);
-            content.AddChild(title);
-
-            var value = new Label { Text = $"+{CraftingFormat.PercentText(bonus)}" };
-            value.AddThemeFontSizeOverride("font_size", 16);
-            content.AddChild(value);
-
-            content.AddChild(new ProgressBar
-            {
-                CustomMinimumSize = new Vector2(0, 3),
-                MaxValue = 1.0,
-                Step = 0.001,
-                Value = progress,
-                ShowPercentage = false,
-            });
-            return chip;
-        }
     }
 }
