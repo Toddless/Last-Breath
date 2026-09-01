@@ -2,7 +2,6 @@ namespace SharedUi
 {
     using Core.Data;
     using Core.Views.UI;
-    using Godot;
 
     /// <summary>
     /// The shared UI catalog's registrations: one call every project's bootstrap makes, so an element

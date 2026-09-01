@@ -13,7 +13,7 @@
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8osjy"]
 radius = 35.0
-height = 120.0
+height = 239.69
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_4npdn"]
 atlas = ExtResource("3_njduj")
@@ -711,8 +711,9 @@ animations = [{
 "speed": 24.0
 }]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
-radius = 32.0
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0trnf"]
+radius = 37.4
+height = 136.39
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5f5v3"]
 radius = 77.64
@@ -727,20 +728,22 @@ script = ExtResource("3_r5eee")
 _animatedSprite2D = NodePath("../AnimatedSprite2D")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1573985267]
+position = Vector2(0, 101)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=93244490]
+position = Vector2(0, -57)
 shape = SubResource("CapsuleShape2D_8osjy")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=331296717]
-scale = Vector2(0.35, 0.35)
 sprite_frames = SubResource("SpriteFrames_fx85w")
 animation = &"Idle_Down"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=177793197]
-position = Vector2(0, 25)
-shape = SubResource("CircleShape2D_fx85w")
+position = Vector2(0, 92)
+shape = SubResource("CapsuleShape2D_0trnf")
 
 [node name="DialogueActor" type="Area2D" parent="." unique_id=1792907842]
+position = Vector2(0, 70)
 script = ExtResource("10_r5eee")
 metadata/_custom_type_script = "uid://bqc3et70qq3ua"
 

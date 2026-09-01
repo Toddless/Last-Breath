@@ -6,7 +6,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Data.SaveData;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events;
     using Core.Narrative;
     using Core.Narrative.Actions;
     using Core.Services;

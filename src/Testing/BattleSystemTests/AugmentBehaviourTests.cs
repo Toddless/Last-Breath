@@ -4,7 +4,6 @@ namespace LastBreathTest.BattleSystemTests
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Battle.Source;
     using Battle.Source.Abilities;
     using Core.Battle;
     using Core.Context;

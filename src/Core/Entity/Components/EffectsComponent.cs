@@ -10,7 +10,6 @@
     using Entity;
     using Enums;
     using Views;
-    using Godot;
 
     public class EffectsComponent(IFightable owner) : IEffectsComponent
     {

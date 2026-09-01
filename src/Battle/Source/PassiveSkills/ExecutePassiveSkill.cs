@@ -63,7 +63,7 @@
             EntityType.Elit => Mathf.Max(MinPossibleThreshold, Threshold * 0.7f),
             EntityType.Unique => Mathf.Max(MinPossibleThreshold, Threshold * 0.5f),
             EntityType.Boss => Mathf.Max(MinPossibleThreshold, Threshold * 0.35f),
-            EntityType.Archon => Mathf.Max(MinPossibleThreshold, threshold * 0.15f),
+            EntityType.Archon => Mathf.Max(MinPossibleThreshold, Threshold * 0.15f),
             _ => Threshold,
         };
     }

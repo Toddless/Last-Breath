@@ -15,7 +15,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.PassiveTree.Allocation;
     using Core.Save;
     using Core.Save.Participants;
-    using Core.Services;
     using Core.Session;
     using Microsoft.Extensions.DependencyInjection;
     using Moq;

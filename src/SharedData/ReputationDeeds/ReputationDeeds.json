@@ -1,27 +1,27 @@
 {
-    "witnessRadius": 600,
-    "deeds": [
-        {
-            "id": "Deed_Kill_Npc",
-            "reputation": -120,
-            "noPenaltyAtOrBelow": "Hostility",
-            "hostileToTargetBonus": 10,
-            "requiresWitness": true,
-            "repeatDecay": 0.9
-        },
-        {
-            "id": "Deed_Flattery",
-            "reputation": 0,
-            "personal": 40,
-            "requiresWitness": false,
-            "repeatDecay": 0.5
-        },
-        {
-            "id": "Deed_Insult",
-            "reputation": -10,
-            "personal": -60,
-            "requiresWitness": false,
-            "repeatDecay": 0.7
-        }
-    ]
+	"witnessRadius": 600,
+	"deeds": [
+		{
+			"id": "Deed_Kill_Npc",
+			"reputation": -120,
+			"noPenaltyAtOrBelow": "Hostility",
+			"hostileToTargetBonus": 10,
+			"requiresWitness": true,
+			"repeatDecay": 0.9
+		},
+		{
+			"id": "Deed_Flattery",
+			"reputation": 0,
+			"personal": 40,
+			"requiresWitness": false,
+			"repeatDecay": 0.5
+		},
+		{
+			"id": "Deed_Insult",
+			"reputation": -10,
+			"personal": -60,
+			"requiresWitness": false,
+			"repeatDecay": 0.7
+		}
+	]
 }

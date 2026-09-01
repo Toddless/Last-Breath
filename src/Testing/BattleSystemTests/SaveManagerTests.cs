@@ -7,7 +7,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Entity;
     using Core.Items.Grants;
     using Core.MessageBus;
-    using Core.Reputation;
     using Core.Save;
     using Core.Services;
     using Core.Session;

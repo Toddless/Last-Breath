@@ -30,7 +30,7 @@ namespace LastBreath.World
             Dictionary<string, TerrainEntry> byLayer = [];
             foreach (TerrainEntry? entry in Entries)
             {
-                if (entry is null || string.IsNullOrWhiteSpace(entry.Layer)) continue;
+                if (string.IsNullOrWhiteSpace(entry.Layer)) continue;
 
                 byLayer.TryAdd(entry.Layer, entry);
             }

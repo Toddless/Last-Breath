@@ -10,7 +10,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Data;
     using Core.Data.AbilityData;
     using Core.Entity;
-    using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
     using Moq;

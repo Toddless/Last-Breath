@@ -3,7 +3,6 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source.UIElements.PassiveWheel;
     using Core.Enums;
     using Core.Localization;
-    using Core.Modifiers.Context;
     using Core.PassiveTree;
     using Core.PassiveTree.Summary;
 

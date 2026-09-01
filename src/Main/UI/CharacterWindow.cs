@@ -1,7 +1,6 @@
 namespace LastBreath.UI
 {
     using System;
-    using System.Globalization;
     using Core.Data;
     using Core.Entity;
     using Core.Enums;

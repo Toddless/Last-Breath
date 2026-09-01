@@ -13,7 +13,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
-    using Core.Interfaces;
     using Core.Items;
     using Godot;
 

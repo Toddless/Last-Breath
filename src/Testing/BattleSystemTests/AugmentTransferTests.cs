@@ -3,7 +3,6 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source;
     using Battle.Source.Abilities;
     using Battle.Source.RequestHandlers;
-    using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data;
     using Core.Data.GameData;

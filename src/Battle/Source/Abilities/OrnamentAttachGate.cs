@@ -3,7 +3,6 @@ namespace Battle.Source.Abilities
     using System;
     using System.Linq;
     using Core.Battle.Abilities;
-    using Core.Entity.Components;
     using Core.Inventory;
     using Core.Items;
     using Core.Services;

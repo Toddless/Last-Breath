@@ -1,7 +1,6 @@
 namespace Core.Battle.Abilities
 {
     using System.Collections.Generic;
-    using Skills;
 
     /// <summary>
     /// The one place an effect is built from an id and numbers out of data — item grants today, catalog

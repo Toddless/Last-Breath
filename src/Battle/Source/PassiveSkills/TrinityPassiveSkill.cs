@@ -1,7 +1,5 @@
 namespace Battle.Source.PassiveSkills
 {
-    using System.Collections.Generic;
-    using System.Linq;
     using Core;
     using Core.Battle.Skills;
     using Core.Context;

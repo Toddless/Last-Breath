@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="TerrainRootConfig" format=3]
+[gd_resource type="Resource" format=3 uid="uid://30auv84x7a2l"]
 
-[ext_resource type="Script" path="res://World/TerrainEntry.cs" id="1_entry"]
-[ext_resource type="Script" path="res://World/TerrainRootConfig.cs" id="2_config"]
-[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Tiles/Forest_GrassToDirt_Transitions.png" id="3_dirt"]
-[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Tiles/Forest_GrassToTurf_Transitions.png" id="4_turf"]
-[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Tiles/Forest_GrassToWater_Transitions.png" id="5_water"]
-[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Tiles/Forest_GrassToTallGrass_Transitions.png" id="6_tallgrass"]
-[ext_resource type="Texture2D" path="res://Data/Shared/Assets/Tiles/Forest_Grass_Tuft.png" id="7_tuft"]
+[ext_resource type="Script" uid="uid://bl6rh3e3m0370" path="res://World/TerrainEntry.cs" id="1_entry"]
+[ext_resource type="Script" uid="uid://de2g0a07260y5" path="res://World/TerrainRootConfig.cs" id="2_config"]
+[ext_resource type="Texture2D" uid="uid://hh6m4qrnl506" path="res://Data/Shared/Assets/Tiles/Forest_GrassToDirt_Transitions.png" id="3_dirt"]
+[ext_resource type="Texture2D" uid="uid://cclyk6f6173nh" path="res://Data/Shared/Assets/Tiles/Forest_GrassToTurf_Transitions.png" id="4_turf"]
+[ext_resource type="Texture2D" uid="uid://beqbbipo0af4u" path="res://Data/Shared/Assets/Tiles/Forest_GrassToWater_Transitions.png" id="5_water"]
+[ext_resource type="Texture2D" uid="uid://cv5vrghhd2aje" path="res://Data/Shared/Assets/Tiles/Forest_GrassToTallGrass_Transitions.png" id="6_tallgrass"]
+[ext_resource type="Texture2D" uid="uid://tte8vbncynef" path="res://Data/Shared/Assets/Tiles/Forest_Grass_Tuft.png" id="7_tuft"]
 
 [sub_resource type="Resource" id="Resource_Dirt"]
 script = ExtResource("1_entry")
@@ -28,10 +28,6 @@ script = ExtResource("1_entry")
 Layer = "TallGrass"
 Transitions = ExtResource("6_tallgrass")
 Prop = ExtResource("7_tuft")
-PropHeight = 96.0
-MinPropsPerCell = 2
-MaxPropsPerCell = 4
-EdgeMargin = 24.0
 
 [resource]
 script = ExtResource("2_config")

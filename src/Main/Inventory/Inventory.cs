@@ -27,7 +27,6 @@
 
         public event Action<string, int>? ItemAmountChanges;
         public event Action<IItem, MouseInteractions>? ItemInteraction;
-
         /// <summary>An equipped piece was dragged into a bag slot; the window resolves the unequip.</summary>
         public event Action<EquipmentPiece, IInventorySlot>? EquipmentDroppedIntoBag;
 

@@ -1,13 +1,11 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Battle.Source;
     using Battle.Source.Effects;
     using Core.Battle.Abilities;
     using Core.Context;
-    using Core.Data;
     using Core.Entity;
     using Core.Entity.Components;
     using Core.Enums;

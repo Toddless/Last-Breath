@@ -38,6 +38,8 @@ namespace LastBreath.Inventory
         private IPlayerAccessor? _playerAccessor;
         private IUiElementsManager? _uiElementsManager;
         private bool _destroyMode;
+        private Inventory? Bag => _inventory as Inventory;
+        private IEquipmentComponent? Equipment => _playerAccessor?.Player?.Equipment;
 
         public override void _Ready()
         {
@@ -54,15 +56,12 @@ namespace LastBreath.Inventory
         public override void _ExitTree()
         {
             _bagGrid?.Detach();
-            if (Bag != null)
-            {
-                Bag.ItemInteraction -= OnItemInteraction;
-                Bag.EquipmentDroppedIntoBag -= OnEquipmentDroppedIntoBag;
-                Bag.ItemAmountChanges -= OnBagChanged;
-            }
+            Bag?.ItemInteraction -= OnItemInteraction;
+            Bag?.EquipmentDroppedIntoBag -= OnEquipmentDroppedIntoBag;
+            Bag?.ItemAmountChanges -= OnBagChanged;
 
-            if (Equipment is { } equipment) equipment.EquipmentChanged -= OnEquipmentChanged;
-            if (_playerAccessor?.Player != null) _playerAccessor.Player.Parameters.ParameterChanged -= OnParameterChanged;
+            Equipment?.EquipmentChanged -= OnEquipmentChanged;
+            _playerAccessor?.Player?.Parameters.ParameterChanged -= OnParameterChanged;
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -81,8 +80,8 @@ namespace LastBreath.Inventory
                 Bag.ItemAmountChanges += OnBagChanged;
             }
 
-            if (Equipment is { } equipment) equipment.EquipmentChanged += OnEquipmentChanged;
-            if (_playerAccessor?.Player != null) _playerAccessor.Player.Parameters.ParameterChanged += OnParameterChanged;
+            Equipment?.EquipmentChanged += OnEquipmentChanged;
+            _playerAccessor?.Player?.Parameters.ParameterChanged += OnParameterChanged;
 
             _paperDoll?.Bind(CanEquipFromBag, EquipInstanceFromBag, OnUnequipPressed, ShowEquippedTooltip);
             _paperDoll?.Refresh(Equipment);
@@ -93,10 +92,6 @@ namespace LastBreath.Inventory
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         public void Close() => QueueFree();
-
-        private Inventory? Bag => _inventory as Inventory;
-
-        private IEquipmentComponent? Equipment => _playerAccessor?.Player?.Equipment;
 
         private void LocalizeStaticLabels()
         {

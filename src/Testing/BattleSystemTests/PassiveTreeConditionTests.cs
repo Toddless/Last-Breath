@@ -4,7 +4,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Entity;
     using Core.Enums;
     using Core.Modifiers.Conditions;
-    using Core.Modifiers.Context;
     using Core.PassiveTree;
     using Core.PassiveTree.Allocation;
     using Core.Session;

@@ -3,7 +3,6 @@ namespace LastBreathTest.BattleSystemTests
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Battle.Source;
     using Battle.Source.Abilities;
     using Battle.Source.Abilities.PoisonExplosion;
     using Battle.Source.Abilities.SeriesOfAttacks;

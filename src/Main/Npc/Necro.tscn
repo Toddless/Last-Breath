@@ -365,6 +365,5 @@ _animatedSprite2D = NodePath("../AnimatedSprite2D")
 metadata/_custom_type_script = "uid://b83aev78cw2jb"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=761992687]
-scale = Vector2(0.35, 0.35)
 sprite_frames = SubResource("SpriteFrames_n3ud6")
 animation = &"Idle_Left"

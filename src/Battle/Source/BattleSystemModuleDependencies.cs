@@ -4,10 +4,6 @@
     using System.Collections.Generic;
     using Abilities;
     using CombatRules;
-    using Core.Ai.World;
-    using Core.Ai.World.Recovery;
-    using Core.Ai.World.SmartPoints;
-    using Core.Ai.World.Time;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;

@@ -68,6 +68,8 @@ namespace Core.Trade
         IRandomNumberGenerator? rnd = null) : ITraderService, ISessionResettable
     {
         private const int BuybackCapacity = 12;
+        private const float Tolerance = 0.001f;
+        private const double GameMinutesPerDay = 1440;
 
         private sealed class Offer(string offerId, IItem item, bool isRandomEquip, bool isBuyback = false, int buybackUnitPrice = 0)
         {
@@ -92,12 +94,12 @@ namespace Core.Trade
         private readonly IRandomNumberGenerator _rnd = rnd ?? new DefaultRandomNumberGenerator();
         private int _offerCounter;
 
-        private double NowMinutes => clock != null ? clock.Day * 1440 + clock.MinuteOfDay : 0;
+        private double NowMinutes => clock != null ? clock.Day * GameMinutesPerDay + clock.MinuteOfDay : 0;
 
         public TraderDefinition? GetTrader(string traderId) => traders.GetTrader(traderId);
 
         public double? GetNextRestockMinutes(string traderId) =>
-            _states.TryGetValue(traderId, out var state) && state.NextRestockMinutes != double.MinValue
+            _states.TryGetValue(traderId, out var state) && Math.Abs(state.NextRestockMinutes - double.MinValue) > Tolerance
                 ? state.NextRestockMinutes
                 : null;
 
@@ -117,11 +119,11 @@ namespace Core.Trade
             if (offer == null) return null;
 
             offer.Remaining -= amount;
-            if (offer.IsBuyback && offer.Remaining == 0) state!.Buyback.Remove(offer);
+            if (offer is { IsBuyback: true, Remaining: 0 }) state!.Buyback.Remove(offer);
 
             // Rolled instances (random equips, buyback gear) leave the shelf themselves;
             // plain goods hand out one fresh copy the caller adds with the amount.
-            return offer.IsRandomEquip || (offer.IsBuyback && offer.Item.MaxStackSize <= 1)
+            return offer.IsRandomEquip || offer is { IsBuyback: true, Item.MaxStackSize: <= 1 }
                 ? offer.Item
                 : offer.Item.Copy<IItem>();
         }
@@ -193,7 +195,7 @@ namespace Core.Trade
             if (!_states.TryGetValue(traderId, out var state))
                 _states[traderId] = state = new TraderState();
 
-            if (NowMinutes >= state.NextRestockMinutes || state.NextRestockMinutes == double.MinValue)
+            if (NowMinutes >= state.NextRestockMinutes || Math.Abs(state.NextRestockMinutes - double.MinValue) < Tolerance)
                 Restock(definition, state);
 
             return state;

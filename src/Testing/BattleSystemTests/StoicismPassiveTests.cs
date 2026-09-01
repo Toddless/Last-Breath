@@ -5,7 +5,6 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source.PassiveSkills;
     using Core.Battle;
     using Core.Battle.Skills;
-    using Core.Context;
     using Core.Enums;
     using Core.Modifiers;
 

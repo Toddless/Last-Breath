@@ -4,7 +4,6 @@ namespace Battle.Source.UIElements.PassiveWheel
     using System.Collections.Generic;
     using Core.Enums;
     using Core.Localization;
-    using Core.Modifiers;
     using Core.PassiveTree.Summary;
 
     /// <summary>

@@ -151,17 +151,18 @@ namespace Core.Views.UI
                     [ValuePlaceholder] = turns,
                 });
 
-        /// <summary>The tags this card has anything to say with — see <see cref="UnprintedTags"/>. The list
-        /// itself is untouched: what is filtered is one sentence on one screen.</summary>
-        private static IReadOnlyList<string> Printed(IReadOnlyList<string>? tags) =>
-            tags is not { Count: > 0 } ? [] : [.. tags.Where(tag => !UnprintedTags.Contains(tag))];
-
         /// <summary>Price and wait as the one line a surface has room for. A missing half leaves no
         /// separator dangling behind it.</summary>
         public static string MetaLine(string cost, string cooldown) =>
             string.IsNullOrEmpty(cost) || string.IsNullOrEmpty(cooldown)
                 ? $"{cost}{cooldown}"
                 : $"{cost}{MetaSeparator}{cooldown}";
+
+        /// <summary>The tags this card has anything to say with — see <see cref="UnprintedTags"/>. The list
+        /// itself is untouched: what is filtered is one sentence on one screen.</summary>
+        private static IReadOnlyList<string> Printed(IReadOnlyList<string>? tags) =>
+            tags is not { Count: > 0 } ? [] : [.. tags.Where(tag => !UnprintedTags.Contains(tag))];
+
     }
 
     /// <summary>

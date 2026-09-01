@@ -1,6 +1,5 @@
 namespace LastBreathTest.LootSimulation
 {
-    using Core;
     using Core.Data.NpcData;
     using Core.Entity;
     using Core.Enums;

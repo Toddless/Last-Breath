@@ -15,7 +15,7 @@ namespace SharedUi
         private static readonly Color s_filteredOut = new(1f, 1f, 1f, 0.28f);
 
         [Export] private GridContainer? _grid;
-        [Export] private int _columns = 1;
+        [Export] private int _columns = 10;
 
         private ISlotLender? _lender;
 

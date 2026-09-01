@@ -14,11 +14,13 @@
 [ext_resource type="Texture2D" uid="uid://bdjksiw57v026" path="res://Player/Right - Walking.png" id="12_q84kv"]
 [ext_resource type="Texture2D" uid="uid://dsuq0chuwshlj" path="res://Player/Back - Walking.png" id="13_q84kv"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7ir56"]
+radius = 72.0
+height = 160.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_q84kv"]
-radius = 35.0
-height = 125.0
+radius = 72.0
+height = 160.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jn0y0"]
 atlas = ExtResource("3_o843n")
@@ -1307,19 +1309,21 @@ script = ExtResource("2_p7tob")
 _animatedSprite2D = NodePath("../AnimatedSprite2D")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1039071691]
-shape = SubResource("CircleShape2D_fx85w")
+position = Vector2(0, 73)
+shape = SubResource("CapsuleShape2D_7ir56")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1501129080]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1850665749]
+position = Vector2(0, 71)
 shape = SubResource("CapsuleShape2D_q84kv")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2090733347]
-scale = Vector2(0.35, 0.35)
 sprite_frames = SubResource("SpriteFrames_fx85w")
 animation = &"Idle_Right"
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=132693475]
+zoom = Vector2(0.5, 0.5)
 position_smoothing_enabled = true
 position_smoothing_speed = 150.0
 drag_horizontal_enabled = true

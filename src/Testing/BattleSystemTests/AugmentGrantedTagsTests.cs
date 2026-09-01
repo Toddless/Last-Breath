@@ -4,15 +4,12 @@ namespace LastBreathTest.BattleSystemTests
     using System.Threading.Tasks;
     using Battle.Source;
     using Battle.Source.Abilities;
-    using Battle.Source.Effects;
     using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Context;
     using Core.Data.AbilityData;
     using Core.Entity;
     using Core.Entity.Components;
     using Core.Enums;
-    using Core.Events;
     using Moq;
     using static AugmentCopies;
 

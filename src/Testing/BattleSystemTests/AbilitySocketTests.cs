@@ -3,14 +3,11 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source;
     using Core.Battle.Abilities;
     using Core.Data.SaveData;
-    using Core.Entity;
-    using Core.Entity.Components;
     using Core.Enums;
     using Core.PassiveTree;
     using Core.PassiveTree.Allocation;
     using Core.Save;
     using Core.Save.Participants;
-    using Core.Services;
     using Core.Session;
     using Microsoft.Extensions.DependencyInjection;
     using Moq;

@@ -2,7 +2,6 @@ namespace LastBreathTest.BattleSystemTests
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Entity.Components;

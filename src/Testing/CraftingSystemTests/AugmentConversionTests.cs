@@ -2,7 +2,6 @@ namespace LastBreathTest.CraftingSystemTests
 {
     using System.Globalization;
     using Battle.Source;
-    using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data.GameData;
     using Core.Entity.Components;

@@ -3,7 +3,6 @@ namespace LastBreath.Npc
     using Core.Data;
     using Core.Data.NpcData;
     using Core.Entity;
-    using Core.Services;
     using Godot;
 
     /// <summary>

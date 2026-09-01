@@ -83,34 +83,28 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         public override void _Ready()
         {
-            if (_topBar != null)
-            {
-                _topBar.RespecToggled += OnRespecToggled;
-                _topBar.SummaryToggled += OnSummaryToggled;
-                _topBar.ApplyPressed += () => Apply(closeOnSuccess: false);
-                _topBar.CancelPressed += DropPlan;
-                _topBar.FramePressed += () => _canvas?.FrameAll();
-                _topBar.ClosePressed += RequestClose;
-            }
+            _topBar?.RespecToggled += OnRespecToggled;
+            _topBar?.SummaryToggled += OnSummaryToggled;
+            _topBar?.ApplyPressed += () => Apply(closeOnSuccess: false);
+            _topBar?.CancelPressed += DropPlan;
+            _topBar?.FramePressed += () => _canvas?.FrameAll();
+            _topBar?.ClosePressed += RequestClose;
 
-            if (_closeGuard != null)
-            {
-                _closeGuard.Applied += () => Apply(closeOnSuccess: true);
-                _closeGuard.Discarded += DiscardAndClose;
-                _closeGuard.Stayed += () => _closeGuard.Visible = false;
-            }
+            _closeGuard?.Applied += () => Apply(closeOnSuccess: true);
+            _closeGuard?.Discarded += DiscardAndClose;
+            _closeGuard?.Stayed += () => _closeGuard.Visible = false;
 
             _canvas?.StatusChanged += ShowHint;
         }
 
         public override void _ExitTree()
         {
-            if (_tree != null) _tree.AllocationChanged -= Refresh;
-            if (_board != null) _board.Changed -= Refresh;
-            if (_tree != null) _tree.AllocationChanged -= RefreshAbilityCards;
-            if (_board != null) _board.Changed -= RefreshAbilityCards;
-            if (_wallet != null) _wallet.GoldChanged -= OnGoldChanged;
-            if (_draft != null) _draft.Changed -= Refresh;
+            _tree?.AllocationChanged -= Refresh;
+            _board?.Changed -= Refresh;
+            _tree?.AllocationChanged -= RefreshAbilityCards;
+            _board?.Changed -= RefreshAbilityCards;
+            _wallet?.GoldChanged -= OnGoldChanged;
+            _draft?.Changed -= Refresh;
 
             // Anything the courier put on the Overlay layer belongs to this window's lifetime: the layer
             // outlives it, and a list left standing over the world still seats augments.
@@ -292,11 +286,9 @@ namespace Battle.Source.UIElements.PassiveWheel
             if (!givesBack)
             {
                 bool affordablePoints = planned <= (_tree?.AvailablePoints ?? 0);
-                _topBar.ShowApply(Localization.Render(PassiveWheelText.ApplyTake, new Dictionary<string, object?>
-                {
-                    [PassiveWheelText.CountValue] = planned,
-                    [PassiveWheelText.PointsValue] = planned
-                }), affordablePoints);
+                _topBar.ShowApply(
+                    Localization.Render(PassiveWheelText.ApplyTake,
+                        new Dictionary<string, object?> { [PassiveWheelText.CountValue] = planned, [PassiveWheelText.PointsValue] = planned }), affordablePoints);
 
                 _topBar.ShowPrice(string.Empty, affordable: true);
                 return;
@@ -307,11 +299,9 @@ namespace Battle.Source.UIElements.PassiveWheel
             bool priced = _quotes is { CanCharge: true };
             bool allowed = verdict == AllocationResult.Success && priced && quote.Affordable;
 
-            _topBar.ShowApply(Localization.Render(PassiveWheelText.ApplyRefund, new Dictionary<string, object?>
-            {
-                [PassiveWheelText.CountValue] = planned,
-                [PassiveWheelText.GoldValue] = quote.Gold
-            }), allowed);
+            _topBar.ShowApply(
+                Localization.Render(PassiveWheelText.ApplyRefund,
+                    new Dictionary<string, object?> { [PassiveWheelText.CountValue] = planned, [PassiveWheelText.GoldValue] = quote.Gold }), allowed);
 
             _topBar.ShowPrice(priced
                 ? Localization.Render(PassiveWheelText.RefundPrice,
@@ -348,7 +338,9 @@ namespace Battle.Source.UIElements.PassiveWheel
 
         private int PlannedCount() => _draft == null
             ? 0
-            : _draft.Mode == DraftMode.Refund ? _draft.PendingRefunds.Count : _draft.PendingTakes.Count;
+            : _draft.Mode == DraftMode.Refund
+                ? _draft.PendingRefunds.Count
+                : _draft.PendingTakes.Count;
 
         private int WaitingAugments() =>
             _board?.Sockets.Count(socket => !socket.IsOpen && !socket.IsEmpty) ?? 0;
@@ -439,12 +431,7 @@ namespace Battle.Source.UIElements.PassiveWheel
                 : planned <= (_tree?.AvailablePoints ?? 0);
 
             string message = Localization.Render(givesBack ? PassiveWheelText.CloseRefund : PassiveWheelText.CloseTake,
-                new Dictionary<string, object?>
-                {
-                    [PassiveWheelText.CountValue] = planned,
-                    [PassiveWheelText.PointsValue] = planned,
-                    [PassiveWheelText.GoldValue] = quote.Gold
-                });
+                new Dictionary<string, object?> { [PassiveWheelText.CountValue] = planned, [PassiveWheelText.PointsValue] = planned, [PassiveWheelText.GoldValue] = quote.Gold });
 
             _closeGuard.Ask(message, canApply,
                 canApply ? null : Localization.Localize(PassiveWheelText.NotEnoughGold));

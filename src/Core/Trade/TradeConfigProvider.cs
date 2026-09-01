@@ -2,7 +2,6 @@ namespace Core.Trade
 {
     using System;
     using System.Collections.Generic;
-    using Data;
     using Data.GameData;
     using Newtonsoft.Json;
 

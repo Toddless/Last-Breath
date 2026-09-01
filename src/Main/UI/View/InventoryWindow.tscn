@@ -37,9 +37,8 @@ mouse_filter = 2
 alignment = 2
 
 [node name="Panel" type="PanelContainer" parent="Center" unique_id=918931418]
-custom_minimum_size = Vector2(1620, 840)
 layout_mode = 2
-size_flags_vertical = 4
+size_flags_horizontal = 10
 theme_type_variation = &"UmbralWindowPanel"
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=569449233]
@@ -89,29 +88,31 @@ size_flags_vertical = 3
 theme_override_constants/separation = 14
 
 [node name="LeftPane" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body" unique_id=382916336]
-custom_minimum_size = Vector2(372, 0)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
 
 [node name="LeftMargin" type="MarginContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane" unique_id=37174432]
 layout_mode = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
 [node name="LeftLayout" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin" unique_id=889558013]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="PaperDoll" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" instance=ExtResource("2_pdoll")]
+[node name="PaperDoll" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" unique_id=736591541 instance=ExtResource("2_pdoll")]
 layout_mode = 2
 
-[node name="StatsPane" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" instance=ExtResource("3_spane")]
+[node name="StatsPane" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" unique_id=1472003894 instance=ExtResource("3_spane")]
 layout_mode = 2
 
 [node name="RightPane" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body" unique_id=1406827386]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.6
 
 [node name="RightMargin" type="MarginContainer" parent="Center/Panel/Margin/Layout/Body/RightPane" unique_id=30254361]
 layout_mode = 2
@@ -124,9 +125,9 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="FilterBar" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" instance=ExtResource("4_fbar")]
+[node name="FilterBar" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=954939396 instance=ExtResource("4_fbar")]
 layout_mode = 2
 
-[node name="BagGrid" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" instance=ExtResource("5_bgrid")]
+[node name="BagGrid" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=927184330 instance=ExtResource("5_bgrid")]
 layout_mode = 2
 _columns = 20

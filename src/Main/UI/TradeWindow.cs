@@ -28,16 +28,16 @@ namespace LastBreath.UI
     /// </summary>
     public partial class TradeWindow : Control, IWindow
     {
-        public const string ShowcaseKey = "UI_Trade_Showcase";
-        public const string DealKey = "UI_Trade_Deal";
-        public const string InventoryKey = "UI_Inventory";
-        public const string ClickToSellKey = "UI_Trade_ClickToSell";
-        public const string GoldSuffixKey = "UI_Trade_GoldSuffix";
-        public const string RestockKey = "UI_Trade_Restock";
-        public const string RotationKey = "UI_Trade_Rotation";
+        private const string ShowcaseKey = "UI_Trade_Showcase";
+        private const string DealKey = "UI_Trade_Deal";
+        private const string InventoryKey = "UI_Inventory";
+        private const string ClickToSellKey = "UI_Trade_ClickToSell";
+        private const string GoldSuffixKey = "UI_Trade_GoldSuffix";
+        private const string RestockKey = "UI_Trade_Restock";
+        private const string RotationKey = "UI_Trade_Rotation";
+        private const string NoDeadline = "--:--";
 
         private const string UID = "uid://cix0yesodqrxr";
-        private const string NoDeadline = "--:--";
         private const double GameMinutesPerDay = 1440;
 
         [Export] private WindowHeader? _header;
@@ -85,8 +85,8 @@ namespace LastBreath.UI
         public override void _ExitTree()
         {
             if (Active == this) Active = null;
-            if (_wallet != null) _wallet.GoldChanged -= OnGoldChanged;
-            if (_bagClicks != null) _bagClicks.ItemInteraction -= OnBagItemInteraction;
+            _wallet?.GoldChanged -= OnGoldChanged;
+            _bagClicks?.ItemInteraction -= OnBagItemInteraction;
             _bagGrid?.Detach();
         }
 
@@ -114,14 +114,11 @@ namespace LastBreath.UI
 
             _wallet?.GoldChanged += OnGoldChanged;
             _bagClicks?.ItemInteraction += OnBagItemInteraction;
-            if (_bagLender is { } lender) _bagGrid?.Attach(lender);
+            _bagGrid?.Attach(_bagLender);
 
-            if (_goodsShelf is { } shelf)
-            {
-                shelf.ShowTooltip = ShowOfferTooltip;
-                shelf.OfferClicked += OnOfferClicked;
-                shelf.BuybackClicked += OnOfferClicked;
-            }
+            _goodsShelf?.ShowTooltip = ShowOfferTooltip;
+            _goodsShelf?.OfferClicked += OnOfferClicked;
+            _goodsShelf?.BuybackClicked += OnOfferClicked;
 
             _dealColumn?.Confirmed += OnDealConfirmed;
             OnGoldChanged(_wallet?.Gold ?? 0);

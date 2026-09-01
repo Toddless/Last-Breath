@@ -5,7 +5,6 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source.Effects;
     using Core.Battle.Abilities;
     using Core.Context;
-    using Core.Data;
     using Core.Entity;
     using Core.Enums;
 

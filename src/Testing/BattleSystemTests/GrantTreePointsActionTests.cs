@@ -2,7 +2,6 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
     using Core.Battle;
-    using Core.Data.SaveData;
     using Core.MessageBus;
     using Core.Narrative;
     using Core.Narrative.Actions;

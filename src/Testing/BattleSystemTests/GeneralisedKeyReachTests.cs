@@ -8,7 +8,6 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source.Effects;
     using BerserkFuryCast = Battle.Source.Abilities.BerserkFury.BerserkFury;
     using Core.Battle;
-    using Core.Events;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Context;

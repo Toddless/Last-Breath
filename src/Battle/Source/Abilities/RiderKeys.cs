@@ -1,7 +1,5 @@
 namespace Battle.Source.Abilities
 {
-    using System;
-
     /// <summary>
     /// The name a seated augment's rider is filed under, in one place because two things read it: the
     /// augment that seats and unseats its own rider, and the ability answering which copy's riders are

@@ -11,7 +11,6 @@
     using DoubleStrike;
     using Effects;
     using IncreasingPressure;
-    using PoisonCoating;
     using PoisonExplosion;
     using PassiveSkills;
     using Riders;

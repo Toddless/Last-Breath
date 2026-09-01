@@ -3,7 +3,6 @@ namespace Battle.Source.Abilities
     using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Data;
     using Core.Entity;
     using Core.Enums;
 

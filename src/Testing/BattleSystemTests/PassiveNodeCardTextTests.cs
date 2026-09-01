@@ -4,10 +4,8 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source;
     using Core.Battle;
     using Core.Battle.Skills;
-    using Core.Data;
     using Core.Data.GameData;
     using Core.Localization;
-    using Core.Modifiers;
     using Core.PassiveTree;
     using Core.PassiveTree.View;
 

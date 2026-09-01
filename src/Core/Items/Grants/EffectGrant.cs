@@ -5,7 +5,6 @@ namespace Core.Items.Grants
     using System.Linq;
     using Battle;
     using Battle.Abilities;
-    using Battle.Skills;
     using Entity;
     using Events;
 

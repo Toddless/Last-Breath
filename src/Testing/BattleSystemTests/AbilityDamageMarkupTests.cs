@@ -2,7 +2,6 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Core.Data.AbilityData;
     using Core.Data.GameData;
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <summary>

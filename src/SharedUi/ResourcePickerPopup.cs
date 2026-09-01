@@ -40,16 +40,13 @@ namespace SharedUi
         public override void _Ready()
         {
             _cancel?.Pressed += Close;
-            if (_list != null)
-            {
-                _list.ItemSelected += OnItemSelected;
-                // Entries carrying a Preview open their own popup (the full item card) instead of the
-                // engine tooltip. ItemList rows are not controls, so the picker reads the hovered row
-                // off the mouse itself and the shared handle owns the delay and the lifetime.
-                _preview = HoverTooltip.Follow(this, ShowPreview);
-                _list.GuiInput += OnListGuiInput;
-                _list.MouseExited += () => _preview?.Target(null);
-            }
+            _list?.ItemSelected += OnItemSelected;
+            // Entries carrying a Preview open their own popup (the full item card) instead of the
+            // engine tooltip. ItemList rows are not controls, so the picker reads the hovered row
+            // off the mouse itself and the shared handle owns the delay and the lifetime.
+            _preview = HoverTooltip.Follow(this, ShowPreview);
+            _list?.GuiInput += OnListGuiInput;
+            _list?.MouseExited += () => _preview?.Target(null);
 
             // ShowPopup hands the instance out before the deferred AddChild lands it in the tree,
             // so the actual placement waits for _Ready (+ one frame for the panel's layout pass).
@@ -109,7 +106,7 @@ namespace SharedUi
         }
 
         private IPopup? ShowPreview(object? key) =>
-            key is int index && index >= 0 && index < _entries.Count ? _entries[index].Preview?.Invoke() : null;
+            key is int index and >= 0 && index < _entries.Count ? _entries[index].Preview?.Invoke() : null;
 
         private void Place()
         {

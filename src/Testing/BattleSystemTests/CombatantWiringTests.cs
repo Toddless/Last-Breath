@@ -8,13 +8,10 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Context;
-    using Core.Data;
     using Core.Entity;
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
-    using Core.Interfaces;
-    using Core.Modifiers;
     using Core.PassiveTree;
     using Core.PassiveTree.Allocation;
     using Moq;

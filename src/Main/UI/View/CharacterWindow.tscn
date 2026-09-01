@@ -26,9 +26,9 @@ mouse_filter = 2
 alignment = 2
 
 [node name="Panel" type="PanelContainer" parent="Center" unique_id=915909695]
-custom_minimum_size = Vector2(760, 760)
+custom_minimum_size = Vector2(450, 0)
 layout_mode = 2
-size_flags_vertical = 4
+size_flags_horizontal = 2
 theme_type_variation = &"UmbralWindowPanel"
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=975171210]

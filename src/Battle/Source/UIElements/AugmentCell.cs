@@ -1,6 +1,5 @@
 namespace Battle.Source.UIElements
 {
-    using Abilities;
     using Core.Battle.Abilities;
     using Core.Localization;
     using Core.Views;

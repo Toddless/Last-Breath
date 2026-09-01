@@ -5,12 +5,9 @@ namespace LastBreathTest.BattleSystemTests
     using Battle.Source.RequestHandlers;
     using Battle.Source.UIElements;
     using Battle.Source.UIElements.PassiveWheel;
-    using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Data;
     using Core.Entity.Components;
     using Core.Enums;
-    using Core.Inventory;
     using Core.Items;
     using Core.Localization;
     using Core.MessageBus.Requests;

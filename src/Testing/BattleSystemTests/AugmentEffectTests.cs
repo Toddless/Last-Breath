@@ -13,8 +13,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Entity;
     using Core.Entity.Components;
     using Core.Enums;
-    using Core.Events;
-    using Core.Inventory;
     using Core.Items;
     using Core.MessageBus.Requests;
     using Core.PassiveTree;

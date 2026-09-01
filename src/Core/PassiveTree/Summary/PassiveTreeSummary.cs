@@ -6,7 +6,6 @@ namespace Core.PassiveTree.Summary
     using Context;
     using Enums;
     using Modifiers;
-    using Modifiers.Context;
 
     /// <summary>
     /// What a set of taken nodes is worth. The final number goes through the game's own
