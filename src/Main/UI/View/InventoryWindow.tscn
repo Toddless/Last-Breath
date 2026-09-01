@@ -1,9 +1,12 @@
 [gd_scene format=3 uid="uid://byx7g1b2wlwfl"]
 
 [ext_resource type="Script" uid="uid://bi6bbowdumghk" path="res://Inventory/InventoryWindow.cs" id="1_plih6"]
-[ext_resource type="Script" uid="uid://b0dwbj6fjdgce" path="res://Inventory/EquipmentSlot.cs" id="2_eqslt"]
+[ext_resource type="PackedScene" uid="uid://bd7pallqm2c8u" path="res://UI/Modules/PaperDoll.tscn" id="2_pdoll"]
+[ext_resource type="PackedScene" uid="uid://bstp4qa8w1e6h" path="res://UI/Modules/StatsPane.tscn" id="3_spane"]
+[ext_resource type="PackedScene" uid="uid://bqf3n2vhs4x1m" path="res://UI/Modules/FilterBar.tscn" id="4_fbar"]
+[ext_resource type="PackedScene" uid="uid://bbaggr5idw2n0" path="res://Addons/SharedUi/BagGrid.tscn" id="5_bgrid"]
 
-[node name="InventoryWindow" type="Control" unique_id=1634708058 node_paths=PackedStringArray("_craftingButton", "_allStatsButton", "_sortButton", "_destroyButton", "_inventoryGrid", "_doll", "_stats", "_resists", "_search", "_typeFilter", "_chips", "_title", "_equipHeader", "_statsHeader")]
+[node name="InventoryWindow" type="Control" unique_id=1634708058 node_paths=PackedStringArray("_craftingButton", "_allStatsButton", "_sortButton", "_destroyButton", "_title", "_paperDoll", "_statsPane", "_filterBar", "_bagGrid")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -16,16 +19,11 @@ _craftingButton = NodePath("Center/Panel/Margin/Layout/Header/CraftingButton")
 _allStatsButton = NodePath("Center/Panel/Margin/Layout/Header/AllStatsButton")
 _sortButton = NodePath("Center/Panel/Margin/Layout/Header/Sort")
 _destroyButton = NodePath("Center/Panel/Margin/Layout/Header/Destroy")
-_inventoryGrid = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/BagScroll/InventorySlots")
-_doll = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll")
-_stats = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/Stats")
-_resists = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/Resists")
-_search = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/FilterBar/Search")
-_typeFilter = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/FilterBar/TypeFilter")
-_chips = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/FilterBar/Chips")
 _title = NodePath("Center/Panel/Margin/Layout/Header/Title")
-_equipHeader = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/EquipHeader")
-_statsHeader = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/StatsHeader")
+_paperDoll = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/PaperDoll")
+_statsPane = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/StatsPane")
+_filterBar = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/FilterBar")
+_bagGrid = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/BagGrid")
 
 [node name="Center" type="HBoxContainer" parent="." unique_id=864763390]
 layout_mode = 1
@@ -105,306 +103,10 @@ theme_override_constants/margin_bottom = 10
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="EquipHeader" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" unique_id=2134967383]
-layout_mode = 2
-theme_type_variation = &"DimLabel"
-text = "Equipment"
-
-[node name="DollCenter" type="CenterContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" unique_id=903164599]
+[node name="PaperDoll" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" instance=ExtResource("2_pdoll")]
 layout_mode = 2
 
-[node name="Doll" type="Control" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter" unique_id=345162383]
-custom_minimum_size = Vector2(292, 344)
-layout_mode = 2
-
-[node name="WeaponSlot" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=602015162 node_paths=PackedStringArray("_icon")]
-layout_mode = 0
-offset_left = 16.0
-offset_top = 14.0
-offset_right = 80.0
-offset_bottom = 162.0
-theme_type_variation = &"DollSlotPanel"
-script = ExtResource("2_eqslt")
-Piece = 7
-_icon = NodePath("Icon")
-
-[node name="Icon" type="TextureRect" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll/WeaponSlot" unique_id=993673921]
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-
-[node name="WeaponCap" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=378920794]
-layout_mode = 0
-offset_left = 16.0
-offset_top = 164.0
-offset_right = 80.0
-offset_bottom = 178.0
-theme_type_variation = &"DimLabel"
-theme_override_font_sizes/font_size = 10
-text = "Weapon"
-horizontal_alignment = 1
-
-[node name="HelmetSlot" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=1141600874 node_paths=PackedStringArray("_icon")]
-layout_mode = 0
-offset_left = 116.0
-offset_top = 14.0
-offset_right = 180.0
-offset_bottom = 78.0
-theme_type_variation = &"DollSlotPanel"
-script = ExtResource("2_eqslt")
-Piece = 4
-_icon = NodePath("Icon")
-
-[node name="Icon" type="TextureRect" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll/HelmetSlot" unique_id=134063524]
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="HelmetCap" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=222614634]
-layout_mode = 0
-offset_left = 116.0
-offset_top = 80.0
-offset_right = 180.0
-offset_bottom = 94.0
-theme_type_variation = &"DimLabel"
-theme_override_font_sizes/font_size = 10
-text = "Helmet"
-horizontal_alignment = 1
-
-[node name="CloakSlot" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=1767854239 node_paths=PackedStringArray("_icon")]
-layout_mode = 0
-offset_left = 212.0
-offset_top = 14.0
-offset_right = 276.0
-offset_bottom = 78.0
-theme_type_variation = &"DollSlotPanel"
-script = ExtResource("2_eqslt")
-Piece = 6
-_icon = NodePath("Icon")
-
-[node name="Icon" type="TextureRect" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll/CloakSlot" unique_id=267789143]
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="CloakCap" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=763683269]
-layout_mode = 0
-offset_left = 212.0
-offset_top = 80.0
-offset_right = 276.0
-offset_bottom = 94.0
-theme_type_variation = &"DimLabel"
-theme_override_font_sizes/font_size = 10
-text = "Cloak"
-horizontal_alignment = 1
-
-[node name="BodySlot" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=1455489121 node_paths=PackedStringArray("_icon")]
-layout_mode = 0
-offset_left = 116.0
-offset_top = 90.0
-offset_right = 180.0
-offset_bottom = 238.0
-theme_type_variation = &"DollSlotPanel"
-script = ExtResource("2_eqslt")
-_icon = NodePath("Icon")
-
-[node name="Icon" type="TextureRect" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll/BodySlot" unique_id=646154091]
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BodyCap" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=1479097362]
-layout_mode = 0
-offset_left = 116.0
-offset_top = 240.0
-offset_right = 180.0
-offset_bottom = 254.0
-theme_type_variation = &"DimLabel"
-theme_override_font_sizes/font_size = 10
-text = "Body"
-horizontal_alignment = 1
-
-[node name="AmuletSlot" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=1553027062 node_paths=PackedStringArray("_icon")]
-layout_mode = 0
-offset_left = 184.0
-offset_top = 104.0
-offset_right = 220.0
-offset_bottom = 140.0
-theme_type_variation = &"DollSlotPanel"
-script = ExtResource("2_eqslt")
-Piece = 5
-_icon = NodePath("Icon")
-
-[node name="Icon" type="TextureRect" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll/AmuletSlot" unique_id=2033812763]
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="AmuletCap" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=1119055311]
-layout_mode = 0
-offset_left = 174.0
-offset_top = 142.0
-offset_right = 230.0
-offset_bottom = 156.0
-theme_type_variation = &"DimLabel"
-theme_override_font_sizes/font_size = 10
-text = "Amulet"
-horizontal_alignment = 1
-
-[node name="RingSlot" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=412541165 node_paths=PackedStringArray("_icon")]
-layout_mode = 0
-offset_left = 80.0
-offset_top = 192.0
-offset_right = 116.0
-offset_bottom = 228.0
-theme_type_variation = &"DollSlotPanel"
-script = ExtResource("2_eqslt")
-Piece = 8
-_icon = NodePath("Icon")
-
-[node name="Icon" type="TextureRect" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll/RingSlot" unique_id=1493725953]
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="RingCap" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=1995728735]
-layout_mode = 0
-offset_left = 70.0
-offset_top = 230.0
-offset_right = 126.0
-offset_bottom = 244.0
-theme_type_variation = &"DimLabel"
-theme_override_font_sizes/font_size = 10
-text = "Ring"
-horizontal_alignment = 1
-
-[node name="Ring2Slot" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=1139175544 node_paths=PackedStringArray("_icon")]
-layout_mode = 0
-offset_left = 184.0
-offset_top = 192.0
-offset_right = 220.0
-offset_bottom = 228.0
-theme_type_variation = &"DollSlotPanel"
-script = ExtResource("2_eqslt")
-Piece = 9
-_icon = NodePath("Icon")
-
-[node name="Icon" type="TextureRect" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll/Ring2Slot" unique_id=1141836951]
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Ring2Cap" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=1868482325]
-layout_mode = 0
-offset_left = 174.0
-offset_top = 230.0
-offset_right = 230.0
-offset_bottom = 244.0
-theme_type_variation = &"DimLabel"
-theme_override_font_sizes/font_size = 10
-text = "Ring"
-horizontal_alignment = 1
-
-[node name="GlovesSlot" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=217338772 node_paths=PackedStringArray("_icon")]
-layout_mode = 0
-offset_left = 16.0
-offset_top = 258.0
-offset_right = 80.0
-offset_bottom = 322.0
-theme_type_variation = &"DollSlotPanel"
-script = ExtResource("2_eqslt")
-Piece = 2
-_icon = NodePath("Icon")
-
-[node name="Icon" type="TextureRect" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll/GlovesSlot" unique_id=196242350]
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="GlovesCap" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=667631236]
-layout_mode = 0
-offset_left = 16.0
-offset_top = 324.0
-offset_right = 80.0
-offset_bottom = 338.0
-theme_type_variation = &"DimLabel"
-theme_override_font_sizes/font_size = 10
-text = "Gloves"
-horizontal_alignment = 1
-
-[node name="BeltSlot" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=859998413 node_paths=PackedStringArray("_icon")]
-layout_mode = 0
-offset_left = 116.0
-offset_top = 262.0
-offset_right = 180.0
-offset_bottom = 294.0
-theme_type_variation = &"DollSlotPanel"
-script = ExtResource("2_eqslt")
-Piece = 1
-_icon = NodePath("Icon")
-
-[node name="Icon" type="TextureRect" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll/BeltSlot" unique_id=1954820429]
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BeltCap" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=1084175819]
-layout_mode = 0
-offset_left = 116.0
-offset_top = 296.0
-offset_right = 180.0
-offset_bottom = 310.0
-theme_type_variation = &"DimLabel"
-theme_override_font_sizes/font_size = 10
-text = "Belt"
-horizontal_alignment = 1
-
-[node name="BootsSlot" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=1135104171 node_paths=PackedStringArray("_icon")]
-layout_mode = 0
-offset_left = 212.0
-offset_top = 258.0
-offset_right = 276.0
-offset_bottom = 322.0
-theme_type_variation = &"DollSlotPanel"
-script = ExtResource("2_eqslt")
-Piece = 3
-_icon = NodePath("Icon")
-
-[node name="Icon" type="TextureRect" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll/BootsSlot" unique_id=665153508]
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BootsCap" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/DollCenter/Doll" unique_id=834853460]
-layout_mode = 0
-offset_left = 212.0
-offset_top = 324.0
-offset_right = 276.0
-offset_bottom = 338.0
-theme_type_variation = &"DimLabel"
-theme_override_font_sizes/font_size = 10
-text = "Boots"
-horizontal_alignment = 1
-
-[node name="StatsHeader" type="Label" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" unique_id=354324904]
-layout_mode = 2
-theme_type_variation = &"DimLabel"
-text = "Stats"
-
-[node name="Stats" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" unique_id=1128144307]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="Resists" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" unique_id=605082212]
+[node name="StatsPane" parent="Center/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" instance=ExtResource("3_spane")]
 layout_mode = 2
 
 [node name="RightPane" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body" unique_id=1406827386]
@@ -422,33 +124,9 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="FilterBar" type="HBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=105388812]
+[node name="FilterBar" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" instance=ExtResource("4_fbar")]
 layout_mode = 2
-theme_override_constants/separation = 8
 
-[node name="Search" type="LineEdit" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/FilterBar" unique_id=1078269624]
+[node name="BagGrid" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" instance=ExtResource("5_bgrid")]
 layout_mode = 2
-size_flags_horizontal = 3
-placeholder_text = "Search..."
-clear_button_enabled = true
-
-[node name="Chips" type="HBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/FilterBar" unique_id=211814909]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="TypeFilter" type="OptionButton" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/FilterBar" unique_id=794962646]
-custom_minimum_size = Vector2(160, 0)
-layout_mode = 2
-focus_mode = 0
-
-[node name="BagScroll" type="ScrollContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=1855877138]
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="InventorySlots" type="GridContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/BagScroll" unique_id=1038422219]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/h_separation = 4
-theme_override_constants/v_separation = 4
-columns = 20
+_columns = 20

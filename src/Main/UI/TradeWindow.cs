@@ -30,7 +30,7 @@ namespace LastBreath.UI
         [Export] private SharedUi.WindowHeader? _header;
         [Export] private Label? _goldLabel;
         [Export] private VBoxContainer? _offersContainer;
-        [Export] private GridContainer? _inventoryGrid;
+        [Export] private SharedUi.BagGrid? _bagGrid;
         [Export] private Label? _goodsLabel;
         [Export] private Label? _bagLabel;
 
@@ -65,11 +65,8 @@ namespace LastBreath.UI
         {
             if (Active == this) Active = null;
             if (_wallet != null) _wallet.GoldChanged -= OnGoldChanged;
-            if (BagService is { } bag)
-            {
-                bag.DetachSlots();
-                bag.ItemInteraction -= OnBagItemInteraction;
-            }
+            _bagGrid?.Detach();
+            if (BagService is { } bag) bag.ItemInteraction -= OnBagItemInteraction;
         }
 
         /// <summary>What THIS trader pays for the item right now (perk included); null when the item
@@ -92,9 +89,9 @@ namespace LastBreath.UI
             _uiElements = provider.GetService<IUiElementsManager>();
 
             if (_wallet != null) _wallet.GoldChanged += OnGoldChanged;
-            if (BagService is { } bag && _inventoryGrid != null)
+            if (BagService is { } bag)
             {
-                bag.AttachSlots(_inventoryGrid);
+                _bagGrid?.Attach(bag);
                 bag.ItemInteraction += OnBagItemInteraction;
             }
 

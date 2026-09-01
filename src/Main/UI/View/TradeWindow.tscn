@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" uid="uid://b4rx6pujdtcga" path="res://UI/TradeWindow.cs" id="1_jmo3o"]
 [ext_resource type="PackedScene" uid="uid://q1mb3d00x8m8" path="res://Addons/SharedUi/WindowHeader.tscn" id="2_whead"]
+[ext_resource type="PackedScene" uid="uid://bbaggr5idw2n0" path="res://Addons/SharedUi/BagGrid.tscn" id="3_bgrid"]
 
-[node name="TradeWindow" type="Control" unique_id=989308892 node_paths=PackedStringArray("_header", "_goldLabel", "_offersContainer", "_inventoryGrid", "_goodsLabel", "_bagLabel")]
+[node name="TradeWindow" type="Control" unique_id=989308892 node_paths=PackedStringArray("_header", "_goldLabel", "_offersContainer", "_bagGrid", "_goodsLabel", "_bagLabel")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,7 +15,7 @@ script = ExtResource("1_jmo3o")
 _header = NodePath("Center/Panel/Margin/Layout/Header")
 _goldLabel = NodePath("Center/Panel/Margin/Layout/Header/Gold")
 _offersContainer = NodePath("Center/Panel/Margin/Layout/Body/ShelfPane/ShelfScroll/Offers")
-_inventoryGrid = NodePath("Center/Panel/Margin/Layout/Body/BagPane/BagScroll/InventorySlots")
+_bagGrid = NodePath("Center/Panel/Margin/Layout/Body/BagPane/BagGrid")
 _goodsLabel = NodePath("Center/Panel/Margin/Layout/Body/ShelfPane/GoodsLabel")
 _bagLabel = NodePath("Center/Panel/Margin/Layout/Body/BagPane/BagLabel")
 
@@ -89,15 +90,7 @@ layout_mode = 2
 theme_type_variation = &"SectionLabel"
 text = "Inventory"
 
-[node name="BagScroll" type="ScrollContainer" parent="Center/Panel/Margin/Layout/Body/BagPane" unique_id=341743278]
+[node name="BagGrid" parent="Center/Panel/Margin/Layout/Body/BagPane" instance=ExtResource("3_bgrid")]
 layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
-
-[node name="InventorySlots" type="GridContainer" parent="Center/Panel/Margin/Layout/Body/BagPane/BagScroll" unique_id=432871310]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/h_separation = 4
-theme_override_constants/v_separation = 4
-columns = 8
+_columns = 8

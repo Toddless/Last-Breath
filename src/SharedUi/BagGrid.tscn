@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bbaggr5idw2n0"]
+
+[ext_resource type="Script" uid="uid://cbg1r7dslot4y" path="res://Addons/SharedUi/BagGrid.cs" id="1_bgrid"]
+
+[node name="BagGrid" type="ScrollContainer" node_paths=PackedStringArray("_grid")]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+script = ExtResource("1_bgrid")
+_grid = NodePath("InventorySlots")
+
+[node name="InventorySlots" type="GridContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4

@@ -14,7 +14,7 @@
     using Godot;
     using UI;
 
-    public class Inventory(IUiElementsManager uiElements, IGameMessageBus messageBus) : IInventory, ISessionResettable
+    public class Inventory(IUiElementsManager uiElements, IGameMessageBus messageBus) : IInventory, ISlotLender, ISessionResettable
     {
         private const int BagSlots = 220;
         private const string BagIsFullKey = "UI_Inventory_Full";
