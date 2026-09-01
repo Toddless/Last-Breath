@@ -18,6 +18,10 @@
  *   3. Every failure was treated as "ImageMagick is not installed": the input was copied over
  *      the output and reported as a success. Only a missing binary takes that path now, and a
  *      magick warning that names a rejected argument is raised instead of swallowed.
+ *   4. --remove-bg was a global color replacement, so it erased matching pixels anywhere in the
+ *      frame, including areas enclosed by the subject. Icons whose subject is filled with a light
+ *      color - ice, bone, silver, white fur, cream cloth - came out as hollow outlines. It is now
+ *      an edge flood: only background reachable from the frame's rim is erased.
  * Added for this pipeline: --fit, which normalizes how much of the frame the subject occupies.
  *
  * Usage:
@@ -32,13 +36,15 @@
  */
 
 // === Constants ===
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 const SCRIPT_NAME = "process-icon";
 
 /** Background color --remove-bg assumes when the caller names none. */
 const DEFAULT_BACKGROUND_COLOR = "white";
 /** Tolerance both transparency operations use when --fuzz is absent. */
 const DEFAULT_FUZZ = "10%";
+/** Width of the sacrificial rim the background flood is seeded from, in pixels. */
+const FLOOD_RIM = 1;
 
 // === Types ===
 interface ProcessOptions {
@@ -98,6 +104,34 @@ function quoteForDisplay(argument: string): string {
   return /[\s"']/.test(argument) ? `"${argument.replace(/"/g, '\\"')}"` : argument;
 }
 
+/** The four corners of the frame once the flood rim has been added around it. */
+function rimCorners(size: { width: number; height: number }): Array<[number, number]> {
+  const right = size.width + 2 * FLOOD_RIM - 1;
+  const bottom = size.height + 2 * FLOOD_RIM - 1;
+  return [[0, 0], [right, 0], [0, bottom], [right, bottom]];
+}
+
+/**
+ * Erases only the background that is reachable from the frame's rim, leaving areas of the same
+ * color enclosed by the subject intact.
+ *
+ * A rim of the named color is added first and shaved off afterwards. It joins the whole perimeter
+ * into one region, so a subject that touches the edge cannot strand a corner of background behind
+ * it, and it makes the flood key on the color that was asked for rather than on whatever pixel
+ * happens to sit in a corner. All four corners are seeded so the erase does not rest on the rim
+ * alone. `size` is the frame before the rim is added.
+ */
+function edgeFloodArgs(color: string, fuzz: string, size: { width: number; height: number }): string[] {
+  const seeds = rimCorners(size).flatMap(([x, y]) => ["-draw", `alpha ${x},${y} floodfill`]);
+  return [
+    "-alpha", "set",
+    "-bordercolor", color, "-border", String(FLOOD_RIM),
+    "-fuzz", fuzz, "-fill", "none",
+    ...seeds,
+    "-shave", `${FLOOD_RIM}x${FLOOD_RIM}`,
+  ];
+}
+
 // === Core Processing ===
 export async function processIcon(options: ProcessOptions): Promise<ProcessResult> {
   const operations: string[] = [];
@@ -118,15 +152,18 @@ export async function processIcon(options: ProcessOptions): Promise<ProcessResul
     const currentInput = options.input;
     const fuzz = normalizeFuzz(options.fuzz);
 
+    // --color-key is global by contract: it clears the named color wherever it occurs.
     if (options.colorKey) {
       magickArgs.push("-fuzz", fuzz, "-transparent", `#${options.colorKey}`);
-      operations.push(`color-key: #${options.colorKey} (fuzz ${fuzz})`);
+      operations.push(`color-key: #${options.colorKey} global (fuzz ${fuzz})`);
     }
 
+    // --remove-bg clears only what the frame's rim can reach, so light fills enclosed by the
+    // subject survive. Erasing them everywhere is what left ice and bone icons as hollow outlines.
     if (options.removeBg) {
       const color = typeof options.removeBg === "string" ? options.removeBg : DEFAULT_BACKGROUND_COLOR;
-      magickArgs.push("-fuzz", fuzz, "-transparent", color);
-      operations.push(`remove-bg: ${color} (fuzz ${fuzz})`);
+      magickArgs.push(...edgeFloodArgs(color, fuzz, dimensions));
+      operations.push(`remove-bg: ${color} edge flood (fuzz ${fuzz})`);
     }
 
     if (options.trim || options.fit !== undefined) {
@@ -256,7 +293,9 @@ Required:
   --output <path>     Output image path
 
 Processing Options:
-  --remove-bg [color] Make the background transparent. Without an argument the color is
+  --remove-bg [color] Make the background transparent by flooding inwards from all four corners
+                      of the frame: only background the rim can reach is cleared, so a light fill
+                      enclosed by the subject survives. Without an argument the color is
                       "${DEFAULT_BACKGROUND_COLOR}"; name one to knock out a different background
                       (e.g. --remove-bg F6EFD9 for the warm cream icon canon)
   --fuzz <n>          Match tolerance for --remove-bg / --color-key (default ${DEFAULT_FUZZ}).
@@ -268,7 +307,9 @@ Processing Options:
   --filter <type>     Resize filter: nearest (default) or linear
   --trim              Trim transparent/white borders
   --padding <n>       Add transparent padding (pixels)
-  --color-key <hex>   Make specific color transparent (e.g., ff00ff)
+  --color-key <hex>   Make specific color transparent EVERYWHERE it occurs, enclosed areas
+                      included (e.g., ff00ff). This is the global counterpart of --remove-bg,
+                      which only clears background connected to the frame's rim
 
 Other:
   --json              Output result as JSON

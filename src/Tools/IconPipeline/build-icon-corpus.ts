@@ -27,9 +27,17 @@ const DATA_PATHS = {
   resources: "Resources",
 } as const;
 
-/** Approved generation canon (AssetStyleGuide.md lineage). Inserted verbatim into every prompt. */
+/**
+ * Approved generation canon (AssetStyleGuide.md lineage). Inserted verbatim into every prompt.
+ *
+ * The closing paragraph is a guard against the model answering with bare line art. An object whose
+ * enclosed areas are left blank reads as a hollow outline over the game's dark panels, and any part
+ * of it painted in the background color is indistinguishable from background wherever it touches
+ * the frame.
+ */
 const CANON_PROMPT =
-  "stylized comic book dark fantasy game icon, single object centered and isolated, bold expressive ink linework with dense crosshatching accents, painted color over inked lines, heavily desaturated washed-out faded palette - cold greys and browns, faded olive, dim rust accents, deep shadows, grim gothic mood, in the manner of Battle Chasers and Darksiders concept art, three-quarter view, even lighting, no background scenery, plain flat warm cream background, no frame, no border, no ornament ring, no text, no watermark, 2D game asset, no photorealism";
+  "stylized comic book dark fantasy game icon, single object centered and isolated, bold expressive ink linework with dense crosshatching accents, painted color over inked lines, heavily desaturated washed-out faded palette - cold greys and browns, faded olive, dim rust accents, deep shadows, grim gothic mood, in the manner of Battle Chasers and Darksiders concept art, three-quarter view, even lighting, no background scenery, plain flat warm cream background, no frame, no border, no ornament ring, no text, no watermark, 2D game asset, no photorealism. " +
+  "Every area enclosed by the linework is finished painted art: it carries color from that palette and is modeled with shading and crosshatching, and is never left as blank white, bare paper or the flat background color. No uncolored outline drawing, no coloring-book look - the cream belongs to the background alone and never appears inside the object";
 
 /**
  * Canon exemption for raw materials. Desaturation makes copper, iron and silver read as the same
@@ -262,7 +270,7 @@ const ABILITY_MOTIFS: Record<string, string> = {
   Ability_Overload:
     "a cracked arcane orb drinking in energy, thin streams of cold blue mana spiralling inward through its fractures",
   Ability_Chain_Lightning:
-    "a forked bolt of harsh white lightning zigzagging through three branching jumps, each fork thinner than the last",
+    "a forked bolt of lightning zigzagging through three branching jumps, each fork thinner than the last, its body a solid painted mass of cold pale blue-grey planes with a dim violet core and shaded undersides",
   Ability_Ice_Aegis:
     "a kite shield carved from cracked blue ice, frost creeping outward from its rim",
   Ability_Ice_Shards:
