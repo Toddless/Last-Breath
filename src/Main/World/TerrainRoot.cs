@@ -22,8 +22,12 @@ namespace LastBreath.World
     /// once. Nothing it builds is owned by the scene and nothing it builds is saved; the data layers themselves
     /// are read and never written, their visibility included.
     /// </para>
+    /// <para>
+    /// Editor preview is disabled (2026-09-01): a live [Tool] instance keeps the editor from unloading the C#
+    /// assembly on rebuild (godotengine/godot#78513). Layout is verified by running the scene; restore the
+    /// preview by putting the [Tool] attribute back once the upstream fix lands.
+    /// </para>
     /// </remarks>
-    [Tool]
     [GlobalClass]
     public partial class TerrainRoot : Node2D
     {

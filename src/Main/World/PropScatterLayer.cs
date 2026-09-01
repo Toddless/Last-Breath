@@ -19,8 +19,12 @@ namespace LastBreath.World
     /// The scatter also grows in the editor. Its props are marked and unowned, so the scene never saves them,
     /// and the container — a scene node the preview only borrows — is not written to there.
     /// </para>
+    /// <para>
+    /// Editor preview is disabled (2026-09-01): a live [Tool] instance keeps the editor from unloading the C#
+    /// assembly on rebuild (godotengine/godot#78513). Layout is verified by running the scene; restore the
+    /// preview by putting the [Tool] attribute back once the upstream fix lands.
+    /// </para>
     /// </remarks>
-    [Tool]
     [GlobalClass]
     public partial class PropScatterLayer : Node2D, IReloadUnhookable
     {

@@ -16,8 +16,12 @@ namespace LastBreath.World
     /// The component also runs in the editor, where two things it does at runtime are off limits: the world
     /// layer keeps whatever visibility its author gave it, and a display layer that belongs to the saved scene
     /// is left untouched — cells written into it would be serialised on the next save.
+    /// <para>
+    /// Editor preview is disabled (2026-09-01): a live [Tool] instance keeps the editor from unloading the C#
+    /// assembly on rebuild (godotengine/godot#78513). Layout is verified by running the scene; restore the
+    /// preview by putting the [Tool] attribute back once the upstream fix lands.
+    /// </para>
     /// </remarks>
-    [Tool]
     [GlobalClass]
     public partial class DualGridTerrainLayer : Node2D, IReloadUnhookable
     {
