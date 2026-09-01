@@ -4,7 +4,8 @@
 // Consumes the corpus written by build-icon-corpus.ts and drops one <id>.png per entry.
 //
 // A run never spends more than --limit requests, never re-spends on files that already
-// exist under --resume, and never aborts the whole batch because one entry failed.
+// exist under --resume, never waits on one entry past its time budget, and never aborts the
+// whole batch because one entry failed.
 //
 // Usage:
 //   deno run --allow-env --allow-net --allow-read --allow-write src/Tools/IconPipeline/generate-icons.ts \
@@ -23,6 +24,22 @@ const DEFAULT_DELAY_MS = 1500;
 const DEFAULT_CONCURRENCY = 1;
 const MAX_CONCURRENCY = 3;
 const LOG_FILE_NAME = "generation-log.jsonl";
+
+/**
+ * Ceilings per network call. Without them a socket that stops answering hangs the whole batch:
+ * the poll loop is bounded, the calls it makes were not. Sized against observed round trips
+ * (submit and status answer in well under a second, a finished icon downloads in a few).
+ */
+const SUBMIT_TIMEOUT_MS = 30_000;
+const STATUS_TIMEOUT_MS = 15_000;
+const RESULT_TIMEOUT_MS = 30_000;
+const DOWNLOAD_TIMEOUT_MS = 60_000;
+
+/**
+ * Ceiling on one entry end to end, polling included. Whatever is still unfinished at this point is
+ * reported as a failed entry so the run moves on. A whole icon normally takes about ten seconds.
+ */
+const ENTRY_BUDGET_MS = 300_000;
 
 // ============================================================================
 // Types
@@ -100,37 +117,85 @@ function describe(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-async function submit(prompt: string, key: string): Promise<{ status_url: string; response_url: string }> {
-  const response = await fetch(MODEL_ENDPOINT, {
+function seconds(ms: number): string {
+  return `${(ms / 1000).toFixed(0)}s`;
+}
+
+/** Wall-clock ceiling for one entry. Every call it makes is bounded by what is left of it. */
+interface Deadline {
+  expiresAt: number;
+}
+
+function deadlineIn(budgetMs: number): Deadline {
+  return { expiresAt: Date.now() + budgetMs };
+}
+
+/**
+ * Fetch bounded by two ceilings at once: this call's own timeout and the remainder of the entry's
+ * budget. A socket that never answers costs one timeout instead of the run, and a sequence of slow
+ * but answered calls still cannot outlive the entry.
+ */
+async function fetchWithin(
+  label: string,
+  url: string,
+  init: RequestInit,
+  timeoutMs: number,
+  deadline: Deadline,
+): Promise<Response> {
+  const remaining = deadline.expiresAt - Date.now();
+  if (remaining <= 0) throw new Error(`${label}: entry budget of ${seconds(ENTRY_BUDGET_MS)} exhausted`);
+  const limit = Math.min(timeoutMs, remaining);
+  try {
+    return await fetch(url, { ...init, signal: AbortSignal.timeout(limit) });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "TimeoutError") {
+      throw new Error(`${label} timed out after ${seconds(limit)}`);
+    }
+    throw error;
+  }
+}
+
+async function submit(
+  prompt: string,
+  key: string,
+  deadline: Deadline,
+): Promise<{ status_url: string; response_url: string }> {
+  const response = await fetchWithin("submit", MODEL_ENDPOINT, {
     method: "POST",
     headers: { Authorization: `Key ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({ prompt, num_images: 1, output_format: OUTPUT_FORMAT }),
-  });
+  }, SUBMIT_TIMEOUT_MS, deadline);
   if (!response.ok) throw new Error(`submit ${response.status}: ${(await response.text()).slice(0, 300)}`);
   return await response.json();
 }
 
-async function awaitImageUrl(statusUrl: string, responseUrl: string, key: string): Promise<string> {
+async function awaitImageUrl(
+  statusUrl: string,
+  responseUrl: string,
+  key: string,
+  deadline: Deadline,
+): Promise<string> {
   const headers = { Authorization: `Key ${key}` };
   for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt++) {
     await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-    const status = await (await fetch(statusUrl, { headers })).json();
+    const status = await (await fetchWithin("status", statusUrl, { headers }, STATUS_TIMEOUT_MS, deadline)).json();
     if (status.status === "FAILED" || status.status === "ERROR") {
       throw new Error(`generation failed: ${JSON.stringify(status).slice(0, 300)}`);
     }
     if (status.status !== "COMPLETED") continue;
-    const result = await (await fetch(responseUrl, { headers })).json();
+    const result = await (await fetchWithin("result", responseUrl, { headers }, RESULT_TIMEOUT_MS, deadline)).json();
     const url = result?.images?.[0]?.url;
     if (typeof url !== "string") throw new Error(`completed with no image: ${JSON.stringify(result).slice(0, 300)}`);
     return url;
   }
-  throw new Error(`timed out after ${(POLL_ATTEMPTS * POLL_INTERVAL_MS) / 1000}s`);
+  throw new Error(`polling gave up after ${seconds(POLL_ATTEMPTS * POLL_INTERVAL_MS)}`);
 }
 
 async function generateOne(entry: CorpusEntry, target: string, key: string): Promise<number> {
-  const { status_url, response_url } = await submit(entry.prompt, key);
-  const imageUrl = await awaitImageUrl(status_url, response_url, key);
-  const download = await fetch(imageUrl);
+  const deadline = deadlineIn(ENTRY_BUDGET_MS);
+  const { status_url, response_url } = await submit(entry.prompt, key, deadline);
+  const imageUrl = await awaitImageUrl(status_url, response_url, key, deadline);
+  const download = await fetchWithin("download", imageUrl, {}, DOWNLOAD_TIMEOUT_MS, deadline);
   if (!download.ok) throw new Error(`download ${download.status}`);
   const bytes = new Uint8Array(await download.arrayBuffer());
   await Deno.writeFile(target, bytes);
