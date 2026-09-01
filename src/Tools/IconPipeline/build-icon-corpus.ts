@@ -44,14 +44,14 @@ const CANON_PROMPT =
  * grey stone in the bag, so the material's own colour is lifted out from under it — and only that.
  */
 const CANON_MATERIAL_COLOR_CLAUSE =
-  "One exemption from that palette: the material's OWN colour is the single saturated thing in the picture and must read at full true chroma, so the material is identified at a glance and never mistaken for a neighbouring one - copper reads as copper, gold as gold, an emerald as an emerald. Everything that is not the material itself - the ink linework, the shadows, the surrounding host rock, the cloth, the vial glass, any setting or backing - stays washed out and desaturated exactly as described above.";
+  "One exemption from that palette: the material's OWN colour is the single saturated thing in the picture and must read at full true chroma, so the material is identified at a glance and never mistaken for a neighbouring one - copper reads as copper, gold as gold, an emerald as an emerald. Everything that is not the material itself - the ink linework, the shadows, the surrounding host rock, the vial glass, the dowels, frames, cords and wrappings the material is held by, any setting or backing - stays washed out and desaturated exactly as described above.";
 
 /**
  * Canon exemption for smithing consumables. Four dusts differ by grade alone, so here the saturated
  * carrier is the rarity colour of the game's own ladder rather than a material.
  */
 const CANON_RARITY_COLOR_CLAUSE =
-  "One exemption from that palette: the grade colour named below is the single saturated thing in the picture and must read at full true chroma, so two grades of the same object are told apart at a glance. Everything else - the ink linework, the shadows, the material body, the cloth it rests on - stays washed out and desaturated exactly as described above.";
+  "One exemption from that palette: the grade colour named below is the single saturated thing in the picture and must read at full true chroma, so two grades of the same object are told apart at a glance. Everything else - the ink linework, the shadows, the material body, the vessel or wrapper the object is held in - stays washed out and desaturated exactly as described above. The object rests on nothing: there is no cloth, mat, board, table or ground under it anywhere in the picture.";
 
 // ============================================================================
 // Types
@@ -482,6 +482,21 @@ const MATERIAL_CATEGORY_FORMS: Record<string, string> = {
 };
 
 /**
+ * What the category's icon must not drift into. Stock material reads as a finished item the moment
+ * the model is left to guess: ore becomes an ingot, a gem becomes a ring, an essence becomes an
+ * apothecary's shelf.
+ */
+const MATERIAL_PRESENTATION_NOTES: Record<string, string> = {
+  Category_Metal: "raw unrefined stock, not an ingot and not a finished item",
+  Category_Fabric: "cloth stock, not a garment and not a finished item",
+  Category_Leather: "hide stock, not a garment and not a finished item",
+  Category_Gem:
+    "the bare loose stone and nothing else - no metal setting, no claws or prongs, no bezel, no ring, no rim, no host rock or matrix around it and nothing under it",
+  Category_Bone: "a raw trophy taken from the beast, not a carved or finished item",
+  Category_Essence: "one sealed vessel by itself, no shelf, no rack and no second bottle",
+};
+
+/**
  * Material tint, keyed by the resource's own last tag. Bone and hide entries are qualified
  * with their category because the same beast yields differently-coloured parts.
  */
@@ -520,11 +535,11 @@ const MATERIAL_TINTS: Record<string, string> = {
   "Category_Bone:Bear": "a thick blunt bear claw of dark horn",
   "Category_Bone:Direwolf": "a long hooked direwolf claw, grey and scarred",
   "Category_Bone:Ancient": "a huge fossilised fang gone stone-brown and cracked with age",
-  Critical: "a sharp red spark suspended in the fluid",
+  Critical: "colourless fluid holding one sharp white-hot spark",
   Accuracy: "a thin bright needle of light suspended in the fluid",
-  Damage: "a churning dark orange mote turning in the fluid",
-  Health: "thick dark red fluid",
-  Armor: "grey metallic sediment settling through the fluid",
+  Damage: "churning ember-orange fluid",
+  Health: "thick dark red fluid, nearly opaque",
+  Armor: "grey metallic sediment settling through colourless fluid",
   Evade: "pale grey vapour swirling in the fluid",
   Barrier: "cold blue light held inside the fluid",
 };
@@ -570,6 +585,118 @@ const UPGRADE_ROLE_FORMS: readonly UpgradeRole[] = [
   { tag: "Upgrade", form: "a flat carved rune stone bearing one deep smith's glyph, iron-bound along its edge", accents: UPGRADE_ITEM_ACCENTS },
   { tag: "Ascend", form: "a heavy master's seal stamp turned engraved-face forward", accents: UPGRADE_ITEM_ACCENTS },
 ];
+
+/**
+ * Presentation form of one entity, standing in for the shared body of its group.
+ *
+ * A group whose members differ only in tint is one icon in N tints at bag size, and at 64 px hue is
+ * the weakest cue there is: eight bolts of cloth, five rolls of hide, seven vials all read as the
+ * same object. So every member of such a group is given its OWN form - how the thing is presented,
+ * what outline it cuts - and tint is left to separate only what is still close. At most one member
+ * may keep the shared body, because by then that body belongs to it alone.
+ *
+ * Keys are tried most specific first: the entity id, then a subgroup key "<group>:<axis>" for
+ * members that also vary along a second axis - four grades of one dust for each of three crafts.
+ * Groups where a full-chroma colour already does the separating are named in SHARED_BODY_EXEMPTIONS
+ * instead; everything else is expected here, and the build says so when it is not.
+ *
+ * This is where a family is prepared before it is generated. The armor slots repeat one body
+ * fifteen times over, so their entries belong in this table exactly as the cloths do.
+ */
+const SILHOUETTES: Record<string, string> = {
+  // Fabric - eight bolts of one shape. Velvet keeps the group body, so it now reads as its own.
+  Crafting_Resource_Coarse_Wool_Fabric:
+    "a skein of coarse spun yarn wound into a figure of eight, two loose ends standing out from it",
+  Crafting_Resource_Linen_Fabric:
+    "a bolt wound on a plain wooden dowel, its free end unrolled and hanging down the front",
+  Crafting_Resource_Broadcloth_Fabric:
+    "a thick bolt standing upright on its end, the spiral of its rolled layers showing across the top",
+  Crafting_Resource_Fine_Linen_Fabric:
+    "a neat stack of five folded squares laid one on another, their edges flush",
+  Crafting_Resource_Serge_Fabric:
+    "a folded length bound crosswise by cord in two places, the cord biting into the cloth",
+  Crafting_Resource_Silk_Fabric:
+    "a single loose length hanging free and caught in a soft falling S-curve, not rolled and not folded",
+  Crafting_Resource_Purple_Fabric:
+    "a small torn swatch with a frayed fringe along its lower edge, no roll and no bolt",
+
+  // Leather - five rolls of one shape. Bear keeps the group body.
+  Crafting_Resource_Deer_Leather:
+    "a whole hide stretched taut inside a square drying frame and laced to it at the corners",
+  Crafting_Resource_Wolf_Leather:
+    "a whole pelt laid out flat and open, legs spread and tail still attached",
+  Crafting_Resource_Wild_Boar_Leather:
+    "a stack of cut rectangular pieces laid one on another, their edges left uneven",
+  Crafting_Resource_Direwolf_Leather:
+    "an enormous pelt thrown over a beam and hanging down in two heavy halves",
+
+  // Gem - one presentation for the whole group, the loose stone; the cut is what separates them.
+  Crafting_Resource_Diamond_Gem:
+    "a round brilliant-cut stone, crown up, its facets radiating out from a flat table",
+  Crafting_Resource_Ruby_Gem: "a cushion-cut stone, a rounded square under a domed crown",
+  Crafting_Resource_Emerald_Gem: "a rectangular step-cut stone with bevelled corners",
+  Crafting_Resource_Sapphire_Gem: "a bipyramid crystal, a steep spindle pointed at both ends",
+  Crafting_Resource_Beryl_Gem: "a long six-sided prism crystal lying on its side, one end snapped off square",
+  Crafting_Resource_Garnet_Gem: "a cabochon, domed smoothly on top and flat underneath",
+  Crafting_Resource_Malachite_Gem:
+    "a flat disc sawn across the stone's banding, concentric rings running over its face",
+  Crafting_Resource_Lazurite_Gem: "a rough tumbled nugget with two flat sawn faces cut into it",
+  Crafting_Resource_Alexandrite_Gem: "a pear-cut drop, pointed at the top and rounded below",
+  Crafting_Resource_Taaffeite_Gem: "a trillion-cut stone, a flat-topped triangle with three clipped points",
+
+  // Essence - seven vials of one shape. Each gets its own vessel; the fluid keeps carrying the tint.
+  Crafting_Resource_Essence_Health:
+    "a round-bellied bulb flask with a short neck, its mouth sealed under a blob of dark wax",
+  Crafting_Resource_Essence_Critical_Chance:
+    "a tall narrow bottle cut in hard facets like a gemstone, its stopper ground from the same glass",
+  Crafting_Resource_Essence_Damage:
+    "a squat wide-mouthed jar closed by a driven cork standing proud of the rim",
+  Crafting_Resource_Essence_Armor:
+    "a heavy bottle caged in a woven wicker sleeve, only its neck and shoulder left bare",
+  Crafting_Resource_Essence_Accuracy:
+    "a long slender tube with a pointed base, hung by a cord looped under its collar",
+  Crafting_Resource_Essence_Barrier:
+    "a spherical orb-flask with no neck at all, a metal band clamped around its middle",
+  Crafting_Resource_Essence_Evade: "a flat curved hip-flask of glass, a small stopper set at one corner",
+
+  // Dust - the grade colour separates the four grades, the vessel separates the three crafts.
+  // Armor keeps the free heap.
+  "Recraft:Weapon":
+    "fine milled powder mounded in an open folded-paper packet, the paper turned down at the top so the heap stands above the fold, floury and evenly ground like flour or ash, no lumps, no grit, no shards and no whole pieces anywhere in it",
+  "Recraft:Jewellery":
+    "fine milled powder filling a shallow round dish level to its rim, floury and evenly ground like flour or ash, no lumps, no grit, no shards and no whole pieces anywhere in it",
+
+  // Smith runes - three of one grade, so the grade colour cannot separate them. Their bodies do.
+  Upgrade_Resource_Weapon_Rune:
+    "a slim rune spike, square in section and tapering to a point, one glyph cut into its flattened head",
+  Upgrade_Resource_Blacksmith_Rune:
+    "a round rune boss, a domed disc with a raised rim and one glyph struck deep into its centre",
+  Upgrade_Resource_Jeweler_Rune:
+    "a pierced rune bead, a flattened ring with a hole through its middle and one glyph chased around the hole",
+
+  // Master's marks - likewise all of one grade.
+  Upgrade_Resource_Weaponsmith_Mark:
+    "a heavy stamp seal with a short thick grip behind it, its engraved face turned forward and cut in the shape of a broad blade tip, standing in empty space with nothing under it",
+  Upgrade_Resource_Armorsmith_Mark:
+    "a heavy square seal block without a handle, engraved face forward, dull wax still clinging along its edges",
+  Upgrade_Resource_Jeweler_Mark: "a small round signet worn on a finger ring, the engraved face turned forward",
+};
+
+/** How many members of one group may share a body before the build calls the sharing out. */
+const SHARED_BODY_LIMIT = 2;
+
+/**
+ * Groups allowed to share one body, keyed "<family>/<group>". Ore and the smithing ladders are one
+ * object in several materials or at several grades, and the canon hands those a saturated colour of
+ * their own to be told apart by; the bone tints already name each trophy's own shape.
+ */
+const SHARED_BODY_EXEMPTIONS: ReadonlySet<string> = new Set([
+  "crafting_resource/Category_Metal",
+  "crafting_resource/Category_Bone",
+  "upgrade_resource/Recraft",
+  "upgrade_resource/Flux",
+  "upgrade_resource/Rune",
+]);
 
 // ============================================================================
 // Subject assembly helpers
@@ -644,6 +771,39 @@ function baseStatAccents(family: Family, facts: Record<string, unknown>, issues:
   return accents.length > 0 ? accents.join(" and ") : null;
 }
 
+/** What an entity's body is being resolved from. */
+interface BodyRequest {
+  family: Family;
+  id: string;
+  /** Key of the group whose members share one form: the material category, the slot, the role. */
+  group: string;
+  /** That shared form, used when nothing more specific is authored. */
+  shared: string | null;
+  /** Second-axis key tried after the id, e.g. "Recraft:Weapon". */
+  subgroup?: string;
+}
+
+/**
+ * The entity's own body: its authored silhouette when it has one, its group's shared form
+ * otherwise. Every fallback is recorded, so a family generated before its silhouettes were written
+ * is named at the end of the build instead of quietly shipping N copies of one shape.
+ */
+function bodyOf(ctx: BuildContext, request: BodyRequest): string | null {
+  const authored = lookup(SILHOUETTES, request.id) ?? lookup(SILHOUETTES, request.subgroup);
+  if (authored !== null) return authored;
+  const key = `${request.family}/${request.group}`;
+  ctx.sharedBodies.set(key, [...(ctx.sharedBodies.get(key) ?? []), request.id]);
+  return request.shared;
+}
+
+/** Names every group that leant on one body for more members than the rule allows. */
+function reportSharedBodies(ctx: BuildContext): void {
+  for (const [key, ids] of ctx.sharedBodies) {
+    if (ids.length <= SHARED_BODY_LIMIT || SHARED_BODY_EXEMPTIONS.has(key)) continue;
+    ctx.issues.add("warn", key, `${ids.length} entities share one body with no silhouette entry: ${ids.join(", ")}`);
+  }
+}
+
 function rarityTreatment(
   table: Record<string, string>,
   facts: Record<string, unknown>,
@@ -664,6 +824,8 @@ interface BuildContext {
   dataRoot: URL;
   localization: Localization;
   issues: IssueLog;
+  /** Ids that fell back to a shared body, keyed "<family>/<group>". */
+  sharedBodies: Map<string, string[]>;
 }
 
 /** Directory path (absolute, either slash style) as a trailing-slash file URL. */
@@ -811,7 +973,12 @@ const FAMILIES: readonly FamilySpec[] = [
       const motif = named?.motif ?? visualDescription(entity.id, ctx);
       if (motif === null) ctx.issues.add("warn", entity.id, "no name motif matched and no visual description available");
       return joinSubject(name, [
-        form ?? "a hand weapon shown alone",
+        bodyOf(ctx, {
+          family: "weapon",
+          id: entity.id,
+          group: type ?? "unknown",
+          shared: form ?? "a hand weapon shown alone",
+        }),
         lookup(HANDEDNESS_FORMS, entity.facts.handedness as string | undefined),
         motif,
         rarityTreatment(RARITY_TREATMENTS, entity.facts, ctx.issues, entity.id),
@@ -831,7 +998,12 @@ const FAMILIES: readonly FamilySpec[] = [
       const motif = named?.motif ?? visualDescription(entity.id, ctx);
       if (motif === null) ctx.issues.add("warn", entity.id, "no name motif matched and no visual description available");
       return joinSubject(name, [
-        form ?? "a single piece of gear shown alone",
+        bodyOf(ctx, {
+          family,
+          id: entity.id,
+          group: part ?? "unknown",
+          shared: form ?? "a single piece of gear shown alone",
+        }),
         motif,
         named?.dropStatAccents === true ? null : baseStatAccents(family, entity.facts, ctx.issues, entity.id),
         rarityTreatment(RARITY_TREATMENTS, entity.facts, ctx.issues, entity.id),
@@ -853,10 +1025,15 @@ const FAMILIES: readonly FamilySpec[] = [
       const tint = lookup(MATERIAL_TINTS, `${categoryId}:${tag}`) ?? lookup(MATERIAL_TINTS, tag);
       if (tint === null) ctx.issues.add("warn", entity.id, `material tag "${tag}" has no tint entry`);
       return joinSubject(name, [
-        form ?? "a single raw crafting material",
+        bodyOf(ctx, {
+          family: "crafting_resource",
+          id: entity.id,
+          group: categoryId ?? "unknown",
+          shared: form ?? "a single raw crafting material",
+        }),
         tint,
         rarityTreatment(RESOURCE_RARITY_TREATMENTS, entity.facts, ctx.issues, entity.id),
-        "a plain unworked material, not a finished item",
+        lookup(MATERIAL_PRESENTATION_NOTES, categoryId) ?? "a plain material, not a finished item",
       ]);
     },
   },
@@ -870,9 +1047,16 @@ const FAMILIES: readonly FamilySpec[] = [
       const tags = Array.isArray(entity.facts.tags) ? (entity.facts.tags as string[]) : [];
       const role = UPGRADE_ROLE_FORMS.find((entry) => tags.includes(entry.tag)) ?? null;
       if (role === null) ctx.issues.add("warn", entity.id, `tags [${tags.join(",")}] match no role entry`);
+      const category = entity.facts.category as string | undefined;
       return joinSubject(name, [
-        role?.form ?? "a single smithing consumable",
-        role === null ? null : lookup(role.accents, entity.facts.category as string | undefined),
+        role === null ? "a single smithing consumable" : bodyOf(ctx, {
+          family: "upgrade_resource",
+          id: entity.id,
+          group: role.tag,
+          shared: role.form,
+          subgroup: category === undefined ? undefined : `${role.tag}:${category}`,
+        }),
+        role === null ? null : lookup(role.accents, category),
         visualDescription(entity.id, ctx),
         rarityTreatment(UPGRADE_RARITY_TREATMENTS, entity.facts, ctx.issues, entity.id),
       ]);
@@ -912,7 +1096,12 @@ async function build(dataRoot: URL): Promise<{ corpus: CorpusEntry[]; coverage: 
   } catch (error) {
     issues.add("error", DATA_PATHS.localization, `not readable: ${describe(error)}`);
   }
-  const ctx: BuildContext = { dataRoot, localization: Localization.parse(poText, issues), issues };
+  const ctx: BuildContext = {
+    dataRoot,
+    localization: Localization.parse(poText, issues),
+    issues,
+    sharedBodies: new Map(),
+  };
 
   const corpus: CorpusEntry[] = [];
   const coverage: FamilyCoverage[] = [];
@@ -934,6 +1123,7 @@ async function build(dataRoot: URL): Promise<{ corpus: CorpusEntry[]; coverage: 
     coverage.push({ family: spec.family, expected: spec.expected, actual: entities.length });
   }
 
+  reportSharedBodies(ctx);
   return { corpus, coverage, issues };
 }
 
