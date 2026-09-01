@@ -4,19 +4,43 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Threading;
     using Godot;
     using Serilog;
 
     public static class Tracker
     {
-        private static readonly ILogger s_logger;
+        private static readonly Lock Gate = new();
+        private static ILogger? s_logger;
 
-        static Tracker()
+        static Tracker() => AssemblyUnloadCleanup.Register(CloseAndFlush);
+
+        /// <summary>Flushes and releases the file sink; the next Track* call builds a fresh logger.
+        /// Runs on editor assembly unload — an open log handle would pin the dying load context.</summary>
+        public static void CloseAndFlush()
+        {
+            lock (Gate)
+            {
+                (s_logger as IDisposable)?.Dispose();
+                s_logger = null;
+            }
+        }
+
+        private static ILogger Logger
+        {
+            get
+            {
+                if (s_logger is { } live) return live;
+                lock (Gate) return s_logger ??= CreateLogger();
+            }
+        }
+
+        private static ILogger CreateLogger()
         {
             // ProjectSettings is a native engine call: outside Godot (tests, simulations) it is a fatal
             // access violation no try/catch can stop — non-Godot hosts MUST set the override first.
             string logPath = TrackerBootstrap.LogPathOverride ?? ProjectSettings.GlobalizePath("user://log.txt");
-            s_logger = new LoggerConfiguration()
+            return new LoggerConfiguration()
                 .WriteTo.File(logPath,
                 outputTemplate: "\n{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}]  {Message:lj}. Source: {Source}, Method: {Method}, Line: {Line} {NewLine}{Exception}  \n CallStack: {CallStack}")
                 .CreateLogger();
@@ -42,7 +66,7 @@
                 .GetFrames()
                 .Take(10));
 
-            return s_logger.ForContext("Line", line)
+            return Logger.ForContext("Line", line)
                 .ForContext("Method", method)
                 .ForContext("Source", source?.GetType().Name)
                 .ForContext("CallStack", callStack);

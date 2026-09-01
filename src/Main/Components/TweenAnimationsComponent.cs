@@ -41,9 +41,10 @@ namespace LastBreath.Components
         private const float BreathRise = 3f;
 
         // Tween targets are node paths; the engine's own property names spell them without magic strings.
-        private static readonly NodePath PositionPath = new(Node2D.PropertyName.Position);
-        private static readonly NodePath ScalePath = new(Node2D.PropertyName.Scale);
-        private static readonly NodePath RotationPath = new(Node2D.PropertyName.Rotation);
+        // Instance fields, not statics: a static native wrapper would pin the editor's dying load context.
+        private readonly NodePath _positionPath = new(Node2D.PropertyName.Position);
+        private readonly NodePath _scalePath = new(Node2D.PropertyName.Scale);
+        private readonly NodePath _rotationPath = new(Node2D.PropertyName.Rotation);
 
         private readonly TweenAnimationState _state = new();
         private Vector2 _restPosition;
@@ -251,13 +252,13 @@ namespace LastBreath.Components
             float reach = seconds * StrikeShare;
             float recover = seconds - reach;
 
-            tween.TweenProperty(sprite, PositionPath, _restPosition + (direction * LungeDistance), reach)
+            tween.TweenProperty(sprite, _positionPath, _restPosition + (direction * LungeDistance), reach)
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
-            tween.TweenProperty(sprite, ScalePath, Squashed(), reach)
+            tween.TweenProperty(sprite, _scalePath, Squashed(), reach)
                 .SetTrans(Tween.TransitionType.Back).SetEase(Tween.EaseType.Out);
-            tween.Chain().TweenProperty(sprite, PositionPath, _restPosition, recover)
+            tween.Chain().TweenProperty(sprite, _positionPath, _restPosition, recover)
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.InOut);
-            tween.TweenProperty(sprite, ScalePath, _restScale, recover)
+            tween.TweenProperty(sprite, _scalePath, _restScale, recover)
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.InOut);
         }
 
@@ -267,13 +268,13 @@ namespace LastBreath.Components
             float shove = seconds * StrikeShare;
             float settle = seconds - shove;
 
-            tween.TweenProperty(sprite, PositionPath, _restPosition - (direction * RecoilDistance), shove)
+            tween.TweenProperty(sprite, _positionPath, _restPosition - (direction * RecoilDistance), shove)
                 .SetTrans(Tween.TransitionType.Back).SetEase(Tween.EaseType.Out);
-            tween.TweenProperty(sprite, RotationPath, _restRotation + Mathf.DegToRad(HurtDegrees), shove)
+            tween.TweenProperty(sprite, _rotationPath, _restRotation + Mathf.DegToRad(HurtDegrees), shove)
                 .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
-            tween.Chain().TweenProperty(sprite, PositionPath, _restPosition, settle)
+            tween.Chain().TweenProperty(sprite, _positionPath, _restPosition, settle)
                 .SetTrans(Tween.TransitionType.Elastic).SetEase(Tween.EaseType.Out);
-            tween.TweenProperty(sprite, RotationPath, _restRotation, settle)
+            tween.TweenProperty(sprite, _rotationPath, _restRotation, settle)
                 .SetTrans(Tween.TransitionType.Elastic).SetEase(Tween.EaseType.Out);
         }
 
@@ -282,11 +283,11 @@ namespace LastBreath.Components
         {
             float side = facing == TweenFacing.Left ? -1f : 1f;
 
-            tween.TweenProperty(sprite, RotationPath, _restRotation + Mathf.DegToRad(FallDegrees * side), seconds)
+            tween.TweenProperty(sprite, _rotationPath, _restRotation + Mathf.DegToRad(FallDegrees * side), seconds)
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.In);
-            tween.TweenProperty(sprite, PositionPath, _restPosition + new Vector2(0f, FallDrop), seconds)
+            tween.TweenProperty(sprite, _positionPath, _restPosition + new Vector2(0f, FallDrop), seconds)
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.In);
-            tween.TweenProperty(sprite, ScalePath, Squashed(), seconds)
+            tween.TweenProperty(sprite, _scalePath, Squashed(), seconds)
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.In);
         }
 
@@ -297,11 +298,11 @@ namespace LastBreath.Components
         /// </summary>
         private void BuildCollapse(Tween tween, Node2D sprite, float seconds)
         {
-            tween.TweenProperty(sprite, PositionPath, _restPosition + new Vector2(0f, CollapseDrop), seconds)
+            tween.TweenProperty(sprite, _positionPath, _restPosition + new Vector2(0f, CollapseDrop), seconds)
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
-            tween.TweenProperty(sprite, ScalePath, Squashed(), seconds)
+            tween.TweenProperty(sprite, _scalePath, Squashed(), seconds)
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
-            tween.TweenProperty(sprite, RotationPath, _restRotation, seconds)
+            tween.TweenProperty(sprite, _rotationPath, _restRotation, seconds)
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
         }
 
@@ -314,7 +315,7 @@ namespace LastBreath.Components
             for (int i = 0; i < StunSwings; i++)
             {
                 float target = i == StunSwings - 1 ? _restRotation : _restRotation + (amplitude * (i % 2 == 0 ? 1f : -1f));
-                tween.Chain().TweenProperty(sprite, RotationPath, target, swing)
+                tween.Chain().TweenProperty(sprite, _rotationPath, target, swing)
                     .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
             }
         }
@@ -325,13 +326,13 @@ namespace LastBreath.Components
             float wind = seconds * StrikeShare;
             float release = seconds - wind;
 
-            tween.TweenProperty(sprite, PositionPath, _restPosition - (direction * RecoilDistance), wind)
+            tween.TweenProperty(sprite, _positionPath, _restPosition - (direction * RecoilDistance), wind)
                 .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
-            tween.TweenProperty(sprite, ScalePath, _restScale * CastPulse, wind)
+            tween.TweenProperty(sprite, _scalePath, _restScale * CastPulse, wind)
                 .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
-            tween.Chain().TweenProperty(sprite, PositionPath, _restPosition, release)
+            tween.Chain().TweenProperty(sprite, _positionPath, _restPosition, release)
                 .SetTrans(Tween.TransitionType.Back).SetEase(Tween.EaseType.Out);
-            tween.TweenProperty(sprite, ScalePath, _restScale, release)
+            tween.TweenProperty(sprite, _scalePath, _restScale, release)
                 .SetTrans(Tween.TransitionType.Back).SetEase(Tween.EaseType.Out);
         }
 
@@ -378,13 +379,13 @@ namespace LastBreath.Components
             // Endless by design, so the binding matters most here: on this node it dies with the
             // animator, on the sprite it would keep squashing a body nobody owns any more.
             var breath = CreateTween().SetLoops().SetParallel();
-            breath.TweenProperty(sprite, ScalePath, new Vector2(_restScale.X, _restScale.Y * (1f - BreathSquash)), BreathSeconds)
+            breath.TweenProperty(sprite, _scalePath, new Vector2(_restScale.X, _restScale.Y * (1f - BreathSquash)), BreathSeconds)
                 .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
-            breath.TweenProperty(sprite, PositionPath, _restPosition - new Vector2(0f, BreathRise), BreathSeconds)
+            breath.TweenProperty(sprite, _positionPath, _restPosition - new Vector2(0f, BreathRise), BreathSeconds)
                 .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
-            breath.Chain().TweenProperty(sprite, ScalePath, _restScale, BreathSeconds)
+            breath.Chain().TweenProperty(sprite, _scalePath, _restScale, BreathSeconds)
                 .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
-            breath.TweenProperty(sprite, PositionPath, _restPosition, BreathSeconds)
+            breath.TweenProperty(sprite, _positionPath, _restPosition, BreathSeconds)
                 .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
             _breath = breath;
         }

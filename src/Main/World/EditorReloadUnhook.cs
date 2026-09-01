@@ -2,8 +2,8 @@ namespace LastBreath.World
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.Loader;
     using System.Threading;
+    using Core;
 
     /// <summary>A signal subscription that must come apart before this assembly's load context unloads.</summary>
     internal interface IReloadUnhookable
@@ -18,6 +18,7 @@ namespace LastBreath.World
     /// itself during that unload — and when the unload fails (godotengine/godot#78513), the recovery pass walks
     /// the list again, printing "nonexistent connection" for the entries the first pass already removed.
     /// Unhooking here, before the engine touches its list, leaves both passes nothing to disconnect.
+    /// The unload moment itself comes from <see cref="AssemblyUnloadCleanup"/>.
     /// </summary>
     /// <remarks>
     /// In a running game the Unloading event never fires; the registry is then just a short list that empties
@@ -53,11 +54,7 @@ namespace LastBreath.World
             if (_armed) return;
 
             _armed = true;
-            // Null names an assembly outside any load context — nothing will ever unload it, no hook needed.
-            if (AssemblyLoadContext.GetLoadContext(typeof(EditorReloadUnhook).Assembly) is { } context)
-            {
-                context.Unloading += _ => UnhookAll();
-            }
+            AssemblyUnloadCleanup.Register(UnhookAll);
         }
 
         private static void UnhookAll()

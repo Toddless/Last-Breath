@@ -5,7 +5,6 @@ namespace Core.Services
     using Ai.World;
     using Ai.World.Recovery;
     using Ai.World.SmartPoints;
-    using Ai.World.Time;
     using Data;
     using Data.GameData;
     using Entity.Components;
@@ -30,6 +29,8 @@ namespace Core.Services
         private static GameServiceProvider? s_instance;
         private readonly ServiceProvider _serviceProvider;
 
+        static GameServiceProvider() => AssemblyUnloadCleanup.Register(DisposeRoot);
+
         private GameServiceProvider(Action<IServiceCollection> configureProject) =>
             _serviceProvider = BuildProvider(configureProject);
 
@@ -50,6 +51,14 @@ namespace Core.Services
         {
             s_instance ??= new GameServiceProvider(configureProject);
             return s_instance;
+        }
+
+        /// <summary>On editor assembly unload: the composition root reaches the whole singleton graph,
+        /// so it is disposed and dropped before the load context goes away.</summary>
+        private static void DisposeRoot()
+        {
+            s_instance?._serviceProvider.Dispose();
+            s_instance = null;
         }
 
         public T GetService<T>()

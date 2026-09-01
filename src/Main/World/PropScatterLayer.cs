@@ -4,7 +4,6 @@ namespace LastBreath.World
     using Core;
     using Core.World.DualGrid;
     using Godot;
-    using Helpers.Extensions;
 
     /// <summary>
     /// Grows sprite props over the cells painted on an invisible world <see cref="TileMapLayer"/> — the same
@@ -243,7 +242,7 @@ namespace LastBreath.World
         }
 
         private Vector2 CellSize() =>
-            _world!.TileSet is TileSet tileSet ? tileSet.TileSize : new Vector2(128f, 128f);
+            _world!.TileSet is { } tileSet ? tileSet.TileSize : new Vector2(128f, 128f);
 
         /// <summary>Shrinks the texture to the configured world height; a prop asset is authored much larger.</summary>
         private float FitScale()

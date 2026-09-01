@@ -4,7 +4,6 @@ namespace LastBreath.World
     using Core;
     using Core.World.DualGrid;
     using Godot;
-    using Helpers.Extensions;
 
     /// <summary>
     /// Paints a display <see cref="TileMapLayer"/> from terrain drawn on an invisible world layer. The display
@@ -113,7 +112,7 @@ namespace LastBreath.World
         /// <summary>Half-cell shift, measured from the world layer so a moved world layer takes the display with it.</summary>
         private void AlignDisplay()
         {
-            if (_display!.TileSet is not TileSet tileSet)
+            if (_display!.TileSet is not { } tileSet)
             {
                 Tracker.TrackError("DualGridTerrainLayer display layer has no TileSet: the half-cell shift cannot be measured", this);
                 return;
