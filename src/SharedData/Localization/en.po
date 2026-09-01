@@ -813,7 +813,7 @@ msgid "Crafting_Resource_Ruby_Gem"
 msgstr "Ruby"
 
 msgid "Crafting_Resource_Diamond_Gem"
-msgstr "Diamong"
+msgstr "Diamond"
 
 msgid "Crafting_Resource_Iron_Ore"
 msgstr "Iron Ore"
