@@ -289,28 +289,45 @@ const ABILITY_MOTIFS: Record<string, string> = {
     "a bleached wolf skull with hollow sockets, thin bone shards rising around it like a gathering pack",
 };
 
-/** Stance motifs: what the stance's fighting style looks like as one object. */
+/**
+ * Stance motifs: what the stance's fighting style looks like as one object. A stance is not an item
+ * in a bag but a state sign in the combat HUD, so the three are separated by gross outline first -
+ * a wide bottom-heavy mass, a round coil, a tall spike - and only then by what they depict.
+ */
 const STANCE_MOTIFS: Record<string, string> = {
   Stance_Dexterity:
-    "a slender dagger crossed by a swift motion streak, a single green venom drop hanging from its point",
+    "a viper wound into one tight coil and reared to strike, its wedge head raised clear above the coil with fangs bared, a single dim green venom drop falling from one fang",
   Stance_Strength:
-    "a heavy two-handed axe head crossed with a dented iron pauldron, both scarred from use",
+    "an empty iron gauntlet clenched into a fist and held knuckles forward, one broad blocky mass at its widest across the scarred knuckle plates, its cuff flaring at the wrist, dim ember-red heat caught deep in the joint seams",
   Stance_Intelligence:
-    "a faceted arcane crystal held inside a metal ring, thin arcs of frost, flame and lightning orbiting it",
+    "a compact cluster of pale ice-blue crystal, one broad central shard flanked by two shorter ones grown from the same base into a single blocky wedge, three small sparks caught deep inside the stone itself - one cold blue, one dim ember, one pale violet - and nothing orbiting it on the outside",
 };
+
+/** What a stance icon has to survive: the combat HUD shows it at button size, so its outline carries it. */
+const STANCE_PRESENTATION_NOTE =
+  "one emblematic object, no figure, and no ring, badge or frame around it: a single compact mass with one bold unbroken outline that still reads at button size, no thin floating slivers and no scattered small parts";
 
 /** Weapon body: what shape the blank weapon has before its name is applied. */
 const WEAPON_TYPE_FORMS: Record<string, string> = {
   Sword: "a straight double-edged sword standing blade-up",
   Axe: "a bearded battle axe, head turned to the side",
-  Dagger: "a short narrow-bladed dagger standing point-up",
+  Dagger:
+    "a short narrow-bladed dagger standing point-up, the grip taking up nearly half of its whole length and the blade the other half, a knife and not a small sword",
   Wand: "a slender carved wand laid upright",
 };
 
+/**
+ * Grip length only. How a grip is dressed belongs to the item's own silhouette: a table that calls
+ * every two-hander cloth-wrapped takes that separator away from the axe whose wrapping identifies it.
+ */
 const HANDEDNESS_FORMS: Record<string, string> = {
-  OneHanded: "one-handed with a short bound grip",
-  TwoHanded: "two-handed with a long cloth-wrapped grip",
+  OneHanded: "one-handed, its grip short and sized for a single hand",
+  TwoHanded: "two-handed, its grip long and sized for both hands",
 };
+
+/** A weapon is an object, not a material: it is shown whole, and nothing holds or carries it. */
+const WEAPON_PRESENTATION_NOTE =
+  "the whole weapon shown end to end and unbroken, nothing cropped away by the frame, no hand, no sheath, no rack and nothing propping it up";
 
 /** Armor and jewellery body: the blank object of the slot. */
 const SLOT_FORMS: Record<string, string> = {
@@ -604,6 +621,20 @@ const UPGRADE_ROLE_FORMS: readonly UpgradeRole[] = [
  * fifteen times over, so their entries belong in this table exactly as the cloths do.
  */
 const SILHOUETTES: Record<string, string> = {
+  // Weapons - separated by the build of the thing itself rather than by how it is laid out: one bit
+  // against two, the beard of the head, the length and dressing of the haft, the pommel. Three axes,
+  // so all three are authored; the sword and dagger pairs each leave their plain member on the body.
+  Weapon_Simple_Axe:
+    "a short single-bit hatchet standing haft-down, its one wedge head straight along the top and hooking into a deep beard underneath, set on a stubby bare wooden haft that ends flat with no pommel",
+  Weapon_Righteous_Wrath:
+    "a great double-bitted axe standing haft-down, two mirrored crescent bits sweeping out either side into one broad symmetrical head, a short spike rising from the crown between them, the long haft ending in a heavy round pommel disc",
+  Weapon_Silent_Fury:
+    "a long-hafted axe standing haft-down, its single bit a narrow deeply sweeping crescent curving down almost to the haft, haft and the back of the head alike bound over in dark rag strips whose loose tails hang free from the butt",
+  Weapon_All_Cutting:
+    "a straight sword standing blade-up whose blade is impossibly long and no wider than a finger, rising needle-straight out of a round flat disc guard with no crossbar arms at all, the long grip below it closed by a wide open ring pommel",
+  Weapon_Bloodthirsty:
+    "a heavy single-edged dagger standing point-up, its blade barely longer than the grip beneath it, its spine straight and thick and its belly swelling toward the point like a cleaver, one hooked quillon curling up from the guard",
+
   // Fabric - eight bolts of one shape. Velvet keeps the group body, so it now reads as its own.
   Crafting_Resource_Coarse_Wool_Fabric:
     "a skein of coarse spun yarn wound into a figure of eight, two loose ends standing out from it",
@@ -982,6 +1013,7 @@ const FAMILIES: readonly FamilySpec[] = [
         lookup(HANDEDNESS_FORMS, entity.facts.handedness as string | undefined),
         motif,
         rarityTreatment(RARITY_TREATMENTS, entity.facts, ctx.issues, entity.id),
+        WEAPON_PRESENTATION_NOTE,
       ]);
     },
   },
@@ -1073,7 +1105,7 @@ const FAMILIES: readonly FamilySpec[] = [
       if (authored === null) {
         ctx.issues.add("warn", entity.id, "no stance motif entry — fell back to the localized description");
       }
-      return joinSubject(name, [motif, "one emblematic object, no figure"]);
+      return joinSubject(name, [motif, STANCE_PRESENTATION_NOTE]);
     },
   },
 ];
