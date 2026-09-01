@@ -331,8 +331,8 @@ const WEAPON_PRESENTATION_NOTE =
 
 /** Armor and jewellery body: the blank object of the slot. */
 const SLOT_FORMS: Record<string, string> = {
-  Body: "a sleeveless chest armor piece shown alone and empty, no wearer, no stand, no pedestal",
-  Helmet: "a helmet shown alone and empty, no wearer, no stand, no pedestal",
+  Body: "a sleeveless chest armor piece",
+  Helmet: "a helmet",
   Gloves: "a pair of gauntlets laid side by side",
   Boots: "a pair of boots standing side by side",
   Cloak: "a hooded cloak hanging in heavy folds",
@@ -340,6 +340,15 @@ const SLOT_FORMS: Record<string, string> = {
   Amulet: "an amulet on a chain, its pendant hanging centred",
   Ring: "a single finger ring standing upright",
 };
+
+/**
+ * Worn gear is drawn empty. Left unsaid, a chest piece grows a torso, a helm grows a head and the
+ * icon becomes a portrait of a wearer instead of the item the bag holds. Named once here rather
+ * than repeated in every slot form and silhouette; a hook, nail or cord the piece hangs by is part
+ * of that piece's own presentation and is not what this forbids.
+ */
+const WORN_GEAR_PRESENTATION_NOTE =
+  "the piece shown empty with nothing worn inside it: no wearer, no figure, no bare skin, no head, limb or body of any kind inside the gear, and no mannequin, bust, stand or pedestal";
 
 /** A name-derived motif and whether it already says everything the base stats would add. */
 interface NameMotif {
@@ -634,6 +643,139 @@ const SILHOUETTES: Record<string, string> = {
     "a straight sword standing blade-up whose blade is impossibly long and no wider than a finger, rising needle-straight out of a round flat disc guard with no crossbar arms at all, the long grip below it closed by a wide open ring pommel",
   Weapon_Bloodthirsty:
     "a heavy single-edged dagger standing point-up, its blade barely longer than the grip beneath it, its spine straight and thick and its belly swelling toward the point like a cleaver, one hooked quillon curling up from the guard",
+
+  // Armor, chest - fifteen pieces on one body, the worst crowding in the game. Separated first by
+  // what KIND of armor the item's own name says it is: plate, lamellar, mail, brigandine, gambeson,
+  // mantle, hide wrap. Presentation - standing, spread open, hung, laid flat - separates further
+  // only where a kind is already taken, so no two of the fifteen cut the same outline.
+  Body_Stoneheart:
+    "a lamellar cuirass of thick rectangular grey stone plates laced in horizontal courses, squared flat across the shoulders and cut level at the hem, standing upright on that hem, its outline a plain blocky rectangle banded across by the rows of slabs",
+  Body_Steel_Bastion:
+    "a full plate cuirass standing square and front-on, broad rounded pauldrons capping both shoulders and a fauld of overlapping lames flaring out below the waist, planted on the flared bottom edge of that fauld",
+  Body_Vital_Core:
+    "a quilted gambeson spread out flat and open, its front lacing undone so that the two padded panels fall away to either side and lie wide apart, vertical quilting channels running down both of them",
+  Body_Hunter_Chestplate:
+    "a moulded one-piece cuirass of dark brown boiled leather, its front smooth and rounded with no plates, scales or panels anywhere on it, a heavy line of stitching running round its whole edge, buckled shut by two short straps at each side and standing upright on its level hem",
+  Body_Hunters_Dream:
+    "a wide flat hide tabard hanging as one straight rectangular panel from two shoulder straps, cut square down both sides with no waist shaping at all, its whole lower edge finished in a long deep fringe strung with bone charms and feather tokens, the hide solid with no gaps or openings cut through it",
+  Body_Feral_Instinct:
+    "an untailored chest wrap of one whole shaggy animal skin bound round and knotted at the front, its ragged edges and dangling paws sticking out on every side so the outline is uneven and hairy",
+  Body_Archmage_Mantle:
+    "a long sleeveless mage's mantle hanging at full length from a narrow shoulder yoke and sweeping out to a wide floor-length hem, split up the middle from hem to waist, its outline a tall clean trapezoid",
+  Body_Mysterious_Bastion:
+    "a mail hauberk of blackened rings laid out flat and squared, its two short sleeves standing straight out to the sides so the whole piece reads as a T, its hem cut level and its neck slit closed by one small clasp",
+  Body_Aegis:
+    "a cuirass built as three tall vertical warding bands, the middle band standing proud over the two flanking it and every band edged by a thin cold line of light, standing upright and symmetrical",
+  Body_Porcupine:
+    "a studded brigandine from which long iron quills stand straight out on every side, the quills longer than the body is thick, so the outline is a bristling spiked star",
+  Body_Carapace:
+    "a beetle-shell cuirass, one seamless domed chitin carapace closed over the chest with a raised ridge running down its spine and segmented abdominal plates flaring below it, its outline a smooth ovoid dome",
+  Body_Strong_Spirit:
+    "a hollow breastplate that has kept the shape of the man it lost, standing upright with nothing at all inside it, pale spirit-light pouring out of every seam and streaming up out of the empty neck opening",
+  Body_Ice_Mage:
+    "a narrow dark corset armoured in frost-rimed ice, broad translucent ice shards growing outward and upward from both shoulders into a high spiked collar while the body below stays slim and unbroken",
+  Body_Disaster_Herald:
+    "a scorched black plate cuirass split from collar to hem by one jagged rent, the two halves buckled apart along the tear and dim ember light showing deep inside the crack",
+  Body_Creators_Vestment:
+    "a threadbare patched vest hanging from a single iron nail by one shoulder alone, all the rest of it sagging limply to the other side, its armhole gaping and its hem torn into an uneven ragged line",
+
+  // Armor, gloves - fourteen pairs on one body. Kind first (plate gauntlet, mail mitten, leather
+  // bracer-glove, half-glove, claw, cloth mitt), then count and pose: a pair or a single one,
+  // standing, laid flat, crossed, hung, clenched, open-palmed.
+  Gloves_Stoneheart:
+    "one heavy stone-plated mitten shown alone, the back of the hand a single solid slab and the fingers one blocky mitten hood, iron straps banding it at the wrist, standing upright on its cuff",
+  Gloves_Steel:
+    "a pair of articulated plate gauntlets standing upright side by side on their cuffs, their fingers built from rows of overlapping lames and their wide bell cuffs flaring out at the wrist",
+  Gloves_Vital_Core:
+    "a pair of padded quilted mittens laid flat side by side and a little apart, each a fingerless rounded mitten with one stubby thumb standing out at its side and their cuffs level along the bottom, clear empty space left between the two so they never join into one shape",
+  Gloves_Hunter:
+    "a pair of leather bracer-gloves standing side by side, each with a tall stiff cuff running most of the way to the elbow and closed by three buckles up its length, so each reads as a narrow upright tower",
+  Gloves_Hunters_Dream:
+    "a pair of fingerless half-gloves cut off square at the knuckles, laid out flat and open side by side, bone charms and feather tokens strung on the lacing cords crossing their backs",
+  Gloves_Feral_Instinct:
+    "one fur-backed gauntlet shown alone, its fingers replaced by four long curved beast claws reaching out well past where the hand ends, the hand raised and half closed as if to rake",
+  Gloves_Archmage:
+    "a pair of long silk mage's gloves draped over a plain wooden rod and hanging down either side of it, so limp that they fall in loose folds, their elbow-length cuffs over the rod and their empty finger tips hanging free below",
+  Gloves_Mysterious_Bastion:
+    "a pair of mail mittens of blackened rings hanging side by side from one leather thong knotted above them, both empty hands dangling straight down like two heavy sacks, the thong a solid cord with no ring or open loop above it",
+  Gloves_Aegis:
+    "one armoured gauntlet shown alone with its fingers clearly drawn and spread open, the back of its hand covered by a small round layered plate no wider than the hand itself and edged by a thin cold line of light, the fingers and thumb reaching well out past that plate",
+  Gloves_Fortune_Smile:
+    "one soft leather glove lying flat on its back and turned sideways so that its fingers point straight across the frame rather than upward, a worn pair of dice and a bent coin sewn over its knuckles",
+  Gloves_Titan_Hand:
+    "one colossal crude gauntlet alone, cut off at the wrist and lying on its back with its huge fingers open and curled up toward the viewer like a rough stone bowl, its plates mismatched and far oversized",
+  Gloves_Crushing_Grip:
+    "one gauntlet alone clenched into a tight fist and turned knuckles-forward at the viewer, its row of heavy spiked knuckle plates facing out like blunt teeth",
+  Gloves_Flawlessness:
+    "one flawless steel gauntlet standing upright alone, drawn from a single unbroken piece of polished metal without a rivet, lame or seam anywhere on it, its four fingers fused into one smooth mitten paddle with no finger separations cut into it at all, plainly hard metal and not a bare hand",
+  Gloves_Creators_Hand:
+    "a pair of crude cloth mitts, each just two patched squares of cloth sewn together round the edge with ragged holes cut through for the fingers, laid flat and slightly overlapping",
+
+  // Armor, boots - twelve pairs on one body. Kind first (sabaton, greave, clog, soft boot, moccasin,
+  // sandal, chausse), then how the pair is put down: standing, on their sides, hung, or split so
+  // that one of the two carries the icon.
+  Boots_Stone_Tread:
+    "a pair of squat stone clogs standing side by side, each carved from one block hollowed out for the foot and strapped down with dark iron bands, flat-soled and with no shaft above the ankle at all",
+  Boots_Steel_Greaves:
+    "a pair of full steel greaves standing upright side by side, each a tall shin cylinder closing below into a pointed sabaton of overlapping lames, with no soft or cloth part anywhere on them",
+  Boots_Vital_Core:
+    "a pair of padded quilted ankle boots lying on their sides one behind the other, their worn soles turned toward the viewer",
+  Boots_Hunter:
+    "a pair of tall soft leather hunting boots standing side by side, their wide tops turned down into a fur-lined cuff that flops outward, laced up the front from toe to cuff",
+  Boots_Hunters_Dream:
+    "a pair of light moccasin shoes hanging in the air side by side, tied together by their own laces in one knot above them, bone charms and feather tokens strung along the hanging cords",
+  Boots_Feral_Instinct:
+    "one heavy fur boot shown alone, four curved beast claws set into its toe and reaching forward past it, its shaft an unshaped shaggy pelt bound down with crossed thongs",
+  Boots_Archmage_Sandals:
+    "a pair of open sandals laid flat side by side, each one a thin sole under a few crossing straps and nothing more, open empty space showing between the straps",
+  Boots_Mysterious_Bastion:
+    "a pair of mail chausses, ring-mail stockings of blackened rings, hanging limp side by side from an iron bar by their open tops so that both feet dangle and point straight down",
+  Boots_Aegis:
+    "one boot shown alone, its shin sheathed in layered curved plates stepped one over the next in concentric bands and each band edged by a thin cold line of light, standing on a broad rounded sabaton",
+  Boots_Talaria:
+    "a pair of light ankle boots with small feathered wings spread wide out from both heels, the outspread wings taking up more of the outline than the boots themselves do",
+  Boots_Rebirth_Tread:
+    "one worn boot standing alone and split open along its cracked seams, green shoots and leaves pushing out through the splits and rising well above the boot's top",
+  Boots_Creators_Trace:
+    "a ruined pair of patched shoes, one standing upright and the other fallen on its side beside it, their uppers a mosaic of mismatched patches and their soles worn through",
+
+  // Armor, helmets - ten on one body. A head piece is its kind and nothing else: great helm,
+  // bascinet, kettle hat, arming cap, coif, mask, skull headdress, circlet.
+  Helmet_Stoneheart:
+    "a great helm hewn from one block of grey stone, a plain squared bucket flat across the top with a single narrow eye slit cut across its face and iron bands strapping it round",
+  Helmet_Steel:
+    "an open-faced steel bascinet with a raised pointed skull, its hinged visor swung fully up and standing above the brow, its cheek plates hanging open at both sides",
+  Helmet_Vital_Core:
+    "a padded arming cap quilted from deep dull red leather panels, soft and shapeless, seen from behind and slightly above so that its face opening is hidden entirely on the far side and the cap reads as one closed padded dome, its chin cords hanging loose below it and no bare background showing anywhere inside or through it",
+  Helmet_Hunter:
+    "a leather kettle hat whose broad flat brim reaches out well past the skull the whole way round like a shallow bell, its low crown sitting in the middle of that brim, the hollow under the brim painted in deep black shadow and never left as bare background",
+  Helmet_Hunters_Dream:
+    "a light leather half-mask covering only the eyes and the bridge of the nose, its side straps hung with feather tokens and small bone charms",
+  Helmet_Feral_Instinct:
+    "a beast-skull headdress, the upper skull of a great animal worn as a helm with its fangs still in the jaw and hanging over the brow, a shaggy fur mantle falling away behind it",
+  Helmet_Archmage_Cap:
+    "a tall soft scholar's cap of dark cloth, its long point folded over and hanging down one side well below the band",
+  Helmet_Mysterious_Bastion:
+    "a mail coif of blackened rings, a hood with a wide mantle draping out over where the shoulders would be and an open face hole gaping in front, hanging as an empty shell",
+  Helmet_Aegis:
+    "a closed round-domed full helm built from concentric layered plates stepped one over the next from crown to gorget, a raised ridge crest over the dome and a thin cold line of light around its narrow face slit",
+  Helmet_Creators_Crown:
+    "a soft patched cloth cap whose band is sewn all round with small mismatched metal scraps standing in for the plates of a crown, one tall crooked wire point rising at the front, the cap closed over the top into a solid dome with no ring, opening or hollow anywhere in it",
+
+  // Armor, cloaks - six on one body. Kind first (half-circle cape, pelt cloak, hooded cloak, open
+  // mantle, wound shroud, cassock); the hem carries the rest.
+  Cloak_Simple:
+    "a short shoulder cape of coarse dark cloth, far wider than it is tall, its hem cut level and square instead of curved, gathered at the throat by one plain wooden toggle on a cord, with no hood and no trim of any kind",
+  Cloak_Direwolf_Hide:
+    "a whole wolf pelt worn as a cloak with the animal's skull still attached as its hood, the skull standing proud at the top with its jaws open and the paws hanging free at both front corners",
+  Cloak_Dark_Priest:
+    "a long hooded mourning cloak closed down its whole front by one tarnished silver clasp so that it hangs as a single narrow column, its deep hood pulled forward into a wide empty cowl",
+  Cloak_Light_Priest:
+    "a broad ceremonial mantle spread wide and open with no hood, held only at the shoulders by a sunburst clasp on a chain strung between them, its hem cut in a shallow scallop",
+  Cloak_Eternal_Life_Shroud:
+    "a burial shroud wound as one long unbroken bandage strip spiralling round on itself in overlapping wraps into a closed cocoon, its loose end trailing away below",
+  Cloak_Creators_Cassock:
+    "a long sleeved cassock robe buttoned from throat to hem down one straight front line, its sleeves hanging at its sides and its skirt torn into an uneven ragged fringe along the bottom",
 
   // Fabric - eight bolts of one shape. Velvet keeps the group body, so it now reads as its own.
   Crafting_Resource_Coarse_Wool_Fabric:
@@ -1039,6 +1181,7 @@ const FAMILIES: readonly FamilySpec[] = [
         motif,
         named?.dropStatAccents === true ? null : baseStatAccents(family, entity.facts, ctx.issues, entity.id),
         rarityTreatment(RARITY_TREATMENTS, entity.facts, ctx.issues, entity.id),
+        WORN_GEAR_PRESENTATION_NOTE,
       ]);
     },
   })),
