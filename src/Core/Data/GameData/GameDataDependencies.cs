@@ -1,6 +1,7 @@
 namespace Core.Data.GameData
 {
     using System;
+    using Ai.World;
     using Ai.World.Time;
     using Battle;
     using Battle.Abilities;
@@ -41,6 +42,9 @@ namespace Core.Data.GameData
             // Shared because game time is: schedules, trader restocks and the save file all read the
             // same clock, and a second reading of the World catalog would be a second "now".
             services.AddGameDataParticipant<IWorldClock, GameWorldClock>();
+            // Shared because the death rules are: the player dies, lies and revives in the world and in
+            // battle alike, and two readings of the Player catalog would be two sets of rules.
+            services.AddGameDataParticipant<IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>();
             return services;
         }
 

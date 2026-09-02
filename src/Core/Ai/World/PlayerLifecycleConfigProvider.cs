@@ -1,10 +1,9 @@
-namespace Battle.Internal.World
+namespace Core.Ai.World
 {
     using System;
     using System.Collections.Generic;
-    using Core.Ai.World;
-    using Core.Data.GameData;
-    using Core.Data.WorldData;
+    using Data.GameData;
+    using Data.WorldData;
     using Newtonsoft.Json;
 
     /// <summary>Consumes the Player catalog; the built-in defaults apply if the JSON is absent.</summary>

@@ -92,7 +92,6 @@ namespace LastBreath.Services
             // World NPC stack: providers, population, skirmishes, spawner — raids sit on top of it.
             services.AddGameDataParticipant<INpcProvider, NpcProvider>();
             services.AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>();
-            services.AddGameDataParticipant<IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>();
             services.AddGameDataParticipant<IPlayerStatsProvider, PlayerStatsProvider>();
             services.AddConditionCatalog();
             services.AddGameDataParticipant<IPassiveTreeProvider, PassiveTreeProvider>();

@@ -10,7 +10,6 @@ namespace Battle.Services
     using Core.Services;
     using Core.Session;
     using Internal.Npc;
-    using Internal.World;
     using Microsoft.Extensions.DependencyInjection;
     using SharedUi;
     using Source;
@@ -39,7 +38,6 @@ namespace Battle.Services
                 .AddSingleton<INpcWorldRegistry, NpcWorldRegistry>()
                 .AddSingleton<INpcSkirmishService, NpcSkirmishService>()
                 .AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>()
-                .AddGameDataParticipant<IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>()
                 .AddGameDataParticipant<IFactionRelationService, FactionRelationService>()
                 .AddGameDataParticipant<IReputationDeedProcessor, ReputationDeedProcessor>()
                 .AddSingleton<ReputationBroadcaster>()
