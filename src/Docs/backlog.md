@@ -1,5 +1,17 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из переноса NpcBuffs и базовых данных способностей в Core (2026-09-02; оба accept)
+
+- (nit, комментарий обещает больше) `src/Core/Data/GameData/GameDataDependencies.cs:37-38` — «…or its corpse is paid out»: LootGeneration каталог бафов не спрашивает; настоящая причина общей регистрации — два тела, спавнящие NPC, живут в разных композициях.
+- (гигиена, предсуществующее) `src/Battle/Internal/Npc/NpcProvider.cs.uid`, `NpcPopulationService.cs.uid` — осиротевшие сайдкары от прежних переездов (классы в Core без сайдкаров); `git rm` отдельной уборкой вместе с `LootGeneration/Services/NpcModifierProvider.cs.uid`.
+- (nit, порядок членов) `src/Core/Battle/Abilities/IAbilityAugmentCatalog.cs:24-32` — свойства `Abilities`/`AbilityIds` объявлены после метода `Find`; поднять под `All`.
+- (nit, док) `AbilityAugmentCatalog.cs:21` — «immutable, nothing here copies them»: `Tags` это `string[]` по ссылке; честнее «handed out as they were parsed».
+- (nit, репорт дубля) `AbilityAugmentCatalog.cs:64` — сообщение называет только файл второго объявления; при разбиении каталога на файлы начнёт врать: `"{kind} '{id}' is declared again in '{file}'; the last declaration wins"`. Тем же махом `TryAdd` вместо `ContainsKey`+индексатор.
+- (nit, имя) `IAbilityAugmentCatalog`/`AbilityAugmentCatalog` теперь отвечают за обе секции файла (abilities + augments); переименование в `IAbilityCatalog` задело бы partial-файлы `AbilityProvider` и два стаба тестов — отдельной задачей.
+- (nit, не запинено) `src/Battle/Source/BattleSystemModuleDependencies.cs:43-45` — единственность инстанции `AbilityProvider` теперь собрана вручную (три регистрации), мутация во вторую инстанцию переживает прогон; один `Assert.AreSame` на `IAbilityProvider` vs `IAugmentLaidEffects` в `AbilityAugmentCatalogTests` закрыл бы.
+- (дубль, предсуществующее) `AugmentFitTests.cs:447` и `AugmentGrantedTagsTests.cs:671` — `AugmentCatalogStub` байт-в-байт в двух файлах; один общий стаб рядом с `AugmentCopies`.
+- (док) CLAUDE.md «Данные»/«Аугменты» не говорит, что базовые записи способностей отдаёт Core-каталог `AbilityAugmentCatalog`, а `AbilityProvider` — больше не участник загрузки; дописать при следующей правке файла (сейчас в незакоммиченных правках владельца).
+
 ## Из переноса парсеров в Core под тулы (2026-09-02; CombatRules — accept with minors, ItemDataProvider шаги 1–2)
 
 - (minor, комментарий лжёт) `src/Battle/Source/BattleSystemModuleDependencies.cs:55-58` — комментарий над `AugmentMinter` ссылается на «those rules … the two are registered together»: регистрация `CombatRulesProvider` уехала в общие участники, антецедента нет; полоса редкости аугмента и раньше жила в `AbilityAugmentData.RarityBand`, не в `CombatRules.json`. Переписать на «minting is a job of this module».
