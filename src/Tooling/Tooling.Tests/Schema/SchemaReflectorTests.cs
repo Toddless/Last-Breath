@@ -1,0 +1,1021 @@
+namespace Tooling.Tests.Schema
+{
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
+    using Newtonsoft.Json.Linq;
+    using Tooling.Schema;
+    using Tooling.Schema.Model;
+    using Tooling.Schema.Reflection;
+
+    /// <summary>
+    /// Reading a DTO into a schema. The DTOs here repeat the shapes the game's catalogs actually take —
+    /// an NPC record with a list of ids and a map of parameters, a loot table whose positions sit two
+    /// arrays down and take two shapes, a record that leads back to itself — because the promise is that
+    /// the tool draws what the game will parse, and the only proof of that is the shapes it parses.
+    /// </summary>
+    [TestClass]
+    public class SchemaReflectorTests
+    {
+        private const string AbilitiesCatalog = "Abilities";
+        private const string EquipItemsCatalog = "EquipItems";
+        private const string ResourcesCatalog = "Resources";
+        private const string NpcBuffsCatalog = "NpcBuffs";
+
+        private const string IdField = "id";
+        private const string KeyField = "key";
+        private const string FractionField = "fraction";
+        private const string AbilitiesField = "abilities";
+        private const string BaseParametersField = "baseParameters";
+        private const string ParametersField = "parameters";
+        private const string AuthoredField = "authored";
+        private const string ConditionsField = "acceptConditions";
+        private const string LevelField = "lvl";
+        private const string AuthoredLevelField = "level";
+        private const string ScalingField = "levelScaling";
+        private const string AggressiveField = "aggressive";
+        private const string VersionField = "version";
+        private const string NpcIdField = "npcId";
+        private const string NoteField = "note";
+        private const string BuffField = "npcBuffId";
+        private const string TitleField = "title";
+        private const string SummaryField = "summary";
+        private const string TiersField = "tiers";
+        private const string ItemsField = "items";
+        private const string PriceField = "price";
+        private const string TierField = "tier";
+        private const string AugmentsField = "augments";
+        private const string ChildrenField = "children";
+        private const string ParentField = "parent";
+        private const string LooseField = "loose";
+        private const string AnythingField = "anything";
+        private const string BrokenField = "broken";
+        private const string WeightsField = "weights";
+        private const string NameField = "name";
+        private const string ScaleField = "scale";
+        private const string ModifiersField = "modifiers";
+        private const string TagsField = "tags";
+        private const string NamesADropField = "namesADrop";
+        private const string FragileField = "fragile";
+        private const string ValueField = "value";
+        private const string RarityField = "rarity";
+        private const string PrimaryField = "primary";
+        private const string FallbackField = "fallback";
+
+        /// <summary>Enough of a note to tell it from the others said about the same field.</summary>
+        private const string SaidComputed = "worked out from other fields";
+        private const string SaidThrew = "threw when it was read";
+        private const string SaidReadThrough = "is read through";
+        private const string SaidMap = "is a map";
+        private const string SaidTwice = "registered twice";
+        private const string SaidNoArguments = "cannot be built without arguments";
+        private const string SaidNotText = "is not text";
+        private const string SaidNotANumber = "is not a number";
+
+        private const string DescriptionSuffix = "_Description";
+
+        private const string NpcsKey = "npcs";
+        private const string GeneralKey = "general";
+        private const string IndividualKey = "individual";
+
+        private const string NpcCatalog = "Npc";
+        private const string LootTablesCatalog = "LootTables";
+
+        private const int MinTier = 0;
+        private const int MaxTier = 3;
+
+        private const int AuthoredLevel = 7;
+        private const float NoScaling = 0f;
+
+        private SchemaReflector _reflector = null!;
+
+        [TestInitialize]
+        public void CreateReflector() => _reflector = new SchemaReflector();
+
+        /// <summary>The order of the fields is the order of a canonical file, so it is the order the type
+        /// declares them in and nothing else.</summary>
+        [TestMethod]
+        public void Fields_StandInTheOrderTheTypeDeclaresThem()
+        {
+            RecordSchema record = _reflector.Record(typeof(NpcDto));
+
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    IdField, NpcIdField, FractionField, AbilitiesField, BaseParametersField, ParametersField,
+                    AuthoredField, ConditionsField, LevelField, ScalingField, AggressiveField, VersionField
+                },
+                Names(record));
+            Assert.AreEqual(nameof(NpcDto), record.TypeName);
+        }
+
+        /// <summary>A member says its json name, or the serializer's naming strategy makes one of the name
+        /// it has. Both are read here the way the game's own serializer reads them.</summary>
+        [TestMethod]
+        public void AJsonName_IsTheOneWrittenDown_OrTheCamelCaseOfTheMembersOwn()
+        {
+            RecordSchema record = _reflector.Record(typeof(NpcDto));
+
+            Assert.AreEqual(FieldKind.Integer, Field(record, LevelField).Kind, "the name written on the member wins");
+            Assert.IsNotNull(Field(record, NpcIdField), "and a run of capitals comes out the way the strategy makes it");
+        }
+
+        [TestMethod]
+        public void AMemberTheSerializerIgnores_IsNotInTheSchema() =>
+            Assert.IsFalse(Names(_reflector.Record(typeof(NpcDto))).Contains(NoteField));
+
+        /// <summary>What a string means is written on it: the catalog its id points into, the enum whose
+        /// members it holds, the localization key it stands for.</summary>
+        [TestMethod]
+        public void WhatAStringHolds_IsReadFromTheMarkupOnIt()
+        {
+            RecordSchema npc = _reflector.Record(typeof(NpcDto));
+            RecordSchema text = _reflector.Record(typeof(TextDto));
+
+            FieldSchema fraction = Field(npc, FractionField);
+            Assert.AreEqual(FieldKind.Enum, fraction.Kind);
+            CollectionAssert.AreEqual(Enum.GetNames<TestFraction>(), fraction.EnumValues.ToArray());
+
+            Assert.AreEqual(FieldKind.LocalizedKey, Field(text, TitleField).Kind);
+            Assert.AreEqual(LocalizedKeyAttribute.NoSuffix, Field(text, TitleField).LocalizationSuffix);
+            Assert.AreEqual(DescriptionSuffix, Field(text, SummaryField).LocalizationSuffix);
+            Assert.AreEqual(FieldKind.String, Field(text, KeyField).Kind, "a refusal is not a reference");
+        }
+
+        /// <summary>A list of ids is a list, and the ids are what point into a catalog: markup that says what
+        /// a value means belongs to the value, however deep it sits.</summary>
+        [TestMethod]
+        public void AListOfIds_CarriesTheCatalogOnItsElements()
+        {
+            FieldSchema abilities = Field(_reflector.Record(typeof(NpcDto)), AbilitiesField);
+
+            Assert.AreEqual(FieldKind.Array, abilities.Kind);
+            Assert.IsNotNull(abilities.Item);
+            Assert.AreEqual(FieldKind.Reference, abilities.Item.Kind);
+            Assert.AreEqual(FieldSchema.Unnamed, abilities.Item.JsonName);
+            CollectionAssert.AreEqual(new[] { AbilitiesCatalog }, abilities.Item.RefCatalogs.ToArray());
+        }
+
+        /// <summary>One field, several catalogs, and an empty value that names nothing on purpose.</summary>
+        [TestMethod]
+        public void AReference_NamesEveryCatalogItMayPointInto_AndWhetherEmptyIsLegal()
+        {
+            RecordSchema record = _reflector.Record(typeof(TextDto));
+            FieldSchema buff = Field(record, BuffField);
+
+            CollectionAssert.AreEquivalent(new[] { EquipItemsCatalog, ResourcesCatalog }, Field(record, IdField).RefCatalogs.ToArray());
+            Assert.IsFalse(Field(record, IdField).AllowEmpty);
+            Assert.IsTrue(buff.AllowEmpty);
+            CollectionAssert.AreEqual(new[] { NpcBuffsCatalog }, buff.RefCatalogs.ToArray());
+        }
+
+        /// <summary>A map the author keys freely says so by having no key schema; one keyed by an enum says
+        /// which members it takes, because an inspector that did not know would accept any word.</summary>
+        [TestMethod]
+        public void AMap_DescribesItsKeysAsWellAsItsValues()
+        {
+            RecordSchema record = _reflector.Record(typeof(NpcDto));
+
+            FieldSchema free = Field(record, BaseParametersField);
+            Assert.AreEqual(FieldKind.Dictionary, free.Kind);
+            Assert.IsNull(free.Key);
+            Assert.AreEqual(FieldKind.Number, free.Item?.Kind);
+
+            FieldSchema keyed = Field(record, ParametersField);
+            Assert.AreEqual(FieldKind.Enum, keyed.Key?.Kind);
+            CollectionAssert.AreEqual(Enum.GetNames<TestParameter>(), keyed.Key!.EnumValues.ToArray());
+            Assert.AreEqual(FieldKind.Integer, keyed.Item?.Kind);
+        }
+
+        /// <summary>Every kind an editor draws differently, read from the type that produces it.</summary>
+        [TestMethod]
+        public void EveryKind_ComesFromTheClrTypeThatHoldsIt()
+        {
+            RecordSchema record = _reflector.Record(typeof(NpcDto));
+
+            Assert.AreEqual(FieldKind.String, Field(record, IdField).Kind);
+            Assert.AreEqual(FieldKind.Integer, Field(record, LevelField).Kind);
+            Assert.AreEqual(FieldKind.Number, Field(record, ScalingField).Kind);
+            Assert.AreEqual(FieldKind.Boolean, Field(record, AggressiveField).Kind);
+            Assert.AreEqual(FieldKind.Object, Field(record, AuthoredField).Kind);
+            Assert.AreEqual(FieldKind.Array, Field(record, AbilitiesField).Kind);
+            Assert.AreEqual(FieldKind.Dictionary, Field(record, BaseParametersField).Kind);
+            Assert.AreEqual(FieldKind.Any, Field(record, ConditionsField).Kind, "a free structure is kept verbatim");
+            Assert.IsNull(Field(record, IdField).Documentation, "xml docs are not in the assembly at runtime");
+        }
+
+        [TestMethod]
+        public void ANestedObject_CarriesTheRecordOfItsOwnType()
+        {
+            RecordSchema authored = Field(_reflector.Record(typeof(NpcDto)), AuthoredField).Record!;
+
+            Assert.AreEqual(nameof(AuthoredDto), authored.TypeName);
+            CollectionAssert.AreEqual(new[] { AuthoredLevelField, NameField }, Names(authored));
+        }
+
+        /// <summary>Required is what the file has to state: neither nullable, nor given a value where it is
+        /// declared, nor optional by any other means.</summary>
+        [TestMethod]
+        public void WhatIsRequired_IsWhatIsNeitherNullableNorGivenAValueOfItsOwn()
+        {
+            RecordSchema record = _reflector.Record(typeof(NpcDto));
+
+            Assert.IsTrue(Field(record, ScalingField).Required, "a number with nothing written for it");
+            Assert.IsFalse(Field(record, IdField).Required, "a string that starts empty");
+            Assert.IsFalse(Field(record, LevelField).Required, "a number that starts at one");
+            Assert.IsFalse(Field(record, AuthoredField).Required, "a section that may be absent");
+            Assert.IsFalse(Field(record, ConditionsField).Required);
+            Assert.IsTrue(Field(_reflector.Record(typeof(StrictDto)), IdField).Required, "and what the type demands");
+        }
+
+        /// <summary>The default is what the game reads when the key is absent, which is the value a fresh
+        /// instance holds. Shapes have none: an absent list is a list the editor builds, not a value.</summary>
+        [TestMethod]
+        public void ADefault_IsWhatAFreshInstanceHolds()
+        {
+            RecordSchema record = _reflector.Record(typeof(NpcDto));
+
+            Assert.AreEqual(1, Field(record, LevelField).Default);
+            Assert.AreEqual(true, Field(record, AggressiveField).Default);
+            Assert.AreEqual(string.Empty, Field(record, IdField).Default);
+            Assert.AreEqual(NoScaling, Field(record, ScalingField).Default);
+            Assert.IsNull(Field(record, AbilitiesField).Default);
+            Assert.IsNull(Field(record, AuthoredField).Default);
+        }
+
+        /// <summary>A name is what the file holds for an enum, so a name is what the default is written as.</summary>
+        [TestMethod]
+        public void ADefaultOfAnEnum_IsTheNameTheFileWrites() =>
+            Assert.AreEqual(nameof(TestParameter.Health), Field(_reflector.Record(typeof(AwkwardDto)), NameField).Default);
+
+        /// <summary>Nothing builds a positional record without arguments, so nothing can say what it starts
+        /// with — and everything it declares has to be written down.</summary>
+        [TestMethod]
+        public void ATypeThatCannotBeBuiltWithoutArguments_StatesNoDefaults()
+        {
+            RecordSchema record = _reflector.Record(typeof(PositionalDto));
+
+            Assert.IsNull(Field(record, IdField).Default);
+            Assert.IsNull(Field(record, PriceField).Default);
+            Assert.IsTrue(Field(record, IdField).Required);
+            Assert.IsFalse(Field(record, AugmentsField).Required, "except what may be absent");
+            Said(nameof(PositionalDto), SaidNoArguments);
+        }
+
+        /// <summary>Machinery stays in the file and out of the inspector; a range narrows the numbers a field
+        /// takes, on the number itself however it is held.</summary>
+        [TestMethod]
+        public void MarkupThatNarrowsAField_IsCarriedOntoIt()
+        {
+            RecordSchema npc = _reflector.Record(typeof(NpcDto));
+            RecordSchema tier = _reflector.Record(typeof(LootTierDto));
+
+            Assert.IsTrue(Field(npc, VersionField).Hidden);
+            Assert.IsFalse(Field(npc, IdField).Hidden);
+            Assert.AreEqual(new NumericRange(MinTier, MaxTier), Field(tier, TierField).Range);
+            Assert.AreEqual(new NumericRange(MinTier, MaxTier), Field(tier, WeightsField).Item?.Range, "a list of numbers is narrowed on its numbers");
+        }
+
+        /// <summary>The polymorphic thing in a loot table is the position, and a position sits two arrays
+        /// below the table. Registered against the type, the shapes have to reach it there.</summary>
+        [TestMethod]
+        public void RegisteredShapes_ReachTheRecordWhereverItSits()
+        {
+            _reflector.Polymorphic(typeof(LootPositionDto), Positions());
+
+            RecordSchema table = _reflector.Record(typeof(LootTableDto));
+            RecordSchema position = Nested(Nested(table, TiersField), ItemsField);
+
+            Assert.IsNotNull(position.Variants);
+            CollectionAssert.AreEqual(
+                new[] { IdField, AugmentsField },
+                position.Variants.Variants.Select(variant => variant.DiscriminatorValue).ToArray());
+            Assert.AreEqual(nameof(LootPositionByIdDto), position.Variants.Variants[0].Record.TypeName);
+            Assert.IsNull(Nested(table, TiersField).Variants, "and only the record they were registered against");
+        }
+
+        [TestMethod]
+        public void RegisteredShapes_HangOnTheRecordAskedForDirectly()
+        {
+            _reflector.Polymorphic(typeof(LootPositionDto), Positions());
+
+            Assert.IsNotNull(_reflector.Record(typeof(LootPositionDto)).Variants);
+        }
+
+        /// <summary>Shapes are put on a record where it is BUILT, and a record is a value nobody keeps a
+        /// list of copies of: registered afterwards, they reach nothing already handed out. The order is
+        /// the descriptor's to get right, and getting it wrong is not something to find out from a file.</summary>
+        [TestMethod]
+        public void ShapesRegisteredAfterTheRecordsWereRead_ReachNothing_AndAreNamed()
+        {
+            CatalogSchemaBuilder early = new();
+            CatalogSchemaBuilder late = new();
+
+            CatalogSchema first = early.Build(new LootTablesDescriptor());
+            CatalogSchema second = late.Build(new LateShapesDescriptor());
+
+            Assert.AreNotEqual(first, second);
+            Assert.IsNotNull(Positions(first).Variants);
+            Assert.IsNull(Positions(second).Variants, "the record was built before the shapes were named");
+            Assert.IsTrue(early.Reflection.IsClean, early.Reflection.ToString());
+            StringAssert.Contains(late.Reflection.ToString(), nameof(LootPositionDto));
+        }
+
+        /// <summary>Shapes are registered against a type by name, and a misspelt name registers shapes
+        /// nothing will ever wear. The schema comes out with one record where the file has several, and
+        /// nothing about it looks wrong.</summary>
+        [TestMethod]
+        public void ShapesRegisteredForATypeTheCatalogNeverHolds_AreSaidOutLoud()
+        {
+            CatalogSchemaBuilder builder = new();
+
+            builder.Build(new StrayShapesDescriptor());
+
+            Assert.IsFalse(builder.Checks.IsClean);
+            StringAssert.Contains(builder.Checks.ToString(), nameof(TreeNodeDto));
+        }
+
+        [TestMethod]
+        public void ShapesRegisteredTwiceForOneType_AreSaidOutLoud()
+        {
+            _reflector.Polymorphic(typeof(LootPositionDto), Positions());
+            _reflector.Polymorphic(typeof(LootPositionDto), Positions());
+
+            Said(nameof(LootPositionDto), SaidTwice);
+        }
+
+        /// <summary>A record holding a record of its own type would be read for as long as the machine
+        /// stands. The field keeps its kind so the editor still knows an object goes there.</summary>
+        [TestMethod]
+        public void ATypeThatLeadsBackToItself_IsReadOnce_AndSaidSo()
+        {
+            RecordSchema record = _reflector.Record(typeof(TreeNodeDto));
+
+            Assert.AreEqual(FieldKind.Object, Field(record, ParentField).Kind);
+            Assert.IsNull(Field(record, ParentField).Record);
+            Assert.AreEqual(FieldKind.Object, Field(record, ChildrenField).Item?.Kind);
+            Assert.IsNull(Field(record, ChildrenField).Item?.Record);
+            Said(nameof(TreeNodeDto), ChildrenField);
+        }
+
+        /// <summary>Base first, then what the derived record adds: the file was written that way and a
+        /// canonical save must not move a line the author did not touch.</summary>
+        [TestMethod]
+        public void WhatARecordInherits_StandsBeforeWhatItAdds() =>
+            CollectionAssert.AreEqual(new[] { IdField, WeightsField, ScaleField }, Names(_reflector.Record(typeof(ScaledDto))));
+
+        /// <summary>An abstract record and an interface describe a shape nothing in the file ever is. Read
+        /// as far as they go, and said out loud, because the shapes were meant to be registered.</summary>
+        [TestMethod]
+        public void ATypeNothingIsEverExactly_IsSaidOutLoud()
+        {
+            _reflector.Record(typeof(ModifierBase));
+
+            Said(nameof(ModifierBase));
+        }
+
+        [TestMethod]
+        public void ATypeWhoseShapesAreRegistered_IsNotComplainedAbout()
+        {
+            _reflector.Polymorphic(typeof(ModifierBase), new VariantSet([Variant(ScaleField, _reflector.Record(typeof(ScaledDto)))], IdField));
+            _reflector.Record(typeof(ModifierBase));
+
+            Assert.IsTrue(_reflector.Report.IsClean, _reflector.Report.ToString());
+        }
+
+        /// <summary>Everything the walk could not read is named. A field quietly dropped looks exactly like
+        /// a field the game never had.</summary>
+        [TestMethod]
+        public void WhatCannotBeRead_IsLeftOutAndNamed()
+        {
+            RecordSchema record = _reflector.Record(typeof(AwkwardDto));
+
+            CollectionAssert.DoesNotContain(Names(record), SummaryField);
+            Said(nameof(AwkwardDto), nameof(AwkwardDto.Summary));
+            Said(nameof(AwkwardDto), nameof(AwkwardDto.Fragile), SaidThrew);
+            Assert.IsNull(Field(record, FragileField).Default, "a value that cannot be read has no default");
+        }
+
+        /// <summary>A property nothing can be written to is worked out from the others and stands in no
+        /// file: required, it would demand a key no author can write. A get-only LIST is another matter —
+        /// the deserializer fills it where it stands, so the file does write it.</summary>
+        [TestMethod]
+        public void AValueWorkedOutFromTheOthers_IsNotInTheSchema()
+        {
+            RecordSchema record = _reflector.Record(typeof(AwkwardDto));
+
+            CollectionAssert.DoesNotContain(Names(record), NamesADropField);
+            CollectionAssert.DoesNotContain(Names(record), BrokenField);
+            CollectionAssert.Contains(Names(record), TagsField);
+            Assert.AreEqual(FieldKind.Array, Field(record, TagsField).Kind);
+            Said(nameof(AwkwardDto), nameof(AwkwardDto.NamesADrop), SaidComputed);
+        }
+
+        /// <summary>The metadata puts every field of a type before every property of it, so a schema holding
+        /// both would state an order no file was ever written in.</summary>
+        [TestMethod]
+        public void APublicField_IsNotInTheSchema_AndIsNamed()
+        {
+            RecordSchema record = _reflector.Record(typeof(FieldedDto));
+
+            CollectionAssert.AreEqual(new[] { IdField }, Names(record));
+            Said(nameof(FieldedDto), nameof(FieldedDto.Count));
+        }
+
+        /// <summary>A converter writes whatever it likes: the game reads a loot position as "an id OR a
+        /// group" and a range as "a number OR a pair", neither of which is the shape of the type. The
+        /// reflector cannot know what it writes, and a shape stated with confidence it does not have is
+        /// worse than one the report has flagged.</summary>
+        [TestMethod]
+        public void AFieldReadThroughAConverter_IsFlagged()
+        {
+            _reflector.Record(typeof(ConvertedDto));
+
+            Said(nameof(ConvertedDto), ItemsField, nameof(RangeConverter));
+            Said(nameof(ConvertedDto), ValueField, nameof(RangeConverter), SaidReadThrough);
+        }
+
+        /// <summary>An enum written as its name is the one converter that changes nothing: a name is what
+        /// the schema says the file holds already.</summary>
+        [TestMethod]
+        public void AnEnumWrittenAsItsName_IsNotFlagged()
+        {
+            _reflector.Record(typeof(ConvertedDto));
+
+            NothingSaid(RarityField);
+        }
+
+        /// <summary>Two properties of one type are two readings of it. A schema that handed the second one
+        /// nothing — a cache keyed by type, a walk that remembers too much — would lose half a file.</summary>
+        [TestMethod]
+        public void OneTypeStandingInTwoPlaces_IsReadForBothOfThem()
+        {
+            RecordSchema record = _reflector.Record(typeof(PairDto));
+
+            Assert.IsNotNull(Field(record, PrimaryField).Record);
+            Assert.IsNotNull(Field(record, FallbackField).Record);
+            Assert.AreEqual(nameof(AuthoredDto), Field(record, FallbackField).Record!.TypeName);
+            Assert.IsTrue(_reflector.Report.IsClean, _reflector.Report.ToString());
+        }
+
+        /// <summary>Markup on a map describes what the map HOLDS. An author who wrote it meaning the keys
+        /// gets a word about it, instead of a complaint that the numbers in it are not text.</summary>
+        [TestMethod]
+        public void MarkupOnAMap_IsReadAsDescribingItsValues()
+        {
+            FieldSchema map = Field(_reflector.Record(typeof(MappedDto)), BaseParametersField);
+
+            Assert.IsNull(map.Key);
+            Said(nameof(MappedDto), BaseParametersField, SaidMap);
+        }
+
+        [TestMethod]
+        public void ASequenceThatDoesNotSayWhatItHolds_IsKeptVerbatim()
+        {
+            RecordSchema record = _reflector.Record(typeof(AwkwardDto));
+
+            Assert.AreEqual(FieldKind.Any, Field(record, LooseField).Kind);
+            Assert.AreEqual(FieldKind.Any, Field(record, AnythingField).Kind);
+            Said(nameof(AwkwardDto), LooseField);
+        }
+
+        /// <summary>Json keys by words. A map keyed by anything else is left free rather than described as
+        /// something the file cannot hold.</summary>
+        [TestMethod]
+        public void AMapKeyedByWhatJsonCannotWrite_IsLeftFree_AndNamed()
+        {
+            FieldSchema map = Field(_reflector.Record(typeof(AwkwardDto)), WeightsField);
+
+            Assert.AreEqual(FieldKind.Dictionary, map.Kind);
+            Assert.IsNull(map.Key);
+            Said(nameof(AwkwardDto), WeightsField);
+        }
+
+        /// <summary>Markup on a value that cannot use it does nothing, and a field that is marked and reads
+        /// as unmarked is the one thing the markup exists to prevent.</summary>
+        [TestMethod]
+        public void MarkupAValueCannotUse_IsSaidOutLoud()
+        {
+            RecordSchema record = _reflector.Record(typeof(AwkwardDto));
+
+            Assert.AreEqual(FieldKind.Integer, Field(record, PriceField).Kind);
+            Assert.AreEqual(0, Field(record, PriceField).RefCatalogs.Count);
+            Assert.IsNull(Field(record, IdField).Range);
+            Said(nameof(AwkwardDto), PriceField, SaidNotText);
+            Said(nameof(AwkwardDto), IdField, SaidNotANumber);
+        }
+
+        /// <summary>A field marked a reference and marked not one at once: the refusal is taken, because a
+        /// validator told to check ids it should not would report every value in the file as broken.</summary>
+        [TestMethod]
+        public void AFieldRefusedAndNamedAtOnce_KeepsTheRefusal()
+        {
+            FieldSchema field = Field(_reflector.Record(typeof(AwkwardDto)), KeyField);
+
+            Assert.AreEqual(FieldKind.String, field.Kind);
+            Assert.AreEqual(0, field.RefCatalogs.Count);
+            Said(nameof(AwkwardDto), KeyField);
+        }
+
+        [TestMethod]
+        public void TwoMembersUnderOneJsonName_LeaveOneFieldAndOneWord()
+        {
+            RecordSchema record = _reflector.Record(typeof(TwiceNamedDto));
+
+            Assert.AreEqual(1, record.Fields.Count);
+            Said(nameof(TwiceNamedDto), KeyField);
+        }
+
+        /// <summary>A field naming what tells the shapes apart, and shapes told apart by something else, is
+        /// two decisions about one file. Only one of them can be the one the editor draws.</summary>
+        [TestMethod]
+        public void AFieldNamingAnotherDiscriminatorThanTheShapesUse_IsSaidOutLoud()
+        {
+            _reflector.Polymorphic(typeof(ModifierBase), new VariantSet([Variant(ScaleField, _reflector.Record(typeof(ScaledDto)))], IdField));
+            _reflector.Record(typeof(SectionDto));
+
+            Said(nameof(SectionDto), ModifiersField, KeyField);
+        }
+
+        /// <summary>A type with nothing filled in has no fields to read, and a schema of a record that says
+        /// nothing is worse than a word about it.</summary>
+        [TestMethod]
+        public void AnOpenGenericType_IsReadAsNothing_AndNamed()
+        {
+            RecordSchema record = _reflector.Record(typeof(HolderDto<>));
+
+            Assert.AreEqual(0, record.Fields.Count);
+            Said(nameof(HolderDto<object>));
+        }
+
+        [TestMethod]
+        public void ATypeThatThrowsWhenBuilt_LosesItsDefaultsAndNothingElse()
+        {
+            RecordSchema record = _reflector.Record(typeof(ThrowingDto));
+
+            Assert.AreEqual(1, record.Fields.Count);
+            Assert.IsNull(Field(record, IdField).Default);
+            Said(nameof(ThrowingDto));
+        }
+
+        [TestMethod]
+        public void APlainRecord_LeavesNothingToSay()
+        {
+            _reflector.Record(typeof(NpcDto));
+
+            Assert.IsTrue(_reflector.Report.IsClean, _reflector.Report.ToString());
+        }
+
+        [TestMethod]
+        public void TheReflector_RefusesNothingWhereSomethingIsRequired()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => _reflector.Record(null!));
+            Assert.ThrowsException<ArgumentNullException>(() => _reflector.Polymorphic(null!, Positions()));
+            Assert.ThrowsException<ArgumentNullException>(() => _reflector.Polymorphic(typeof(LootPositionDto), null!));
+        }
+
+        /// <summary>The builder hands back what the descriptor said, and says what the descriptor and the
+        /// types it named do not agree about.</summary>
+        [TestMethod]
+        public void ADescribedCatalog_IsBuiltAsItWasDescribed()
+        {
+            CatalogSchemaBuilder builder = new();
+
+            CatalogSchema schema = builder.Build(new LootTablesDescriptor());
+
+            Assert.AreEqual(RootShape.SectionsOfArrays, schema.Shape);
+            Assert.AreEqual(KeyField, schema.Sections[0].Record.IdField);
+            Assert.IsTrue(builder.Checks.IsClean, builder.Checks.ToString());
+            Assert.IsTrue(builder.Reflection.IsClean, builder.Reflection.ToString());
+        }
+
+        /// <summary>A record whose id is written under a key it does not have leaves the tool with no way to
+        /// name a record, and the model cannot see it: the id is named by the descriptor, the fields by the
+        /// type.</summary>
+        [TestMethod]
+        public void AnIdWrittenUnderAKeyTheRecordDoesNotHave_IsSaidOutLoud()
+        {
+            CatalogSchemaBuilder builder = new();
+
+            builder.Build(new MisnamedDescriptor());
+
+            Assert.IsFalse(builder.Checks.IsClean);
+            StringAssert.Contains(builder.Checks.ToString(), NameField);
+        }
+
+        /// <summary>Nine files, one per slot — and a slot no record writes leaves every record with no file
+        /// to go to.</summary>
+        [TestMethod]
+        public void ACatalogSplitByAFieldNoRecordWrites_IsSaidOutLoud()
+        {
+            CatalogSchemaBuilder builder = new();
+
+            builder.Build(new SplitDescriptor());
+
+            Assert.IsFalse(builder.Checks.IsClean);
+            StringAssert.Contains(builder.Checks.ToString(), ScaleField);
+        }
+
+        [TestMethod]
+        public void TheBuilder_RefusesNothingWhereSomethingIsRequired()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => new CatalogSchemaBuilder().Build(null!));
+            Assert.ThrowsException<ArgumentNullException>(() => new CatalogSchemaBuilder(null!));
+        }
+
+        internal static VariantSchema Variant(string value, RecordSchema record) =>
+            new() { DiscriminatorValue = value, Record = record };
+
+        internal static SectionSchema Section(string key, RecordSchema record) => new() { Key = key, Record = record };
+
+        internal static FieldSchema Field(RecordSchema record, string jsonName) =>
+            record.Fields.FirstOrDefault(field => field.JsonName == jsonName)
+            ?? throw new AssertFailedException($"{record.TypeName} has no field '{jsonName}'.");
+
+        internal static RecordSchema Nested(RecordSchema record, string jsonName) =>
+            Field(record, jsonName).Item?.Record
+            ?? throw new AssertFailedException($"{record.TypeName}.{jsonName} holds no records.");
+
+        private static string[] Names(RecordSchema record) => [.. record.Fields.Select(field => field.JsonName)];
+
+        private VariantSet Positions() => new(
+        [
+            Variant(IdField, _reflector.Record(typeof(LootPositionByIdDto))),
+            Variant(AugmentsField, _reflector.Record(typeof(LootPositionByAugmentsDto)))
+        ]);
+
+        /// <summary>The position record of a built loot catalog, two arrays below its first section.</summary>
+        private static RecordSchema Positions(CatalogSchema schema) =>
+            Nested(Nested(schema.Sections[0].Record, TiersField), ItemsField);
+
+        /// <summary>One note naming all of these, in whatever words it uses.</summary>
+        private void Said(params string[] parts)
+        {
+            Assert.IsTrue(Told(parts), $"nothing was said about {string.Join(", ", parts)}: {_reflector.Report}");
+        }
+
+        /// <summary>No note about it at all — which is the whole of what a rule that lets something through
+        /// can be checked by.</summary>
+        private void NothingSaid(params string[] parts)
+        {
+            Assert.IsFalse(Told(parts), $"something was said about {string.Join(", ", parts)}: {_reflector.Report}");
+        }
+
+        private bool Told(string[] parts) =>
+            _reflector.Report.Notes.Any(note => parts.All(part => note.Contains(part, StringComparison.Ordinal)));
+
+        internal enum TestFraction
+        {
+            Human,
+            Undead,
+            Animal
+        }
+
+        internal enum TestParameter
+        {
+            Health,
+            Damage
+        }
+
+        internal enum TestRarity
+        {
+            Legendary,
+            Common
+        }
+
+        internal sealed record NpcDto
+        {
+            public string Id { get; init; } = string.Empty;
+
+            public string NPCId { get; init; } = string.Empty;
+
+            [EnumOf(typeof(TestFraction))] public string Fraction { get; init; } = string.Empty;
+
+            [CatalogRef(AbilitiesCatalog)] public List<string> Abilities { get; init; } = [];
+
+            public Dictionary<string, float> BaseParameters { get; init; } = [];
+
+            public Dictionary<TestParameter, int> Parameters { get; init; } = [];
+
+            public AuthoredDto? Authored { get; init; }
+
+            public JToken? AcceptConditions { get; init; }
+
+            [JsonProperty(LevelField)] public int LevelMin { get; init; } = 1;
+
+            public float LevelScaling { get; init; }
+
+            public bool Aggressive { get; init; } = true;
+
+            [Hidden] public int Version { get; init; }
+
+            [JsonIgnore] public string Note { get; init; } = string.Empty;
+        }
+
+        internal sealed record AuthoredDto
+        {
+            public int? Level { get; init; } = AuthoredLevel;
+
+            public string? Name { get; init; }
+        }
+
+        internal sealed record TextDto
+        {
+            [CatalogRef(EquipItemsCatalog)]
+            [CatalogRef(ResourcesCatalog)]
+            public string Id { get; init; } = string.Empty;
+
+            [CatalogRef(NpcBuffsCatalog, AllowEmpty = true)] public string NpcBuffId { get; init; } = string.Empty;
+
+            [NotARef] public string Key { get; init; } = string.Empty;
+
+            [LocalizedKey] public string Title { get; init; } = string.Empty;
+
+            [LocalizedKey(DescriptionSuffix)] public string Summary { get; init; } = string.Empty;
+        }
+
+        internal sealed record StrictDto
+        {
+            public required string Id { get; init; }
+        }
+
+        internal sealed record LootTableDto
+        {
+            [NotARef] public string Key { get; init; } = string.Empty;
+
+            public List<LootTierDto> Tiers { get; init; } = [];
+        }
+
+        internal sealed record LootTierDto
+        {
+            [Range(MinTier, MaxTier)] public int Tier { get; init; }
+
+            [Range(MinTier, MaxTier)] public List<int> Weights { get; init; } = [];
+
+            public List<LootPositionDto> Items { get; init; } = [];
+        }
+
+        internal sealed record LootPositionDto
+        {
+            public float Price { get; init; }
+        }
+
+        internal sealed record LootPositionByIdDto
+        {
+            [CatalogRef(EquipItemsCatalog)] public string Id { get; init; } = string.Empty;
+
+            public float Price { get; init; }
+        }
+
+        internal sealed record LootPositionByAugmentsDto
+        {
+            public AugmentGroupDto? Augments { get; init; }
+
+            public float Price { get; init; }
+        }
+
+        internal sealed record AugmentGroupDto
+        {
+            [Range(MinTier, MaxTier)] public int Tier { get; init; }
+
+            [EnumOf(typeof(TestRarity))] public string Rarity { get; init; } = string.Empty;
+        }
+
+        /// <summary>A position named by a constructor: nothing builds it without arguments.</summary>
+        internal sealed record PositionalDto(string Id, float Price, AugmentGroupDto? Augments = null);
+
+        internal abstract record ModifierBase
+        {
+            public string Id { get; init; } = string.Empty;
+
+            public List<float> Weights { get; init; } = [];
+        }
+
+        internal sealed record ScaledDto : ModifierBase
+        {
+            public float Scale { get; init; }
+        }
+
+        internal sealed record SectionDto
+        {
+            [NotARef] public string Key { get; init; } = string.Empty;
+
+            [Discriminator(KeyField)] public List<ModifierBase> Modifiers { get; init; } = [];
+        }
+
+        internal sealed record TreeNodeDto
+        {
+            public string Id { get; init; } = string.Empty;
+
+            public TreeNodeDto? Parent { get; init; }
+
+            public List<TreeNodeDto> Children { get; init; } = [];
+        }
+
+        internal sealed record TwiceNamedDto
+        {
+            public string Key { get; init; } = string.Empty;
+
+            [JsonProperty(KeyField)] public string Other { get; init; } = string.Empty;
+        }
+
+        internal sealed record HolderDto<T>
+        {
+            public T? Held { get; init; }
+        }
+
+        internal sealed record ThrowingDto
+        {
+            public ThrowingDto() => throw new InvalidOperationException(nameof(ThrowingDto));
+
+            public string Id { get; init; } = string.Empty;
+        }
+
+        /// <summary>Every shape the walk cannot take at face value, in one record.</summary>
+        internal sealed record AwkwardDto
+        {
+            /// <summary>A list nothing can be assigned to is still filled where it stands, so the file does
+            /// write it — the one get-only shape that belongs in a schema.</summary>
+            public List<string> Tags { get; } = [];
+
+            /// <summary>Worked out from the fields around it, the way a loot position answers whether it
+            /// names a drop. Nothing in the file corresponds to it.</summary>
+            public bool NamesADrop => Tags.Count > 0;
+
+            public string Broken => throw new InvalidOperationException(nameof(Broken));
+
+            /// <summary>Written to, so it belongs in the schema; unreadable, so it has no default.</summary>
+            public string Fragile
+            {
+                get => throw new InvalidOperationException(nameof(Fragile));
+                init => _ = value;
+            }
+
+            [Range(MinTier, MaxTier)] public string Id { get; init; } = string.Empty;
+
+            [CatalogRef(EquipItemsCatalog)]
+            [NotARef]
+            public string Key { get; init; } = string.Empty;
+
+            [CatalogRef(EquipItemsCatalog)] public int Price { get; init; }
+
+            public TestParameter Name { get; init; } = TestParameter.Health;
+
+            public Dictionary<int, float> Weights { get; init; } = [];
+
+            public ArrayList Loose { get; init; } = [];
+
+            public object? Anything { get; init; }
+
+            public string this[int index] => string.Empty;
+
+            public string Summary
+            {
+                init => _ = value;
+            }
+        }
+
+        /// <summary>Two properties of one type, side by side: the walk reads the type twice and neither
+        /// reading is the other's leftovers.</summary>
+        internal sealed record PairDto
+        {
+            public AuthoredDto? Primary { get; init; }
+
+            public AuthoredDto? Fallback { get; init; }
+        }
+
+        internal sealed record FieldedDto
+        {
+            public string Id { get; init; } = string.Empty;
+
+            public int Count = 1;
+        }
+
+        /// <summary>What the game reads through converters: a list whose entries take a shape of their own,
+        /// an enum written as its name, and a type that is a number in the file as often as a pair.</summary>
+        internal sealed record ConvertedDto
+        {
+            [JsonConverter(typeof(RangeConverter))] public List<LootPositionDto> Items { get; init; } = [];
+
+            [JsonConverter(typeof(StringEnumConverter))] public TestRarity Rarity { get; init; }
+
+            public RangeDto Value { get; init; } = new();
+        }
+
+        [JsonConverter(typeof(RangeConverter))]
+        internal sealed record RangeDto
+        {
+            public float Min { get; init; }
+
+            public float Max { get; init; }
+        }
+
+        internal sealed record MappedDto
+        {
+            [EnumOf(typeof(TestParameter))] public Dictionary<string, float> BaseParameters { get; init; } = [];
+        }
+
+        /// <summary>Stands for the converters the game reads its ranges and its loot positions through. What
+        /// it does is nobody's business here — only that it is written down.</summary>
+        private sealed class RangeConverter : JsonConverter
+        {
+            public override bool CanConvert(Type objectType) => true;
+
+            public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) => null;
+
+            public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+            {
+            }
+        }
+
+        private sealed class LootTablesDescriptor : ICatalogDescriptor
+        {
+            public string Catalog => LootTablesCatalog;
+
+            public CatalogSchema Describe(ISchemaBuilder builder)
+            {
+                builder.Polymorphic(typeof(LootPositionDto), new VariantSet(
+                [
+                    Variant(IdField, builder.Record(typeof(LootPositionByIdDto))),
+                    Variant(AugmentsField, builder.Record(typeof(LootPositionByAugmentsDto)))
+                ]));
+
+                RecordSchema table = builder.Record(typeof(LootTableDto)) with { IdField = KeyField };
+
+                return new CatalogSchema(
+                    RootShape.SectionsOfArrays,
+                    [Section(GeneralKey, table), Section(IndividualKey, table)],
+                    [],
+                    new SingleFilePlacement { FileName = LootTablesCatalog });
+            }
+        }
+
+        /// <summary>The same catalog written the wrong way round: the table is read before the shapes of its
+        /// positions are named.</summary>
+        private sealed class LateShapesDescriptor : ICatalogDescriptor
+        {
+            public string Catalog => LootTablesCatalog;
+
+            public CatalogSchema Describe(ISchemaBuilder builder)
+            {
+                RecordSchema table = builder.Record(typeof(LootTableDto)) with { IdField = KeyField };
+
+                builder.Polymorphic(typeof(LootPositionDto), new VariantSet(
+                [
+                    Variant(IdField, builder.Record(typeof(LootPositionByIdDto))),
+                    Variant(AugmentsField, builder.Record(typeof(LootPositionByAugmentsDto)))
+                ]));
+
+                return new CatalogSchema(
+                    RootShape.SectionsOfArrays,
+                    [Section(GeneralKey, table), Section(IndividualKey, table)],
+                    [],
+                    new SingleFilePlacement { FileName = LootTablesCatalog });
+            }
+        }
+
+        /// <summary>Shapes named for a type this catalog holds nothing of — a name misspelt in a typeof.</summary>
+        private sealed class StrayShapesDescriptor : ICatalogDescriptor
+        {
+            public string Catalog => NpcCatalog;
+
+            public CatalogSchema Describe(ISchemaBuilder builder)
+            {
+                builder.Polymorphic(
+                    typeof(TreeNodeDto),
+                    new VariantSet([Variant(AuthoredLevelField, builder.Record(typeof(AuthoredDto)))]));
+
+                return new CatalogSchema(
+                    RootShape.ArrayUnderKey,
+                    [Section(NpcsKey, builder.Record(typeof(NpcDto)))],
+                    [],
+                    new FreeFilePlacement());
+            }
+        }
+
+        private sealed class MisnamedDescriptor : ICatalogDescriptor
+        {
+            public string Catalog => NpcCatalog;
+
+            public CatalogSchema Describe(ISchemaBuilder builder) => new(
+                RootShape.ArrayUnderKey,
+                [Section(NpcsKey, builder.Record(typeof(NpcDto)) with { IdField = NameField })],
+                [],
+                new FreeFilePlacement());
+        }
+
+        private sealed class SplitDescriptor : ICatalogDescriptor
+        {
+            public string Catalog => EquipItemsCatalog;
+
+            public CatalogSchema Describe(ISchemaBuilder builder) => new(
+                RootShape.ArrayUnderKey,
+                [Section(ItemsField, builder.Record(typeof(NpcDto)))],
+                [],
+                new FieldFilePlacement { FieldName = ScaleField });
+        }
+    }
+}
