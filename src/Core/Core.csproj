@@ -22,6 +22,9 @@
     <PackageReference Update="GodotSharpEditor" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Tooling\Tooling.Schema\Tooling.Schema.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="Modifiers\Conditions\" />
   </ItemGroup>
 </Project>

@@ -1,7 +1,10 @@
 namespace Core.Data.NpcData
 {
     using System.Collections.Generic;
+    using Ai;
+    using GameData;
     using Newtonsoft.Json;
+    using Tooling.Schema;
 
     /// <summary>
     /// One behavior archetype from NpcBehavior.json (aggressive/defensive/mixed, keyed to a stance).
@@ -23,9 +26,9 @@ namespace Core.Data.NpcData
 
     public record NpcAbilityBehaviorData
     {
-        [JsonProperty("id")] public string Id { get; init; } = string.Empty;
+        [JsonProperty("id")][CatalogRef(DataCatalog.Abilities)] public string Id { get; init; } = string.Empty;
         [JsonProperty("weight")] public float Weight { get; init; } = 1f;
-        [JsonProperty("role")] public string Role { get; init; } = string.Empty;
+        [JsonProperty("role")][EnumOf(typeof(AbilityRole))] public string Role { get; init; } = string.Empty;
     }
 
     public record NpcBehaviorsData

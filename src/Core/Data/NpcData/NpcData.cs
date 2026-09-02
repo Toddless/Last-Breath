@@ -1,7 +1,12 @@
 namespace Core.Data.NpcData
 {
     using System.Collections.Generic;
+    using Ai;
+    using Ai.World;
+    using Enums;
+    using GameData;
     using Newtonsoft.Json;
+    using Tooling.Schema;
 
     /// <summary>
     /// One NPC definition from Npc.json. Enums travel as names (fraction, entityType, stances)
@@ -11,12 +16,12 @@ namespace Core.Data.NpcData
     public record NpcData
     {
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
-        [JsonProperty("fraction")] public string Fraction { get; init; } = string.Empty;
-        [JsonProperty("entityType")] public string EntityType { get; init; } = string.Empty;
-        [JsonProperty("aiIntellect")] public string AiIntellect { get; init; } = string.Empty;
+        [JsonProperty("fraction")][EnumOf(typeof(Fractions))] public string Fraction { get; init; } = string.Empty;
+        [JsonProperty("entityType")][EnumOf(typeof(EntityType))] public string EntityType { get; init; } = string.Empty;
+        [JsonProperty("aiIntellect")][EnumOf(typeof(AiIntellect))] public string AiIntellect { get; init; } = string.Empty;
 
         /// <summary>Stances this NPC may roll at spawn; the behavior archetype follows the stance.</summary>
-        [JsonProperty("stances")] public List<string> Stances { get; init; } = [];
+        [JsonProperty("stances")][EnumOf(typeof(Stance))] public List<string> Stances { get; init; } = [];
 
         [JsonProperty("levelMin")] public int LevelMin { get; init; } = 1;
 
@@ -35,10 +40,10 @@ namespace Core.Data.NpcData
         [JsonProperty("abilityCount")] public int? AbilityCount { get; init; }
 
         /// <summary>Fixed rarity name (bosses/uniques). Empty = rolled by weight at spawn.</summary>
-        [JsonProperty("rarity")] public string? Rarity { get; init; }
+        [JsonProperty("rarity")][EnumOf(typeof(Rarity))] public string? Rarity { get; init; }
 
         /// <summary>Authored ability list (bosses). Non-empty = exactly these instead of the archetype roll.</summary>
-        [JsonProperty("abilities")] public List<string> Abilities { get; init; } = [];
+        [JsonProperty("abilities")][CatalogRef(DataCatalog.Abilities)] public List<string> Abilities { get; init; } = [];
 
         /// <summary>Per-NPC override of the archetype's flee threshold; 0 = never flees (bosses).</summary>
         [JsonProperty("fleeHealthThreshold")] public float? FleeHealthThreshold { get; init; }
@@ -89,7 +94,7 @@ namespace Core.Data.NpcData
         /// <summary>Fixed stance name; absent = rolled from "stances". A typo is refused, never defaulted.
         /// Named, it ignores "stances" ENTIRELY — the list is not a whitelist — so an authored record is
         /// expected to leave "stances" empty.</summary>
-        [JsonProperty("stance")] public string? Stance { get; init; }
+        [JsonProperty("stance")][EnumOf(typeof(Stance))] public string? Stance { get; init; }
 
         /// <summary>Fixed level; absent = rolled between "levelMin" and the "levelMax"/EntityType cap.
         /// Named, neither "levelMin" nor "levelMax" takes part in building the definition.</summary>
@@ -97,7 +102,7 @@ namespace Core.Data.NpcData
 
         /// <summary>Fixed rarity name; absent = the top-level "rarity" field, then the weighted roll.
         /// Present, it wins over "rarity": one authored block must read as the whole truth about the npc.</summary>
-        [JsonProperty("rarity")] public string? Rarity { get; init; }
+        [JsonProperty("rarity")][EnumOf(typeof(Rarity))] public string? Rarity { get; init; }
 
         /// <summary>How many npc modifiers the spawn picks; absent = the type × rarity formula of
         /// <see cref="NpcTypeDefaults.ModifierCount"/>, named = that formula replaced whole. Nullable
@@ -111,7 +116,7 @@ namespace Core.Data.NpcData
     /// (same property names the item-grant channel feeds to the skill factory).</summary>
     public record NpcPassiveData
     {
-        [JsonProperty("id")] public string Id { get; init; } = string.Empty;
+        [JsonProperty("id")][CatalogRef(DataCatalog.PassiveSkills)] public string Id { get; init; } = string.Empty;
         [JsonProperty("properties")] public Dictionary<string, float> Properties { get; init; } = [];
     }
 
@@ -129,7 +134,7 @@ namespace Core.Data.NpcData
         /// <summary>Cycle name (<see cref="NpcLifecycleKind"/>). Absent = <see cref="NpcLifecycleKind.Undead"/>,
         /// so every record authored before the villager cycle existed keeps its old fate; a typo is
         /// refused, never silently defaulted.</summary>
-        [JsonProperty("kind")] public string? Kind { get; init; }
+        [JsonProperty("kind")][EnumOf(typeof(NpcLifecycleKind))] public string? Kind { get; init; }
 
         /// <summary>Undead cycle only — maps 1:1 to Core.Ai.World.NpcLifecycleConfig.</summary>
         [JsonProperty("resurrectMinSeconds")] public float ResurrectMinSeconds { get; init; } = 60f;
@@ -155,7 +160,7 @@ namespace Core.Data.NpcData
         [JsonProperty("postBattleGraceSeconds")] public float PostBattleGraceSeconds { get; init; } = 5f;
         [JsonProperty("aggressive")] public bool Aggressive { get; init; } = true;
         [JsonProperty("hostileToPlayer")] public bool HostileToPlayer { get; init; }
-        [JsonProperty("activity")] public string Activity { get; init; } = "Idle";
+        [JsonProperty("activity")][EnumOf(typeof(WorldActivityType))] public string Activity { get; init; } = "Idle";
         [JsonProperty("wanderRadius")] public float WanderRadius { get; init; } = 250f;
         [JsonProperty("activityPauseSeconds")] public float ActivityPauseSeconds { get; init; } = 2f;
 
@@ -174,7 +179,7 @@ namespace Core.Data.NpcData
     /// <summary>One routine step: the activity runs for a budget of game minutes, then the cycle advances.</summary>
     public record NpcRoutineStepData
     {
-        [JsonProperty("activity")] public string Activity { get; init; } = "Idle";
+        [JsonProperty("activity")][EnumOf(typeof(WorldActivityType))] public string Activity { get; init; } = "Idle";
         [JsonProperty("minutes")] public float Minutes { get; init; } = 60f;
         [JsonProperty("wanderRadius")] public float? WanderRadius { get; init; }
 
@@ -187,7 +192,7 @@ namespace Core.Data.NpcData
     {
         [JsonProperty("from")] public string From { get; init; } = "00:00";
         [JsonProperty("to")] public string To { get; init; } = "00:00";
-        [JsonProperty("activity")] public string Activity { get; init; } = "Idle";
+        [JsonProperty("activity")][EnumOf(typeof(WorldActivityType))] public string Activity { get; init; } = "Idle";
         [JsonProperty("wanderRadius")] public float? WanderRadius { get; init; }
 
         /// <summary>Smart point tag the activity anchors to (Campfire/Tent/OreVein/...); null = the type's default.</summary>
@@ -197,13 +202,15 @@ namespace Core.Data.NpcData
     /// <summary>One "reactions" entry — parsed strictly into NpcReactionConfig by NpcReactionParser.</summary>
     public record NpcReactionData
     {
-        [JsonProperty("abilityId")] public string AbilityId { get; init; } = string.Empty;
-        [JsonProperty("trigger")] public string Trigger { get; init; } = string.Empty;
+        [JsonProperty("abilityId")][CatalogRef(DataCatalog.Abilities)] public string AbilityId { get; init; } = string.Empty;
+        [JsonProperty("trigger")][EnumOf(typeof(ReactionTrigger))] public string Trigger { get; init; } = string.Empty;
         [JsonProperty("chance")] public float Chance { get; init; }
         [JsonProperty("maxPerTurn")] public int MaxPerTurn { get; init; } = 1;
 
         /// <summary>Npc id whose final death (world fact) permanently disables this reaction.</summary>
-        [JsonProperty("blockedByFinalDeathOf")] public string? BlockedByFinalDeathOf { get; init; }
+        [JsonProperty("blockedByFinalDeathOf")]
+        [CatalogRef(DataCatalog.Npc, AllowEmpty = true)]
+        public string? BlockedByFinalDeathOf { get; init; }
     }
 
     /// <summary>One "stages" entry — parsed strictly into NpcStageConfig by NpcStageParser.</summary>
@@ -212,7 +219,7 @@ namespace Core.Data.NpcData
         [JsonProperty("parameterMultiplier")] public float ParameterMultiplier { get; init; } = 1f;
 
         /// <summary>The stage's full ability set — replaces the book's content on stage entry.</summary>
-        [JsonProperty("abilities")] public List<string> Abilities { get; init; } = [];
+        [JsonProperty("abilities")][CatalogRef(DataCatalog.Abilities)] public List<string> Abilities { get; init; } = [];
 
         /// <summary>Effects riding every landed attack while this stage is active.</summary>
         [JsonProperty("attackEffects")] public List<NpcStageAttackEffectData> AttackEffects { get; init; } = [];
@@ -230,7 +237,7 @@ namespace Core.Data.NpcData
     /// <summary>One on-attack effect of a boss stage; damagePercent is the effect's magnitude.</summary>
     public record NpcStageAttackEffectData
     {
-        [JsonProperty("effect")] public string Effect { get; init; } = string.Empty;
+        [JsonProperty("effect")][EnumOf(typeof(StageAttackEffectKind))] public string Effect { get; init; } = string.Empty;
         [JsonProperty("chance")] public float Chance { get; init; }
         [JsonProperty("damagePercent")] public float? DamagePercent { get; init; }
         [JsonProperty("duration")] public int Duration { get; init; }
