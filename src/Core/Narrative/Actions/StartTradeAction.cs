@@ -1,8 +1,10 @@
 namespace Core.Narrative.Actions
 {
+    using Data.GameData;
     using MessageBus;
     using MessageBus.Messages;
     using Newtonsoft.Json.Linq;
+    using Tooling.Schema.Model;
 
     /// <summary>Dialogue action "StartTrade": hands the conversation over to the trader's shop.
     /// Authors put it on a node that ends the dialogue — the trade window opens as it closes.</summary>
@@ -13,14 +15,22 @@ namespace Core.Narrative.Actions
 
     public class StartTradeActionFactory(IGameMessageBus messageBus) : INarrativeActionFactory
     {
-        public string Type => "StartTrade";
+        private const string TypeName = "StartTrade";
+        private const string TraderIdKey = "traderId";
+
+        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+            NarrativeParameterSchema.Text(TraderIdKey, required: true, DataCatalog.Traders));
+
+        public string Type => TypeName;
+
+        public RecordSchema Parameters => s_parameters;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {
-            string traderId = json.Value<string>("traderId") ?? string.Empty;
+            string traderId = json.Value<string>(TraderIdKey) ?? string.Empty;
             if (traderId.Length == 0)
             {
-                Tracker.TrackError("StartTrade action: traderId is missing");
+                Tracker.TrackError($"{TypeName} action: {TraderIdKey} is missing");
                 return null;
             }
 

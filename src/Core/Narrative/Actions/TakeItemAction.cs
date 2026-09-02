@@ -2,6 +2,7 @@ namespace Core.Narrative.Actions
 {
     using Inventory;
     using Newtonsoft.Json.Linq;
+    using Tooling.Schema.Model;
 
     /// <summary>Availability is the CALLER's problem: gate the option on HasItem first.</summary>
     public class TakeItemAction(IInventory inventory, string itemId, int amount) : INarrativeAction
@@ -11,18 +12,19 @@ namespace Core.Narrative.Actions
 
     public class TakeItemActionFactory(IInventory inventory) : INarrativeActionFactory
     {
-        public string Type => "TakeItem";
+        private const string TypeName = "TakeItem";
 
-        public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
-        {
-            string itemId = json.Value<string>("itemId") ?? string.Empty;
-            if (itemId.Length == 0)
-            {
-                Tracker.TrackError("TakeItem action: itemId is missing");
-                return null;
-            }
+        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+            ItemIdParameter.Field, NarrativeParameterSchema.Integer(ItemIdParameter.AmountKey, ItemIdParameter.DefaultAmount));
 
-            return new TakeItemAction(inventory, itemId, json.Value<int?>("amount") ?? 1);
-        }
+        public string Type => TypeName;
+
+        /// <summary>The bag is emptied by raw id, the same id the giving side mints by.</summary>
+        public RecordSchema Parameters => s_parameters;
+
+        public INarrativeAction? Create(JObject json, INarrativeActionParser parser) =>
+            ItemIdParameter.Require(json, TypeName) is { } itemId
+                ? new TakeItemAction(inventory, itemId, ItemIdParameter.Amount(json))
+                : null;
     }
 }

@@ -20,7 +20,7 @@ namespace Core.Narrative.Actions
                 return null;
             }
 
-            string type = json.Value<string>("type") ?? string.Empty;
+            string type = json.Value<string>(NarrativeParameterSchema.TypeKey) ?? string.Empty;
             if (!_factories.TryGetValue(type, out var factory))
             {
                 Tracker.TrackNotFound($"Narrative action type '{type}' has no registered factory");

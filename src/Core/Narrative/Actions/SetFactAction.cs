@@ -2,6 +2,7 @@ namespace Core.Narrative.Actions
 {
     using Facts;
     using Newtonsoft.Json.Linq;
+    using Tooling.Schema.Model;
 
     /// <summary>Raises a free-form flag ("count" turns it into a counter increment).</summary>
     public class SetFactAction(IWorldFactsService facts, string key, int count) : INarrativeAction
@@ -15,18 +16,30 @@ namespace Core.Narrative.Actions
 
     public class SetFactActionFactory(IWorldFactsService facts) : INarrativeActionFactory
     {
-        public string Type => "SetFact";
+        private const string TypeName = "SetFact";
+        private const string FactKey = "key";
+        private const string CountKey = "count";
+        private const int DefaultCount = 1;
+
+        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+            NarrativeParameterSchema.Text(FactKey, required: true),
+            NarrativeParameterSchema.Integer(CountKey, DefaultCount));
+
+        public string Type => TypeName;
+
+        /// <summary>The same free-form key the Fact condition reads back, declared the same way.</summary>
+        public RecordSchema Parameters => s_parameters;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {
-            string key = json.Value<string>("key") ?? string.Empty;
+            string key = json.Value<string>(FactKey) ?? string.Empty;
             if (key.Length == 0)
             {
-                Tracker.TrackError("SetFact action: key is missing");
+                Tracker.TrackError($"{TypeName} action: {FactKey} is missing");
                 return null;
             }
 
-            return new SetFactAction(facts, key, json.Value<int?>("count") ?? 1);
+            return new SetFactAction(facts, key, json.Value<int?>(CountKey) ?? DefaultCount);
         }
     }
 }

@@ -5,10 +5,12 @@ namespace Core.Narrative.Actions
     using System.Linq;
     using Ai.World.Raids;
     using Data;
+    using Data.GameData;
     using Entity;
     using Godot;
     using Newtonsoft.Json.Linq;
     using Services;
+    using Tooling.Schema.Model;
 
     /// <summary>
     /// Puts a named NPC into the world: the quest vocabulary's way of producing a trial target.
@@ -148,28 +150,43 @@ namespace Core.Narrative.Actions
         INpcPopulationService population,
         ISpawnPointRegistry points) : INarrativeActionFactory
     {
-        public string Type => "SpawnNpc";
+        private const string TypeName = "SpawnNpc";
+        private const string NpcIdKey = "npcId";
+        private const string PointIdKey = "pointId";
+        private const string ModifiersKey = "modifiers";
+
+        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+            NarrativeParameterSchema.Text(NpcIdKey, required: true, DataCatalog.Npc),
+            NarrativeParameterSchema.FreeText(PointIdKey, required: true),
+            NarrativeParameterSchema.References(ModifiersKey, DataCatalog.NpcModifiers));
+
+        public string Type => TypeName;
+
+        /// <summary>The point is named by a scene's own spawn point and no catalog holds those ids. The
+        /// modifiers list carries no default: absent leaves the record's own roll standing, while the
+        /// property present names the exact set, an empty array included.</summary>
+        public RecordSchema Parameters => s_parameters;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {
-            string npcId = json.Value<string>("npcId") ?? string.Empty;
+            string npcId = json.Value<string>(NpcIdKey) ?? string.Empty;
             if (npcId.Length == 0)
             {
-                Tracker.TrackError("SpawnNpc action: npcId is missing");
+                Tracker.TrackError($"{TypeName} action: {NpcIdKey} is missing");
                 return null;
             }
 
-            string pointId = json.Value<string>("pointId") ?? string.Empty;
+            string pointId = json.Value<string>(PointIdKey) ?? string.Empty;
             if (pointId.Length == 0)
             {
-                Tracker.TrackError($"SpawnNpc action '{npcId}': pointId is missing");
+                Tracker.TrackError($"{TypeName} action '{npcId}': {PointIdKey} is missing");
                 return null;
             }
 
             var modifierIds = ReadModifierIds(json);
             if (modifierIds != null && modifierIds.Any(id => id.Length == 0))
             {
-                Tracker.TrackError($"SpawnNpc action '{npcId}': the modifiers list holds an empty id");
+                Tracker.TrackError($"{TypeName} action '{npcId}': the {ModifiersKey} list holds an empty id");
                 return null;
             }
 
@@ -180,7 +197,7 @@ namespace Core.Narrative.Actions
         /// the EXACT set the entry names, an empty array included: a bare target is an authored
         /// answer (the weakest rung of a trial ladder), not a missing one.</summary>
         private static IReadOnlyList<string>? ReadModifierIds(JObject json) =>
-            json["modifiers"] is not JArray array
+            json[ModifiersKey] is not JArray array
                 ? null
                 : array.Select(token => token.Value<string>() ?? string.Empty).ToList();
     }

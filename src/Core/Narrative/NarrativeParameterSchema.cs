@@ -29,9 +29,33 @@ namespace Core.Narrative
                 ? new FieldSchema { JsonName = jsonName, Kind = FieldKind.String, Required = required }
                 : new FieldSchema { JsonName = jsonName, Kind = FieldKind.Reference, Required = required, RefCatalogs = catalogs };
 
+        /// <summary>Text the parser reads with a fallback, which is what makes writing it optional.</summary>
+        public static FieldSchema Text(string jsonName, string fallback) =>
+            new() { JsonName = jsonName, Kind = FieldKind.String, Default = fallback };
+
+        /// <summary>Text naming something no catalog holds — a spot in a scene, a key of the author's own
+        /// invention. Refused as a reference rather than left silent, so a name ending in "Id" that points
+        /// nowhere reads as a decision.</summary>
+        public static FieldSchema FreeText(string jsonName, bool required) =>
+            new() { JsonName = jsonName, Kind = FieldKind.String, Required = required, RefusedAsReference = true };
+
         /// <summary>A number the parser reads with a fallback, which is what makes writing it optional.</summary>
         public static FieldSchema Integer(string jsonName, int fallback) =>
             new() { JsonName = jsonName, Kind = FieldKind.Integer, Default = fallback };
+
+        /// <summary>A whole number with no fallback behind it: the parser refuses the entry without one.</summary>
+        public static FieldSchema Integer(string jsonName, bool required) =>
+            new() { JsonName = jsonName, Kind = FieldKind.Integer, Required = required };
+
+        /// <summary>A list of references into the named catalogs. It carries no default because absence and
+        /// an empty list are different answers — what a missing list means is the factory's to document.</summary>
+        public static FieldSchema References(string jsonName, params string[] catalogs) =>
+            new()
+            {
+                JsonName = jsonName,
+                Kind = FieldKind.Array,
+                Item = new FieldSchema { JsonName = FieldSchema.Unnamed, Kind = FieldKind.Reference, RefCatalogs = catalogs }
+            };
 
         /// <summary>Every member of the enum the parser reads the key into.</summary>
         public static FieldSchema Enum<TEnum>(string jsonName, bool required = true)

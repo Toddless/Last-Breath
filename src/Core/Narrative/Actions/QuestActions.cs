@@ -1,8 +1,10 @@
 namespace Core.Narrative.Actions
 {
     using System;
+    using Conditions;
     using Newtonsoft.Json.Linq;
     using Quests;
+    using Tooling.Schema.Model;
 
     /// <summary>Quest-vocabulary actions (dialogue options are the normal path for all four).
     /// Func-injected log for the same DI-cycle reason as the quest conditions.</summary>
@@ -33,12 +35,16 @@ namespace Core.Narrative.Actions
     {
         public string Type => $"{kind}Quest";
 
+        /// <summary>Built once per factory: all four kinds are addressed by the one quest reference the
+        /// conditions read back, and only the name under which it is declared differs.</summary>
+        public RecordSchema Parameters => field ??= NarrativeParameterSchema.Of(Type, QuestIdParameter.Field);
+
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {
-            string questId = json.Value<string>("questId") ?? string.Empty;
+            string questId = json.Value<string>(QuestIdParameter.Key) ?? string.Empty;
             if (questId.Length > 0) return new QuestAction(log, questId, kind);
 
-            Tracker.TrackError($"{Type} action: questId is required");
+            Tracker.TrackError($"{Type} action: {QuestIdParameter.Key} is required");
             return null;
         }
     }

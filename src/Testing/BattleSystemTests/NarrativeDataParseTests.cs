@@ -21,7 +21,9 @@ namespace LastBreathTest.BattleSystemTests
     public class NarrativeDataParseTests
     {
         private const string VeteranNpcId = "Npc_Bandit_Veteran";
+        private const string TraderNpcId = "Npc_Ronald";
         private const string QuestId = "Quest_Field_Of_Bones";
+        private const string TrialQuestId = "Quest_Trial_Of_The_Fang";
 
         private WorldFactsService _facts = null!;
         private InfluenceMastery _influence = null!;
@@ -53,17 +55,22 @@ namespace LastBreathTest.BattleSystemTests
                 () => _questLog,
                 () => _quests);
 
-            var actionFactories = new List<INarrativeActionFactory>
-            {
-                new SetFactActionFactory(_facts),
-                new GiveItemActionFactory(Mock.Of<Core.Items.IItemMinter>(), inventory.Object),
-                new TakeItemActionFactory(inventory.Object),
-                new PublishDeedActionFactory(_events, Mock.Of<IPlayerAccessor>()),
-                new AddReputationActionFactory(new Core.Reputation.FactionRelationService(FactionTestData.Create())),
-                new AddInfluenceExpActionFactory(_influence),
-            };
-            foreach (var kind in Enum.GetValues<QuestActionKind>())
-                actionFactories.Add(new QuestActionFactory(() => _questLog, kind));
+            var actionFactories = NarrativeTestFactories.Actions(
+                _facts,
+                inventory.Object,
+                Mock.Of<Core.Items.IItemMinter>(),
+                _events,
+                Mock.Of<IPlayerAccessor>(),
+                new Core.Reputation.FactionRelationService(FactionTestData.Create()),
+                _influence,
+                Mock.Of<Core.Battle.IMartialArtMastery>(),
+                Mock.Of<Core.MessageBus.IGameMessageBus>(),
+                Mock.Of<Core.Entity.INpcProvider>(),
+                Mock.Of<Core.Data.INpcModifierProvider>(),
+                Mock.Of<Core.Entity.INpcWorldSpawner>(),
+                Mock.Of<INpcPopulationService>(),
+                Mock.Of<Core.Entity.ISpawnPointRegistry>(),
+                () => _questLog);
 
             var conditions = new NarrativeConditionParser(conditionFactories);
             var actions = new NarrativeActionParser(actionFactories);
@@ -92,6 +99,16 @@ namespace LastBreathTest.BattleSystemTests
             var dialogue = _dialogues.Get(VeteranNpcId);
             Assert.IsNotNull(dialogue, $"dialogue for '{VeteranNpcId}' was dropped at parse — check the test log for the Tracker report");
             Assert.AreEqual(8, dialogue!.Nodes.Count);
+        }
+
+        /// <summary>The records the vocabulary's own gaps used to swallow: a shop opens with StartTrade,
+        /// a trial spawns its target and pays in tree points. A registry short of one action drops the
+        /// whole record that names it, so an incomplete list here hid data bugs instead of finding them.</summary>
+        [TestMethod]
+        public void TheTraderAndTrialRecords_SurviveTheFullActionRegistry()
+        {
+            Assert.IsNotNull(_dialogues.Get(TraderNpcId), $"dialogue for '{TraderNpcId}' was dropped at parse — check the test log for the Tracker report");
+            Assert.IsNotNull(_quests.Get(TrialQuestId), $"'{TrialQuestId}' was dropped at parse — check the test log for the Tracker report");
         }
 
         [TestMethod]

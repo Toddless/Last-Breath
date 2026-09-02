@@ -1,8 +1,14 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Core.Ai.World.Time;
+    using Core.Battle;
+    using Core.Data;
     using Core.Entity;
+    using Core.Events;
     using Core.Inventory;
+    using Core.Items;
+    using Core.MessageBus;
+    using Core.Narrative.Actions;
     using Core.Narrative.Conditions;
     using Core.Narrative.Facts;
     using Core.Narrative.Influence;
@@ -11,9 +17,10 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Services;
 
     /// <summary>
-    /// The condition vocabulary as GameServiceProvider registers it, in one place: the tests cannot
-    /// reference the game project, and two hand-written copies of this list would drift apart.
-    /// The reflection pin in <see cref="NarrativeConditionSchemaTests"/> is what keeps it level with Core.
+    /// The narrative vocabulary as GameServiceProvider registers it, in one place: the tests cannot
+    /// reference the game project, and two hand-written copies of these lists would drift apart.
+    /// The reflection pins in <see cref="NarrativeConditionSchemaTests"/> and
+    /// <see cref="NarrativeActionSchemaTests"/> are what keep them level with Core.
     /// </summary>
     internal static class NarrativeTestFactories
     {
@@ -43,6 +50,36 @@ namespace LastBreathTest.BattleSystemTests
             new CanAcceptQuestConditionFactory(log),
             new CanTurnInQuestConditionFactory(log),
             new QuestOfferRollConditionFactory(facts, influence, clock, rnd: null!, quests),
+        ];
+
+        /// <summary>One factory per quest kind, exactly as the registration loop builds them.</summary>
+        public static List<INarrativeActionFactory> Actions(
+            IWorldFactsService facts,
+            IInventory inventory,
+            IItemMinter items,
+            IGameEventBus events,
+            IPlayerAccessor player,
+            IFactionRelationService relations,
+            IInfluenceMastery influence,
+            IMartialArtMastery mastery,
+            IGameMessageBus messageBus,
+            INpcProvider npcs,
+            INpcModifierProvider npcModifiers,
+            INpcWorldSpawner spawner,
+            INpcPopulationService population,
+            ISpawnPointRegistry points,
+            Func<IQuestLogService> log) =>
+        [
+            new SetFactActionFactory(facts),
+            new GiveItemActionFactory(items, inventory),
+            new TakeItemActionFactory(inventory),
+            new PublishDeedActionFactory(events, player),
+            new AddReputationActionFactory(relations),
+            new AddInfluenceExpActionFactory(influence),
+            new GrantTreePointsActionFactory(mastery),
+            new StartTradeActionFactory(messageBus),
+            new SpawnNpcActionFactory(npcs, npcModifiers, spawner, population, points),
+            .. Enum.GetValues<QuestActionKind>().Select(kind => new QuestActionFactory(log, kind)),
         ];
     }
 }
