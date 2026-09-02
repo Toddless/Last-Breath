@@ -1,5 +1,16 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из переноса парсеров в Core под тулы (2026-09-02; CombatRules — accept with minors, ItemDataProvider шаги 1–2)
+
+- (minor, комментарий лжёт) `src/Battle/Source/BattleSystemModuleDependencies.cs:55-58` — комментарий над `AugmentMinter` ссылается на «those rules … the two are registered together»: регистрация `CombatRulesProvider` уехала в общие участники, антецедента нет; полоса редкости аугмента и раньше жила в `AbilityAugmentData.RarityBand`, не в `CombatRules.json`. Переписать на «minting is a job of this module».
+- (minor, имя теста обещает то, чего он не меряет) `src/Testing/BattleSystemTests/MulticastStageRulesTests.cs:94-104` — после общей регистрации null-ветка `?? MulticastRules.Default` в `MulticastActivation.ResolveRules` в этом прогоне не исполняется (провайдер есть, но не загружен); переименовать в `TheStanceRollsTheWorkingLadderWhenTheCompositionCarriesNoRulesOfItsOwn` и сказать в комментарии, что null-ветка резолвера здесь не доказывается.
+- (minor, комментарий лжёт) `src/Testing/LootSimulation/LootPipeline.cs:52-54` — стенд не читает `ICombatRulesProvider`, числа аугмента не «вокруг полосы из CombatRules.json»; правила приезжают просто как часть общего набора.
+- (minor, док-ссылка в пустоту) `src/Docs/SharpeningAndHitCap.md:79` — ссылка на удалённый `src/LootGeneration/Services/ItemDataProvider.cs:67`; заменить на имя метода `GetEquipItemBaseModifierPool` в `ItemDataProvider` без пути (правило документации №4).
+- (nit, порядок членов) `src/Core/Data/ItemDataProvider.cs` — `AllBlueprints` стоит между методами, приватные хелперы внизу; унаследовано дословно из Main-копии, перекладывать вместе с следующей правкой файла.
+- (знать, кандидат в карточку) `src/Core/Data/ItemDataProvider.cs:58-60` — `_upgradeCosts = ParseUpgradeCosts(...)` — присваивание, не слияние: второй файл в каталоге `UpgradeCosts` молча затрёт первый (у остальных каталогов провайдера — слияние). Теперь правило общее для четырёх проектов.
+- (гигиена) `src/LootGeneration/Services/NpcModifierProvider.cs.uid` — осиротевший сайдкар: класса в папке нет, живёт в `src/Core/Services/`.
+- (знать) `src/Core/Data/ItemDataProvider.cs:26` — Crafting и LootGeneration теперь грузят каталог `Items` (пустой по факту: `ParseItems` читает `ItemDataList.Items`, а файл несёт секции `quest`/`common` — см. запись про `Items.json` выше); потребителей нет.
+
 ## Из Б-191 (2026-08-24, коммит `d9d03739`; accept with minors)
 
 - **(кандидат, тест-инфра)** Node-половина replay-фикса без пинов (гонка гейта `WaitUntilIdleAsync`, идемпотентность `ShowDeathAsync`, деление hold на скорость, очистка `_shownDead`) — три мутации ревьюера зелёные. Предложение ревьюера: вынести за Godot тем же приёмом, что `DeathBeat`, состояние гейта (какой насос ждём) и реестр упавших — обе половины чистые, обе получили бы пины.
