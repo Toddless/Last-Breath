@@ -308,7 +308,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             var service = new GameDataService(
                 new FileSystemDataSource(SharedData.Root()),
-                [container.GetRequiredService<AbilityAugmentCatalog>(), container.GetRequiredService<EffectProvider>()]);
+                [container.GetRequiredService<AbilityAugmentCatalog>(), container.GetRequiredService<EffectCanonCatalog>()]);
             List<string> failures = [];
             service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
 
@@ -343,7 +343,7 @@ namespace LastBreathTest.BattleSystemTests
         /// nothing on disk is touched and the untouched registry beside it still says what it said.</summary>
         private static EffectProvider Rebalanced(string effectId, string key, float figure)
         {
-            var provider = new EffectProvider();
+            List<string> files = [];
             foreach (string file in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Effects), "*.json", SearchOption.AllDirectories))
             {
                 JObject root = JObject.Parse(File.ReadAllText(file));
@@ -351,10 +351,10 @@ namespace LastBreathTest.BattleSystemTests
                     if ((string?)entry["id"] == effectId && entry["properties"] is JObject properties)
                         properties[key] = figure;
 
-                provider.Apply(DataCatalog.Effects, new GameDataFile(Path.GetFileName(file), root.ToString()));
+                files.Add(root.ToString());
             }
 
-            return provider;
+            return EffectProviders.FromJson([.. files]);
         }
 
         /// <summary>A registry that knows one effect and its figures — for the merge rule, which is about

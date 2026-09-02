@@ -20,7 +20,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             // Declared keys are a promise in two directions: the factory reads no key it did not name
             // (or the walk below would hand it everything and still fail) and needs no key beyond them.
-            var provider = new EffectProvider();
+            var provider = EffectProviders.WithoutCanon();
 
             Assert.IsTrue(provider.KnownIds.Count > 0, "the registry is empty, so the walks prove nothing");
 
@@ -41,7 +41,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             // The whole point of declaring keys. A misspelled property used to ride along unread: the
             // effect was built, tuned by whatever was left, and nothing said so.
-            var provider = new EffectProvider();
+            var provider = EffectProviders.WithoutCanon();
             const string Id = "Effect_Clumsiness";
             IReadOnlyCollection<string> keys = provider.KeysOf(Id)!;
 
@@ -56,7 +56,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void AMissingKeyIsRefusedRatherThanGuessed()
         {
-            var provider = new EffectProvider();
+            var provider = EffectProviders.WithoutCanon();
             const string Id = "Effect_Clumsiness";
             IReadOnlyCollection<string> keys = provider.KeysOf(Id)!;
 
@@ -70,7 +70,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void AnIdNobodyBuildsIsRefused()
         {
-            Assert.IsNull(new EffectProvider().CreateEffect("Effect_No_Such_Thing", RecordProperties.Empty),
+            Assert.IsNull(EffectProviders.WithoutCanon().CreateEffect("Effect_No_Such_Thing", RecordProperties.Empty),
                 "an id nothing answers came back with an effect");
         }
 
@@ -80,7 +80,7 @@ namespace LastBreathTest.BattleSystemTests
             // The half that will carry the weight once records name effects themselves (wave C-2). Today
             // the shipped catalog grants passives only, so the walk asserts it READ the catalog rather
             // than passing on an empty list — a vacuous green here would be the same silence again.
-            var provider = new EffectProvider();
+            var provider = EffectProviders.WithoutCanon();
             List<(string Id, List<string> Keys)> used = [.. EffectGrantsInData()];
             List<string> broken = [];
 

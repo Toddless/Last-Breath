@@ -63,7 +63,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestInitialize]
         public void ComposeTheCanon()
         {
-            GameServiceProvider.Initialize(services => services.AddSingleton<IEffectProvider>(Canon()));
+            EffectProviders.ComposeShipped();
 
             Assert.AreEqual(CanonCeiling, GameServiceProvider.TryGet<IEffectProvider>()?.StackCeilingOf(BuffId),
                 "the composition does not answer for the shipped canon, so nothing below is measuring the ceiling");
@@ -217,13 +217,7 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>The shipped canonical numbers, read through the registry that loads them.</summary>
-        private static EffectProvider Canon()
-        {
-            var canon = new EffectProvider();
-            foreach (string file in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Effects), "*.json"))
-                canon.Apply(DataCatalog.Effects, new GameDataFile(Path.GetFileName(file), File.ReadAllText(file)));
-            return canon;
-        }
+        private static EffectProvider Canon() => EffectProviders.FromShippedData();
 
         /// <summary>The shipped ability as the game builds it, off the real files and the real loader.</summary>
         private static Ability Shipped()

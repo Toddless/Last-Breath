@@ -36,6 +36,9 @@ namespace Core.Data.GameData
             // Shared because control resistance, arena and effect rules are asked by every project that
             // fights, and a bootstrap-local registration once left one of them without the file.
             services.AddGameDataParticipant<ICombatRulesProvider, CombatRulesProvider>();
+            // Shared because the balanced figures of an effect are asked wherever one is described: a
+            // card in a bag, a tooltip and an editor read them in compositions that never fight.
+            services.AddGameDataParticipant<IEffectCanonCatalog, EffectCanonCatalog>();
             // Shared for the same reason: a buff id rides on an NPC modifier, and the modifier is rolled
             // wherever an NPC is spawned or its corpse is paid out, not only where the fight happens.
             services.AddGameDataParticipant<INpcBuffProvider, NpcBuffProvider>();

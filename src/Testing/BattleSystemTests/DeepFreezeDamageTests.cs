@@ -203,9 +203,7 @@ namespace LastBreathTest.BattleSystemTests
 
         private static Dictionary<string, IReadOnlyDictionary<string, float>> CanonOf(params string[] ids)
         {
-            var provider = new EffectProvider();
-            foreach (string file in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Effects), "*.json"))
-                provider.Apply(DataCatalog.Effects, new GameDataFile(Path.GetFileName(file), File.ReadAllText(file)));
+            EffectProvider provider = EffectProviders.FromShippedData();
 
             Dictionary<string, IReadOnlyDictionary<string, float>> canon = new(StringComparer.Ordinal);
             foreach (string id in ids)

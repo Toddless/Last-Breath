@@ -86,9 +86,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestInitialize]
         public void ComposeTheCanon()
         {
-            var canon = new EffectProvider();
-            ShippedRowsInto(canon);
-            GameServiceProvider.Initialize(services => services.AddSingleton<IEffectProvider>(canon));
+            EffectProviders.ComposeShipped();
             ShippedRowsInto(ComposedCanon());
 
             Assert.IsNotNull(GameServiceProvider.TryGet<IEffectProvider>()?.StackCeilingOf(PoisonId),
@@ -232,20 +230,11 @@ namespace LastBreathTest.BattleSystemTests
                 "a status with no canonical row was built at a default share instead of being refused");
         }
 
-        /// <summary>The composed registry as a reader of data files — the door a substitute canon goes in
-        /// through, and the same one the shipped rows are put back through.</summary>
-        private static IGameDataParticipant ComposedCanon()
-        {
-            var canon = GameServiceProvider.TryGet<IEffectProvider>() as IGameDataParticipant;
-            Assert.IsNotNull(canon, "the composed effect registry reads no data files, so no canon can be put under it");
-            return canon;
-        }
+        /// <summary>The catalog the composed registry reads its canon from — the door a substitute canon
+        /// goes in through, and the same one the shipped rows are put back through.</summary>
+        private static IGameDataParticipant ComposedCanon() => (IGameDataParticipant)EffectProviders.ComposedCanon();
 
-        private static void ShippedRowsInto(IGameDataParticipant canon)
-        {
-            foreach (string file in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Effects), "*.json"))
-                canon.Apply(DataCatalog.Effects, new GameDataFile(Path.GetFileName(file), File.ReadAllText(file)));
-        }
+        private static void ShippedRowsInto(IGameDataParticipant canon) => EffectProviders.ShippedRowsInto(canon);
 
         /// <summary>The two rows under test with their share moved and nothing else touched. Both carry
         /// every key their factory reads: the registry refuses a half-written row, which is what keeps a

@@ -117,7 +117,7 @@ namespace LastBreathTest.BattleSystemTests
         public void EveryCanonicalRowIsBuiltAndEveryBuiltEffectHasACanonicalRow()
         {
             var canon = Canon();
-            var registry = new EffectProvider().KnownIds.ToHashSet(StringComparer.Ordinal);
+            var registry = EffectProviders.WithoutCanon().KnownIds.ToHashSet(StringComparer.Ordinal);
 
             string[] unbuilt = [.. canon.Keys.Except(registry, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
             string[] uncovered = [.. registry.Except(canon.Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
@@ -130,7 +130,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void EveryCanonicalRowCarriesExactlyTheKeysItsFactoryReads()
         {
-            var provider = new EffectProvider();
+            var provider = EffectProviders.WithoutCanon();
             List<string> broken = [];
 
             foreach ((string id, IReadOnlyDictionary<string, float> figures) in Canon())
@@ -431,13 +431,7 @@ namespace LastBreathTest.BattleSystemTests
             if (Math.Abs(actual - expected) > 0.0001f) divergent.Add($"{id}.{key}: the list says {expected}, the canon says {actual}");
         }
 
-        private static EffectProvider Loaded()
-        {
-            var provider = new EffectProvider();
-            foreach (string file in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Effects), "*.json", SearchOption.AllDirectories))
-                provider.Apply(DataCatalog.Effects, new GameDataFile(Path.GetFileName(file), File.ReadAllText(file)));
-            return provider;
-        }
+        private static EffectProvider Loaded() => EffectProviders.FromShippedData();
 
         /// <summary>The shipped canon as written, read straight off the file rather than through the
         /// provider — the provider is one of the two sides being compared.</summary>

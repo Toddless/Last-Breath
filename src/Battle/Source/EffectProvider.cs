@@ -6,21 +6,20 @@ namespace Battle.Source
     using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Data;
-    using Core.Data.EffectsData;
     using Core.Data.GameData;
     using Core.Enums;
     using Effects;
-    using Newtonsoft.Json;
 
     /// <summary>
     /// Builds an effect from an id and the numbers behind it — the single registry item grants and
     /// catalog records share. Every entry declares the keys it reads; the numbers themselves are
-    /// balanced in ONE place, <c>SharedData/Effects</c>, which this provider loads as its canon.
+    /// balanced in ONE place, <c>SharedData/Effects</c>, which <see cref="IEffectCanonCatalog"/> reads
+    /// and this registry asks at the moment of the question — the catalog is filled by the same load
+    /// that composes the registry, and reading it up front would freeze an empty one.
     /// A record may still carry its own numbers and they win over the canon for now — the transition
     /// is described in <c>Docs/PLAN-Augments.md §4f</c>, and CL-3b takes the numbers off the records.
     /// </summary>
-    public class EffectProvider : IEffectProvider, IGameDataParticipant
+    public class EffectProvider(IEffectCanonCatalog canon) : IEffectProvider
     {
         /// <summary>The keys an effect is built from and the builder that reads them. All keys are required:
         /// an effect built without one of its numbers is a mis-tuned effect nobody asked for.</summary>
@@ -172,17 +171,14 @@ namespace Battle.Source
                 new MythicCalculationEffect(p.GetInt("duration"), p.GetInt("maxStacks"))),
         };
 
-        /// <summary>Canonical numbers per effect id, as loaded from SharedData/Effects.</summary>
-        private readonly Dictionary<string, IReadOnlyDictionary<string, float>> _canon = new(StringComparer.Ordinal);
-
-        /// <summary>Canonical strength per effect id; ids absent from here are weak, as most effects are.</summary>
-        private readonly Dictionary<string, EffectPower> _powers = new(StringComparer.Ordinal);
+        /// <summary>Ids whose canonical row the registry refuses to take whole: the row names a figure
+        /// nothing reads or leaves out one the factory needs. Filled by the walk that reports them, and
+        /// withheld from every answer below — a half-read row would tune an effect nobody balanced.</summary>
+        private readonly HashSet<string> _refused = new(StringComparer.Ordinal);
 
         /// <summary>The pairing of registry and canon is reported once, on first use: loading walks file
         /// by file, and a catalog of several files would be judged half-read at the end of the first.</summary>
         private bool _pairingReported;
-
-        public IReadOnlyList<string> Catalogs => [DataCatalog.Effects];
 
         public IReadOnlyCollection<string> KnownIds
         {
@@ -193,55 +189,14 @@ namespace Battle.Source
             }
         }
 
-        public void Apply(string catalog, GameDataFile file)
-        {
-            var data = JsonConvert.DeserializeObject<EffectCatalogData>(file.Json)
-                       ?? throw new InvalidOperationException("Failed to deserialize effect data");
+        public int? StackCeilingOf(string effectId) => Taken(effectId) ? canon.StackCeilingOf(effectId) : null;
 
-            foreach (EffectDefinitionData definition in data.Effects)
-            {
-                if (!s_factories.TryGetValue(definition.Id, out EffectFactory? factory))
-                {
-                    // An error and not a missed lookup: balance written for an effect nothing builds is
-                    // balance that will never be played, and the file is the thing being read right now.
-                    Tracker.TrackError(
-                        $"Canonical row '{definition.Id}' names an effect nothing builds. "
-                        + $"Known: {string.Join(", ", s_factories.Keys.Order(StringComparer.Ordinal))}");
-                    continue;
-                }
-
-                string[] unread = [.. definition.Properties.Keys.Except(factory.Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
-                string[] missing = [.. factory.Keys.Except(definition.Properties.Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
-                if (unread.Length > 0 || missing.Length > 0)
-                {
-                    Tracker.TrackError(
-                        $"Canonical row '{definition.Id}' not taken. Properties nothing reads: [{string.Join(", ", unread)}]; "
-                        + $"missing: [{string.Join(", ", missing)}]; the factory reads: [{string.Join(", ", factory.Keys)}]");
-                    continue;
-                }
-
-                if (!TryReadPower(definition, out EffectPower power)) continue;
-
-                _canon[definition.Id] = new Dictionary<string, float>(definition.Properties, StringComparer.Ordinal);
-                _powers[definition.Id] = power;
-            }
-
-            // A second file may complete the pairing, so the verdict is postponed until first use.
-            _pairingReported = false;
-        }
-
-        public int? StackCeilingOf(string effectId) =>
-            _canon.TryGetValue(effectId, out IReadOnlyDictionary<string, float>? canon)
-            && canon.TryGetValue("maxStacks", out float ceiling)
-                ? (int)ceiling
-                : null;
-
-        public EffectPower PowerOf(string effectId) => _powers.GetValueOrDefault(effectId, EffectPower.Weak);
+        public EffectPower PowerOf(string effectId) => Taken(effectId) ? canon.PowerOf(effectId) : EffectPower.Weak;
 
         public IReadOnlyCollection<string>? KeysOf(string effectId) =>
             s_factories.TryGetValue(effectId, out EffectFactory? factory) ? [.. factory.Keys] : null;
 
-        public IReadOnlyDictionary<string, float>? CanonOf(string effectId) => _canon.GetValueOrDefault(effectId);
+        public IReadOnlyDictionary<string, float>? CanonOf(string effectId) => Taken(effectId) ? canon.CanonOf(effectId) : null;
 
         public IEffect? CreateEffect(string id, RecordProperties properties)
         {
@@ -249,7 +204,7 @@ namespace Battle.Source
 
             if (!s_factories.TryGetValue(id, out EffectFactory? factory))
             {
-                Tracker.TrackNotFound($"Effect factory for '{id}'. Known: {string.Join(", ", s_factories.Keys.Order(StringComparer.Ordinal))}", this);
+                Tracker.TrackNotFound($"Effect factory for '{id}'. Known: {KnownFactories()}", this);
                 return null;
             }
 
@@ -269,22 +224,8 @@ namespace Battle.Source
             return factory.Build(new RecordProperties(id, numbers));
         }
 
-        /// <summary>The strength the row names, or Weak when it names none. A name that parses into nothing
-        /// refuses the whole row: an unreadable strength must not pass for the default one.</summary>
-        private static bool TryReadPower(EffectDefinitionData definition, out EffectPower power)
-        {
-            try
-            {
-                power = EnumParser.ParseEnumOrDefault<EffectPower>(definition.Power);
-                return true;
-            }
-            catch (FormatException exception)
-            {
-                Tracker.TrackError($"Canonical row '{definition.Id}' not taken: {exception.Message}");
-                power = EffectPower.Weak;
-                return false;
-            }
-        }
+        /// <summary>The effect ids the registry answers to, as a report names them.</summary>
+        private static string KnownFactories() => string.Join(", ", s_factories.Keys.Order(StringComparer.Ordinal));
 
         /// <summary>
         /// The numbers the effect is actually built from: the canon is the default, a number the record
@@ -293,8 +234,9 @@ namespace Battle.Source
         /// </summary>
         private Dictionary<string, float> Compose(string id, RecordProperties properties, EffectFactory factory)
         {
-            var numbers = _canon.TryGetValue(id, out IReadOnlyDictionary<string, float>? canon)
-                ? new Dictionary<string, float>(canon, StringComparer.Ordinal)
+            IReadOnlyDictionary<string, float>? row = CanonOf(id);
+            var numbers = row != null
+                ? new Dictionary<string, float>(row, StringComparer.Ordinal)
                 : new Dictionary<string, float>(StringComparer.Ordinal);
 
             foreach (string key in factory.Keys)
@@ -304,15 +246,17 @@ namespace Battle.Source
             return numbers;
         }
 
-        /// <summary>Names both halves of a broken pairing rather than letting an effect fall back on
-        /// whatever a record happens to carry. Rows naming an id nothing builds are reported as the file
-        /// is read; this is the other direction, plus the case of no canon at all.</summary>
+        /// <summary>Names every broken pairing of registry and canon rather than letting an effect fall
+        /// back on whatever a record happens to carry: rows naming an id nothing builds, rows the factory
+        /// cannot take whole, effects with no row at all, and the case of no canon whatsoever. Judged on
+        /// first use rather than as the files are read — the catalog is a load of its own now, and the
+        /// registry is not there to see it end.</summary>
         private void ReportPairingOnce()
         {
             if (_pairingReported) return;
             _pairingReported = true;
 
-            if (_canon.Count == 0)
+            if (canon.Ids.Count == 0)
             {
                 Tracker.TrackError(
                     $"Canonical effect data ({DataCatalog.Effects}) was never loaded: every effect falls back "
@@ -320,9 +264,42 @@ namespace Battle.Source
                 return;
             }
 
-            string[] uncovered = [.. s_factories.Keys.Except(_canon.Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+            foreach (string id in canon.Ids.Order(StringComparer.Ordinal)) Judge(id);
+
+            string[] uncovered = [.. s_factories.Keys.Except(canon.Ids, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
             if (uncovered.Length > 0)
                 Tracker.TrackError($"Effects the registry builds with no canonical row: [{string.Join(", ", uncovered)}]");
+        }
+
+        /// <summary>One canonical row against the factory that would build it. A row nothing builds is
+        /// balance that will never be played, and a row whose keys and the factory's disagree is the typo
+        /// trap the declared keys exist for — both are refused whole, and both are named.</summary>
+        private void Judge(string effectId)
+        {
+            if (!s_factories.TryGetValue(effectId, out EffectFactory? factory))
+            {
+                _refused.Add(effectId);
+                Tracker.TrackError($"Canonical row '{effectId}' names an effect nothing builds. Known: {KnownFactories()}");
+                return;
+            }
+
+            IEnumerable<string> figures = canon.CanonOf(effectId)?.Keys ?? [];
+            string[] unread = [.. figures.Except(factory.Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+            string[] missing = [.. factory.Keys.Except(figures, StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+            if (unread.Length == 0 && missing.Length == 0) return;
+
+            _refused.Add(effectId);
+            Tracker.TrackError(
+                $"Canonical row '{effectId}' not taken. Properties nothing reads: [{string.Join(", ", unread)}]; "
+                + $"missing: [{string.Join(", ", missing)}]; the factory reads: [{string.Join(", ", factory.Keys)}]");
+        }
+
+        /// <summary>Whether the registry takes the canonical row of an id. The pairing is judged on the
+        /// first question asked of it, so a row is answered for only once it has been looked at.</summary>
+        private bool Taken(string effectId)
+        {
+            ReportPairingOnce();
+            return !_refused.Contains(effectId);
         }
     }
 }

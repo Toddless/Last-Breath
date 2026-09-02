@@ -67,9 +67,10 @@
             // The other half of what the allocation hands out: nodes carrying a passive instead of lines.
             // A singleton beside the unlock service, and after the registry it builds passives through.
             services.AddSingleton<PassiveGrantService>();
-            // A data participant since CL-3a: the numbers of every effect are balanced in one catalog,
-            // and the registry that builds them is the one place that reads it.
-            services.AddGameDataParticipant<IEffectProvider, EffectProvider>();
+            // Not a data participant: the canonical numbers are read by the shared catalog, and this
+            // registry asks it for them — a card and a tooltip need those figures in compositions that
+            // build no battle module, while the factories that turn them into effects are this one's own.
+            services.AddSingleton<IEffectProvider, EffectProvider>();
             // The ability registry builds data-declared behaviours out of it; lazy so registration order
             // stays irrelevant and a sandbox without one still mints every other augment.
             services.AddSingleton<Func<IEffectProvider?>>(sp => sp.GetService<IEffectProvider>);

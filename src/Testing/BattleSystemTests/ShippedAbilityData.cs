@@ -116,13 +116,14 @@ namespace LastBreathTest.BattleSystemTests
         private static (AbilityProvider Abilities, AbilityAugmentCatalog Augments, EffectProvider Effects) ComposeFrom(string root)
         {
             var augments = new AbilityAugmentCatalog();
-            // The effect registry reads the canonical numbers as a participant of this very load, so a
-            // record reaching an effect through this stand travels the road it travels in the game:
-            // the canon supplies what the record leaves unsaid. An unloaded registry here would leave
-            // every such walk asserting about numbers no shipped composition ever uses.
-            var effects = new EffectProvider();
+            // The canonical numbers are read by a participant of this very load, so a record reaching an
+            // effect through this stand travels the road it travels in the game: the canon supplies what
+            // the record leaves unsaid. A registry over an unread catalog here would leave every such
+            // walk asserting about numbers no shipped composition ever uses.
+            var canon = new EffectCanonCatalog();
+            var effects = new EffectProvider(canon);
             var abilities = new AbilityProvider(augments, () => effects);
-            var service = new GameDataService(new FileSystemDataSource(root), [augments, effects]);
+            var service = new GameDataService(new FileSystemDataSource(root), [augments, canon]);
             List<string> failures = [];
             service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
 

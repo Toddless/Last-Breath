@@ -53,11 +53,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestInitialize]
         public void ComposeTheCanon()
         {
-            var canon = new EffectProvider();
-            foreach (string file in Directory.EnumerateFiles(SharedData.Catalog(DataCatalog.Effects), "*.json"))
-                canon.Apply(DataCatalog.Effects, new GameDataFile(Path.GetFileName(file), File.ReadAllText(file)));
-
-            GameServiceProvider.Initialize(services => services.AddSingleton<IEffectProvider>(canon));
+            EffectProviders.ComposeShipped();
 
             Assert.AreEqual(EffectPower.Absolute, GameServiceProvider.TryGet<IEffectProvider>()?.PowerOf(s_seals[0]),
                 "the composition does not answer for the shipped canon, so nothing below is measuring the canonical strength");
