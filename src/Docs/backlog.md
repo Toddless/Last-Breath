@@ -1,5 +1,13 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из разворота зависимости, шаг 1: разметка в Core, чтение по имени (2026-09-02; accept with minors)
+
+- (minor) `src/Tooling/Tooling.Core/Schema/SchemaReflector.cs:473` — «свойство есть, но держит null» молчит для всех; законно только у `DictionaryKey.EnumType`/`Catalog`. `CatalogRef.Catalog = null`, `Discriminator.Field = null`, `LocalizedKey.Suffix = null` — нота `MarkupUnreadable`; `DictionaryKey` с обоими null — нота. Стало: `Reads<T>(…, bool mayHoldNothing)`, `true` только в двух чтениях `DictionaryKey`.
+- (minor) `SchemaReflector.cs:414,423` — `Any(...)`/`FirstOrDefault(...)` с побочной нотой останавливаются на первом — ноты по второму/третьему одноимённому атрибуту теряются по порядку; материализовать (`Count(...) > 0`, `[.. Select]`).
+- (minor) `SchemaReflector.cs:407` — `GetCustomAttributes(inherit: false)` против прежнего `inherit: true` и соседей `Converted`/`IsRequired`; в `Core/Data` нет `virtual`/`override`, но правило внутри рефлектора стало двумя. Либо `inherit: true`, либо двойник с `override` и нота.
+- (minor, процедура) `MarkupNames.cs:3-9`, `SchemaMarkup.cs:4-6`, обе `Convention()` — переименование трогает четыре места (атрибут/свойство, константа `MarkupNames`, две таблицы `Convention()`), нигде не записано; одна строка в xml-доке с обеих сторон.
+- (nit) `SchemaReflector.cs:461-462` — `GetProperty(property)` бросит `AmbiguousMatchException` на `new`-свойстве, `GetValue` — что угодно из чужого геттера; `GetProperties(Public|Instance)` + `try/catch` с нотой. `SchemaMarkup.cs:1` — папка `Markup`, namespace `Core.Data.Schema`; пин игры фильтрует по namespace. `decisions.md` строка про раскладку `Tooling.Schema` — привести к реальности после шага 4.
+
 ## Из описателей ModifierPools и Resources (2026-09-02; accept with minors)
 
 - (minor) `src/Core/Data/CraftingData/MaterialData.cs:14` — `Id` (`Material_*`, 41 запись) размечен `NotARef`, но поле мёртвое: парсер контекст берёт из `craftingData.Id`, ключей `Material_*` в .po нет; инспектор нарисует живое текстовое поле. Стало: `[Hidden]` рядом либо карточка на снос поля из DTO и 41 записи.
