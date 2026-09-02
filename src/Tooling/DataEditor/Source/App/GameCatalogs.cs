@@ -1,6 +1,6 @@
 namespace DataEditor.Source.App
 {
-    using Core.Data.Schema;
+    using LastBreath.Descriptors;
     using Tooling.Catalogs;
 
     /// <summary>

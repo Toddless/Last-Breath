@@ -1,7 +1,7 @@
-namespace Core.Data.Schema
+namespace LastBreath.Descriptors
 {
     using System.Collections.Generic;
-    using GameData;
+    using Core.Data.GameData;
     using Tooling.Schema;
 
     /// <summary>The one place that says which catalogs the authoring tool can be handed a schema for.

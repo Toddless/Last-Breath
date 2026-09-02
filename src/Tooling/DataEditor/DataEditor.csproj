@@ -18,6 +18,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Core.csproj" />
+    <ProjectReference Include="..\LastBreath.Descriptors\LastBreath.Descriptors.csproj" />
     <ProjectReference Include="..\Tooling.Core\Tooling.Core.csproj" />
   </ItemGroup>
   <ItemGroup>

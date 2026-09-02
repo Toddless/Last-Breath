@@ -1,7 +1,8 @@
-namespace Core.Data.Schema
+namespace LastBreath.Descriptors
 {
-    using GameData;
-    using LootTable;
+    using Core.Data.GameData;
+    using Core.Data.LootTable;
+    using Core.Data.Schema;
 
     /// <summary>
     /// A position naming the one thing it drops. One of the two shapes a seat at a loot table is

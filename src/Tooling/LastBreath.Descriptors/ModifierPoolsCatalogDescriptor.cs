@@ -1,8 +1,8 @@
-namespace Core.Data.Schema
+namespace LastBreath.Descriptors
 {
     using System;
-    using EquipData;
-    using GameData;
+    using Core.Data.EquipData;
+    using Core.Data.GameData;
     using Tooling.Schema;
     using Tooling.Schema.Model;
 

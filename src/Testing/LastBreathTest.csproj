@@ -21,6 +21,7 @@
     <ProjectReference Include="..\Battle\Battle.csproj" />
     <ProjectReference Include="..\Crafting\Crafting.csproj" />
     <ProjectReference Include="..\LootGeneration\LootGeneration.csproj" />
+    <ProjectReference Include="..\Tooling\LastBreath.Descriptors\LastBreath.Descriptors.csproj" />
     <ProjectReference Include="..\Tooling\Tooling.Core\Tooling.Core.csproj" />
   </ItemGroup>
 

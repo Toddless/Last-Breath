@@ -10,6 +10,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Data.Schema;
     using Core.Enums;
     using Core.Localization;
+    using LastBreath.Descriptors;
     using Newtonsoft.Json.Linq;
     using Tooling.Catalogs;
     using Tooling.Json;

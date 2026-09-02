@@ -1,10 +1,10 @@
-namespace Core.Data.Schema
+namespace LastBreath.Descriptors
 {
     using System;
     using System.Linq;
-    using Enums;
-    using GameData;
-    using LootTable;
+    using Core.Data.GameData;
+    using Core.Data.LootTable;
+    using Core.Enums;
     using Tooling.Schema;
     using Tooling.Schema.Model;
 
