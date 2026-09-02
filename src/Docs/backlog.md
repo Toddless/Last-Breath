@@ -1,5 +1,11 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из правки коллекций в инспекторе (2026-09-02; accept)
+
+- (minor) `src/Tooling/DataEditor/Source/View/InspectorPanel.cs:810` — подсказка поля свободного ключа берётся из схемы ЗНАЧЕНИЯ (`Hint(item)` при `field.Key == null`) — рекламирует каталоги значения как требование к ключу; передавать готовую подсказку, при отсутствии `Key` — `KeyPlaceholder`.
+- (minor) `InspectorPanel.cs:904-907` — проверка границ выбора пикера написана дважды (`Picked` для карты и заново в `NewField`); общий `Chosen(picker, fields)`.
+- (nit) «×» строится тремя способами (`FieldGesture` мимо `Gesture`); тело `Gesture` переписано в `TextSubmitted` — общий `Attempt(build, change)`; отказ смены формы оставляет пикер на невыбранном; `EveryKeyHint` врёт при пустом enum; ключ-носитель формы (различение по наличию ключа) удаляется как обычное поле — гасить «×» с причиной; `RecordTemplates.cs:132` недостижимая ветка молча даёт запись без формы; `/modifiers/0` литералом в двух тестах.
+
 ## Из разворота зависимости, шаг 1: разметка в Core, чтение по имени (2026-09-02; accept with minors)
 
 - (minor) `src/Tooling/Tooling.Core/Schema/SchemaReflector.cs:473` — «свойство есть, но держит null» молчит для всех; законно только у `DictionaryKey.EnumType`/`Catalog`. `CatalogRef.Catalog = null`, `Discriminator.Field = null`, `LocalizedKey.Suffix = null` — нота `MarkupUnreadable`; `DictionaryKey` с обоими null — нота. Стало: `Reads<T>(…, bool mayHoldNothing)`, `true` только в двух чтениях `DictionaryKey`.
