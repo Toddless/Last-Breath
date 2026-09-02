@@ -1,6 +1,7 @@
 namespace Core.Data.GameData
 {
     using System;
+    using Ai.World.Time;
     using Battle;
     using Battle.Abilities;
     using Battle.CombatRules;
@@ -37,6 +38,9 @@ namespace Core.Data.GameData
             // Shared for the same reason: a buff id rides on an NPC modifier, and the modifier is rolled
             // wherever an NPC is spawned or its corpse is paid out, not only where the fight happens.
             services.AddGameDataParticipant<INpcBuffProvider, NpcBuffProvider>();
+            // Shared because game time is: schedules, trader restocks and the save file all read the
+            // same clock, and a second reading of the World catalog would be a second "now".
+            services.AddGameDataParticipant<IWorldClock, GameWorldClock>();
             return services;
         }
 

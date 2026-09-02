@@ -1,10 +1,9 @@
-namespace Battle.Internal.World
+namespace Core.Ai.World.Time
 {
     using System;
     using System.Collections.Generic;
-    using Core.Ai.World.Time;
-    using Core.Data.GameData;
-    using Core.Data.WorldData;
+    using Data.GameData;
+    using Data.WorldData;
     using Newtonsoft.Json;
 
     /// <summary>The runtime world clock: the pure WorldClock configured from the World catalog.</summary>

@@ -2,7 +2,6 @@ namespace Battle.Services
 {
     using Core.Ai.World;
     using Core.Ai.World.Skirmish;
-    using Core.Ai.World.Time;
     using Core.Data;
     using Core.Data.GameData;
     using Core.Entity;
@@ -40,7 +39,6 @@ namespace Battle.Services
                 .AddSingleton<INpcWorldRegistry, NpcWorldRegistry>()
                 .AddSingleton<INpcSkirmishService, NpcSkirmishService>()
                 .AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>()
-                .AddGameDataParticipant<IWorldClock, GameWorldClock>()
                 .AddGameDataParticipant<IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>()
                 .AddGameDataParticipant<IFactionRelationService, FactionRelationService>()
                 .AddGameDataParticipant<IReputationDeedProcessor, ReputationDeedProcessor>()

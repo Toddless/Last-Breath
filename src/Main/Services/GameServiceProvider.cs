@@ -89,11 +89,9 @@ namespace LastBreath.Services
             services.AddSingleton<INpcWorldRegistry, NpcWorldRegistry>();
             services.AddSingleton<IWitnessQuery, WorldWitnessQuery>();
 
-            // World NPC stack: providers, population, skirmishes, clock, spawner — raids sit on top of it.
+            // World NPC stack: providers, population, skirmishes, spawner — raids sit on top of it.
             services.AddGameDataParticipant<INpcProvider, NpcProvider>();
-            services.AddGameDataParticipant<INpcBuffProvider, NpcBuffProvider>();
             services.AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>();
-            services.AddGameDataParticipant<IWorldClock, GameWorldClock>();
             services.AddGameDataParticipant<IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>();
             services.AddGameDataParticipant<IPlayerStatsProvider, PlayerStatsProvider>();
             services.AddConditionCatalog();
