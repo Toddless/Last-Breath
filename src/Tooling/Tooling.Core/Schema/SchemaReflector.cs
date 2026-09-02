@@ -414,13 +414,15 @@ namespace Tooling.Schema.Reflection
 
             // The element is read under the name of the field holding it, so that anything said about it is
             // said about a field the author can find, and given the empty name the model asks for after.
+            // What the keys hold is answered here and travels no further: the values of the map are a
+            // separate question, and the markup answering it is the rest of what is written on the field.
             if (AsDictionary(actual, out Type key, out Type item))
                 return new FieldSchema
                 {
                     JsonName = jsonName,
                     Kind = FieldKind.Dictionary,
                     Key = Keys(jsonName, key, markup, walk),
-                    Item = Unnamed(Value(jsonName, item, markup, walk))
+                    Item = Unnamed(Value(jsonName, item, markup with { Keys = default }, walk))
                 };
 
             if (AsSequence(actual, out Type element))
@@ -483,31 +485,57 @@ namespace Tooling.Schema.Reflection
             if (!text) return field;
 
             if (markup.Narrowings > 1) Note(Notes.NarrowedTwice, walk.Owner, jsonName);
-
-            if (markup.EnumType is { } members) return Choice(jsonName, members);
-
             if (markup.Catalogs.Count > 0 && markup.NotARef) Note(Notes.RefusedAndNamed, walk.Owner, jsonName);
 
-            if (markup.Catalogs.Count > 0 && !markup.NotARef)
-                return field with { Kind = FieldKind.Reference, RefCatalogs = markup.Catalogs, AllowEmpty = markup.AllowEmpty };
+            FieldSchema narrowed = Narrow(jsonName, markup.Holds) ?? Localized(field, markup.LocalizationSuffix);
 
-            return markup.LocalizationSuffix is { } suffix
-                ? field with { Kind = FieldKind.LocalizedKey, LocalizationSuffix = suffix }
-                : field;
+            // The refusal rides on whatever the text turned out to be: a field marked and reading as
+            // unmarked is what a check for "a reference or a refusal" would never find.
+            return narrowed with { RefusedAsReference = markup.NotARef };
         }
 
-        /// <summary>What the author may write as a key: the members of an enum, or any word at all. A key of
-        /// any other type cannot be written to json as it stands, so the keys are left free and said so.</summary>
+        /// <summary>What text is narrowed to: the members of an enum, or the ids of records in catalogs.
+        /// Null when the markup narrows it to neither. Asked of the value a field holds and of the keys a
+        /// map is written under, which are the same question about two different pieces of markup.</summary>
+        private static FieldSchema? Narrow(string jsonName, Narrowing narrowing)
+        {
+            if (narrowing.EnumType is { } members) return Choice(jsonName, members);
+
+            if (narrowing.Catalogs.Count == 0) return null;
+
+            return new FieldSchema
+            {
+                JsonName = jsonName,
+                Kind = FieldKind.Reference,
+                RefCatalogs = narrowing.Catalogs,
+                AllowEmpty = narrowing.AllowEmpty
+            };
+        }
+
+        private static FieldSchema Localized(FieldSchema field, string? suffix) =>
+            suffix is null ? field : field with { Kind = FieldKind.LocalizedKey, LocalizationSuffix = suffix };
+
+        /// <summary>What the author may write as a key: the members of an enum, the ids of a catalog, or any
+        /// word at all. A key of any other type cannot be written to json as it stands, so the keys are left
+        /// free and said so.</summary>
         private FieldSchema? Keys(string jsonName, Type key, Markup markup, Walk walk)
         {
-            if (key.IsEnum) return Choice(FieldSchema.Unnamed, key);
-
             if (key != typeof(string))
             {
+                // The type says what the keys are already; markup about them is a second answer to a
+                // question that has one, and the type is what the file is parsed into.
+                if (markup.Keys.Ways > 0) Note(Notes.KeyAlreadyTyped, walk.Owner, jsonName, key.Name);
+
+                if (key.IsEnum) return Choice(FieldSchema.Unnamed, key);
+
                 Note(Notes.KeyNotAWord, walk.Owner, jsonName, key.Name);
 
                 return null;
             }
+
+            if (markup.Keys.Ways > 1) Note(Notes.KeyNarrowedTwice, walk.Owner, jsonName);
+
+            if (Narrow(FieldSchema.Unnamed, markup.Keys) is { } narrowed) return narrowed;
 
             // Markup on a map describes what the map HOLDS. An author who wrote it meaning the keys gets a
             // word about it here, and a puzzling complaint about the values not being text just below.
@@ -522,6 +550,9 @@ namespace Tooling.Schema.Reflection
         {
             if (!text && markup.Narrowings > 0) Note(Notes.NotAString, walk.Owner, jsonName);
             if (!number && markup.Range is not null) Note(Notes.NotANumber, walk.Owner, jsonName);
+
+            // A map is the one thing read for its keys, and a map never comes through here.
+            if (markup.Keys.Ways > 0) Note(Notes.NotAMap, walk.Owner, jsonName);
         }
 
         /// <summary>Whether the field the markup names as telling shapes apart is the one the shapes
@@ -589,6 +620,14 @@ namespace Tooling.Schema.Reflection
         /// already inside of, which is what a type leading back to itself is recognised by.</summary>
         private readonly record struct Walk(string Owner, HashSet<Type> Path);
 
+        /// <summary>What text is narrowed to, whichever piece of markup says so: the members of an enum, or
+        /// the ids of records in catalogs. Both cannot be true of one string at once.</summary>
+        private readonly record struct Narrowing(Type? EnumType, SchemaList<string> Catalogs, bool AllowEmpty)
+        {
+            /// <summary>How many answers the markup gives. More than one is a contradiction.</summary>
+            public int Ways => (EnumType is null ? 0 : 1) + (Catalogs.Count > 0 ? 1 : 0);
+        }
+
         /// <summary>The schema markup written on one member, read once.</summary>
         private readonly record struct Markup(
             SchemaList<string> Catalogs,
@@ -598,15 +637,21 @@ namespace Tooling.Schema.Reflection
             string? LocalizationSuffix,
             NumericRange? Range,
             bool Hidden,
-            string? Discriminator)
+            string? Discriminator,
+            Narrowing Keys)
         {
             /// <summary>How many ways the markup says to read the text. More than one is a contradiction.</summary>
             public int Narrowings =>
                 (EnumType is null ? 0 : 1) + (Catalogs.Count > 0 ? 1 : 0) + (LocalizationSuffix is null ? 0 : 1);
 
+            /// <summary>What the markup narrows the VALUE to. A refusal empties the catalogs: a validator
+            /// told to check ids it should not would report every value in the file as broken.</summary>
+            public Narrowing Holds => new(EnumType, NotARef ? SchemaList<string>.Empty : Catalogs, AllowEmpty);
+
             public static Markup Of(MemberInfo member)
             {
                 CatalogRefAttribute[] references = [.. member.GetCustomAttributes<CatalogRefAttribute>()];
+                DictionaryKeyAttribute[] keys = [.. member.GetCustomAttributes<DictionaryKeyAttribute>()];
                 RangeAttribute? range = member.GetCustomAttribute<RangeAttribute>();
                 LocalizedKeyAttribute? localized = member.GetCustomAttribute<LocalizedKeyAttribute>();
 
@@ -619,7 +664,12 @@ namespace Tooling.Schema.Reflection
                     localized?.Suffix,
                     range is null ? null : new NumericRange(range.Min, range.Max),
                     member.GetCustomAttribute<HiddenAttribute>() != null,
-                    member.GetCustomAttribute<DiscriminatorAttribute>()?.Field);
+                    member.GetCustomAttribute<DiscriminatorAttribute>()?.Field,
+                    // A key names nothing on purpose in no file: json writes no empty key.
+                    new Narrowing(
+                        keys.Select(key => key.EnumType).FirstOrDefault(enumType => enumType is not null),
+                        [.. keys.Where(key => key.Catalog is not null).Select(key => key.Catalog!)],
+                        AllowEmpty: false));
             }
         }
 
@@ -645,6 +695,9 @@ namespace Tooling.Schema.Reflection
             public const string TwiceNamed = "'{0}' writes two members under '{1}'; the second is not in the schema.";
             public const string Untyped = "'{0}.{1}' is a sequence that does not say what it holds: it is kept as free-form json.";
             public const string KeyNotAWord = "'{0}.{1}' is keyed by '{2}', which is not a word json can key by: the keys are left free.";
+            public const string KeyAlreadyTyped = "'{0}.{1}' is keyed by '{2}' rather than by words, so the markup saying what its keys hold was not applied.";
+            public const string KeyNarrowedTwice = "'{0}.{1}' is keyed both by an enum and by a catalog; the enum was taken.";
+            public const string NotAMap = "'{0}.{1}' is not a map, so the markup saying what its keys hold was not applied.";
             public const string NarrowedTwice = "'{0}.{1}' is marked as more than one of enum, reference and localization key.";
             public const string NotAString = "'{0}.{1}' is not text, so the markup saying what its text means was not applied.";
             public const string NotANumber = "'{0}.{1}' is not a number, so its range was not applied.";

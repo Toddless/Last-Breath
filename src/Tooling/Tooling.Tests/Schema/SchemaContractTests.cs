@@ -81,6 +81,10 @@ namespace Tooling.Tests.Schema
             Assert.AreEqual(LocalizedKeyAttribute.NoSuffix, Attribute<LocalizedKeyAttribute>(typeof(DialogueNodeDto), nameof(DialogueNodeDto.Text)).Suffix);
             Assert.AreEqual(DescriptionSuffix, Attribute<LocalizedKeyAttribute>(typeof(DialogueNodeDto), nameof(DialogueNodeDto.Summary)).Suffix);
             Assert.AreEqual(KeyField, Attribute<DiscriminatorAttribute>(typeof(NpcModifiersDocumentDto), nameof(NpcModifiersDocumentDto.Mods)).Field);
+            Assert.AreEqual(typeof(TestParameter), Attribute<DictionaryKeyAttribute>(typeof(NpcDto), nameof(NpcDto.BaseParameters)).EnumType);
+            Assert.IsNull(Attribute<DictionaryKeyAttribute>(typeof(NpcDto), nameof(NpcDto.BaseParameters)).Catalog);
+            Assert.AreEqual(AbilitiesCatalog, Attribute<DictionaryKeyAttribute>(typeof(NpcDto), nameof(NpcDto.AbilityWeights)).Catalog);
+            Assert.IsNull(Attribute<DictionaryKeyAttribute>(typeof(NpcDto), nameof(NpcDto.AbilityWeights)).EnumType);
             Assert.IsNotNull(Attribute<NotARefAttribute>(typeof(DialogueNodeDto), nameof(DialogueNodeDto.NodeId)));
             Assert.IsNotNull(Attribute<HiddenAttribute>(typeof(NpcDto), nameof(NpcDto.Version)));
         }
@@ -108,6 +112,7 @@ namespace Tooling.Tests.Schema
 
             Assert.IsNull(property.GetCustomAttribute<CatalogRefAttribute>());
             Assert.IsNull(property.GetCustomAttribute<NotARefAttribute>());
+            Assert.IsNull(property.GetCustomAttribute<DictionaryKeyAttribute>());
             Assert.IsNull(property.GetCustomAttribute<HiddenAttribute>());
         }
 
@@ -138,6 +143,16 @@ namespace Tooling.Tests.Schema
         [TestMethod]
         public void EnumOf_SomethingThatIsNotAnEnum_IsRefused() =>
             Assert.ThrowsException<ArgumentException>(() => new EnumOfAttribute(typeof(NpcDto)));
+
+        /// <summary>Keys are described by their own markup, which is refused on the same terms as the markup
+        /// describing values: an empty catalog names nothing, and a type with no members offers nothing.</summary>
+        [TestMethod]
+        public void DictionaryKey_NamingNoCatalog_IsRefused() =>
+            Assert.ThrowsException<ArgumentException>(() => new DictionaryKeyAttribute(" "));
+
+        [TestMethod]
+        public void DictionaryKey_OfSomethingThatIsNotAnEnum_IsRefused() =>
+            Assert.ThrowsException<ArgumentException>(() => new DictionaryKeyAttribute(typeof(NpcDto)));
 
         [TestMethod]
         public void Range_EndingBelowItsStart_IsRefused() =>
@@ -497,7 +512,9 @@ namespace Tooling.Tests.Schema
 
             [CatalogRef(AbilitiesCatalog)] public List<string> Abilities { get; init; } = [];
 
-            public Dictionary<string, float> BaseParameters { get; init; } = [];
+            [DictionaryKey(typeof(TestParameter))] public Dictionary<string, float> BaseParameters { get; init; } = [];
+
+            [DictionaryKey(AbilitiesCatalog)] public Dictionary<string, float> AbilityWeights { get; init; } = [];
 
             [Hidden] public int Version { get; init; }
         }

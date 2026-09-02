@@ -64,6 +64,7 @@ namespace Tooling.Tests.Schema
         private const string RarityField = "rarity";
         private const string PrimaryField = "primary";
         private const string FallbackField = "fallback";
+        private const string PassivesField = "passives";
 
         /// <summary>Enough of a note to tell it from the others said about the same field.</summary>
         private const string SaidComputed = "worked out from other fields";
@@ -74,6 +75,9 @@ namespace Tooling.Tests.Schema
         private const string SaidNoArguments = "cannot be built without arguments";
         private const string SaidNotText = "is not text";
         private const string SaidNotANumber = "is not a number";
+        private const string SaidNotAMap = "is not a map";
+        private const string SaidAlreadyKeyed = "rather than by words";
+        private const string SaidKeyedTwice = "keyed both by";
 
         private const string DescriptionSuffix = "_Description";
 
@@ -172,6 +176,38 @@ namespace Tooling.Tests.Schema
             CollectionAssert.AreEqual(new[] { NpcBuffsCatalog }, buff.RefCatalogs.ToArray());
         }
 
+        /// <summary>A refusal is a decision and is written down as one. A field that reads as unmarked is a
+        /// field nothing can check for having been thought about at all.</summary>
+        [TestMethod]
+        public void ARefusalOfAReference_IsCarriedOntoTheField()
+        {
+            RecordSchema record = _reflector.Record(typeof(TextDto));
+            FieldSchema key = Field(record, KeyField);
+
+            Assert.AreEqual(FieldKind.String, key.Kind);
+            Assert.IsTrue(key.RefusedAsReference);
+            Assert.IsFalse(Field(record, TitleField).RefusedAsReference, "and nothing is refused where nothing was written");
+        }
+
+        /// <summary>A list of strings carries the refusal where it carries everything else said about them:
+        /// on the elements, which are what an id would have been.</summary>
+        [TestMethod]
+        public void ARefusalOnAListOfStrings_IsCarriedOntoItsElements()
+        {
+            FieldSchema tags = Field(_reflector.Record(typeof(TextDto)), TagsField);
+
+            Assert.AreEqual(FieldKind.Array, tags.Kind);
+            Assert.IsFalse(tags.RefusedAsReference, "the list is not the thing that could have been an id");
+            Assert.AreEqual(FieldKind.String, tags.Item?.Kind);
+            Assert.IsTrue(tags.Item?.RefusedAsReference);
+        }
+
+        /// <summary>A field named and refused at once keeps the refusal, and says so in the model as well as
+        /// in the report: the tool asks the field, not the walk that built it.</summary>
+        [TestMethod]
+        public void AFieldRefusedAndNamedAtOnce_ReadsAsRefused() =>
+            Assert.IsTrue(Field(_reflector.Record(typeof(AwkwardDto)), KeyField).RefusedAsReference);
+
         /// <summary>A map the author keys freely says so by having no key schema; one keyed by an enum says
         /// which members it takes, because an inspector that did not know would accept any word.</summary>
         [TestMethod]
@@ -188,6 +224,67 @@ namespace Tooling.Tests.Schema
             Assert.AreEqual(FieldKind.Enum, keyed.Key?.Kind);
             CollectionAssert.AreEqual(Enum.GetNames<TestParameter>(), keyed.Key!.EnumValues.ToArray());
             Assert.AreEqual(FieldKind.Integer, keyed.Item?.Kind);
+        }
+
+        /// <summary>A map written with words for keys and meaning the members of an enum says which enum,
+        /// and the tool offers the members instead of taking any word.</summary>
+        [TestMethod]
+        public void KeysMarkedAsAnEnum_AreOfferedAsItsMembers()
+        {
+            FieldSchema map = Field(_reflector.Record(typeof(KeyedDto)), BaseParametersField);
+
+            Assert.AreEqual(FieldKind.Enum, map.Key?.Kind);
+            Assert.AreEqual(FieldSchema.Unnamed, map.Key!.JsonName);
+            CollectionAssert.AreEqual(Enum.GetNames<TestParameter>(), map.Key.EnumValues.ToArray());
+            Assert.AreEqual(FieldKind.Number, map.Item?.Kind);
+            NothingSaid(BaseParametersField);
+        }
+
+        /// <summary>Keys that name records name them out of every catalog written on the field, the way the
+        /// value of a reference does.</summary>
+        [TestMethod]
+        public void KeysNamingRecords_PointIntoEveryCatalogWrittenOnThem()
+        {
+            FieldSchema map = Field(_reflector.Record(typeof(KeyedDto)), ItemsField);
+
+            Assert.AreEqual(FieldKind.Reference, map.Key?.Kind);
+            CollectionAssert.AreEqual(new[] { EquipItemsCatalog, ResourcesCatalog }, map.Key!.RefCatalogs.ToArray());
+        }
+
+        /// <summary>What the keys hold and what the values hold are two questions, answered by two pieces of
+        /// markup on one field. Neither answer is read as the other, and neither is complained about.</summary>
+        [TestMethod]
+        public void TheKeysOfAMap_AreDescribedApartFromItsValues()
+        {
+            FieldSchema map = Field(_reflector.Record(typeof(KeyedDto)), PassivesField);
+
+            Assert.AreEqual(FieldKind.Enum, map.Key?.Kind);
+            Assert.AreEqual(FieldKind.Reference, map.Item?.Kind);
+            NothingSaid(PassivesField);
+        }
+
+        /// <summary>Keys described where the type has settled them already, and where there are no keys at
+        /// all: the schema is still built, and markup that did nothing is named.</summary>
+        [TestMethod]
+        public void KeyMarkupNothingCanUse_IsSaidOutLoud()
+        {
+            RecordSchema record = _reflector.Record(typeof(KeyedDto));
+
+            Assert.AreEqual(FieldKind.Enum, Field(record, ParametersField).Key?.Kind, "the type is what the file is parsed into");
+            Assert.AreEqual(FieldKind.String, Field(record, NameField).Kind);
+            Said(nameof(KeyedDto), ParametersField, SaidAlreadyKeyed);
+            Said(nameof(KeyedDto), NameField, SaidNotAMap);
+        }
+
+        /// <summary>Keys said to be an enum and to name records at once: one of the two is what the author
+        /// is offered, and which one it is has to be said rather than found out from a file.</summary>
+        [TestMethod]
+        public void KeysNarrowedTwoWaysAtOnce_KeepTheEnum_AndAreSaidOutLoud()
+        {
+            FieldSchema map = Field(_reflector.Record(typeof(KeyedDto)), WeightsField);
+
+            Assert.AreEqual(FieldKind.Enum, map.Key?.Kind);
+            Said(nameof(KeyedDto), WeightsField, SaidKeyedTwice);
         }
 
         /// <summary>Every kind an editor draws differently, read from the type that produces it.</summary>
@@ -732,9 +829,36 @@ namespace Tooling.Tests.Schema
 
             [NotARef] public string Key { get; init; } = string.Empty;
 
+            [NotARef] public List<string> Tags { get; init; } = [];
+
             [LocalizedKey] public string Title { get; init; } = string.Empty;
 
             [LocalizedKey(DescriptionSuffix)] public string Summary { get; init; } = string.Empty;
+        }
+
+        /// <summary>The maps of an NPC record, whose keys are as much a decision as their values: parameters
+        /// named by an enum, properties named by the factory that reads them, and the markup that misses.</summary>
+        internal sealed record KeyedDto
+        {
+            [DictionaryKey(typeof(TestParameter))] public Dictionary<string, float> BaseParameters { get; init; } = [];
+
+            [DictionaryKey(EquipItemsCatalog)]
+            [DictionaryKey(ResourcesCatalog)]
+            public Dictionary<string, int> Items { get; init; } = [];
+
+            [DictionaryKey(typeof(TestParameter))]
+            [CatalogRef(AbilitiesCatalog)]
+            public Dictionary<string, string> Passives { get; init; } = [];
+
+            [DictionaryKey(typeof(TestParameter))]
+            [DictionaryKey(EquipItemsCatalog)]
+            public Dictionary<string, float> Weights { get; init; } = [];
+
+            /// <summary>Keys said to be an enum where the type has already said so.</summary>
+            [DictionaryKey(typeof(TestParameter))] public Dictionary<TestParameter, int> Parameters { get; init; } = [];
+
+            /// <summary>Keys described where there are no keys.</summary>
+            [DictionaryKey(typeof(TestParameter))] public string Name { get; init; } = string.Empty;
         }
 
         internal sealed record StrictDto

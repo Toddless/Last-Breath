@@ -32,6 +32,10 @@ namespace Tooling.Schema.Model
         /// <summary>An empty reference names nothing on purpose rather than being unfinished.</summary>
         public bool AllowEmpty { get; init; }
 
+        /// <summary>The field was declared not to be a reference, whatever its name suggests: a decision
+        /// told apart from a silence, which is what lets a check demand one or the other.</summary>
+        public bool RefusedAsReference { get; init; }
+
         public NumericRange? Range
         {
             get => field;

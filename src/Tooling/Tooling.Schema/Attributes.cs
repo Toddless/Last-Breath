@@ -48,6 +48,34 @@ namespace Tooling.Schema
         public Type EnumType { get; }
     }
 
+    /// <summary>The KEYS of a map are not words the author picks freely: they are the members of an enum,
+    /// or ids of records in the named catalog. Written once per catalog the keys may point into; what the
+    /// map HOLDS is a separate question, answered by the markup on the values.</summary>
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
+    public sealed class DictionaryKeyAttribute : Attribute
+    {
+        public DictionaryKeyAttribute(Type enumType)
+        {
+            ArgumentNullException.ThrowIfNull(enumType);
+            if (!enumType.IsEnum)
+                throw new ArgumentException($"'{enumType.Name}' is not an enum, so the keys would have no members to offer.", nameof(enumType));
+
+            EnumType = enumType;
+        }
+
+        public DictionaryKeyAttribute(string catalog)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(catalog);
+            Catalog = catalog;
+        }
+
+        /// <summary>Enum whose members name the keys; null when the keys name records instead.</summary>
+        public Type? EnumType { get; }
+
+        /// <summary>Catalog whose records the keys may name; null when the keys are enum members instead.</summary>
+        public string? Catalog { get; }
+    }
+
     /// <summary>The numbers this field accepts, ends included.</summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public sealed class RangeAttribute : Attribute
