@@ -10,7 +10,13 @@ namespace Core.Data.Schema
     public static class CatalogDescriptors
     {
         public static IReadOnlyList<ICatalogDescriptor> All { get; } =
-            [new NpcCatalogDescriptor(), new LootTablesCatalogDescriptor(), new EquipItemsCatalogDescriptor()];
+        [
+            new NpcCatalogDescriptor(),
+            new LootTablesCatalogDescriptor(),
+            new EquipItemsCatalogDescriptor(),
+            new ModifierPoolsCatalogDescriptor(),
+            new ResourcesCatalogDescriptor()
+        ];
 
         /// <summary>Catalogs with no descriptor yet, named one by one rather than counted: a name added
         /// to <see cref="DataCatalog"/> has to be put on one of the two lists by hand.</summary>
@@ -46,10 +52,8 @@ namespace Core.Data.Schema
             DataCatalog.ItemEffects,
             DataCatalog.Ornaments,
             DataCatalog.Effects,
-            DataCatalog.Resources,
             DataCatalog.Trade,
             DataCatalog.Traders,
-            DataCatalog.ModifierPools,
             DataCatalog.Conditions,
             DataCatalog.UpgradeCosts,
         ];

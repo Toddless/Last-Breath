@@ -2,6 +2,7 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Core.Ai;
     using Core.Ai.World;
+    using Core.Data.CraftingData;
     using Core.Data.EquipData;
     using Core.Data.GameData;
     using Core.Data.LootTable;
@@ -10,6 +11,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Enums;
     using Core.Localization;
     using Newtonsoft.Json.Linq;
+    using Tooling.Catalogs;
     using Tooling.Json;
     using Tooling.Schema;
     using Tooling.Schema.Model;
@@ -30,12 +32,6 @@ namespace LastBreathTest.BattleSystemTests
         /// is the reaction's ability, whatever lists and maps stand between the two.</summary>
         private const char PathSeparator = '.';
 
-        private const string JsonExtension = ".json";
-
-        /// <summary>Every file of a catalog folder — a catalog is the union of its files, and the ones
-        /// split by slot have nine.</summary>
-        private const string JsonFiles = "*" + JsonExtension;
-
         /// <summary>Separates the steps of a json pointer, which is how the addresses of the keys a
         /// schema does not know are written.</summary>
         private const char PointerSeparator = '/';
@@ -49,6 +45,16 @@ namespace LastBreathTest.BattleSystemTests
         private const string TiersField = "tiers";
 
         private const string ItemsField = "items";
+
+        /// <summary>What a composite modifier line holds its parts under. No descriptor names it — it is
+        /// the DTO's own field, the way a table's tiers are, so the walk spells it out.</summary>
+        private const string PartsField = "parts";
+
+        /// <summary>What a line handing out behaviour instead of a number is written under.</summary>
+        private const string GrantField = "grant";
+
+        /// <summary>What a modifier line claims its slot family under.</summary>
+        private const string AffixField = "affix";
 
         /// <summary>What an augment group is written with.</summary>
         private const string TierField = "tier";
@@ -111,28 +117,51 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>What a note about a member the file does not hold turns on.</summary>
         private const string WorkedOut = "worked out";
 
+        /// <summary>What a note about a type that names its parts in a constructor turns on: a positional
+        /// record cannot be built empty, so nothing can state what its fields start at.</summary>
+        private const string NamesItsPartsInAConstructor = "cannot be built";
+
         /// <summary>
-        /// What the reflector has to say about the real equipment DTOs, as pairs of "about what" and the
-        /// word the note turns on — the sentences themselves are the library's wording, and pinning them
-        /// would fail on a rephrasing that changed nothing.
+        /// What the reflector has to say about a modifier line wherever one stands — on an item, in a
+        /// rollable pool, on a material — as pairs of "about what" and the word the note turns on: the
+        /// sentences themselves are the library's wording, and pinning them would fail on a rephrasing that
+        /// changed nothing.
         /// <para>Every one of them is a fact about the shipped types: a "number or {min,max}" field is read
         /// through a converter, so the shape of the file may differ from the shape of the type; the two ends
-        /// of such a range answer questions worked out from each other; and a modifier line holds modifier
-        /// lines (composites) and grants that hold lines again, so the walk meets types it is already
-        /// inside of.</para>
+        /// of such a range answer questions worked out from each other; and a line holds lines (composites)
+        /// and grants that hold lines again, so the walk meets types it is already inside of.</para>
         /// </summary>
-        private static readonly (string About, string Word)[] s_allowedEquipItemNotes =
+        private static readonly (string About, string Word)[] s_modifierLineNotes =
         [
-            ($"{nameof(EquipItemData)}.updateLevel", nameof(LevelRangeDataConverter)),
-            ($"{nameof(ItemModifier)}.extraUpgradeLevels", nameof(LevelRangeDataConverter)),
-            ($"{nameof(BaseStatData)}.value", nameof(ValueRangeDataConverter)),
             ($"{nameof(ItemModifier)}.value", nameof(ValueRangeDataConverter)),
+            ($"{nameof(ItemModifier)}.extraUpgradeLevels", nameof(LevelRangeDataConverter)),
             ($"{nameof(ValueRangeData)}.{nameof(ValueRangeData.IsFixed)}", WorkedOut),
             ($"{nameof(ValueRangeData)}.{nameof(ValueRangeData.IsValid)}", WorkedOut),
             ($"{nameof(LevelRangeData)}.{nameof(LevelRangeData.IsFixed)}", WorkedOut),
-            ($"{nameof(ItemModifier)}.parts", nameof(ItemModifier)),
-            ($"{nameof(ItemModifier)}.grant", nameof(GrantData)),
+            ($"{nameof(ItemModifier)}.{PartsField}", nameof(ItemModifier)),
             ($"{nameof(GrantData)}.modifiers", nameof(ItemModifier)),
+        ];
+
+        /// <summary>What the walk has to say about the real equipment DTOs: the lines any catalog carrying
+        /// them earns, and the two of its own — a template's level is a range too, and its grants are read
+        /// before its lines, so the walk meets a grant inside a line already inside a grant.</summary>
+        private static readonly (string About, string Word)[] s_allowedEquipItemNotes =
+        [
+            .. s_modifierLineNotes,
+            ($"{nameof(EquipItemData)}.updateLevel", nameof(LevelRangeDataConverter)),
+            ($"{nameof(BaseStatData)}.value", nameof(ValueRangeDataConverter)),
+            ($"{nameof(ItemModifier)}.grant", nameof(GrantData)),
+        ];
+
+        /// <summary>What the walk has to say about the real resource DTOs: the lines a material carries,
+        /// and four records that name their parts in a constructor.</summary>
+        private static readonly (string About, string Word)[] s_allowedResourceNotes =
+        [
+            .. s_modifierLineNotes,
+            (nameof(MaterialCategoryData), NamesItsPartsInAConstructor),
+            (nameof(MaterialData), NamesItsPartsInAConstructor),
+            (nameof(UpgradeResourceData), NamesItsPartsInAConstructor),
+            (nameof(CraftingResourceData), NamesItsPartsInAConstructor),
         ];
 
         /// <summary>Every reference the equipment parser resolves by id, addressed the way the file writes
@@ -186,6 +215,74 @@ namespace LastBreathTest.BattleSystemTests
         /// Both are data rather than schema: the game's reader matches names without regard to case and
         /// passes over what it cannot place, so neither is heard from at load.</summary>
         private static readonly string[] s_unknownEquipItemKeys = ["CriticalDamage", "effectId"];
+
+        /// <summary>Every id the pool parser resolves against another catalog, addressed the way the file
+        /// writes it. A pool entry is a modifier line and names what any line names.</summary>
+        private static readonly (string Path, string Catalog)[] s_modifierPoolReferences =
+        [
+            (Entry("condition"), DataCatalog.Conditions),
+            (Entry("grant.id"), DataCatalog.PassiveSkills),
+            (Entry("grant.id"), DataCatalog.Effects),
+        ];
+
+        /// <summary>Every field of a pool entry the parser turns into an enum member.</summary>
+        private static readonly (string Path, Type Members)[] s_modifierPoolChoices =
+        [
+            (Entry("scope"), typeof(ModifierScope)),
+            (Entry("affix"), typeof(AffixKind)),
+            (Entry("grant.kind"), typeof(GrantKind)),
+        ];
+
+        /// <summary>The two shipped pool files and whether the entries in them are the ascension gift's:
+        /// what tells the files apart is written on the ENTRIES, which is why no placement rule can reach
+        /// it. Held here so that a third file, or a mythic entry filed among the ordinary pools, fails.</summary>
+        private static readonly (string File, bool Mythic)[] s_modifierPoolFiles =
+        [
+            ("EquipItemModifierPools", false),
+            ("MythicModifiers", true)
+        ];
+
+        /// <summary>Every id the resource parser resolves against another catalog, addressed the way the
+        /// file writes it, under the section whose records write it. A material names its category in the
+        /// catalog it stands in itself.</summary>
+        private static readonly (string Section, string Path, string Catalog)[] s_resourceReferences =
+        [
+            (ResourcesCatalogDescriptor.CraftingResourcesKey, $"material.{ResourcesCatalogDescriptor.CategoryField}", DataCatalog.Resources),
+            (ResourcesCatalogDescriptor.CraftingResourcesKey, "material.modifiers.condition", DataCatalog.Conditions),
+            (ResourcesCatalogDescriptor.MaterialCategoriesKey, "modifiers.condition", DataCatalog.Conditions),
+        ];
+
+        /// <summary>Every field the resource parser turns into an enum member, under the section whose
+        /// records write it. The lines of an overlay are reached through the map holding them, so what a
+        /// line says is checked on both sides of the category split.</summary>
+        private static readonly (string Section, string Path, Type Members)[] s_resourceChoices =
+        [
+            (ResourcesCatalogDescriptor.UpgradeResourcesKey, RarityField, typeof(Rarity)),
+            (ResourcesCatalogDescriptor.UpgradeResourcesKey, "category", typeof(EquipmentCategory)),
+            (ResourcesCatalogDescriptor.CraftingResourcesKey, RarityField, typeof(Rarity)),
+            (ResourcesCatalogDescriptor.CraftingResourcesKey, "material.modifiers.scope", typeof(ModifierScope)),
+            (ResourcesCatalogDescriptor.CraftingResourcesKey, "material.modifiers.affix", typeof(AffixKind)),
+            (ResourcesCatalogDescriptor.CraftingResourcesKey, $"material.{ResourcesCatalogDescriptor.OverlayField}.scope", typeof(ModifierScope)),
+            (ResourcesCatalogDescriptor.CraftingResourcesKey, $"material.{ResourcesCatalogDescriptor.OverlayField}.affix", typeof(AffixKind)),
+            (ResourcesCatalogDescriptor.MaterialCategoriesKey, "modifiers.scope", typeof(ModifierScope)),
+            (ResourcesCatalogDescriptor.MaterialCategoriesKey, "modifiers.affix", typeof(AffixKind)),
+            (ResourcesCatalogDescriptor.MaterialCategoriesKey, $"{ResourcesCatalogDescriptor.OverlayField}.scope", typeof(ModifierScope)),
+            (ResourcesCatalogDescriptor.MaterialCategoriesKey, $"{ResourcesCatalogDescriptor.OverlayField}.affix", typeof(AffixKind)),
+        ];
+
+        /// <summary>The two records writing the overlay: a whole category of materials, and one material
+        /// of its own. Both are keyed by the equipment categories and hold the same lines.</summary>
+        private static readonly (string Section, string Path)[] s_resourceOverlays =
+        [
+            (ResourcesCatalogDescriptor.MaterialCategoriesKey, ResourcesCatalogDescriptor.OverlayField),
+            (ResourcesCatalogDescriptor.CraftingResourcesKey, $"material.{ResourcesCatalogDescriptor.OverlayField}")
+        ];
+
+        /// <summary>Keys the shipped files write that no field of the schema is written under, in both
+        /// catalogs carrying modifier lines. All of them sit inside a composite: a line holds lines, so the
+        /// walk stops at the second one and what is under it is carried through as the file had it.</summary>
+        private static readonly string[] s_unknownKeysInsideComposites =
+            ["parameter", "modifierType", "scope", "value", "min", "max"];
 
         /// <summary>Every catalog a loot position may name its drop out of; any one of them knowing the
         /// id makes the position real, which is why the field carries them all at once.</summary>
@@ -258,28 +355,16 @@ namespace LastBreathTest.BattleSystemTests
         {
             RecordSchema record = Schema(DataCatalog.Npc).Sections[0].Record;
 
-            foreach ((string path, string catalog) in s_npcReferences)
-            {
-                FieldSchema field = Leaf(Locate(record, path));
+            foreach ((string path, string catalog) in s_npcReferences) Points(Leaf(Locate(record, path)), path, catalog);
 
-                Assert.AreEqual(FieldKind.Reference, field.Kind, $"'{path}' is not a reference");
-                CollectionAssert.Contains(field.RefCatalogs.ToArray(), catalog, $"'{path}' does not point into {catalog}");
-            }
-
-            foreach ((string path, Type members) in s_npcChoices)
-            {
-                FieldSchema field = Leaf(Locate(record, path));
-
-                Assert.AreEqual(FieldKind.Enum, field.Kind, $"'{path}' is not a choice of names");
-                CollectionAssert.AreEqual(Enum.GetNames(members), field.EnumValues.ToArray(), $"'{path}' offers other members than {members.Name}");
-            }
+            foreach ((string path, Type members) in s_npcChoices) Choice(Leaf(Locate(record, path)), members);
         }
 
         /// <summary>
         /// The shipped file read back through the schema: every key it holds is a key the schema ranks,
-        /// and what the canonical write puts out holds everything the file held. The keys of a map the
-        /// author fills himself are the exception, and the schema itself names them: nothing in the
-        /// contract marks the keys of a dictionary, so the tool carries them through as the file had them.
+        /// and what the canonical write puts out holds everything the file held. The keys of a map are the
+        /// exception, and the schema itself names the maps: the order ranks the fields of a record, and a
+        /// map has none, so the tool carries its keys through as the file had them.
         /// <para>Where the shipped file wrote the keys of a record in another order the writing IS the
         /// change — the policy is canonicalizing — so the records it would move are reported and not
         /// failed.</para>
@@ -463,16 +548,9 @@ namespace LastBreathTest.BattleSystemTests
         {
             RecordSchema record = Schema(DataCatalog.EquipItems).Sections[0].Record;
 
-            foreach ((string path, string catalog) in s_equipItemReferences)
-            {
-                FieldSchema field = Leaf(Locate(record, path));
+            foreach ((string path, string catalog) in s_equipItemReferences) Points(Leaf(Locate(record, path)), path, catalog);
 
-                Assert.AreEqual(FieldKind.Reference, field.Kind, $"'{path}' is not a reference");
-                CollectionAssert.Contains(field.RefCatalogs.ToArray(), catalog, $"'{path}' does not point into {catalog}");
-            }
-
-            foreach ((string path, Type members) in s_equipItemChoices)
-                Choice(Leaf(Locate(record, path)), members);
+            foreach ((string path, Type members) in s_equipItemChoices) Choice(Leaf(Locate(record, path)), members);
         }
 
         /// <summary>
@@ -500,12 +578,12 @@ namespace LastBreathTest.BattleSystemTests
                 foreach (JObject item in records)
                 {
                     string slot = schema.Placement.FileFor(key => item[key]?.Value<string>())
-                                  ?? throw new AssertFailedException($"{name}: the placement names no file for '{Id(item)}'");
+                                  ?? throw new AssertFailedException($"{name}: the placement names no file for '{Id(item, EquipItemsCatalogDescriptor.IdField)}'");
 
                     Assert.AreEqual(
                         item[EquipItemsCatalogDescriptor.SlotField]?.Value<string>(),
                         slot,
-                        $"{name}: '{Id(item)}' is placed by something other than the slot it is worn in");
+                        $"{name}: '{Id(item, EquipItemsCatalogDescriptor.IdField)}' is placed by something other than the slot it is worn in");
 
                     slots.Add(slot);
                     if (!string.Equals(name, slot, StringComparison.Ordinal)) named.Add((name, slot));
@@ -560,36 +638,190 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void TheEquipItemsSchemaRanksEveryKeyTheShippedFilesWrite()
         {
-            CatalogSchema schema = Schema(DataCatalog.EquipItems);
-            SchemaKeyOrder order = new(schema);
-            List<string> unknown = [];
-            List<string> reordered = [];
-
-            foreach (string file in ShippedFiles(DataCatalog.EquipItems))
-            {
-                string name = Path.GetFileName(file);
-                JToken root = JsonTreeDocument.Load(file).Root;
-                (List<string> unplaced, List<string> moved) = Written(root, schema, order);
-
-                unknown.AddRange(unplaced.Select(key => $"{name}{key}"));
-                reordered.AddRange(moved.Select(record => $"{name} {record}"));
-
-                string once = CanonicalJsonWriter.Write(root, order, CanonicalJsonOptions.Default);
-                JToken written = JsonTreeDocument.Parse(once).Root;
-
-                Assert.AreEqual(once, CanonicalJsonWriter.Write(written, order, CanonicalJsonOptions.Default),
-                    $"the canonical write of {name} is not settled: writing what it produced says something else again");
-                Assert.IsTrue(JToken.DeepEquals(root, written),
-                    $"the canonical write of {name} says something other than the file it was given");
-            }
-
-            Report("Keys of the EquipItems files the schema does not know", unknown);
-            Report("Records the canonical write would reorder", reordered);
+            List<string> unknown = UnknownKeys(Schema(DataCatalog.EquipItems), DataCatalog.EquipItems);
 
             CollectionAssert.AreEquivalent(
                 s_unknownEquipItemKeys,
                 unknown.Select(LastKey).Distinct(StringComparer.Ordinal).ToArray(),
                 $"the EquipItems files write other keys than the known ones no field of the schema is written under:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", unknown)}");
+        }
+
+        /// <summary>The schema of the rollable pools, built from the shipped DTOs. A pool is a bag of
+        /// modifier lines and nothing else, so what the walk has to say about it is what a line is known
+        /// for wherever one stands.</summary>
+        [TestMethod]
+        public void TheModifierPoolsSchemaBuildsFromTheRealDtosWithTheNotesItsLinesAreKnownFor()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.ModifierPools));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape);
+            Assert.AreEqual(1, schema.Sections.Count);
+            Assert.AreEqual(ModifierPoolsCatalogDescriptor.RecordsKey, schema.Sections[0].Key);
+            Assert.AreEqual(ModifierPoolsCatalogDescriptor.IdField, schema.Sections[0].Record.IdField);
+            Assert.AreEqual(0, schema.LocalizedSuffixes.Count, "a pool is drawn from and never shown: the line it hands out is worded from its own parameter");
+
+            Unexpected(builder.Reflection.Notes, s_modifierLineNotes, builder.Reflection);
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled ModifierPools catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>Every id a pool entry resolves against another catalog, and every name it parses into
+        /// an enum, said so in the schema — the same markup the equipment lines are read by, reached down
+        /// the field a pool holds its entries in.</summary>
+        [TestMethod]
+        public void TheModifierPoolsSchemaNamesTheReferencesAndChoicesTheParserResolves()
+        {
+            RecordSchema record = Schema(DataCatalog.ModifierPools).Sections[0].Record;
+
+            foreach ((string path, string catalog) in s_modifierPoolReferences) Points(Leaf(Locate(record, path)), path, catalog);
+
+            foreach ((string path, Type members) in s_modifierPoolChoices) Choice(Leaf(Locate(record, path)), members);
+        }
+
+        /// <summary>
+        /// The catalog ships two files with two meanings — the pools an item rolls from and the pools the
+        /// ascension gift draws from — and no field of a POOL says which it belongs to: the mythic mark is
+        /// written on its entries, one level below anything a placement rule is handed. So the file a new
+        /// pool goes to is the tool's to choose, and the two facts are held together here: what the files
+        /// are apart, and that the record cannot say it.
+        /// </summary>
+        [TestMethod]
+        public void TheModifierPoolsCatalogLeavesTheFileToTheToolBecauseNoPoolNamesOne()
+        {
+            CatalogSchema schema = Schema(DataCatalog.ModifierPools);
+
+            Assert.IsInstanceOfType<FreeFilePlacement>(schema.Placement, "the pools name a file of their own");
+            CollectionAssert.AreEqual(
+                new[] { ModifierPoolsCatalogDescriptor.IdField, ModifierPoolsCatalogDescriptor.EntriesField },
+                schema.Sections[0].Record.Fields.Select(field => field.JsonName).ToArray(),
+                "a pool writes a field besides its id and its entries — one of them may well name the file");
+
+            List<string> files = ShippedFiles(DataCatalog.ModifierPools);
+            CollectionAssert.AreEquivalent(
+                s_modifierPoolFiles.Select(known => known.File).ToArray(),
+                files.Select(Path.GetFileNameWithoutExtension).ToArray(),
+                "the catalog ships other files than the two known ones");
+
+            foreach (string file in files)
+            {
+                string name = Path.GetFileNameWithoutExtension(file);
+                bool mythic = s_modifierPoolFiles.First(known => known.File == name).Mythic;
+                List<JObject> pools = SectionRecords(JsonTreeDocument.Load(file).Root, ModifierPoolsCatalogDescriptor.RecordsKey);
+
+                Assert.AreNotEqual(0, pools.Count, $"{name} holds no pools — the check would pass on an empty file");
+
+                foreach (JObject pool in pools)
+                    foreach (JObject entry in Entries(pool))
+                        Assert.AreEqual(
+                            mythic,
+                            entry[AffixField]?.Value<string>() == nameof(AffixKind.Mythic),
+                            $"{name}: an entry of '{Id(pool, ModifierPoolsCatalogDescriptor.IdField)}' claims another slot family than the file it is written in stands for");
+            }
+        }
+
+        /// <summary>The shipped pool files read back through the schema. Everything they write is ranked
+        /// bar the insides of a composite: a line holding lines is where the walk stops.</summary>
+        [TestMethod]
+        public void TheModifierPoolsSchemaRanksEveryKeyTheShippedFilesWriteOutsideAComposite()
+        {
+            InsideCompositesOnly(
+                UnknownKeys(Schema(DataCatalog.ModifierPools), DataCatalog.ModifierPools),
+                DataCatalog.ModifierPools);
+        }
+
+        /// <summary>The schema of the resources: three sections of one file, each record found by its own
+        /// id and named in the localization by it. Beside what a modifier line is known for, the walk has
+        /// one thing to say per record — every one of them names its parts in a constructor, so nothing can
+        /// state what its fields start at.</summary>
+        [TestMethod]
+        public void TheResourcesSchemaBuildsFromTheRealDtosWithTheNotesItsRecordsAreKnownFor()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.Resources));
+
+            Assert.AreEqual(RootShape.SectionsOfArrays, schema.Shape);
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    ResourcesCatalogDescriptor.MaterialCategoriesKey,
+                    ResourcesCatalogDescriptor.UpgradeResourcesKey,
+                    ResourcesCatalogDescriptor.CraftingResourcesKey
+                },
+                schema.Sections.Select(section => section.Key).ToArray());
+
+            foreach (SectionSchema section in schema.Sections)
+                Assert.AreEqual(ResourcesCatalogDescriptor.IdField, section.Record.IdField, $"a record of '{section.Key}' is found by another field");
+
+            CollectionAssert.AreEqual(
+                new[] { LocalizedKeyAttribute.NoSuffix },
+                schema.LocalizedSuffixes.ToArray(),
+                "a resource is named in the localization by its own id and has no text of its own besides");
+            Assert.AreEqual(ResourcesCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null));
+
+            Unexpected(builder.Reflection.Notes, s_allowedResourceNotes, builder.Reflection);
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled Resources catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>Every id the resource parser resolves and every name it parses into an enum, said so in
+        /// the schema. The material's category is a reference like any other, and points into the catalog it
+        /// is written in itself: a resource naming a category nothing answers loses its lines at load.</summary>
+        [TestMethod]
+        public void TheResourcesSchemaNamesTheReferencesAndChoicesTheParserResolves()
+        {
+            CatalogSchema schema = Schema(DataCatalog.Resources);
+
+            foreach ((string section, string path, string catalog) in s_resourceReferences)
+                Points(Leaf(Locate(Section(schema, section), path)), $"{section}.{path}", catalog);
+
+            foreach ((string section, string path, Type members) in s_resourceChoices)
+                Choice(Leaf(Locate(Section(schema, section), path)), members);
+        }
+
+        /// <summary>
+        /// The overlay a category and a material carry is a map keyed by the equipment categories, and the
+        /// keys are the schema's answer rather than free words: an author writing a fourth section loses it
+        /// at load with nothing but a report. The shipped file is held against the same members.
+        /// </summary>
+        [TestMethod]
+        public void TheResourcesSchemaKeysTheCategoryOverlayByTheEquipmentCategories()
+        {
+            CatalogSchema schema = Schema(DataCatalog.Resources);
+
+            foreach ((string section, string path) in s_resourceOverlays)
+            {
+                FieldSchema overlay = Locate(Section(schema, section), path);
+
+                Assert.AreEqual(FieldKind.Dictionary, overlay.Kind, $"'{section}.{path}' is not a map");
+                Choice(
+                    overlay.Key ?? throw new AssertFailedException($"'{section}.{path}' lets the author write its keys freely"),
+                    typeof(EquipmentCategory));
+            }
+
+            JToken root = JsonTreeDocument.Load(CatalogFile(schema, DataCatalog.Resources)).Root;
+            List<string> written = [.. Keys(root, ResourcesCatalogDescriptor.OverlayField).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+
+            Assert.AreNotEqual(0, written.Count, "no record of the shipped file splits its lines by category — the check is checking nothing");
+            CollectionAssert.IsSubsetOf(
+                written,
+                Enum.GetNames<EquipmentCategory>(),
+                $"the shipped file splits its lines by something other than an {nameof(EquipmentCategory)}: {string.Join(", ", written)}");
+        }
+
+        /// <summary>The shipped resource file read back through the schema. Everything it writes is ranked
+        /// bar the insides of a composite, the keys of the overlay included: those are the members of an
+        /// enum rather than a record's fields, and they keep the place the file gave them.</summary>
+        [TestMethod]
+        public void TheResourcesSchemaRanksEveryKeyTheShippedFileWritesOutsideAComposite()
+        {
+            InsideCompositesOnly(
+                UnknownKeys(Schema(DataCatalog.Resources), DataCatalog.Resources),
+                DataCatalog.Resources);
         }
 
         /// <summary>
@@ -645,18 +877,134 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0, stale.Count, $"nothing was said about: {string.Join(", ", stale)}");
         }
 
-        /// <summary>Every shipped file of a catalog folder, in a settled order — a catalog split by a
-        /// field is the union of its files, and one of them is not the catalog.</summary>
+        /// <summary>Every shipped file of a catalog folder, in the order the game's own data source reads
+        /// them — a catalog is the union of its files, and one of them is not the catalog.</summary>
         private static List<string> ShippedFiles(string catalog) =>
-            [.. Directory.EnumerateFiles(SharedData.Catalog(catalog), JsonFiles).Order(StringComparer.Ordinal)];
+            [.. CatalogWorkspace.FilePaths(SharedData.Catalog(catalog))];
 
         /// <summary>The records one section of a file holds.</summary>
         private static List<JObject> SectionRecords(JToken root, string section) =>
             [.. (root[section] as JArray ?? []).OfType<JObject>()];
 
         /// <summary>What a record calls itself, for a message about it.</summary>
-        private static string Id(JObject record) =>
-            record[EquipItemsCatalogDescriptor.IdField]?.Value<string>() ?? string.Empty;
+        private static string Id(JObject record, string idField) =>
+            record[idField]?.Value<string>() ?? string.Empty;
+
+        /// <summary>The entries of one shipped pool.</summary>
+        private static List<JObject> Entries(JObject pool) =>
+            [.. (pool[ModifierPoolsCatalogDescriptor.EntriesField] as JArray ?? []).OfType<JObject>()];
+
+        /// <summary>The address of a field of a pool entry: an entry is written under the field a pool
+        /// holds its entries in, and everything about it is addressed from there.</summary>
+        private static string Entry(string path) =>
+            $"{ModifierPoolsCatalogDescriptor.EntriesField}{PathSeparator}{path}";
+
+        /// <summary>The records of one section, which is where a path down a catalog of several starts.</summary>
+        private static RecordSchema Section(CatalogSchema schema, string section) =>
+            schema.Sections.FirstOrDefault(candidate => candidate.Key == section)?.Record
+            ?? throw new AssertFailedException($"the catalog holds no '{section}' section.");
+
+        /// <summary>That a field names a record of a catalog: an unmarked one reads to the tool as free
+        /// text, and the author types a name nothing answers.</summary>
+        private static void Points(FieldSchema field, string path, string catalog)
+        {
+            Assert.AreEqual(FieldKind.Reference, field.Kind, $"'{path}' is not a reference");
+            CollectionAssert.Contains(field.RefCatalogs.ToArray(), catalog, $"'{path}' does not point into {catalog}");
+        }
+
+        /// <summary>The keys one map is written with, wherever in a document it stands.</summary>
+        private static IEnumerable<string> Keys(JToken token, string map)
+        {
+            switch (token)
+            {
+                case JObject holder:
+                    foreach (JProperty property in holder.Properties())
+                    {
+                        if (property.Name == map && property.Value is JObject keyed)
+                            foreach (JProperty key in keyed.Properties())
+                                yield return key.Name;
+
+                        foreach (string nested in Keys(property.Value, map)) yield return nested;
+                    }
+
+                    break;
+
+                case JArray array:
+                    foreach (JToken item in array)
+                        foreach (string nested in Keys(item, map))
+                            yield return nested;
+
+                    break;
+            }
+        }
+
+        /// <summary>How many times a key is written anywhere in a document — how many composites a catalog
+        /// ships, how many of its lines hand out behaviour instead of a number.</summary>
+        private static int Occurrences(JToken token, string key) => token switch
+        {
+            JObject holder => holder.Properties().Sum(property => (property.Name == key ? 1 : 0) + Occurrences(property.Value, key)),
+            JArray array => array.Sum(item => Occurrences(item, key)),
+            _ => 0
+        };
+
+        /// <summary>
+        /// Every shipped file of a catalog read back through its schema: the addresses of the keys no field
+        /// is written under, gathered for the caller to hold against what it expects, while the canonical
+        /// write is checked here — it must lose nothing and say the same thing on a second pass, whichever
+        /// catalog it is given.
+        /// </summary>
+        private static List<string> UnknownKeys(CatalogSchema schema, string catalog)
+        {
+            SchemaKeyOrder order = new(schema);
+            List<string> unknown = [];
+            List<string> reordered = [];
+            int composites = 0;
+            int grants = 0;
+
+            foreach (string file in ShippedFiles(catalog))
+            {
+                string name = Path.GetFileName(file);
+                JToken root = JsonTreeDocument.Load(file).Root;
+                (List<string> unplaced, List<string> moved) = Written(root, schema, order);
+
+                unknown.AddRange(unplaced.Select(key => $"{name}{key}"));
+                reordered.AddRange(moved.Select(record => $"{name} {record}"));
+                composites += Occurrences(root, PartsField);
+                grants += Occurrences(root, GrantField);
+
+                string once = CanonicalJsonWriter.Write(root, order, CanonicalJsonOptions.Default);
+                JToken written = JsonTreeDocument.Parse(once).Root;
+
+                Assert.AreEqual(once, CanonicalJsonWriter.Write(written, order, CanonicalJsonOptions.Default),
+                    $"the canonical write of {name} is not settled: writing what it produced says something else again");
+                Assert.IsTrue(JToken.DeepEquals(root, written),
+                    $"the canonical write of {name} says something other than the file it was given");
+            }
+
+            Report($"Keys of the {catalog} files the schema does not know", unknown);
+            Report("Records the canonical write would reorder", reordered);
+            Report($"Lines of the {catalog} files the walk cannot rank the insides of",
+                [$"{PartsField}: {composites}", $"{GrantField}: {grants}"]);
+
+            return unknown;
+        }
+
+        /// <summary>That the keys the schema could not place all sit inside a composite, and that a
+        /// composite writes the keys a line is known for. A line holds lines, so the walk stops at the
+        /// second one and everything under it is carried through as the file had it — a key ANYWHERE else
+        /// is a field the tool would not let the author touch.</summary>
+        private static void InsideCompositesOnly(List<string> unknown, string catalog)
+        {
+            string inside = $"{PointerSeparator}{PartsField}{PointerSeparator}";
+            List<string> elsewhere = [.. unknown.Where(address => !address.Contains(inside, StringComparison.Ordinal))];
+
+            Assert.AreEqual(0, elsewhere.Count,
+                $"keys of the {catalog} files outside a composite that no field of the schema is written under: {string.Join(", ", elsewhere)}");
+            CollectionAssert.AreEquivalent(
+                s_unknownKeysInsideComposites,
+                unknown.Select(LastKey).Distinct(StringComparer.Ordinal).ToArray(),
+                $"a composite of the {catalog} files writes other keys than the known ones:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", unknown)}");
+        }
 
         /// <summary>Json names of the fields holding a range record — a number or a pair of bounds. Read
         /// off the schema rather than listed, so a field of the same shape added later is counted too.</summary>
@@ -687,14 +1035,14 @@ namespace LastBreathTest.BattleSystemTests
             string name = schema.Placement.FileFor(_ => null)
                           ?? throw new AssertFailedException($"the {catalog} catalog names no file of its own.");
 
-            return Path.Combine(SharedData.Catalog(catalog), name + JsonExtension);
+            return Path.Combine(SharedData.Catalog(catalog), name + CatalogWorkspace.FileExtension);
         }
 
         /// <summary>What a shipped file writes against what the schema knows: the keys no field is
         /// written under, and the records the canonical write would put in another order.</summary>
         private static (List<string> Unknown, List<string> Reordered) Written(JToken root, CatalogSchema schema, SchemaKeyOrder order)
         {
-            HashSet<string> freeMaps = FreeKeyedMaps(schema);
+            HashSet<string> maps = Maps(schema);
             List<string> unknown = [];
             List<string> reordered = [];
 
@@ -706,7 +1054,7 @@ namespace LastBreathTest.BattleSystemTests
                 if (!written.SequenceEqual(ranked, StringComparer.Ordinal))
                     reordered.Add($"{at}: {string.Join(", ", written)} → {string.Join(", ", ranked)}");
 
-                if (freeMaps.Contains(at.Last ?? string.Empty)) continue;
+                if (maps.Contains(at.Last ?? string.Empty)) continue;
 
                 unknown.AddRange(written
                     .Where(key => order.Rank(at, key) == IKeyOrder.Unknown)
@@ -754,10 +1102,7 @@ namespace LastBreathTest.BattleSystemTests
             ?? throw new AssertFailedException($"no shape is picked by '{key}'.");
 
         private static FieldSchema SectionKey(CatalogSchema schema, string section) =>
-            Field(
-                schema.Sections.FirstOrDefault(candidate => candidate.Key == section)?.Record
-                ?? throw new AssertFailedException($"the catalog holds no '{section}' section."),
-                LootTablesCatalogDescriptor.KeyField);
+            Field(Section(schema, section), LootTablesCatalogDescriptor.KeyField);
 
         /// <summary>That a field names something to drop, out of every catalog droppable things live in.</summary>
         private static void NamesADrop(FieldSchema field, string what)
@@ -794,14 +1139,15 @@ namespace LastBreathTest.BattleSystemTests
             return null;
         }
 
-        /// <summary>Json names of the maps whose keys the author writes freely. Read off the schema
-        /// rather than listed here: nothing in the contract marks the keys of a dictionary, so a map is
-        /// recognised by the schema having no key schema for it.</summary>
-        private static HashSet<string> FreeKeyedMaps(CatalogSchema schema) =>
+        /// <summary>Json names of every map the catalog holds, read off the schema rather than listed here.
+        /// The order ranks the keys of a RECORD, and a map has none — whether its keys are free words or the
+        /// members of an enum, they keep the place the file gave them, and what they are allowed to be is
+        /// checked where the map is described.</summary>
+        private static HashSet<string> Maps(CatalogSchema schema) =>
         [
             .. Records(schema)
                 .SelectMany(record => record.Fields)
-                .Where(field => Map(field) is { Key: null })
+                .Where(field => Map(field) != null)
                 .Select(field => field.JsonName)
         ];
 
