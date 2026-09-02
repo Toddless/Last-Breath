@@ -1,5 +1,11 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из переноса GameWorldClock в Core (2026-09-02; accept with minors)
+
+- (minor, мёртвая ветка) `src/Core/Ai/World/Recovery/RestRecoveryService.cs:9,23,42` — после общей регистрации часов ни одна композиция не даёт сервису `clock == null`; фолбэк `_fallbackMinutes` и док «without a clock (sandbox scenes)» описывают несуществующий сценарий, а стоящие часы песочниц (никто не тикает) хуже отсутствующих: если песочница начнёт тикать восстановление, `minutes` всегда 0. Стало: `IWorldClock` обязательный параметр (тесты подают `SettableClock`), ветку снять.
+- (nit, комментарий) `src/Main/Services/GameServiceProvider.cs:92` — «World NPC stack: providers, population, skirmishes, spawner — raids sit on top» перечисляет то, что регистрируется ниже по файлу; сократить до «providers and configs».
+- (гигиена) осиротевшие `.uid` от прежних переездов: `src/Main/Npc/NpcProvider.cs.uid`, `NpcPopulationService.cs.uid`, `NpcWorldRegistry.cs.uid`, `FactionRelationService.cs.uid`, `src/Battle/Internal/Npc/NpcProvider.cs.uid`, `NpcPopulationService.cs.uid`, `src/LootGeneration/Services/NpcModifierProvider.cs.uid` — снести одним проходом (заказано вместе с переносом `PlayerLifecycleConfigProvider`).
+
 ## Из переноса NpcBuffs и базовых данных способностей в Core (2026-09-02; оба accept)
 
 - (nit, комментарий обещает больше) `src/Core/Data/GameData/GameDataDependencies.cs:37-38` — «…or its corpse is paid out»: LootGeneration каталог бафов не спрашивает; настоящая причина общей регистрации — два тела, спавнящие NPC, живут в разных композициях.
