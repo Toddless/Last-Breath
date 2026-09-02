@@ -114,7 +114,7 @@
 
 ### 1.2 `Body_Stoneheart` — броня с жизнью и армором
 
-База (`BodyArmor.json`): `Health 180..350` → 265, `Armor 300..750` → 525.
+База (`Body.json`): `Health 180..350` → 265, `Armor 300..750` → 525.
 Аффиксы из пула `Body` (:819): P1 `Health Flat 200` (Local) · P2 `Armor Flat 700` (Local)
 · S1 `FireResistance Flat 0.15` (Global) · S2 `HealthRecovery Flat 25` (Local).
 

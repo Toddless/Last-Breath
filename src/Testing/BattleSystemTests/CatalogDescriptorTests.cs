@@ -203,14 +203,6 @@ namespace LastBreathTest.BattleSystemTests
         /// ring lands in is the equipment component's answer, not the record's.</summary>
         private const EquipmentPiece SlotNoItemCarries = EquipmentPiece.Ring2;
 
-        /// <summary>The files whose name is not the slot their records carry. One, and it is data rather
-        /// than schema: the placement rule hands the tool the slot a record names, so a record saved out
-        /// of BodyArmor.json lands in a Body.json beside it until the file is renamed.</summary>
-        private static readonly (string File, string Slot)[] s_equipItemFilesNamedOtherThanTheirSlot =
-        [
-            ("BodyArmor", nameof(EquipmentPiece.Body))
-        ];
-
         /// <summary>Keys the shipped equipment files write that no field of the schema is written under.
         /// Both are data rather than schema: the game's reader matches names without regard to case and
         /// passes over what it cannot place, so neither is heard from at load.</summary>
@@ -558,15 +550,14 @@ namespace LastBreathTest.BattleSystemTests
         /// every record of every shipped file answers with the slot it carries, and the file it sits in is
         /// named after it. The slots are all the paperdoll has bar the second ring, which no item is
         /// written for.
-        /// <para>A file named otherwise than its records' slot is named here one by one: the rule hands the
-        /// writer the slot, so such a file is one the tool would write a second copy of beside.</para>
+        /// <para>The placement rule hands the writer the slot, so a file named otherwise than its records'
+        /// slot is one the tool would write a second copy of beside.</para>
         /// </summary>
         [TestMethod]
         public void TheEquipItemsCatalogIsSplitIntoOneFilePerSlotByTheRecordsOwnField()
         {
             CatalogSchema schema = Schema(DataCatalog.EquipItems);
             List<string> files = ShippedFiles(DataCatalog.EquipItems);
-            List<(string File, string Slot)> named = [];
             HashSet<string> slots = new(StringComparer.Ordinal);
 
             foreach (string file in files)
@@ -585,15 +576,10 @@ namespace LastBreathTest.BattleSystemTests
                         slot,
                         $"{name}: '{Id(item, EquipItemsCatalogDescriptor.IdField)}' is placed by something other than the slot it is worn in");
 
+                    Assert.AreEqual(name, slot, $"'{Id(item, EquipItemsCatalogDescriptor.IdField)}' sits in a file named other than the slot it carries");
                     slots.Add(slot);
-                    if (!string.Equals(name, slot, StringComparison.Ordinal)) named.Add((name, slot));
                 }
             }
-
-            CollectionAssert.AreEquivalent(
-                s_equipItemFilesNamedOtherThanTheirSlot,
-                named.Distinct().ToArray(),
-                "the files whose name is not the slot their records carry are other than the ones named");
 
             string[] worn = [.. Enum.GetNames<EquipmentPiece>().Where(piece => piece != SlotNoItemCarries.ToString())];
             CollectionAssert.AreEquivalent(worn, slots.ToArray(), "the shipped records cover other slots than the paperdoll has");
