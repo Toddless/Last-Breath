@@ -1,14 +1,14 @@
-namespace Battle.Internal.Npc
+namespace Core.Entity.NpcModifiers
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Data;
-    using Core.Data.GameData;
-    using Core.Data.NpcBuffsData;
-    using Core.Entity;
-    using Core.Enums;
-    using Core.Modifiers;
+    using Data;
+    using Data.GameData;
+    using Data.NpcBuffsData;
+    using Entity;
+    using Enums;
+    using Modifiers;
     using Newtonsoft.Json;
 
     /// <summary>

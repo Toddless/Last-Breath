@@ -38,7 +38,6 @@ namespace Battle.Services
                 .AddGameDataParticipant<INpcProvider, NpcProvider>()
                 .AddSingleton<INpcPopulationService, NpcPopulationService>()
                 .AddSingleton<INpcWorldRegistry, NpcWorldRegistry>()
-                .AddGameDataParticipant<INpcBuffProvider, NpcBuffProvider>()
                 .AddSingleton<INpcSkirmishService, NpcSkirmishService>()
                 .AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>()
                 .AddGameDataParticipant<IWorldClock, GameWorldClock>()

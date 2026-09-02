@@ -1,6 +1,7 @@
 ﻿namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
+    using Battle.Source.Abilities;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Data.GameData;
@@ -11,8 +12,9 @@
     /// <summary>
     /// Seating an augment names two ids and holds neither, so the fitting rule is only worth as much
     /// as the thing that turns those ids into records. That thing is the augment catalog: a data
-    /// participant of Core's own, reading the section that declares the records and the tags of the
-    /// abilities a fit is judged against. These tests hold the seam end to end — the shipped data
+    /// participant of Core's own, reading the section that declares the records and the abilities a fit
+    /// is judged against — whole, since the registry that builds them reads no file of its own any
+    /// more and asks here instead. These tests hold the seam end to end — the shipped data
     /// reaching the catalog through the real loader, the catalog reaching the board through the
     /// container a project composes, and the board refusing what the rule refuses instead of taking
     /// what it is handed.
@@ -80,6 +82,63 @@
             }
 
             Assert.IsTrue(tags > 0, "no shipped ability declares a tag, so an empty answer would pass the walk above");
+        }
+
+        [TestMethod]
+        public void TheCatalogAnswersWithTheBaseRecordOfEveryAbilityHiddenOnesIncluded()
+        {
+            // The records themselves, not only the tags off them: an editor outside the battle module
+            // lists abilities, and the module that builds them asks this same catalog what to build
+            // from. Hidden abilities are records like any other — what may be LEARNED is a question
+            // about the record, so a catalog quietly dropping them would leave the boss reactions
+            // unbuildable while every walk over the visible ones still passed.
+            IAbilityAugmentCatalog catalog = ShippedCatalog();
+            int declared = 0;
+            int hidden = 0;
+
+            foreach (JObject ability in DeclaredAbilities())
+            {
+                string id = ability.Value<string>("id") ?? string.Empty;
+                AbilityBaseData? record = catalog.FindAbility(id);
+
+                Assert.IsNotNull(record, $"the catalog does not hold '{id}', which the section declares");
+                Assert.AreEqual(id, record.Id, $"'{id}' came back under another id");
+                Assert.AreEqual(ability.Value<bool>("hidden"), record.Hidden, $"'{id}' came back with another answer about being castable only internally");
+                declared++;
+                if (record.Hidden) hidden++;
+            }
+
+            Assert.IsTrue(declared > 0, "the shipped data declares no ability at all, so the walk proves nothing");
+            Assert.IsTrue(hidden > 0, "no shipped ability is hidden, so dropping the hidden ones would pass the walk above");
+            Assert.AreEqual(declared, catalog.Abilities.Count, "the catalog holds abilities the section does not write, or fewer than it does");
+            CollectionAssert.AreEquivalent(
+                catalog.Abilities.Select(record => record.Id).ToArray(), catalog.AbilityIds.ToArray(),
+                "the ids the catalog offers are not the ids of the records it holds");
+            Assert.IsNull(catalog.FindAbility(UnwrittenAbility), "an id nothing declares came back as a record");
+        }
+
+        [TestMethod]
+        public void TheAbilityRegistryReadsItsBaseDataOutOfTheCatalogAndKeepsNoneOfItsOwn()
+        {
+            // The registry stopped reading the files: it is handed the catalog and asks it at the
+            // moment of the question. Composed before anything is loaded it therefore knows nothing,
+            // and loading the catalog ALONE — the registry is no participant of that load — is what
+            // makes it know everything. A registry filling a dictionary of its own would stay empty
+            // here, and one reading the catalog in its constructor would stay empty too.
+            var catalog = new AbilityAugmentCatalog();
+            var registry = new AbilityProvider(catalog);
+
+            Assert.AreEqual(0, registry.KnownAbilityIds.Count, "the registry knew abilities before a single file was read");
+
+            LoadInto(catalog);
+
+            CollectionAssert.AreEquivalent(catalog.AbilityIds.ToArray(), registry.KnownAbilityIds.ToArray(),
+                "the registry answers about other abilities than the catalog holds, so it kept a second copy of the section");
+            foreach (AbilityBaseData record in catalog.Abilities)
+            {
+                Assert.AreEqual(record.Stance, registry.GetAbilityStance(record.Id), $"'{record.Id}' is put in another stance than its record declares");
+                Assert.AreEqual(record.Hidden, registry.IsHidden(record.Id), $"'{record.Id}' is judged learnable against another record than its own");
+            }
         }
 
         [TestMethod]
@@ -164,11 +223,12 @@
         private static ServiceProvider ProjectComposition() => Composition().BuildServiceProvider();
 
         /// <summary>The shipped data into a composed container, through the loader the game runs.</summary>
-        private static void LoadInto(ServiceProvider container)
+        private static void LoadInto(ServiceProvider container) => LoadInto(container.GetRequiredService<AbilityAugmentCatalog>());
+
+        /// <summary>The shipped data into one catalog, through that same loader.</summary>
+        private static void LoadInto(AbilityAugmentCatalog catalog)
         {
-            var service = new GameDataService(
-                new FileSystemDataSource(SharedData.Root()),
-                [container.GetRequiredService<AbilityAugmentCatalog>()]);
+            var service = new GameDataService(new FileSystemDataSource(SharedData.Root()), [catalog]);
             List<string> failures = [];
             service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
 

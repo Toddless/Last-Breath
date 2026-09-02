@@ -6,32 +6,28 @@
     using Core;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
-    using Core.Data.GameData;
     using Core.Enums;
-    using Newtonsoft.Json;
 
     /// <summary>
-    /// The abilities as their data declares them: what each one is built from, and how a copy of an
-    /// augment becomes the upgrade it installs. The records of the augments themselves are not read
-    /// here — they are asked of <see cref="IAbilityAugmentCatalog"/>, which every composition holds,
-    /// while the code that turns one into an upgrade is this module's own.
+    /// How an ability is built from what its data declares, and how a copy of an augment becomes the
+    /// upgrade it installs. Neither the ability records nor the augment records are read here — both
+    /// are asked of <see cref="IAbilityAugmentCatalog"/>, which every composition holds, while the
+    /// factories and the numeric table that turn a record into something castable are this module's
+    /// own. The catalog is asked at the moment of the question: it is filled by the same load that
+    /// composes this registry, and reading it up front would freeze an empty one.
     ///
     /// An ability is created bare. What it wears is not a property of the ability but of the sockets
     /// its owner has filled, so the arrangement is put on by <see cref="IAbilityAugmentBinder"/> and
     /// never handed over at construction.
     /// </summary>
     public partial class AbilityProvider(IAbilityAugmentCatalog augments, Func<IEffectProvider?>? effects = null)
-        : IAbilityProvider, IGameDataParticipant, IAugmentLaidEffects
+        : IAbilityProvider, IAugmentLaidEffects
     {
-        private readonly Dictionary<string, AbilityBaseData> _abilityBaseData = [];
-
         /// <summary>Resolved lazily: a sandbox without an effect registry still builds every other
         /// augment, and a behaviour that needs one refuses out loud instead of throwing.</summary>
         private readonly Func<IEffectProvider?> _effects = effects ?? (static () => null);
 
-        public IReadOnlyList<string> Catalogs => [DataCatalog.Abilities];
-
-        public IReadOnlyCollection<string> KnownAbilityIds => _abilityBaseData.Keys;
+        public IReadOnlyCollection<string> KnownAbilityIds => augments.AbilityIds;
 
         /// <summary>Every augment this build knows how to make an upgrade of — the augments a factory
         /// is written for and the augments the parameter table describes, which are two halves of one
@@ -81,13 +77,6 @@
         private IEnumerable<string> FactoryMoves(string augmentId) =>
             AbilityUpgrades.TryGetValue(augmentId, out AugmentFactory factory) ? factory.MovedParameters : [];
 
-        public void Apply(string catalog, GameDataFile file)
-        {
-            var root = JsonConvert.DeserializeObject<AbilityDataRoot>(file.Json)
-                       ?? throw new InvalidOperationException("Failed to deserialize ability data");
-            foreach (AbilityBaseData abilityData in root.Abilities) _abilityBaseData[abilityData.Id] = abilityData;
-        }
-
         public IAbility CreateAbility(string abilityId) => GetFactory(abilityId).Invoke(GetBaseData(abilityId));
 
         /// <summary>The stance an ability belongs to — the ability book partitions by it on Learn.</summary>
@@ -96,8 +85,10 @@
         /// <summary>Internal-cast-only ability (boss reactions): never learnable, never shown in trees.</summary>
         public bool IsHidden(string abilityId) => GetBaseData(abilityId).Hidden;
 
+        /// <summary>The record the catalog holds for the id — asked now rather than kept, so an empty
+        /// catalog is a catalog not loaded YET and not a registry frozen around one.</summary>
         private AbilityBaseData GetBaseData(string abilityId) =>
-            _abilityBaseData.GetValueOrDefault(abilityId)
+            augments.FindAbility(abilityId)
             ?? throw new KeyNotFoundException($"No base data loaded for ability '{abilityId}'");
 
         private Func<AbilityBaseData, IAbility> GetFactory(string abilityId) =>

@@ -8,9 +8,10 @@ namespace LastBreathTest.BattleSystemTests
 
     /// <summary>
     /// The shipped ability data as the game reads it: the real source, the real loader, the real
-    /// parsers. Two participants read that one catalog — the augment records are Core's, because
-    /// every composition needs them, while the abilities and the code that builds an augment are the
-    /// battle module's — so a test asking about either takes both out of a single load.
+    /// parsers. The catalog is what reads that file — the records of both sections are Core's, because
+    /// every composition needs them — while the registry that BUILDS an ability or an augment out of a
+    /// record is the battle module's and reads nothing. A test asking about either takes both out of a
+    /// single load, the way a composed game holds them.
     /// </summary>
     internal static class ShippedAbilityData
     {
@@ -121,7 +122,7 @@ namespace LastBreathTest.BattleSystemTests
             // every such walk asserting about numbers no shipped composition ever uses.
             var effects = new EffectProvider();
             var abilities = new AbilityProvider(augments, () => effects);
-            var service = new GameDataService(new FileSystemDataSource(root), [abilities, augments, effects]);
+            var service = new GameDataService(new FileSystemDataSource(root), [augments, effects]);
             List<string> failures = [];
             service.LoadFailed += (context, exception) => failures.Add($"{context}: {exception.Message}");
 

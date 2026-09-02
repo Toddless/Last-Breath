@@ -40,7 +40,11 @@
                 sp.GetService<IPassiveTreeService>));
             services.AddSingleton<IMartialArtMastery>(sp => sp.GetRequiredService<MartialArtMastery>());
             services.AddSingleton<IGameDataParticipant>(sp => sp.GetRequiredService<MartialArtMastery>());
-            services.AddGameDataParticipant<IAbilityProvider, AbilityProvider>();
+            // Not a data participant: the ability records are read by the shared catalog, and this
+            // registry asks it for them. The concrete type is registered on its own because the laid
+            // effects below resolve it by type — one singleton wearing three faces, not three of them.
+            services.AddSingleton<AbilityProvider>();
+            services.AddSingleton<IAbilityProvider>(sp => sp.GetRequiredService<AbilityProvider>());
             // The records an install names are NOT registered here: a composition without this module
             // still has augments to offer, judge and handle, so the catalog is a shared data
             // participant (AddSharedGameDataParticipants) and this module only consumes it.

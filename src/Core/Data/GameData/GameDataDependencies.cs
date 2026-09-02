@@ -4,6 +4,8 @@ namespace Core.Data.GameData
     using Battle;
     using Battle.Abilities;
     using Battle.CombatRules;
+    using Entity;
+    using Entity.NpcModifiers;
     using Localization;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -32,6 +34,9 @@ namespace Core.Data.GameData
             // Shared because control resistance, arena and effect rules are asked by every project that
             // fights, and a bootstrap-local registration once left one of them without the file.
             services.AddGameDataParticipant<ICombatRulesProvider, CombatRulesProvider>();
+            // Shared for the same reason: a buff id rides on an NPC modifier, and the modifier is rolled
+            // wherever an NPC is spawned or its corpse is paid out, not only where the fight happens.
+            services.AddGameDataParticipant<INpcBuffProvider, NpcBuffProvider>();
             return services;
         }
 

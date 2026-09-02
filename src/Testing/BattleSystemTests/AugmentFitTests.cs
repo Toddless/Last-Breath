@@ -447,13 +447,17 @@
         private sealed class AugmentCatalogStub : IAbilityAugmentCatalog
         {
             private readonly Dictionary<string, AbilityAugmentData> _augments = new(StringComparer.Ordinal);
-            private readonly Dictionary<string, string[]> _abilityTags = new(StringComparer.Ordinal);
+            private readonly Dictionary<string, AbilityBaseData> _abilities = new(StringComparer.Ordinal);
 
             public IReadOnlyCollection<AbilityAugmentData> All => _augments.Values;
 
+            public IReadOnlyCollection<AbilityBaseData> Abilities => _abilities.Values;
+
+            public IReadOnlyCollection<string> AbilityIds => _abilities.Keys;
+
             public AugmentCatalogStub WithAbility(string abilityId, params string[] tags)
             {
-                _abilityTags[abilityId] = tags;
+                _abilities[abilityId] = new AbilityBaseData { Id = abilityId, Tags = tags };
                 return this;
             }
 
@@ -465,7 +469,9 @@
 
             public AbilityAugmentData? Find(string augmentId) => _augments.GetValueOrDefault(augmentId);
 
-            public IReadOnlyCollection<string> TagsOf(string abilityId) => _abilityTags.GetValueOrDefault(abilityId, []);
+            public AbilityBaseData? FindAbility(string abilityId) => _abilities.GetValueOrDefault(abilityId);
+
+            public IReadOnlyCollection<string> TagsOf(string abilityId) => FindAbility(abilityId)?.Tags ?? [];
         }
     }
 }

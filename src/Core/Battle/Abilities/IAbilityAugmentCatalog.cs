@@ -21,6 +21,19 @@ namespace Core.Battle.Abilities
         /// <summary>The augment's own record; null when the catalog holds no augment of that id.</summary>
         AbilityAugmentData? Find(string augmentId);
 
+        /// <summary>Every ability record the data declares, hidden ones included — what an ability is
+        /// before anything is built out of it. Asked by whoever lists or edits the abilities instead of
+        /// naming one, which is a question the module that BUILDS them cannot be the only answer to.</summary>
+        IReadOnlyCollection<AbilityBaseData> Abilities { get; }
+
+        /// <summary>The ids of those records. Membership is its own question — a passive node and an NPC
+        /// entry both ask "is this id written anywhere" per node and per entry — and answering it by
+        /// walking the records would make a lookup out of every one of them.</summary>
+        IReadOnlyCollection<string> AbilityIds { get; }
+
+        /// <summary>The ability's own record; null when the catalog holds no ability of that id.</summary>
+        AbilityBaseData? FindAbility(string abilityId);
+
         /// <summary>The combat tags of an ability; empty when the catalog does not hold the ability.</summary>
         IReadOnlyCollection<string> TagsOf(string abilityId);
     }
