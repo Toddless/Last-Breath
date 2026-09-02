@@ -105,20 +105,11 @@ namespace Tooling.Catalogs
         }
 
         /// <summary>The id the record is written under, or its place in the section when it carries
-        /// none — a settings document, a position at a loot table. An id written as something other
-        /// than text is named the way the file holds it: it is the word the author searches the file
-        /// for, and no machine's culture has a say in it.</summary>
-        private static string Id(RecordSchema schema, JToken token, int index)
-        {
-            if (schema.IdField is { } name
-                && token is JObject holder
-                && holder.TryGetValue(name, StringComparison.Ordinal, out JToken? value)
-                && value is JValue { Value: not null }
-                && JsonScalars.Written(value) is { Length: > 0 } written)
-                return written;
-
-            return Text(IndexIdFormat, index);
-        }
+        /// none — a settings document, a position at a loot table. Reading the id is the record's own
+        /// rule, because a record is asked the same question again every time it is named to its
+        /// author; only the standing-in name is decided here, where the place is known.</summary>
+        private static string Id(RecordSchema schema, JToken token, int index) =>
+            CatalogRecord.WrittenId(schema, token) ?? Text(IndexIdFormat, index);
 
         private static string Named(JsonPointer pointer) => pointer.IsRoot ? Notes.RootName : pointer.ToString();
 

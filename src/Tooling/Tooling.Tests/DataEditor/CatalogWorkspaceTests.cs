@@ -415,57 +415,33 @@ namespace Tooling.Tests.DataEditor
             return workspace.Catalogs[0];
         }
 
-        private void Write(string catalog, string file, string content)
-        {
-            string folder = Path.Combine(_root, catalog);
+        private void Write(string catalog, string file, string content) =>
+            CatalogFixture.Write(_root, catalog, file, content);
 
-            Directory.CreateDirectory(folder);
-            File.WriteAllText(Path.Combine(folder, file), content);
-        }
-
-        private static ICatalogDescriptor Npcs() => new Descriptor(
+        private static ICatalogDescriptor Npcs() => CatalogFixture.Descriptor(
             NpcCatalog,
             RootShape.ArrayUnderKey,
-            [Section(NpcsKey, Record(IdField))]);
+            [CatalogFixture.Section(NpcsKey, Record(IdField))]);
 
-        private static ICatalogDescriptor Tables() => new Descriptor(
+        private static ICatalogDescriptor Tables() => CatalogFixture.Descriptor(
             TablesCatalog,
             RootShape.SectionsOfArrays,
-            [Section(GeneralKey, Record(IdField)), Section(IndividualKey, Record(IdField))]);
+            [CatalogFixture.Section(GeneralKey, Record(IdField)), CatalogFixture.Section(IndividualKey, Record(IdField))]);
 
-        private static ICatalogDescriptor Map() => new Descriptor(
+        private static ICatalogDescriptor Map() => CatalogFixture.Descriptor(
             MapCatalog,
             RootShape.Dictionary,
-            [Section(RootKey, Record(idField: null))]);
+            [CatalogFixture.Section(RootKey, Record(idField: null))]);
 
-        private static ICatalogDescriptor Settings() => new Descriptor(
+        private static ICatalogDescriptor Settings() => CatalogFixture.Descriptor(
             SettingsCatalog,
             RootShape.Single,
-            [Section(RootKey, Record(IdField))]);
+            [CatalogFixture.Section(RootKey, Record(IdField))]);
 
-        private static SectionSchema Section(string key, RecordSchema record) => new() { Key = key, Record = record };
-
-        private static RecordSchema Record(string? idField) => new()
-        {
-            TypeName = nameof(Record),
-            Fields =
-            [
-                new FieldSchema { JsonName = IdField, Kind = FieldKind.String },
-                new FieldSchema { JsonName = NameField, Kind = FieldKind.String }
-            ],
-            IdField = idField
-        };
-
-        /// <summary>A catalog described in full by hand: the builder is offered and not used, which is
-        /// what keeps the shapes under test out of the reflector's reach.</summary>
-        private sealed class Descriptor(string catalog, RootShape shape, SchemaList<SectionSchema> sections)
-            : ICatalogDescriptor
-        {
-            public string Catalog => catalog;
-
-            public CatalogSchema Describe(ISchemaBuilder builder) =>
-                new(shape, sections, [], new SingleFilePlacement { FileName = catalog });
-        }
+        private static RecordSchema Record(string? idField) => CatalogFixture.Record(
+            idField,
+            CatalogFixture.Field(IdField, FieldKind.String),
+            CatalogFixture.Field(NameField, FieldKind.String));
 
         /// <summary>A describer that throws something the library was never told to expect. A descriptor
         /// is code from outside it, and one catalog refusing to be described has to cost that catalog
