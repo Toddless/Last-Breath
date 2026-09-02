@@ -1,5 +1,18 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из описателя каталога Npc (2026-09-02; accept with minors) — часть уходит в следующие описатели
+
+- (minor, тест не фальсифицируем) `src/Testing/BattleSystemTests/CatalogDescriptorTests.cs:181-186` — `once == twice` структурно не может упасть (стабильная сортировка по рангу идемпотентна); заменить на «канонический прогон ничего не теряет»: `JToken.DeepEquals(root, Parse(once).Root)`; четыре переставленные записи боссов держать именованным списком, чтобы пятая стала падением. Док теста привести к проверяемому.
+- (minor, адресность) `CatalogDescriptorTests.cs:171,241` — свободные словари исключаются по имени последнего сегмента (`properties`, `baseParameters`), а не по узлу схемы; словарь под массивом не ловится. Вести `FieldSchema?` рядом с обходом json и исключать по `Kind == Dictionary && Key == null` этого узла.
+- (minor, дубль) `CatalogDescriptorTests.cs:293` ↔ `src/Testing/ShippedCatalogTests.cs:38` — рефлексия по константам `DataCatalog` и `"*.json"` дважды; общий `DataCatalogNames.All()` рядом с `SharedDataRoot.cs`.
+- (minor, не удержано) `CatalogDescriptorTests.cs:104-118` — тест (б) не пинит `LocalizedSuffixes` (только имя) и `Sections.Count`.
+- (minor, не удержано) `CatalogDescriptorTests.cs:39-46,130` — ссылки проверяются `Contains` без `AllowEmpty` и без точного состава `RefCatalogs`; тройка `(Path, Catalog, AllowEmpty)` + `AreEquivalent`.
+- (minor → следующий описатель) пин «поле с суффиксом Id — ссылка либо отказ» теперь пишется по схеме: `FieldSchema.RefusedAsReference` появился (T2.7); добавить в `CatalogDescriptorTests` общий проход по `CatalogDescriptors.All`.
+- (риск владельцу) `src/Core/Core.csproj` — `Tooling.Schema` первый не-Godot проект под `Godot.NET.Sdk`-ссылкой, у него нет `<Configurations>Debug;ExportDebug;ExportRelease;Release</Configurations>`; сборка проверена только в Debug. Прогнать `dotnet build -c ExportRelease src/Main/LastBreath.csproj`; если конфигурация не подхватывается — дописать `<Configurations>` в `Tooling.Schema.csproj` (и `Tooling.Core.csproj`, его тянет тест-проект).
+- (nit) `src/Main/LastBreath.sln` не содержит `Tooling.Schema`/`Tooling.Core`, на которые ссылаются Core и тесты — добавить в решение.
+- (nit) `NpcBehaviorData.cs:16` — `NpcBehaviorData.Stance` парсится `ParseEnum<Stance>`, не размечен (каталог NpcBehaviors без описателя); `NpcData.cs:211-213` — атрибуты разнесены на три строки; `NpcCatalogDescriptor.cs:36` — имя файла взято из константы имени каталога, завести `FileName`.
+- (данные, находка владельцу) `Npc.json`: у `Npc_Boss_Digri`, `Npc_Boss_Zigri`, `Npc_Boss_Rat_King`, `Npc_Boss_Bone_Pack_Leader` ключи стоят не в порядке DTO (`rarity`/`authored` после `entityType`; у последнего `passives` перед `abilityBehaviors`) — первый сейв из тула переставит их (ожидаемо по политике записи).
+
 ## Из переноса PlayerLifecycleConfigProvider (2026-09-02; accept with minors)
 
 - (minor, IDE0005) `src/Battle/Services/GameServiceProvider.cs:3` `using Core.Ai.World;`, `src/Main/Services/GameServiceProvider.cs:5,45` `using Core.Ai.World;` и `using World;` — осиротели после переезда (ни один тип этих пространств в файлах больше не называется); `.editorconfig` держит IDE0005 как error, но `EnforceCodeStyleInBuild` не выставлен. Снять три строки при следующей правке бутстрапов.
