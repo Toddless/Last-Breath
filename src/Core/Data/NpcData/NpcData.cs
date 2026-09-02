@@ -6,7 +6,7 @@ namespace Core.Data.NpcData
     using Enums;
     using GameData;
     using Newtonsoft.Json;
-    using Tooling.Schema;
+    using Schema;
 
     /// <summary>
     /// One NPC definition from Npc.json. Enums travel as names (fraction, entityType, stances)

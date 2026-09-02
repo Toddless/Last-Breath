@@ -1,7 +1,7 @@
 namespace Core.Data.CraftingData
 {
     using Enums;
-    using Tooling.Schema;
+    using Schema;
 
     public record CraftingResourceData(
         string Id,

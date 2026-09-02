@@ -2,7 +2,6 @@ namespace Core.Data.Schema
 {
     using GameData;
     using LootTable;
-    using Tooling.Schema;
 
     /// <summary>
     /// A position naming the one thing it drops. One of the two shapes a seat at a loot table is

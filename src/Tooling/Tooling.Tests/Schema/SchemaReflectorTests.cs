@@ -91,6 +91,11 @@ namespace Tooling.Tests.Schema
         private const int MinTier = 0;
         private const int MaxTier = 3;
 
+        /// <summary>The ends of a range written as words: what markup carrying the right name and the
+        /// wrong kind of thing under it holds.</summary>
+        private const string TierFloor = "0";
+        private const string TierCeiling = "3";
+
         private const int AuthoredLevel = 7;
         private const float NoScaling = 0f;
 
@@ -617,6 +622,20 @@ namespace Tooling.Tests.Schema
             Said(nameof(AwkwardDto), KeyField);
         }
 
+        /// <summary>Markup the tool knows by name and that answers to nothing behind it — a name carried
+        /// by nothing, and a name carrying something of another kind entirely. The field is read as
+        /// unmarked and the break is named: markup that quietly does nothing looks exactly like a field
+        /// nobody has marked up yet.</summary>
+        [TestMethod]
+        public void MarkupNotAnsweringToTheNamesItIsReadBy_IsSaidOutLoud()
+        {
+            RecordSchema record = _reflector.Record(typeof(BrokenMarkupDto));
+
+            Assert.IsNull(Field(record, TierField).Range);
+            Said(nameof(BrokenMarkupDto), TierField, MarkupNames.Min);
+            Said(nameof(BrokenMarkupDto), ModifiersField, MarkupNames.Field);
+        }
+
         [TestMethod]
         public void TwoMembersUnderOneJsonName_LeaveOneFieldAndOneWord()
         {
@@ -928,6 +947,14 @@ namespace Tooling.Tests.Schema
             [NotARef] public string Key { get; init; } = string.Empty;
 
             [Discriminator(KeyField)] public List<ModifierBase> Modifiers { get; init; } = [];
+        }
+
+        /// <summary>Markup wearing the names the tool reads by and answering to neither of them.</summary>
+        internal sealed record BrokenMarkupDto
+        {
+            [Broken.Range(TierFloor, TierCeiling)] public int Tier { get; init; }
+
+            [Broken.Discriminator] public List<ModifierBase> Modifiers { get; init; } = [];
         }
 
         internal sealed record TreeNodeDto

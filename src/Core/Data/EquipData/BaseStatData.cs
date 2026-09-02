@@ -2,7 +2,7 @@ namespace Core.Data.EquipData
 {
     using Enums;
     using Newtonsoft.Json;
-    using Tooling.Schema;
+    using Schema;
 
     public record BaseStatData
     {

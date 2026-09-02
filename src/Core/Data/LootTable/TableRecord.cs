@@ -6,7 +6,7 @@ namespace Core.Data.LootTable
     using GameData;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema;
+    using Schema;
 
     /// <summary>
     /// One position of a loot table: what the budget buys when the position comes up, and what it

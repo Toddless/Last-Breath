@@ -3,7 +3,7 @@ namespace Core.Data.EquipData
     using System.Collections.Generic;
     using Enums;
     using Newtonsoft.Json;
-    using Tooling.Schema;
+    using Schema;
 
     /// <summary>One equipment template from the EquipItems catalog. The catalog is split into a file per
     /// slot, and <see cref="EquipmentPart"/> is the field that says which — a record carries its own

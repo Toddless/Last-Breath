@@ -4,7 +4,7 @@ namespace Core.Data.EquipData
     using Enums;
     using GameData;
     using Newtonsoft.Json;
-    using Tooling.Schema;
+    using Schema;
 
     public record ItemModifier
     {

@@ -4,7 +4,7 @@ namespace Core.Data.NpcData
     using Ai;
     using GameData;
     using Newtonsoft.Json;
-    using Tooling.Schema;
+    using Schema;
 
     /// <summary>
     /// One behavior archetype from NpcBehavior.json (aggressive/defensive/mixed, keyed to a stance).

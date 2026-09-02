@@ -3,7 +3,7 @@ namespace Core.Data.EquipData
     using System;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema;
+    using Schema;
 
     /// <summary>Polymorphic "updateLevel" field: a plain number (exact starting level) or a
     /// {"min": X, "max": Y} object — the range spec the item minter will roll (next block); until then

@@ -1,6 +1,10 @@
-namespace Tooling.Schema
+namespace Core.Data.Schema
 {
     using System;
+
+    // Data markup for external tools. The game reads none of it: the authoring tool recognises an
+    // attribute by the NAME of its type and reads what it carries by the NAMES of its properties, so a
+    // rename here is a rename of the contract.
 
     /// <summary>The string holds the id of a record in the named catalog; on a collection of strings,
     /// every element does. Written once per catalog the field may point into: one loot position names

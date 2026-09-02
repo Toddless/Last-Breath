@@ -79,7 +79,8 @@ namespace Tooling.Schema.Reflection
 
     /// <summary>
     /// Reads a DTO into a <see cref="RecordSchema"/>: json names as the game's serializer builds them,
-    /// field kinds from the CLR types, and the <see cref="Tooling.Schema"/> markup on top of both.
+    /// field kinds from the CLR types, and the markup the game writes on its members — recognised by the
+    /// names in <see cref="MarkupNames"/>, never by type — on top of both.
     /// <para>Properties are read, in the order the type declares them and base types first, which is the
     /// order a canonical file is written in. A public field is named in the report and left out: the
     /// metadata puts every field of a type before every property of it, so a schema holding both would
@@ -383,7 +384,7 @@ namespace Tooling.Schema.Reflection
 
         private FieldSchema Field(PropertyInfo member, string jsonName, Type type, object? value, Walk walk)
         {
-            Markup markup = Markup.Of(member);
+            Markup markup = MarkupOf(member, new At(walk.Owner, jsonName));
 
             Agree(jsonName, type, markup, walk);
             Converted(jsonName, type, member, walk);
@@ -396,6 +397,84 @@ namespace Tooling.Schema.Reflection
                 Default = Written(field.Kind, value),
                 Hidden = markup.Hidden
             };
+        }
+
+        /// <summary>The markup written on one member. The attributes belong to the game, which the tool
+        /// does not reference, so each is recognised by the NAME of its type and read by the NAMES of what
+        /// it carries — the names in <see cref="MarkupNames"/> and nowhere else.</summary>
+        private Markup MarkupOf(MemberInfo member, At at)
+        {
+            Attribute[] written = [.. member.GetCustomAttributes(inherit: false).OfType<Attribute>()];
+            Attribute[] references = Every(written, MarkupNames.CatalogRef);
+            Attribute[] keys = Every(written, MarkupNames.DictionaryKey);
+
+            return new Markup(
+                [.. references.Select(reference => Word(reference, MarkupNames.Catalog, at)).OfType<string>()],
+                // One catalog calling the empty value legal makes it legal: the field is one field.
+                references.Any(reference => Flag(reference, MarkupNames.AllowEmpty, at)),
+                One(written, MarkupNames.NotARef) is not null,
+                EnumOf(One(written, MarkupNames.EnumOf), at),
+                Word(One(written, MarkupNames.LocalizedKey), MarkupNames.Suffix, at),
+                Bounds(One(written, MarkupNames.Range), at),
+                One(written, MarkupNames.Hidden) is not null,
+                Word(One(written, MarkupNames.Discriminator), MarkupNames.Field, at),
+                // A key names nothing on purpose in no file: json writes no empty key.
+                new Narrowing(
+                    keys.Select(key => EnumOf(key, at)).FirstOrDefault(enumType => enumType is not null),
+                    [.. keys.Select(key => Word(key, MarkupNames.Catalog, at)).OfType<string>()],
+                    AllowEmpty: false));
+        }
+
+        private static Attribute[] Every(Attribute[] written, string name) =>
+            [.. written.Where(attribute => string.Equals(attribute.GetType().Name, name, StringComparison.Ordinal))];
+
+        private static Attribute? One(Attribute[] written, string name) =>
+            written.FirstOrDefault(attribute => string.Equals(attribute.GetType().Name, name, StringComparison.Ordinal));
+
+        private string? Word(Attribute? attribute, string property, At at) =>
+            Reads(attribute, property, at, out string? word) ? word : null;
+
+        private Type? EnumOf(Attribute? attribute, At at) =>
+            Reads(attribute, MarkupNames.EnumType, at, out Type? enumType) ? enumType : null;
+
+        private bool Flag(Attribute? attribute, string property, At at) =>
+            Reads(attribute, property, at, out bool flag) && flag;
+
+        private NumericRange? Bounds(Attribute? attribute, At at)
+        {
+            if (attribute is null) return null;
+            if (!Reads(attribute, MarkupNames.Min, at, out double min)) return null;
+            if (!Reads(attribute, MarkupNames.Max, at, out double max)) return null;
+
+            return new NumericRange(min, max);
+        }
+
+        /// <summary>What one piece of markup carries under the given name. False when it carries nothing
+        /// there — the markup saying nothing about it — and false with a word about it when the name is
+        /// not one the attribute answers to at all, which is the convention broken.</summary>
+        private bool Reads<T>(Attribute? attribute, string property, At at, out T value)
+        {
+            value = default!;
+
+            if (attribute is null) return false;
+
+            PropertyInfo? carried = attribute.GetType().GetProperty(property);
+            object? held = carried?.GetValue(attribute);
+
+            if (held is T typed)
+            {
+                value = typed;
+
+                return true;
+            }
+
+            // Markup allowed to say nothing under a name says it by holding nothing there; anything else
+            // is a name the tool reads by and an attribute that does not answer to it.
+            if (carried is not null && held is null) return false;
+
+            Note(Notes.MarkupUnreadable, at.Owner, at.Field, attribute.GetType().Name, property);
+
+            return false;
         }
 
         /// <summary>The kind a value takes, and the markup narrowing it. Markup that says what a value MEANS
@@ -619,6 +698,9 @@ namespace Tooling.Schema.Reflection
         /// already inside of, which is what a type leading back to itself is recognised by.</summary>
         private readonly record struct Walk(string Owner, HashSet<Type> Path);
 
+        /// <summary>The field a piece of markup was written on, as a note names it.</summary>
+        private readonly record struct At(string Owner, string Field);
+
         /// <summary>What text is narrowed to, whichever piece of markup says so: the members of an enum, or
         /// the ids of records in catalogs. Both cannot be true of one string at once.</summary>
         private readonly record struct Narrowing(Type? EnumType, SchemaList<string> Catalogs, bool AllowEmpty)
@@ -646,30 +728,6 @@ namespace Tooling.Schema.Reflection
             /// <summary>What the markup narrows the VALUE to. A refusal empties the catalogs: a validator
             /// told to check ids it should not would report every value in the file as broken.</summary>
             public Narrowing Holds => new(EnumType, NotARef ? SchemaList<string>.Empty : Catalogs, AllowEmpty);
-
-            public static Markup Of(MemberInfo member)
-            {
-                CatalogRefAttribute[] references = [.. member.GetCustomAttributes<CatalogRefAttribute>()];
-                DictionaryKeyAttribute[] keys = [.. member.GetCustomAttributes<DictionaryKeyAttribute>()];
-                RangeAttribute? range = member.GetCustomAttribute<RangeAttribute>();
-                LocalizedKeyAttribute? localized = member.GetCustomAttribute<LocalizedKeyAttribute>();
-
-                return new Markup(
-                    [.. references.Select(reference => reference.Catalog)],
-                    // One catalog calling the empty value legal makes it legal: the field is one field.
-                    references.Any(reference => reference.AllowEmpty),
-                    member.GetCustomAttribute<NotARefAttribute>() != null,
-                    member.GetCustomAttribute<EnumOfAttribute>()?.EnumType,
-                    localized?.Suffix,
-                    range is null ? null : new NumericRange(range.Min, range.Max),
-                    member.GetCustomAttribute<HiddenAttribute>() != null,
-                    member.GetCustomAttribute<DiscriminatorAttribute>()?.Field,
-                    // A key names nothing on purpose in no file: json writes no empty key.
-                    new Narrowing(
-                        keys.Select(key => key.EnumType).FirstOrDefault(enumType => enumType is not null),
-                        [.. keys.Where(key => key.Catalog is not null).Select(key => key.Catalog!)],
-                        AllowEmpty: false));
-            }
         }
 
         /// <summary>What the reflector has to say about a type it could not read whole.</summary>
@@ -702,6 +760,7 @@ namespace Tooling.Schema.Reflection
             public const string NotANumber = "'{0}.{1}' is not a number, so its range was not applied.";
             public const string RefusedAndNamed = "'{0}.{1}' is marked both a reference and not one; the refusal was taken.";
             public const string Disagrees = "'{0}.{1}' says '{2}' tells the shapes apart, while the shapes registered for '{3}' are told apart by '{4}'.";
+            public const string MarkupUnreadable = "'{0}.{1}' carries a '{2}' with no '{3}' the tool can read: that part of the markup was not applied.";
         }
     }
 }

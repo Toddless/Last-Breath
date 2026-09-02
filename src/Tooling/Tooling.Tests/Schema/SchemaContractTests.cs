@@ -7,6 +7,7 @@ namespace Tooling.Tests.Schema
     using System.Runtime.CompilerServices;
     using Tooling.Schema;
     using Tooling.Schema.Model;
+    using Tooling.Schema.Reflection;
 
     /// <summary>
     /// The contract between the game and the authoring tool: what a DTO may say about itself, what a
@@ -65,6 +66,10 @@ namespace Tooling.Tests.Schema
         private const double MaxTier = 3d;
 
         private const string ModelNamespace = "Tooling.Schema.Model";
+        private const string MarkupNamespace = "Tooling.Tests.Schema";
+
+        /// <summary>Markup that is the whole answer by being written at all.</summary>
+        private const string NothingCarried = "";
 
         /// <summary>The tool reads the markup off the properties and draws a picker, a range or a text
         /// box accordingly. Read back one by one: an attribute carrying the wrong argument fails here
@@ -116,47 +121,26 @@ namespace Tooling.Tests.Schema
             Assert.IsNull(property.GetCustomAttribute<HiddenAttribute>());
         }
 
-        /// <summary>The markup describes fields of a record and nothing else; anywhere else it would be
-        /// read by nobody.</summary>
+        /// <summary>The tool's half of the naming convention: every name the reflector reads markup by is
+        /// a constant, and every constant is a name markup actually wears. A name spelt into
+        /// <see cref="MarkupNames"/> and nowhere else would read every field as unmarked, in silence.</summary>
         [TestMethod]
-        public void Attributes_TargetPropertiesAndFieldsOnly()
+        public void MarkupNames_AreExactlyTheNamesMarkupCarries()
         {
-            IReadOnlyList<Type> attributes = SchemaAttributes();
-
-            Assert.AreNotEqual(0, attributes.Count);
-            foreach (Type attribute in attributes)
+            foreach ((string attribute, string property, Type carried) in Convention())
             {
-                AttributeUsageAttribute? usage = attribute.GetCustomAttribute<AttributeUsageAttribute>();
+                Type markup = Markup(attribute);
 
-                Assert.IsNotNull(usage, $"{attribute.Name} does not say where it may be written.");
-                Assert.AreEqual(AttributeTargets.Property | AttributeTargets.Field, usage.ValidOn, attribute.Name);
-                Assert.IsTrue(attribute.IsSealed, $"{attribute.Name} is open to inheritance.");
+                if (property.Length == 0) continue;
+
+                PropertyInfo? held = markup.GetProperty(property);
+
+                Assert.IsNotNull(held, $"{attribute} carries no '{property}'.");
+                Assert.AreEqual(carried, Nullable.GetUnderlyingType(held.PropertyType) ?? held.PropertyType, $"{attribute}.{property}");
             }
+
+            CollectionAssert.AreEquivalent(SpelledOut(), Named(), "MarkupNames spells a name nothing in the markup wears.");
         }
-
-        [TestMethod]
-        public void CatalogRef_NamingNoCatalog_IsRefused() =>
-            Assert.ThrowsException<ArgumentException>(() => new CatalogRefAttribute(" "));
-
-        /// <summary>A field pointed at something that is not an enum would offer an empty list of
-        /// members, which reads to the author as "this one has no values yet".</summary>
-        [TestMethod]
-        public void EnumOf_SomethingThatIsNotAnEnum_IsRefused() =>
-            Assert.ThrowsException<ArgumentException>(() => new EnumOfAttribute(typeof(NpcDto)));
-
-        /// <summary>Keys are described by their own markup, which is refused on the same terms as the markup
-        /// describing values: an empty catalog names nothing, and a type with no members offers nothing.</summary>
-        [TestMethod]
-        public void DictionaryKey_NamingNoCatalog_IsRefused() =>
-            Assert.ThrowsException<ArgumentException>(() => new DictionaryKeyAttribute(" "));
-
-        [TestMethod]
-        public void DictionaryKey_OfSomethingThatIsNotAnEnum_IsRefused() =>
-            Assert.ThrowsException<ArgumentException>(() => new DictionaryKeyAttribute(typeof(NpcDto)));
-
-        [TestMethod]
-        public void Range_EndingBelowItsStart_IsRefused() =>
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => new RangeAttribute(MaxTier, MinTier));
 
         /// <summary>A schema is handed around, held for comparison against the file on disk and kept
         /// while the author edits: anything settable on it is a way for one holder to change what
@@ -462,8 +446,40 @@ namespace Tooling.Tests.Schema
         private static IReadOnlyList<Type> ModelTypes() =>
             [.. typeof(CatalogSchema).Assembly.GetTypes().Where(type => type.IsPublic && type.Namespace == ModelNamespace)];
 
-        private static IReadOnlyList<Type> SchemaAttributes() =>
-            [.. typeof(CatalogRefAttribute).Assembly.GetTypes().Where(type => type.IsPublic && type.IsSubclassOf(typeof(Attribute)))];
+        /// <summary>The markup by name: what each attribute is called, what it carries and of what type.
+        /// One that carries nothing is named with no property. The game states the same table over its own
+        /// attributes; the two being written twice on purpose is what makes them a convention.</summary>
+        private static IEnumerable<(string Attribute, string Property, Type Carried)> Convention() =>
+        [
+            (MarkupNames.CatalogRef, MarkupNames.Catalog, typeof(string)),
+            (MarkupNames.CatalogRef, MarkupNames.AllowEmpty, typeof(bool)),
+            (MarkupNames.DictionaryKey, MarkupNames.Catalog, typeof(string)),
+            (MarkupNames.DictionaryKey, MarkupNames.EnumType, typeof(Type)),
+            (MarkupNames.EnumOf, MarkupNames.EnumType, typeof(Type)),
+            (MarkupNames.Range, MarkupNames.Min, typeof(double)),
+            (MarkupNames.Range, MarkupNames.Max, typeof(double)),
+            (MarkupNames.LocalizedKey, MarkupNames.Suffix, typeof(string)),
+            (MarkupNames.Discriminator, MarkupNames.Field, typeof(string)),
+            (MarkupNames.NotARef, NothingCarried, typeof(void)),
+            (MarkupNames.Hidden, NothingCarried, typeof(void))
+        ];
+
+        private static Type Markup(string name) =>
+            typeof(SchemaContractTests).Assembly.GetTypes()
+                .FirstOrDefault(type => type.Namespace == MarkupNamespace && type.Name == name && type.IsSubclassOf(typeof(Attribute)))
+            ?? throw new AssertFailedException($"No markup is called '{name}'.");
+
+        private static string[] SpelledOut() =>
+            [.. typeof(MarkupNames)
+                .GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Where(name => name.IsLiteral)
+                .Select(name => (string)name.GetRawConstantValue()!)];
+
+        private static string[] Named() =>
+            [.. Convention()
+                .SelectMany(part => new[] { part.Attribute, part.Property })
+                .Where(name => name.Length > 0)
+                .Distinct(StringComparer.Ordinal)];
 
         private static PropertyInfo Property(Type dto, string name) =>
             dto.GetProperty(name) ?? throw new AssertFailedException($"{dto.Name} has no property {name}.");

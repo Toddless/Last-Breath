@@ -1,7 +1,7 @@
 namespace Core.Data.CraftingData
 {
     using Enums;
-    using Tooling.Schema;
+    using Schema;
 
     /// <summary>Category is optional: dusts and sharpening runes serve one equipment category, fluxes and
     /// creation runes serve any and simply omit the field.</summary>
