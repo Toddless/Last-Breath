@@ -1,5 +1,12 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из полировки хоста DataEditor (2026-09-02; accept with minors)
+
+- (minor) `src/Tooling/DataEditor/Source/View/InspectorPanel.cs:210,214,222` — `Documentation` навешивается только на скалярные строки; `Section(parent, name, documentation)` + общий `Described(Label, string?)` для заголовков Object/Array/Dictionary.
+- (minor) `src/Tooling/Tooling.Core/Catalogs/CatalogWorkspace.cs:100` — нота из `broken.Message` без имени типа исключения (после `catch (Exception)` `NullReferenceException` чужого описателя даёт бессмысленную строку): `"{0}: the schema could not be built: {1}: {2}"` с `broken.GetType().Name`.
+- (minor, экспорт) `src/Tooling/DataEditor/DataEditor.sln:44-67` — `Tooling.Core`/`Tooling.Schema` (Microsoft.NET.Sdk) отображены в `ExportDebug|ExportRelease`, для которых SDK не применяет ни Debug-, ни Release-блок (`Optimize=false`, без `DEFINE`): в экспортном билде библиотеки едут неоптимизированными. Стало: в sln маппить `ExportDebug → Debug|Any CPU`, `ExportRelease → Release|Any CPU` для обоих GUID (как `Tooling.sln` маппит платформы). То же для `PassiveTreeEditor.sln`, когда он переподключится к библиотеке.
+- (nit) `JsonScalars.Written`: `Date`/`Guid`/`TimeSpan` вернутся в кавычках — ветвить по `value is JValue { Value: string text }`; тест культуры — `[DoNotParallelize]` и сообщение к `AreNotEqual`; `ScrollVertical` диалога сбрасывать перед показом; `InspectorPanel.cs:196` `Wears` сравнивает дискриминатор через `ToString()` — через `JsonScalars.Written`; xml-доки на 3–4 строки в `GameCatalogs.cs:15-17`, `EditorRoot.cs:27-29`, `CatalogWorkspace.cs:86-90`, `InspectorPanel.cs:259-261`.
+
 ## Из описателя LootTables (2026-09-02; accept with minors)
 
 - (minor) `src/Core/Data/Schema/LootTablesCatalogDescriptor.cs:96-109` — `Meaning` копирует с подменяющего поля только `Kind`/`EnumValues`/`RefCatalogs`/`RefusedAsReference`, остальное (`AllowEmpty`, `Range`, `Item`/`Key`) молча теряется. Стало: `names with { Required = field.Required, Default = field.Default, Hidden = field.Hidden }`.
