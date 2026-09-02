@@ -1,5 +1,16 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из описателя EquipItems (2026-09-02; accept with minors) — данные владельцу отдельно в отчёте
+
+- (minor) `src/Testing/BattleSystemTests/CatalogDescriptorTests.cs:650-651` — `ShippedFiles` перечисляет `*.json` без `SearchOption.AllDirectories`, а игра и тул читают рекурсивно; стало: `[.. CatalogWorkspace.FilePaths(SharedData.Catalog(catalog))]` (заодно уходят локальные `JsonFiles`/`JsonExtension`).
+- (nit, контракт) `src/Core/Data/EquipData/GrantData.cs:14-21` — `grants[].id` размечен двумя каталогами, но у `GrantKind.Modifier` id не именует запись; лечение — `[Discriminator("kind")]` + три формы в описателе, когда появится валидатор.
+- (nit) `CatalogDescriptorTests.cs:150,158-161` — док `s_equipItemChoices` обещает «каждое поле, которое парсер превращает в enum», а `affix` в этом каталоге парсер отвергает (`AffixPolicy.Forbidden`); `:185-188` — `CriticalDamage` читается регистронезависимо и живо, `effectId` выбрасывается — развести формулировки; в файле две конвенции allowlist нот (точные строки у Npc/LootTables, пары у EquipItems) — перевести первые две на `Unexpected`.
+- (ДАННЫЕ → владельцу, решение) `src/SharedData/EquipItems/BodyArmor.json` хранит слот `Body` (единственный из девяти файл, названный не по слоту): раскладка по полю слота вернёт `Body`, и первый сейв из тула создаст десятый `Body.json`. Рекомендация исполнителя и ревьюера: `git mv BodyArmor.json Body.json` (ссылок на имя файла в коде/сценах/экспорте нет; два упоминания в прозе `HANDOFF.md:417`, `SharpeningAndHitCap.md:117`); переименование члена `EquipmentPiece.Body` ломает сейвы (слот пишется именем). Тест держит расхождение константой `s_equipItemFilesNamedOtherThanTheirSlot`.
+- (ДАННЫЕ → владельцу) `Weapon.json` — ключ `CriticalDamage` вместо `criticalDamage` в 8 записях (читается регистронезависимо, тул покажет неизвестным); `BodyArmor.json:253,296,330` — мёртвый `"effectId": ""`; `maxStackSize` в DTO и в 48 записях, но `ParseEquipItems` его не читает; канонический сейв переставит 132 записи (`basePrice` с конца на место по DTO).
+- (данные, предсуществующее) теги экипировки в поставке (`Body`, `Boots`, `Equipment`, `Gloves`, `Helmet`, `Ring`) не входят в `TagConstants.AllTags` (там нижний регистр, `Ordinal`) — `HasTag` на них отвечает `false`.
+- (контракт, вход для решения) скалярная форма диапазонов `ValueRange`/`LevelRange` («число ИЛИ {min,max}») вариантами не выражается: по девяти файлам 108 скаляров (почти все `updateLevel`, 104/105) против 202 объектов; расширение контракта «скаляр как вариант» затронет каждую запись каталога.
+- (знать) `ItemModifier.parts` рекурсивен — в схеме массив объектов без записи (нота цикла), ключи внутри не ранжируются; `ModifierPools`/`Resources` на том же DTO столкнутся при своих описателях.
+
 ## Из полировки хоста DataEditor (2026-09-02; accept with minors)
 
 - (minor) `src/Tooling/DataEditor/Source/View/InspectorPanel.cs:210,214,222` — `Documentation` навешивается только на скалярные строки; `Section(parent, name, documentation)` + общий `Described(Label, string?)` для заголовков Object/Array/Dictionary.
