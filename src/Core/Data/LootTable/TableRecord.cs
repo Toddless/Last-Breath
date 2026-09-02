@@ -3,8 +3,10 @@ namespace Core.Data.LootTable
     using System;
     using System.Collections.Generic;
     using Enums;
+    using GameData;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using Tooling.Schema;
 
     /// <summary>
     /// One position of a loot table: what the budget buys when the position comes up, and what it
@@ -18,10 +20,16 @@ namespace Core.Data.LootTable
     /// Either way the position is one seat at the table, so its share of the drop stays the
     /// designer's decision rather than a consequence of how many things answer it.
     /// </summary>
+    /// <param name="Id">Names one thing to drop, out of every catalog a droppable thing is written in:
+    /// any one of them knowing the id makes the position real.</param>
     /// <param name="Price">Loot units, never gold. A group carries one price for the whole set: the
     /// price says what a thing of that kind is worth, and the members of a group are alike by
     /// construction — they share a tier and a rarity.</param>
-    public record TableRecord(string Id, float Price, AugmentGroup? Augments = null)
+    public record TableRecord(
+        [property: CatalogRef(DataCatalog.EquipItems), CatalogRef(DataCatalog.Items), CatalogRef(DataCatalog.Recipes), CatalogRef(DataCatalog.Resources)]
+        string Id,
+        float Price,
+        AugmentGroup? Augments = null)
     {
         /// <summary>Whether the position names anything at all to drop. Positions also arrive from
         /// code — an NPC modifier adding to the table — where nothing has read them for sense, so

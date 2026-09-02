@@ -1,6 +1,5 @@
 namespace LastBreathTest
 {
-    using System.Reflection;
     using Core.Data.GameData;
 
     /// <summary>
@@ -18,7 +17,7 @@ namespace LastBreathTest
         [TestMethod]
         public void EveryCatalogNameHasShippedDataBehindIt()
         {
-            IReadOnlyList<string> catalogs = CatalogNames();
+            IReadOnlyList<string> catalogs = DataCatalogNames.All();
             Assert.IsTrue(catalogs.Count > 0, "no catalog names were found — the guard is checking nothing");
 
             List<string> unbacked = [];
@@ -34,12 +33,5 @@ namespace LastBreathTest
             Assert.AreEqual(0, unbacked.Count,
                 $"catalogs named in code with no shipped data behind them: {string.Join(", ", unbacked)}");
         }
-
-        private static IReadOnlyList<string> CatalogNames() =>
-            typeof(DataCatalog)
-                .GetFields(BindingFlags.Public | BindingFlags.Static)
-                .Where(field => field is { IsLiteral: true, IsInitOnly: false } && field.FieldType == typeof(string))
-                .Select(field => (string)field.GetRawConstantValue()!)
-                .ToList();
     }
 }
