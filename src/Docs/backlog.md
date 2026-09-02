@@ -1,5 +1,12 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из расширения контракта схемы: NotARef-след и ключи словарей (2026-09-02; accept with minors)
+
+- (minor, молчание) `src/Tooling/Tooling.Core/Schema/SchemaReflector.cs:628,670` — `[DictionaryKey(typeof(A))][DictionaryKey(typeof(B))]` схлопывается в первый enum без ноты (`Narrowing.Ways` считает роды, не число ответов). Стало: собирать различающиеся enum-типы, `Ways => EnumWays + (Catalogs.Count > 0 ? 1 : 0)`, нота `KeyNarrowedTwice` обобщается «names more than one thing its keys may be; '{2}' was taken».
+- (minor, порядок атрибутов) `Tooling.Tests/Schema/SchemaReflectorTests.cs:251` — `AreEqual` на `RefCatalogs` ключей держится за неспецифицированный порядок `GetCustomAttributes`; как у значения — `AreEquivalent`.
+- (minor, ОБЯЗАТЕЛЬНО при разметке baseParameters) `src/Testing/BattleSystemTests/CatalogDescriptorTests.cs:244` — `FreeKeyedMaps` опознаёт свободную карту по `Key == null`; как только на `NpcData.BaseParameters` встанет `[DictionaryKey(typeof(EntityParameter))]`, поле выпадет из исключений и тест «все ключи файла известны» покраснеет (`SchemaKeyOrder` ключи карт не ранжирует вообще). Стало: критерий «карты вообще» (`Kind == Dictionary`), комментарий метода переписать; альтернатива дороже — научить `SchemaKeyOrder` ранжировать ключи карт по `Key.EnumValues` (решение про данные: порядок `baseParameters` станет каноническим).
+- (nit) дубли каталогов в `RefCatalogs` не схлопываются ни у ключей (`:671`), ни у значений (`:659`) — если дедуп, то в обеих строках; `:670` лишний `Select`; `:644` `Markup.Narrowings` дублирует счёт `Narrowing.Ways`; решение «`[NotARef]`+`[EnumOf]` → Enum с флагом» тестом не закреплено; `[DictionaryKey]` на `List<Dictionary<string,T>>` доходит до элемента — поведение верное, не записано; будущий пин по `RefusedAsReference` через `Leaf` покроет значения, но не ключи карт (отказ для ключей выразить нечем) — назвать вслух при написании.
+
 ## Из описателя каталога Npc (2026-09-02; accept with minors) — часть уходит в следующие описатели
 
 - (minor, тест не фальсифицируем) `src/Testing/BattleSystemTests/CatalogDescriptorTests.cs:181-186` — `once == twice` структурно не может упасть (стабильная сортировка по рангу идемпотентна); заменить на «канонический прогон ничего не теряет»: `JToken.DeepEquals(root, Parse(once).Root)`; четыре переставленные записи боссов держать именованным списком, чтобы пятая стала падением. Док теста привести к проверяемому.
