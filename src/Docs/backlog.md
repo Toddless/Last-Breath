@@ -1,5 +1,15 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из описателей ModifierPools и Resources (2026-09-02; accept with minors)
+
+- (minor) `src/Core/Data/CraftingData/MaterialData.cs:14` — `Id` (`Material_*`, 41 запись) размечен `NotARef`, но поле мёртвое: парсер контекст берёт из `craftingData.Id`, ключей `Material_*` в .po нет; инспектор нарисует живое текстовое поле. Стало: `[Hidden]` рядом либо карточка на снос поля из DTO и 41 записи.
+- (minor, сказать вслух) `ModifierPoolsCatalogDescriptor.cs:9-15` — один `ItemModifier` обслуживает два каталога с противоположной политикой аффикса (`Required` в пулах, `Forbidden` в экипировке), схема в обоих говорит «необязателен»; контракт не выражает — назвать в `<remarks>`.
+- (minor, контракт) `MaterialData.cs:15` — `CatalogRef(Resources)` на `categoryId` честен на уровне каталога, но парсер резолвит только против секции `materialCategories` (6 валидных из 73 id) — первая ссылка в ОДНУ секцию многосекционного каталога; карточка на `CatalogRef(catalog, section)`.
+- (minor, пин формы данных) `CatalogDescriptorTests.cs:284-285,996-1007` — `s_unknownKeysInsideComposites` через `AreEquivalent` для Resources (3 композита, 6 частей) роняет тест схемы при штатной правке данных; для малой выборки — `IsSubsetOf`.
+- (minor) `ResourcesCatalogDescriptor.cs:34,38` — `CategoryField`/`OverlayField` не используются в `Describe`, единственный потребитель — тест; перенести к `PartsField`/`GrantField`/`AffixField` в тест.
+- (nit) `Choice(field, members)` печатает `field.JsonName` = `""` у элемента массива — параметр `path`; `NamesItsPartsInAConstructor = "cannot be built"` совпадает и с `Shapeless`/`NoSample` — `"cannot be built without arguments"`; док `UpgradeResourceData.cs:5-6` дублирует комментарий парсера.
+- (ДАННЫЕ → владельцу) `CraftingResources.json`: плоский `modifiers` пуст у всех 6 категорий и 41 ресурса (весь пул в `byCategory`); `Category_Essence` без строк вовсе; `MaterialData.Id` не читается; `CLAUDE.md:158` порядок ключей секции `Weapon/Armor/Jewellery` — в данных `Armor/Weapon/Jewellery` в разном порядке (на парс не влияет).
+
 ## Из схем действий нарратива (2026-09-02; accept with minors)
 
 - (minor, ловушка перегрузки) `src/Core/Narrative/NarrativeParameterSchema.cs:33` — `Text(name, string fallback)` рядом с `Text(name, bool required, params string[] catalogs)`: забытый `required:` биндится в fallback и даёт необязательную строку с «дефолтом» = имя каталога. Переименовать в `TextOr`/`OptionalText`.
