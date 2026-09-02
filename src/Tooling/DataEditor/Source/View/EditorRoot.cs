@@ -253,6 +253,15 @@ namespace DataEditor.Source.View
 
             _catalogList.ItemSelected += index => ShowCatalog((int)index);
             _recordList.ItemSelected += index => ShowRecord((int)index);
+            _inspector.Said += Report;
+        }
+
+        /// <summary>What the inspector came to when the record cannot show it — a key already written, a
+        /// key nobody named — on the line that says what the run last did.</summary>
+        private void Report(string what)
+        {
+            _action = what;
+            Refresh();
         }
 
         /// <summary>

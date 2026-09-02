@@ -16,10 +16,11 @@ namespace DataEditor.Source.View
     /// One record, field by field, in the order its schema names them — and, for the values a schema
     /// can vouch for, the control that changes them. Everything a control writes goes into the
     /// document's history, so one key takes it back.
-    /// <para>Only scalars a record names are edited here. An element of a list and a value of a free map
-    /// are read: what they need is a way to add, remove and reorder, which is a gesture the panel does
-    /// not have yet, and half of it — a value editable where its neighbour cannot be removed — reads as
-    /// the other half being broken.</para>
+    /// <para>Structure is authored here too: an element added to a list, taken out of it or moved along
+    /// it, a key added to a map or taken out, an optional key of a record written or dropped, and the
+    /// shape a polymorphic record is written in. All of it goes onto the same history as a typed value,
+    /// and every one of them moves the addresses of what stands below — which is why a structural gesture
+    /// always redraws, and never from inside the press that asked for it.</para>
     /// <para>The panel is rebuilt whole for every record and after every step through the history. A
     /// record is small, and rebuilding is the one way of showing what the document holds now that cannot
     /// leave a stale row behind.</para>
@@ -51,6 +52,9 @@ namespace DataEditor.Source.View
         /// on its own.</summary>
         private const double UnboundedLimit = 1_000_000_000;
 
+        /// <summary>What an option button holds when nothing it offers answers for what the file has.</summary>
+        private const int NoChoice = -1;
+
         private const string Ellipsis = "…";
 
         /// <summary>What stands where the file wrote nothing.</summary>
@@ -73,6 +77,37 @@ namespace DataEditor.Source.View
         /// <summary>How "no value at all" is offered when the game reads something in its place: the
         /// author choosing it has to be able to see what leaving the key out actually means.</summary>
         private const string MissingDefaultFormat = "{0}   ({1})";
+
+        /// <summary>The name the shape of a polymorphic record is picked under.</summary>
+        private const string FormName = "form";
+
+        private const string AddElementText = "+ element";
+        private const string AddKeyText = "+ key";
+        private const string AddFieldText = "+ field";
+        private const string RemoveText = "×";
+        private const string UpText = "↑";
+        private const string DownText = "↓";
+
+        private const string FormHint = "the shape this record is written in";
+        private const string AddElementHint = "add an element at the end of the list";
+        private const string RemoveElementHint = "take this element out";
+        private const string MoveUpHint = "move this element one place up";
+        private const string MoveDownHint = "move this element one place down";
+        private const string FirstElementHint = "this is the first element";
+        private const string LastElementHint = "this is the last element";
+        private const string AddKeyHint = "write this key into the map";
+        private const string RemoveKeyHint = "take this key out of the map";
+        private const string EveryKeyHint = "every key the schema names is already written";
+        private const string AddFieldHint = "write this key into the record";
+        private const string RemoveFieldHint = "take this key out; the game reads the default in its place";
+        private const string RequiredFieldHint = "the schema requires this key: it can be emptied, not removed";
+        private const string AbsentFieldHint = "the record does not hold this key";
+
+        /// <summary>What an empty key box says while the schema has nothing to say about the keys.</summary>
+        private const string KeyPlaceholder = "key";
+
+        private const string KeyTakenFormat = "“{0}” is already there";
+        private const string NoKeyText = "name the key to add";
 
         private const string FontSizeOverride = "font_size";
         private const string MarginLeftOverride = "margin_left";
@@ -108,6 +143,11 @@ namespace DataEditor.Source.View
         /// that is typing into it.</summary>
         private bool _writing;
 
+        /// <summary>What a gesture came to when the record itself cannot show it: a key already written,
+        /// a key nobody named. The panel has no line of its own to say it on, and the tool has one that
+        /// says what the run last did.</summary>
+        public event Action<string>? Said;
+
         /// <summary>Draws the record, or says why there is nothing to draw.</summary>
         public void Rebuild(CatalogRecord? record)
         {
@@ -127,10 +167,12 @@ namespace DataEditor.Source.View
 
         /// <summary>A heading with an indented body under it, and the body is where the caller keeps
         /// drawing. A nested record reads as a block that way without the panel having to know how deep
-        /// it already is.</summary>
-        private static Node Section(Node parent, string name)
+        /// it already is. What may be done to the block as a whole hangs off its heading, where the block
+        /// is named — a button under the last row of a long list would be answering about nothing
+        /// visible.</summary>
+        private static Node Section(Node parent, string name, Control? actions)
         {
-            parent.AddChild(Header(name));
+            parent.AddChild(actions is null ? Header(name) : Headed(name, actions));
 
             var margin = new MarginContainer();
             margin.AddThemeConstantOverride(MarginLeftOverride, Indent);
@@ -143,10 +185,24 @@ namespace DataEditor.Source.View
             return body;
         }
 
+        /// <summary>A heading with what may be done to what it names beside it.</summary>
+        private static Control Headed(string name, Control actions)
+        {
+            var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            Label header = Header(name);
+
+            header.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+
+            row.AddChild(header);
+            row.AddChild(actions);
+
+            return row;
+        }
+
         /// <summary>One field as a row. What the field means hangs off its name as a tooltip: the panel
         /// is read down the value column, and a sentence per row printed in full would push the values
         /// apart until the record no longer reads as one thing.</summary>
-        private static Control Row(string name, Control value, string? documentation)
+        private static Control Row(string name, Control value, string? documentation, Control? actions)
         {
             var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
 
@@ -168,6 +224,8 @@ namespace DataEditor.Source.View
             row.AddChild(label);
             row.AddChild(value);
 
+            if (actions is not null) row.AddChild(actions);
+
             return row;
         }
 
@@ -178,32 +236,12 @@ namespace DataEditor.Source.View
             SizeFlagsHorizontal = SizeFlags.ExpandFill
         };
 
-        /// <summary>The shape a polymorphic record is actually written in. A record whose shape the
-        /// schema does not list is said out loud and then drawn by the shape it was declared with: the
-        /// author has to see that the file names something the game will not recognise.</summary>
-        private static RecordSchema Shape(Node parent, RecordSchema schema, JToken token)
-        {
-            if (schema.Variants is not { } variants) return schema;
-
-            foreach (VariantSchema variant in variants.Variants)
-                if (Wears(token, variants.Discriminator, variant.DiscriminatorValue))
-                    return variant.Record;
-
-            parent.AddChild(new Label { Text = UnknownShapeText });
-
-            return schema;
-        }
-
-        /// <summary>Whether a record is of one shape: by the value of the field that names shapes, or,
-        /// with no such field, by the presence of the key the shape is known by.</summary>
-        private static bool Wears(JToken token, string? discriminator, string value)
-        {
-            if (token is not JObject holder) return false;
-
-            return discriminator is null
-                ? holder.ContainsKey(value)
-                : string.Equals(holder[discriminator]?.ToString(), value, StringComparison.Ordinal);
-        }
+        /// <summary>Whether a field is the one whose value names the record's shape. It is drawn once, as
+        /// the picker: a second control over the same key would be a second answer to which shape this
+        /// is, and the two would take turns overwriting each other.</summary>
+        private static bool NamesTheForm(RecordSchema schema, FieldSchema field) =>
+            schema.Variants is { Discriminator: { } named }
+            && string.Equals(field.JsonName, named, StringComparison.Ordinal);
 
         /// <summary>One field as a line of text. A value the file does not hold is named by the default
         /// the game will read instead, which is the answer to "what happens if I leave this out".</summary>
@@ -439,7 +477,9 @@ namespace DataEditor.Source.View
         /// <para>"No value at all" is an entry like any other, named by what the game reads in its
         /// place. It is offered wherever the file may legally lack the key, and also on a required key
         /// the file lacks anyway — a picker that showed nothing selected would leave the author reading
-        /// a blank box with no way to learn what the game does with it.</para>
+        /// a blank box with no way to learn what the game does with it. It is not offered on an element
+        /// of a list or a value of a map: leaving those out is taking the element out, which is what the
+        /// row's own button does, and one gesture with two controls is one of them going unnoticed.</para>
         /// </summary>
         private static Control Member(FieldEdit edit)
         {
@@ -453,14 +493,17 @@ namespace DataEditor.Source.View
             // long as the game makes it, and a constant chosen today is a collision the day it grows
             // past it. Negative ids cannot stand in — Godot substitutes the item index for those.
             int none = members.Count;
+            bool absence = edit.Removable && (!edit.Field.Required || written.Length == 0);
 
-            if (!edit.Field.Required || written.Length == 0) picker.AddItem(Absent(edit.Field), none);
+            if (absence) picker.AddItem(Absent(edit.Field), none);
 
             for (int index = 0; index < members.Count; index++) picker.AddItem(members[index], index);
 
             int at = members.IndexOf(written);
 
-            picker.Selected = picker.GetItemIndex(at >= 0 ? at : none);
+            // Nothing selected where nothing on offer answers for what the file holds: an element written
+            // as no member at all is not one, and standing on the first member would be a claim.
+            picker.Selected = at >= 0 ? picker.GetItemIndex(at) : absence ? picker.GetItemIndex(none) : NoChoice;
 
             picker.ItemSelected += index =>
             {
@@ -594,72 +637,341 @@ namespace DataEditor.Source.View
 
         private void AddRecord(Node parent, RecordSchema schema, JToken token, JsonPointer at, int depth)
         {
-            RecordSchema written = Shape(parent, schema, token);
+            RecordSchema written = Wearing(parent, schema, token, at);
 
             foreach (FieldSchema field in written.Fields)
             {
-                if (field.Hidden) continue;
+                if (field.Hidden || NamesTheForm(schema, field)) continue;
 
-                AddField(parent, field, Value(token, field.JsonName), field.JsonName, at.Append(field.JsonName),
-                    named: true, depth);
+                JsonPointer key = at.Append(field.JsonName);
+                JToken? value = Value(token, field.JsonName);
+
+                AddField(parent, field, value, field.JsonName, key, named: true, depth, FieldGesture(field, value, key));
             }
+
+            if (token is JObject holder && NewField(written, schema, holder, at) is { } add) parent.AddChild(add);
+        }
+
+        /// <summary>
+        /// The shape a polymorphic record is written in, together with the picker that changes it. A
+        /// record whose shape the schema does not list is said out loud and then drawn by the shape it
+        /// was declared with: the author has to see that the file names something the game will not
+        /// recognise, and the picker is how he answers it.
+        /// </summary>
+        private RecordSchema Wearing(Node parent, RecordSchema schema, JToken token, JsonPointer at)
+        {
+            if (schema.Variants is not { } variants) return schema;
+
+            VariantSchema? worn = RecordTemplates.Worn(variants, token);
+
+            if (_document is not null && token is JObject)
+                parent.AddChild(Row(FormName, FormPicker(variants, worn, at), FormHint, actions: null));
+
+            if (worn is null) parent.AddChild(new Label { Text = UnknownShapeText });
+
+            return worn?.Record ?? schema;
         }
 
         /// <summary>
         /// One field, drawn by what it holds. <paramref name="named"/> is what tells a field of a record
-        /// from an element of a list or an entry of a free map: only the first has a key of its own to
-        /// write under, and only the first is edited here.
+        /// from an element of a list or an entry of a map: only the first has a key of its own that may
+        /// be left out of the file, so only the first is offered "no value at all".
+        /// <para><paramref name="actions"/> is what may be done to the value where it stands — taken out,
+        /// moved — drawn beside the row or beside the heading of the block, whichever the value turns
+        /// out to need.</para>
         /// </summary>
         private void AddField(Node parent, FieldSchema field, JToken? value, string name, JsonPointer at,
-            bool named, int depth)
+            bool named, int depth, Control? actions)
         {
             if (depth >= MaxDepth || value is null || value.Type == JTokenType.Null)
             {
-                parent.AddChild(Row(name, Editor(field, value, at, named), field.Documentation));
+                parent.AddChild(Row(name, Editor(field, value, at, named), field.Documentation, actions));
                 return;
             }
 
             switch (field.Kind)
             {
                 case FieldKind.Object when field.Record is { } record && value is JObject:
-                    AddRecord(Section(parent, name), record, value, at, depth + 1);
+                    AddRecord(Section(parent, name, actions), record, value, at, depth + 1);
                     break;
 
                 case FieldKind.Array when field.Item is { } item && value is JArray array:
-                    Node elements = Section(parent, Text(CountFormat, name, array.Count));
+                    Node elements = Section(parent, Text(CountFormat, name, array.Count), actions);
 
                     for (int index = 0; index < array.Count; index++)
                         AddField(elements, item, array[index], Text(IndexFormat, index), at.Append(index),
-                            named: false, depth + 1);
+                            named: false, depth + 1, ElementGestures(at, index, array.Count));
 
+                    elements.AddChild(NewElement(item, at, array.Count));
                     break;
 
                 case FieldKind.Dictionary when field.Item is { } item && value is JObject map:
-                    Node pairs = Section(parent, Text(CountFormat, name, map.Count));
+                    Node pairs = Section(parent, Text(CountFormat, name, map.Count), actions);
 
                     foreach (JProperty pair in map.Properties())
-                        AddField(pairs, item, pair.Value, pair.Name, at.Append(pair.Name), named: false, depth + 1);
+                        AddField(pairs, item, pair.Value, pair.Name, at.Append(pair.Name), named: false, depth + 1,
+                            Gesture(RemoveText, RemoveKeyHint, enabled: true, document => document.Remove(at.Append(pair.Name))));
 
+                    pairs.AddChild(NewKey(field, item, map, at));
                     break;
 
                 default:
-                    parent.AddChild(Row(name, Editor(field, value, at, named), field.Documentation));
+                    parent.AddChild(Row(name, Editor(field, value, at, named), field.Documentation, actions));
                     break;
             }
         }
 
         /// <summary>The control a field is changed through, or the text it is read as. A value the panel
-        /// will not take responsibility for writing is read: a field of a list, a kind no control
-        /// answers for, and a structure standing where the schema expected a value — a box over that
-        /// last one would write a word across whatever the author actually wrote there.</summary>
+        /// will not take responsibility for writing is read: a kind no control answers for, and a
+        /// structure standing where the schema expected a value — a box over that last one would write a
+        /// word across whatever the author actually wrote there.</summary>
         private Control Editor(FieldSchema field, JToken? value, JsonPointer at, bool named)
         {
-            if (!named || _document is null || value is JObject or JArray)
-                return ValueLabel(Scalar(field, value));
+            if (_document is null || value is JObject or JArray) return ValueLabel(Scalar(field, value));
 
             return s_editors.TryGetValue(field.Kind, out Func<FieldEdit, Control>? build)
-                ? build(new FieldEdit(this, _build, field, value, at))
+                ? build(new FieldEdit(this, _build, field, value, at, named))
                 : ValueLabel(Scalar(field, value));
+        }
+
+        // ── gestures ───────────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// A button that changes the shape of the record. Disabled where there is nothing for it to do,
+        /// with the reason on it: a row whose element cannot move up says which row it is, and a button
+        /// that answered nothing would read as the tool having missed the press.
+        /// </summary>
+        private Button Gesture(string text, string hint, bool enabled, Func<JsonTreeDocument, bool> change)
+        {
+            var button = new Button { Text = text, TooltipText = hint, Disabled = !enabled };
+            object build = _build;
+
+            button.Pressed += () =>
+            {
+                if (!Stale(build)) Restructure(change);
+            };
+
+            return button;
+        }
+
+        /// <summary>What may be done to one element where it stands. The ends of the list are shown as
+        /// buttons that cannot be pressed rather than as buttons that are not there: the rows stay one
+        /// column, and the first row says it is the first.</summary>
+        private Control ElementGestures(JsonPointer list, int index, int count)
+        {
+            var row = new HBoxContainer();
+            JsonPointer element = list.Append(index);
+
+            row.AddChild(Gesture(UpText, index > 0 ? MoveUpHint : FirstElementHint, index > 0,
+                document => document.Move(element, index - 1)));
+
+            row.AddChild(Gesture(DownText, index < count - 1 ? MoveDownHint : LastElementHint, index < count - 1,
+                document => document.Move(element, index + 1)));
+
+            row.AddChild(Gesture(RemoveText, RemoveElementHint, enabled: true, document => document.Remove(element)));
+
+            return row;
+        }
+
+        /// <summary>What may be done to one field of a record where it stands. A key the schema requires
+        /// is not one of them: emptying it is what the field's own control is for, and a record without
+        /// it is a record the game refuses to read.</summary>
+        private Control FieldGesture(FieldSchema field, JToken? value, JsonPointer at)
+        {
+            if (field.Required) return new Button { Text = RemoveText, Disabled = true, TooltipText = RequiredFieldHint };
+            if (value is null) return new Button { Text = RemoveText, Disabled = true, TooltipText = AbsentFieldHint };
+
+            return Gesture(RemoveText, RemoveFieldHint, enabled: true, document => document.Remove(at));
+        }
+
+        /// <summary>The row that adds an element to a list, at the end of the list it adds to.</summary>
+        private Control NewElement(FieldSchema item, JsonPointer at, int count)
+        {
+            Button add = Gesture(AddElementText, AddElementHint, enabled: true,
+                document => document.Insert(at, count, RecordTemplates.Blank(item)));
+
+            add.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+
+            return add;
+        }
+
+        /// <summary>
+        /// The row that adds a key to a map: the keys the schema names, offered as a list with the taken
+        /// ones left out of it, or a box when the author writes the key himself.
+        /// <para>A reference key is written rather than offered for the same reason a reference field is:
+        /// what may answer it lives in a catalog this panel has not read, so it says which catalogs those
+        /// are and leaves the word to the author.</para>
+        /// </summary>
+        private Control NewKey(FieldSchema field, FieldSchema item, JObject map, JsonPointer at)
+        {
+            var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+
+            if (field.Key is { Kind: FieldKind.Enum } key) AddMemberKey(row, key, item, map, at);
+            else AddWrittenKey(row, field.Key ?? item, item, map, at);
+
+            return row;
+        }
+
+        private void AddMemberKey(Node row, FieldSchema key, FieldSchema item, JObject map, JsonPointer at)
+        {
+            List<string> free = [.. key.EnumValues.Where(member => !map.ContainsKey(member))];
+            bool any = free.Count > 0;
+
+            var picker = new OptionButton
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                Disabled = !any,
+                TooltipText = any ? AddKeyHint : EveryKeyHint
+            };
+
+            foreach (string member in free) picker.AddItem(member);
+
+            picker.Selected = any ? 0 : NoChoice;
+
+            row.AddChild(picker);
+            row.AddChild(Gesture(AddKeyText, any ? AddKeyHint : EveryKeyHint, any,
+                document => Added(document, map, item, at, Picked(picker, free))));
+        }
+
+        private void AddWrittenKey(Node row, FieldSchema key, FieldSchema item, JObject map, JsonPointer at)
+        {
+            string hint = Hint(key) is { Length: > 0 } written ? written : KeyPlaceholder;
+            object build = _build;
+
+            var box = new LineEdit
+            {
+                PlaceholderText = hint,
+                TooltipText = hint,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+
+            // Enter adds it too: the box and the button stand together, and a key typed into one and then
+            // submitted to nothing reads as the map having refused the word.
+            box.TextSubmitted += typed =>
+            {
+                if (!Stale(build)) Restructure(document => Added(document, map, item, at, typed));
+            };
+
+            row.AddChild(box);
+            row.AddChild(Gesture(AddKeyText, AddKeyHint, enabled: true,
+                document => Added(document, map, item, at, box.Text)));
+        }
+
+        /// <summary>The member a picker stands on, or nothing when it stands on none.</summary>
+        private static string Picked(OptionButton picker, IReadOnlyList<string> members) =>
+            picker.Selected >= 0 && picker.Selected < members.Count ? members[picker.Selected] : string.Empty;
+
+        /// <summary>Writes a key into a map with the blank of what the map holds under it. A key nobody
+        /// named and a key already there are said out loud: an add that answered nothing would read as
+        /// the map having refused a word the author is looking straight at.</summary>
+        private bool Added(JsonTreeDocument document, JObject map, FieldSchema item, JsonPointer at, string key)
+        {
+            string wanted = key.Trim();
+
+            if (wanted.Length == 0)
+            {
+                Said?.Invoke(NoKeyText);
+                return false;
+            }
+
+            if (map.ContainsKey(wanted))
+            {
+                Said?.Invoke(Text(KeyTakenFormat, wanted));
+                return false;
+            }
+
+            return document.Insert(at, wanted, RecordTemplates.Blank(item));
+        }
+
+        /// <summary>The row that writes one of the record's own keys into it, offering the keys the schema
+        /// names and the file does not hold. Null when it holds all of them — a picker with nothing in it
+        /// is a row that only takes up space.</summary>
+        private Control? NewField(RecordSchema written, RecordSchema declared, JObject holder, JsonPointer at)
+        {
+            List<FieldSchema> absent = [.. written.Fields.Where(field =>
+                !field.Hidden && !NamesTheForm(declared, field) && !holder.ContainsKey(field.JsonName))];
+
+            if (absent.Count == 0) return null;
+
+            var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            var picker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = AddFieldHint };
+
+            foreach (FieldSchema field in absent) picker.AddItem(field.JsonName);
+
+            picker.Selected = 0;
+
+            row.AddChild(picker);
+            row.AddChild(Gesture(AddFieldText, AddFieldHint, enabled: true, document =>
+                picker.Selected >= 0
+                && picker.Selected < absent.Count
+                && document.Insert(at, absent[picker.Selected].JsonName, RecordTemplates.Blank(absent[picker.Selected]))));
+
+            return row;
+        }
+
+        /// <summary>The shape of a polymorphic record, picked. Nothing is selected while the record wears
+        /// a shape the schema does not list: the picker is what the author fixes it with, and standing on
+        /// the first shape would be claiming the record already is one.</summary>
+        private Control FormPicker(VariantSet variants, VariantSchema? worn, JsonPointer at)
+        {
+            var picker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = FormHint };
+            object build = _build;
+
+            for (int index = 0; index < variants.Variants.Count; index++)
+                picker.AddItem(variants.Variants[index].DiscriminatorValue, index);
+
+            picker.Selected = worn is null ? NoChoice : IndexOf(variants, worn);
+
+            picker.ItemSelected += index =>
+            {
+                if (Stale(build)) return;
+
+                VariantSchema chosen = variants.Variants[(int)index];
+
+                if (!ReferenceEquals(chosen, worn))
+                    Restructure(document => RecordTemplates.SwitchVariant(document, at, variants, chosen));
+            };
+
+            return picker;
+        }
+
+        private static int IndexOf(VariantSet variants, VariantSchema worn)
+        {
+            for (int index = 0; index < variants.Variants.Count; index++)
+                if (ReferenceEquals(variants.Variants[index], worn))
+                    return index;
+
+            return NoChoice;
+        }
+
+        /// <summary>
+        /// Changes the shape of the record and redraws once the gesture that asked for it is over.
+        /// <para>Guarded the way a typed value is: the document tells everyone it changed, this panel
+        /// included, and a redraw from inside the press would tear down the very button being pressed.
+        /// The run of keystrokes the author was on is ended on both sides of it, so a structural step is
+        /// never the tail of a word being typed and never swallows the next one.</para>
+        /// </summary>
+        private bool Restructure(Func<JsonTreeDocument, bool> change)
+        {
+            if (_document is not { } document) return false;
+
+            _writing = true;
+            bool changed;
+
+            try
+            {
+                document.History.Seal();
+                changed = change(document);
+                document.History.Seal();
+            }
+            finally
+            {
+                _writing = false;
+            }
+
+            if (changed) RebuildLater();
+
+            return changed;
         }
 
         /// <summary>Whether a control still speaks for what is on screen.</summary>
@@ -709,11 +1021,16 @@ namespace DataEditor.Source.View
 
         /// <summary>One field of the record as a control writes it: what the schema says about it, what
         /// stands there now, where it goes, and which build of the panel it belongs to.</summary>
-        private sealed class FieldEdit(InspectorPanel panel, object build, FieldSchema schema, JToken? value, JsonPointer at)
+        private sealed class FieldEdit(InspectorPanel panel, object build, FieldSchema schema, JToken? value,
+            JsonPointer at, bool named)
         {
             public FieldSchema Field => schema;
 
             public JToken? Value => value;
+
+            /// <summary>Whether leaving this value out means leaving out a key. An element of a list and a
+            /// value of a map go with the element itself, which is a gesture of its own.</summary>
+            public bool Removable => named;
 
             /// <summary>What the file holds, spelled the way the file spells it; empty for a key it does
             /// not hold at all.</summary>
