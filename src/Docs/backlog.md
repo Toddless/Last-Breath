@@ -1,5 +1,9 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из переноса PlayerLifecycleConfigProvider (2026-09-02; accept with minors)
+
+- (minor, IDE0005) `src/Battle/Services/GameServiceProvider.cs:3` `using Core.Ai.World;`, `src/Main/Services/GameServiceProvider.cs:5,45` `using Core.Ai.World;` и `using World;` — осиротели после переезда (ни один тип этих пространств в файлах больше не называется); `.editorconfig` держит IDE0005 как error, но `EnforceCodeStyleInBuild` не выставлен. Снять три строки при следующей правке бутстрапов.
+
 ## Из переноса GameWorldClock в Core (2026-09-02; accept with minors)
 
 - (minor, мёртвая ветка) `src/Core/Ai/World/Recovery/RestRecoveryService.cs:9,23,42` — после общей регистрации часов ни одна композиция не даёт сервису `clock == null`; фолбэк `_fallbackMinutes` и док «without a clock (sandbox scenes)» описывают несуществующий сценарий, а стоящие часы песочниц (никто не тикает) хуже отсутствующих: если песочница начнёт тикать восстановление, `minutes` всегда 0. Стало: `IWorldClock` обязательный параметр (тесты подают `SettableClock`), ветку снять.
