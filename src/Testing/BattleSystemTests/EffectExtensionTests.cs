@@ -3,10 +3,10 @@ namespace LastBreathTest.BattleSystemTests
     using System.IO;
     using System.Threading.Tasks;
     using Battle.Source;
-    using Battle.Source.CombatRules;
     using Battle.Source.Effects;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Battle.CombatRules;
     using Core.Context;
     using Core.Data.CombatRulesData;
     using Core.Data.GameData;

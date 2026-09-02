@@ -6,7 +6,6 @@ namespace LastBreathTest.LootSimulation
     using Core.Entity.Components;
     using Core.Services;
     using LootGeneration.Internal;
-    using LootGeneration.Services;
     using LootGeneration.Source;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -50,15 +49,13 @@ namespace LastBreathTest.LootSimulation
             var effectCatalog = new Core.Crafting.CraftingEffectProvider();
             ServiceProvider shared = new ServiceCollection().AddSharedGameDataParticipants().BuildServiceProvider();
 
-            // The one battle-module participant the stand reads: an augment copy's numbers are drawn
-            // around the band this file declares, and a drop pipeline that cannot mint an augment
-            // would report the augment seats of the tables as dropping nothing at all.
-            var combatRules = new Battle.Source.CombatRules.CombatRulesProvider();
-
+            // The combat rules an augment copy draws its numbers around arrive with the shared
+            // participants: the stand builds no battle module, and a drop pipeline that cannot mint an
+            // augment would report the augment seats of the tables as dropping nothing at all.
             var dataService = new GameDataService(
                 new FileSystemDataSource(dataRoot),
                 [
-                    itemProvider, modifierProvider, spawnRolls, tableProvider, configurationProvider, effectCatalog, combatRules,
+                    itemProvider, modifierProvider, spawnRolls, tableProvider, configurationProvider, effectCatalog,
                     .. shared.GetServices<IGameDataParticipant>()
                 ]);
             var loadFailures = new List<string>();

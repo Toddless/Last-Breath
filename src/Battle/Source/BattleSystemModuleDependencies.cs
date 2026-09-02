@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using Abilities;
-    using CombatRules;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
@@ -53,9 +52,6 @@
             // allocation pass with it.
             services.AddSingleton<IAbilityAugmentBinder, AbilityAugmentBinder>();
             services.AddSingleton<IAbilityUnlockService, AbilityUnlockService>();
-            // Shared on purpose: control resistance and arena rules must exist in every project
-            // that fights (Main included) — a bootstrap-local registration left Main without them.
-            services.AddGameDataParticipant<ICombatRulesProvider, CombatRulesProvider>();
             // Minting an augment — as a copy for a socket or as a thing for the bag — draws its
             // numbers around the band those rules declare, so the two are registered together. A
             // composition without them holds no augment minter, and the item minter treats augment

@@ -1,7 +1,9 @@
 namespace Core.Data.GameData
 {
     using System;
+    using Battle;
     using Battle.Abilities;
+    using Battle.CombatRules;
     using Localization;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -27,6 +29,9 @@ namespace Core.Data.GameData
             // Shared because the thing that asks it is: every project that can spawn an NPC rolls how
             // many modifiers and abilities that NPC comes out with, and the answer has to be one file.
             services.AddGameDataParticipant<INpcSpawnRollsProvider, NpcSpawnRollsProvider>();
+            // Shared because control resistance, arena and effect rules are asked by every project that
+            // fights, and a bootstrap-local registration once left one of them without the file.
+            services.AddGameDataParticipant<ICombatRulesProvider, CombatRulesProvider>();
             return services;
         }
 
@@ -59,6 +64,19 @@ namespace Core.Data.GameData
             where TImplementation : class, TService, IGameDataParticipant
         {
             services.AddSingleton<TImplementation>();
+            services.AddSingleton<TService>(provider => provider.GetRequiredService<TImplementation>());
+            services.AddSingleton<IGameDataParticipant>(provider => provider.GetRequiredService<TImplementation>());
+            return services;
+        }
+
+        /// <summary>Same two faces for a participant the bootstrap builds itself — the composition that
+        /// configures a provider (the catalogs it reads, say) still registers it in one place.</summary>
+        public static IServiceCollection AddGameDataParticipant<TService, TImplementation>(
+            this IServiceCollection services, Func<IServiceProvider, TImplementation> create)
+            where TService : class
+            where TImplementation : class, TService, IGameDataParticipant
+        {
+            services.AddSingleton(create);
             services.AddSingleton<TService>(provider => provider.GetRequiredService<TImplementation>());
             services.AddSingleton<IGameDataParticipant>(provider => provider.GetRequiredService<TImplementation>());
             return services;

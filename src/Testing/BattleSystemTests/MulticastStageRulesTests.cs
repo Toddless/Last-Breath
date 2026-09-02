@@ -4,8 +4,8 @@ namespace LastBreathTest.BattleSystemTests
     using System.IO;
     using System.Linq;
     using Battle.Source.Abilities.Activation;
-    using Battle.Source.CombatRules;
     using Core.Battle;
+    using Core.Battle.CombatRules;
     using Core.Data.GameData;
     using Core.Entity;
     using Core.Entity.Components;
@@ -93,12 +93,15 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void WithNoRulesToReachTheStanceStillRollsTheWorkingLadder()
         {
-            // The sandbox side of the same seam: abilities are cast by hosts that compose no services at
-            // all, and the roll there answers from the working ladder instead of falling silent. It is
-            // what the stage walks of the ability suites lean on — DischargeBarrierTests draws below the
-            // stage-3 chance and above the stage-4 one, DeepFreezeDamageTests draws at both ends.
-            Assert.IsNull(GameServiceProvider.TryGet<ICombatRulesProvider>(),
-                "this host composes combat rules after all, so what the walk measures is not the fallback");
+            // The sandbox side of the same seam: abilities are cast by hosts that reach no rules — either
+            // because they compose no services at all, or because the composition they do build was never
+            // handed the file — and the roll there answers from the working ladder instead of falling
+            // silent. It is what the stage walks of the ability suites lean on — DischargeBarrierTests
+            // draws below the stage-3 chance and above the stage-4 one, DeepFreezeDamageTests draws at
+            // both ends.
+            MulticastRules? composed = GameServiceProvider.TryGet<ICombatRulesProvider>()?.Multicast;
+            Assert.IsTrue(composed == null || composed.Stages.SequenceEqual(MulticastRules.Default.Stages),
+                "this host composes a ladder of its own, so what the walk measures is not the fallback");
 
             foreach (MulticastStage stage in MulticastRules.Default.Stages)
             {

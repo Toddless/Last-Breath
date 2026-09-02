@@ -1,14 +1,12 @@
-namespace Battle.Source.CombatRules
+namespace Core.Battle.CombatRules
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Core;
-    using Core.Battle;
-    using Core.Data;
-    using Core.Data.CombatRulesData;
-    using Core.Data.GameData;
-    using Core.Enums;
+    using Data;
+    using Data.CombatRulesData;
+    using Data.GameData;
+    using Enums;
     using Newtonsoft.Json;
 
     /// <summary>Loads SharedData/CombatRules; enums are parsed at load time so a typo is a report, not a mid-fight throw.</summary>

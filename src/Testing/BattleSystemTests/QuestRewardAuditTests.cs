@@ -6,7 +6,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Data.QuestData;
     using Core.Items;
     using LootGeneration.Internal;
-    using LootGeneration.Services;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 

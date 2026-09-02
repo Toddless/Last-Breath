@@ -75,7 +75,10 @@ namespace LastBreath.Services
         {
             services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
             services.AddSingleton<IDataParser, DataParser>();
-            services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>();
+            // Legacy basic items are built only by this project's IItemGameDataFactory, so only this
+            // composition declares their catalog; Resources stay ahead of it and win an id collision.
+            services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>(sp =>
+                new ItemDataProvider(sp.GetRequiredService<IDataParser>(), [.. ItemDataProvider.SharedCatalogs, DataCatalog.Items]));
             // One reading of "one of a kind" for everyone who hands an item over.
             services.AddSingleton<IUniqueItemQuery, UniqueItemQuery>();
             services.AddGameDataParticipant<IFactionRelationService, FactionRelationService>();
