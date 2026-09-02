@@ -1,5 +1,11 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из разворота зависимости, шаг 2: описатели в адаптере (2026-09-02; accept with minors)
+
+- (minor, док) `src/Tooling/DataEditor/README.md:5,15` — говорит, что хост берёт схему из `Core.Data.Schema.CatalogDescriptors` и что ссылок две; теперь реестр в `LastBreath.Descriptors`, ссылок три (после шага 4 — две: адаптер и Tooling.Core). Переписать на шаге 4.
+- (minor, экспорт) `DataEditor.sln:49-52` — новый проект скопировал маппинг `ExportDebug→ExportDebug` у `Tooling.Schema`/`Tooling.Core` (пункт бэклога про Debug/Release не выполнен ни у кого) — чинить все три GUID одним заходом.
+- (minor → шаг 4) `DataEditor.csproj:20` — прямая ссылка хоста на `Core.csproj` мёртвая (в `Source/` ни одного `Core.*`); снять, Core приедет транзитивно через адаптер.
+
 ## Из правки коллекций в инспекторе (2026-09-02; accept)
 
 - (minor) `src/Tooling/DataEditor/Source/View/InspectorPanel.cs:810` — подсказка поля свободного ключа берётся из схемы ЗНАЧЕНИЯ (`Hint(item)` при `field.Key == null`) — рекламирует каталоги значения как требование к ключу; передавать готовую подсказку, при отсутствии `Key` — `KeyPlaceholder`.
