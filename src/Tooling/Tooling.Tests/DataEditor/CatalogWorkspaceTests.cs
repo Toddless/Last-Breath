@@ -1,6 +1,8 @@
 namespace Tooling.Tests.DataEditor
 {
+    using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using Tooling.Catalogs;
@@ -43,6 +45,13 @@ namespace Tooling.Tests.DataEditor
         private const string ExtraFile = "Npc_Extra.json";
         private const string NestedFolder = "Bandits";
         private const string NotJsonFile = "notes.txt";
+
+        /// <summary>What a describer that will not describe says, so the note can be shown to carry it.</summary>
+        private const string BrokenMessage = "this describer refuses";
+
+        /// <summary>A culture that writes a fraction with a comma and is not the one the tests run in:
+        /// the values a file holds are the file's, and a machine set to it must read them the same.</summary>
+        private const string OtherCulture = "ru-RU";
 
         private const string TwoNpcs = """
             {
@@ -93,9 +102,34 @@ namespace Tooling.Tests.DataEditor
             { "id": "Rules", "name": "combat" }
             """;
 
+        /// <summary>The same id as <see cref="TwoNpcs"/> writes, in a file of its own.</summary>
+        private const string RonaldAgain = """
+            {
+                "npcs": [
+                    { "id": "Npc_Ronald", "name": "Ronald of the second file" }
+                ]
+            }
+            """;
+
+        /// <summary>Ids of every scalar kind json has but text: a fraction, a flag, and an integer too
+        /// long to be held as anything but a long.</summary>
+        private const string UntypedIds = """
+            {
+                "npcs": [
+                    { "id": 0.5 },
+                    { "id": true },
+                    { "id": 9007199254740993 }
+                ]
+            }
+            """;
+
         private const string NpcsNotAnArray = """
             { "npcs": { "id": "Npc_Ronald" } }
             """;
+
+        /// <summary>A document written as a list where the shape of its catalog says one record, or a
+        /// map of them.</summary>
+        private const string AnArray = "[ ]";
 
         private const string NotJson = "{ this is not json";
 
@@ -182,6 +216,50 @@ namespace Tooling.Tests.DataEditor
         }
 
         [TestMethod]
+        public void Load_NamesARecordWhoseIdIsNotTextTheWayTheFileWritesIt()
+        {
+            Write(NpcCatalog, NpcFile, UntypedIds);
+
+            CultureInfo spoken = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = new CultureInfo(OtherCulture);
+
+            try
+            {
+                // The premise of the test: in this culture the CLR's own way of writing a number is not
+                // the file's. Without it the test would pass on any machine and prove nothing.
+                Assert.AreNotEqual("0.5", 0.5.ToString(CultureInfo.CurrentCulture));
+
+                CatalogView view = Single(Load(Npcs()));
+
+                CollectionAssert.AreEqual(
+                    new[] { "0.5", "true", "9007199254740993" },
+                    view.Records.Select(record => record.Id).ToArray());
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = spoken;
+            }
+        }
+
+        [TestMethod]
+        public void Load_KeepsBothRecordsWhenTwoFilesWriteOneId()
+        {
+            Write(NpcCatalog, NpcFile, TwoNpcs);
+            Write(NpcCatalog, ExtraFile, RonaldAgain);
+
+            CatalogView view = Single(Load(Npcs()));
+
+            CatalogRecord[] ronalds = [.. view.Records.Where(record => record.Id == RonaldId)];
+
+            Assert.AreEqual(3, view.Records.Count);
+            Assert.AreEqual(2, ronalds.Length);
+            CollectionAssert.AreEquivalent(
+                new[] { NpcFile, ExtraFile },
+                ronalds.Select(record => record.File.Name).ToArray());
+            Assert.AreEqual(0, view.Notes.Count);
+        }
+
+        [TestMethod]
         public void Load_ReadsTheRecordsOfEverySection()
         {
             Write(TablesCatalog, NpcFile, SectionsOfTables);
@@ -262,6 +340,45 @@ namespace Tooling.Tests.DataEditor
             Assert.AreEqual(0, view.Records.Count);
             Assert.AreEqual(1, view.Notes.Count);
             StringAssert.Contains(view.Notes[0], NpcsKey);
+        }
+
+        [TestMethod]
+        public void Load_NotesADocumentThatIsNotOneRecord()
+        {
+            Write(SettingsCatalog, NpcFile, AnArray);
+
+            CatalogView view = Single(Load(Settings()));
+
+            Assert.AreEqual(0, view.Records.Count);
+            Assert.AreEqual(1, view.Notes.Count);
+            StringAssert.Contains(view.Notes[0], NpcFile);
+        }
+
+        [TestMethod]
+        public void Load_NotesASectionThatHoldsNoMap()
+        {
+            Write(MapCatalog, NpcFile, AnArray);
+
+            CatalogView view = Single(Load(Map()));
+
+            Assert.AreEqual(0, view.Records.Count);
+            Assert.AreEqual(1, view.Notes.Count);
+            StringAssert.Contains(view.Notes[0], NpcFile);
+        }
+
+        [TestMethod]
+        public void Load_NotesADescriberThatThrowsAndReadsTheCatalogsThatDid()
+        {
+            Write(NpcCatalog, NpcFile, TwoNpcs);
+
+            CatalogWorkspace workspace = Load(new BrokenDescriptor(TablesCatalog), Npcs());
+
+            Assert.AreEqual(1, workspace.Catalogs.Count);
+            Assert.AreEqual(NpcCatalog, workspace.Catalogs[0].Catalog);
+            Assert.AreEqual(2, workspace.RecordCount);
+            Assert.AreEqual(1, workspace.Report.Count);
+            StringAssert.StartsWith(workspace.Report[0], TablesCatalog);
+            StringAssert.Contains(workspace.Report[0], BrokenMessage);
         }
 
         [TestMethod]
@@ -348,6 +465,16 @@ namespace Tooling.Tests.DataEditor
 
             public CatalogSchema Describe(ISchemaBuilder builder) =>
                 new(shape, sections, [], new SingleFilePlacement { FileName = catalog });
+        }
+
+        /// <summary>A describer that throws something the library was never told to expect. A descriptor
+        /// is code from outside it, and one catalog refusing to be described has to cost that catalog
+        /// and nothing else.</summary>
+        private sealed class BrokenDescriptor(string catalog) : ICatalogDescriptor
+        {
+            public string Catalog => catalog;
+
+            public CatalogSchema Describe(ISchemaBuilder builder) => throw new InvalidOperationException(BrokenMessage);
         }
     }
 }

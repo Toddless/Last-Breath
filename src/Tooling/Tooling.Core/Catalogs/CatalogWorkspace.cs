@@ -2,13 +2,13 @@ namespace Tooling.Catalogs
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using Tooling.Json;
     using Tooling.Schema;
     using Tooling.Schema.Model;
     using Tooling.Schema.Reflection;
+    using static Tooling.Text.Format;
 
     /// <summary>
     /// Everything one run of an authoring tool has open: a data root, the catalogs described for it,
@@ -83,7 +83,11 @@ namespace Tooling.Catalogs
         public static string Folder(string root, string catalog) => Path.Combine(root, catalog);
 
         /// <summary>Reads one catalog. Null when its schema could not be built at all — there is
-        /// nothing to draw it with, and the reason is put on the run's report instead.</summary>
+        /// nothing to draw it with, and the reason is put on the run's report instead.
+        /// <para>Anything a describer throws is that reason. A descriptor is code from outside this
+        /// library, and the promise made above it — that one catalog costs itself and no more — cannot
+        /// be kept by naming in advance the exceptions someone else's walk over someone else's types
+        /// might raise.</para></summary>
         private static CatalogView? Read(string root, ICatalogDescriptor descriptor, List<string> report)
         {
             var builder = new CatalogSchemaBuilder();
@@ -93,7 +97,7 @@ namespace Tooling.Catalogs
             {
                 schema = builder.Build(descriptor);
             }
-            catch (ArgumentException broken)
+            catch (Exception broken)
             {
                 report.Add(Text(Notes.Undescribed, descriptor.Catalog, broken.Message));
                 return null;
@@ -146,9 +150,6 @@ namespace Tooling.Catalogs
                 return null;
             }
         }
-
-        private static string Text(string format, params object?[] parts) =>
-            string.Format(CultureInfo.InvariantCulture, format, parts);
 
         private static class Notes
         {

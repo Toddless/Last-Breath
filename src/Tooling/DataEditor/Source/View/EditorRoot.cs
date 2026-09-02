@@ -1,12 +1,13 @@
 namespace DataEditor.Source.View
 {
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
+    using System.Linq;
     using App;
     using Godot;
     using Io;
     using Tooling.Catalogs;
+    using static Tooling.Text.Format;
 
     /// <summary>
     /// Composition root of the data editor: three panes built in code — the catalogs the game
@@ -23,6 +24,11 @@ namespace DataEditor.Source.View
         private const int DialogWidth = 760;
         private const int DialogHeight = 520;
 
+        /// <summary>How many lines of a report the dialog writes out. A run over a data root that is
+        /// not there has something to say about every catalog in it, and a list that long is read as
+        /// "many" and scrolled past; the count of the rest is the part still worth naming.</summary>
+        private const int DialogLines = 60;
+
         /// <summary>What a selection index means when there is nothing to select.</summary>
         private const int NoSelection = -1;
 
@@ -30,6 +36,11 @@ namespace DataEditor.Source.View
         private const string RecordRowFormat = "{0}   ·  {1}";
         private const string StatusFormat =
             "{0}   —   {1} catalog(s) of {2} described, {3} file(s), {4} record(s), {5} note(s)";
+
+        private const string MoreLinesFormat = "…and {0} more";
+
+        /// <summary>What one line of the dialog ends with.</summary>
+        private const string LineBreak = "\n";
 
         private const string NoRootTitle = "Data root not found";
         private const string NoRootHint = "Data/Shared is a symlink to src/SharedData; restore-links.ps1 puts it back.";
@@ -40,6 +51,7 @@ namespace DataEditor.Source.View
         private InspectorPanel _inspector = null!;
         private Label _status = null!;
         private AcceptDialog _messageDialog = null!;
+        private Label _messageLines = null!;
 
         private CatalogWorkspace? _workspace;
         private CatalogView? _catalog;
@@ -86,7 +98,18 @@ namespace DataEditor.Source.View
             _status = new Label();
             root.AddChild(_status);
 
+            // The dialog's own text is left empty and the lines are written to a label of ours instead:
+            // a report is as long as the data is wrong, and only a frame that scrolls can hold one
+            // without the dialog growing past the screen. The dialog lays every control child over the
+            // same rect, so the label it carries itself would sit under this one.
+            _messageLines = new Label
+            {
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+
             _messageDialog = new AcceptDialog();
+            _messageDialog.AddChild(Scrolled(_messageLines));
             AddChild(_messageDialog);
 
             _catalogList.ItemSelected += index => ShowCatalog((int)index);
@@ -139,7 +162,7 @@ namespace DataEditor.Source.View
                 StatusFormat,
                 root,
                 _workspace.Catalogs.Count,
-                _workspace.Catalogs.Count + GameCatalogs.UndescribedCount,
+                GameCatalogs.TotalCount,
                 _workspace.FileCount,
                 _workspace.RecordCount,
                 _workspace.Report.Count);
@@ -158,7 +181,7 @@ namespace DataEditor.Source.View
                 ? _workspace.Catalogs[index]
                 : null;
 
-            if (_catalog is not null) _catalogList.Select(index);
+            if (_catalog is not null) Show(_catalogList, index);
 
             _recordList.Clear();
 
@@ -181,19 +204,32 @@ namespace DataEditor.Source.View
                 ? _catalog.Records[index]
                 : null;
 
-            if (record is not null) _recordList.Select(index);
+            if (record is not null) Show(_recordList, index);
 
             _inspector.Rebuild(record);
+        }
+
+        /// <summary>Selects a row and scrolls it into view. A row chosen without a click — the one the
+        /// tool opens on, or the first record of a catalog just picked — is otherwise selected where
+        /// the list is not looking.</summary>
+        private static void Show(ItemList list, int index)
+        {
+            list.Select(index);
+            list.EnsureCurrentIsVisible();
         }
 
         private void ShowMessage(string title, IReadOnlyList<string> lines)
         {
             _messageDialog.Title = title;
-            _messageDialog.DialogText = string.Join("\n", lines);
+            _messageLines.Text = string.Join(LineBreak, Shown(lines));
             _messageDialog.PopupCentered(new Vector2I(DialogWidth, DialogHeight));
         }
 
-        private static string Text(string format, params object?[] parts) =>
-            string.Format(CultureInfo.InvariantCulture, format, parts);
+        /// <summary>The lines the dialog writes, and, when there are more than it writes, a last line
+        /// counting the ones it does not.</summary>
+        private static IEnumerable<string> Shown(IReadOnlyList<string> lines) =>
+            lines.Count <= DialogLines
+                ? lines
+                : [.. lines.Take(DialogLines), Text(MoreLinesFormat, lines.Count - DialogLines)];
     }
 }

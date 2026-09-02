@@ -1,12 +1,13 @@
 namespace DataEditor.Source.View
 {
     using System;
-    using System.Globalization;
     using Godot;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using Tooling.Catalogs;
+    using Tooling.Json;
     using Tooling.Schema.Model;
+    using static Tooling.Text.Format;
 
     /// <summary>
     /// Reads one record out to the author, field by field, in the order its schema names them. Nothing
@@ -48,6 +49,7 @@ namespace DataEditor.Source.View
         private const string CountFormat = "{0}   ({1})";
         private const string DefaultFormat = "{0}   (default)";
         private const string ReferenceFormat = "{0}   → {1}";
+        private const string TranslationFormat = "{0}   ·   “{1}”";
         private const string IndexFormat = "[{0}]";
         private const string CatalogSeparator = ", ";
 
@@ -121,16 +123,29 @@ namespace DataEditor.Source.View
             return body;
         }
 
-        private static Control Row(string name, string value)
+        /// <summary>One field as a row. What the field means hangs off its name as a tooltip: the panel
+        /// is read down the value column, and a sentence per row printed in full would push the values
+        /// apart until the record no longer reads as one thing.</summary>
+        private static Control Row(string name, string value, string? documentation)
         {
             var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
 
-            row.AddChild(new Label
+            var label = new Label
             {
                 Text = name,
                 CustomMinimumSize = new Vector2(NameWidth, 0),
                 VerticalAlignment = VerticalAlignment.Top
-            });
+            };
+
+            // A label ignores the mouse, and a tooltip is only ever shown for a control the mouse can
+            // land on; a row with nothing to say goes on ignoring it.
+            if (documentation is { Length: > 0 })
+            {
+                label.TooltipText = documentation;
+                label.MouseFilter = MouseFilterEnum.Pass;
+            }
+
+            row.AddChild(label);
 
             row.AddChild(new Label
             {
@@ -185,7 +200,7 @@ namespace DataEditor.Source.View
         {
             if (depth >= MaxDepth || value is null || value.Type == JTokenType.Null)
             {
-                parent.AddChild(Row(name, Scalar(field, value)));
+                parent.AddChild(Row(name, Scalar(field, value), field.Documentation));
                 return;
             }
 
@@ -212,7 +227,7 @@ namespace DataEditor.Source.View
                     break;
 
                 default:
-                    parent.AddChild(Row(name, Scalar(field, value)));
+                    parent.AddChild(Row(name, Scalar(field, value), field.Documentation));
                     break;
             }
         }
@@ -228,13 +243,27 @@ namespace DataEditor.Source.View
             // json itself is the honest answer, cut where a row stops being readable.
             if (value is JObject or JArray || field.Kind == FieldKind.Any) return Raw(value);
 
-            string written = value.ToString();
+            string written = JsonScalars.Written(value);
 
             if (written.Length == 0) return Missing;
 
-            return field.Kind == FieldKind.Reference && field.RefCatalogs.Count > 0
-                ? Text(ReferenceFormat, written, string.Join(CatalogSeparator, field.RefCatalogs))
-                : written;
+            return field.Kind switch
+            {
+                FieldKind.Reference when field.RefCatalogs.Count > 0 =>
+                    Text(ReferenceFormat, written, string.Join(CatalogSeparator, field.RefCatalogs)),
+                FieldKind.LocalizedKey => Translated(written),
+                _ => written
+            };
+        }
+
+        /// <summary>A localization key together with the text it stands for. A key nothing translates
+        /// answers with itself, and the panel says it once: the author is reading whether the key has
+        /// been written yet, and a line repeating it says that as clearly as a line saying nothing.</summary>
+        private static string Translated(string key)
+        {
+            string translation = TranslationServer.Translate(key).ToString();
+
+            return string.Equals(translation, key, StringComparison.Ordinal) ? key : Text(TranslationFormat, key, translation);
         }
 
         private static string Raw(JToken token)
@@ -246,8 +275,5 @@ namespace DataEditor.Source.View
 
         private static JToken? Value(JToken token, string name) =>
             token is JObject holder && holder.TryGetValue(name, StringComparison.Ordinal, out JToken? value) ? value : null;
-
-        private static string Text(string format, params object?[] parts) =>
-            string.Format(CultureInfo.InvariantCulture, format, parts);
     }
 }

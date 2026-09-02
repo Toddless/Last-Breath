@@ -1,0 +1,52 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEditor", "DataEditor.csproj", "{63A7785E-25CE-42A7-9C65-CCABEB184785}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "..\..\Core\Core.csproj", "{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tooling.Core", "..\Tooling.Core\Tooling.Core.csproj", "{4C4CB066-638E-4AD9-BBEE-78C5AAE28E2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tooling.Schema", "..\Tooling.Schema\Tooling.Schema.csproj", "{F34DA019-81A9-4942-B0AB-7A8654877370}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		ExportDebug|Any CPU = ExportDebug|Any CPU
+		ExportRelease|Any CPU = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{63A7785E-25CE-42A7-9C65-CCABEB184785}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63A7785E-25CE-42A7-9C65-CCABEB184785}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63A7785E-25CE-42A7-9C65-CCABEB184785}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{63A7785E-25CE-42A7-9C65-CCABEB184785}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{63A7785E-25CE-42A7-9C65-CCABEB184785}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{63A7785E-25CE-42A7-9C65-CCABEB184785}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{D5731C0E-5492-25B1-FA4D-E8F72BDD01C6}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{4C4CB066-638E-4AD9-BBEE-78C5AAE28E2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C4CB066-638E-4AD9-BBEE-78C5AAE28E2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C4CB066-638E-4AD9-BBEE-78C5AAE28E2A}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{4C4CB066-638E-4AD9-BBEE-78C5AAE28E2A}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{4C4CB066-638E-4AD9-BBEE-78C5AAE28E2A}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{4C4CB066-638E-4AD9-BBEE-78C5AAE28E2A}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{F34DA019-81A9-4942-B0AB-7A8654877370}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F34DA019-81A9-4942-B0AB-7A8654877370}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F34DA019-81A9-4942-B0AB-7A8654877370}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{F34DA019-81A9-4942-B0AB-7A8654877370}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{F34DA019-81A9-4942-B0AB-7A8654877370}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{F34DA019-81A9-4942-B0AB-7A8654877370}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2F9B41C7-5A08-4E63-9D14-8B7A6C03E5F1}
+	EndGlobalSection
+EndGlobal

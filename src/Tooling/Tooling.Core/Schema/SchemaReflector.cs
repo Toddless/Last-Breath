@@ -3,7 +3,6 @@ namespace Tooling.Schema.Reflection
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
@@ -12,6 +11,7 @@ namespace Tooling.Schema.Reflection
     using Newtonsoft.Json.Linq;
     using Newtonsoft.Json.Serialization;
     using Tooling.Schema.Model;
+    using static Tooling.Text.Format;
 
     /// <summary>What the walk could not answer with certainty, in the order it was met. The library has no
     /// tracker of its own, so whoever asked for a schema reads these and reports them its own way.</summary>
@@ -613,8 +613,7 @@ namespace Tooling.Schema.Reflection
             return _nullability.Create(member).ReadState != NullabilityState.Nullable && !HasInitializer(type, value);
         }
 
-        private void Note(string format, params object?[] parts) =>
-            Report.Note(string.Format(CultureInfo.InvariantCulture, format, parts));
+        private void Note(string format, params object?[] parts) => Report.Note(Text(format, parts));
 
         /// <summary>Where the walk stands: the record whose fields are being read, and the types it is
         /// already inside of, which is what a type leading back to itself is recognised by.</summary>

@@ -2,8 +2,8 @@ namespace Tooling.Schema.Reflection
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using Tooling.Schema.Model;
+    using static Tooling.Text.Format;
 
     /// <summary>
     /// Builds the schema of one catalog: the descriptor states the shape of the file, the reflector reads
@@ -134,8 +134,7 @@ namespace Tooling.Schema.Reflection
             return shapes;
         }
 
-        private void Note(string format, params object?[] parts) =>
-            Checks.Note(string.Format(CultureInfo.InvariantCulture, format, parts));
+        private void Note(string format, params object?[] parts) => Checks.Note(Text(format, parts));
 
         private static class Notes
         {

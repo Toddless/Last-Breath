@@ -2,10 +2,10 @@ namespace Tooling.Catalogs
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using Newtonsoft.Json.Linq;
     using Tooling.Json;
     using Tooling.Schema.Model;
+    using static Tooling.Text.Format;
 
     /// <summary>
     /// Finds the records of one file by the shape its catalog is written in. The shape is the only
@@ -105,23 +105,22 @@ namespace Tooling.Catalogs
         }
 
         /// <summary>The id the record is written under, or its place in the section when it carries
-        /// none — a settings document, a position at a loot table.</summary>
+        /// none — a settings document, a position at a loot table. An id written as something other
+        /// than text is named the way the file holds it: it is the word the author searches the file
+        /// for, and no machine's culture has a say in it.</summary>
         private static string Id(RecordSchema schema, JToken token, int index)
         {
             if (schema.IdField is { } name
                 && token is JObject holder
                 && holder.TryGetValue(name, StringComparison.Ordinal, out JToken? value)
                 && value is JValue { Value: not null }
-                && value.ToString() is { Length: > 0 } written)
+                && JsonScalars.Written(value) is { Length: > 0 } written)
                 return written;
 
             return Text(IndexIdFormat, index);
         }
 
         private static string Named(JsonPointer pointer) => pointer.IsRoot ? Notes.RootName : pointer.ToString();
-
-        private static string Text(string format, params object?[] parts) =>
-            string.Format(CultureInfo.InvariantCulture, format, parts);
 
         private static class Notes
         {
