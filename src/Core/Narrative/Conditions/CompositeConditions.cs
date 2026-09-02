@@ -3,6 +3,7 @@ namespace Core.Narrative.Conditions
     using System.Collections.Generic;
     using System.Linq;
     using Newtonsoft.Json.Linq;
+    using Tooling.Schema.Model;
 
     /// <summary>Composites are strict: one broken child breaks the whole composite (null from the
     /// factory). A silently dropped clause would soften a gate — fail closed instead.</summary>
@@ -23,12 +24,17 @@ namespace Core.Narrative.Conditions
 
     public abstract class CompositeConditionFactory : INarrativeConditionFactory
     {
+        private const string ConditionsKey = "conditions";
+
         public abstract string Type { get; }
+
+        /// <summary>Built once per factory: the shape is the same for every composite, the name is not.</summary>
+        public RecordSchema Parameters => field ??= NarrativeParameterSchema.Of(Type, NarrativeParameterSchema.Conditions(ConditionsKey));
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {
             var children = new List<INarrativeCondition>();
-            foreach (var token in json.Value<JArray>("conditions") ?? [])
+            foreach (var token in json.Value<JArray>(ConditionsKey) ?? [])
             {
                 var child = parser.Parse(token);
                 if (child == null) return null; // already reported
@@ -37,7 +43,7 @@ namespace Core.Narrative.Conditions
 
             if (children.Count != 0) return Build(children);
 
-            Tracker.TrackError($"{Type} condition: conditions list is empty");
+            Tracker.TrackError($"{Type} condition: {ConditionsKey} list is empty");
             return null;
         }
 
@@ -58,14 +64,22 @@ namespace Core.Narrative.Conditions
 
     public class NotConditionFactory : INarrativeConditionFactory
     {
-        public string Type => "Not";
+        private const string TypeName = "Not";
+        private const string ConditionKey = "condition";
+
+        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+            NarrativeParameterSchema.Condition(ConditionKey));
+
+        public string Type => TypeName;
+
+        public RecordSchema Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {
-            var inner = json["condition"] is { } token ? parser.Parse(token) : null;
+            var inner = json[ConditionKey] is { } token ? parser.Parse(token) : null;
             if (inner != null) return new NotCondition(inner);
 
-            Tracker.TrackError("Not condition: inner condition is missing or broken");
+            Tracker.TrackError($"{TypeName} condition: inner {ConditionKey} is missing or broken");
             return null;
         }
     }

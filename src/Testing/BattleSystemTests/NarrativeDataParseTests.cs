@@ -39,25 +39,19 @@ namespace LastBreathTest.BattleSystemTests
 
             var clock = new Mock<Core.Ai.World.Time.IWorldClock>();
 
-            var conditionFactories = new List<INarrativeConditionFactory>
-            {
-                new HasItemConditionFactory(Mock.Of<Core.Inventory.IInventory>()),
-                new FactConditionFactory(_facts),
-                new FactionStandingConditionFactory(new Core.Reputation.FactionRelationService(FactionTestData.Create())),
-                new NpcRelationConditionFactory(Mock.Of<Core.Reputation.IPersonalReputationService>()),
-                new AttributeConditionFactory(Mock.Of<IPlayerAccessor>()),
-                new InfluenceConditionFactory(_influence),
-                new AllOfConditionFactory(),
-                new AnyOfConditionFactory(),
-                new NotConditionFactory(),
-                new QuestStatusConditionFactory(() => _questLog),
-                new CanAcceptQuestConditionFactory(() => _questLog),
-                new CanTurnInQuestConditionFactory(() => _questLog),
-                new QuestOfferRollConditionFactory(_facts, _influence, clock.Object, null!, () => _quests),
-            };
-
             var inventory = new Mock<Core.Inventory.IInventory>();
             inventory.Setup(mock => mock.GetAvailableCapacity()).Returns(100);
+
+            var conditionFactories = NarrativeTestFactories.Conditions(
+                inventory.Object,
+                _facts,
+                new Core.Reputation.FactionRelationService(FactionTestData.Create()),
+                Mock.Of<Core.Reputation.IPersonalReputationService>(),
+                Mock.Of<IPlayerAccessor>(),
+                _influence,
+                clock.Object,
+                () => _questLog,
+                () => _quests);
 
             var actionFactories = new List<INarrativeActionFactory>
             {

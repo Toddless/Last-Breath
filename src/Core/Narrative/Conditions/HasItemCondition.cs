@@ -1,7 +1,9 @@
 namespace Core.Narrative.Conditions
 {
+    using Data.GameData;
     using Inventory;
     using Newtonsoft.Json.Linq;
+    using Tooling.Schema.Model;
 
     /// <summary>Reads the live inventory instead of a "picked up" counter — that is what lets a
     /// quest item found before the quest count, and a sold-off one stop counting.</summary>
@@ -12,18 +14,32 @@ namespace Core.Narrative.Conditions
 
     public class HasItemConditionFactory(IInventory inventory) : INarrativeConditionFactory
     {
-        public string Type => "HasItem";
+        private const string TypeName = "HasItem";
+        private const string ItemIdKey = "itemId";
+        private const string AmountKey = "amount";
+        private const int DefaultAmount = 1;
+
+        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+            NarrativeParameterSchema.Text(ItemIdKey, required: true,
+                DataCatalog.EquipItems, DataCatalog.Resources, DataCatalog.Items, DataCatalog.Ornaments),
+            NarrativeParameterSchema.Integer(AmountKey, DefaultAmount));
+
+        public string Type => TypeName;
+
+        /// <summary>The bag is searched by raw id, so gold and augments — minted outside any catalog —
+        /// are named in itemId just as well as the catalogued items are.</summary>
+        public RecordSchema Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {
-            string itemId = json.Value<string>("itemId") ?? string.Empty;
+            string itemId = json.Value<string>(ItemIdKey) ?? string.Empty;
             if (itemId.Length == 0)
             {
-                Tracker.TrackError("HasItem condition: itemId is missing");
+                Tracker.TrackError($"{TypeName} condition: {ItemIdKey} is missing");
                 return null;
             }
 
-            return new HasItemCondition(inventory, itemId, json.Value<int?>("amount") ?? 1);
+            return new HasItemCondition(inventory, itemId, json.Value<int?>(AmountKey) ?? DefaultAmount);
         }
     }
 }

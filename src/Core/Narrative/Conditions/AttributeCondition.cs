@@ -6,6 +6,7 @@ namespace Core.Narrative.Conditions
     using Enums;
     using Newtonsoft.Json.Linq;
     using Services;
+    using Tooling.Schema.Model;
 
     /// <summary>A hard attribute gate, no roll: muscles don't gamble, words do (speech checks
     /// against Influence are the rolled kind).</summary>
@@ -25,11 +26,25 @@ namespace Core.Narrative.Conditions
 
     public class AttributeConditionFactory(IPlayerAccessor playerAccessor) : INarrativeConditionFactory
     {
-        public string Type => "Attribute";
+        private const string TypeName = "Attribute";
+        private const string AttributeKey = "attribute";
+        private const string AtLeastKey = "atLeast";
+        private const int DefaultAtLeast = 0;
+
+        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+            NarrativeParameterSchema.Choice(AttributeKey, required: true,
+                nameof(AttributeType.Strength), nameof(AttributeType.Dexterity), nameof(AttributeType.Intelligence)),
+            NarrativeParameterSchema.Integer(AtLeastKey, DefaultAtLeast));
+
+        public string Type => TypeName;
+
+        /// <summary>Only the three attributes an entity carries are offered: the condition resolves any
+        /// other member of the enum to nothing and is then never met.</summary>
+        public RecordSchema Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser) =>
             new AttributeCondition(playerAccessor,
-                EnumParser.ParseEnum<AttributeType>(json.Value<string>("attribute") ?? string.Empty),
-                json.Value<int?>("atLeast") ?? 0);
+                EnumParser.ParseEnum<AttributeType>(json.Value<string>(AttributeKey) ?? string.Empty),
+                json.Value<int?>(AtLeastKey) ?? DefaultAtLeast);
     }
 }

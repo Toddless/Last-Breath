@@ -4,6 +4,7 @@ namespace Core.Narrative.Conditions
     using Enums;
     using Newtonsoft.Json.Linq;
     using Reputation;
+    using Tooling.Schema.Model;
 
     /// <summary>The interlocutor's EFFECTIVE relation: faction standing shifted by personal
     /// opinion. Outside a conversation (empty context) the condition is never met.</summary>
@@ -16,9 +17,17 @@ namespace Core.Narrative.Conditions
 
     public class NpcRelationConditionFactory(IPersonalReputationService personal) : INarrativeConditionFactory
     {
-        public string Type => "NpcRelation";
+        private const string TypeName = "NpcRelation";
+        private const string AtLeastKey = "atLeast";
+
+        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+            NarrativeParameterSchema.Enum<RelationLevel>(AtLeastKey));
+
+        public string Type => TypeName;
+
+        public RecordSchema Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser) =>
-            new NpcRelationCondition(personal, EnumParser.ParseEnum<RelationLevel>(json.Value<string>("atLeast") ?? string.Empty));
+            new NpcRelationCondition(personal, EnumParser.ParseEnum<RelationLevel>(json.Value<string>(AtLeastKey) ?? string.Empty));
     }
 }
