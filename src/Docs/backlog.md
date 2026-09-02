@@ -1,5 +1,27 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из описателя LootTables (2026-09-02; accept with minors)
+
+- (minor) `src/Core/Data/Schema/LootTablesCatalogDescriptor.cs:96-109` — `Meaning` копирует с подменяющего поля только `Kind`/`EnumValues`/`RefCatalogs`/`RefusedAsReference`, остальное (`AllowEmpty`, `Range`, `Item`/`Key`) молча теряется. Стало: `names with { Required = field.Required, Default = field.Default, Hidden = field.Hidden }`.
+- (minor, имя) там же `:29-37` — `IdField` в описателе означает ключ формы позиции, а не id записи (в Npc-описателе — id); переименовать в `ByIdKey`/`ByGroupKey`.
+- (minor, хрупко) `CatalogDescriptorTests.cs:62-68` — allowlist нот пинит точные предложения из `SchemaReflector.Notes`; сравнивать пары «о чём / опорное слово» через `Contains` + `AreEqual(4, notes.Count)`.
+- (minor, размен) `CatalogDescriptorTests.cs:198-215` — в Npc-тесте пин идемпотентности `once == twice` убран, а не дополнен `DeepEquals`; вернуть обе строки (`DeepEquals` к порядку нечувствителен).
+- (minor, ДАННЫЕ → владельцу) `src/SharedData/LootTables/LootTables.json:1016` — ключ `npc_id` в секции `individual` не существует ни в одном `Npc.json` (плейсхолдер); тул нарисует битую ссылку; `LootTablesAuditTests` ключи таблиц не проверяет — снести запись либо дописать в аудит проверку ключей `individual` против Npc и `fractions`/`types` против enum'ов.
+- (nit) `FileName = "LootTables"` литералом против `FileName = DataCatalog.Npc` у соседа — выровнять правило; цикл по секциям проверяет один и тот же объект `tiers`; `FileFor` сравнивается сам с собой; `DataCatalogNames.All()` пересчитывает рефлексию на каждый вызов, `"*.json"` остался литералом в `ShippedCatalogTests`; `LootTablesAuditTests.GroupProperty` дублирует `AugmentsField`.
+- (знать, несущий инвариант) `SchemaKeyOrder.Merge` слепляет поля вариантов и `TableRecord` только пока `Alike` — лишний `[CatalogRef]`/`[Range]` на одной стороне сделает `augments` → `Any`, `tier`/`rarity` потеряют ранг, тест «все ключи известны» упадёт.
+
+## Из скелета хоста DataEditor (2026-09-02; accept with minors) — первые три закрываются задачей полировки
+
+- (minor, ДЕФЕКТ на русской Windows) `src/Tooling/DataEditor/Source/View/InspectorPanel.cs:231` + `Tooling.Core/Catalogs/CatalogRecords.cs:115` — `JToken.ToString()` без культуры: `0,5` и `True`. Стало: строка → `Value<string>()`, остальное → `ToString(Formatting.None)`.
+- (minor) `EditorRoot.cs:142` — «всего каталогов» считается от собравшихся схем; знаменатель — `CatalogDescriptors.All.Count + NotYetDescribed.Count` из `GameCatalogs.TotalCount`.
+- (minor) `EditorRoot.cs:189-194` — весь `Report` в `AcceptDialog.DialogText` без скролла; `ScrollContainer` + `Label` внутри диалога либо первые N.
+- (minor) `InspectorPanel.cs:222-238` — не использует `Documentation` (tooltip), `LocalizedKey` (`TranslationServer.Translate`), `EnumValues`/`Range`.
+- (minor) `CatalogWorkspace.cs:96` — ловит только `ArgumentException`, а `Describe` — чужой код; ловить `Exception` в ноту `Undescribed`.
+- (minor, тесты) `CatalogWorkspaceTests.cs` — не покрыты: схема не собралась (каталог выбывает), дубли id между файлами (оба сохраняются), `Single`/`Dictionary` не той формы.
+- (minor) у `DataEditor` нет своего `.sln` рядом с `project.godot` (кнопка Build в Godot и экспорт ждут его с конфигурациями `ExportDebug/ExportRelease`) — скопировать `PassiveTreeEditor.sln` со сменой имён/GUID.
+- (minor, дубль ×6) хелпер `Text(...)` в `CatalogWorkspace.cs:150`, `CatalogRecords.cs:123`, `EditorRoot.cs:196`, `InspectorPanel.cs:250` + `Note()` в `CatalogSchemaBuilder.cs:138`, `SchemaReflector.cs:617` — один `internal static` в `Tooling.Core`.
+- (nit) `main.tscn` без uid — первый запуск перепишет файл; `Locate` и `SchemaKeyOrder` читают «пустой ключ = корень» по-разному (единственная секция vs всегда) — `SchemaGuard` отвергать пустой ключ при `Sections.Count > 1`; `Select(index)` без `EnsureCurrentIsVisible()`; `OS.HasFeature("editor")` литералом (как у образца).
+
 ## Из выноса канона эффектов в Core (2026-09-02; accept with minors)
 
 - (minor, ловушка; ревьюер счёл обязательным) `src/Battle/Source/EffectProvider.cs:181,254-257,299-303` — вердикт сверки «канон ↔ фабрики» взводится один раз навсегда: если первый вопрос задан при пустом каноне, `_refused` остаётся пустым и после поздней загрузки строка с опечаткой в ключе пройдёт гейт; старый `Apply` перевзводил защёлку на каждый файл. В игре недостижимо (каталог грузится до первого вопроса, файл один), пин `TheRegistryTakesItsCanonFromTheCatalogAtTheMomentItIsAsked` закрепляет эту дорогу. Стало: защёлка по содержимому — `if (_judgedRows == canon.Ids.Count) return; _judgedRows = canon.Ids.Count; _refused.Clear();` (три строки) либо ревизия на `IEffectCanonCatalog`.
