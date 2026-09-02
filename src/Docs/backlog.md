@@ -1,5 +1,13 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из схем действий нарратива (2026-09-02; accept with minors)
+
+- (minor, ловушка перегрузки) `src/Core/Narrative/NarrativeParameterSchema.cs:33` — `Text(name, string fallback)` рядом с `Text(name, bool required, params string[] catalogs)`: забытый `required:` биндится в fallback и даёт необязательную строку с «дефолтом» = имя каталога. Переименовать в `TextOr`/`OptionalText`.
+- (minor, дубль) `GiveItemAction.cs:21`, `TakeItemAction.cs:18` — поле `amount` собирается дважды; `ItemIdParameter.AmountField`.
+- (minor, дубль между половинами; нужна санкция на правку условий) `GiveItemAction.cs:37` vs `Conditions/HasItemCondition.cs:18-25` — ссылка на предмет (`itemId`/`amount`/1/четыре каталога) существует дважды; перенести `ItemIdParameter` в `Core/Narrative` рядом с `NarrativeParameterSchema` и указать на него условие.
+- (minor, для тула) ограничения, невыразимые через `Required` (`delta ≠ 0`, `amount > 0`, `pointId` — точка сцены, `modifiers` отсутствие ≠ пустой список) живут только в xml-доке C#; передавать как `FieldSchema.Documentation` на поле — то же для схем условий.
+- (nit) `s_unwatchableDefaults` несёт два смысла (дефолта нет vs не подсмотреть) — два списка; классы-действия (`SpawnNpcAction.cs`, `PublishDeedAction.cs`) пишут имя типа литералом в 7 сообщениях; док `QuestIdParameter` «four conditions» устарел; `ItemIdParameter` лежит в `GiveItemAction.cs`, а читает его и `TakeItem` — отдельный файл или `ItemActions.cs`; у 6 фабрик из 13 собственных `*Key`-констант нет, прямое направление пина пусто (дрейф невозможен конструктивно); нет нарративного аналога пина «*Id — ссылка либо отказ» (`FreeText` введён ради него).
+
 ## Из описателя EquipItems (2026-09-02; accept with minors) — данные владельцу отдельно в отчёте
 
 - (minor) `src/Testing/BattleSystemTests/CatalogDescriptorTests.cs:650-651` — `ShippedFiles` перечисляет `*.json` без `SearchOption.AllDirectories`, а игра и тул читают рекурсивно; стало: `[.. CatalogWorkspace.FilePaths(SharedData.Catalog(catalog))]` (заодно уходят локальные `JsonFiles`/`JsonExtension`).
