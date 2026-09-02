@@ -3,6 +3,7 @@ namespace Core.Data.EquipData
     using System;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using Tooling.Schema;
 
     /// <summary>Polymorphic "updateLevel" field: a plain number (exact starting level) or a
     /// {"min": X, "max": Y} object — the range spec the item minter will roll (next block); until then
@@ -11,7 +12,9 @@ namespace Core.Data.EquipData
     public readonly record struct LevelRangeData(int Min, int Max)
     {
         public bool IsFixed => Min == Max;
-        public bool IsMalformed { get; init; }
+
+        /// <summary>The converter's verdict on a shape it could not read, never a key of the file.</summary>
+        [Hidden] public bool IsMalformed { get; init; }
     }
 
     public class LevelRangeDataConverter : JsonConverter<LevelRangeData>

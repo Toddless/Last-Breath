@@ -2,11 +2,13 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Core.Ai;
     using Core.Ai.World;
+    using Core.Data.EquipData;
     using Core.Data.GameData;
     using Core.Data.LootTable;
     using Core.Data.NpcData;
     using Core.Data.Schema;
     using Core.Enums;
+    using Core.Localization;
     using Newtonsoft.Json.Linq;
     using Tooling.Json;
     using Tooling.Schema;
@@ -29,6 +31,14 @@ namespace LastBreathTest.BattleSystemTests
         private const char PathSeparator = '.';
 
         private const string JsonExtension = ".json";
+
+        /// <summary>Every file of a catalog folder — a catalog is the union of its files, and the ones
+        /// split by slot have nine.</summary>
+        private const string JsonFiles = "*" + JsonExtension;
+
+        /// <summary>Separates the steps of a json pointer, which is how the addresses of the keys a
+        /// schema does not know are written.</summary>
+        private const char PointerSeparator = '/';
 
         /// <summary>What the json name of a field holding an id ends with, whatever its case.</summary>
         private const string IdSuffix = "Id";
@@ -97,6 +107,85 @@ namespace LastBreathTest.BattleSystemTests
             ("reactions.trigger", typeof(ReactionTrigger)),
             ("stages.attackEffects.effect", typeof(StageAttackEffectKind)),
         ];
+
+        /// <summary>What a note about a member the file does not hold turns on.</summary>
+        private const string WorkedOut = "worked out";
+
+        /// <summary>
+        /// What the reflector has to say about the real equipment DTOs, as pairs of "about what" and the
+        /// word the note turns on — the sentences themselves are the library's wording, and pinning them
+        /// would fail on a rephrasing that changed nothing.
+        /// <para>Every one of them is a fact about the shipped types: a "number or {min,max}" field is read
+        /// through a converter, so the shape of the file may differ from the shape of the type; the two ends
+        /// of such a range answer questions worked out from each other; and a modifier line holds modifier
+        /// lines (composites) and grants that hold lines again, so the walk meets types it is already
+        /// inside of.</para>
+        /// </summary>
+        private static readonly (string About, string Word)[] s_allowedEquipItemNotes =
+        [
+            ($"{nameof(EquipItemData)}.updateLevel", nameof(LevelRangeDataConverter)),
+            ($"{nameof(ItemModifier)}.extraUpgradeLevels", nameof(LevelRangeDataConverter)),
+            ($"{nameof(BaseStatData)}.value", nameof(ValueRangeDataConverter)),
+            ($"{nameof(ItemModifier)}.value", nameof(ValueRangeDataConverter)),
+            ($"{nameof(ValueRangeData)}.{nameof(ValueRangeData.IsFixed)}", WorkedOut),
+            ($"{nameof(ValueRangeData)}.{nameof(ValueRangeData.IsValid)}", WorkedOut),
+            ($"{nameof(LevelRangeData)}.{nameof(LevelRangeData.IsFixed)}", WorkedOut),
+            ($"{nameof(ItemModifier)}.parts", nameof(ItemModifier)),
+            ($"{nameof(ItemModifier)}.grant", nameof(GrantData)),
+            ($"{nameof(GrantData)}.modifiers", nameof(ItemModifier)),
+        ];
+
+        /// <summary>Every reference the equipment parser resolves by id, addressed the way the file writes
+        /// it. A grant names a passive or an effect by the kind it declares; a line names the predicate it
+        /// is held up by, wherever a line stands.</summary>
+        private static readonly (string Path, string Catalog)[] s_equipItemReferences =
+        [
+            ("grants.id", DataCatalog.PassiveSkills),
+            ("grants.id", DataCatalog.Effects),
+            ("implicits.condition", DataCatalog.Conditions),
+            ("modifiers.condition", DataCatalog.Conditions),
+            ("grants.modifiers.condition", DataCatalog.Conditions),
+        ];
+
+        /// <summary>Every field the equipment parser turns into an enum member.</summary>
+        private static readonly (string Path, Type Members)[] s_equipItemChoices =
+        [
+            (EquipItemsCatalogDescriptor.SlotField, typeof(EquipmentPiece)),
+            ("weaponType", typeof(WeaponType)),
+            ("handedness", typeof(Handedness)),
+            ("rarity", typeof(Rarity)),
+            ("baseStats.parameter", typeof(EntityParameter)),
+            ("implicits.scope", typeof(ModifierScope)),
+            ("implicits.affix", typeof(AffixKind)),
+            ("modifiers.scope", typeof(ModifierScope)),
+            ("modifiers.affix", typeof(AffixKind)),
+            ("grants.kind", typeof(GrantKind)),
+        ];
+
+        /// <summary>The records written as a number OR a {min,max} object. Read off the schema by the
+        /// record standing under a field, so a second field of the same shape is found without being
+        /// listed here.</summary>
+        private static readonly string[] s_rangeRecords = [nameof(ValueRangeData), nameof(LevelRangeData)];
+
+        /// <summary>The two ends every one of those records is written with.</summary>
+        private static readonly string[] s_rangeBounds = ["min", "max"];
+
+        /// <summary>The one slot of the paperdoll no item is written for: which of the two ring slots a
+        /// ring lands in is the equipment component's answer, not the record's.</summary>
+        private const EquipmentPiece SlotNoItemCarries = EquipmentPiece.Ring2;
+
+        /// <summary>The files whose name is not the slot their records carry. One, and it is data rather
+        /// than schema: the placement rule hands the tool the slot a record names, so a record saved out
+        /// of BodyArmor.json lands in a Body.json beside it until the file is renamed.</summary>
+        private static readonly (string File, string Slot)[] s_equipItemFilesNamedOtherThanTheirSlot =
+        [
+            ("BodyArmor", nameof(EquipmentPiece.Body))
+        ];
+
+        /// <summary>Keys the shipped equipment files write that no field of the schema is written under.
+        /// Both are data rather than schema: the game's reader matches names without regard to case and
+        /// passes over what it cannot place, so neither is heard from at load.</summary>
+        private static readonly string[] s_unknownEquipItemKeys = ["CriticalDamage", "effectId"];
 
         /// <summary>Every catalog a loot position may name its drop out of; any one of them knowing the
         /// id makes the position real, which is why the field carries them all at once.</summary>
@@ -341,6 +430,168 @@ namespace LastBreathTest.BattleSystemTests
                 "the canonical write of LootTables.json says something other than the file it was given");
         }
 
+        /// <summary>The schema of the equipment, built from the shipped DTOs. What the walk has to say is
+        /// held as pairs of subject and keyword rather than whole sentences: which types earn a note is the
+        /// fact being pinned, while the wording belongs to the library.</summary>
+        [TestMethod]
+        public void TheEquipItemsSchemaBuildsFromTheRealDtosWithTheNotesItsRangesAndCompositesAreKnownFor()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.EquipItems));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape);
+            Assert.AreEqual(1, schema.Sections.Count);
+            Assert.AreEqual(EquipItemsCatalogDescriptor.RecordsKey, schema.Sections[0].Key);
+            Assert.AreEqual(EquipItemsCatalogDescriptor.IdField, schema.Sections[0].Record.IdField);
+            CollectionAssert.AreEqual(
+                new[] { LocalizedKeyAttribute.NoSuffix, LocalizationService.DescriptionSuffix },
+                schema.LocalizedSuffixes.ToArray(),
+                "an equipment template is named and described in the localization by its own id");
+
+            Unexpected(builder.Reflection.Notes, s_allowedEquipItemNotes, builder.Reflection);
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled EquipItems catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>Every id the equipment parser resolves against another catalog, and every name it
+        /// parses into an enum, said so in the schema. An unmarked one reads to the tool as free text: the
+        /// author types a name nothing answers, and the miss surfaces when the item is minted.</summary>
+        [TestMethod]
+        public void TheEquipItemsSchemaNamesTheReferencesAndChoicesTheParserResolves()
+        {
+            RecordSchema record = Schema(DataCatalog.EquipItems).Sections[0].Record;
+
+            foreach ((string path, string catalog) in s_equipItemReferences)
+            {
+                FieldSchema field = Leaf(Locate(record, path));
+
+                Assert.AreEqual(FieldKind.Reference, field.Kind, $"'{path}' is not a reference");
+                CollectionAssert.Contains(field.RefCatalogs.ToArray(), catalog, $"'{path}' does not point into {catalog}");
+            }
+
+            foreach ((string path, Type members) in s_equipItemChoices)
+                Choice(Leaf(Locate(record, path)), members);
+        }
+
+        /// <summary>
+        /// The catalog is split into a file per slot, and the rule that says so is the record's own field:
+        /// every record of every shipped file answers with the slot it carries, and the file it sits in is
+        /// named after it. The slots are all the paperdoll has bar the second ring, which no item is
+        /// written for.
+        /// <para>A file named otherwise than its records' slot is named here one by one: the rule hands the
+        /// writer the slot, so such a file is one the tool would write a second copy of beside.</para>
+        /// </summary>
+        [TestMethod]
+        public void TheEquipItemsCatalogIsSplitIntoOneFilePerSlotByTheRecordsOwnField()
+        {
+            CatalogSchema schema = Schema(DataCatalog.EquipItems);
+            List<string> files = ShippedFiles(DataCatalog.EquipItems);
+            List<(string File, string Slot)> named = [];
+            HashSet<string> slots = new(StringComparer.Ordinal);
+
+            foreach (string file in files)
+            {
+                string name = Path.GetFileNameWithoutExtension(file);
+                List<JObject> records = SectionRecords(JsonTreeDocument.Load(file).Root, EquipItemsCatalogDescriptor.RecordsKey);
+                Assert.AreNotEqual(0, records.Count, $"{name} holds no records — the check would pass on an empty file");
+
+                foreach (JObject item in records)
+                {
+                    string slot = schema.Placement.FileFor(key => item[key]?.Value<string>())
+                                  ?? throw new AssertFailedException($"{name}: the placement names no file for '{Id(item)}'");
+
+                    Assert.AreEqual(
+                        item[EquipItemsCatalogDescriptor.SlotField]?.Value<string>(),
+                        slot,
+                        $"{name}: '{Id(item)}' is placed by something other than the slot it is worn in");
+
+                    slots.Add(slot);
+                    if (!string.Equals(name, slot, StringComparison.Ordinal)) named.Add((name, slot));
+                }
+            }
+
+            CollectionAssert.AreEquivalent(
+                s_equipItemFilesNamedOtherThanTheirSlot,
+                named.Distinct().ToArray(),
+                "the files whose name is not the slot their records carry are other than the ones named");
+
+            string[] worn = [.. Enum.GetNames<EquipmentPiece>().Where(piece => piece != SlotNoItemCarries.ToString())];
+            CollectionAssert.AreEquivalent(worn, slots.ToArray(), "the shipped records cover other slots than the paperdoll has");
+            Assert.AreEqual(worn.Length, files.Count, "the catalog ships another number of files than there are slots to split it by");
+        }
+
+        /// <summary>
+        /// A "number or {min,max}" field reaches the tool as the object alone: the contract states shapes as
+        /// whole records and a bare number is not one, so the scalar form has no variant to be drawn as.
+        /// The run counts how many records are written the scalar way, which is what a decision to widen the
+        /// contract would be taken on.
+        /// </summary>
+        [TestMethod]
+        public void TheEquipItemsSchemaDrawsARangeAsItsObjectFormAndCountsWhatIsWrittenAsANumber()
+        {
+            CatalogSchema schema = Schema(DataCatalog.EquipItems);
+            HashSet<string> ranges = RangeFields(schema);
+            Assert.AreNotEqual(0, ranges.Count, "no field of the catalog is a range — the count is counting nothing");
+
+            foreach (RecordSchema range in Records(schema).Where(record => s_rangeRecords.Contains(record.TypeName)))
+                foreach (string bound in s_rangeBounds)
+                {
+                    FieldSchema end = Field(range, bound);
+                    Assert.IsTrue(end.Kind is FieldKind.Integer or FieldKind.Number, $"'{range.TypeName}.{bound}' is not a number");
+                }
+
+            List<string> scalars = [];
+
+            foreach (string file in ShippedFiles(DataCatalog.EquipItems))
+            {
+                int written = Scalars(JsonTreeDocument.Load(file).Root, ranges);
+                if (written > 0) scalars.Add($"{Path.GetFileName(file)}: {written}");
+            }
+
+            Report($"Ranges written as a plain number, which the tool draws as raw json ({string.Join(", ", ranges.Order(StringComparer.Ordinal))})", scalars);
+        }
+
+        /// <summary>The shipped files read back through the schema, all nine of them the way the game reads
+        /// them: every key they write is one the schema ranks, and the canonical write neither loses
+        /// anything nor moves on a second pass. The keys it does not know are named one by one — a key the
+        /// schema cannot place is a field the tool would not let the author touch.</summary>
+        [TestMethod]
+        public void TheEquipItemsSchemaRanksEveryKeyTheShippedFilesWrite()
+        {
+            CatalogSchema schema = Schema(DataCatalog.EquipItems);
+            SchemaKeyOrder order = new(schema);
+            List<string> unknown = [];
+            List<string> reordered = [];
+
+            foreach (string file in ShippedFiles(DataCatalog.EquipItems))
+            {
+                string name = Path.GetFileName(file);
+                JToken root = JsonTreeDocument.Load(file).Root;
+                (List<string> unplaced, List<string> moved) = Written(root, schema, order);
+
+                unknown.AddRange(unplaced.Select(key => $"{name}{key}"));
+                reordered.AddRange(moved.Select(record => $"{name} {record}"));
+
+                string once = CanonicalJsonWriter.Write(root, order, CanonicalJsonOptions.Default);
+                JToken written = JsonTreeDocument.Parse(once).Root;
+
+                Assert.AreEqual(once, CanonicalJsonWriter.Write(written, order, CanonicalJsonOptions.Default),
+                    $"the canonical write of {name} is not settled: writing what it produced says something else again");
+                Assert.IsTrue(JToken.DeepEquals(root, written),
+                    $"the canonical write of {name} says something other than the file it was given");
+            }
+
+            Report("Keys of the EquipItems files the schema does not know", unknown);
+            Report("Records the canonical write would reorder", reordered);
+
+            CollectionAssert.AreEquivalent(
+                s_unknownEquipItemKeys,
+                unknown.Select(LastKey).Distinct(StringComparer.Ordinal).ToArray(),
+                $"the EquipItems files write other keys than the known ones no field of the schema is written under:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", unknown)}");
+        }
+
         /// <summary>
         /// Across every described catalog: a field written under a name ending in "id" either points into
         /// a catalog or says out loud that it does not. The one exception is the field a record IS found
@@ -377,6 +628,58 @@ namespace LastBreathTest.BattleSystemTests
             ?? throw new AssertFailedException($"{nameof(CatalogDescriptors)} holds no descriptor of the {catalog} catalog.");
 
         private static CatalogSchema Schema(string catalog) => new CatalogSchemaBuilder(new SchemaReflector()).Build(Descriptor(catalog));
+
+        /// <summary>Every note the walk had, held against what the DTOs are known for. A note matching no
+        /// pair is something new the tool cannot see; a pair matching no note is a fact that has moved on
+        /// and would go on excusing whatever grows into its place.</summary>
+        private static void Unexpected(IReadOnlyList<string> notes, (string About, string Word)[] allowed, SchemaReflectionReport report)
+        {
+            bool Matches((string About, string Word) pair, string note) =>
+                note.Contains(pair.About, StringComparison.Ordinal) && note.Contains(pair.Word, StringComparison.Ordinal);
+
+            List<string> strangers = [.. notes.Where(note => !allowed.Any(pair => Matches(pair, note))).Distinct(StringComparer.Ordinal)];
+            List<string> stale = [.. allowed.Where(pair => !notes.Any(note => Matches(pair, note))).Select(pair => $"{pair.About} ({pair.Word})")];
+
+            Assert.AreEqual(0, strangers.Count,
+                $"reflection has something else to say about the DTOs:{Environment.NewLine}{string.Join(Environment.NewLine, strangers)}{Environment.NewLine}all of it:{Environment.NewLine}{report}");
+            Assert.AreEqual(0, stale.Count, $"nothing was said about: {string.Join(", ", stale)}");
+        }
+
+        /// <summary>Every shipped file of a catalog folder, in a settled order — a catalog split by a
+        /// field is the union of its files, and one of them is not the catalog.</summary>
+        private static List<string> ShippedFiles(string catalog) =>
+            [.. Directory.EnumerateFiles(SharedData.Catalog(catalog), JsonFiles).Order(StringComparer.Ordinal)];
+
+        /// <summary>The records one section of a file holds.</summary>
+        private static List<JObject> SectionRecords(JToken root, string section) =>
+            [.. (root[section] as JArray ?? []).OfType<JObject>()];
+
+        /// <summary>What a record calls itself, for a message about it.</summary>
+        private static string Id(JObject record) =>
+            record[EquipItemsCatalogDescriptor.IdField]?.Value<string>() ?? string.Empty;
+
+        /// <summary>Json names of the fields holding a range record — a number or a pair of bounds. Read
+        /// off the schema rather than listed, so a field of the same shape added later is counted too.</summary>
+        private static HashSet<string> RangeFields(CatalogSchema schema) =>
+        [
+            .. Records(schema)
+                .SelectMany(record => record.Fields)
+                .Where(field => Leaf(field).Record is { } held && s_rangeRecords.Contains(held.TypeName))
+                .Select(field => field.JsonName)
+        ];
+
+        /// <summary>How many of those fields the document writes as a plain number instead of the object
+        /// the schema states.</summary>
+        private static int Scalars(JToken token, HashSet<string> ranges) => token switch
+        {
+            JObject holder => holder.Properties().Sum(property =>
+                (ranges.Contains(property.Name) && property.Value is not JObject ? 1 : 0) + Scalars(property.Value, ranges)),
+            JArray array => array.Sum(item => Scalars(item, ranges)),
+            _ => 0
+        };
+
+        /// <summary>The key an address ends in, which is the name the schema does not know.</summary>
+        private static string LastKey(string address) => address.Split(PointerSeparator)[^1];
 
         /// <summary>The shipped file of a catalog, named by the schema's own placement rule.</summary>
         private static string CatalogFile(CatalogSchema schema, string catalog)
