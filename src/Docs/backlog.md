@@ -1,5 +1,13 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из подключения локализации к хосту нарратива (2026-09-03; accept with minors) — minor'ы раздела «Из скелета NarrativeEditor» (двойной Refresh, (not a list)/outcome, опция без key, failNext, заметки чужих каталогов, страж инспектора, `_tree`, перевод из TranslationServer) закрыты
+
+- (minor) `src/Tooling/NarrativeEditor/Source/View/NarrativeRoot.cs:264,273-278` — `Same(null, null)` = true → `Rebuild(null)` не зовётся никогда: при пустых каталогах инспектор — голый прямоугольник вместо «nothing selected»; посеять `_inspector.Rebuild(null)` в `BuildBody`.
+- (minor) `NarrativeRoot.cs:268` — `Rebuild` без третьего аргумента-соседа: первый ключ записи ложится в конец .po, тогда как DataEditor кладёт к соседям; отдать `CurrentId` предыдущей записи как `EditorRoot.Neighbour`.
+- (minor, карточка) `GameNarrative.cs:27,84` — префикс ноты `"{0}: "` продублирован из приватного `CatalogWorkspace.Notes.Named`; дать `CatalogWorkspace.Report` структурный вид (каталог → нота) или открыть формат.
+- (minor, карточка, дубли по ограничению) `NarrativeRoot.LoadTexts` ≡ `EditorRoot.LoadTexts` (≈25 строк), `OutlineTree.Translation` ≡ `InspectorPanel.Translation`; `LoadTexts` принадлежит `ToolShell`, «что ключ говорит сейчас» — `LocalizedTexts`.
+- (nit) `ToolShell.ReportIssues(workspace, also, report)` — «добавить» и «заменить» в одном методе; `protected virtual Reported(workspace)`; `Outline.cs:289` — кривой `speechCheck` (не объект) молчит — дописать `· not a record`.
+
 ## Из статического словаря нарратива (2026-09-03; accept with minors)
 
 - (minor, док) `src/Tooling/NarrativeEditor/Source/App/GameNarrative.cs:19-21` — ремарка утверждает, что словарь вне игры перечислить нельзя; теперь `NarrativeSchemas.Conditions()/Actions()` читают его без игры — переписать одной строкой (условия/действия пока рисуются сырым json).
