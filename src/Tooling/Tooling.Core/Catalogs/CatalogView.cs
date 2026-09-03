@@ -2,6 +2,7 @@ namespace Tooling.Catalogs
 {
     using System;
     using System.Collections.Generic;
+    using Tooling.Editing.History;
     using Tooling.Schema;
     using Tooling.Schema.Model;
 
@@ -31,6 +32,11 @@ namespace Tooling.Catalogs
         /// folder that one happens to sit in.</summary>
         public required string Folder { get; init; }
 
+        /// <summary>The stack this catalog's files record onto, or null where each keeps its own. Held so
+        /// that a file the run lays down joins it too: the gesture that created a file is written into that
+        /// file, and a step left on a stack nothing steps is a gesture nobody can take back.</summary>
+        public EditHistory? History { get; init; }
+
         public required IReadOnlyList<CatalogFile> Files
         {
             get => _files;
@@ -51,10 +57,14 @@ namespace Tooling.Catalogs
         public string Catalog => Descriptor.Catalog;
 
         /// <summary>Takes a file into the catalog. The document is the run's from here on: it is written
-        /// with the rest on the next save, and it is on its own history that its edits are taken back.</summary>
+        /// with the rest on the next save, and it joins the catalog's history bringing the step that wrote
+        /// it along — a file is laid down by being written into, and that first record is as much a thing
+        /// to take back as any other.</summary>
         public void AddFile(CatalogFile file)
         {
             ArgumentNullException.ThrowIfNull(file);
+
+            if (History is { } history) file.Document.Follow(history);
 
             _files.Add(file);
             FileAdded?.Invoke(file);

@@ -6,6 +6,7 @@ namespace Tooling.Tests.Localization
     using System.Linq;
     using System.Text;
     using Tooling.Catalogs;
+    using Tooling.Editing.History;
     using Tooling.Localization;
 
     /// <summary>
@@ -104,6 +105,9 @@ namespace Tooling.Tests.Localization
         private const string Renamed = "Weapon_Sanguine";
 
         private const string Drinks = "Пьёт то, что режет.";
+
+        /// <summary>What the host names the gesture that renames a record and its wording together.</summary>
+        private const string RenameStep = "rename Weapon_Bloodthirsty → Weapon_Sanguine";
 
         private static readonly string[] s_suffixes = [Name, Description];
 
@@ -424,6 +428,40 @@ namespace Tooling.Tests.Localization
             Assert.AreEqual(2, Depth(Ru));
         }
 
+        /// <summary>
+        /// A record renamed is one gesture: the id in its own file and the keys of every locale worded from
+        /// it. Filed as one step — the way the host opens it around the rename — one press of undo puts back
+        /// the id and the keys of both locales together.
+        /// <para>Without the step, the same rename is two moves of the wording plus the id, and an author
+        /// taking back what he just did would be left with a record read under one word in its file and
+        /// under another in the catalogs — a state nothing on screen shows him.</para>
+        /// </summary>
+        [TestMethod]
+        public void RenameRecord_InsideOneStep_IsTakenBackWholeInEveryLocale()
+        {
+            EditHistory history = new();
+            LocalizedTexts texts = Load(history);
+
+            using (history.Group(RenameStep))
+            {
+                Assert.AreEqual(new LocalizedRename(2, null), texts.RenameRecord(Weapon, Renamed, s_suffixes));
+            }
+
+            Assert.AreEqual(1, history.Depth, "one gesture over two locales is one step");
+            Assert.AreEqual(RenameStep, history.NextUndo);
+
+            history.Undo();
+
+            foreach (string locale in texts.Locales)
+            {
+                Assert.IsNotNull(texts.Read(locale, Weapon), "the name is read under the old id again");
+                Assert.IsNotNull(texts.Read(locale, WeaponDescription));
+                Assert.IsNull(texts.Read(locale, Renamed));
+            }
+
+            Assert.IsFalse(texts.IsDirty, "the files are back where they were opened");
+        }
+
         [TestMethod]
         public void Load_OfAFolderWithoutTheFiles_SaysSo()
         {
@@ -433,9 +471,9 @@ namespace Tooling.Tests.Localization
             Assert.ThrowsException<FileNotFoundException>(() => LocalizedTexts.Load(empty));
         }
 
-        private LocalizedTexts Load()
+        private LocalizedTexts Load(EditHistory? history = null)
         {
-            _set = PoCatalogSet.Load(_folder, LocalizedTexts.AuthoringLocale, LocalizedTexts.ReferenceLocale);
+            _set = PoCatalogSet.Load(_folder, history, LocalizedTexts.AuthoringLocale, LocalizedTexts.ReferenceLocale);
 
             return new LocalizedTexts(_set);
         }

@@ -4,16 +4,18 @@ namespace Tooling.Localization
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Editing.History;
 
     /// <summary>How far one locale has got with a set of keys: the ones it says something for, out of the
     /// ones any locale in the set has.</summary>
     public readonly record struct PoCoverage(int Translated, int Total);
 
     /// <summary>
-    /// The locales of one folder edited together. Each file keeps its own document and its own undo stack —
-    /// a key added to two locales is two steps, because the files are two files on disk and one history over
-    /// both of them would report a save that only half happened as done. What must not go half done is a
-    /// change of the key set: those are checked against every locale before the first of them is touched.
+    /// The locales of one folder edited together. Each file keeps its own document, and whether they record
+    /// onto one stack is the caller's to say — a key added to two locales is two steps unless the gesture
+    /// that added it was opened as one, because the files are two files on disk and a save writes them one
+    /// at a time. What must not go half done is a change of the key set: those are checked against every
+    /// locale before the first of them is touched.
     /// </summary>
     public sealed class PoCatalogSet
     {
@@ -31,7 +33,11 @@ namespace Tooling.Localization
         /// them in this order, so a key added to several files lands in the same place in each.</summary>
         public IReadOnlyList<string> Locales => _locales;
 
-        public static PoCatalogSet Load(string folder, params string[] locales)
+        public static PoCatalogSet Load(string folder, params string[] locales) => Load(folder, null, locales);
+
+        /// <summary>Reads the locales onto <paramref name="history"/> where one is given: a tool that edits
+        /// the wording beside the records it belongs to steps all of it with one key.</summary>
+        public static PoCatalogSet Load(string folder, EditHistory? history, params string[] locales)
         {
             ArgumentException.ThrowIfNullOrEmpty(folder);
             ArgumentNullException.ThrowIfNull(locales);
@@ -44,7 +50,7 @@ namespace Tooling.Localization
             {
                 ArgumentException.ThrowIfNullOrEmpty(locale, nameof(locales));
 
-                if (!set._byLocale.TryAdd(locale, PoDocument.Load(set.PathOf(locale))))
+                if (!set._byLocale.TryAdd(locale, PoDocument.Load(set.PathOf(locale), history)))
                 {
                     throw new ArgumentException($"the locale '{locale}' is named twice", nameof(locales));
                 }

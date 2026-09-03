@@ -84,8 +84,31 @@ namespace Tooling.Tests.Editing
         public void IsClean_OnFreshHistory_IsTrue()
         {
             EditHistory history = new();
+            Cell cell = new(Initial);
 
-            Assert.IsTrue(history.IsClean);
+            Assert.IsTrue(history.IsCleanFor(cell));
+        }
+
+        /// <summary>One stack carries the whole tool, and a save writes one file at a time: a step taken in
+        /// one document leaves the others exactly as they were written, and a save of one of them says
+        /// nothing about the work waiting in the next.</summary>
+        [TestMethod]
+        public void IsClean_IsAnsweredPerDocument()
+        {
+            EditHistory history = new();
+            Cell one = new(Initial);
+            Cell another = new(Initial);
+
+            history.Record(Write(one, TitleField, First, LabelFirst));
+
+            Assert.IsFalse(history.IsCleanFor(one));
+            Assert.IsTrue(history.IsCleanFor(another), "nothing was written into the other document");
+
+            history.Record(Write(another, TitleField, Second, LabelSecond));
+            history.MarkSaved(another);
+
+            Assert.IsTrue(history.IsCleanFor(another));
+            Assert.IsFalse(history.IsCleanFor(one), "a save of one document does not write the other");
         }
 
         /// <summary>Clean is a position in the stack, not a flag somebody sets. Walking away from the saved
@@ -98,17 +121,17 @@ namespace Tooling.Tests.Editing
             Cell cell = new(Initial);
 
             history.Record(Write(cell, TitleField, First, LabelFirst));
-            history.MarkSaved();
-            Assert.IsTrue(history.IsClean);
+            history.MarkSaved(cell);
+            Assert.IsTrue(history.IsCleanFor(cell));
 
             history.Record(Write(cell, BudgetField, Second, LabelSecond));
-            Assert.IsFalse(history.IsClean);
+            Assert.IsFalse(history.IsCleanFor(cell));
 
             history.Undo();
-            Assert.IsTrue(history.IsClean);
+            Assert.IsTrue(history.IsCleanFor(cell));
 
             history.Redo();
-            Assert.IsFalse(history.IsClean);
+            Assert.IsFalse(history.IsCleanFor(cell));
         }
 
         [TestMethod]
@@ -118,17 +141,17 @@ namespace Tooling.Tests.Editing
             Cell cell = new(Initial);
 
             history.Record(Write(cell, TitleField, First, LabelFirst));
-            history.MarkSaved();
+            history.MarkSaved(cell);
             history.Record(Write(cell, BudgetField, Second, LabelSecond));
-            history.MarkSaved();
+            history.MarkSaved(cell);
 
-            Assert.IsTrue(history.IsClean);
+            Assert.IsTrue(history.IsCleanFor(cell));
 
             history.Undo();
-            Assert.IsFalse(history.IsClean);
+            Assert.IsFalse(history.IsCleanFor(cell));
 
             history.Redo();
-            Assert.IsTrue(history.IsClean);
+            Assert.IsTrue(history.IsCleanFor(cell));
         }
 
         /// <summary>Saving closes the run it happened in the middle of. A merged command keeps its own
@@ -144,19 +167,19 @@ namespace Tooling.Tests.Editing
 
             history.Record(Write(cell, TitleField, First, LabelFirst));
             history.Changed += () => notified++;
-            history.MarkSaved();
+            history.MarkSaved(cell);
 
             Assert.AreEqual(1, notified);
 
             history.Record(Write(cell, TitleField, Second, LabelSecond));
 
             Assert.AreEqual(2, history.Depth);
-            Assert.IsFalse(history.IsClean);
+            Assert.IsFalse(history.IsCleanFor(cell));
 
             history.Undo();
 
             Assert.AreEqual(First, cell.Value);
-            Assert.IsTrue(history.IsClean);
+            Assert.IsTrue(history.IsCleanFor(cell));
         }
 
         /// <summary>A saved step pushed off the far end of a full stack can never be on top again, so the
@@ -166,19 +189,20 @@ namespace Tooling.Tests.Editing
         public void IsClean_AfterTheSavedStepFallsOffTheStack_StaysFalse()
         {
             EditHistory history = new();
+            Cell cell = new(Initial);
             List<string> trace = [];
 
-            history.Record(new MarkerEdit(LabelFirst, trace));
-            history.MarkSaved();
+            history.Record(new MarkerEdit(cell, LabelFirst, trace));
+            history.MarkSaved(cell);
 
-            for (int step = 0; step < EditHistory.MaxDepth; step++) history.Record(new MarkerEdit(LabelSecond, trace));
+            for (int step = 0; step < EditHistory.MaxDepth; step++) history.Record(new MarkerEdit(cell, LabelSecond, trace));
 
             Assert.AreEqual(EditHistory.MaxDepth, history.Depth);
-            Assert.IsFalse(history.IsClean);
+            Assert.IsFalse(history.IsCleanFor(cell));
 
             while (history.CanUndo) history.Undo();
 
-            Assert.IsFalse(history.IsClean);
+            Assert.IsFalse(history.IsCleanFor(cell));
         }
 
         /// <summary>Typing into one field is one thing the author did, so it is one thing he can take back —
@@ -280,10 +304,11 @@ namespace Tooling.Tests.Editing
         public void Record_DropsTheOldestStep_BeyondMaxDepth()
         {
             EditHistory history = new();
+            Cell cell = new(Initial);
             List<string> trace = [];
 
             for (int step = 0; step <= EditHistory.MaxDepth; step++)
-                history.Record(new MarkerEdit(Numbered(step), trace));
+                history.Record(new MarkerEdit(cell, Numbered(step), trace));
 
             Assert.AreEqual(EditHistory.MaxDepth, history.Depth);
             Assert.AreEqual(Numbered(EditHistory.MaxDepth), history.NextUndo);
@@ -404,7 +429,7 @@ namespace Tooling.Tests.Editing
             Cell cell = new(Initial);
 
             history.Record(Write(cell, TitleField, First, LabelFirst));
-            history.MarkSaved();
+            history.MarkSaved(cell);
             history.Record(Write(cell, BudgetField, Second, LabelSecond));
             history.Undo();
 
@@ -417,7 +442,143 @@ namespace Tooling.Tests.Editing
             Assert.AreEqual(0, history.Depth);
             Assert.IsFalse(history.CanUndo);
             Assert.IsFalse(history.CanRedo);
-            Assert.IsTrue(history.IsClean);
+            Assert.IsTrue(history.IsCleanFor(cell));
+        }
+
+        /// <summary>A gesture that changed two documents is one thing the author did. Undone, it is undone
+        /// whole and backwards — a rename left half taken back is a record read under one word in its own
+        /// file and under another in the locales, which is the state nothing on screen can show.</summary>
+        [TestMethod]
+        public void Group_FilesEverythingRecordedInIt_AsOneStep()
+        {
+            EditHistory history = new();
+            Cell one = new(Initial);
+            Cell another = new(Initial);
+
+            using (history.Group(LabelRename))
+            {
+                history.Record(Write(one, TitleField, First, LabelFirst));
+                history.Record(Write(another, TitleField, Second, LabelSecond));
+            }
+
+            Assert.AreEqual(1, history.Depth);
+            Assert.AreEqual(LabelRename, history.NextUndo, "the step is named by the gesture, not by its last command");
+
+            history.Undo();
+
+            Assert.AreEqual(Initial, one.Value);
+            Assert.AreEqual(Initial, another.Value);
+            Assert.IsFalse(history.CanUndo, "half of the gesture is still there to take back");
+
+            history.Redo();
+
+            Assert.AreEqual(First, one.Value);
+            Assert.AreEqual(Second, another.Value);
+        }
+
+        /// <summary>What a change means elsewhere is known only once it has been made: the id is written
+        /// into the record first and the keys are named again after it, and the two are one gesture.</summary>
+        [TestMethod]
+        public void GroupWithNewest_TakesTheStepAlreadyFiled_IntoTheSameStep()
+        {
+            EditHistory history = new();
+            Cell record = new(Initial);
+            Cell locale = new(Initial);
+
+            history.Record(Write(record, TitleField, First, LabelFirst));
+
+            using (history.GroupWithNewest(LabelRename))
+            {
+                history.Record(Write(locale, TitleField, Second, LabelSecond));
+            }
+
+            Assert.AreEqual(1, history.Depth, "the id and the keys named from it are one step");
+            Assert.AreEqual(LabelRename, history.NextUndo);
+
+            history.Undo();
+
+            Assert.AreEqual(Initial, record.Value);
+            Assert.AreEqual(Initial, locale.Value, "the locale was stepped back with the id");
+        }
+
+        /// <summary>A step made of several changes is dirty in every document any of them touched, or a
+        /// save would write the record's file and leave the locales it renamed keys in behind.</summary>
+        [TestMethod]
+        public void Group_IsUnsavedInEveryDocumentItTouched()
+        {
+            EditHistory history = new();
+            Cell one = new(Initial);
+            Cell another = new(Initial);
+
+            using (history.Group(LabelRename))
+            {
+                history.Record(Write(one, TitleField, First, LabelFirst));
+                history.Record(Write(another, TitleField, Second, LabelSecond));
+            }
+
+            Assert.IsFalse(history.IsCleanFor(one));
+            Assert.IsFalse(history.IsCleanFor(another));
+        }
+
+        /// <summary>A gesture that recorded nothing is not a step: the author pressed something that changed
+        /// nothing, and an undo taking back nothing reads as the key having been missed.</summary>
+        [TestMethod]
+        public void Group_WithNothingRecordedInIt_FilesNoStep()
+        {
+            EditHistory history = new();
+
+            using (history.Group(LabelRename))
+            {
+            }
+
+            Assert.AreEqual(0, history.Depth);
+            Assert.IsFalse(history.CanUndo);
+        }
+
+        /// <summary>A gesture made of gestures is still one thing the author did, and the outermost of them
+        /// is the one that names it: the inner one is flattened into the step already open.</summary>
+        [TestMethod]
+        public void Group_OpenedInsideAnother_IsTheSameStep()
+        {
+            EditHistory history = new();
+            Cell cell = new(Initial);
+
+            using (history.Group(LabelRename))
+            {
+                history.Record(Write(cell, TitleField, First, LabelFirst));
+
+                using (history.Group(LabelSecond))
+                {
+                    history.Record(Write(cell, BudgetField, Second, LabelSecond));
+                }
+
+                Assert.AreEqual(0, history.Depth, "the inner gesture filed a step of its own");
+            }
+
+            Assert.AreEqual(1, history.Depth);
+            Assert.AreEqual(LabelRename, history.NextUndo);
+        }
+
+        /// <summary>Nothing is stepped while a gesture is still being made: half of it is a state the author
+        /// never had, and the rest of the gesture would go on writing onto what the step left behind.</summary>
+        [TestMethod]
+        public void Step_WhileAGestureIsOpen_IsRefused()
+        {
+            EditHistory history = new();
+            Cell cell = new(Initial);
+
+            history.Record(Write(cell, TitleField, First, LabelFirst));
+
+            using (history.Group(LabelRename))
+            {
+                history.Record(Write(cell, BudgetField, Second, LabelSecond));
+
+                Assert.IsNull(history.Undo());
+                Assert.IsNull(history.Redo());
+                Assert.AreEqual(Second, cell.Value);
+            }
+
+            Assert.AreEqual(2, history.Depth);
         }
 
         /// <summary>Applies the change and hands back the command that files it: the stack records what has
@@ -447,13 +608,15 @@ namespace Tooling.Tests.Editing
 
         /// <summary>A step that is not part of any run and writes down that it was taken: two of them in a
         /// row are always two steps, and the trace says which ones survived a bounded stack.</summary>
-        private sealed class MarkerEdit(string label, List<string> trace) : IEditCommand
+        private sealed class MarkerEdit(Cell owner, string label, List<string> trace) : IOwnedEdit
         {
             public string Label => label;
 
             public void Undo() => trace.Add(UndoMark + label);
 
             public void Redo() => trace.Add(RedoMark + label);
+
+            public bool Touches(object asked) => ReferenceEquals(asked, owner);
         }
 
         /// <summary>A step that moves a record from one id to another and says so.</summary>

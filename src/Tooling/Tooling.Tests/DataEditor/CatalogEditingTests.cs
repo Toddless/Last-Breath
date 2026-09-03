@@ -299,7 +299,7 @@ namespace Tooling.Tests.DataEditor
 
             Assert.IsFalse(result.Done);
             Assert.AreEqual(1, view.Records.Count);
-            Assert.IsTrue(view.Files[0].Document.History.IsClean);
+            Assert.IsTrue(view.Files[0].Document.IsClean);
         }
 
         [TestMethod]
@@ -315,7 +315,7 @@ namespace Tooling.Tests.DataEditor
 
             // Refused and not half written: the file is where it was, with nothing to take back.
             Assert.AreEqual(2, view.Records.Count);
-            Assert.IsTrue(view.Files[0].Document.History.IsClean);
+            Assert.IsTrue(view.Files[0].Document.IsClean);
         }
 
         [TestMethod]
@@ -356,7 +356,7 @@ namespace Tooling.Tests.DataEditor
             Assert.IsFalse(result.Done);
             StringAssert.Contains(result.Note, IndividualTableId);
             Assert.AreEqual(1, Section(view.Files[0], IndividualKey).Count);
-            Assert.IsTrue(view.Files[0].Document.History.IsClean);
+            Assert.IsTrue(view.Files[0].Document.IsClean);
         }
 
         [TestMethod]
@@ -371,7 +371,7 @@ namespace Tooling.Tests.DataEditor
             // record of that name is the one that never loads, whichever file holds it.
             Assert.IsFalse(result.Done);
             Assert.AreEqual(1, view.Files.Count);
-            Assert.IsTrue(view.Files[0].Document.History.IsClean);
+            Assert.IsTrue(view.Files[0].Document.IsClean);
         }
 
         [TestMethod]
@@ -384,7 +384,7 @@ namespace Tooling.Tests.DataEditor
 
             Assert.IsFalse(result.Done);
             Assert.AreEqual(2, view.Records.Count);
-            Assert.IsTrue(view.Files[0].Document.History.IsClean);
+            Assert.IsTrue(view.Files[0].Document.IsClean);
         }
 
         [TestMethod]
@@ -466,7 +466,7 @@ namespace Tooling.Tests.DataEditor
             Assert.IsFalse(result.Done);
             StringAssert.Contains(result.Note, UnusableName);
             Assert.AreEqual(1, view.Files.Count);
-            Assert.IsTrue(view.Files[0].Document.History.IsClean);
+            Assert.IsTrue(view.Files[0].Document.IsClean);
         }
 
         [TestMethod]
@@ -510,7 +510,7 @@ namespace Tooling.Tests.DataEditor
             view.Reread();
 
             Assert.AreEqual(2, view.Records.Count);
-            Assert.IsTrue(view.Files[0].Document.History.IsClean);
+            Assert.IsTrue(view.Files[0].Document.IsClean);
         }
 
         [TestMethod]
@@ -563,7 +563,7 @@ namespace Tooling.Tests.DataEditor
             Assert.AreEqual(1, view.Records.Count);
             Assert.AreSame(untouched, view.Records[0].File);
             Assert.IsNotNull(emptied.Document.History.NextUndo);
-            Assert.IsTrue(untouched.Document.History.IsClean);
+            Assert.IsTrue(untouched.Document.IsClean);
 
             Assert.IsNotNull(emptied.Document.History.Undo());
 
@@ -617,7 +617,7 @@ namespace Tooling.Tests.DataEditor
 
             Assert.IsFalse(result.Done);
             Assert.AreEqual(2, view.Records.Count);
-            Assert.IsTrue(view.Files[0].Document.History.IsClean);
+            Assert.IsTrue(view.Files[0].Document.IsClean);
         }
 
         [TestMethod]
@@ -651,7 +651,7 @@ namespace Tooling.Tests.DataEditor
             Assert.IsFalse(copied.Done);
             Assert.AreEqual(added.Note, copied.Note);
             Assert.AreEqual(1, view.Records.Count);
-            Assert.IsTrue(view.Files[0].Document.History.IsClean);
+            Assert.IsTrue(view.Files[0].Document.IsClean);
         }
 
         [TestMethod]

@@ -1,5 +1,30 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из перекрёстных проверок нарратива, карточка #249 (2026-09-03; accept with minors)
+
+- (minor, первым в чистку) `NarrativeChecks.cs:303`, `ChecksPanel.cs:131-147`, `NarrativeDocuments.cs:70` — `line.Key.Length` роняет NRE на `"key": null` (Newtonsoft кладёт null несмотря на `= string.Empty`); загрузчик такую строку принимает; `ChecksPanel.Start` не ловит — необработанное исключение из обработчика кнопки в Godot. Стало: `is { Length: > 0 }`-паттерны и `catch` вокруг прогона в панели.
+- (minor) `NarrativeVocabularyWalk.cs:161-177, :108-109` — не проверяется `NarrativeParameterKind.Choice` (`parameter.Choices` есть) и `[EnumOf]`-поля DTO (`Speaker`, `Faction`, `DeclinePolicy`) — все ронятельные у парсера (`EnumParser.ParseEnum` бросает) → голый `Dropped`. `Conditions/Actions` не массивом — молча. Стало: ветка `Choice` + три поля рядом с `Npc()`.
+- (minor) `NarrativeCheckRun.cs:60-61` — в `Notes` отчёта переливаются безусловные заметки песочницы про семантику сухого прогона. Стало: разделить «не прочиталось» и «чем прогон молчит по природе».
+- (minor) `ChecksPanel.Watch()` — нет подписки на `CatalogView.FileAdded` и `LocalizedTexts.Changed`: правка .po (та самая, что чинит `MissingText`) не помечает панель устаревшей.
+- (minor) `NarrativeChecks.cs:223-224, :375-376` — два диалога с одним `npcId`/два квеста с одним `id` тихо оставляют последний, `DuplicateId` на уровне каталога нет.
+- (minor) `NarrativeChecks.cs:21-85` — 31 константа json-имён дублирует `[JsonProperty]` DTO; обоснование в доке неверно (атрибут принимает `const string`, `ItemReference.Key` так и сделан). Стало: `const` в DTO.
+- (minor) `QuestProvider.cs:152-178` — три ронятельные причины квеста не смоделированы (исход вместе с `transitions`, `fails:true` при `canFail:false`, стадия достижимая из себя) → голый `Dropped`.
+- (minor) `NarrativeChecks.cs:237-239` — дока `Nodes()` про дубли узлов врёт: `ToDictionary` бросает, диалог роняется целиком.
+- (nit) `ChecksPanel.Record()` разбирает адрес безымянной записи/секционной цели неверно (ущерба нет — `OpenRecord` молчит); диалог без `entryRules` шумит `UnreachableNode` на каждый узел; `KeyFormat`≡`SectionFormat`; `_vocabulary`/`_speaking` `null!` вместо инициализаторов, `Walk()` не идемпотентен; адрес дубля исхода при безымянной стадии — пустой шаг; `Open` на один каталог дважды → заметка дважды; `UntranslatedText` фактически «ключа нет в файле» (пустой `msgstr` не сообщается — в `ru.po` 48 из 51 `Dlg_*` пусты), дока `INarrativeTextSource` обещает иное; порядок `using`; рекурсия `NestedCondition(s)` негативным случаем не покрыта.
+- (знать) причина дропа без дублирования правил: провайдеры пишут в `Tracker` (Serilog без in-process приёмника) — сток в память на время прогона превратил бы сообщения парсера в `Notes`.
+- (знать) `pointId` не проверяется — `FreeText(RefusedAsReference)`, спавн-точки живут в `MainWorld.tscn`; клик по находке открывает запись, не узел; `References` скаляром вместо массива проходит молча.
+
+## Из общей истории правок json + .po (2026-09-03; accept with minors) — закрыты пункты «undo правки id не откатывает ключи .po», «Ctrl+Z не ходит по истории PoDocument», «`Stepped` = null после удаления единственной записи»
+
+- (minor) `EditHistory.cs:86,180` — `Record` принимает `IEditCommand`, а `NewestFor` молча пропускает всё, что не `IOwnedEdit`: первая команда без интерфейса сделает свой файл вечно чистым. Стало: `Record(IOwnedEdit)` либо считать неопознанную команду касающейся всех.
+- (minor) `EditHistory.cs:191-206` — `GroupWithNewest` забирает `_done[^1]` вслепую (без проверки владельца/поля); держится на порядке Godot «focus_exited раньше сигнала нового контрола». Стало: перегрузка с ожидаемым `EditTarget` и отказ от кражи при несовпадении.
+- (minor) `EditHistory.Take`/`JsonTreeDocument.Follow` — переносят только `_done`; `_undone` и `_savedFor` источника выбрасываются (публичный API; живой вызов один — `Fresh`). Стало: переносить и их, либо задокументировать «только для несохранённого документа без откатов».
+- (minor) `CatalogSaver.Changed`/`LocalizedTexts.Changed` — ни одного продового подписчика (оболочка слушает `History.Changed`): `_watched`-дедупликация и `Raise` мёртвые. Стало: либо хосты обратно на них, либо снести. `History.Clear()` нигде не зовётся — при появлении смены корня данных стек унесёт чужие шаги.
+- (minor) `EditorRoot.cs:691` — тройная перерисовка инспектора на один Ctrl+Z (`Changed`→`DrawRecord`, `SyncRecords`→`Rebuild`, `Stepped()` синхронно); `NarrativeRoot` делает отложенно одной. Стало: отложенный перестрой или флаг.
+- (minor) тесты — не закреплены: «внутри группы `IMergeableEdit` не сливает» (оба теста пишут в разные таргеты), `Take` опустошает источник, `GroupWithNewest` на пустом стеке, усыновление истории в `AddFile` на уровне `CatalogEditing`.
+- (nit) `OpenStep.Dispose` не идемпотентен (второй вызов уводит `_groupDepth` в −1); `Take` зовёт `Push` мимо открытой группы; владелец в API — голый `object` (маркерный `IEditOwner`); `HistoryStep`/`IIdChangingEdit`/`IdSwap` в проде без потребителей — подключить к выделению строки после undo либо убрать.
+- (Godot-прогон владельца) порядок `focus_exited` относительно `toggled`/`pressed` и перестроение инспектора изнутри своего сигнала — выведено из документации движка: набрать id, уйти кликом на чекбокс, Ctrl+Z.
+
 ## Из занятости id по секции (2026-09-03; accept with minors)
 
 - (minor) `CatalogEditing.cs:125-126` — обоснование case-клаузы неверно («whichever the game read second» — при `Ordinal`-чтении два регистровых варианта это две живые записи); настоящая причина — путаница автора и ссылка от руки не в ту запись; сводка шесть строк вместо одной-двух.

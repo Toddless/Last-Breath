@@ -4,6 +4,7 @@ namespace Tooling.Tests.Json
     using System.Collections.Generic;
     using System.IO;
     using Newtonsoft.Json.Linq;
+    using Tooling.Editing.History;
     using Tooling.Json;
 
     /// <summary>
@@ -167,7 +168,7 @@ namespace Tooling.Tests.Json
 
             Assert.IsTrue(document.SetValue(At(Level), new JValue(3)));
             Assert.AreEqual(0, document.History.Depth);
-            Assert.IsTrue(document.History.IsClean);
+            Assert.IsTrue(document.IsClean);
         }
 
         /// <summary>The kind of a number is part of what the file says: 3 and 3.0 are the same value and two
@@ -406,16 +407,16 @@ namespace Tooling.Tests.Json
             JsonTreeDocument document = JsonTreeDocument.Parse(Json);
             document.SetValue(At(Id), new JValue(SecondName));
 
-            Assert.IsFalse(document.History.IsClean);
+            Assert.IsFalse(document.IsClean);
 
             document.Save(_file, FileKeyOrder.Instance);
 
-            Assert.IsTrue(document.History.IsClean);
+            Assert.IsTrue(document.IsClean);
             Assert.AreEqual(Canon(document), File.ReadAllText(_file));
 
             document.History.Undo();
 
-            Assert.IsFalse(document.History.IsClean, "the tree on screen is no longer the tree on disk");
+            Assert.IsFalse(document.IsClean, "the tree on screen is no longer the tree on disk");
         }
 
         /// <summary>The whole document can be replaced — a reload, a paste over everything — and that is a
@@ -461,6 +462,54 @@ namespace Tooling.Tests.Json
             // The root cannot become a value and has no key to be written under: a put there is refused
             // the way a set is, rather than replacing the document with a number.
             Assert.IsFalse(document.Put(JsonPointer.Root, new JValue(1)));
+        }
+
+        /// <summary>
+        /// Two files of one tool record onto the stack the tool handed them, so one press of undo takes back
+        /// the author's last edit whichever file it was made in — and each file still answers for itself
+        /// whether it is the file on disk, because a save writes them one at a time.
+        /// </summary>
+        [TestMethod]
+        public void Parse_OntoAnOutsideHistory_FilesEveryDocumentsEditsOnIt()
+        {
+            EditHistory history = new();
+            JsonTreeDocument one = JsonTreeDocument.Parse(Json, history);
+            JsonTreeDocument another = JsonTreeDocument.Parse(Json, history);
+
+            Assert.IsTrue(one.SetValue(At(Level), new JValue(9)));
+            Assert.IsTrue(another.SetValue(At(Level), new JValue(7)));
+
+            Assert.AreEqual(2, history.Depth, "a run of keystrokes does not reach across two documents");
+            Assert.IsFalse(one.IsClean);
+            Assert.IsFalse(another.IsClean);
+
+            history.Undo();
+
+            Assert.AreEqual(3, another.Resolve(At(Level))?.Value<int>(), "the newest edit was the other file's");
+            Assert.AreEqual(9, one.Resolve(At(Level))?.Value<int>());
+            Assert.IsTrue(another.IsClean);
+            Assert.IsFalse(one.IsClean);
+        }
+
+        /// <summary>A file the run lays down is written into before anything takes it in. It joins the
+        /// tool's stack with that first step, or the one gesture nobody could take back would be the one
+        /// that created a file.</summary>
+        [TestMethod]
+        public void Follow_BringsTheStepsAlreadyTakenOntoTheNewHistory()
+        {
+            EditHistory history = new();
+            JsonTreeDocument document = JsonTreeDocument.Parse(Json);
+
+            Assert.IsTrue(document.SetValue(At(Level), new JValue(9)));
+
+            document.Follow(history);
+
+            Assert.AreEqual(1, history.Depth);
+            Assert.IsFalse(document.IsClean);
+
+            history.Undo();
+
+            Assert.AreEqual(3, document.Resolve(At(Level))?.Value<int>());
         }
 
         /// <summary>One edit, walked back and forward: the file has to be the same on both ends of the walk.</summary>

@@ -2,7 +2,6 @@ namespace LastBreath.Descriptors.Sandbox
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using Core.Data.GameData;
     using Core.Entity.Components;
@@ -14,7 +13,6 @@ namespace LastBreath.Descriptors.Sandbox
     using Core.Narrative.Quests;
     using Core.Save;
     using Core.Services;
-    using Newtonsoft.Json;
     using Tooling.Catalogs;
     using static Tooling.Text.Format;
 
@@ -28,10 +26,6 @@ namespace LastBreath.Descriptors.Sandbox
     /// </summary>
     public sealed class NarrativeSandbox
     {
-        private const string ReadFailedFormat = "{0} could not be read: {1}";
-
-        private const string NoCatalogFormat = "the {0} catalog is not among the ones this run opened";
-
         private const string NoCurvesFormat =
             "'{0}' holds no file: the speech-check and quest-offer chances fall back to their built-in defaults";
 
@@ -62,6 +56,10 @@ namespace LastBreath.Descriptors.Sandbox
         public IReadOnlyList<string> Notes => _notes;
 
         public IDialogueProvider Dialogues => _dialogues;
+
+        /// <summary>The quests as the CATALOG was read, which is not the same question as where they
+        /// stand: what a document writes and this does not hold was dropped by the loader.</summary>
+        public IQuestProvider QuestCatalog { get; }
 
         public IDialogueService Dialogue => _dialogue;
 
@@ -118,10 +116,11 @@ namespace LastBreath.Descriptors.Sandbox
 
             _quests = log;
             _dialogues = dialogues;
+            QuestCatalog = quests;
             _dialogue = new DialogueService(dialogues, _facts, _influence, Rnd, events);
 
-            Read(workspace, DataCatalog.Quests, quests);
-            Read(workspace, DataCatalog.Dialogues, dialogues);
+            NarrativeDocuments.Read(workspace, DataCatalog.Quests, quests, _notes);
+            NarrativeDocuments.Read(workspace, DataCatalog.Dialogues, dialogues, _notes);
         }
 
         /// <summary>Opens a sandbox over the documents this tool has open. Read afresh on every run: a
@@ -158,43 +157,12 @@ namespace LastBreath.Descriptors.Sandbox
         {
             var mastery = new InfluenceMastery(messages);
             string folder = CatalogWorkspace.Folder(root, DataCatalog.Influence);
-            IReadOnlyList<string> paths = CatalogWorkspace.FilePaths(folder);
 
-            if (paths.Count == 0) _notes.Add(Text(NoCurvesFormat, folder));
+            if (CatalogWorkspace.FilePaths(folder).Count == 0) _notes.Add(Text(NoCurvesFormat, folder));
 
-            foreach (string path in paths)
-                Guarded(Path.GetFileName(path), () => mastery.Apply(DataCatalog.Influence, new GameDataFile(Path.GetFileName(path), File.ReadAllText(path))));
+            NarrativeDocuments.Read(folder, DataCatalog.Influence, mastery, _notes);
 
             return mastery;
-        }
-
-        /// <summary>Hands one catalog's open documents to the game's own provider. A catalog this run
-        /// never opened is a note and not an empty provider passed off as a read one.</summary>
-        private void Read(CatalogWorkspace workspace, string catalog, IGameDataParticipant participant)
-        {
-            CatalogView? view = workspace.Catalogs.FirstOrDefault(entry => string.Equals(entry.Catalog, catalog, StringComparison.Ordinal));
-            if (view is null)
-            {
-                _notes.Add(Text(NoCatalogFormat, catalog));
-                return;
-            }
-
-            foreach (CatalogFile file in view.Files)
-                Guarded(file.Name, () => participant.Apply(catalog, new GameDataFile(file.Name, file.Document.Root.ToString(Formatting.None))));
-        }
-
-        /// <summary>One document read, or one note saying why it was not. The providers already drop a
-        /// broken record on their own; this catches the file that is not the shape they expect at all.</summary>
-        private void Guarded(string name, Action read)
-        {
-            try
-            {
-                read();
-            }
-            catch (Exception failure) when (failure is IOException or JsonException or InvalidOperationException or ArgumentException)
-            {
-                _notes.Add(Text(ReadFailedFormat, name, failure.Message));
-            }
         }
     }
 }

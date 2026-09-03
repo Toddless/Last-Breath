@@ -8,7 +8,6 @@ namespace DataEditor.Source.View
     using Godot;
     using LastBreath.Descriptors;
     using Tooling.Catalogs;
-    using Tooling.Json;
     using Tooling.Localization;
     using Tooling.Schema.Model;
     using Tooling.Ui;
@@ -19,10 +18,10 @@ namespace DataEditor.Source.View
     /// describes, the records of the chosen one, and the record itself — under the shell every tool of
     /// this repository wears. The scene file holds nothing but this node; there is no designer to hand a
     /// .tscn to, so the layout lives where it can be reviewed as code.
-    /// <para>Every edit goes through the history of the document it belongs to, so undo is per file:
-    /// the file of the record on screen is the one the keys move. Saving is not — Ctrl+S writes every
-    /// changed file of the run, because the author edits records and has no reason to remember which
-    /// catalog each of them came from.</para>
+    /// <para>Every edit goes onto the one history of the run, so undo takes back the last thing the
+    /// author did — a value in any file, a text in any locale, a record renamed in both at once. Saving
+    /// is the same gesture over the whole run: Ctrl+S writes every changed file, because the author
+    /// edits records and has no reason to remember which catalog each of them came from.</para>
     /// </summary>
     public partial class EditorRoot : ToolShell
     {
@@ -112,12 +111,6 @@ namespace DataEditor.Source.View
         private CatalogView? _catalog;
         private CatalogRecord? _record;
 
-        /// <summary>The file the last gesture over the list changed. A gesture can leave no record on
-        /// screen at all — the only record of a catalog taken out — and undo has to reach the history
-        /// the work was done in even then, or the one thing that cannot be taken back would be the one
-        /// that emptied the pane.</summary>
-        private JsonTreeDocument? _touched;
-
         /// <summary>Whether the dialog on screen is asking for a record to copy rather than for a fresh
         /// one. The two ask for the same thing — a name nobody has used — and differ only in what is
         /// written once it is given.</summary>
@@ -134,10 +127,6 @@ namespace DataEditor.Source.View
         private readonly List<string> _notes = [];
 
         protected override string ToolName => ToolTitle;
-
-        /// <summary>The file the history keys step: the one the record on screen lives in, and the one
-        /// the last gesture changed while there is no record to look at.</summary>
-        protected override JsonTreeDocument? Stepped => _record?.File.Document ?? _touched;
 
         /// <summary>The records of the catalog, under the three things that may be done to the list
         /// itself. The buttons sit above the list and not beside a row: two of them speak about the row
@@ -307,11 +296,9 @@ namespace DataEditor.Source.View
             string root = ToolPaths.SharedDataRoot;
 
             Root = root;
-            _workspace = GameCatalogs.Load(root);
+            _workspace = GameCatalogs.Load(root, History);
 
-            var saver = new CatalogSaver(_workspace);
-            saver.Changed += Refresh;
-            Saver = saver;
+            Saver = new CatalogSaver(_workspace);
 
             // The ids of every catalog of the run, for the fields that point at one. Built here because
             // it answers about the run as a whole and the panel is shown one record at a time.
@@ -380,7 +367,7 @@ namespace DataEditor.Source.View
 
             try
             {
-                LocalizedTexts texts = LocalizedTexts.Load(folder);
+                LocalizedTexts texts = LocalizedTexts.Load(folder, History);
 
                 Texts = texts;
                 _inspector.Texts = texts;
@@ -401,11 +388,6 @@ namespace DataEditor.Source.View
                 : null;
 
             if (_catalog is not null) Show(_catalogList, index);
-
-            // The file of the last gesture belongs to the catalog it was made in. Carried across a
-            // change of catalog, it would point the history keys at a file the author has left — and an
-            // undo pressed over a catalog that shows nothing would take back a step in another one.
-            _touched = null;
 
             FillRecords();
 
@@ -662,20 +644,14 @@ namespace DataEditor.Source.View
             // renamed during the run would be reported gone under a word nobody on screen can see.
             string id = record.CurrentId;
 
-            // The record's own file is named, because the gesture leaves no record to be asked for it:
-            // what is taken out is the last thing that knew which history the step went onto.
-            Told(CatalogEditing.RemoveRecord(view, record), RemovedFormat, id, record.File.Document);
+            Told(CatalogEditing.RemoveRecord(view, record), RemovedFormat, id);
         }
 
         /// <summary>Says on the status line what the gesture came to — the record it wrote, or the reason
-        /// it refused — remembers the file it changed for the history keys, and puts the record it left
-        /// standing on screen.</summary>
-        private void Told(CatalogEditResult result, string format, string what, JsonTreeDocument? changed = null)
+        /// it refused — and puts the record it left standing on screen.</summary>
+        private void Told(CatalogEditResult result, string format, string what)
         {
             Action = result.Note ?? Text(format, what);
-
-            // A refusal changed nothing, so it does not move where undo would step either.
-            if (result.Done) _touched = result.Record?.File.Document ?? changed;
 
             Refresh();
 
@@ -709,6 +685,10 @@ namespace DataEditor.Source.View
             SyncRecords();
             EnableActions();
         }
+
+        /// <summary>A step through the history may have moved a text of a locale: the inspector copied it
+        /// into its boxes, and nothing about the record's own file would say it has changed.</summary>
+        protected override void Stepped() => _inspector.Rebuild(_record, Suffixes(), Neighbour(_recordIndex));
 
         /// <summary>
         /// Brings the list of records up to what the catalog holds now. The catalog is read again first:

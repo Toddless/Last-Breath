@@ -98,7 +98,9 @@ namespace Tooling.Ui
         private const string TextRefusedFormat = "“{0}” could not be written in {1}";
         private const string RenamedKeysFormat = "renamed {0} localization key(s)";
         private const string KeysNotMovedFormat = "keys for “{0}” were not moved: “{1}” is already written";
-        private const string KeysLeftBehindFormat = "localization keys stay under “{0}”";
+
+        /// <summary>What a rename is called on the status line, in both directions of the history.</summary>
+        private const string RenameStepFormat = "rename {0} → {1}";
 
         private const string AddElementText = "+ element";
         private const string AddKeyText = "+ key";
@@ -193,11 +195,6 @@ namespace Tooling.Ui
         /// second line of dialogue lands under the first rather than at the end of the file.</summary>
         private string? _keyAnchor;
 
-        /// <summary>The id this panel last named the localization keys under. An undo steps the record's
-        /// own file and nothing else — the keys stay where the rename put them, and this is the one place
-        /// the author would otherwise not be told.</summary>
-        private string? _renamedTo;
-
         /// <summary>The row naming the record. Held because it is the one thing rewritten without a
         /// redraw: it carries the id, and the id is edited from a box in this very panel.</summary>
         private Label? _heading;
@@ -262,10 +259,6 @@ namespace Tooling.Ui
             _record = record;
             _suffixes = suffixes ?? [];
             _after = after;
-
-            // A rename belongs to the record it was made on. Carried across a change of record it would
-            // warn about an id nothing on screen carries.
-            _renamedTo = null;
 
             Follow(record?.File.Document);
             DrawRecord();
@@ -758,23 +751,6 @@ namespace Tooling.Ui
             }
 
             DrawRecord();
-
-            // Asked here and not inside the draw: only a change this panel did not make can step an id
-            // away from the keys named after it, and an undo is exactly that.
-            WarnIfKeysLeftBehind();
-        }
-
-        /// <summary>Says so when the record's id no longer matches the id its localization keys were named
-        /// under. An undo steps the record's own file and nothing else — the .po files carry their own
-        /// histories — so a record stepped back to its old name would go into the game with no name at
-        /// all, and nothing else on screen would say why.</summary>
-        private void WarnIfKeysLeftBehind()
-        {
-            if (_renamedTo is not { } named) return;
-            if (string.Equals(named, _record?.CurrentId, StringComparison.Ordinal)) return;
-
-            _renamedTo = null;
-            Say(Text(KeysLeftBehindFormat, named));
         }
 
         private void DrawRecord()
@@ -1261,13 +1237,19 @@ namespace Tooling.Ui
 
             if (string.Equals(now, _idBefore, StringComparison.Ordinal)) return;
 
-            LocalizedRename rename = texts.RenameRecord(_idBefore, now, _suffixes);
+            // The id was written into the record a moment ago and the keys move because of it: one step of
+            // the history, so a record stepped back to its old name is read under that name in every locale
+            // too — a record whose id says one word and whose wording is written under another is exactly
+            // what the author cannot see and cannot repair.
+            using (record.File.Document.History.GroupWithNewest(Text(RenameStepFormat, _idBefore, now)))
+            {
+                LocalizedRename rename = texts.RenameRecord(_idBefore, now, _suffixes);
 
-            if (rename.Taken is { } taken) Say(Text(KeysNotMovedFormat, _idBefore, taken));
-            else if (rename.Renamed > 0) Say(Text(RenamedKeysFormat, rename.Renamed));
+                if (rename.Taken is { } taken) Say(Text(KeysNotMovedFormat, _idBefore, taken));
+                else if (rename.Renamed > 0) Say(Text(RenamedKeysFormat, rename.Renamed));
+            }
 
             _idBefore = now;
-            _renamedTo = rename.Renamed > 0 ? now : null;
 
             // Whether a key moved or not: the boxes on screen are written under the keys the OLD id worded,
             // and a record that has just been given another id would go on writing its wording into them —

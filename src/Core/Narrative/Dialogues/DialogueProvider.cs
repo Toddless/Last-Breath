@@ -19,6 +19,8 @@ namespace Core.Narrative.Dialogues
     {
         private readonly Dictionary<string, DialogueDefinition> _dialogues = [];
 
+        public IReadOnlyCollection<DialogueDefinition> All => _dialogues.Values;
+
         public IReadOnlyList<string> Catalogs => [DataCatalog.Dialogues];
 
         public void Apply(string catalog, GameDataFile file)

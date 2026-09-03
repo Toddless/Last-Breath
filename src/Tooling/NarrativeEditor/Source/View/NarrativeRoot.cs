@@ -7,7 +7,6 @@ namespace NarrativeEditor.Source.View
     using Godot;
     using LastBreath.Descriptors;
     using Tooling.Catalogs;
-    using Tooling.Json;
     using Tooling.Localization;
     using Tooling.Narrative;
     using Tooling.Ui;
@@ -29,6 +28,11 @@ namespace NarrativeEditor.Source.View
 
         private const string ToolTitle = "narrative editor";
 
+        /// <summary>What the two readings of a record are named on their tabs.</summary>
+        private const string DryRunTabName = "dry run";
+
+        private const string ChecksTabName = "checks";
+
         private const string SectionRowFormat = "{0}   ({1})";
         private const string RecordRowFormat = "{0}{1}";
         private const string ReadoutFormat = "{0}   —   {1} record(s), {2} file(s), {3} note(s)";
@@ -46,6 +50,7 @@ namespace NarrativeEditor.Source.View
         private OutlineTree _outline = null!;
         private InspectorPanel _inspector = null!;
         private DryRunPanel _dryRun = null!;
+        private ChecksPanel _checks = null!;
 
         private CatalogWorkspace? _workspace;
 
@@ -62,10 +67,6 @@ namespace NarrativeEditor.Source.View
         private CatalogRecord? _shown;
 
         protected override string ToolName => ToolTitle;
-
-        /// <summary>The file the history keys step: the one the record on screen lives in. Every row of
-        /// the outline is an address inside that same record, so the outline never moves it.</summary>
-        protected override JsonTreeDocument? Stepped => _record?.File.Document;
 
         protected override Control BuildBody()
         {
@@ -85,6 +86,7 @@ namespace NarrativeEditor.Source.View
             _outline = new OutlineTree(tree);
             _inspector = new InspectorPanel { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             _dryRun = new DryRunPanel();
+            _checks = new ChecksPanel { Name = ChecksTabName };
 
             // Two divides rather than one container holding all three panes: nested, each divider
             // starts at the minimum width of the pane before it and moves without touching the other.
@@ -99,17 +101,33 @@ namespace NarrativeEditor.Source.View
                 SizeFlagsVertical = SizeFlags.ExpandFill
             };
 
+            // Two readings of one record, side by side under the same divide: walking the conversation,
+            // and holding it against everything outside it. Tabs and not a third pane — an author does
+            // one or the other, and both at once would leave neither enough of the window to be read in.
+            var read = new TabContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                SizeFlagsVertical = SizeFlags.ExpandFill
+            };
+
+            ScrollContainer walked = Scrolled(_dryRun);
+            walked.Name = DryRunTabName;
+
             body.AddChild(_recordList);
             body.AddChild(right);
             right.AddChild(tree);
             right.AddChild(edited);
             edited.AddChild(Scrolled(_inspector));
-            edited.AddChild(Scrolled(_dryRun));
+            edited.AddChild(read);
+            read.AddChild(walked);
+            read.AddChild(_checks);
 
             _recordList.ItemSelected += index => ShowRecord((int)index);
             tree.ItemSelected += ShowElement;
             _inspector.Said += Report;
             _dryRun.Said += Report;
+            _checks.Said += Report;
+            _checks.Chose += OpenRecord;
 
             return body;
         }
@@ -119,16 +137,18 @@ namespace NarrativeEditor.Source.View
             string root = ToolPaths.SharedDataRoot;
 
             Root = root;
-            _workspace = GameNarrative.Load(root);
+            _workspace = GameNarrative.Load(root, History);
             _dryRun.Workspace = _workspace;
 
-            var saver = new CatalogSaver(_workspace);
-            saver.Changed += Refresh;
-            Saver = saver;
+            Saver = new CatalogSaver(_workspace);
 
             // The ids of every catalog of the run, for the fields that point at one. A dialogue names
             // npcs, items and quests, so this is most of what the inspector can say about a record here.
-            _inspector.References = new ReferenceIndex(_workspace);
+            var references = new ReferenceIndex(_workspace);
+
+            _inspector.References = references;
+            _checks.References = references;
+            _checks.Workspace = _workspace;
 
             // The conditions and the actions: the schema can only call them free json, and this is what
             // tells the inspector which key is written from which of the two vocabularies.
@@ -160,12 +180,13 @@ namespace NarrativeEditor.Source.View
 
             try
             {
-                LocalizedTexts texts = LocalizedTexts.Load(folder);
+                LocalizedTexts texts = LocalizedTexts.Load(folder, History);
 
                 Texts = texts;
                 _inspector.Texts = texts;
                 _outline.Texts = texts;
                 _dryRun.Texts = texts;
+                _checks.Texts = texts;
             }
             catch (Exception failure) when (failure is IOException or UnauthorizedAccessException
                                                or FormatException or ArgumentException)
@@ -182,6 +203,14 @@ namespace NarrativeEditor.Source.View
             _outline.Show(Outlined());
             ShowElement();
             _dryRun.Standing(_record, IsDialogue());
+        }
+
+        /// <summary>A step through the history may have moved a line of a locale: the inspector copied it
+        /// into its boxes, and nothing about the record's own file would say it has changed.</summary>
+        protected override void Stepped()
+        {
+            _shown = null;
+            ShowElement();
         }
 
         /// <summary>Whether the record on screen is a conversation. Only those can be walked: a quest is
@@ -268,6 +297,19 @@ namespace NarrativeEditor.Source.View
             // The outline and the inspector are drawn by the refresh, which is what draws them after every
             // other change too: doing it here as well would build the same tree twice per record opened.
             Refresh();
+        }
+
+        /// <summary>Opens the record a finding belongs to. Nothing happens when this run has no such
+        /// record: a check reads every catalog of the game, and the id it names may belong to one this
+        /// tool does not list.</summary>
+        private void OpenRecord(string catalog, string id)
+        {
+            int index = _rows.FindIndex(row =>
+                row.Record is { } record
+                && string.Equals(row.View.Catalog, catalog, StringComparison.Ordinal)
+                && string.Equals(record.CurrentId, id, StringComparison.Ordinal));
+
+            if (index >= 0) ShowRecord(index);
         }
 
         /// <summary>The record on screen as its author's structure, or nothing while none is open.</summary>

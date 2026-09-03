@@ -2,6 +2,7 @@ namespace DataEditor.Source.App
 {
     using LastBreath.Descriptors;
     using Tooling.Catalogs;
+    using Tooling.Editing.History;
 
     /// <summary>
     /// The one place this host touches the game: the catalogs it can be handed a schema for. Below it
@@ -10,7 +11,8 @@ namespace DataEditor.Source.App
     /// </summary>
     public static class GameCatalogs
     {
-        public static CatalogWorkspace Load(string root) => CatalogWorkspace.Load(root, CatalogDescriptors.All);
+        public static CatalogWorkspace Load(string root, EditHistory? history = null) =>
+            CatalogWorkspace.Load(root, CatalogDescriptors.All, history);
 
         /// <summary>How many catalogs the game has at all, described or not. It is the denominator of
         /// the status line: counted from the descriptors themselves, a catalog whose schema refused to

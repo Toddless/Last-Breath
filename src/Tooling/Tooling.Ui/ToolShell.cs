@@ -5,7 +5,7 @@ namespace Tooling.Ui
     using System.Linq;
     using Godot;
     using Tooling.Catalogs;
-    using Tooling.Json;
+    using Tooling.Editing.History;
     using Tooling.Localization;
     using static Tooling.Text.Format;
 
@@ -14,9 +14,11 @@ namespace Tooling.Ui
     /// a line saying what was read and what is not yet written, the keys that save and step the history,
     /// and the promise that work in hand does not leave with the window.
     /// <para>The host says what it draws (<see cref="BuildBody"/>), what it opens on
-    /// (<see cref="Opened"/>), what it redraws after a change (<see cref="Redraw"/>) and which file the
-    /// history keys step (<see cref="Stepped"/>). Everything else here is the same in every tool, and
-    /// two readings of "is there work unsaved" would be two answers.</para>
+    /// (<see cref="Opened"/>) and what it redraws after a change (<see cref="Redraw"/>). Everything else
+    /// here is the same in every tool, and two readings of "is there work unsaved" would be two answers.</para>
+    /// <para>The history is the shell's and there is one of it: the host reads its catalogs and its
+    /// locales onto it, so that one press of undo takes back the last thing the author did — a value in
+    /// any file, a text in any locale, a record renamed in both at once.</para>
     /// </summary>
     public abstract partial class ToolShell : Control
     {
@@ -92,20 +94,11 @@ namespace Tooling.Ui
         /// <summary>The .po files of the run, or null while it edits none. Held by the shell for the
         /// reason the saver is: the status line, the save key and the question asked on the way out are
         /// one answer about all the work in hand, and the wording is part of it.</summary>
-        protected LocalizedTexts? Texts
-        {
-            get => field;
-            set
-            {
-                // The one it held stops speaking first: a set read again over a run that has already read
-                // one would leave the old files refreshing a status line that no longer counts them.
-                if (field is { } held) held.Changed -= Refresh;
+        protected LocalizedTexts? Texts { get; set; }
 
-                field = value;
-
-                if (value is not null) value.Changed += Refresh;
-            }
-        }
+        /// <summary>The one stack of the tool. The host hands it to everything it reads, so that a step
+        /// back is a step back through the author's work and not through one file of it.</summary>
+        protected EditHistory History { get; } = new();
 
         /// <summary>What this tool is called in the window's title.</summary>
         protected abstract string ToolName { get; }
@@ -119,10 +112,6 @@ namespace Tooling.Ui
 
         /// <summary>A save that wrote nothing and had nothing to complain about.</summary>
         private static CatalogSaveResult Nothing => new([], []);
-
-        /// <summary>The file the history keys step. Every file carries its own stack, so an undo takes
-        /// back an edit of what is being looked at and never one made somewhere else.</summary>
-        protected abstract JsonTreeDocument? Stepped { get; }
 
         public override void _Ready()
         {
@@ -139,6 +128,10 @@ namespace Tooling.Ui
 
             BuildMessageDialog();
             BuildQuitDialog();
+
+            // One subscription for the whole run: every document of it records here, so the status line,
+            // the marks and the panels follow an edit wherever it was made.
+            History.Changed += Refresh;
 
             // The tool answers the close request itself, or work not yet written would go with the
             // window. Everything else about quitting is left to the engine.
@@ -236,6 +229,13 @@ namespace Tooling.Ui
         /// <summary>Everything the host shows that follows a change: rows renamed, marks moved, buttons
         /// enabled. Called after the status line is written, on every refresh.</summary>
         protected abstract void Redraw();
+
+        /// <summary>The history has just been stepped. A redraw follows every change and asks only what a
+        /// list shows; a step can also have moved a text of a locale, which the panels copied into their
+        /// boxes and no document of theirs will tell them about — so the host draws them again here.</summary>
+        protected virtual void Stepped()
+        {
+        }
 
         /// <summary>What a gesture came to when the thing on screen cannot show it — a key already
         /// written, a key nobody named — on the line that says what the run last did.</summary>
@@ -370,22 +370,20 @@ namespace Tooling.Ui
         /// <summary>What one press of undo would take back, so the author reads what the key means
         /// before pressing it.</summary>
         private string NextUndo() =>
-            Stepped?.History.NextUndo is { } step ? Text(UndoFormat, step) : NoUndoText;
+            History.NextUndo is { } step ? Text(UndoFormat, step) : NoUndoText;
 
         private void StepBack()
         {
-            if (Stepped?.History is not { } history) return;
-
-            Action = history.Undo() is { } step ? Text(UndoFormat, step.Label) : NothingToUndoText;
+            Action = History.Undo() is { } step ? Text(UndoFormat, step.Label) : NothingToUndoText;
             Refresh();
+            Stepped();
         }
 
         private void StepForward()
         {
-            if (Stepped?.History is not { } history) return;
-
-            Action = history.Redo() is { } step ? Text(RedoneFormat, step.Label) : NothingToRedoText;
+            Action = History.Redo() is { } step ? Text(RedoneFormat, step.Label) : NothingToRedoText;
             Refresh();
+            Stepped();
         }
 
         /// <summary>Leaves only once the work is on disk. A save that could not write everything keeps

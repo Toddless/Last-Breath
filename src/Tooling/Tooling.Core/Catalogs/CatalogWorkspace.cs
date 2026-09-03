@@ -4,6 +4,7 @@ namespace Tooling.Catalogs
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Tooling.Editing.History;
     using Tooling.Json;
     using Tooling.Schema;
     using Tooling.Schema.Model;
@@ -45,7 +46,11 @@ namespace Tooling.Catalogs
 
         public int RecordCount => Catalogs.Sum(catalog => catalog.Records.Count);
 
-        public static CatalogWorkspace Load(string root, IEnumerable<ICatalogDescriptor> descriptors)
+        /// <summary>Reads the described catalogs of one data root. Every document is put on
+        /// <paramref name="history"/> where the tool has one of its own, so that one press of undo takes
+        /// back the author's last change whichever file of whichever catalog it was in.</summary>
+        public static CatalogWorkspace Load(string root, IEnumerable<ICatalogDescriptor> descriptors,
+            EditHistory? history = null)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(root);
             ArgumentNullException.ThrowIfNull(descriptors);
@@ -55,7 +60,7 @@ namespace Tooling.Catalogs
 
             foreach (ICatalogDescriptor descriptor in descriptors)
             {
-                if (Read(root, descriptor, report) is not { } view) continue;
+                if (Read(root, descriptor, report, history) is not { } view) continue;
 
                 catalogs.Add(view);
                 report.AddRange(view.Notes.Select(note => Text(Notes.Named, view.Catalog, note)));
@@ -88,7 +93,7 @@ namespace Tooling.Catalogs
         /// library, and the promise made above it — that one catalog costs itself and no more — cannot
         /// be kept by naming in advance the exceptions someone else's walk over someone else's types
         /// might raise.</para></summary>
-        private static CatalogView? Read(string root, ICatalogDescriptor descriptor, List<string> report)
+        private static CatalogView? Read(string root, ICatalogDescriptor descriptor, List<string> report, EditHistory? history)
         {
             var builder = new CatalogSchemaBuilder();
             CatalogSchema schema;
@@ -120,7 +125,7 @@ namespace Tooling.Catalogs
 
             foreach (string path in paths)
             {
-                if (Open(path, notes) is not { } file) continue;
+                if (Open(path, notes, history) is not { } file) continue;
 
                 files.Add(file);
                 records.AddRange(CatalogRecords.Read(schema, file, notes));
@@ -131,6 +136,7 @@ namespace Tooling.Catalogs
                 Descriptor = descriptor,
                 Schema = schema,
                 Folder = folder,
+                History = history,
                 Files = files,
                 Records = records,
                 Notes = notes
@@ -139,11 +145,11 @@ namespace Tooling.Catalogs
 
         /// <summary>Reads one file, or notes why it could not be read and hands back nothing. A broken
         /// file costs its own records and no more.</summary>
-        private static CatalogFile? Open(string path, List<string> notes)
+        private static CatalogFile? Open(string path, List<string> notes, EditHistory? history)
         {
             try
             {
-                return new CatalogFile(path, JsonTreeDocument.Load(path));
+                return new CatalogFile(path, JsonTreeDocument.Load(path, history));
             }
             catch (Exception failure) when (failure is FormatException or IOException or UnauthorizedAccessException)
             {

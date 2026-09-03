@@ -30,10 +30,12 @@ namespace Tooling.Localization
         private readonly Dictionary<string, PoEntry> _index = new(StringComparer.Ordinal);
         private readonly List<PoWarning> _warnings;
 
-        private PoDocument(List<PoBlock> blocks, List<PoWarning> warnings, string newLine, bool endsWithNewLine, bool byteOrderMark)
+        private PoDocument(List<PoBlock> blocks, List<PoWarning> warnings, string newLine, bool endsWithNewLine,
+            bool byteOrderMark, EditHistory? history)
         {
             _blocks = blocks;
             _warnings = warnings;
+            History = history ?? new EditHistory();
             NewLine = newLine;
             EndsWithNewLine = endsWithNewLine;
             HasByteOrderMark = byteOrderMark;
@@ -49,7 +51,10 @@ namespace Tooling.Localization
         /// through the history. A rename reports the key the entry has after the step.</summary>
         public event Action<string>? Changed;
 
-        public EditHistory History { get; } = new();
+        /// <summary>The stack this file's edits are filed on — the tool's own where it was handed one, so
+        /// that a text written and an id renamed are steps of one history, and a stack of its own where
+        /// nobody said otherwise.</summary>
+        public EditHistory History { get; }
 
         public IReadOnlyList<PoBlock> Blocks => _blocks;
 
@@ -68,16 +73,17 @@ namespace Tooling.Localization
 
         public bool HasByteOrderMark { get; }
 
-        public bool IsClean => History.IsClean;
+        public bool IsClean => History.IsCleanFor(this);
 
-        public static PoDocument Parse(string text)
+        /// <summary>Reads a catalog, filing its edits on <paramref name="history"/> where one is given.</summary>
+        public static PoDocument Parse(string text, EditHistory? history = null)
         {
             ArgumentNullException.ThrowIfNull(text);
 
-            return Read(text);
+            return Read(text, history);
         }
 
-        public static PoDocument Load(string path)
+        public static PoDocument Load(string path, EditHistory? history = null)
         {
             ArgumentException.ThrowIfNullOrEmpty(path);
 
@@ -89,7 +95,7 @@ namespace Tooling.Localization
                 // swallowed on the way in is a mark missing from the file the tool writes back. The decoder
                 // throws rather than substituting, because a byte quietly replaced here stands in the source
                 // lines of an entry nobody edited and goes to disk on the next save.
-                return Read(Utf8(strict: true).GetString(File.ReadAllBytes(path)));
+                return Read(Utf8(strict: true).GetString(File.ReadAllBytes(path)), history);
             }
             catch (DecoderFallbackException broken)
             {
@@ -199,7 +205,7 @@ namespace Tooling.Localization
             }
 
             Put();
-            History.Record(new StructuralEdit($"{AddLabel} {msgId}", Take, Put));
+            History.Record(new StructuralEdit(this, $"{AddLabel} {msgId}", Take, Put));
 
             return true;
         }
@@ -240,7 +246,7 @@ namespace Tooling.Localization
             }
 
             Take();
-            History.Record(new StructuralEdit($"{RemoveLabel} {msgId}", Put, Take));
+            History.Record(new StructuralEdit(this, $"{RemoveLabel} {msgId}", Put, Take));
 
             return true;
         }
@@ -271,7 +277,7 @@ namespace Tooling.Localization
             }
 
             Name(oldId, newId);
-            History.Record(new RenameEdit($"{RenameLabel} {oldId}", oldId, newId, Name));
+            History.Record(new RenameEdit(this, $"{RenameLabel} {oldId}", oldId, newId, Name));
 
             return true;
         }
@@ -303,7 +309,7 @@ namespace Tooling.Localization
             ArgumentException.ThrowIfNullOrEmpty(path);
 
             File.WriteAllBytes(path, Utf8(strict: false).GetBytes(Write()));
-            History.MarkSaved();
+            History.MarkSaved(this);
         }
 
         /// <summary>The encoding these files are written in: UTF-8, and the mark, when the file had one, is a
@@ -311,7 +317,7 @@ namespace Tooling.Localization
         private static UTF8Encoding Utf8(bool strict) =>
             new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: strict);
 
-        private static PoDocument Read(string text)
+        private static PoDocument Read(string text, EditHistory? history)
         {
             List<PoWarning> warnings = [];
             bool byteOrderMark = text.Length > 0 && text[0] == PoSyntax.ByteOrderMark;
@@ -331,7 +337,7 @@ namespace Tooling.Localization
 
             if (lines.Length == 0) warnings.Add(new PoWarning(0, "the file is empty"));
 
-            return new PoDocument(ReadBlocks(lines, warnings), warnings, newLine, endsWithNewLine, byteOrderMark);
+            return new PoDocument(ReadBlocks(lines, warnings), warnings, newLine, endsWithNewLine, byteOrderMark, history);
         }
 
         /// <summary>The ending the file used. A file that mixed them cannot be written back untouched either
@@ -686,18 +692,21 @@ namespace Tooling.Localization
         /// <summary>A change of shape that carries both directions it can be applied in. Each of them closes
         /// over the state captured before the change — the entry that was taken out, the place it stood in —
         /// and works nothing out again.</summary>
-        private sealed class StructuralEdit(string label, Action undo, Action redo) : IEditCommand
+        private sealed class StructuralEdit(PoDocument owner, string label, Action undo, Action redo) : IOwnedEdit
         {
             public string Label => label;
 
             public void Undo() => undo();
 
             public void Redo() => redo();
+
+            public bool Touches(object asked) => ReferenceEquals(asked, owner);
         }
 
         /// <summary>A rename, which has to say which key became which: a key is how the rest of the tool holds
         /// an entry, so whatever was pointing at the old one points at nothing the moment the step lands.</summary>
-        private sealed class RenameEdit(string label, string oldId, string newId, Action<string, string> name) : IIdChangingEdit
+        private sealed class RenameEdit(PoDocument owner, string label, string oldId, string newId, Action<string, string> name)
+            : IIdChangingEdit, IOwnedEdit
         {
             public string Label => label;
 
@@ -706,6 +715,8 @@ namespace Tooling.Localization
             public void Redo() => name(oldId, newId);
 
             public IdSwap Swap(bool undoing) => undoing ? new IdSwap(newId, oldId) : new IdSwap(oldId, newId);
+
+            public bool Touches(object asked) => ReferenceEquals(asked, owner);
         }
     }
 }

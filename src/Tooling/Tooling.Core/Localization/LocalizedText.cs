@@ -4,6 +4,7 @@ namespace Tooling.Localization
     using System.Collections.Generic;
     using System.Linq;
     using Tooling.Catalogs;
+    using Tooling.Editing.History;
     using static Tooling.Text.Format;
 
     /// <summary>One piece of a record's text: the suffix its catalog words it under, the key that spells
@@ -46,7 +47,10 @@ namespace Tooling.Localization
 
             _set = set;
 
-            foreach (PoDocument document in Documents()) document.History.Changed += Raise;
+            // Once per stack and not once per locale: the files may be sharing the tool's own history, and
+            // a second subscription to it would answer every keystroke with two refreshes.
+            foreach (EditHistory history in Documents().Select(document => document.History).Distinct())
+                history.Changed += Raise;
         }
 
         /// <summary>A history moved: a text was written, taken back, put back or saved. What is unsaved is
@@ -61,9 +65,10 @@ namespace Tooling.Localization
         public int DirtyCount => Documents().Count(document => !document.IsClean);
 
         /// <summary>Reads the locales of one folder in the order the tool edits them: the authoring one
-        /// first, the reference one beside it.</summary>
-        public static LocalizedTexts Load(string folder) =>
-            new(PoCatalogSet.Load(folder, AuthoringLocale, ReferenceLocale));
+        /// first, the reference one beside it — onto <paramref name="history"/> where the tool has one of
+        /// its own, so that the wording is stepped by the same key as the records.</summary>
+        public static LocalizedTexts Load(string folder, EditHistory? history = null) =>
+            new(PoCatalogSet.Load(folder, history, AuthoringLocale, ReferenceLocale));
 
         /// <summary>
         /// The keys one record's text is written under, in the order the catalog declares its suffixes.
@@ -166,6 +171,8 @@ namespace Tooling.Localization
         /// leaves a record whose name is read under one id and whose description is read under another,
         /// and the author, looking at one box that answered and one that did not, has no gesture that puts
         /// it back.</para>
+        /// <para>What step these moves are filed as is the caller's: the id in the record's own file was
+        /// retyped first and belongs to the same gesture, and only the caller holds both.</para>
         /// </summary>
         public LocalizedRename RenameRecord(string oldId, string newId, IEnumerable<string> suffixes)
         {

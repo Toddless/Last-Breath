@@ -4,6 +4,7 @@ namespace Tooling.Catalogs
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Tooling.Editing.History;
     using Tooling.Json;
     using Tooling.Schema.Reflection;
     using static Tooling.Text.Format;
@@ -38,9 +39,9 @@ namespace Tooling.Catalogs
     /// <summary>
     /// What a run has changed and how it gets back to disk. Godot-free like everything else the host
     /// draws from: the host asks what is unsaved and says so, it never walks the files itself.
-    /// <para>Whether a file is dirty is asked of its own history, so stepping back onto the state that
-    /// was written makes it clean again — an answer that a flag, which can only ever be turned on,
-    /// could not give.</para>
+    /// <para>Whether a file is dirty is asked of the stack its edits were filed on, so stepping back onto
+    /// the state that was written makes it clean again — an answer that a flag, which can only ever be
+    /// turned on, could not give.</para>
     /// <para>The questions about one catalog are static because they are functions of it and of nothing
     /// else. The instance exists for the one thing a caller cannot work out from a view — that some
     /// history, in some file, has just moved.</para>
@@ -48,6 +49,10 @@ namespace Tooling.Catalogs
     public sealed class CatalogSaver
     {
         private readonly CatalogWorkspace _workspace;
+
+        /// <summary>The stacks already listened to. The files of a run may share one, and a second
+        /// subscription to it would answer every keystroke with two refreshes.</summary>
+        private readonly HashSet<EditHistory> _watched = [];
 
         public CatalogSaver(CatalogWorkspace workspace)
         {
@@ -77,7 +82,7 @@ namespace Tooling.Catalogs
         {
             ArgumentNullException.ThrowIfNull(file);
 
-            return !file.Document.History.IsClean;
+            return !file.Document.IsClean;
         }
 
         public static bool IsDirty(CatalogView view)
@@ -141,7 +146,10 @@ namespace Tooling.Catalogs
         private static string? Save(CatalogFile file, SchemaKeyOrder order) =>
             CatalogSaveResult.Guarded(() => file.Document.Save(file.Path, order, CanonicalJsonOptions.Default));
 
-        private void Watch(CatalogFile file) => file.Document.History.Changed += Raise;
+        private void Watch(CatalogFile file)
+        {
+            if (_watched.Add(file.Document.History)) file.Document.History.Changed += Raise;
+        }
 
         private void Raise() => Changed?.Invoke();
 

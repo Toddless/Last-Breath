@@ -6,6 +6,7 @@ namespace NarrativeEditor.Source.App
     using Core.Data.GameData;
     using LastBreath.Descriptors;
     using Tooling.Catalogs;
+    using Tooling.Editing.History;
     using Tooling.Narrative;
     using Tooling.Schema;
     using static Tooling.Text.Format;
@@ -34,7 +35,8 @@ namespace NarrativeEditor.Source.App
         /// and a reference is only checked — and only offered as a list to pick from — against a catalog
         /// the run has read; a workspace of two catalogs would leave every id in the narrative unanswered.
         /// </summary>
-        public static CatalogWorkspace Load(string root) => CatalogWorkspace.Load(root, CatalogDescriptors.All);
+        public static CatalogWorkspace Load(string root, EditHistory? history = null) =>
+            CatalogWorkspace.Load(root, CatalogDescriptors.All, history);
 
         /// <summary>The catalogs of the narrative as this run read them, in the order they are listed.
         /// A catalog the build describes no schema for is not among them.</summary>

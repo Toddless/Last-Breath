@@ -208,8 +208,8 @@ namespace Tooling.Tests.DataEditor
 
             // The refusal costs its own file and no more: the one that was written is clean, the one
             // that was not still has its change to be saved another time.
-            Assert.IsTrue(view.Files[0].Document.History.IsClean);
-            Assert.IsFalse(view.Files[1].Document.History.IsClean);
+            Assert.IsTrue(view.Files[0].Document.IsClean);
+            Assert.IsFalse(view.Files[1].Document.IsClean);
         }
 
         [TestMethod]

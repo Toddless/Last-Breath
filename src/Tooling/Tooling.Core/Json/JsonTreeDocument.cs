@@ -24,7 +24,11 @@ namespace Tooling.Json
         /// <summary>What a step names when it changed the whole document, which has no address of its own.</summary>
         private const string RootLabel = "document";
 
-        private JsonTreeDocument(JToken root) => Root = root;
+        private JsonTreeDocument(JToken root, EditHistory? history)
+        {
+            Root = root;
+            History = history ?? new EditHistory();
+        }
 
         /// <summary>Whichever node changed, or the container whose contents shifted. Everything outside —
         /// an inspector, a tree view, a validator — learns about a change from here, whether it came from an
@@ -33,18 +37,25 @@ namespace Tooling.Json
 
         public JToken Root { get; private set; }
 
-        public EditHistory History { get; } = new();
+        /// <summary>The stack this document's edits are filed on — the tool's own where it was handed one,
+        /// so that one press of undo takes back the author's last change whichever file it was in, and a
+        /// stack of its own where nobody said otherwise.</summary>
+        public EditHistory History { get; private set; }
 
-        public static JsonTreeDocument Parse(string json)
+        /// <summary>Whether the tree matches what was last written to disk.</summary>
+        public bool IsClean => History.IsCleanFor(this);
+
+        /// <summary>Reads a document, filing its edits on <paramref name="history"/> where one is given.</summary>
+        public static JsonTreeDocument Parse(string json, EditHistory? history = null)
         {
             ArgumentNullException.ThrowIfNull(json);
 
             using var text = new StringReader(json);
 
-            return new JsonTreeDocument(ReadRoot(text));
+            return new JsonTreeDocument(ReadRoot(text), history);
         }
 
-        public static JsonTreeDocument Load(string path)
+        public static JsonTreeDocument Load(string path, EditHistory? history = null)
         {
             ArgumentException.ThrowIfNullOrEmpty(path);
 
@@ -54,7 +65,20 @@ namespace Tooling.Json
             // arrived with one comes to canon on its first save.
             using var text = new StreamReader(path, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), detectEncodingFromByteOrderMarks: true);
 
-            return new JsonTreeDocument(ReadRoot(text));
+            return new JsonTreeDocument(ReadRoot(text), history);
+        }
+
+        /// <summary>Puts this document on another stack, bringing the steps already taken on it along. A
+        /// file the run lays down is written into before it joins the tool: its first step is the one that
+        /// created it, and a step left behind on a stack nothing steps is a gesture nobody can take back.</summary>
+        public void Follow(EditHistory history)
+        {
+            ArgumentNullException.ThrowIfNull(history);
+
+            if (ReferenceEquals(history, History)) return;
+
+            history.Take(History);
+            History = history;
         }
 
         public JToken? Resolve(JsonPointer pointer)
@@ -119,7 +143,7 @@ namespace Tooling.Json
             }
 
             Add();
-            History.Record(new TreeEdit(Labelled(InsertLabel, parent.Append(key)), Drop, Add));
+            History.Record(new TreeEdit(this, Labelled(InsertLabel, parent.Append(key)), Drop, Add));
 
             return true;
         }
@@ -148,7 +172,7 @@ namespace Tooling.Json
             }
 
             Add();
-            History.Record(new TreeEdit(Labelled(InsertLabel, parent.Append(index)), Drop, Add));
+            History.Record(new TreeEdit(this, Labelled(InsertLabel, parent.Append(index)), Drop, Add));
 
             return true;
         }
@@ -196,7 +220,7 @@ namespace Tooling.Json
                     }
 
                     DropKey();
-                    History.Record(new TreeEdit(Labelled(RemoveLabel, pointer), RestoreKey, DropKey));
+                    History.Record(new TreeEdit(this, Labelled(RemoveLabel, pointer), RestoreKey, DropKey));
 
                     return true;
 
@@ -214,7 +238,7 @@ namespace Tooling.Json
                     }
 
                     DropItem();
-                    History.Record(new TreeEdit(Labelled(RemoveLabel, pointer), RestoreItem, DropItem));
+                    History.Record(new TreeEdit(this, Labelled(RemoveLabel, pointer), RestoreItem, DropItem));
 
                     return true;
 
@@ -248,7 +272,7 @@ namespace Tooling.Json
             }
 
             Shift(from, newIndex);
-            History.Record(new TreeEdit(Labelled(MoveLabel, pointer), () => Shift(newIndex, from), () => Shift(from, newIndex)));
+            History.Record(new TreeEdit(this, Labelled(MoveLabel, pointer), () => Shift(newIndex, from), () => Shift(from, newIndex)));
 
             return true;
         }
@@ -282,7 +306,7 @@ namespace Tooling.Json
             }
 
             Rename(key, newKey);
-            History.Record(new TreeEdit(Labelled(RenameLabel, pointer), () => Rename(newKey, key), () => Rename(key, newKey)));
+            History.Record(new TreeEdit(this, Labelled(RenameLabel, pointer), () => Rename(newKey, key), () => Rename(key, newKey)));
 
             return true;
         }
@@ -295,7 +319,7 @@ namespace Tooling.Json
         public void Save(string path, IKeyOrder order, CanonicalJsonOptions? options = null)
         {
             CanonicalJsonWriter.WriteFile(path, Root, order, options ?? CanonicalJsonOptions.Default);
-            History.MarkSaved();
+            History.MarkSaved(this);
         }
 
         private static JToken ReadRoot(TextReader text)
@@ -402,13 +426,15 @@ namespace Tooling.Json
         /// <summary>A structural change that carries both directions it can be applied in. Each of them
         /// closes over the state captured before the change — the node that was taken out, the place it
         /// stood in — and works nothing out again.</summary>
-        private sealed class TreeEdit(string label, Action undo, Action redo) : IEditCommand
+        private sealed class TreeEdit(JsonTreeDocument owner, string label, Action undo, Action redo) : IOwnedEdit
         {
             public string Label => label;
 
             public void Undo() => undo();
 
             public void Redo() => redo();
+
+            public bool Touches(object asked) => ReferenceEquals(asked, owner);
         }
     }
 }
