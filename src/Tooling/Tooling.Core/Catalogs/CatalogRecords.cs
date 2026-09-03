@@ -61,8 +61,20 @@ namespace Tooling.Catalogs
 
         /// <summary>Where a section stands in its file: under its key, or at the root itself when the
         /// section has no key of its own.</summary>
-        private static JsonPointer Locate(string key) =>
+        internal static JsonPointer Locate(string key) =>
             string.IsNullOrEmpty(key) ? JsonPointer.Root : JsonPointer.Root.Append(key);
+
+        /// <summary>Whether the records of this catalog carry a name of their own — a field the schema
+        /// reads the id from, or the key of the map they are written under. Records of a catalog with
+        /// neither are listed here under the place they stand in, which names a position and not a
+        /// record: nothing points at such a name, and nothing may be refused for taking it.</summary>
+        internal static bool Names(CatalogSchema schema, RecordSchema record)
+        {
+            ArgumentNullException.ThrowIfNull(schema);
+            ArgumentNullException.ThrowIfNull(record);
+
+            return record.IdField is not null || schema.Shape == RootShape.Dictionary;
+        }
 
         private static void ReadArray(
             List<CatalogRecord> records, CatalogFile file, JsonPointer at, SectionSchema section, JToken token, IList<string> notes)

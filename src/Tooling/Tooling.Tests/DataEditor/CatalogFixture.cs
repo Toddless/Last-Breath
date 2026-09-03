@@ -16,8 +16,12 @@ namespace Tooling.Tests.DataEditor
         /// have used: the repository is normalized to LF, and so is the writer.</summary>
         public const string Newline = "\n";
 
-        public static ICatalogDescriptor Descriptor(string catalog, RootShape shape, SchemaList<SectionSchema> sections) =>
-            new HandWritten(catalog, shape, sections);
+        /// <summary>A catalog described by hand. The placement is one file named after the catalog unless
+        /// the test is about placement itself — which file a record goes to is a rule of its own, and a
+        /// test of the records has no business restating it.</summary>
+        public static ICatalogDescriptor Descriptor(
+            string catalog, RootShape shape, SchemaList<SectionSchema> sections, FilePlacement? placement = null) =>
+            new HandWritten(catalog, shape, sections, placement ?? new SingleFilePlacement { FileName = catalog });
 
         public static SectionSchema Section(string key, RecordSchema record) => new() { Key = key, Record = record };
 
@@ -29,6 +33,11 @@ namespace Tooling.Tests.DataEditor
         };
 
         public static FieldSchema Field(string jsonName, FieldKind kind) => new() { JsonName = jsonName, Kind = kind };
+
+        /// <summary>A field the record cannot be written without, which is what a blank record is filled
+        /// from.</summary>
+        public static FieldSchema Required(string jsonName, FieldKind kind) =>
+            new() { JsonName = jsonName, Kind = kind, Required = true };
 
         /// <summary>A written constant as a canonical file holds it: LF whatever this source was checked
         /// out with, and the newline at the end that the writer always adds — so a file laid down by a
@@ -45,13 +54,13 @@ namespace Tooling.Tests.DataEditor
 
         /// <summary>A catalog described in full by hand: the builder is offered and not used, which is
         /// what keeps the shapes under test out of the reflector's reach.</summary>
-        private sealed class HandWritten(string catalog, RootShape shape, SchemaList<SectionSchema> sections)
+        private sealed class HandWritten(
+            string catalog, RootShape shape, SchemaList<SectionSchema> sections, FilePlacement placement)
             : ICatalogDescriptor
         {
             public string Catalog => catalog;
 
-            public CatalogSchema Describe(ISchemaBuilder builder) =>
-                new(shape, sections, [], new SingleFilePlacement { FileName = catalog });
+            public CatalogSchema Describe(ISchemaBuilder builder) => new(shape, sections, [], placement);
         }
     }
 }

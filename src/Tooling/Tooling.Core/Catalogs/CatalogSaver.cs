@@ -31,7 +31,12 @@ namespace Tooling.Catalogs
 
             _workspace = workspace;
 
-            foreach (CatalogFile file in Files(workspace)) file.Document.History.Changed += Raise;
+            foreach (CatalogFile file in Files(workspace)) Watch(file);
+
+            // A file the run lays down is watched the same way the ones read from disk are: it is dirty
+            // from its first record onwards, and a status line that never heard of it would say the run
+            // has nothing to write while a whole file waits to be created.
+            foreach (CatalogView catalog in workspace.Catalogs) catalog.FileAdded += Watch;
         }
 
         /// <summary>A history moved: something was edited, undone, redone or written out. What is unsaved
@@ -125,6 +130,8 @@ namespace Tooling.Catalogs
                 return failure.Message;
             }
         }
+
+        private void Watch(CatalogFile file) => file.Document.History.Changed += Raise;
 
         private void Raise() => Changed?.Invoke();
 

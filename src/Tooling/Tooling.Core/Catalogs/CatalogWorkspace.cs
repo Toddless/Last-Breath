@@ -130,6 +130,7 @@ namespace Tooling.Catalogs
             {
                 Descriptor = descriptor,
                 Schema = schema,
+                Folder = folder,
                 Files = files,
                 Records = records,
                 Notes = notes

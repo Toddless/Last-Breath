@@ -110,7 +110,28 @@ namespace DataEditor.Source.View
         private const string NoKeyText = "name the key to add";
 
         private const string FontSizeOverride = "font_size";
+        private const string FontColorOverride = "font_color";
         private const string MarginLeftOverride = "margin_left";
+
+        /// <summary>How wide and how tall the list of ids a reference is picked from opens.</summary>
+        private const int PickerWidth = 340;
+        private const int PickerHeight = 300;
+
+        /// <summary>How many ids the picker offers at once. A query of one letter answers with most of a
+        /// catalog, and a list nobody scrolls to the end of is a list that only costs rows.</summary>
+        private const int PickerRows = 60;
+
+        private const string PickText = "…";
+        private const string PickHint = "pick an id from the catalogs this field names";
+        private const string SearchPlaceholder = "search";
+
+        private const string BrokenReferenceFormat = "nothing in {0} is written under this id";
+        private const string EmptyReferenceText = "this field has to name something";
+        private const string UncheckedReferenceFormat = "{0}: this build describes no such catalog, so the id is not checked";
+
+        /// <summary>What a word answering to nothing is written in. A reference is read down a column of
+        /// them, and the one that points nowhere has to be the one the eye stops on.</summary>
+        private static readonly Color BrokenReference = new(0.93f, 0.42f, 0.38f);
 
         /// <summary>Which control answers for which kind of value — the one place a kind and a widget
         /// are put together. A kind absent from here has no editor and is drawn as text, which is what
@@ -118,7 +139,7 @@ namespace DataEditor.Source.View
         private static readonly Dictionary<FieldKind, Func<FieldEdit, Control>> s_editors = new()
         {
             [FieldKind.String] = TextBox,
-            [FieldKind.Reference] = TextBox,
+            [FieldKind.Reference] = ReferenceBox,
             [FieldKind.LocalizedKey] = LocalizedKey,
             [FieldKind.Integer] = WholeNumber,
             [FieldKind.Number] = Fraction,
@@ -147,6 +168,12 @@ namespace DataEditor.Source.View
         /// a key nobody named. The panel has no line of its own to say it on, and the tool has one that
         /// says what the run last did.</summary>
         public event Action<string>? Said;
+
+        /// <summary>The ids the run knows, by the catalog writing them. A field that points at a record
+        /// of another catalog is answered from here — offered as a list to pick from, and marked when the
+        /// word standing in it answers to nothing. Null while nothing has been read, which leaves a
+        /// reference the plain box it always was.</summary>
+        public ReferenceIndex? References { get; set; }
 
         /// <summary>Draws the record, or says why there is nothing to draw.</summary>
         public void Rebuild(CatalogRecord? record)
@@ -338,6 +365,79 @@ namespace DataEditor.Source.View
         }
 
         private static Control TextBox(FieldEdit edit) => Box(edit);
+
+        /// <summary>
+        /// A box of text with the catalogs it points into behind it: the word may be typed, and it may be
+        /// picked out of the ids those catalogs actually write. A word answering to none of them is
+        /// marked where it stands — a reference nobody has is a record the game drops on load, and the
+        /// file gives no sign of it until then.
+        /// </summary>
+        private static Control ReferenceBox(FieldEdit edit)
+        {
+            var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            LineEdit box = Box(edit);
+            var pick = new Button { Text = PickText, TooltipText = PickHint, Disabled = !edit.Offered };
+
+            void Judge(string written) => Judged(edit, box, written);
+
+            // Judged as it is typed: the author is asking exactly whether the word he is writing answers
+            // to anything, and a mark that only arrived on the next record would answer about another.
+            Judge(edit.Written);
+            box.TextChanged += Judge;
+
+            pick.Pressed += () => edit.Pick(box, id =>
+            {
+                if (!edit.Write(new JValue(id))) return;
+
+                box.Text = id;
+                edit.Seal();
+                Judge(id);
+            });
+
+            row.AddChild(box);
+            row.AddChild(pick);
+
+            return row;
+        }
+
+        /// <summary>
+        /// Marks the word standing in a reference, and says on it what is wrong. Nothing is marked while
+        /// the run cannot tell: a catalog this build describes no schema for writes ids the tool has
+        /// never read, and painting every reference into it red would be the tool complaining about
+        /// itself.
+        /// </summary>
+        private static void Judged(FieldEdit edit, LineEdit box, string written)
+        {
+            box.RemoveThemeColorOverride(FontColorOverride);
+
+            // A field that names no catalog at all keeps the box it always was, hint and all: there is
+            // nothing to check it against and nothing to offer instead.
+            if (!edit.Offered) return;
+
+            string named = string.Join(CatalogSeparator, edit.Field.RefCatalogs);
+            IReadOnlyList<string> unread = edit.Undescribed();
+
+            if (unread.Count > 0)
+            {
+                box.TooltipText = Text(UncheckedReferenceFormat, string.Join(CatalogSeparator, unread));
+                return;
+            }
+
+            if (written.Length == 0 && edit.Field.AllowEmpty)
+            {
+                box.TooltipText = named;
+                return;
+            }
+
+            if (written.Length > 0 && edit.Exists(written))
+            {
+                box.TooltipText = named;
+                return;
+            }
+
+            box.AddThemeColorOverride(FontColorOverride, BrokenReference);
+            box.TooltipText = written.Length == 0 ? EmptyReferenceText : Text(BrokenReferenceFormat, named);
+        }
 
         /// <summary>A key and, beside it, the text it stands for now. The translation follows the
         /// keystrokes: an author typing a key is asking exactly that question, and an answer that only
@@ -974,6 +1074,62 @@ namespace DataEditor.Source.View
             return changed;
         }
 
+        /// <summary>
+        /// The ids of the catalogs a field points into, offered under the box it is written in: a query
+        /// and the ids answering it, best match first. One click writes the id, which is what the author
+        /// came for — a picker asking for a second confirming press is a list read twice.
+        /// <para>Built for the press and freed when it closes. The panel is torn down and drawn again on
+        /// every change, and a list held between two of those would be offering the ids of a record that
+        /// is no longer on screen.</para>
+        /// </summary>
+        private void OpenPicker(FieldEdit edit, Control under, Action<string> chosen)
+        {
+            var popup = new PopupPanel();
+            var body = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
+            var query = new LineEdit { PlaceholderText = SearchPlaceholder, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            var results = new ItemList { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
+
+            void Fill(string typed)
+            {
+                results.Clear();
+
+                foreach (string id in edit.Search(typed)) results.AddItem(id);
+            }
+
+            void Take(int index)
+            {
+                if (index < 0 || index >= results.ItemCount) return;
+
+                chosen(results.GetItemText(index));
+                popup.Hide();
+            }
+
+            Fill(string.Empty);
+
+            query.TextChanged += Fill;
+
+            // Enter takes the best hit: typing the id of a record and pressing return is the fast path
+            // the search field exists for.
+            query.TextSubmitted += _ => Take(0);
+            results.ItemSelected += index => Take((int)index);
+
+            body.AddChild(query);
+            body.AddChild(results);
+            popup.AddChild(body);
+            popup.PopupHide += popup.QueueFree;
+
+            AddChild(popup);
+
+            var at = (Vector2I)(under.GetScreenPosition() + new Vector2(0, under.Size.Y));
+
+            popup.Popup(new Rect2I(at, new Vector2I(Math.Max(PickerWidth, (int)under.Size.X), PickerHeight)));
+
+            // Taken once the window is on screen, the way every other dialog of the tool takes it: a
+            // window still being opened has no focus to hand out, and a search field that has to be
+            // clicked before it can be typed into is a list the author scrolls instead.
+            Callable.From(query.GrabFocus).CallDeferred();
+        }
+
         /// <summary>Whether a control still speaks for what is on screen.</summary>
         private bool Stale(object build) => !ReferenceEquals(build, _build);
 
@@ -1038,9 +1194,30 @@ namespace DataEditor.Source.View
                 ? string.Empty
                 : JsonScalars.Written(value);
 
+            /// <summary>Whether the run can answer this field at all: it points somewhere, and the ids of
+            /// the catalogs it points into have been read.</summary>
+            public bool Offered => panel.References is not null && schema.RefCatalogs.Count > 0;
+
             public bool Write(JToken written) => !panel.Stale(build) && panel.Write(at, written);
 
             public bool Erase() => !panel.Stale(build) && panel.Erase(at);
+
+            /// <summary>Whether one of the catalogs this field names writes a record under that id.</summary>
+            public bool Exists(string id) => panel.References?.Exists(schema.RefCatalogs, id) ?? false;
+
+            /// <summary>The catalogs this field names that the run has no schema for, and so cannot say
+            /// anything about.</summary>
+            public IReadOnlyList<string> Undescribed() => panel.References?.Undescribed(schema.RefCatalogs) ?? [];
+
+            /// <summary>The ids of those catalogs a query names, best first.</summary>
+            public IReadOnlyList<string> Search(string query) =>
+                panel.References?.Search(schema.RefCatalogs, query, PickerRows) ?? [];
+
+            /// <summary>Offers those ids under <paramref name="under"/>, and hands back the one picked.</summary>
+            public void Pick(Control under, Action<string> chosen)
+            {
+                if (!panel.Stale(build)) panel.OpenPicker(this, under, chosen);
+            }
 
             /// <summary>Ends the run of keystrokes this field was taking, so the next field edited is a
             /// step of its own.</summary>
