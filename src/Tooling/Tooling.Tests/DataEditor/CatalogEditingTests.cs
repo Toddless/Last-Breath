@@ -47,6 +47,13 @@ namespace Tooling.Tests.DataEditor
         private const string RingSlot = "Ring";
         private const string BeltSlot = "Belt";
 
+        /// <summary>The record the file-per-slot catalog is written with.</summary>
+        private const string RingId = "Ring_Signet";
+
+        /// <summary>The two records of the sectioned catalog, one in each of its sections.</summary>
+        private const string GeneralTableId = "Table_General";
+        private const string IndividualTableId = "Table_Ronald";
+
         private const string RonaldId = "Npc_Ronald";
         private const string SkeletonId = "Npc_Skeleton";
         private const string NewId = "Npc_Test";
@@ -324,6 +331,50 @@ namespace Tooling.Tests.DataEditor
         }
 
         [TestMethod]
+        public void AddRecord_TakesANameAnotherSectionOfTheCatalogWrites()
+        {
+            Write(TablesCatalog, TablesFile, TwoSections);
+
+            CatalogView view = Tables();
+            CatalogEditResult result = CatalogEditing.AddRecord(view, IndividualKey, fileChoice: null, GeneralTableId);
+
+            // The id is the key of the table its own section is read into: the same word under another
+            // section is another record, and a catalog written that way on purpose can be edited.
+            Assert.IsTrue(result.Done, result.Note);
+            Assert.AreEqual(2, Section(view.Files[0], IndividualKey).Count);
+            Assert.AreEqual(GeneralTableId, result.Record?.CurrentId);
+        }
+
+        [TestMethod]
+        public void AddRecord_RefusesANameItsOwnSectionWrites()
+        {
+            Write(TablesCatalog, TablesFile, TwoSections);
+
+            CatalogView view = Tables();
+            CatalogEditResult result = CatalogEditing.AddRecord(view, IndividualKey, fileChoice: null, IndividualTableId);
+
+            Assert.IsFalse(result.Done);
+            StringAssert.Contains(result.Note, IndividualTableId);
+            Assert.AreEqual(1, Section(view.Files[0], IndividualKey).Count);
+            Assert.IsTrue(view.Files[0].Document.History.IsClean);
+        }
+
+        [TestMethod]
+        public void AddRecord_RefusesANameTheSectionWritesInAnotherFile()
+        {
+            Write(EquipCatalog, RingFile, OneRing);
+
+            CatalogView view = Equipment();
+            CatalogEditResult result = CatalogEditing.AddRecord(view, sectionKey: null, BeltSlot, RingId);
+
+            // One section spread over the folder's files is still one table to the game: the second
+            // record of that name is the one that never loads, whichever file holds it.
+            Assert.IsFalse(result.Done);
+            Assert.AreEqual(1, view.Files.Count);
+            Assert.IsTrue(view.Files[0].Document.History.IsClean);
+        }
+
+        [TestMethod]
         public void AddRecord_RefusesARecordNobodyNamed()
         {
             Write(NpcCatalog, NpcFile, TwoNpcs);
@@ -570,6 +621,23 @@ namespace Tooling.Tests.DataEditor
         }
 
         [TestMethod]
+        public void DuplicateRecord_TakesANameAnotherSectionWrites_AndRefusesOneItsOwnSectionDoes()
+        {
+            Write(TablesCatalog, TablesFile, TwoSections);
+
+            CatalogView view = Tables();
+            CatalogRecord general = view.Records[0];
+
+            Assert.IsFalse(CatalogEditing.DuplicateRecord(view, general, GeneralTableId).Done, "its own section holds that name");
+
+            CatalogEditResult result = CatalogEditing.DuplicateRecord(view, general, IndividualTableId);
+
+            Assert.IsTrue(result.Done, result.Note);
+            Assert.AreEqual(2, Section(view.Files[0], GeneralKey).Count);
+            Assert.AreEqual(IndividualTableId, result.Record?.CurrentId);
+        }
+
+        [TestMethod]
         public void DuplicateRecord_RefusesACatalogThatIsOneRecordForBeingOne()
         {
             Write(RulesCatalog, RulesFile, Rules);
@@ -612,6 +680,21 @@ namespace Tooling.Tests.DataEditor
             Assert.IsTrue(result.Done, result.Note);
             Assert.AreEqual(2, view.Records.Count);
             Assert.AreEqual("flat", result.Record?.Token?[UnitField]?.ToString());
+        }
+
+        /// <summary>The one judge of an id being spoken for — asked by every gesture that names a record,
+        /// and the answer any path renaming one has to take.</summary>
+        [TestMethod]
+        public void Taken_AnswersForTheSectionAndNotForTheWholeCatalog()
+        {
+            Write(TablesCatalog, TablesFile, TwoSections);
+
+            CatalogView view = Tables();
+
+            Assert.IsTrue(CatalogEditing.Taken(view, IndividualKey, IndividualTableId));
+            Assert.IsTrue(CatalogEditing.Taken(view, IndividualKey, "table_ronald"), "case is not part of the answer");
+            Assert.IsFalse(CatalogEditing.Taken(view, GeneralKey, IndividualTableId), "another section's name is free");
+            Assert.IsFalse(CatalogEditing.Taken(view, IndividualKey, GeneralTableId));
         }
 
         /// <summary>The array one section of a file holds.</summary>

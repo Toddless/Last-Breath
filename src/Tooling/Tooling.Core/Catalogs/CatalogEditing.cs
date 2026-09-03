@@ -48,7 +48,7 @@ namespace Tooling.Catalogs
 
             string wanted = (id ?? string.Empty).Trim();
 
-            if (Refusal(view, section.Record, wanted) is { } refusal) return Refused(refusal);
+            if (Refusal(view, section.Key, section.Record, wanted) is { } refusal) return Refused(refusal);
 
             JObject blank = RecordTemplates.Blank(section.Record);
 
@@ -79,7 +79,7 @@ namespace Tooling.Catalogs
 
             string wanted = (id ?? string.Empty).Trim();
 
-            if (Refusal(view, record.Schema, wanted) is { } refusal) return Refused(refusal);
+            if (Refusal(view, record.Section, record.Schema, wanted) is { } refusal) return Refused(refusal);
 
             var copy = (JObject)token.DeepClone();
 
@@ -118,25 +118,30 @@ namespace Tooling.Catalogs
             return null;
         }
 
-        /// <summary>Whether the catalog already writes a record under this name. Asked of the whole
-        /// catalog and not of one file: the game reads every file of a folder into one table, so two
-        /// records sharing a name are one record and one that never loads.</summary>
-        public static bool Taken(CatalogView view, string id)
+        /// <summary>Whether the named section already writes a record under this name. Asked of the
+        /// section and of every file at once: the game reads a section across the whole folder into a
+        /// table of its own, so a name is one record's inside its section and free in every other — a
+        /// catalog written under one section is its whole self here, as it was before.
+        /// <para>Case is not part of the answer: two ids differing only in it are one word to the author,
+        /// and the record he meant to point at would be whichever the game read second.</para></summary>
+        public static bool Taken(CatalogView view, string section, string id)
         {
             ArgumentNullException.ThrowIfNull(view);
 
-            return view.Records.Any(record => string.Equals(record.CurrentId, id, StringComparison.OrdinalIgnoreCase));
+            return view.Records.Any(record =>
+                string.Equals(record.Section, section, StringComparison.Ordinal)
+                && string.Equals(record.CurrentId, id, StringComparison.OrdinalIgnoreCase));
         }
 
         private static CatalogEditResult Refused(string note) => new(null, note);
 
         /// <summary>Why a name will not do, or null when it will. A record the shape or the schema names
-        /// by its id has to have one, and no catalog may write the same name twice.</summary>
-        private static string? Refusal(CatalogView view, RecordSchema schema, string id)
+        /// by its id has to have one, and no section may write the same name twice.</summary>
+        private static string? Refusal(CatalogView view, string section, RecordSchema schema, string id)
         {
             if (CatalogRecords.Names(view.Schema, schema) && id.Length == 0) return Notes.NoId;
 
-            return id.Length > 0 && Taken(view, id) ? Text(Notes.IdTaken, id) : null;
+            return id.Length > 0 && Taken(view, section, id) ? Text(Notes.IdTaken, id) : null;
         }
 
         private static string? Named(string? text) => string.IsNullOrWhiteSpace(text) ? null : text.Trim();
@@ -292,7 +297,7 @@ namespace Tooling.Catalogs
             public const string OneRecordOnly = "this catalog is one record and has nothing to add to.";
             public const string NoSection = "the catalog writes no section called '{0}'.";
             public const string NoId = "name the record before adding it.";
-            public const string IdTaken = "'{0}' is already written in this catalog.";
+            public const string IdTaken = "'{0}' is already written in this section.";
             public const string Gone = "the record is no longer in the document.";
             public const string NotRemoved = "'{0}' could not be taken out.";
             public const string NoFileNamed = "nothing says which file the record goes to.";
