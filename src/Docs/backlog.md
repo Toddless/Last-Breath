@@ -16,7 +16,7 @@
 - (minor) `SchemaReflector.cs:414,423` — `Any(...)`/`FirstOrDefault(...)` с побочной нотой останавливаются на первом — ноты по второму/третьему одноимённому атрибуту теряются по порядку; материализовать (`Count(...) > 0`, `[.. Select]`).
 - (minor) `SchemaReflector.cs:407` — `GetCustomAttributes(inherit: false)` против прежнего `inherit: true` и соседей `Converted`/`IsRequired`; в `Core/Data` нет `virtual`/`override`, но правило внутри рефлектора стало двумя. Либо `inherit: true`, либо двойник с `override` и нота.
 - (minor, процедура) `MarkupNames.cs:3-9`, `SchemaMarkup.cs:4-6`, обе `Convention()` — переименование трогает четыре места (атрибут/свойство, константа `MarkupNames`, две таблицы `Convention()`), нигде не записано; одна строка в xml-доке с обеих сторон.
-- (nit) `SchemaReflector.cs:461-462` — `GetProperty(property)` бросит `AmbiguousMatchException` на `new`-свойстве, `GetValue` — что угодно из чужого геттера; `GetProperties(Public|Instance)` + `try/catch` с нотой. `SchemaMarkup.cs:1` — папка `Markup`, namespace `Core.Data.Schema`; пин игры фильтрует по namespace. `decisions.md` строка про раскладку `Tooling.Schema` — привести к реальности после шага 4.
+- (nit) `SchemaReflector.cs:461-462` — `GetProperty(property)` бросит `AmbiguousMatchException` на `new`-свойстве, `GetValue` — что угодно из чужого геттера; `GetProperties(Public|Instance)` + `try/catch` с нотой. `SchemaMarkup.cs:1` — папка `Markup`, namespace `Core.Data.Schema`; пин игры фильтрует по namespace.
 
 ## Из описателей ModifierPools и Resources (2026-09-02; accept with minors)
 

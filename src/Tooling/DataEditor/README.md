@@ -59,5 +59,5 @@ dotnet test src\Tooling\Tooling.Tests
 
 Чистая часть (сбор файлов каталога, перечисление записей по форме схемы, id записи) живёт в
 `Tooling.Core/Catalogs` и покрыта тестами в `Tooling.Tests/DataEditor`; в этом проекте остаётся
-только Godot-обёртка над ней. Собственного `.sln` у проекта пока нет — он понадобится при экспорте в
+только Godot-обёртка над ней. Решение `DataEditor.sln` лежит рядом с `project.godot` (его и собирает плагин .NET): библиотеки тулинга отображены в нём `ExportDebug → Debug|Any CPU`, `ExportRelease → Release|Any CPU`, игровые Godot-проекты — сами в себя.
 exe (плагин .NET ищет решение рядом с `project.godot`).
