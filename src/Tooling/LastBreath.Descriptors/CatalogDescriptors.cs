@@ -22,6 +22,14 @@ namespace LastBreath.Descriptors
             new QuestsCatalogDescriptor(),
             new FormattingCatalogDescriptor(),
 
+            // The crafting bench: what is made, what it is made of, what an operation costs and what a
+            // finished item may be given on top.
+            new RecipesCatalogDescriptor(),
+            new UpgradeCostsCatalogDescriptor(),
+            new CraftingAdditivesCatalogDescriptor(),
+            new ItemEffectsCatalogDescriptor(),
+            new OrnamentsCatalogDescriptor(),
+
             // The settings documents: one object each, and one shape between them.
             new CombatRulesCatalogDescriptor(),
             new LootConfigurationCatalogDescriptor(),
@@ -32,7 +40,8 @@ namespace LastBreath.Descriptors
             new WorldClockCatalogDescriptor(),
             new TradeCatalogDescriptor(),
             new InfluenceCatalogDescriptor(),
-            new MartialArtMasteryCatalogDescriptor()
+            new MartialArtMasteryCatalogDescriptor(),
+            new CraftingMasteryCatalogDescriptor()
         ];
 
         /// <summary>Catalogs with no descriptor yet, named one by one rather than counted: a name added
@@ -51,16 +60,17 @@ namespace LastBreath.Descriptors
             DataCatalog.PlayerStats,
             DataCatalog.PassiveTree,
             DataCatalog.PassiveSkills,
+
+            // The legacy plain items. A DTO reads the file — one array under "items" — and the shipped
+            // file is written in another shape entirely, two sections of its own, so the parser finds no
+            // records at all and every reference into the catalog answers to nothing. Its one record is
+            // the coal a quest asks for and takes, which no other catalog declares and no kill drops, so
+            // that quest cannot be finished. Describing the catalog would mean choosing between the shape
+            // the game reads and the shape the file is in.
             DataCatalog.Items,
-            DataCatalog.Recipes,
-            DataCatalog.CraftingAdditives,
-            DataCatalog.CraftingMastery,
-            DataCatalog.ItemEffects,
-            DataCatalog.Ornaments,
             DataCatalog.Effects,
             DataCatalog.Traders,
             DataCatalog.Conditions,
-            DataCatalog.UpgradeCosts,
         ];
     }
 }

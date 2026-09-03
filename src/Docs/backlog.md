@@ -1,5 +1,21 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из волны крафтовых описателей (2026-09-03; rework → accept)
+
+Находки владельцу по данным:
+- **Нет ключа локализации `Crafting_Mastery`** ни в `en.po`, ни в `ru.po` (есть только `Passive_Skill_Crafting_Mastery`); две строки `MasteryLevel` в `Recipes.json` — окно крафта (`CraftingWindow.StaticCardView`) рисует сырой ключ. Аудит локализации id требований не собирает.
+- **4 рецепта чеканят несуществующие шаблоны**: `Body_/Helmet_/Boots_/Gloves_Iron_Bastion` — верстак возьмёт ресурсы и не выдаст ничего (пин `s_unansweredCraftingIds`).
+- **`ItemEffects.json`: `Passive_Skill_Regeneration` записан дважды** (веса 100 и 20) — ролл берёт обе, суммарный вес 120 (пин `s_recordsWrittenTwice`).
+- **`Items.json` мёртв и уносит квест** (карточка #251): парсер читает массив под `items`, файл — секции `quest`/`common`; единственная запись `Coal` — `Quest_Field_Of_Bones` просит и забирает его, больше `Coal` нигде не объявлен и в лут не входит ⇒ квест непроходим.
+- `Recipes.json` `optionalResourceCategories: ["Essence"]` — тег ресурса, категория зовётся `Category_Essence`; поле никто не читает (размечено `NotARef`).
+
+Код:
+- (minor, карточка) `RecipeRequirementsData.id` размечен type-слепо: под `MasteryLevel` `id` — ключ локализации, не ссылка; обход тестов пропускает такие строки по значению `type`. Настоящая разметка — варианты по значению дискриминатора (`Discriminator(type)`), первое применение, требует поддержки в инспекторе.
+- (minor) `CatalogDescriptorTests.cs` — `References` умеет варианты (`Shapes`), а `Unanswered` разрешает адрес через `Locate` по базовой записи: в день вариантной разметки требований обход упадёт «writes no 'id'». Стало: разрешение адреса по `Shapes` либо варианты из `References` убрать с причиной.
+- (nit) комментарий над `s_settingsMapKeys`: `expRewards.modeFactors` при пропуске платит ПОЛНУЮ ставку (`GetValueOrDefault(mode, 1f)`), не ноль.
+- (nit) `NamesNoRecord` (исключение `MasteryLevel`) зашит в общий ходок `ValuesAt` — предикатом параметром; `Part` рядом с `Section` — выразить один через другой; `Shapes` — третье место «запись плюс её формы» (`Records`, `CatalogSchemaBuilder.Shapes`); страж `addressed` глобальный — исчезновение ссылок одного каталога (Ornaments их не имеет) не заметит.
+- (знать) `ItemEffects.id` → PassiveSkills+Effects не резолвится автоматом, пока цели не описаны (вручную: все 25 id есть в `PassiveCatalog.json`); `GrantKind.Modifier` каталога не называет.
+
 ## Из сухого прогона диалога (2026-09-03; rework → accept)
 
 - (nit) `DialogueDryRunTests.cs` — `ADialogueThatWillNotParse_IsSaidRatherThanThrown` идёт тем же путём, что `AnNpcNobodyWroteADialogueFor` (провайдер отдаёт null); общая ветка `catch (Exception)` в `DialogueDryRun.Guarded` не покрыта. Стало: случай, где бросает сам шаг разговора (узел с `next` на несуществующий id), либо признать непокрытой.

@@ -1,7 +1,9 @@
 namespace Core.Data.CraftingData
 {
     using System.Collections.Generic;
+    using Enums;
     using Newtonsoft.Json;
+    using Schema;
 
     /// <summary>Crafting mastery tuning (CraftingMastery catalog). Property defaults mirror the
     /// shipped json so a mastery born before LoadAll (tests, sandboxes) behaves sanely.
@@ -20,7 +22,7 @@ namespace Core.Data.CraftingData
 
         /// <summary>Creation rarity weights (enum-name keys, strictly parsed). Mastery shifts the
         /// split through the rarerItem bonus, not through a second weight set.</summary>
-        [JsonProperty("rarityWeights")] public Dictionary<string, float> RarityWeights { get; init; } = new()
+        [JsonProperty("rarityWeights")][DictionaryKey(typeof(Rarity))] public Dictionary<string, float> RarityWeights { get; init; } = new()
         {
             ["Legendary"] = 1f,
             ["Epic"] = 10f,
@@ -59,7 +61,7 @@ namespace Core.Data.CraftingData
 
     public record CraftingMasteryExpRewardsData
     {
-        [JsonProperty("byRarity")] public Dictionary<string, int> ByRarity { get; init; } = new()
+        [JsonProperty("byRarity")][DictionaryKey(typeof(Rarity))] public Dictionary<string, int> ByRarity { get; init; } = new()
         {
             ["Common"] = 10,
             ["Uncommon"] = 10,
@@ -70,7 +72,7 @@ namespace Core.Data.CraftingData
             ["Mythic"] = 40,
         };
 
-        [JsonProperty("modeFactors")] public Dictionary<string, float> ModeFactors { get; init; } = new()
+        [JsonProperty("modeFactors")][DictionaryKey(typeof(CraftingMode))] public Dictionary<string, float> ModeFactors { get; init; } = new()
         {
             ["Create"] = 1f,
             ["Upgrade"] = 0.3f,

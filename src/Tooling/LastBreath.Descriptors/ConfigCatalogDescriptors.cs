@@ -4,6 +4,7 @@ namespace LastBreath.Descriptors
     using Core.Ai.World.Recovery;
     using Core.Battle;
     using Core.Data.CombatRulesData;
+    using Core.Data.CraftingData;
     using Core.Data.GameData;
     using Core.Data.InfluenceData;
     using Core.Data.LootTable;
@@ -81,4 +82,26 @@ namespace LastBreath.Descriptors
     /// <summary>The martial art curve: the level cap, which is also the passive tree's budget.</summary>
     public sealed class MartialArtMasteryCatalogDescriptor()
         : SingleObjectDescriptor(DataCatalog.MartialArtMastery, typeof(MartialArtMasteryData), "MartialArtMastery");
+
+    /// <summary>The smith's curve: the experience a level costs, the six channels a level buys, and the
+    /// gates and base chances the crafting operations read off it.</summary>
+    public sealed class CraftingMasteryCatalogDescriptor()
+        : SingleObjectDescriptor(DataCatalog.CraftingMastery, typeof(CraftingMasteryData), "CraftingMastery")
+    {
+        /// <summary>Json name of the map of created-item rarity to its weight in the creation roll — what
+        /// <see cref="CraftingMasteryData.RarityWeights"/> is written as.</summary>
+        public const string RarityWeightsField = "rarityWeights";
+
+        /// <summary>Json name of the map of rarity to the experience an operation on it pays — what
+        /// <see cref="CraftingMasteryExpRewardsData.ByRarity"/> is written as.</summary>
+        public const string ExpByRarityField = "byRarity";
+
+        /// <summary>Json name of the map of operation to what it multiplies that experience by — what
+        /// <see cref="CraftingMasteryExpRewardsData.ModeFactors"/> is written as.</summary>
+        public const string ExpModeFactorsField = "modeFactors";
+
+        /// <summary>Json name of the field holding the two maps above — what
+        /// <see cref="CraftingMasteryData.ExpRewards"/> is written as.</summary>
+        public const string ExpRewardsField = "expRewards";
+    }
 }

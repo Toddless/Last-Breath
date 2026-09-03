@@ -2299,13 +2299,22 @@ namespace LastBreathTest.BattleSystemTests
         ];
 
         /// <summary>Every map of a settings document whose KEYS are members of an enum rather than words
-        /// the author picks. Both parsers read them strictly, so a key naming no member is a throw at
-        /// load — the tool has to offer the members instead of a text box.</summary>
+        /// the author picks. None of the readers takes a word it does not know: the budgets and the price
+        /// multipliers throw at load, the mastery's maps drop the entry with a report — a rarity paying
+        /// nothing and a channel worth zero. Either way the tool has to offer the members rather than a
+        /// text box.</summary>
         private static readonly (string Catalog, string Path, Type Members)[] s_settingsMapKeys =
         [
             (DataCatalog.LootConfiguration, LootConfigurationCatalogDescriptor.BaseBudgetField, typeof(EntityType)),
             (DataCatalog.LootConfiguration, LootConfigurationCatalogDescriptor.RarityMultipliersField, typeof(Rarity)),
             (DataCatalog.Trade, TradeCatalogDescriptor.RarityMultipliersField, typeof(Rarity)),
+            (DataCatalog.CraftingMastery, CraftingMasteryCatalogDescriptor.RarityWeightsField, typeof(Rarity)),
+            (DataCatalog.CraftingMastery,
+                $"{CraftingMasteryCatalogDescriptor.ExpRewardsField}{PathSeparator}{CraftingMasteryCatalogDescriptor.ExpByRarityField}",
+                typeof(Rarity)),
+            (DataCatalog.CraftingMastery,
+                $"{CraftingMasteryCatalogDescriptor.ExpRewardsField}{PathSeparator}{CraftingMasteryCatalogDescriptor.ExpModeFactorsField}",
+                typeof(CraftingMode)),
         ];
 
         /// <summary>Every number of a settings document whose ends the game enforces: a multicast row
@@ -2335,6 +2344,7 @@ namespace LastBreathTest.BattleSystemTests
         [DataRow(DataCatalog.Trade, "TradeConfiguration")]
         [DataRow(DataCatalog.Influence, "InfluenceMastery")]
         [DataRow(DataCatalog.MartialArtMastery, "MartialArtMastery")]
+        [DataRow(DataCatalog.CraftingMastery, "CraftingMastery")]
         public void ASettingsCatalogIsOneRecordAtTheRootOfItsOneFile(string catalog, string fileName)
         {
             CatalogSchemaBuilder builder = new(new SchemaReflector());
@@ -2371,6 +2381,7 @@ namespace LastBreathTest.BattleSystemTests
         [DataRow(DataCatalog.Trade)]
         [DataRow(DataCatalog.Influence)]
         [DataRow(DataCatalog.MartialArtMastery)]
+        [DataRow(DataCatalog.CraftingMastery)]
         [DataRow(DataCatalog.Formatting)]
         public void ASettingsCatalogRanksEveryKeyItsShippedFileWrites(string catalog)
         {
@@ -2534,6 +2545,701 @@ namespace LastBreathTest.BattleSystemTests
 
                     break;
             }
+        }
+
+        /// <summary>What a cost line and a recipe requirement name what they are paid with under. No
+        /// descriptor names it — it is the DTOs' own field, the way a table's tiers are — so the walks
+        /// spell it out.</summary>
+        private const string RequirementIdField = "id";
+
+        /// <summary>What a requirement and a cost line write the KIND of demand under.</summary>
+        private const string RequirementTypeField = "type";
+
+        /// <summary>What a recipe writes the kind of thing it makes under, and the words the optional slots
+        /// are meant for. Both are the DTO's own fields, so the walks spell them out.</summary>
+        private const string ItemTypeField = "itemType";
+
+        private const string OptionalCategoriesField = "optionalResourceCategories";
+
+        /// <summary>What stands for the keys of a map in the address of a value. A path down a RECORD does
+        /// not spell them — the schema steps straight from the map to what it holds — and a document does,
+        /// so the two addresses differ by exactly this step.</summary>
+        private const string AnyKey = "*";
+
+        /// <summary>The catalogs of the bench whose ids are held against the files that answer them. Only
+        /// the catalogs are named: WHERE each writes a reference is read off its schema, so a
+        /// <see cref="CatalogRefAttribute"/> added to a crafting DTO joins the walk without anyone
+        /// remembering to add it here.</summary>
+        private static readonly string[] s_craftingCatalogs =
+        [
+            DataCatalog.Recipes,
+            DataCatalog.UpgradeCosts,
+            DataCatalog.CraftingAdditives,
+            DataCatalog.ItemEffects,
+            DataCatalog.Ornaments
+        ];
+
+        /// <summary>
+        /// The ids the shipped crafting files name that nothing in the game answers — findings about the
+        /// data and not about the schemas, which is why they are named rather than fixed: four recipes mint
+        /// an equipment template no file declares.
+        /// </summary>
+        /// <remarks>Held as the whole list rather than as a count, so that one going away is as loud as
+        /// one arriving: a pin nothing matches any more is a fact that has moved on.</remarks>
+        private static readonly string[] s_unansweredCraftingIds =
+        [
+            $"{DataCatalog.Recipes} {RecipesCatalogDescriptor.ResultField} → 'Body_Iron_Bastion'",
+            $"{DataCatalog.Recipes} {RecipesCatalogDescriptor.ResultField} → 'Boots_Iron_Bastion'",
+            $"{DataCatalog.Recipes} {RecipesCatalogDescriptor.ResultField} → 'Gloves_Iron_Bastion'",
+            $"{DataCatalog.Recipes} {RecipesCatalogDescriptor.ResultField} → 'Helmet_Iron_Bastion'",
+        ];
+
+        /// <summary>Records the shipped data writes twice under one id, by the catalog and the id. A
+        /// catalog states an id field to be FOUND by, so a second record under one id is a record nothing
+        /// can address: whichever the reader keeps, the other is out of reach — and where the id is a
+        /// weight in a roll, both are kept and the roll is loaded.</summary>
+        private static readonly (string Catalog, string Id)[] s_recordsWrittenTwice =
+        [
+            (DataCatalog.ItemEffects, "Passive_Skill_Regeneration"),
+        ];
+
+        /// <summary>A recipe minting an equipment template nobody wrote, beside a requirement paid in a
+        /// resource the game does ship: the walk has to say the first and stay quiet about the second.</summary>
+        private const string ForgedRecipeJson = """
+        {
+          "craftingRecipes": [
+            {
+              "id": "Recipe_Forged",
+              "resultItemId": "Ring_Nobody_Wrote",
+              "rarity": "Rare",
+              "itemType": "Equipment",
+              "requirements": [ { "type": "Resource", "id": "Crafting_Resource_Iron_Ore", "amount": 1 } ]
+            }
+          ]
+        }
+        """;
+
+        /// <summary>A cost line whose rarity override is paid in a resource nobody wrote, while the line's
+        /// own default names one that exists — the override is the half a walk stopping at the record
+        /// would never read.</summary>
+        private const string ForgedUpgradeCostJson = """
+        {
+          "upgrade": [
+            {
+              "category": "Weapon",
+              "requirements": [
+                {
+                  "type": "Resource",
+                  "id": "Upgrade_Resource_Weapon_Rune",
+                  "byRarity": { "Rare": { "id": "Upgrade_Resource_Nobody_Wrote", "amount": 2 } }
+                }
+              ]
+            }
+          ],
+          "recraft": [],
+          "ascend": []
+        }
+        """;
+
+        /// <summary>The schema of the recipes: one array under a key, each found by its own id and named in
+        /// the localization by it. Both reports gather what neither reflection nor the assembled parts could
+        /// vouch for, and an editor drawn from a schema with holes in it draws those holes as fields the
+        /// author may not touch.</summary>
+        [TestMethod]
+        public void TheRecipesSchemaBuildsFromTheRealDtosWithoutAReport()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.Recipes));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape);
+            Assert.AreEqual(1, schema.Sections.Count);
+            Assert.AreEqual(RecipesCatalogDescriptor.RecordsKey, schema.Sections[0].Key);
+            Assert.AreEqual(RecipesCatalogDescriptor.IdField, schema.Sections[0].Record.IdField);
+            CollectionAssert.AreEqual(
+                new[] { LocalizedKeyAttribute.NoSuffix },
+                schema.LocalizedSuffixes.ToArray(),
+                "a recipe is named in the localization by its own id and reads its description off what it makes");
+            Assert.AreEqual(RecipesCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null));
+            CollectionAssert.AreEqual(
+                new[] { RecipesCatalogDescriptor.FileName },
+                ShippedFiles(DataCatalog.Recipes).Select(Path.GetFileNameWithoutExtension).ToArray(),
+                "the catalog ships other files than the one its placement names");
+
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Reflection.Notes.ToArray(),
+                $"reflection has something to say about the recipe DTOs:{Environment.NewLine}{builder.Reflection}");
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled Recipes catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>
+        /// Every id the recipe parser resolves, every name it parses into an enum, and the one field that
+        /// reads like a reference and is none, said so in the schema. What a line is paid with answers from
+        /// two sections at once: a Resource line whose id names a category IS a category line, so the two
+        /// spellings behave alike and both sections have to be offered.
+        /// </summary>
+        [TestMethod]
+        public void TheRecipesSchemaNamesTheReferencesChoicesAndRefusalTheParserResolves()
+        {
+            RecordSchema record = Schema(DataCatalog.Recipes).Sections[0].Record;
+
+            FieldSchema result = Leaf(Locate(record, RecipesCatalogDescriptor.ResultField));
+            Points(result, RecipesCatalogDescriptor.ResultField, DataCatalog.EquipItems, WholeCatalog);
+            Assert.IsFalse(result.AllowEmpty, "a recipe may be written minting nothing, which is a bench that creates nothing");
+
+            string paidWith = $"{RecipesCatalogDescriptor.RequirementsField}{PathSeparator}{RequirementIdField}";
+            Points(Leaf(Locate(record, paidWith)), paidWith, DataCatalog.Resources, ResourcesCatalogDescriptor.CraftingResourcesKey);
+            Points(Leaf(Locate(record, paidWith)), paidWith, DataCatalog.Resources, ResourcesCatalogDescriptor.MaterialCategoriesKey);
+
+            Choice(Leaf(Locate(record, RarityField)), typeof(Rarity));
+            Choice(Leaf(Locate(record, ItemTypeField)), typeof(ItemType));
+            Choice(
+                Leaf(Locate(record, $"{RecipesCatalogDescriptor.RequirementsField}{PathSeparator}{RequirementTypeField}")),
+                typeof(RequirementType));
+
+            Assert.IsTrue(
+                Leaf(Locate(record, OptionalCategoriesField)).RefusedAsReference,
+                "the words the optional slots are meant for read as ids of a catalog, and nothing says they are not");
+        }
+
+        /// <summary>The schema of the upgrade costs: three sections of one file, one per operation that is
+        /// paid for, each price list found by the equipment category it prices. Both reports gather what
+        /// neither reflection nor the assembled parts could vouch for.</summary>
+        [TestMethod]
+        public void TheUpgradeCostsSchemaBuildsFromTheRealDtosWithoutAReport()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.UpgradeCosts));
+
+            Assert.AreEqual(RootShape.SectionsOfArrays, schema.Shape);
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    UpgradeCostsCatalogDescriptor.UpgradeKey,
+                    UpgradeCostsCatalogDescriptor.RecraftKey,
+                    UpgradeCostsCatalogDescriptor.AscendKey
+                },
+                schema.Sections.Select(section => section.Key).ToArray());
+
+            foreach (SectionSchema section in schema.Sections)
+                Assert.AreEqual(UpgradeCostsCatalogDescriptor.IdField, section.Record.IdField,
+                    $"a price list of '{section.Key}' is found by another field");
+
+            Assert.AreEqual(0, schema.LocalizedSuffixes.Count, "a price is spent and never read: what it is spent on is named in its own catalog");
+            Assert.AreEqual(UpgradeCostsCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null));
+
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Reflection.Notes.ToArray(),
+                $"reflection has something to say about the upgrade cost DTOs:{Environment.NewLine}{builder.Reflection}");
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled UpgradeCosts catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>
+        /// Every id the cost parser resolves and every name it parses into an enum, said so in the schema —
+        /// on the line itself and on the rarity that overrides it, because either half may name the
+        /// resource. The keys of the override map are the rarities: the parser reads them strictly, and one
+        /// naming no member drops the WHOLE line rather than its own entry.
+        /// </summary>
+        [TestMethod]
+        public void TheUpgradeCostsSchemaNamesTheReferencesChoicesAndRarityKeysTheParserResolves()
+        {
+            CatalogSchema schema = Schema(DataCatalog.UpgradeCosts);
+            string line = $"{UpgradeCostsCatalogDescriptor.RequirementsField}{PathSeparator}{RequirementIdField}";
+            string overridden =
+                $"{UpgradeCostsCatalogDescriptor.RequirementsField}{PathSeparator}{UpgradeCostsCatalogDescriptor.ByRarityField}" +
+                $"{PathSeparator}{RequirementIdField}";
+
+            foreach (SectionSchema section in schema.Sections)
+            {
+                Choice(Leaf(Locate(section.Record, UpgradeCostsCatalogDescriptor.IdField)), typeof(EquipmentCategory));
+                Choice(
+                    Leaf(Locate(section.Record, $"{UpgradeCostsCatalogDescriptor.RequirementsField}{PathSeparator}{RequirementTypeField}")),
+                    typeof(RequirementType));
+
+                foreach (string path in new[] { line, overridden })
+                {
+                    Points(Leaf(Locate(section.Record, path)), path, DataCatalog.Resources, ResourcesCatalogDescriptor.UpgradeResourcesKey);
+                    Points(Leaf(Locate(section.Record, path)), path, DataCatalog.Resources, ResourcesCatalogDescriptor.CraftingResourcesKey);
+                    Assert.IsTrue(Leaf(Locate(section.Record, path)).AllowEmpty,
+                        $"'{path}' must name a resource, and a line whose rarities each name their own writes none");
+                }
+
+                FieldSchema byRarity = Locate(section.Record, $"{UpgradeCostsCatalogDescriptor.RequirementsField}{PathSeparator}{UpgradeCostsCatalogDescriptor.ByRarityField}");
+                Assert.AreEqual(FieldKind.Dictionary, byRarity.Kind, $"'{UpgradeCostsCatalogDescriptor.ByRarityField}' is not a map");
+                Choice(
+                    byRarity.Key ?? throw new AssertFailedException($"'{UpgradeCostsCatalogDescriptor.ByRarityField}' lets the author write its keys freely"),
+                    typeof(Rarity));
+            }
+        }
+
+        /// <summary>The schema of the crafting additives: one array under a key, each record found by the
+        /// resource it speaks for and carrying no text of its own. Both reports gather what neither
+        /// reflection nor the assembled parts could vouch for.</summary>
+        [TestMethod]
+        public void TheCraftingAdditivesSchemaBuildsFromTheRealDtoWithoutAReport()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.CraftingAdditives));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape);
+            Assert.AreEqual(1, schema.Sections.Count);
+            Assert.AreEqual(CraftingAdditivesCatalogDescriptor.RecordsKey, schema.Sections[0].Key);
+            Assert.AreEqual(CraftingAdditivesCatalogDescriptor.IdField, schema.Sections[0].Record.IdField);
+            Assert.AreEqual(0, schema.LocalizedSuffixes.Count,
+                "an additive is not an item: the flux in the player's hand is worded in the resources catalog");
+            Assert.AreEqual(CraftingAdditivesCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null));
+
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Reflection.Notes.ToArray(),
+                $"reflection has something to say about the additive DTOs:{Environment.NewLine}{builder.Reflection}");
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled CraftingAdditives catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>Every id the additive parser resolves and the one name it parses into an enum, said so
+        /// in the schema. The record is found by a reference: the resource IS the address, and an id
+        /// nothing answers is a record no slot will ever reach.</summary>
+        [TestMethod]
+        public void TheCraftingAdditivesSchemaNamesTheReferencesAndChoiceTheParserResolves()
+        {
+            RecordSchema record = Schema(DataCatalog.CraftingAdditives).Sections[0].Record;
+
+            foreach (string section in new[] { ResourcesCatalogDescriptor.UpgradeResourcesKey, ResourcesCatalogDescriptor.CraftingResourcesKey })
+                Points(
+                    Leaf(Locate(record, CraftingAdditivesCatalogDescriptor.IdField)),
+                    CraftingAdditivesCatalogDescriptor.IdField,
+                    DataCatalog.Resources,
+                    section);
+
+            FieldSchema pool = Leaf(Locate(record, CraftingAdditivesCatalogDescriptor.PoolField));
+            Points(pool, CraftingAdditivesCatalogDescriptor.PoolField, DataCatalog.ModifierPools, WholeCatalog);
+            Assert.IsTrue(pool.AllowEmpty, "an additive that lends no pool has to be able to say so");
+
+            Choice(Leaf(Locate(record, CraftingAdditivesCatalogDescriptor.RarityFloorField)), typeof(Rarity));
+        }
+
+        /// <summary>The schema of the item effects: one array under a key, each record found by the very
+        /// behaviour it hands out. Both reports gather what neither reflection nor the assembled parts could
+        /// vouch for.</summary>
+        [TestMethod]
+        public void TheItemEffectsSchemaBuildsFromTheRealDtoWithoutAReport()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.ItemEffects));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape);
+            Assert.AreEqual(1, schema.Sections.Count);
+            Assert.AreEqual(ItemEffectsCatalogDescriptor.RecordsKey, schema.Sections[0].Key);
+            Assert.AreEqual(ItemEffectsCatalogDescriptor.IdField, schema.Sections[0].Record.IdField);
+            Assert.AreEqual(0, schema.LocalizedSuffixes.Count,
+                "an entry is a weight and a payload: the grant reads its own name where it is declared");
+            Assert.AreEqual(ItemEffectsCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null));
+
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Reflection.Notes.ToArray(),
+                $"reflection has something to say about the item effect DTOs:{Environment.NewLine}{builder.Reflection}");
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled ItemEffects catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>The id an entry is found by is also the reference it makes, and the kind beside it says
+        /// which catalog answers. The payload is a map the author fills himself: its keys are the grant
+        /// factory's own, so the schema offers a map and no picker for what goes in it.</summary>
+        [TestMethod]
+        public void TheItemEffectsSchemaNamesTheReferenceChoiceAndFreePayloadTheParserResolves()
+        {
+            RecordSchema record = Schema(DataCatalog.ItemEffects).Sections[0].Record;
+
+            foreach (string catalog in new[] { DataCatalog.PassiveSkills, DataCatalog.Effects })
+                Points(Leaf(Locate(record, ItemEffectsCatalogDescriptor.IdField)), ItemEffectsCatalogDescriptor.IdField, catalog, WholeCatalog);
+
+            Choice(Leaf(Locate(record, ItemEffectsCatalogDescriptor.KindField)), typeof(GrantKind));
+
+            FieldSchema properties = Locate(record, ItemEffectsCatalogDescriptor.PropertiesField);
+            Assert.AreEqual(FieldKind.Dictionary, properties.Kind, $"'{ItemEffectsCatalogDescriptor.PropertiesField}' is not a map");
+            Assert.IsNull(properties.Key, "the payload's keys are the grant factory's own, and the schema offers a list of them");
+        }
+
+        /// <summary>The schema of the ornaments: one array under a key, each found by its own id and both
+        /// named and described in the localization by it. An ornament points at nothing — which ability
+        /// wears it lives in a save — so the whole of the record is its tier and its worth.</summary>
+        [TestMethod]
+        public void TheOrnamentsSchemaBuildsFromTheRealDtoWithoutAReport()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.Ornaments));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape);
+            Assert.AreEqual(1, schema.Sections.Count);
+            Assert.AreEqual(OrnamentsCatalogDescriptor.RecordsKey, schema.Sections[0].Key);
+            Assert.AreEqual(OrnamentsCatalogDescriptor.IdField, schema.Sections[0].Record.IdField);
+            CollectionAssert.AreEqual(
+                new[] { LocalizedKeyAttribute.NoSuffix, LocalizationService.DescriptionSuffix },
+                schema.LocalizedSuffixes.ToArray(),
+                "an ornament is a named artefact: it is read in a tooltip, not only listed");
+            Assert.AreEqual(OrnamentsCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null));
+
+            RecordSchema record = schema.Sections[0].Record;
+            Assert.AreEqual(FieldKind.Integer, Field(record, OrnamentsCatalogDescriptor.TierField).Kind);
+            Choice(Leaf(Locate(record, RarityField)), typeof(Rarity));
+
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Reflection.Notes.ToArray(),
+                $"reflection has something to say about the ornament DTO:{Environment.NewLine}{builder.Reflection}");
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled Ornaments catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>The shipped files of the bench read back through their schemas: every key they write is
+        /// one the schema ranks, and the canonical write loses nothing. A key the tool cannot place is a
+        /// field the author is quietly locked out of.</summary>
+        [DataTestMethod]
+        [DataRow(DataCatalog.Recipes)]
+        [DataRow(DataCatalog.UpgradeCosts)]
+        [DataRow(DataCatalog.CraftingAdditives)]
+        [DataRow(DataCatalog.ItemEffects)]
+        [DataRow(DataCatalog.Ornaments)]
+        public void ACraftingCatalogRanksEveryKeyItsShippedFilesWrite(string catalog)
+        {
+            List<string> unknown = UnknownKeys(Schema(catalog), catalog);
+
+            Assert.AreEqual(0, unknown.Count,
+                $"keys of the {catalog} files no field of the schema is written under:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", unknown)}");
+        }
+
+        /// <summary>
+        /// Every id the shipped bench names is one the catalog it points into actually writes. Nothing else
+        /// can see this: a schema is built one catalog at a time, and the ids answering a recipe live in
+        /// another one — so a template that was renamed leaves a recipe minting nothing, and says so only
+        /// when the player presses the button.
+        /// <para>What the data owes is named rather than failed on: the ids nothing answers are pinned as
+        /// findings, so one arriving fails and one going away fails just as loudly.</para>
+        /// </summary>
+        [TestMethod]
+        public void EveryIdTheShippedCraftingFilesNameIsOneItsCatalogWrites()
+        {
+            List<string> unanswered = [];
+            int walked = 0;
+            int addressed = 0;
+
+            foreach (string catalog in s_craftingCatalogs)
+            {
+                CatalogSchema schema = Schema(catalog);
+
+                foreach (SectionSchema section in schema.Sections)
+                    foreach (string[] path in References(section.Record))
+                    {
+                        addressed++;
+
+                        foreach (string file in ShippedFiles(catalog))
+                        {
+                            (List<string> missing, int read) = Unanswered(JsonTreeDocument.Load(file).Root, section, catalog, path);
+                            unanswered.AddRange(missing);
+                            walked += read;
+                        }
+                    }
+            }
+
+            Assert.AreNotEqual(0, addressed, "the crafting schemas write no reference at all — the walk has nothing to read");
+            Assert.AreNotEqual(0, walked, "the shipped crafting files name nothing at all — the walk proves nothing");
+
+            List<string> named = [.. unanswered.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+            Report("Ids the shipped crafting files name that nothing answers", named);
+
+            CollectionAssert.AreEquivalent(
+                s_unansweredCraftingIds,
+                named.ToArray(),
+                $"the shipped crafting files name other ids than the known ones nothing answers:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", named)}");
+        }
+
+        /// <summary>The mutation the walk exists for: a recipe minting a template nobody wrote is the one
+        /// the bench would take payment for and hand back nothing. What the same recipe is PAID in exists,
+        /// and the walk has to stay quiet about it.</summary>
+        [TestMethod]
+        public void ARecipeMintingATemplateNobodyWrote_IsCaught()
+        {
+            CatalogSchema schema = Schema(DataCatalog.Recipes);
+            JToken root = JsonTreeDocument.Parse(ForgedRecipeJson).Root;
+
+            SectionSchema section = schema.Sections[0];
+            (List<string> minted, int mints) = Unanswered(root, section, DataCatalog.Recipes, [RecipesCatalogDescriptor.ResultField]);
+            (List<string> paid, int lines) = Unanswered(
+                root, section, DataCatalog.Recipes, [RecipesCatalogDescriptor.RequirementsField, RequirementIdField]);
+
+            Assert.AreEqual(1, mints, "the forged recipe mints another number of things than the walk read");
+            Assert.AreEqual(1, lines, "the forged recipe is paid in another number of resources than the walk read");
+            Assert.AreEqual(1, minted.Count, $"a recipe minting a template nobody wrote went unnoticed: {string.Join(", ", minted)}");
+            Assert.AreEqual(0, paid.Count, $"the walk called a shipped resource broken: {string.Join(", ", paid)}");
+        }
+
+        /// <summary>The second mutation, one level below the first: a rarity override paid in a resource
+        /// nobody wrote. The override is the half a walk stopping at the cost line would never read, and the
+        /// line's own default names a resource that exists.</summary>
+        [TestMethod]
+        public void AnUpgradeCostOverriddenIntoAResourceNobodyWrote_IsCaught()
+        {
+            CatalogSchema schema = Schema(DataCatalog.UpgradeCosts);
+            JToken root = JsonTreeDocument.Parse(ForgedUpgradeCostJson).Root;
+
+            SectionSchema section = Part(schema, UpgradeCostsCatalogDescriptor.UpgradeKey);
+            (List<string> defaults, int lines) = Unanswered(
+                root, section, DataCatalog.UpgradeCosts, [UpgradeCostsCatalogDescriptor.RequirementsField, RequirementIdField]);
+            (List<string> overridden, int rarities) = Unanswered(
+                root,
+                section,
+                DataCatalog.UpgradeCosts,
+                [
+                    UpgradeCostsCatalogDescriptor.RequirementsField, UpgradeCostsCatalogDescriptor.ByRarityField,
+                    AnyKey, RequirementIdField
+                ]);
+
+            Assert.AreEqual(1, lines, "the forged cost writes another number of default resources than the walk read");
+            Assert.AreEqual(1, rarities, "the forged cost writes another number of rarity overrides than the walk read");
+            Assert.AreEqual(0, defaults.Count, $"the walk called a shipped resource broken: {string.Join(", ", defaults)}");
+            Assert.AreEqual(1, overridden.Count,
+                $"a rarity paid in a resource nobody wrote went unnoticed: {string.Join(", ", overridden)}");
+        }
+
+        /// <summary>
+        /// Across every described catalog: no section writes two records under one id. A catalog states the
+        /// field a record is FOUND by, so a second record under one id is a record nothing can address —
+        /// whichever of the two the reader keeps, the other is out of reach. Where the id is not an address
+        /// but a weight in a roll, both are kept instead and the roll is quietly loaded.
+        /// <para>What the shipped data owes is named rather than failed on, so that a duplicate arriving
+        /// fails and one going away fails just as loudly.</para>
+        /// </summary>
+        [TestMethod]
+        public void NoSectionOfADescribedCatalogWritesTwoRecordsUnderOneId()
+        {
+            List<string> twice = [];
+            int counted = 0;
+
+            foreach (ICatalogDescriptor descriptor in CatalogDescriptors.All)
+            {
+                CatalogSchema schema = Schema(descriptor.Catalog);
+
+                if (schema.Shape is not (RootShape.ArrayUnderKey or RootShape.SectionsOfArrays)) continue;
+
+                foreach (SectionSchema section in schema.Sections)
+                {
+                    if (section.Record.IdField is not { } idField) continue;
+
+                    Dictionary<string, int> written = new(StringComparer.Ordinal);
+
+                    foreach (string file in ShippedFiles(descriptor.Catalog))
+                        foreach (JObject record in SectionRecords(JsonTreeDocument.Load(file).Root, section.Key))
+                        {
+                            if (Id(record, idField) is not { Length: > 0 } id) continue;
+
+                            counted++;
+                            written[id] = written.GetValueOrDefault(id) + 1;
+                        }
+
+                    twice.AddRange(written.Where(pair => pair.Value > 1).Select(pair => Named(descriptor.Catalog, pair.Key)));
+                }
+            }
+
+            Assert.AreNotEqual(0, counted, "no record of any described catalog was read — the check is checking nothing");
+
+            List<string> named = [.. twice.Order(StringComparer.Ordinal)];
+            Report("Records the shipped data writes twice under one id", named);
+
+            CollectionAssert.AreEquivalent(
+                s_recordsWrittenTwice.Select(known => Named(known.Catalog, known.Id)).ToArray(),
+                named.ToArray(),
+                $"the shipped data writes other records twice than the known ones:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", named)}");
+        }
+
+        /// <summary>One record of one catalog, as both the finding and the pin spell it.</summary>
+        private static string Named(string catalog, string id) => $"{catalog}: {id}";
+
+        /// <summary>One keyed part of a catalog, where the walk needs the key as much as the record.</summary>
+        private static SectionSchema Part(CatalogSchema schema, string section) =>
+            schema.Sections.FirstOrDefault(candidate => candidate.Key == section)
+            ?? throw new AssertFailedException($"the catalog holds no '{section}' section.");
+
+        /// <summary>
+        /// Every address one record writes a reference at, read off the schema rather than listed: a
+        /// catalog whose DTO gains a reference joins the walk without anyone remembering it. The addresses
+        /// are the FILE's — a map is a step of its own in a document and none in a path down a record — so
+        /// every map met on the way puts an <see cref="AnyKey"/> in.
+        /// <para>What a map is KEYED by is not among them: a key is not written where a value is, and no
+        /// catalog of the bench points into one.</para>
+        /// </summary>
+        private static IEnumerable<string[]> References(RecordSchema record, string[] at, HashSet<RecordSchema>? reading = null)
+        {
+            reading ??= new HashSet<RecordSchema>(ReferenceEqualityComparer.Instance);
+
+            if (!reading.Add(record)) yield break;
+
+            foreach (RecordSchema shape in Shapes(record))
+                foreach (FieldSchema field in shape.Fields)
+                {
+                    string[] address = [.. at, field.JsonName, .. MapSteps(field)];
+                    FieldSchema leaf = Leaf(field);
+
+                    if (leaf.Kind == FieldKind.Reference) yield return address;
+
+                    if (leaf.Record is not { } nested) continue;
+
+                    foreach (string[] found in References(nested, address, reading)) yield return found;
+                }
+
+            reading.Remove(record);
+        }
+
+        /// <summary>The addresses of one section's record, without duplicates: two shapes writing one key
+        /// name one place in the file.</summary>
+        private static IEnumerable<string[]> References(RecordSchema record) =>
+            References(record, []).DistinctBy(address => string.Join(PathSeparator, address), StringComparer.Ordinal);
+
+        /// <summary>A record and the shapes it may take: a reference belongs to whichever of them a record
+        /// on disk turns out to be.</summary>
+        private static IEnumerable<RecordSchema> Shapes(RecordSchema record)
+        {
+            yield return record;
+
+            if (record.Variants is not { } variants) yield break;
+
+            foreach (VariantSchema variant in variants.Variants) yield return variant.Record;
+        }
+
+        /// <summary>An <see cref="AnyKey"/> for every map standing between a field and what it holds.</summary>
+        private static IEnumerable<string> MapSteps(FieldSchema field)
+        {
+            for (FieldSchema node = field; node.Kind is FieldKind.Array or FieldKind.Dictionary && node.Item is { } item; node = item)
+                if (node.Kind == FieldKind.Dictionary)
+                    yield return AnyKey;
+        }
+
+        /// <summary>The ids one section of a document writes at one address that nothing answers, and how
+        /// many were read at all. A field pointing into a catalog this build cannot read is passed over
+        /// whole: half an answer would call every id of the other half broken.</summary>
+        private static (List<string> Unanswered, int Walked) Unanswered(JToken root, SectionSchema section, string catalog, string[] path)
+        {
+            List<string> unanswered = [];
+            int walked = 0;
+            string address = string.Join(PathSeparator, path.Where(step => step != AnyKey));
+
+            FieldSchema field = Leaf(Locate(section.Record, address));
+            Assert.AreEqual(FieldKind.Reference, field.Kind, $"'{catalog}.{address}' is not a reference");
+
+            List<HashSet<string>> answering = [.. field.RefTargets.Select(Answers).OfType<HashSet<string>>()];
+            if (answering.Count != field.RefTargets.Count) return (unanswered, walked);
+
+            foreach (JObject record in SectionRecords(root, section.Key))
+                foreach (string id in ValuesAt(record, path))
+                {
+                    if (id.Length == 0) continue;
+
+                    walked++;
+
+                    if (answering.Exists(ids => ids.Contains(id))) continue;
+
+                    unanswered.Add($"{catalog} {address} → '{id}'");
+                }
+
+            return (unanswered, walked);
+        }
+
+        /// <summary>
+        /// Records whose id the walk must not read as a reference. One case, and it is the price of a
+        /// markup that cannot see the field beside it: a requirement demanding a level of mastery writes a
+        /// LOCALIZATION KEY where its siblings write a resource, and the markup states the catalogs
+        /// without regard to the type — the shipped word answering nothing there is the limit of the
+        /// contract and not broken data.
+        /// </summary>
+        private static bool NamesNoRecord(JObject holder) =>
+            string.Equals(holder.Value<string>(RequirementTypeField), nameof(RequirementType.MasteryLevel), StringComparison.Ordinal);
+
+        /// <summary>Every id one target answers with, read out of the shipped files of the catalog it names
+        /// and off that catalog's own schema. Null for a catalog no descriptor covers: what that one is
+        /// written in is not this build's to know, and reading it as no ids at all would report every
+        /// reference into it broken.</summary>
+        private static HashSet<string>? Answers(ReferenceTarget target)
+        {
+            if (CatalogDescriptors.All.All(descriptor => descriptor.Catalog != target.Catalog)) return null;
+
+            CatalogSchema schema = Schema(target.Catalog);
+
+            // The ids are gathered out of arrays under a section key, which is the one shape that holds
+            // several records. A catalog whose records are keyed by the author, or which is one record,
+            // would answer with nothing at all and call every reference into it broken.
+            Assert.IsTrue(
+                schema.Shape is RootShape.ArrayUnderKey or RootShape.SectionsOfArrays,
+                $"the {target.Catalog} catalog is written as {schema.Shape}, which this walk cannot read ids out of");
+
+            HashSet<string> ids = new(StringComparer.Ordinal);
+
+            foreach (string file in ShippedFiles(target.Catalog))
+            {
+                JToken root = JsonTreeDocument.Load(file).Root;
+
+                foreach (SectionSchema section in schema.Sections)
+                {
+                    if (target.Section is { } named && section.Key != named) continue;
+                    if (section.Record.IdField is not { } idField) continue;
+
+                    foreach (JObject record in SectionRecords(root, section.Key))
+                        if (Id(record, idField) is { Length: > 0 } written)
+                            ids.Add(written);
+                }
+            }
+
+            return ids;
+        }
+
+        /// <summary>Every string one address reaches inside a record: through the lists standing on the
+        /// way, and through the keys of a map wherever the address writes a <see cref="AnyKey"/>. A record
+        /// that <see cref="NamesNoRecord"/> answers for is stepped over with everything under it.</summary>
+        private static IEnumerable<string> ValuesAt(JToken token, string[] path, int step = 0)
+        {
+            if (token is JArray array)
+            {
+                foreach (JToken item in array)
+                    foreach (string found in ValuesAt(item, path, step))
+                        yield return found;
+
+                yield break;
+            }
+
+            if (step == path.Length)
+            {
+                if (token is JValue value && value.Value<string>() is { } text) yield return text;
+
+                yield break;
+            }
+
+            if (token is not JObject holder || NamesNoRecord(holder)) yield break;
+
+            if (path[step] == AnyKey)
+            {
+                foreach (JProperty property in holder.Properties())
+                    foreach (string found in ValuesAt(property.Value, path, step + 1))
+                        yield return found;
+
+                yield break;
+            }
+
+            if (holder[path[step]] is not { } child) yield break;
+
+            foreach (string nested in ValuesAt(child, path, step + 1)) yield return nested;
         }
     }
 }
