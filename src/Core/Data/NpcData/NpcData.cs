@@ -43,7 +43,9 @@ namespace Core.Data.NpcData
         [JsonProperty("rarity")][EnumOf(typeof(Rarity))] public string? Rarity { get; init; }
 
         /// <summary>Authored ability list (bosses). Non-empty = exactly these instead of the archetype roll.</summary>
-        [JsonProperty("abilities")][CatalogRef(DataCatalog.Abilities)] public List<string> Abilities { get; init; } = [];
+        [JsonProperty("abilities")]
+        [CatalogRef(DataCatalog.Abilities, Section = AbilityData.AbilityDataRoot.AbilitiesSection)]
+        public List<string> Abilities { get; init; } = [];
 
         /// <summary>Per-NPC override of the archetype's flee threshold; 0 = never flees (bosses).</summary>
         [JsonProperty("fleeHealthThreshold")] public float? FleeHealthThreshold { get; init; }
@@ -206,7 +208,9 @@ namespace Core.Data.NpcData
     /// <summary>One "reactions" entry — parsed strictly into NpcReactionConfig by NpcReactionParser.</summary>
     public record NpcReactionData
     {
-        [JsonProperty("abilityId")][CatalogRef(DataCatalog.Abilities)] public string AbilityId { get; init; } = string.Empty;
+        [JsonProperty("abilityId")]
+        [CatalogRef(DataCatalog.Abilities, Section = AbilityData.AbilityDataRoot.AbilitiesSection)]
+        public string AbilityId { get; init; } = string.Empty;
         [JsonProperty("trigger")][EnumOf(typeof(ReactionTrigger))] public string Trigger { get; init; } = string.Empty;
         [JsonProperty("chance")] public float Chance { get; init; }
         [JsonProperty("maxPerTurn")] public int MaxPerTurn { get; init; } = 1;
@@ -223,7 +227,9 @@ namespace Core.Data.NpcData
         [JsonProperty("parameterMultiplier")] public float ParameterMultiplier { get; init; } = 1f;
 
         /// <summary>The stage's full ability set — replaces the book's content on stage entry.</summary>
-        [JsonProperty("abilities")][CatalogRef(DataCatalog.Abilities)] public List<string> Abilities { get; init; } = [];
+        [JsonProperty("abilities")]
+        [CatalogRef(DataCatalog.Abilities, Section = AbilityData.AbilityDataRoot.AbilitiesSection)]
+        public List<string> Abilities { get; init; } = [];
 
         /// <summary>Effects riding every landed attack while this stage is active.</summary>
         [JsonProperty("attackEffects")] public List<NpcStageAttackEffectData> AttackEffects { get; init; } = [];

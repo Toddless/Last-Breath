@@ -409,7 +409,7 @@ namespace Tooling.Schema.Reflection
             Attribute[] keys = Every(written, MarkupNames.DictionaryKey);
 
             return new Markup(
-                [.. references.Select(reference => Word(reference, MarkupNames.Catalog, at)).OfType<string>()],
+                [.. references.Select(reference => Target(reference, at)).OfType<ReferenceTarget>()],
                 // One catalog calling the empty value legal makes it legal: the field is one field.
                 references.Any(reference => Flag(reference, MarkupNames.AllowEmpty, at)),
                 One(written, MarkupNames.NotARef) is not null,
@@ -421,8 +421,37 @@ namespace Tooling.Schema.Reflection
                 // A key names nothing on purpose in no file: json writes no empty key.
                 new Narrowing(
                     keys.Select(key => EnumOf(key, at)).FirstOrDefault(enumType => enumType is not null),
-                    [.. keys.Select(key => Word(key, MarkupNames.Catalog, at)).OfType<string>()],
+                    // Keys point into a whole catalog: a map is not narrowed to a section by any markup.
+                    [.. keys.Select(key => Word(key, MarkupNames.Catalog, at)).OfType<string>().Select(ReferenceTarget.Whole)],
                     AllowEmpty: false));
+        }
+
+        /// <summary>Where one reference points. Null when the markup names no catalog, which is the one
+        /// part of it nothing can stand in for.</summary>
+        private ReferenceTarget? Target(Attribute reference, At at)
+        {
+            if (Word(reference, MarkupNames.Catalog, at) is not { } catalog) return null;
+
+            // A reference into a catalog with no name points at nothing there is to point at. The writing
+            // side refuses it outright, so this only ever meets markup written elsewhere — and a walk that
+            // threw here would lose a whole record over one attribute.
+            if (catalog.Trim().Length == 0)
+            {
+                Note(Notes.NamelessCatalog, at.Owner, at.Field);
+
+                return null;
+            }
+
+            string? section = Word(reference, MarkupNames.Section, at);
+
+            if (section is null) return ReferenceTarget.Whole(catalog);
+            if (section.Trim().Length > 0) return new ReferenceTarget(catalog, section);
+
+            // A section written as a blank word narrows the reference to a key no file is written under,
+            // which would report every id in the field as broken. Read as the whole catalog, and said.
+            Note(Notes.NamelessSection, at.Owner, at.Field, catalog);
+
+            return ReferenceTarget.Whole(catalog);
         }
 
         private static Attribute[] Every(Attribute[] written, string name) =>
@@ -564,7 +593,7 @@ namespace Tooling.Schema.Reflection
             if (!text) return field;
 
             if (markup.Narrowings > 1) Note(Notes.NarrowedTwice, walk.Owner, jsonName);
-            if (markup.Catalogs.Count > 0 && markup.NotARef) Note(Notes.RefusedAndNamed, walk.Owner, jsonName);
+            if (markup.Targets.Count > 0 && markup.NotARef) Note(Notes.RefusedAndNamed, walk.Owner, jsonName);
 
             FieldSchema narrowed = Narrow(jsonName, markup.Holds) ?? Localized(field, markup.LocalizationSuffix);
 
@@ -580,13 +609,13 @@ namespace Tooling.Schema.Reflection
         {
             if (narrowing.EnumType is { } members) return Choice(jsonName, members);
 
-            if (narrowing.Catalogs.Count == 0) return null;
+            if (narrowing.Targets.Count == 0) return null;
 
             return new FieldSchema
             {
                 JsonName = jsonName,
                 Kind = FieldKind.Reference,
-                RefCatalogs = narrowing.Catalogs,
+                RefTargets = narrowing.Targets,
                 AllowEmpty = narrowing.AllowEmpty
             };
         }
@@ -703,15 +732,15 @@ namespace Tooling.Schema.Reflection
 
         /// <summary>What text is narrowed to, whichever piece of markup says so: the members of an enum, or
         /// the ids of records in catalogs. Both cannot be true of one string at once.</summary>
-        private readonly record struct Narrowing(Type? EnumType, SchemaList<string> Catalogs, bool AllowEmpty)
+        private readonly record struct Narrowing(Type? EnumType, SchemaList<ReferenceTarget> Targets, bool AllowEmpty)
         {
             /// <summary>How many answers the markup gives. More than one is a contradiction.</summary>
-            public int Ways => (EnumType is null ? 0 : 1) + (Catalogs.Count > 0 ? 1 : 0);
+            public int Ways => (EnumType is null ? 0 : 1) + (Targets.Count > 0 ? 1 : 0);
         }
 
         /// <summary>The schema markup written on one member, read once.</summary>
         private readonly record struct Markup(
-            SchemaList<string> Catalogs,
+            SchemaList<ReferenceTarget> Targets,
             bool AllowEmpty,
             bool NotARef,
             Type? EnumType,
@@ -723,11 +752,11 @@ namespace Tooling.Schema.Reflection
         {
             /// <summary>How many ways the markup says to read the text. More than one is a contradiction.</summary>
             public int Narrowings =>
-                (EnumType is null ? 0 : 1) + (Catalogs.Count > 0 ? 1 : 0) + (LocalizationSuffix is null ? 0 : 1);
+                (EnumType is null ? 0 : 1) + (Targets.Count > 0 ? 1 : 0) + (LocalizationSuffix is null ? 0 : 1);
 
-            /// <summary>What the markup narrows the VALUE to. A refusal empties the catalogs: a validator
+            /// <summary>What the markup narrows the VALUE to. A refusal empties the targets: a validator
             /// told to check ids it should not would report every value in the file as broken.</summary>
-            public Narrowing Holds => new(EnumType, NotARef ? SchemaList<string>.Empty : Catalogs, AllowEmpty);
+            public Narrowing Holds => new(EnumType, NotARef ? SchemaList<ReferenceTarget>.Empty : Targets, AllowEmpty);
         }
 
         /// <summary>What the reflector has to say about a type it could not read whole.</summary>
@@ -761,6 +790,8 @@ namespace Tooling.Schema.Reflection
             public const string RefusedAndNamed = "'{0}.{1}' is marked both a reference and not one; the refusal was taken.";
             public const string Disagrees = "'{0}.{1}' says '{2}' tells the shapes apart, while the shapes registered for '{3}' are told apart by '{4}'.";
             public const string MarkupUnreadable = "'{0}.{1}' carries a '{2}' with no '{3}' the tool can read: that part of the markup was not applied.";
+            public const string NamelessSection = "'{0}.{1}' narrows its reference into '{2}' to a section with no name: it points into the whole catalog.";
+            public const string NamelessCatalog = "'{0}.{1}' points into a catalog with no name, which is no catalog: the reference was not read.";
         }
     }
 }

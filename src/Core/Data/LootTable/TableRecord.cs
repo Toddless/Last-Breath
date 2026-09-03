@@ -2,6 +2,7 @@ namespace Core.Data.LootTable
 {
     using System;
     using System.Collections.Generic;
+    using CraftingData;
     using Enums;
     using GameData;
     using Newtonsoft.Json;
@@ -21,12 +22,17 @@ namespace Core.Data.LootTable
     /// designer's decision rather than a consequence of how many things answer it.
     /// </summary>
     /// <param name="Id">Names one thing to drop, out of every catalog a droppable thing is written in:
-    /// any one of them knowing the id makes the position real.</param>
+    /// any one of them knowing the id makes the position real. In the resources that is the two sections
+    /// holding things — a material category is what a resource belongs to, never a drop of its own.</param>
     /// <param name="Price">Loot units, never gold. A group carries one price for the whole set: the
     /// price says what a thing of that kind is worth, and the members of a group are alike by
     /// construction — they share a tier and a rarity.</param>
     public record TableRecord(
-        [property: CatalogRef(DataCatalog.EquipItems), CatalogRef(DataCatalog.Items), CatalogRef(DataCatalog.Recipes), CatalogRef(DataCatalog.Resources)]
+        [property: CatalogRef(DataCatalog.EquipItems)]
+        [property: CatalogRef(DataCatalog.Items)]
+        [property: CatalogRef(DataCatalog.Recipes)]
+        [property: CatalogRef(DataCatalog.Resources, Section = ResourcesData.UpgradeResourcesSection)]
+        [property: CatalogRef(DataCatalog.Resources, Section = ResourcesData.CraftingResourcesSection)]
         string Id,
         float Price,
         AugmentGroup? Augments = null)

@@ -1,5 +1,6 @@
 namespace LastBreath.Descriptors
 {
+    using Core.Data.AbilityData;
     using Core.Data.GameData;
     using Core.Data.Schema;
 
@@ -19,8 +20,11 @@ namespace LastBreath.Descriptors
     public sealed record AugmentBoundToAbility
     {
         /// <summary>The ability the augment belongs on. Its presence is what makes the record this shape
-        /// rather than one of the other two, so it names an ability or the record binds nothing.</summary>
-        [CatalogRef(DataCatalog.Abilities)]
+        /// rather than one of the other two, so it names an ability or the record binds nothing. It names
+        /// a CAST: the augments stand in the section beside them, and one augment is no binding for
+        /// another. The markup is the record's own — a form is what the inspector draws, so a narrowing
+        /// left on the base record alone never reaches the author.</summary>
+        [CatalogRef(DataCatalog.Abilities, Section = AbilityDataRoot.AbilitiesSection)]
         public string AbilityId { get; init; } = string.Empty;
     }
 

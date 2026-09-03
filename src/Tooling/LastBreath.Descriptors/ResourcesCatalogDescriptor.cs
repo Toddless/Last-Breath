@@ -17,15 +17,17 @@ namespace LastBreath.Descriptors
     {
         /// <summary>Section of the categories a material belongs to — what
         /// <see cref="ResourcesData.MaterialCategories"/> is written as.</summary>
-        public const string MaterialCategoriesKey = "materialCategories";
+        /// <remarks>The keys are the game's own: a reference narrowed to one of these sections is written
+        /// on a DTO, which cannot see this class, so both sides would spell the word out separately.</remarks>
+        public const string MaterialCategoriesKey = ResourcesData.MaterialCategoriesSection;
 
         /// <summary>Section of the resources sharpening and reforging are paid with — what
         /// <see cref="ResourcesData.UpgradeResources"/> is written as.</summary>
-        public const string UpgradeResourcesKey = "upgradeResources";
+        public const string UpgradeResourcesKey = ResourcesData.UpgradeResourcesSection;
 
         /// <summary>Section of the resources an item is crafted out of — what
         /// <see cref="ResourcesData.CraftingResources"/> is written as.</summary>
-        public const string CraftingResourcesKey = "craftingResources";
+        public const string CraftingResourcesKey = ResourcesData.CraftingResourcesSection;
 
         /// <summary>Json name of the field carrying a record's id, which every section writes.</summary>
         public const string IdField = "id";

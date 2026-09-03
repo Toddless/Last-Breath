@@ -9,10 +9,11 @@ namespace Core.Data.CraftingData
     /// <summary>ByCategory: equipment-category sections ("Weapon"/"Armor"/"Jewellery") whose entries
     /// only serve items of that category; the flat list serves all. Null = no category split.</summary>
     /// <remarks>Id labels the material where it stands and names no record of its own; CategoryId points
-    /// back into the same catalog, at the material category the resource draws its base lines from.</remarks>
+    /// back into the same catalog, at the material category the resource draws its base lines from — the
+    /// one section of it the game resolves the id against.</remarks>
     public record MaterialData(
         [property: NotARef] string Id,
-        [property: CatalogRef(DataCatalog.Resources)] string CategoryId,
+        [property: CatalogRef(DataCatalog.Resources, Section = ResourcesData.MaterialCategoriesSection)] string CategoryId,
         List<ItemModifier> Modifiers,
         [property: DictionaryKey(typeof(EquipmentCategory))] Dictionary<string, List<ItemModifier>>? ByCategory = null);
 }

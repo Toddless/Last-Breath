@@ -23,12 +23,14 @@ namespace LastBreath.Descriptors
     {
         /// <summary>Section of the abilities themselves — what <see cref="AbilityDataRoot.Abilities"/> is
         /// written as.</summary>
-        public const string AbilitiesKey = "abilities";
+        /// <remarks>The keys are the game's own: a reference narrowed to one of these sections is written
+        /// on a DTO, which cannot see this class, so both sides would spell the word out separately.</remarks>
+        public const string AbilitiesKey = AbilityDataRoot.AbilitiesSection;
 
         /// <summary>Section of the augments, which are nobody's property: a record says which sockets take
         /// it and is written beside the abilities rather than inside one. What
         /// <see cref="AbilityDataRoot.Augments"/> is written as.</summary>
-        public const string AugmentsKey = "augments";
+        public const string AugmentsKey = AbilityDataRoot.AugmentsSection;
 
         /// <summary>Json name of the field carrying a record's id, which both sections write.</summary>
         public const string IdField = "id";

@@ -89,15 +89,22 @@ namespace LastBreathTest.BattleSystemTests
             $"'{nameof(TableRecord)}.{nameof(TableRecord.NamesADrop)}' is worked out from other fields and is not written to the file; it is not in the schema."
         ];
 
-        /// <summary>Every reference the NPC parser resolves by id, addressed the way the file writes it.</summary>
-        private static readonly (string Path, string Catalog)[] s_npcReferences =
+        /// <summary>What a reference into the whole of a catalog names as its section: none. Every catalog
+        /// whose records answer to one another alike is pointed into this way.</summary>
+        private const string? WholeCatalog = null;
+
+        /// <summary>Every reference the NPC parser resolves by id, addressed the way the file writes it,
+        /// with the section of the catalog it is answered from. Everything an npc names out of the
+        /// abilities catalog is a CAST: the augments written beside them are nobody's to cast, and a field
+        /// naming the whole catalog would offer the author a hundred ids the provider drops.</summary>
+        private static readonly (string Path, string Catalog, string? Section)[] s_npcReferences =
         [
-            ("abilities", DataCatalog.Abilities),
-            ("stages.abilities", DataCatalog.Abilities),
-            ("abilityBehaviors.id", DataCatalog.Abilities),
-            ("reactions.abilityId", DataCatalog.Abilities),
-            ("reactions.blockedByFinalDeathOf", DataCatalog.Npc),
-            ("passives.id", DataCatalog.PassiveSkills),
+            ("abilities", DataCatalog.Abilities, AbilitiesCatalogDescriptor.AbilitiesKey),
+            ("stages.abilities", DataCatalog.Abilities, AbilitiesCatalogDescriptor.AbilitiesKey),
+            ("abilityBehaviors.id", DataCatalog.Abilities, AbilitiesCatalogDescriptor.AbilitiesKey),
+            ("reactions.abilityId", DataCatalog.Abilities, AbilitiesCatalogDescriptor.AbilitiesKey),
+            ("reactions.blockedByFinalDeathOf", DataCatalog.Npc, WholeCatalog),
+            ("passives.id", DataCatalog.PassiveSkills, WholeCatalog),
         ];
 
         /// <summary>Every field the NPC parser turns into an enum member. The tool offers the members; a
@@ -128,9 +135,9 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>Every reference the behaviour parser resolves by id, addressed the way the file writes
         /// it. An archetype scores casts it names by id and nothing else.</summary>
-        private static readonly (string Path, string Catalog)[] s_npcBehaviorReferences =
+        private static readonly (string Path, string Catalog, string? Section)[] s_npcBehaviorReferences =
         [
-            (Cast("id"), DataCatalog.Abilities),
+            (Cast("id"), DataCatalog.Abilities, AbilitiesCatalogDescriptor.AbilitiesKey),
         ];
 
         /// <summary>Every field the behaviour parser turns into an enum member. The stance is the one an
@@ -263,13 +270,15 @@ namespace LastBreathTest.BattleSystemTests
         ];
 
         /// <summary>Every id the resource parser resolves against another catalog, addressed the way the
-        /// file writes it, under the section whose records write it. A material names its category in the
-        /// catalog it stands in itself.</summary>
-        private static readonly (string Section, string Path, string Catalog)[] s_resourceReferences =
+        /// file writes it, under the section whose records write it, with the section it is answered from.
+        /// A material names its category in the catalog it stands in itself — and only in the section of
+        /// categories: six of the seventy-odd ids that catalog writes are answers the parser accepts.</summary>
+        private static readonly (string Section, string Path, string Catalog, string? Into)[] s_resourceReferences =
         [
-            (ResourcesCatalogDescriptor.CraftingResourcesKey, $"material.{ResourcesCatalogDescriptor.CategoryField}", DataCatalog.Resources),
-            (ResourcesCatalogDescriptor.CraftingResourcesKey, "material.modifiers.condition", DataCatalog.Conditions),
-            (ResourcesCatalogDescriptor.MaterialCategoriesKey, "modifiers.condition", DataCatalog.Conditions),
+            (ResourcesCatalogDescriptor.CraftingResourcesKey, $"material.{ResourcesCatalogDescriptor.CategoryField}",
+                DataCatalog.Resources, ResourcesCatalogDescriptor.MaterialCategoriesKey),
+            (ResourcesCatalogDescriptor.CraftingResourcesKey, "material.modifiers.condition", DataCatalog.Conditions, WholeCatalog),
+            (ResourcesCatalogDescriptor.MaterialCategoriesKey, "modifiers.condition", DataCatalog.Conditions, WholeCatalog),
         ];
 
         /// <summary>Every field the resource parser turns into an enum member, under the section whose
@@ -347,12 +356,15 @@ namespace LastBreathTest.BattleSystemTests
         ];
 
         /// <summary>Every id the ability parser resolves against another catalog, under the section whose
-        /// records write it. An augment names the one ability it is written for and the effect its
-        /// behaviour lays; an ability names nothing outside itself.</summary>
-        private static readonly (string Section, string Path, string Catalog)[] s_abilityReferences =
+        /// records write it, with the section it is answered from. An augment names the one ability it is
+        /// written for and the effect its behaviour lays; an ability names nothing outside itself. The
+        /// binding is answered by the casts alone: the augments stand in the same file, and a field naming
+        /// the whole catalog would take one augment as the binding of another.</summary>
+        private static readonly (string Section, string Path, string Catalog, string? Into)[] s_abilityReferences =
         [
-            (AbilitiesCatalogDescriptor.AugmentsKey, AbilitiesCatalogDescriptor.AbilityField, DataCatalog.Abilities),
-            (AbilitiesCatalogDescriptor.AugmentsKey, EffectField, DataCatalog.Effects),
+            (AbilitiesCatalogDescriptor.AugmentsKey, AbilitiesCatalogDescriptor.AbilityField,
+                DataCatalog.Abilities, AbilitiesCatalogDescriptor.AbilitiesKey),
+            (AbilitiesCatalogDescriptor.AugmentsKey, EffectField, DataCatalog.Effects, WholeCatalog),
         ];
 
         /// <summary>Every field the ability parser turns into an enum member, under the section whose
@@ -402,14 +414,17 @@ namespace LastBreathTest.BattleSystemTests
         /// say here, and the number is held so the overlap cannot grow unnoticed.</summary>
         private const int AugmentsCarryingTagsBesideAStrongerKey = 45;
 
-        /// <summary>Every catalog a loot position may name its drop out of; any one of them knowing the
-        /// id makes the position real, which is why the field carries them all at once.</summary>
-        private static readonly string[] s_dropCatalogs =
+        /// <summary>Everywhere a loot position may name its drop; any one of them knowing the id makes the
+        /// position real, which is why the field carries them all at once. The resources answer with the
+        /// two sections holding things and not with the third: a material category is what a resource
+        /// belongs to, and no kill has ever dropped one.</summary>
+        private static readonly ReferenceTarget[] s_dropTargets =
         [
-            DataCatalog.EquipItems,
-            DataCatalog.Items,
-            DataCatalog.Recipes,
-            DataCatalog.Resources
+            ReferenceTarget.Whole(DataCatalog.EquipItems),
+            ReferenceTarget.Whole(DataCatalog.Items),
+            ReferenceTarget.Whole(DataCatalog.Recipes),
+            new(DataCatalog.Resources, ResourcesCatalogDescriptor.UpgradeResourcesKey),
+            new(DataCatalog.Resources, ResourcesCatalogDescriptor.CraftingResourcesKey)
         ];
 
         /// <summary>A catalog name the tool can neither describe nor knowingly skip is a catalog the
@@ -473,7 +488,8 @@ namespace LastBreathTest.BattleSystemTests
         {
             RecordSchema record = Schema(DataCatalog.Npc).Sections[0].Record;
 
-            foreach ((string path, string catalog) in s_npcReferences) Points(Leaf(Locate(record, path)), path, catalog);
+            foreach ((string path, string catalog, string? section) in s_npcReferences)
+                Points(Leaf(Locate(record, path)), path, catalog, section);
 
             foreach ((string path, Type members) in s_npcChoices) Choice(Leaf(Locate(record, path)), members);
         }
@@ -567,7 +583,8 @@ namespace LastBreathTest.BattleSystemTests
         {
             RecordSchema record = Schema(DataCatalog.NpcBehaviors).Sections[0].Record;
 
-            foreach ((string path, string catalog) in s_npcBehaviorReferences) Points(Leaf(Locate(record, path)), path, catalog);
+            foreach ((string path, string catalog, string? section) in s_npcBehaviorReferences)
+                Points(Leaf(Locate(record, path)), path, catalog, section);
 
             foreach ((string path, Type members) in s_npcBehaviorChoices) Choice(Leaf(Locate(record, path)), members);
         }
@@ -691,7 +708,7 @@ namespace LastBreathTest.BattleSystemTests
 
             FieldSchema individual = SectionKey(schema, LootTablesCatalogDescriptor.IndividualKey);
             Assert.AreEqual(FieldKind.Reference, individual.Kind);
-            CollectionAssert.AreEqual(new[] { DataCatalog.Npc }, individual.RefCatalogs.ToArray());
+            CollectionAssert.AreEqual(new[] { ReferenceTarget.Whole(DataCatalog.Npc) }, individual.RefTargets.ToArray());
         }
 
         /// <summary>The shipped file read back through the schema, the way the NPC one is: every key it
@@ -975,8 +992,8 @@ namespace LastBreathTest.BattleSystemTests
         {
             CatalogSchema schema = Schema(DataCatalog.Resources);
 
-            foreach ((string section, string path, string catalog) in s_resourceReferences)
-                Points(Leaf(Locate(Section(schema, section), path)), $"{section}.{path}", catalog);
+            foreach ((string section, string path, string catalog, string? into) in s_resourceReferences)
+                Points(Leaf(Locate(Section(schema, section), path)), $"{section}.{path}", catalog, into);
 
             foreach ((string section, string path, Type members) in s_resourceChoices)
                 Choice(Leaf(Locate(Section(schema, section), path)), members);
@@ -1076,8 +1093,8 @@ namespace LastBreathTest.BattleSystemTests
         {
             CatalogSchema schema = Schema(DataCatalog.Abilities);
 
-            foreach ((string section, string path, string catalog) in s_abilityReferences)
-                Points(Leaf(Locate(Section(schema, section), path)), $"{section}.{path}", catalog);
+            foreach ((string section, string path, string catalog, string? into) in s_abilityReferences)
+                Points(Leaf(Locate(Section(schema, section), path)), $"{section}.{path}", catalog, into);
 
             foreach ((string section, string path, Type members) in s_abilityChoices)
                 Choice(Leaf(Locate(Section(schema, section), path)), members);
@@ -1212,6 +1229,84 @@ namespace LastBreathTest.BattleSystemTests
                 $"fields named like an id that neither point anywhere nor say they do not: {string.Join(", ", silent.Distinct().Order(StringComparer.Ordinal))}");
         }
 
+        /// <summary>
+        /// Across every described catalog: a reference narrowed to a section names a section its target
+        /// catalog actually writes. Nothing else can see this — a schema is built one catalog at a time,
+        /// and the section a field names belongs to another one — so a misspelt narrowing would answer
+        /// every id written in that field with "nothing is named this", and only in the running editor.
+        /// <para>A section named in a catalog no descriptor covers is passed over: what that catalog is
+        /// written in is not this build's to know.</para>
+        /// </summary>
+        [TestMethod]
+        public void EverySectionAReferenceNamesIsOneItsCatalogWrites()
+        {
+            Dictionary<string, CatalogSchema> described =
+                CatalogDescriptors.All.ToDictionary(descriptor => descriptor.Catalog, descriptor => Schema(descriptor.Catalog), StringComparer.Ordinal);
+
+            List<string> lost = [];
+
+            foreach ((string catalog, CatalogSchema schema) in described)
+                foreach (RecordSchema record in Records(schema))
+                    foreach (FieldSchema field in record.Fields)
+                        foreach (ReferenceTarget target in Narrowed(field))
+                        {
+                            if (!described.TryGetValue(target.Catalog, out CatalogSchema? into)) continue;
+                            if (into.Sections.Any(section => section.Key == target.Section)) continue;
+
+                            lost.Add($"{catalog}: {record.TypeName}.{field.JsonName} → {target}");
+                        }
+
+            Assert.AreEqual(0, lost.Count,
+                $"references narrowed to a section their catalog does not write: {string.Join(", ", lost.Distinct().Order(StringComparer.Ordinal))}");
+        }
+
+        /// <summary>
+        /// A record taking several shapes says where a field points TWICE — once on the record every
+        /// reader parses into, once on the form the inspector draws — and the two have to agree. The form
+        /// is what the author is actually offered: the panel builds its rows out of the shape a record
+        /// wears, so a narrowing left on the base record alone never reaches him, and one left on the form
+        /// alone never reaches whatever reads the record whole.
+        /// </summary>
+        [TestMethod]
+        public void EveryShapeOfARecordPointsWhereTheRecordItselfDoes()
+        {
+            List<string> apart = [];
+            int compared = 0;
+
+            foreach (ICatalogDescriptor descriptor in CatalogDescriptors.All)
+                foreach (RecordSchema record in Records(Schema(descriptor.Catalog)))
+                {
+                    if (record.Variants is not { } shapes) continue;
+
+                    foreach (VariantSchema shape in shapes.Variants)
+                        foreach (FieldSchema field in shape.Record.Fields)
+                        {
+                            if (record.Fields.FirstOrDefault(own => own.JsonName == field.JsonName) is not { } own) continue;
+
+                            compared++;
+
+                            if (Leaf(field).RefTargets == Leaf(own).RefTargets) continue;
+
+                            apart.Add($"{descriptor.Catalog}: {shape.Record.TypeName}.{field.JsonName} " +
+                                      $"[{string.Join(", ", Leaf(field).RefTargets)}] against {record.TypeName} [{string.Join(", ", Leaf(own).RefTargets)}]");
+                        }
+                }
+
+            Assert.AreNotEqual(0, compared, "no shape writes a key its record writes too — the check is checking nothing");
+            Assert.AreEqual(0, apart.Count,
+                $"a shape and the record it stands for point at different things:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", apart.Distinct().Order(StringComparer.Ordinal))}");
+        }
+
+        /// <summary>Every target a field points into that names a section — the field's own, and the ones
+        /// its elements and its keys carry, which is where the markup of a list or a map travels to.</summary>
+        private static IEnumerable<ReferenceTarget> Narrowed(FieldSchema field)
+        {
+            foreach (FieldSchema part in new[] { Leaf(field), Leaf(field).Key }.OfType<FieldSchema>())
+                foreach (ReferenceTarget target in part.RefTargets)
+                    if (target.Section is not null)
+                        yield return target;
+        }
+
         /// <summary>The one descriptor of a catalog, taken from the registry the tool reads: a schema
         /// built from a descriptor the registry does not hold would pin nothing the tool uses.</summary>
         private static ICatalogDescriptor Descriptor(string catalog) =>
@@ -1268,12 +1363,16 @@ namespace LastBreathTest.BattleSystemTests
             schema.Sections.FirstOrDefault(candidate => candidate.Key == section)?.Record
             ?? throw new AssertFailedException($"the catalog holds no '{section}' section.");
 
-        /// <summary>That a field names a record of a catalog: an unmarked one reads to the tool as free
-        /// text, and the author types a name nothing answers.</summary>
-        private static void Points(FieldSchema field, string path, string catalog)
+        /// <summary>That a field names a record of a catalog, and of the one section of it the parser
+        /// resolves the id against: an unmarked field reads to the tool as free text, and one narrowed to
+        /// nothing where the game narrows offers ids the game will drop. A caller naming no section is
+        /// saying the whole catalog answers, which is checked just as closely.</summary>
+        private static void Points(FieldSchema field, string path, string catalog, string? section = null)
         {
             Assert.AreEqual(FieldKind.Reference, field.Kind, $"'{path}' is not a reference");
-            CollectionAssert.Contains(field.RefCatalogs.ToArray(), catalog, $"'{path}' does not point into {catalog}");
+
+            ReferenceTarget target = new(catalog, section);
+            CollectionAssert.Contains(field.RefTargets.ToArray(), target, $"'{path}' does not point into {target}");
         }
 
         /// <summary>The keys one map is written with, wherever in a document it stands.</summary>
@@ -1481,12 +1580,15 @@ namespace LastBreathTest.BattleSystemTests
         private static FieldSchema SectionKey(CatalogSchema schema, string section) =>
             Field(Section(schema, section), LootTablesCatalogDescriptor.KeyField);
 
-        /// <summary>That a field names something to drop, out of every catalog droppable things live in.</summary>
+        /// <summary>That a field names something to drop, out of everywhere droppable things live.</summary>
         private static void NamesADrop(FieldSchema field, string what)
         {
             Assert.AreEqual(FieldKind.Reference, field.Kind, $"{what} does not name anything");
             Assert.IsFalse(field.AllowEmpty, $"{what} may be left empty, which prices a seat that drops nothing");
-            CollectionAssert.AreEquivalent(s_dropCatalogs, field.RefCatalogs.ToArray(), $"{what} points into other catalogs");
+            CollectionAssert.AreEquivalent(
+                s_dropTargets,
+                field.RefTargets.ToArray(),
+                $"{what} points somewhere other than where droppable things are written: {string.Join(", ", field.RefTargets)}");
         }
 
         private static void Choice(FieldSchema field, Type members)
@@ -1598,5 +1700,523 @@ namespace LastBreathTest.BattleSystemTests
             Console.WriteLine(lines.Count == 0
                 ? $"{what}: none."
                 : $"{what} ({lines.Count}):{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", lines)}");
+
+        /// <summary>The one file each of the two narrative catalogs ships today. Neither placement rule
+        /// names it — both leave the file to the tool, so that a story line may be written into a file of
+        /// its own — and the names are held here to say what the walks were run over.</summary>
+        private const string DialoguesFileName = "Dialogues";
+
+        private const string QuestsFileName = "Quests";
+
+        /// <summary>What a dialogue writes its opening rules, its nodes and the parts of a node under. No
+        /// descriptor names them — they are the DTOs' own fields, the way a table's tiers are — so the
+        /// walks spell them out.</summary>
+        private const string EntryRulesField = "entryRules";
+
+        private const string NodesField = "nodes";
+
+        private const string LinesField = "lines";
+
+        private const string OptionsField = "options";
+
+        private const string SpeakerField = "speaker";
+
+        /// <summary>What a line and an option carry the localization key they are read under.</summary>
+        private const string TextKeyField = "key";
+
+        /// <summary>The three routes of a dialogue: the node an opening rule leads to, the node an option
+        /// leads to, and the node a failed speech check falls back on.</summary>
+        private const string EntryNodeField = "node";
+
+        private const string NextField = "next";
+
+        private const string SpeechCheckField = "speechCheck";
+
+        private const string FailNextField = "failNext";
+
+        /// <summary>What a record nested inside another names ITSELF by — a node in its dialogue, a stage
+        /// in its quest. Not the id of anything a catalog answers for.</summary>
+        private const string LocalIdField = "id";
+
+        /// <summary>What a quest writes its stages, the objectives of a stage, its routes out and its
+        /// ending under.</summary>
+        private const string StagesField = "stages";
+
+        private const string ObjectivesField = "objectives";
+
+        private const string TransitionsField = "transitions";
+
+        /// <summary>The stage one route leads to.</summary>
+        private const string TransitionTargetField = "to";
+
+        private const string OutcomeField = "outcome";
+
+        private const string RewardsField = "rewards";
+
+        private const string ItemIdField = "itemId";
+
+        private const string PriorityField = "priority";
+
+        /// <summary>Every catalog a quest may name a hand-out out of — the four the item vocabulary of the
+        /// narrative reads an id from. Any one of them knowing the id makes the reward real.</summary>
+        private static readonly string[] s_handedOutCatalogs =
+        [
+            DataCatalog.EquipItems,
+            DataCatalog.Resources,
+            DataCatalog.Items,
+            DataCatalog.Ornaments
+        ];
+
+        /// <summary>Every id the dialogue parser resolves against another catalog, addressed the way the
+        /// file writes it. A dialogue names the npc definition that speaks it and nothing else: everything
+        /// else it points at is a condition's or an action's business.</summary>
+        private static readonly (string Path, string Catalog)[] s_dialogueReferences =
+        [
+            (DialoguesCatalogDescriptor.IdField, DataCatalog.Npc),
+        ];
+
+        /// <summary>Every field the dialogue parser turns into an enum member. Who speaks a line is parsed
+        /// strictly, so a word naming no member drops the whole dialogue at load.</summary>
+        private static readonly (string Path, Type Members)[] s_dialogueChoices =
+        [
+            ($"{NodesField}{PathSeparator}{LinesField}{PathSeparator}{SpeakerField}", typeof(Core.Narrative.Dialogues.DialogueSpeaker)),
+        ];
+
+        /// <summary>Every string a dialogue writes that is a localization key rather than text to read.
+        /// Both are written out in full: nothing about a dialogue is worded from an id of its own.</summary>
+        private static readonly string[] s_dialogueTextKeys =
+        [
+            $"{NodesField}{PathSeparator}{LinesField}{PathSeparator}{TextKeyField}",
+            $"{NodesField}{PathSeparator}{OptionsField}{PathSeparator}{TextKeyField}",
+        ];
+
+        /// <summary>Every string of a dialogue that reads like a reference and is none: the ids naming a
+        /// node and an option inside their own record, and the three routes between the nodes. The
+        /// contract has no way of saying "a node of THIS dialogue", so the records say they point at no
+        /// catalog and <see cref="EveryDialogueRouteNamesANodeOfItsOwnDialogue"/> holds the files to the
+        /// rest of it.</summary>
+        private static readonly string[] s_dialogueRefusals =
+        [
+            $"{NodesField}{PathSeparator}{LocalIdField}",
+            $"{NodesField}{PathSeparator}{OptionsField}{PathSeparator}{LocalIdField}",
+            $"{EntryRulesField}{PathSeparator}{EntryNodeField}",
+            $"{NodesField}{PathSeparator}{OptionsField}{PathSeparator}{NextField}",
+            $"{NodesField}{PathSeparator}{OptionsField}{PathSeparator}{SpeechCheckField}{PathSeparator}{FailNextField}",
+        ];
+
+        /// <summary>Everything of a dialogue the schema keeps as raw json: the vocabulary of conditions and
+        /// actions is the narrative factories' own, and no record of this catalog describes it.</summary>
+        private static readonly string[] s_dialogueFreeFormFields =
+        [
+            "conditions", "onEnter", "visibleConditions", "enabledConditions", "actions", "failActions"
+        ];
+
+        /// <summary>Every id the quest parser resolves against another catalog, addressed the way the file
+        /// writes it. The giver and everyone who may take the quest back are npc definitions; a reward
+        /// names something to hand over out of every catalog holding one.</summary>
+        private static readonly (string Path, string Catalog)[] s_questReferences =
+        [
+            ("giverNpcId", DataCatalog.Npc),
+            ("turnInNpcIds", DataCatalog.Npc),
+        ];
+
+        /// <summary>The two addresses a reward item is written at: the quest-wide list, and the list of an
+        /// ending it may stop on. One record stands under both, and both are walked so that a second
+        /// reward list added later cannot arrive unmarked.</summary>
+        private static readonly string[] s_questRewardItems =
+        [
+            $"{RewardsField}{PathSeparator}{ItemsField}{PathSeparator}{ItemIdField}",
+            $"{StagesField}{PathSeparator}{OutcomeField}{PathSeparator}{RewardsField}{PathSeparator}{ItemsField}{PathSeparator}{ItemIdField}",
+        ];
+
+        /// <summary>Every field the quest parser turns into an enum member. Both are parsed strictly: a
+        /// word naming no member drops the whole quest at load.</summary>
+        private static readonly (string Path, Type Members)[] s_questChoices =
+        [
+            ("faction", typeof(Fractions)),
+            ("declinePolicy", typeof(Core.Narrative.Quests.DeclinePolicy)),
+        ];
+
+        /// <summary>Every string of a quest that reads like a reference and is none: the ids naming a
+        /// stage, an objective and an ending inside their own quest, and the route out of a stage. The
+        /// contract has no way of saying "a stage of THIS quest", so the records say they point at no
+        /// catalog and <see cref="EveryQuestRouteNamesAStageOfItsOwnQuest"/> holds the files to the rest
+        /// of it.</summary>
+        private static readonly string[] s_questRefusals =
+        [
+            $"{StagesField}{PathSeparator}{LocalIdField}",
+            $"{StagesField}{PathSeparator}{ObjectivesField}{PathSeparator}{LocalIdField}",
+            $"{StagesField}{PathSeparator}{OutcomeField}{PathSeparator}{LocalIdField}",
+            $"{StagesField}{PathSeparator}{TransitionsField}{PathSeparator}{TransitionTargetField}",
+        ];
+
+        /// <summary>Everything of a quest the schema keeps as raw json — the same vocabulary the dialogues
+        /// are written with, read at every door a quest opens.</summary>
+        private static readonly string[] s_questFreeFormFields =
+        [
+            "acceptConditions", "onAccept", "onDecline", "onFail", "condition", "conditions", "onEnter",
+            "onComplete", "actions"
+        ];
+
+        /// <summary>A dialogue whose option leads to a node nobody wrote, which is what the walk over the
+        /// shipped files exists to find.</summary>
+        private const string ForgedDialogueJson = """
+        {
+          "dialogues": [
+            {
+              "npcId": "Npc_Forged",
+              "entryRules": [ { "priority": 0, "conditions": [], "node": "Greeting" } ],
+              "nodes": [
+                {
+                  "id": "Greeting",
+                  "lines": [ { "speaker": "Npc", "key": "Dlg_Forged" } ],
+                  "options": [ { "id": "Leave", "key": "Dlg_Forged_Leave", "next": "Farewell" } ]
+                }
+              ]
+            }
+          ]
+        }
+        """;
+
+        /// <summary>A quest whose route leads to a stage nobody wrote.</summary>
+        private const string ForgedQuestRouteJson = """
+        {
+          "quests": [
+            {
+              "id": "Quest_Forged",
+              "stages": [
+                {
+                  "id": "Hunt",
+                  "objectives": [ { "id": "Kill", "counter": { "key": "Kill_Count:Npc_Wolf", "amount": 1 } } ],
+                  "transitions": [ { "to": "Reward", "conditions": [] } ]
+                }
+              ]
+            }
+          ]
+        }
+        """;
+
+        /// <summary>The schema of the dialogues, built from the shipped DTOs. A dialogue is found by the
+        /// npc that speaks it rather than by an id of its own, nothing about it is worded from that id, and
+        /// the file a new one goes to is the tool's to choose. Both reports gather what neither reflection
+        /// nor the assembled parts could vouch for.</summary>
+        [TestMethod]
+        public void TheDialoguesSchemaBuildsFromTheRealDtosWithoutAReport()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.Dialogues));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape);
+            Assert.AreEqual(1, schema.Sections.Count);
+            Assert.AreEqual(DialoguesCatalogDescriptor.RecordsKey, schema.Sections[0].Key);
+            Assert.AreEqual(DialoguesCatalogDescriptor.IdField, schema.Sections[0].Record.IdField);
+            Assert.AreEqual(0, schema.LocalizedSuffixes.Count,
+                "a dialogue words nothing from its own id: every line and option carries the key it is read under");
+
+            Assert.IsInstanceOfType<FreeFilePlacement>(schema.Placement, "the dialogues name a file of their own");
+            CollectionAssert.AreEqual(
+                new[] { DialoguesFileName },
+                ShippedFiles(DataCatalog.Dialogues).Select(Path.GetFileNameWithoutExtension).ToArray(),
+                "the catalog ships other files than the one known today");
+
+            CollectionAssert.AreEquivalent(
+                s_dialogueFreeFormFields,
+                FreeFormFields(schema).ToArray(),
+                "a dialogue keeps other keys as raw json than the conditions and actions it is written with");
+
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Reflection.Notes.ToArray(),
+                $"reflection has something to say about the dialogue DTOs:{Environment.NewLine}{builder.Reflection}");
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled Dialogues catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>Every id the dialogue parser resolves against another catalog, every name it parses
+        /// into an enum, every string it reads as a localization key, and every string that reads like a
+        /// reference while naming something inside its own record, said so in the schema. An unmarked one
+        /// reads to the tool as free text: the author types a name nothing answers, and the miss drops the
+        /// whole dialogue at load.</summary>
+        [TestMethod]
+        public void TheDialoguesSchemaNamesTheReferencesChoicesKeysAndRefusalsTheParserResolves()
+        {
+            RecordSchema record = Schema(DataCatalog.Dialogues).Sections[0].Record;
+
+            foreach ((string path, string catalog) in s_dialogueReferences) Points(Leaf(Locate(record, path)), path, catalog);
+
+            foreach ((string path, Type members) in s_dialogueChoices) Choice(Leaf(Locate(record, path)), members);
+
+            foreach (string path in s_dialogueTextKeys)
+                Assert.AreEqual(FieldKind.LocalizedKey, Leaf(Locate(record, path)).Kind,
+                    $"'{path}' is drawn as text to read instead of the key it holds");
+
+            foreach (string path in s_dialogueRefusals)
+                Assert.IsTrue(Leaf(Locate(record, path)).RefusedAsReference,
+                    $"'{path}' names something inside its own dialogue and neither points anywhere nor says it does not");
+        }
+
+        /// <summary>The shipped file read back through the schema: every key it writes is one the schema
+        /// ranks, bar what stands inside a condition or an action — the vocabulary is the narrative
+        /// factories' own and reaches the tool from them, not from this catalog.</summary>
+        [TestMethod]
+        public void TheDialoguesSchemaRanksEveryKeyTheShippedFilesWriteOutsideAConditionOrAnAction()
+        {
+            InsideFreeFormOnly(Schema(DataCatalog.Dialogues), DataCatalog.Dialogues);
+        }
+
+        /// <summary>The schema of the quests, built from the shipped DTOs. A quest is found by its own id
+        /// and named and described in the localization by it, and the file a new one goes to is the tool's
+        /// to choose. Both reports gather what neither reflection nor the assembled parts could vouch
+        /// for.</summary>
+        [TestMethod]
+        public void TheQuestsSchemaBuildsFromTheRealDtosWithoutAReport()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.Quests));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape);
+            Assert.AreEqual(1, schema.Sections.Count);
+            Assert.AreEqual(QuestsCatalogDescriptor.RecordsKey, schema.Sections[0].Key);
+            Assert.AreEqual(QuestsCatalogDescriptor.IdField, schema.Sections[0].Record.IdField);
+            CollectionAssert.AreEqual(
+                new[] { LocalizedKeyAttribute.NoSuffix, LocalizationService.DescriptionSuffix },
+                schema.LocalizedSuffixes.ToArray(),
+                "a quest is named and described in the journal by its own id");
+
+            Assert.IsInstanceOfType<FreeFilePlacement>(schema.Placement, "the quests name a file of their own");
+            CollectionAssert.AreEqual(
+                new[] { QuestsFileName },
+                ShippedFiles(DataCatalog.Quests).Select(Path.GetFileNameWithoutExtension).ToArray(),
+                "the catalog ships other files than the one known today");
+
+            CollectionAssert.AreEquivalent(
+                s_questFreeFormFields,
+                FreeFormFields(schema).ToArray(),
+                "a quest keeps other keys as raw json than the conditions and actions it is written with");
+
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Reflection.Notes.ToArray(),
+                $"reflection has something to say about the quest DTOs:{Environment.NewLine}{builder.Reflection}");
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled Quests catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>Every id the quest parser resolves against another catalog, every name it parses into
+        /// an enum, and every string that reads like a reference while naming something inside its own
+        /// quest, said so in the schema. A reward names its item out of all four catalogs a hand-out may
+        /// come from, the way the GiveItem action does.</summary>
+        [TestMethod]
+        public void TheQuestsSchemaNamesTheReferencesChoicesAndRefusalsTheParserResolves()
+        {
+            RecordSchema record = Schema(DataCatalog.Quests).Sections[0].Record;
+
+            foreach ((string path, string catalog) in s_questReferences) Points(Leaf(Locate(record, path)), path, catalog);
+
+            foreach (string path in s_questRewardItems)
+                foreach (string catalog in s_handedOutCatalogs)
+                    Points(Leaf(Locate(record, path)), path, catalog);
+
+            foreach ((string path, Type members) in s_questChoices) Choice(Leaf(Locate(record, path)), members);
+
+            foreach (string path in s_questRefusals)
+                Assert.IsTrue(Leaf(Locate(record, path)).RefusedAsReference,
+                    $"'{path}' names something inside its own quest and neither points anywhere nor says it does not");
+        }
+
+        /// <summary>The shipped file read back through the schema, the way the dialogues are: everything
+        /// outside a condition or an action is ranked.</summary>
+        [TestMethod]
+        public void TheQuestsSchemaRanksEveryKeyTheShippedFilesWriteOutsideAConditionOrAnAction()
+        {
+            InsideFreeFormOnly(Schema(DataCatalog.Quests), DataCatalog.Quests);
+        }
+
+        /// <summary>
+        /// Every route of every shipped dialogue leads to a node of the SAME dialogue: the opening rules,
+        /// the options and the fallback of a speech check. The contract cannot say it — a node is not a
+        /// record of any catalog — and the provider drops a dialogue whose route dangles, one npc falling
+        /// silent with nothing but a line in the log, so the files are held to it here.
+        /// </summary>
+        [TestMethod]
+        public void EveryDialogueRouteNamesANodeOfItsOwnDialogue()
+        {
+            List<string> dangling = [];
+            int routes = 0;
+
+            foreach (string file in ShippedFiles(DataCatalog.Dialogues))
+            {
+                (List<string> broken, int walked) = DialogueRoutes(JsonTreeDocument.Load(file).Root);
+                dangling.AddRange(broken.Select(route => $"{Path.GetFileName(file)} {route}"));
+                routes += walked;
+            }
+
+            Assert.AreNotEqual(0, routes, "the shipped dialogues hold no routes at all — the walk proves nothing");
+            Report("Routes between the nodes of the shipped dialogues", [$"{routes} walked"]);
+
+            Assert.AreEqual(0, dangling.Count,
+                $"dialogue routes leading to a node nobody wrote: {string.Join(", ", dangling)}");
+        }
+
+        /// <summary>The mutation the walk exists for, run against the same reading: a dialogue whose
+        /// option leads nowhere is the one the provider would drop in silence.</summary>
+        [TestMethod]
+        public void ADialogueRoutePointingAtAMissingNode_IsCaught()
+        {
+            (List<string> dangling, int routes) = DialogueRoutes(JsonTreeDocument.Parse(ForgedDialogueJson).Root);
+
+            Assert.AreEqual(2, routes, "the forged dialogue writes another number of routes than the walk read");
+            Assert.AreEqual(1, dangling.Count, $"a dialogue leading to a node nobody wrote went unnoticed: {string.Join(", ", dangling)}");
+        }
+
+        /// <summary>
+        /// Every route out of every stage of every shipped quest leads to a stage of the SAME quest. The
+        /// contract cannot say it — a stage is not a record of any catalog — and the provider drops a quest
+        /// whose route dangles. The shipped quests are linear today and write no routes at all, so the
+        /// stages they do write are counted and the number of routes is reported rather than demanded.
+        /// </summary>
+        [TestMethod]
+        public void EveryQuestRouteNamesAStageOfItsOwnQuest()
+        {
+            List<string> dangling = [];
+            int routes = 0;
+            int stages = 0;
+
+            foreach (string file in ShippedFiles(DataCatalog.Quests))
+            {
+                (List<string> broken, int walked, int written) = QuestRoutes(JsonTreeDocument.Load(file).Root);
+                dangling.AddRange(broken.Select(route => $"{Path.GetFileName(file)} {route}"));
+                routes += walked;
+                stages += written;
+            }
+
+            Assert.AreNotEqual(0, stages, "the shipped quests hold no stages at all — the walk proves nothing");
+            Report("Stages and routes of the shipped quests", [$"{stages} stages", $"{routes} routes"]);
+
+            Assert.AreEqual(0, dangling.Count,
+                $"quest routes leading to a stage nobody wrote: {string.Join(", ", dangling)}");
+        }
+
+        /// <summary>The mutation the walk exists for: a branch written to a stage nobody wrote is the one
+        /// the provider would drop in silence.</summary>
+        [TestMethod]
+        public void AQuestRoutePointingAtAMissingStage_IsCaught()
+        {
+            (List<string> dangling, int routes, int stages) = QuestRoutes(JsonTreeDocument.Parse(ForgedQuestRouteJson).Root);
+
+            Assert.AreEqual(1, stages, "the forged quest writes another number of stages than the walk read");
+            Assert.AreEqual(1, routes, "the forged quest writes another number of routes than the walk read");
+            Assert.AreEqual(1, dangling.Count, $"a quest leading to a stage nobody wrote went unnoticed: {string.Join(", ", dangling)}");
+        }
+
+        /// <summary>Json names of every field the schema keeps as raw json, read off the schema rather than
+        /// listed: what stands inside one is the vocabulary's own business, and the walk stops there.</summary>
+        private static HashSet<string> FreeFormFields(CatalogSchema schema) =>
+        [
+            .. Records(schema)
+                .SelectMany(record => record.Fields)
+                .Where(field => Leaf(field).Kind == FieldKind.Any)
+                .Select(field => field.JsonName)
+        ];
+
+        /// <summary>That the keys the schema could not place all sit inside a field it keeps as raw json.
+        /// A key ANYWHERE else is a field the tool would not let the author touch.</summary>
+        private static void InsideFreeFormOnly(CatalogSchema schema, string catalog)
+        {
+            HashSet<string> freeForm = FreeFormFields(schema);
+            Assert.AreNotEqual(0, freeForm.Count, $"no field of the {catalog} catalog is raw json — the check is checking nothing");
+
+            List<string> unknown = UnknownKeys(schema, catalog);
+            List<string> elsewhere =
+            [
+                .. unknown.Where(address => !freeForm.Any(field =>
+                    address.Contains($"{PointerSeparator}{field}{PointerSeparator}", StringComparison.Ordinal)))
+            ];
+
+            Report($"Keys the {catalog} files write inside a condition or an action",
+                [.. unknown.Select(LastKey).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)]);
+
+            Assert.AreEqual(0, elsewhere.Count,
+                $"keys of the {catalog} files outside a condition or an action that no field of the schema is written under: {string.Join(", ", elsewhere)}");
+        }
+
+        /// <summary>The routes of every dialogue of one document that lead to a node nobody wrote, and how
+        /// many routes were read at all.</summary>
+        private static (List<string> Dangling, int Routes) DialogueRoutes(JToken root)
+        {
+            List<string> dangling = [];
+            int routes = 0;
+
+            foreach (JObject dialogue in SectionRecords(root, DialoguesCatalogDescriptor.RecordsKey))
+            {
+                HashSet<string> nodes = [.. Nodes(dialogue).Select(node => Id(node, LocalIdField))];
+
+                foreach ((string at, string target) in DialogueTargets(dialogue))
+                {
+                    routes++;
+
+                    if (!nodes.Contains(target))
+                        dangling.Add($"{Id(dialogue, DialoguesCatalogDescriptor.IdField)} {at} → '{target}'");
+                }
+            }
+
+            return (dangling, routes);
+        }
+
+        private static IEnumerable<JObject> Nodes(JObject dialogue) =>
+            (dialogue[NodesField] as JArray ?? []).OfType<JObject>();
+
+        /// <summary>Every node one dialogue names, with where it names it: an opening rule, an option, and
+        /// the fallback of an option's speech check. A route written as nothing at all ends the
+        /// conversation and names no node.</summary>
+        private static IEnumerable<(string At, string Target)> DialogueTargets(JObject dialogue)
+        {
+            foreach (JObject rule in (dialogue[EntryRulesField] as JArray ?? []).OfType<JObject>())
+                if (rule[EntryNodeField]?.Value<string>() is { } opening)
+                    yield return ($"{EntryRulesField}({rule[PriorityField]})", opening);
+
+            foreach (JObject node in Nodes(dialogue))
+                foreach (JObject option in (node[OptionsField] as JArray ?? []).OfType<JObject>())
+                {
+                    string at = $"{Id(node, LocalIdField)}/{Id(option, LocalIdField)}";
+
+                    if (option[NextField]?.Value<string>() is { } next) yield return (at, next);
+
+                    if (option[SpeechCheckField]?[FailNextField]?.Value<string>() is { } failNext)
+                        yield return ($"{at} {SpeechCheckField}", failNext);
+                }
+        }
+
+        /// <summary>The routes of every quest of one document that lead to a stage nobody wrote, how many
+        /// routes were read, and how many stages they were read against.</summary>
+        private static (List<string> Dangling, int Routes, int Stages) QuestRoutes(JToken root)
+        {
+            List<string> dangling = [];
+            int routes = 0;
+            int written = 0;
+
+            foreach (JObject quest in SectionRecords(root, QuestsCatalogDescriptor.RecordsKey))
+            {
+                List<JObject> stages = [.. (quest[StagesField] as JArray ?? []).OfType<JObject>()];
+                HashSet<string> ids = [.. stages.Select(stage => Id(stage, LocalIdField))];
+                written += stages.Count;
+
+                foreach (JObject stage in stages)
+                    foreach (JObject transition in (stage[TransitionsField] as JArray ?? []).OfType<JObject>())
+                    {
+                        routes++;
+                        string target = transition[TransitionTargetField]?.Value<string>() ?? string.Empty;
+
+                        if (!ids.Contains(target))
+                            dangling.Add($"{Id(quest, QuestsCatalogDescriptor.IdField)} {Id(stage, LocalIdField)} → '{target}'");
+                    }
+            }
+
+            return (dangling, routes, written);
+        }
     }
 }

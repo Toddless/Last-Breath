@@ -12,6 +12,8 @@ namespace Tooling.Tests.Schema
     {
         public string Catalog { get; } = catalog;
 
+        public string? Section { get; init; }
+
         public bool AllowEmpty { get; set; }
     }
 

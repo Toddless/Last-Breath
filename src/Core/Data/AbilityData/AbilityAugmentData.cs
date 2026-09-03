@@ -46,7 +46,9 @@ namespace Core.Data.AbilityData
 
         /// <summary>Hard binding to a single ability — the exception kept for augments too strong to be
         /// handed to a whole family. Set, it decides alone; empty, the augment is bound to nothing.</summary>
-        [JsonProperty("abilityId")][CatalogRef(DataCatalog.Abilities, AllowEmpty = true)] public string AbilityId { get; init; } = string.Empty;
+        [JsonProperty("abilityId")]
+        [CatalogRef(DataCatalog.Abilities, Section = AbilityDataRoot.AbilitiesSection, AllowEmpty = true)]
+        public string AbilityId { get; init; } = string.Empty;
 
         /// <summary>Declares the augment at home on every ability — for records working through the base
         /// contract (cost, cooldown). Universality must be CLAIMED: a record naming no tag is simply

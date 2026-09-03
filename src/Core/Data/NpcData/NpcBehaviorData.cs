@@ -29,7 +29,9 @@ namespace Core.Data.NpcData
 
     public record NpcAbilityBehaviorData
     {
-        [JsonProperty("id")][CatalogRef(DataCatalog.Abilities)] public string Id { get; init; } = string.Empty;
+        [JsonProperty("id")]
+        [CatalogRef(DataCatalog.Abilities, Section = AbilityData.AbilityDataRoot.AbilitiesSection)]
+        public string Id { get; init; } = string.Empty;
         [JsonProperty("weight")] public float Weight { get; init; } = 1f;
         [JsonProperty("role")][EnumOf(typeof(AbilityRole))] public string Role { get; init; } = string.Empty;
     }

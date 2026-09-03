@@ -1,8 +1,12 @@
 namespace Core.Data.QuestData
 {
     using System.Collections.Generic;
+    using Enums;
+    using GameData;
+    using Narrative.Quests;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using Schema;
 
     /// <summary>Raw shape of a Quests catalog file. Conditions and actions stay as JTokens here —
     /// the QuestProvider runs them through the narrative parsers and drops broken quests whole.</summary>
@@ -14,16 +18,16 @@ namespace Core.Data.QuestData
     public record QuestEntry
     {
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
-        [JsonProperty("giverNpcId")] public string GiverNpcId { get; init; } = string.Empty;
+        [JsonProperty("giverNpcId")][CatalogRef(DataCatalog.Npc)] public string GiverNpcId { get; init; } = string.Empty;
 
         /// <summary>Faction the quest belongs to; a turn-in candidate must still carry it
         /// (a giver risen as undead is not the person you promised the blade to).</summary>
-        [JsonProperty("faction")] public string? Faction { get; init; }
+        [JsonProperty("faction")][EnumOf(typeof(Fractions))] public string? Faction { get; init; }
 
         [JsonProperty("tier")] public int Tier { get; init; } = 1;
         [JsonProperty("repeatable")] public bool Repeatable { get; init; }
-        [JsonProperty("turnInNpcIds")] public List<string> TurnInNpcIds { get; init; } = [];
-        [JsonProperty("declinePolicy")] public string DeclinePolicy { get; init; } = "CanReturn";
+        [JsonProperty("turnInNpcIds")][CatalogRef(DataCatalog.Npc)] public List<string> TurnInNpcIds { get; init; } = [];
+        [JsonProperty("declinePolicy")][EnumOf(typeof(DeclinePolicy))] public string DeclinePolicy { get; init; } = "CanReturn";
         [JsonProperty("declineCooldownHours")] public int DeclineCooldownHours { get; init; }
 
         /// <summary>False makes the quest unloseable — deadline, a lost turn-in NPC or a decline
@@ -43,7 +47,10 @@ namespace Core.Data.QuestData
 
     public record QuestStageEntry
     {
-        [JsonProperty("id")] public string Id { get; init; } = string.Empty;
+        /// <summary>Names the stage within its own quest; the routes and the save state are written
+        /// with it. Points into no catalog.</summary>
+        [JsonProperty("id")][NotARef] public string Id { get; init; } = string.Empty;
+
         [JsonProperty("objectives")] public List<QuestObjectiveEntry> Objectives { get; init; } = [];
 
         /// <summary>Routes out of the stage, tried in order. Empty or absent = the next stage of the
@@ -62,7 +69,9 @@ namespace Core.Data.QuestData
     /// last — the first transition whose conditions all hold wins.</summary>
     public record QuestTransitionEntry
     {
-        [JsonProperty("to")] public string To { get; init; } = string.Empty;
+        /// <summary>Id of a stage of THIS quest — where the route leads. Points into no catalog.</summary>
+        [JsonProperty("to")][NotARef] public string To { get; init; } = string.Empty;
+
         [JsonProperty("conditions")] public JToken? Conditions { get; init; }
     }
 
@@ -70,7 +79,10 @@ namespace Core.Data.QuestData
     /// "fails": true buries the quest on the spot instead of offering a turn-in.</summary>
     public record QuestOutcomeEntry
     {
-        [JsonProperty("id")] public string Id { get; init; } = string.Empty;
+        /// <summary>Names the ending within its own quest; the save keeps the outcome by it. Points
+        /// into no catalog.</summary>
+        [JsonProperty("id")][NotARef] public string Id { get; init; } = string.Empty;
+
         [JsonProperty("fails")] public bool Fails { get; init; }
         [JsonProperty("rewards")] public QuestRewardsEntry? Rewards { get; init; }
     }
@@ -79,7 +91,10 @@ namespace Core.Data.QuestData
     /// by nature), a counter tracks a fact with visible X/N progress and an optional baseline.</summary>
     public record QuestObjectiveEntry
     {
-        [JsonProperty("id")] public string Id { get; init; } = string.Empty;
+        /// <summary>Names the objective within its stage; its journal line is worded under it. Points
+        /// into no catalog.</summary>
+        [JsonProperty("id")][NotARef] public string Id { get; init; } = string.Empty;
+
         [JsonProperty("condition")] public JToken? Condition { get; init; }
         [JsonProperty("counter")] public QuestCounterEntry? Counter { get; init; }
         [JsonProperty("optional")] public bool Optional { get; init; }
@@ -105,7 +120,15 @@ namespace Core.Data.QuestData
 
     public record QuestRewardItemEntry
     {
-        [JsonProperty("itemId")] public string ItemId { get; init; } = string.Empty;
+        /// <summary>What is handed over, out of every catalog a hand-out may name — the same four the
+        /// GiveItem action reads its id from.</summary>
+        [JsonProperty("itemId")]
+        [CatalogRef(DataCatalog.EquipItems)]
+        [CatalogRef(DataCatalog.Resources)]
+        [CatalogRef(DataCatalog.Items)]
+        [CatalogRef(DataCatalog.Ornaments)]
+        public string ItemId { get; init; } = string.Empty;
+
         [JsonProperty("amount")] public int Amount { get; init; } = 1;
     }
 }

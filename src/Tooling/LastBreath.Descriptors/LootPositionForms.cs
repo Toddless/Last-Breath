@@ -1,5 +1,6 @@
 namespace LastBreath.Descriptors
 {
+    using Core.Data.CraftingData;
     using Core.Data.GameData;
     using Core.Data.LootTable;
     using Core.Data.Schema;
@@ -11,8 +12,14 @@ namespace LastBreath.Descriptors
     /// </summary>
     public sealed record LootPositionById
     {
-        /// <summary>The thing that drops, named out of every catalog a droppable thing is written in.</summary>
-        [CatalogRef(DataCatalog.EquipItems), CatalogRef(DataCatalog.Items), CatalogRef(DataCatalog.Recipes), CatalogRef(DataCatalog.Resources)]
+        /// <summary>The thing that drops, named out of every catalog a droppable thing is written in —
+        /// and, in the resources, out of the two sections holding things: the categories beside them are
+        /// what a material belongs to and never a drop of their own.</summary>
+        [CatalogRef(DataCatalog.EquipItems)]
+        [CatalogRef(DataCatalog.Items)]
+        [CatalogRef(DataCatalog.Recipes)]
+        [CatalogRef(DataCatalog.Resources, Section = ResourcesData.UpgradeResourcesSection)]
+        [CatalogRef(DataCatalog.Resources, Section = ResourcesData.CraftingResourcesSection)]
         public string Id { get; init; } = string.Empty;
 
         /// <summary>Loot units the seat costs, never gold.</summary>

@@ -17,7 +17,9 @@ namespace LastBreath.Descriptors
             new LootTablesCatalogDescriptor(),
             new EquipItemsCatalogDescriptor(),
             new ModifierPoolsCatalogDescriptor(),
-            new ResourcesCatalogDescriptor()
+            new ResourcesCatalogDescriptor(),
+            new DialoguesCatalogDescriptor(),
+            new QuestsCatalogDescriptor()
         ];
 
         /// <summary>Catalogs with no descriptor yet, named one by one rather than counted: a name added
@@ -33,8 +35,6 @@ namespace LastBreath.Descriptors
             DataCatalog.ReputationPerks,
             DataCatalog.Raids,
             DataCatalog.Influence,
-            DataCatalog.Quests,
-            DataCatalog.Dialogues,
             DataCatalog.Formatting,
             DataCatalog.World,
             DataCatalog.Recovery,

@@ -86,7 +86,7 @@ namespace Tooling.Catalogs
             }
 
             for (int index = 0; index < array.Count; index++)
-                records.Add(new CatalogRecord(file, at.Append(index), Id(section.Record, array[index], index), section.Record));
+                records.Add(new CatalogRecord(file, at.Append(index), Id(section.Record, array[index], index), section.Record, section.Key));
         }
 
         private static void ReadMap(
@@ -99,7 +99,7 @@ namespace Tooling.Catalogs
             }
 
             foreach (JProperty pair in map.Properties())
-                records.Add(new CatalogRecord(file, at.Append(pair.Name), pair.Name, section.Record));
+                records.Add(new CatalogRecord(file, at.Append(pair.Name), pair.Name, section.Record, section.Key));
         }
 
         /// <summary>A file that is one record. It still gets an id, so a list of records reads the same
@@ -113,7 +113,7 @@ namespace Tooling.Catalogs
                 return;
             }
 
-            records.Add(new CatalogRecord(file, at, Id(section.Record, token, index: 0), section.Record));
+            records.Add(new CatalogRecord(file, at, Id(section.Record, token, index: 0), section.Record, section.Key));
         }
 
         /// <summary>The id the record is written under, or its place in the section when it carries

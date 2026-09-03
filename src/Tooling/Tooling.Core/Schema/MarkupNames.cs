@@ -22,6 +22,10 @@ namespace Tooling.Schema.Reflection
         /// <see cref="DictionaryKey"/>.</summary>
         public const string Catalog = "Catalog";
 
+        /// <summary>The one section of that catalog a reference may point into, on
+        /// <see cref="CatalogRef"/>. Markup saying nothing under it points into the whole catalog.</summary>
+        public const string Section = "Section";
+
         /// <summary>Whether an empty value is a legal "nothing named", on <see cref="CatalogRef"/>.</summary>
         public const string AllowEmpty = "AllowEmpty";
 

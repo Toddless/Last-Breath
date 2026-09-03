@@ -25,9 +25,10 @@ namespace Tooling.Schema.Model
         /// <summary>Member names offered for <see cref="FieldKind.Enum"/>; empty otherwise.</summary>
         public SchemaList<string> EnumValues { get; init; }
 
-        /// <summary>Catalogs a <see cref="FieldKind.Reference"/> points into: a record is named if any
-        /// one of them knows it. Loot positions name equipment, resources and recipes in one field.</summary>
-        public SchemaList<string> RefCatalogs { get; init; }
+        /// <summary>Where a <see cref="FieldKind.Reference"/> points: a record is named if any one of the
+        /// targets knows it. Loot positions name equipment, resources and recipes in one field; a target
+        /// naming a section of its catalog is answered by that section alone.</summary>
+        public SchemaList<ReferenceTarget> RefTargets { get; init; }
 
         /// <summary>An empty reference names nothing on purpose rather than being unfinished.</summary>
         public bool AllowEmpty { get; init; }

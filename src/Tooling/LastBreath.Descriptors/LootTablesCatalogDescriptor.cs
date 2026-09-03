@@ -78,7 +78,7 @@ namespace LastBreath.Descriptors
             new() { JsonName = KeyField, Kind = FieldKind.Enum, EnumValues = Enum.GetNames(members) };
 
         private static FieldSchema Reference(string catalog) =>
-            new() { JsonName = KeyField, Kind = FieldKind.Reference, RefCatalogs = [catalog] };
+            new() { JsonName = KeyField, Kind = FieldKind.Reference, RefTargets = [ReferenceTarget.Whole(catalog)] };
 
         /// <summary>A name the author picks himself, pointing at nothing — said out loud, because a key
         /// that names nothing and a key nobody has described yet read the same.</summary>
@@ -103,7 +103,7 @@ namespace LastBreath.Descriptors
             {
                 Kind = names.Kind,
                 EnumValues = names.EnumValues,
-                RefCatalogs = names.RefCatalogs,
+                RefTargets = names.RefTargets,
                 RefusedAsReference = names.RefusedAsReference
             };
         }

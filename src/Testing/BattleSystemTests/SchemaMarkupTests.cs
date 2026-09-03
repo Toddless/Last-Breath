@@ -25,6 +25,7 @@ namespace LastBreathTest.BattleSystemTests
         private const string HiddenName = "HiddenAttribute";
 
         private const string CatalogProperty = "Catalog";
+        private const string SectionProperty = "Section";
         private const string AllowEmptyProperty = "AllowEmpty";
         private const string EnumTypeProperty = "EnumType";
         private const string MinProperty = "Min";
@@ -42,6 +43,10 @@ namespace LastBreathTest.BattleSystemTests
         private const string EquipItemsCatalog = "EquipItems";
         private const string ResourcesCatalog = "Resources";
         private const string RecipesCatalog = "Recipes";
+
+        /// <summary>The section of the abilities catalog a list of casts points into — a catalog holding
+        /// more than the casts is what narrowing a reference to one section is for.</summary>
+        private const string CastsSection = "abilities";
 
         private const string DescriptionSuffix = "_Description";
 
@@ -106,7 +111,9 @@ namespace LastBreathTest.BattleSystemTests
         public void Markup_IsReadBackFromTheMarkedProperties()
         {
             Assert.AreEqual(AbilitiesCatalog, Written<CatalogRefAttribute>(nameof(MarkedDto.Abilities)).Catalog);
+            Assert.AreEqual(CastsSection, Written<CatalogRefAttribute>(nameof(MarkedDto.Abilities)).Section);
             Assert.IsFalse(Written<CatalogRefAttribute>(nameof(MarkedDto.Abilities)).AllowEmpty);
+            Assert.IsNull(Written<CatalogRefAttribute>(nameof(MarkedDto.NpcBuffId)).Section, "a reference names no section unless it was narrowed to one");
             Assert.IsTrue(Written<CatalogRefAttribute>(nameof(MarkedDto.NpcBuffId)).AllowEmpty);
             Assert.AreEqual(typeof(TestFraction), Written<EnumOfAttribute>(nameof(MarkedDto.Fraction)).EnumType);
             Assert.AreEqual(MinTier, Written<RangeAttribute>(nameof(MarkedDto.Tier)).Min);
@@ -184,6 +191,7 @@ namespace LastBreathTest.BattleSystemTests
         private static IEnumerable<(string Attribute, string Property, Type Carried)> Convention() =>
         [
             (CatalogRefName, CatalogProperty, typeof(string)),
+            (CatalogRefName, SectionProperty, typeof(string)),
             (CatalogRefName, AllowEmptyProperty, typeof(bool)),
             (DictionaryKeyName, CatalogProperty, typeof(string)),
             (DictionaryKeyName, EnumTypeProperty, typeof(Type)),
@@ -233,7 +241,7 @@ namespace LastBreathTest.BattleSystemTests
             [CatalogRef(EquipItemsCatalog), CatalogRef(ResourcesCatalog), CatalogRef(RecipesCatalog)]
             public string Id { get; init; } = string.Empty;
 
-            [CatalogRef(AbilitiesCatalog)] public List<string> Abilities { get; init; } = [];
+            [CatalogRef(AbilitiesCatalog, Section = CastsSection)] public List<string> Abilities { get; init; } = [];
 
             [CatalogRef(NpcBuffsCatalog, AllowEmpty = true)] public string NpcBuffId { get; init; } = string.Empty;
 

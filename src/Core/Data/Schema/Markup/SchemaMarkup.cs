@@ -21,9 +21,15 @@ namespace Core.Data.Schema
         /// <summary>Catalog whose records this string may name.</summary>
         public string Catalog { get; }
 
+        /// <summary>The one section of that catalog the id may be written in, as the file keys it; unset
+        /// when every record of the catalog answers. A catalog holding sections that answer to nothing
+        /// each other — the material categories beside the materials, the abilities beside the augments —
+        /// gives a field naming the whole of it far more ids than the game will resolve.</summary>
+        public string? Section { get; init; }
+
         /// <summary>An empty string is a legal "nothing named". Without it an empty value is a broken
         /// reference, which is the answer for every field that must point somewhere.</summary>
-        public bool AllowEmpty { get; set; }
+        public bool AllowEmpty { get; init; }
     }
 
     /// <summary>

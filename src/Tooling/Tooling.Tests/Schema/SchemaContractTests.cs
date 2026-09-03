@@ -48,6 +48,11 @@ namespace Tooling.Tests.Schema
         private const string TierUpgradeChanceField = "tierUpgradeChance";
 
         private const string NpcsKey = "npcs";
+
+        /// <summary>The section of the abilities catalog an npc's list points into: a catalog holding
+        /// more than the casts is what narrowing a reference to one section is for.</summary>
+        private const string CastsKey = "casts";
+
         private const string ModsKey = "mods";
         private const string GeneralKey = "general";
         private const string FractionsKey = "fractions";
@@ -78,7 +83,9 @@ namespace Tooling.Tests.Schema
         public void Attributes_AreReadBackFromTheMarkedProperties()
         {
             Assert.AreEqual(AbilitiesCatalog, Attribute<CatalogRefAttribute>(typeof(NpcDto), nameof(NpcDto.Abilities)).Catalog);
+            Assert.AreEqual(CastsKey, Attribute<CatalogRefAttribute>(typeof(NpcDto), nameof(NpcDto.Abilities)).Section);
             Assert.IsFalse(Attribute<CatalogRefAttribute>(typeof(NpcDto), nameof(NpcDto.Abilities)).AllowEmpty);
+            Assert.IsNull(Attribute<CatalogRefAttribute>(typeof(NpcModifierDto), nameof(NpcModifierDto.NpcBuffId)).Section);
             Assert.IsTrue(Attribute<CatalogRefAttribute>(typeof(NpcModifierDto), nameof(NpcModifierDto.NpcBuffId)).AllowEmpty);
             Assert.AreEqual(typeof(TestFraction), Attribute<EnumOfAttribute>(typeof(NpcDto), nameof(NpcDto.Fraction)).EnumType);
             Assert.AreEqual(MinTier, Attribute<RangeAttribute>(typeof(LootTierDto), nameof(LootTierDto.Tier)).Min);
@@ -232,6 +239,22 @@ namespace Tooling.Tests.Schema
         public void List_WithAnEmptyEntry_IsRefused() =>
             Assert.ThrowsException<ArgumentException>(() => new SchemaList<string>([IdField, null!]));
 
+        /// <summary>A reference points at a catalog, and the section it may name is a key some file is
+        /// written under: a blank one narrows the field to a section nothing holds, which would report
+        /// every id written in it as broken. Naming no section at all is the whole catalog.</summary>
+        [TestMethod]
+        public void ReferenceTarget_NamingNoCatalogOrABlankSection_IsRefused()
+        {
+            Assert.ThrowsException<ArgumentException>(() => new ReferenceTarget(" "));
+            Assert.ThrowsException<ArgumentException>(() => new ReferenceTarget(AbilitiesCatalog, " "));
+
+            Assert.IsNull(ReferenceTarget.Whole(AbilitiesCatalog).Section);
+            Assert.AreEqual(AbilitiesCatalog, ReferenceTarget.Whole(AbilitiesCatalog).ToString());
+            Assert.AreEqual(
+                $"{AbilitiesCatalog}{ReferenceTarget.SectionSeparator}{CastsKey}",
+                new ReferenceTarget(AbilitiesCatalog, CastsKey).ToString());
+        }
+
         /// <summary>Two sections under one key means one of them is never written to the file.</summary>
         [TestMethod]
         public void Catalog_WithTwoSectionsUnderOneKey_IsRefused()
@@ -358,7 +381,8 @@ namespace Tooling.Tests.Schema
             Assert.AreEqual(FieldKind.Reference, named.Kind);
             CollectionAssert.AreEquivalent(
                 new[] { EquipItemsCatalog, ResourcesCatalog, RecipesCatalog },
-                named.RefCatalogs.ToArray());
+                named.RefTargets.Select(target => target.Catalog).ToArray());
+            Assert.IsTrue(named.RefTargets.All(target => target.Section is null), "a drop is named out of whole catalogs");
         }
 
         /// <summary>The modifier sections are told apart by the value of their own key, and each value
@@ -452,6 +476,7 @@ namespace Tooling.Tests.Schema
         private static IEnumerable<(string Attribute, string Property, Type Carried)> Convention() =>
         [
             (MarkupNames.CatalogRef, MarkupNames.Catalog, typeof(string)),
+            (MarkupNames.CatalogRef, MarkupNames.Section, typeof(string)),
             (MarkupNames.CatalogRef, MarkupNames.AllowEmpty, typeof(bool)),
             (MarkupNames.DictionaryKey, MarkupNames.Catalog, typeof(string)),
             (MarkupNames.DictionaryKey, MarkupNames.EnumType, typeof(Type)),
@@ -526,7 +551,7 @@ namespace Tooling.Tests.Schema
 
             [EnumOf(typeof(TestFraction))] public string Fraction { get; init; } = string.Empty;
 
-            [CatalogRef(AbilitiesCatalog)] public List<string> Abilities { get; init; } = [];
+            [CatalogRef(AbilitiesCatalog, Section = CastsKey)] public List<string> Abilities { get; init; } = [];
 
             [DictionaryKey(typeof(TestParameter))] public Dictionary<string, float> BaseParameters { get; init; } = [];
 
@@ -670,7 +695,12 @@ namespace Tooling.Tests.Schema
             }
 
             private static FieldSchema Reference(string name, params string[] catalogs) =>
-                new() { JsonName = name, Kind = FieldKind.Reference, RefCatalogs = catalogs };
+                new()
+                {
+                    JsonName = name,
+                    Kind = FieldKind.Reference,
+                    RefTargets = [.. catalogs.Select(ReferenceTarget.Whole)]
+                };
 
             private static FieldSchema Choice<T>(string name) where T : struct, Enum =>
                 new() { JsonName = name, Kind = FieldKind.Enum, EnumValues = Enum.GetNames<T>() };

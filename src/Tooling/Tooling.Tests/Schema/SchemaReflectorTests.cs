@@ -41,6 +41,14 @@ namespace Tooling.Tests.Schema
         private const string NpcIdField = "npcId";
         private const string NoteField = "note";
         private const string BuffField = "npcBuffId";
+        private const string CategoryField = "categoryId";
+        private const string SectionlessField = "sectionless";
+        private const string CataloglessField = "catalogless";
+
+        /// <summary>The section of the resources catalog a category is written in — a catalog whose
+        /// sections answer to nothing each other is what narrowing a reference is for.</summary>
+        private const string CategoriesKey = "materialCategories";
+
         private const string TitleField = "title";
         private const string SummaryField = "summary";
         private const string TiersField = "tiers";
@@ -165,7 +173,7 @@ namespace Tooling.Tests.Schema
             Assert.IsNotNull(abilities.Item);
             Assert.AreEqual(FieldKind.Reference, abilities.Item.Kind);
             Assert.AreEqual(FieldSchema.Unnamed, abilities.Item.JsonName);
-            CollectionAssert.AreEqual(new[] { AbilitiesCatalog }, abilities.Item.RefCatalogs.ToArray());
+            CollectionAssert.AreEqual(new[] { AbilitiesCatalog }, Catalogs(abilities.Item));
         }
 
         /// <summary>One field, several catalogs, and an empty value that names nothing on purpose.</summary>
@@ -175,10 +183,53 @@ namespace Tooling.Tests.Schema
             RecordSchema record = _reflector.Record(typeof(TextDto));
             FieldSchema buff = Field(record, BuffField);
 
-            CollectionAssert.AreEquivalent(new[] { EquipItemsCatalog, ResourcesCatalog }, Field(record, IdField).RefCatalogs.ToArray());
+            CollectionAssert.AreEquivalent(new[] { EquipItemsCatalog, ResourcesCatalog }, Catalogs(Field(record, IdField)));
             Assert.IsFalse(Field(record, IdField).AllowEmpty);
             Assert.IsTrue(buff.AllowEmpty);
-            CollectionAssert.AreEqual(new[] { NpcBuffsCatalog }, buff.RefCatalogs.ToArray());
+            CollectionAssert.AreEqual(new[] { NpcBuffsCatalog }, Catalogs(buff));
+        }
+
+        /// <summary>A reference narrowed to one section of a catalog says so; one that names no section
+        /// points into the whole of it. The two have to be told apart on the field: a catalog whose
+        /// sections answer to nothing each other would otherwise offer the author ids the game drops.</summary>
+        [TestMethod]
+        public void AReferenceNarrowedToASection_CarriesTheSectionOntoTheField()
+        {
+            RecordSchema record = _reflector.Record(typeof(TextDto));
+
+            Assert.AreEqual(
+                new ReferenceTarget(ResourcesCatalog, CategoriesKey),
+                Field(record, CategoryField).RefTargets[0]);
+            Assert.IsTrue(Field(record, BuffField).RefTargets.All(target => target.Section is null),
+                "a reference naming no section was narrowed to one");
+            NothingSaid(nameof(TextDto), CategoryField);
+        }
+
+        /// <summary>A section named as a blank word narrows the field to a key no file is written under,
+        /// which would report every id in it as broken. Read as the whole catalog, and said out loud: a
+        /// narrowing that quietly does nothing looks exactly like a field nobody has narrowed.</summary>
+        [TestMethod]
+        public void AReferenceNarrowedToANamelessSection_PointsIntoTheWholeCatalog_AndIsSaidOutLoud()
+        {
+            FieldSchema field = Field(_reflector.Record(typeof(AwkwardDto)), SectionlessField);
+
+            Assert.AreEqual(FieldKind.Reference, field.Kind);
+            Assert.AreEqual(ReferenceTarget.Whole(AbilitiesCatalog), field.RefTargets[0]);
+            Said(nameof(AwkwardDto), SectionlessField, AbilitiesCatalog);
+        }
+
+        /// <summary>A catalog named as a blank word is no catalog: the reference is dropped rather than
+        /// answered from nothing, and said out loud on the same terms a nameless section is. The writing
+        /// side refuses it where it is written, and the two halves of the contract have to agree even
+        /// when one of them is markup this build has never seen.</summary>
+        [TestMethod]
+        public void AReferenceIntoANamelessCatalog_IsNotReadAtAll_AndIsSaidOutLoud()
+        {
+            FieldSchema field = Field(_reflector.Record(typeof(AwkwardDto)), CataloglessField);
+
+            Assert.AreEqual(FieldKind.String, field.Kind, "a reference into no catalog was drawn as one");
+            Assert.AreEqual(0, field.RefTargets.Count);
+            Said(nameof(AwkwardDto), CataloglessField);
         }
 
         /// <summary>A refusal is a decision and is written down as one. A field that reads as unmarked is a
@@ -253,7 +304,7 @@ namespace Tooling.Tests.Schema
             FieldSchema map = Field(_reflector.Record(typeof(KeyedDto)), ItemsField);
 
             Assert.AreEqual(FieldKind.Reference, map.Key?.Kind);
-            CollectionAssert.AreEqual(new[] { EquipItemsCatalog, ResourcesCatalog }, map.Key!.RefCatalogs.ToArray());
+            CollectionAssert.AreEqual(new[] { EquipItemsCatalog, ResourcesCatalog }, Catalogs(map.Key!));
         }
 
         /// <summary>What the keys hold and what the values hold are two questions, answered by two pieces of
@@ -604,7 +655,7 @@ namespace Tooling.Tests.Schema
             RecordSchema record = _reflector.Record(typeof(AwkwardDto));
 
             Assert.AreEqual(FieldKind.Integer, Field(record, PriceField).Kind);
-            Assert.AreEqual(0, Field(record, PriceField).RefCatalogs.Count);
+            Assert.AreEqual(0, Field(record, PriceField).RefTargets.Count);
             Assert.IsNull(Field(record, IdField).Range);
             Said(nameof(AwkwardDto), PriceField, SaidNotText);
             Said(nameof(AwkwardDto), IdField, SaidNotANumber);
@@ -618,7 +669,7 @@ namespace Tooling.Tests.Schema
             FieldSchema field = Field(_reflector.Record(typeof(AwkwardDto)), KeyField);
 
             Assert.AreEqual(FieldKind.String, field.Kind);
-            Assert.AreEqual(0, field.RefCatalogs.Count);
+            Assert.AreEqual(0, field.RefTargets.Count);
             Said(nameof(AwkwardDto), KeyField);
         }
 
@@ -767,6 +818,9 @@ namespace Tooling.Tests.Schema
         private static RecordSchema Positions(CatalogSchema schema) =>
             Nested(Nested(schema.Sections[0].Record, TiersField), ItemsField);
 
+        /// <summary>The catalogs a reference points into, whichever sections of them it names.</summary>
+        private static string[] Catalogs(FieldSchema field) => [.. field.RefTargets.Select(target => target.Catalog)];
+
         /// <summary>One note naming all of these, in whatever words it uses.</summary>
         private void Said(params string[] parts)
         {
@@ -845,6 +899,8 @@ namespace Tooling.Tests.Schema
             public string Id { get; init; } = string.Empty;
 
             [CatalogRef(NpcBuffsCatalog, AllowEmpty = true)] public string NpcBuffId { get; init; } = string.Empty;
+
+            [CatalogRef(ResourcesCatalog, Section = CategoriesKey)] public string CategoryId { get; init; } = string.Empty;
 
             [NotARef] public string Key { get; init; } = string.Empty;
 
@@ -1012,6 +1068,13 @@ namespace Tooling.Tests.Schema
             public string Key { get; init; } = string.Empty;
 
             [CatalogRef(EquipItemsCatalog)] public int Price { get; init; }
+
+            /// <summary>Narrowed to a section with no name, which no file writes anything under.</summary>
+            [CatalogRef(AbilitiesCatalog, Section = " ")] public string Sectionless { get; init; } = string.Empty;
+
+            /// <summary>Pointed into a catalog with no name, which is no catalog. The game's own markup
+            /// refuses this where it is written; markup from anywhere else reaches the walk.</summary>
+            [CatalogRef(" ")] public string Catalogless { get; init; } = string.Empty;
 
             public TestParameter Name { get; init; } = TestParameter.Health;
 

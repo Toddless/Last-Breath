@@ -72,7 +72,7 @@ namespace DataEditor.Source.View
         private const string TranslationFormat = "{0}   ·   “{1}”";
         private const string QuotedFormat = "“{0}”";
         private const string IndexFormat = "[{0}]";
-        private const string CatalogSeparator = ", ";
+        private const string TargetSeparator = ", ";
 
         /// <summary>How "no value at all" is offered when the game reads something in its place: the
         /// author choosing it has to be able to see what leaving the key out actually means.</summary>
@@ -122,12 +122,12 @@ namespace DataEditor.Source.View
         private const int PickerRows = 60;
 
         private const string PickText = "…";
-        private const string PickHint = "pick an id from the catalogs this field names";
+        private const string PickHint = "pick an id out of what this field points into";
         private const string SearchPlaceholder = "search";
 
         private const string BrokenReferenceFormat = "nothing in {0} is written under this id";
         private const string EmptyReferenceText = "this field has to name something";
-        private const string UncheckedReferenceFormat = "{0}: this build describes no such catalog, so the id is not checked";
+        private const string UncheckedReferenceFormat = "{0}: this build describes no such catalog or section, so the id is not checked";
 
         /// <summary>What a word answering to nothing is written in. A reference is read down a column of
         /// them, and the one that points nowhere has to be the one the eye stops on.</summary>
@@ -287,8 +287,8 @@ namespace DataEditor.Source.View
 
             return field.Kind switch
             {
-                FieldKind.Reference when field.RefCatalogs.Count > 0 =>
-                    Text(ReferenceFormat, written, string.Join(CatalogSeparator, field.RefCatalogs)),
+                FieldKind.Reference when field.RefTargets.Count > 0 =>
+                    Text(ReferenceFormat, written, string.Join(TargetSeparator, field.RefTargets)),
                 FieldKind.LocalizedKey => Translated(written),
                 _ => written
             };
@@ -354,12 +354,12 @@ namespace DataEditor.Source.View
             return box;
         }
 
-        /// <summary>What an empty box says instead of standing blank: the catalogs a reference may name,
+        /// <summary>What an empty box says instead of standing blank: where a reference may point,
         /// or the value the game reads while the key is absent.</summary>
         private static string Hint(FieldSchema field)
         {
-            if (field.Kind == FieldKind.Reference && field.RefCatalogs.Count > 0)
-                return string.Join(CatalogSeparator, field.RefCatalogs);
+            if (field.Kind == FieldKind.Reference && field.RefTargets.Count > 0)
+                return string.Join(TargetSeparator, field.RefTargets);
 
             return DefaultText(field.Default);
         }
@@ -414,12 +414,12 @@ namespace DataEditor.Source.View
             // nothing to check it against and nothing to offer instead.
             if (!edit.Offered) return;
 
-            string named = string.Join(CatalogSeparator, edit.Field.RefCatalogs);
+            string named = string.Join(TargetSeparator, edit.Field.RefTargets);
             IReadOnlyList<string> unread = edit.Undescribed();
 
             if (unread.Count > 0)
             {
-                box.TooltipText = Text(UncheckedReferenceFormat, string.Join(CatalogSeparator, unread));
+                box.TooltipText = Text(UncheckedReferenceFormat, string.Join(TargetSeparator, unread));
                 return;
             }
 
@@ -1194,24 +1194,24 @@ namespace DataEditor.Source.View
                 ? string.Empty
                 : JsonScalars.Written(value);
 
-            /// <summary>Whether the run can answer this field at all: it points somewhere, and the ids of
-            /// the catalogs it points into have been read.</summary>
-            public bool Offered => panel.References is not null && schema.RefCatalogs.Count > 0;
+            /// <summary>Whether the run can answer this field at all: it points somewhere, and the ids
+            /// of what it points into have been read.</summary>
+            public bool Offered => panel.References is not null && schema.RefTargets.Count > 0;
 
             public bool Write(JToken written) => !panel.Stale(build) && panel.Write(at, written);
 
             public bool Erase() => !panel.Stale(build) && panel.Erase(at);
 
-            /// <summary>Whether one of the catalogs this field names writes a record under that id.</summary>
-            public bool Exists(string id) => panel.References?.Exists(schema.RefCatalogs, id) ?? false;
+            /// <summary>Whether one of the targets this field names writes a record under that id.</summary>
+            public bool Exists(string id) => panel.References?.Exists(schema.RefTargets, id) ?? false;
 
-            /// <summary>The catalogs this field names that the run has no schema for, and so cannot say
-            /// anything about.</summary>
-            public IReadOnlyList<string> Undescribed() => panel.References?.Undescribed(schema.RefCatalogs) ?? [];
+            /// <summary>The targets this field names that the run cannot read — an undescribed catalog, or a
+            /// section no described catalog holds — and so cannot say anything about.</summary>
+            public IReadOnlyList<string> Undescribed() => panel.References?.Undescribed(schema.RefTargets) ?? [];
 
-            /// <summary>The ids of those catalogs a query names, best first.</summary>
+            /// <summary>The ids of those targets a query names, best first.</summary>
             public IReadOnlyList<string> Search(string query) =>
-                panel.References?.Search(schema.RefCatalogs, query, PickerRows) ?? [];
+                panel.References?.Search(schema.RefTargets, query, PickerRows) ?? [];
 
             /// <summary>Offers those ids under <paramref name="under"/>, and hands back the one picked.</summary>
             public void Pick(Control under, Action<string> chosen)

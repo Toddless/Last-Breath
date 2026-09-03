@@ -36,7 +36,7 @@ namespace LastBreath.Descriptors
             NarrativeParameterKind.Number => Field(parameter, FieldKind.Number),
             NarrativeParameterKind.Boolean => Field(parameter, FieldKind.Boolean),
             NarrativeParameterKind.Choice => Field(parameter, FieldKind.Enum) with { EnumValues = [.. parameter.Choices] },
-            NarrativeParameterKind.Reference => Field(parameter, FieldKind.Reference) with { RefCatalogs = [.. parameter.Catalogs] },
+            NarrativeParameterKind.Reference => Field(parameter, FieldKind.Reference) with { RefTargets = Targets(parameter) },
             NarrativeParameterKind.References => Field(parameter, FieldKind.Array) with { Item = ReferenceItem(parameter) },
             NarrativeParameterKind.NestedCondition => Field(parameter, FieldKind.Object) with { Record = s_nestedCondition },
             NarrativeParameterKind.NestedConditions => Field(parameter, FieldKind.Array) with { Item = ConditionItem(parameter) },
@@ -56,7 +56,13 @@ namespace LastBreath.Descriptors
             };
 
         private static FieldSchema ReferenceItem(NarrativeParameterSpec parameter) =>
-            new() { JsonName = FieldSchema.Unnamed, Kind = FieldKind.Reference, RefCatalogs = [.. parameter.Catalogs] };
+            new() { JsonName = FieldSchema.Unnamed, Kind = FieldKind.Reference, RefTargets = Targets(parameter) };
+
+        /// <summary>Where a narrative reference points. The vocabulary states catalogs and no sections:
+        /// nothing a dialogue or a quest names is written in a catalog whose sections answer to nothing
+        /// each other, so every target here is the whole of one.</summary>
+        private static SchemaList<ReferenceTarget> Targets(NarrativeParameterSpec parameter) =>
+            [.. parameter.Catalogs.Select(ReferenceTarget.Whole)];
 
         private static FieldSchema ConditionItem(NarrativeParameterSpec parameter) =>
             new()

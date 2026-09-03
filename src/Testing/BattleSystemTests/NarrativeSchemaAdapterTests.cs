@@ -156,13 +156,13 @@ namespace LastBreathTest.BattleSystemTests
 
                 case NarrativeParameterKind.Reference:
                     Assert.AreEqual(FieldKind.Reference, field.Kind, $"'{address}' names catalogs and did not cross as a reference");
-                    CollectionAssert.AreEqual(parameter.Catalogs.ToList(), field.RefCatalogs.ToList(), $"'{address}' crossed with other catalogs");
+                    CollectionAssert.AreEqual(Targets(parameter), field.RefTargets.ToList(), $"'{address}' crossed with other catalogs");
                     break;
 
                 case NarrativeParameterKind.References:
                     Assert.AreEqual(FieldKind.Array, field.Kind, $"'{address}' holds a list and did not cross as one");
                     Assert.AreEqual(FieldKind.Reference, field.Item?.Kind, $"'{address}' crossed as a list of something other than references");
-                    CollectionAssert.AreEqual(parameter.Catalogs.ToList(), field.Item!.RefCatalogs.ToList(), $"'{address}' crossed with other catalogs");
+                    CollectionAssert.AreEqual(Targets(parameter), field.Item!.RefTargets.ToList(), $"'{address}' crossed with other catalogs");
                     break;
 
                 case NarrativeParameterKind.NestedCondition:
@@ -182,6 +182,12 @@ namespace LastBreathTest.BattleSystemTests
                     break;
             }
         }
+
+        /// <summary>Where the parameter's catalogs point, as the adapter states them: the whole of each
+        /// one. The vocabulary narrows nothing to a section — no catalog a dialogue or a quest names is
+        /// written in sections that answer to nothing each other.</summary>
+        private static List<ReferenceTarget> Targets(NarrativeParameterSpec parameter) =>
+            [.. parameter.Catalogs.Select(ReferenceTarget.Whole)];
 
         /// <summary>The kinds carrying nothing but a value of their own.</summary>
         private static FieldKind Leaf(NarrativeParameterKind kind) => kind switch

@@ -6,10 +6,11 @@ namespace Tooling.Catalogs
     using Tooling.Schema.Model;
 
     /// <summary>One record of a catalog: the file it lives in, its address inside that file, the id it
-    /// was listed under when the file was read, and the schema it is drawn by.</summary>
+    /// was listed under when the file was read, the schema it is drawn by, and the key of the section it
+    /// stands in — empty when the section is the root of the file itself.</summary>
     /// <remarks>The value is not held, only addressed: an edit replaces the node at the pointer, and a
     /// copy taken at load would go stale the moment that happened.</remarks>
-    public sealed record CatalogRecord(CatalogFile File, JsonPointer Pointer, string Id, RecordSchema Schema)
+    public sealed record CatalogRecord(CatalogFile File, JsonPointer Pointer, string Id, RecordSchema Schema, string Section)
     {
         /// <summary>What stands at the record's address now, or null when the document no longer has
         /// anything there.</summary>
