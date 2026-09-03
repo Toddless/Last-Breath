@@ -1,6 +1,5 @@
 namespace Core.Narrative.Conditions
 {
-    using Data.GameData;
     using Inventory;
     using Newtonsoft.Json.Linq;
 
@@ -14,19 +13,18 @@ namespace Core.Narrative.Conditions
     public class HasItemConditionFactory(IInventory inventory) : INarrativeConditionFactory
     {
         private const string TypeName = "HasItem";
-        private const string ItemIdKey = "itemId";
-        private const string AmountKey = "amount";
-        private const int DefaultAmount = 1;
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
-            NarrativeParameterSchema.Text(ItemIdKey, required: true,
-                DataCatalog.EquipItems, DataCatalog.Resources, DataCatalog.Items, DataCatalog.Ornaments),
-            NarrativeParameterSchema.Integer(AmountKey, DefaultAmount));
+        /// <summary>The keys of the item reference, under the names the parser below reads them by: the
+        /// asking half of the vocabulary writes an item exactly the way the giving half does.</summary>
+        private const string ItemIdKey = ItemReference.Key;
+        private const string AmountKey = ItemReference.AmountKey;
+        private const int DefaultAmount = ItemReference.DefaultAmount;
+
+        private static readonly NarrativeRecordSpec s_parameters =
+            NarrativeParameterSchema.Of(TypeName, ItemReference.Field, ItemReference.AmountField);
 
         public string Type => TypeName;
 
-        /// <summary>The bag is searched by raw id, so gold and augments — minted outside any catalog —
-        /// are named in itemId just as well as the catalogued items are.</summary>
         public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)

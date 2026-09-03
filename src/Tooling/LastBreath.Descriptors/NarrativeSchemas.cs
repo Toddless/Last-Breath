@@ -58,11 +58,11 @@ namespace LastBreath.Descriptors
         private static FieldSchema ReferenceItem(NarrativeParameterSpec parameter) =>
             new() { JsonName = FieldSchema.Unnamed, Kind = FieldKind.Reference, RefTargets = Targets(parameter) };
 
-        /// <summary>Where a narrative reference points. The vocabulary states catalogs and no sections:
-        /// nothing a dialogue or a quest names is written in a catalog whose sections answer to nothing
-        /// each other, so every target here is the whole of one.</summary>
+        /// <summary>Where a narrative reference points, said in the tool's own words: the vocabulary states
+        /// a catalog and, where it narrowed one, the section of it the game resolves ids against.</summary>
         private static SchemaList<ReferenceTarget> Targets(NarrativeParameterSpec parameter) =>
-            [.. parameter.Catalogs.Select(ReferenceTarget.Whole)];
+            [.. parameter.Targets.Select(target =>
+                target.Section is null ? ReferenceTarget.Whole(target.Catalog) : new ReferenceTarget(target.Catalog, target.Section))];
 
         private static FieldSchema ConditionItem(NarrativeParameterSpec parameter) =>
             new()

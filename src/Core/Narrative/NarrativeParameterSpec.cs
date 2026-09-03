@@ -14,7 +14,7 @@ namespace Core.Narrative
         /// <summary>One of the members named on the parameter.</summary>
         Choice,
 
-        /// <summary>An id of a record in one of the catalogs named on the parameter.</summary>
+        /// <summary>An id of a record in one of the targets named on the parameter.</summary>
         Reference,
 
         /// <summary>A condition entry of the same vocabulary; its own type key names the factory
@@ -24,12 +24,24 @@ namespace Core.Narrative
         /// <summary>A list of condition entries.</summary>
         NestedConditions,
 
-        /// <summary>A list of references into the catalogs named on the parameter.</summary>
+        /// <summary>A list of references into the targets named on the parameter.</summary>
         References
     }
 
+    /// <summary>Where a narrative reference may point: a catalog, and at most one section of it. A catalog
+    /// whose sections answer to nothing each other — the material categories beside the materials — offers
+    /// a parameter naming the whole of it far more ids than the game will resolve.</summary>
+    /// <remarks>The game's own word for a target; an authoring tool reads it through an adapter, which is
+    /// why no tool type is named here.</remarks>
+    public sealed record NarrativeReferenceTarget(string Catalog, string? Section = null)
+    {
+        /// <summary>The whole of a catalog: every section of it answers. Written out rather than left to the
+        /// second argument, so that "no section" reads as a decision wherever it is made.</summary>
+        public static NarrativeReferenceTarget Whole(string catalog) => new(catalog);
+    }
+
     /// <summary>One key a narrative factory reads: the json name it is written under, what it holds, and
-    /// whatever narrows that down — the members offered, the catalogs pointed into, the fallback.</summary>
+    /// whatever narrows that down — the members offered, the targets pointed into, the fallback.</summary>
     public sealed record NarrativeParameterSpec
     {
         public required string JsonName { get; init; }
@@ -45,8 +57,8 @@ namespace Core.Narrative
         /// <summary>Members offered for <see cref="NarrativeParameterKind.Choice"/>; empty otherwise.</summary>
         public IReadOnlyList<string> Choices { get; init; } = [];
 
-        /// <summary>Catalogs a reference points into: a record is named if any one of them knows it.</summary>
-        public IReadOnlyList<string> Catalogs { get; init; } = [];
+        /// <summary>Where a reference points: a record is named if any one of the targets knows it.</summary>
+        public IReadOnlyList<NarrativeReferenceTarget> Targets { get; init; } = [];
 
         /// <summary>The parameter was declared not to be a reference, whatever its name suggests: a
         /// decision told apart from a silence.</summary>

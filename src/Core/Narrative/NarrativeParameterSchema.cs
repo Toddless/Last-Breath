@@ -1,5 +1,7 @@
 namespace Core.Narrative
 {
+    using System.Linq;
+
     /// <summary>Builds the parameters a narrative factory declares. The game states them in its own
     /// terms; turning them into an editor's schema is that editor's adapter to do.</summary>
     public static class NarrativeParameterSchema
@@ -19,17 +21,22 @@ namespace Core.Narrative
         public static NarrativeRecordSpec Of(string type, params NarrativeParameterSpec[] parameters) =>
             new() { TypeName = type, Parameters = parameters };
 
-        /// <summary>Text; naming catalogs makes it a reference into them.</summary>
+        /// <summary>Text; naming catalogs makes it a reference into the whole of each one.</summary>
         public static NarrativeParameterSpec Text(string jsonName, bool required, params string[] catalogs) =>
             catalogs.Length == 0
                 ? new NarrativeParameterSpec { JsonName = jsonName, Kind = NarrativeParameterKind.Text, Required = required }
-                : new NarrativeParameterSpec
-                {
-                    JsonName = jsonName,
-                    Kind = NarrativeParameterKind.Reference,
-                    Required = required,
-                    Catalogs = catalogs
-                };
+                : Reference(jsonName, required, Whole(catalogs));
+
+        /// <summary>A reference pointing where the targets say — the form to write when one of them is a
+        /// section rather than a whole catalog.</summary>
+        public static NarrativeParameterSpec Reference(string jsonName, bool required, params NarrativeReferenceTarget[] targets) =>
+            new()
+            {
+                JsonName = jsonName,
+                Kind = NarrativeParameterKind.Reference,
+                Required = required,
+                Targets = targets
+            };
 
         /// <summary>Text the parser reads with a fallback, which is what makes writing it optional.</summary>
         public static NarrativeParameterSpec Text(string jsonName, string fallback) =>
@@ -49,10 +56,11 @@ namespace Core.Narrative
         public static NarrativeParameterSpec Integer(string jsonName, bool required) =>
             new() { JsonName = jsonName, Kind = NarrativeParameterKind.Integer, Required = required };
 
-        /// <summary>A list of references into the named catalogs. It carries no default because absence and
-        /// an empty list are different answers — what a missing list means is the factory's to document.</summary>
+        /// <summary>A list of references into the whole of each named catalog. It carries no default because
+        /// absence and an empty list are different answers — what a missing list means is the factory's to
+        /// document.</summary>
         public static NarrativeParameterSpec References(string jsonName, params string[] catalogs) =>
-            new() { JsonName = jsonName, Kind = NarrativeParameterKind.References, Catalogs = catalogs };
+            new() { JsonName = jsonName, Kind = NarrativeParameterKind.References, Targets = Whole(catalogs) };
 
         /// <summary>Every member of the enum the parser reads the key into.</summary>
         public static NarrativeParameterSpec Enum<TEnum>(string jsonName, bool required = true)
@@ -81,5 +89,9 @@ namespace Core.Narrative
                 Required = true,
                 Documentation = NestedConditionNote
             };
+
+        /// <summary>Catalogs named without a section: every record of each one answers.</summary>
+        private static NarrativeReferenceTarget[] Whole(string[] catalogs) =>
+            [.. catalogs.Select(NarrativeReferenceTarget.Whole)];
     }
 }

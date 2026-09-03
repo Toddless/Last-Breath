@@ -10,8 +10,14 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Data.NpcData;
     using Core.Data.Schema;
     using Core.Enums;
+    using Core.Inventory;
+    using Core.Items;
     using Core.Localization;
+    using Core.Narrative;
+    using Core.Narrative.Actions;
+    using Core.Narrative.Conditions;
     using LastBreath.Descriptors;
+    using Moq;
     using Newtonsoft.Json.Linq;
     using Tooling.Catalogs;
     using Tooling.Json;
@@ -1591,6 +1597,17 @@ namespace LastBreathTest.BattleSystemTests
                 $"{what} points somewhere other than where droppable things are written: {string.Join(", ", field.RefTargets)}");
         }
 
+        /// <summary>That a field names something to hand over, out of everywhere an item is written.</summary>
+        private static void NamesAHandOut(FieldSchema field, string what)
+        {
+            Assert.AreEqual(FieldKind.Reference, field.Kind, $"{what} does not name anything");
+            Assert.IsFalse(field.AllowEmpty, $"{what} may be left empty, which promises a reward of nothing");
+            CollectionAssert.AreEquivalent(
+                s_handedOutTargets,
+                field.RefTargets.ToArray(),
+                $"{what} points somewhere other than where items are written: {string.Join(", ", field.RefTargets)}");
+        }
+
         private static void Choice(FieldSchema field, Type members)
         {
             Assert.AreEqual(FieldKind.Enum, field.Kind, $"'{field.JsonName}' is not a choice of names");
@@ -1757,14 +1774,17 @@ namespace LastBreathTest.BattleSystemTests
 
         private const string PriorityField = "priority";
 
-        /// <summary>Every catalog a quest may name a hand-out out of — the four the item vocabulary of the
-        /// narrative reads an id from. Any one of them knowing the id makes the reward real.</summary>
-        private static readonly string[] s_handedOutCatalogs =
+        /// <summary>Everywhere a quest may name a hand-out out of — the same targets the item vocabulary of
+        /// the narrative reads an id from. Any one of them knowing the id makes the reward real; the
+        /// resources answer with the two sections holding things, never with the categories beside them.</summary>
+        private static readonly ReferenceTarget[] s_handedOutTargets =
         [
-            DataCatalog.EquipItems,
-            DataCatalog.Resources,
-            DataCatalog.Items,
-            DataCatalog.Ornaments
+            ReferenceTarget.Whole(DataCatalog.EquipItems),
+            ReferenceTarget.Whole(DataCatalog.Items),
+            ReferenceTarget.Whole(DataCatalog.Recipes),
+            ReferenceTarget.Whole(DataCatalog.Ornaments),
+            new(DataCatalog.Resources, ResourcesCatalogDescriptor.UpgradeResourcesKey),
+            new(DataCatalog.Resources, ResourcesCatalogDescriptor.CraftingResourcesKey)
         ];
 
         /// <summary>Every id the dialogue parser resolves against another catalog, addressed the way the
@@ -2008,8 +2028,8 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>Every id the quest parser resolves against another catalog, every name it parses into
         /// an enum, and every string that reads like a reference while naming something inside its own
-        /// quest, said so in the schema. A reward names its item out of all four catalogs a hand-out may
-        /// come from, the way the GiveItem action does.</summary>
+        /// quest, said so in the schema. A reward names its item out of everywhere an item is written and
+        /// out of nowhere else, the way the GiveItem action does.</summary>
         [TestMethod]
         public void TheQuestsSchemaNamesTheReferencesChoicesAndRefusalsTheParserResolves()
         {
@@ -2018,8 +2038,7 @@ namespace LastBreathTest.BattleSystemTests
             foreach ((string path, string catalog) in s_questReferences) Points(Leaf(Locate(record, path)), path, catalog);
 
             foreach (string path in s_questRewardItems)
-                foreach (string catalog in s_handedOutCatalogs)
-                    Points(Leaf(Locate(record, path)), path, catalog);
+                NamesAHandOut(Leaf(Locate(record, path)), $"the reward at {path}");
 
             foreach ((string path, Type members) in s_questChoices) Choice(Leaf(Locate(record, path)), members);
 
@@ -2027,6 +2046,48 @@ namespace LastBreathTest.BattleSystemTests
                 Assert.IsTrue(Leaf(Locate(record, path)).RefusedAsReference,
                     $"'{path}' names something inside its own quest and neither points anywhere nor says it does not");
         }
+
+        /// <summary>
+        /// The four ways an item is named — the markup of a quest reward, the two actions handing one over
+        /// and the condition asking after one — say the same thing, because one list in the game states it
+        /// and all four read that list. A half naming its own catalogs would offer the author ids the other
+        /// three call broken.
+        /// <para>The loot tables are held beside them and differ by exactly one target: an ornament comes
+        /// through a quest and through nothing else, so no seat at a table may price one.</para>
+        /// </summary>
+        [TestMethod]
+        public void EveryWayAnItemIsNamed_PointsWhereTheItemVocabularySays()
+        {
+            ReferenceTarget[] vocabulary = Stated(ItemReference.Targets);
+
+            CollectionAssert.AreEquivalent(s_handedOutTargets, vocabulary,
+                $"the item vocabulary of the game points elsewhere than this test pins: {string.Join(", ", vocabulary.Select(target => target.ToString()))}");
+
+            (string Type, NarrativeRecordSpec Spec)[] readers =
+            [
+                ("GiveItem", new GiveItemActionFactory(Mock.Of<IItemMinter>(), Mock.Of<IInventory>()).Parameters),
+                ("TakeItem", new TakeItemActionFactory(Mock.Of<IInventory>()).Parameters),
+                ("HasItem", new HasItemConditionFactory(Mock.Of<IInventory>()).Parameters),
+            ];
+
+            foreach ((string type, NarrativeRecordSpec spec) in readers)
+            {
+                NarrativeParameterSpec item = spec.Parameters.Single(parameter => parameter.JsonName == ItemReference.Key);
+
+                CollectionAssert.AreEquivalent(s_handedOutTargets, Stated(item.Targets),
+                    $"'{type}' names its item somewhere other than where the item vocabulary points");
+            }
+
+            CollectionAssert.AreEquivalent(
+                s_handedOutTargets.Where(target => target.Catalog != DataCatalog.Ornaments).ToArray(),
+                s_dropTargets,
+                "a loot seat and a hand-out differ by something other than the ornaments, which quests alone give out");
+        }
+
+        /// <summary>The game's own targets, as the authoring tool states them. The two vocabularies are
+        /// separate types on purpose — the game names no tool type — so the crossing is spelled out.</summary>
+        private static ReferenceTarget[] Stated(IReadOnlyList<NarrativeReferenceTarget> targets) =>
+            [.. targets.Select(target => new ReferenceTarget(target.Catalog, target.Section))];
 
         /// <summary>The shipped file read back through the schema, the way the dialogues are: everything
         /// outside a condition or an action is ranked.</summary>

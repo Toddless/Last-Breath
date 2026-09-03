@@ -32,6 +32,7 @@ namespace LastBreathTest.BattleSystemTests
         private const string SampleKey = "key";
         private const string SampleMember = "Member";
         private const string SampleCatalog = "Catalog";
+        private const string SampleSection = "section";
 
         private List<INarrativeConditionFactory> _conditions = null!;
         private List<INarrativeActionFactory> _actions = null!;
@@ -110,7 +111,7 @@ namespace LastBreathTest.BattleSystemTests
                     JsonName = SampleKey,
                     Kind = kind,
                     Choices = [SampleMember],
-                    Catalogs = [SampleCatalog]
+                    Targets = [NarrativeReferenceTarget.Whole(SampleCatalog)]
                 };
 
                 try
@@ -122,6 +123,29 @@ namespace LastBreathTest.BattleSystemTests
                     Assert.Fail($"'{kind}' is a narrative parameter kind the adapter has no schema for");
                 }
             }
+        }
+
+        /// <summary>A target narrowed to one section of a catalog crosses narrowed, whether it stands alone
+        /// or in a list. A section lost on the way would offer the author every id of the catalog, including
+        /// the ones the game never resolves — and nothing would call the file broken for picking one.</summary>
+        [TestMethod]
+        public void ATargetNarrowedToASection_CrossesNarrowed()
+        {
+            var parameter = new NarrativeParameterSpec
+            {
+                JsonName = SampleKey,
+                Kind = NarrativeParameterKind.Reference,
+                Required = true,
+                Targets = [NarrativeReferenceTarget.Whole(SampleCatalog), new NarrativeReferenceTarget(SampleCatalog, SampleSection)]
+            };
+
+            List<ReferenceTarget> expected = [ReferenceTarget.Whole(SampleCatalog), new(SampleCatalog, SampleSection)];
+
+            CollectionAssert.AreEqual(expected, NarrativeSchemas.ToSchema(parameter).RefTargets.ToList(),
+                "a reference crossed pointing somewhere other than where the vocabulary sent it");
+            CollectionAssert.AreEqual(expected,
+                NarrativeSchemas.ToSchema(parameter with { Kind = NarrativeParameterKind.References }).Item!.RefTargets.ToList(),
+                "a list of references crossed pointing somewhere other than where the vocabulary sent it");
         }
 
         private static void AssertConverted(NarrativeRecordSpec spec)
@@ -183,11 +207,10 @@ namespace LastBreathTest.BattleSystemTests
             }
         }
 
-        /// <summary>Where the parameter's catalogs point, as the adapter states them: the whole of each
-        /// one. The vocabulary narrows nothing to a section — no catalog a dialogue or a quest names is
-        /// written in sections that answer to nothing each other.</summary>
+        /// <summary>Where the parameter points, as the adapter states them: the same catalog, and the same
+        /// section wherever the vocabulary narrowed one.</summary>
         private static List<ReferenceTarget> Targets(NarrativeParameterSpec parameter) =>
-            [.. parameter.Catalogs.Select(ReferenceTarget.Whole)];
+            [.. parameter.Targets.Select(target => new ReferenceTarget(target.Catalog, target.Section))];
 
         /// <summary>The kinds carrying nothing but a value of their own.</summary>
         private static FieldKind Leaf(NarrativeParameterKind kind) => kind switch

@@ -13,8 +13,8 @@ namespace Core.Narrative.Actions
     {
         private const string TypeName = "TakeItem";
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
-            ItemIdParameter.Field, NarrativeParameterSchema.Integer(ItemIdParameter.AmountKey, ItemIdParameter.DefaultAmount));
+        private static readonly NarrativeRecordSpec s_parameters =
+            NarrativeParameterSchema.Of(TypeName, ItemReference.Field, ItemReference.AmountField);
 
         public string Type => TypeName;
 
@@ -22,8 +22,8 @@ namespace Core.Narrative.Actions
         public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser) =>
-            ItemIdParameter.Require(json, TypeName) is { } itemId
-                ? new TakeItemAction(inventory, itemId, ItemIdParameter.Amount(json))
+            ItemReference.Require(json, TypeName) is { } itemId
+                ? new TakeItemAction(inventory, itemId, ItemReference.Amount(json))
                 : null;
     }
 }

@@ -3,6 +3,7 @@ namespace Core.Data.QuestData
     using System.Collections.Generic;
     using Enums;
     using GameData;
+    using Narrative;
     using Narrative.Quests;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -120,13 +121,15 @@ namespace Core.Data.QuestData
 
     public record QuestRewardItemEntry
     {
-        /// <summary>What is handed over, out of every catalog a hand-out may name — the same four the
-        /// GiveItem action reads its id from.</summary>
+        /// <summary>What is handed over, out of everywhere an item is written — the same targets the
+        /// GiveItem action reads its id from, said here as the markup an editor reads.</summary>
         [JsonProperty("itemId")]
-        [CatalogRef(DataCatalog.EquipItems)]
-        [CatalogRef(DataCatalog.Resources)]
-        [CatalogRef(DataCatalog.Items)]
-        [CatalogRef(DataCatalog.Ornaments)]
+        [CatalogRef(ItemReference.EquipItems)]
+        [CatalogRef(ItemReference.Items)]
+        [CatalogRef(ItemReference.Recipes)]
+        [CatalogRef(ItemReference.Ornaments)]
+        [CatalogRef(ItemReference.Resources, Section = ItemReference.UpgradeResources)]
+        [CatalogRef(ItemReference.Resources, Section = ItemReference.CraftingResources)]
         public string ItemId { get; init; } = string.Empty;
 
         [JsonProperty("amount")] public int Amount { get; init; } = 1;
