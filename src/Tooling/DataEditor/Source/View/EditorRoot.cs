@@ -321,6 +321,9 @@ namespace DataEditor.Source.View
             // catalogs listed here, and their vocabulary keys read as free json without this.
             _inspector.Vocabularies = NarrativeFieldVocabularies.Resolve;
 
+            // The catalogs whose records are drawn by a form of their own rather than field by field.
+            _inspector.Forms = Form;
+
             _notes.Clear();
             LoadTexts();
 
@@ -340,6 +343,32 @@ namespace DataEditor.Source.View
             ShowCatalog(_workspace.Catalogs.Count > 0 ? 0 : NoSelection);
 
             ReportIssues(_workspace, _notes);
+        }
+
+        /// <summary>
+        /// The form one record is drawn by, where its catalog has one: a loot table is read as which
+        /// thing sits in which tier and for how much, which is the question its author asks and the one
+        /// thing four levels of nested lists cannot be read as.
+        /// <para>Null for every other catalog, which leaves the record drawn field by field the way it
+        /// always was. Asked of the open catalog rather than of the record: the record is one of the
+        /// catalog's own, and what draws it is the catalog's answer.</para>
+        /// </summary>
+        private Control? Form(CatalogRecord record)
+        {
+            if (_catalog is not { } view || view.Catalog != LootTableFormKeys.Catalog) return null;
+
+            var panel = new LootTablePanel
+            {
+                Layout = LootTableFormKeys.Layout,
+                References = _inspector.References,
+                Gestures = _inspector.Gestures,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+
+            panel.Said += Report;
+            panel.Rebuild(record);
+
+            return panel;
         }
 
         /// <summary>Reads the locales that sit beside the catalogs. A run that cannot open them goes on

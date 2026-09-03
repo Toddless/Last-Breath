@@ -13,6 +13,11 @@ namespace Tooling.Ui
     using Tooling.Schema.Model;
     using static Tooling.Text.Format;
 
+    /// <summary>One change of the document a panel is showing, made as a whole gesture: on the document's
+    /// own history, with the panel kept from redrawing under the hand that made it and drawn again once
+    /// it is over. False when nothing was written.</summary>
+    public delegate bool RecordGesture(Func<JsonTreeDocument, bool> change);
+
     /// <summary>
     /// One record, field by field, in the order its schema names them — and, for the values a schema
     /// can vouch for, the control that changes them. Everything a control writes goes into the
@@ -73,7 +78,6 @@ namespace Tooling.Ui
         private const string TranslationFormat = "{0}   ·   “{1}”";
         private const string QuotedFormat = "“{0}”";
         private const string IndexFormat = "[{0}]";
-        private const string TargetSeparator = ", ";
 
         /// <summary>How "no value at all" is offered when the game reads something in its place: the
         /// author choosing it has to be able to see what leaving the key out actually means.</summary>
@@ -151,26 +155,6 @@ namespace Tooling.Ui
         private const string FontSizeOverride = "font_size";
         private const string FontColorOverride = "font_color";
         private const string MarginLeftOverride = "margin_left";
-
-        /// <summary>How wide and how tall the list of ids a reference is picked from opens.</summary>
-        private const int PickerWidth = 340;
-        private const int PickerHeight = 300;
-
-        /// <summary>How many ids the picker offers at once. A query of one letter answers with most of a
-        /// catalog, and a list nobody scrolls to the end of is a list that only costs rows.</summary>
-        private const int PickerRows = 60;
-
-        private const string PickText = "…";
-        private const string PickHint = "pick an id out of what this field points into";
-        private const string SearchPlaceholder = "search";
-
-        private const string BrokenReferenceFormat = "nothing in {0} is written under this id";
-        private const string EmptyReferenceText = "this field has to name something";
-        private const string UncheckedReferenceFormat = "{0}: this build describes no such catalog or section, so the id is not checked";
-
-        /// <summary>What a word answering to nothing is written in. A reference is read down a column of
-        /// them, and the one that points nowhere has to be the one the eye stops on.</summary>
-        private static readonly Color BrokenReference = new(0.93f, 0.42f, 0.38f);
 
         /// <summary>Which control answers for which kind of value — the one place a kind and a widget are
         /// put together. A kind absent from here has no editor and is drawn as text, which is what keeps
@@ -253,6 +237,21 @@ namespace Tooling.Ui
         /// has no vocabulary for is one the tool cannot vouch for writing.</para>
         /// </summary>
         public Func<FieldSchema, VocabularyBinding?>? Vocabularies { get; set; }
+
+        /// <summary>
+        /// Which records are drawn by a form of their own instead of by the general reading of their
+        /// schema. The panel asks about a record and is answered with the control drawing it, or with
+        /// null — a record no form answers for is drawn field by field, the way every record always was.
+        /// <para>What a form knows about the catalog it draws is the host's business. This panel keeps
+        /// exactly one thing back for itself: the row naming the record, which belongs to the catalog
+        /// listing it and not to the shape of what it holds.</para>
+        /// </summary>
+        public Func<CatalogRecord, Control?>? Forms { get; set; }
+
+        /// <summary>How anything drawn inside this panel changes the document under it: one gesture, one
+        /// step of the history, and the panel drawn again once the gesture is over rather than under the
+        /// hand that made it.</summary>
+        public RecordGesture Gestures => Restructure;
 
         /// <summary>Draws the record, or says why there is nothing to draw.
         /// <paramref name="suffixes"/> is what its catalog words the record's localization keys with, and
@@ -389,7 +388,7 @@ namespace Tooling.Ui
             return field.Kind switch
             {
                 FieldKind.Reference when field.RefTargets.Count > 0 =>
-                    Text(ReferenceFormat, written, string.Join(TargetSeparator, field.RefTargets)),
+                    Text(ReferenceFormat, written, ReferencePicker.Targets(field.RefTargets)),
                 FieldKind.LocalizedKey => Translated(written),
                 _ => written
             };
@@ -470,7 +469,7 @@ namespace Tooling.Ui
         private static string Hint(FieldSchema field)
         {
             if (field.Kind == FieldKind.Reference && field.RefTargets.Count > 0)
-                return string.Join(TargetSeparator, field.RefTargets);
+                return ReferencePicker.Targets(field.RefTargets);
 
             return DefaultText(field.Default);
         }
@@ -487,7 +486,12 @@ namespace Tooling.Ui
         {
             var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             LineEdit box = Box(edit);
-            var pick = new Button { Text = PickText, TooltipText = PickHint, Disabled = !edit.Offered };
+            var pick = new Button
+            {
+                Text = ReferencePicker.PickText,
+                TooltipText = ReferencePicker.PickHint,
+                Disabled = !edit.Offered
+            };
 
             void Judge(string written) => Judged(edit, box, written);
 
@@ -511,12 +515,8 @@ namespace Tooling.Ui
             return row;
         }
 
-        /// <summary>
-        /// Marks the word standing in a reference, and says on it what is wrong. Nothing is marked while
-        /// the run cannot tell: a catalog this build describes no schema for writes ids the tool has
-        /// never read, and painting every reference into it red would be the tool complaining about
-        /// itself.
-        /// </summary>
+        /// <summary>Marks the word standing in a reference, and says on it what is wrong. The judgement
+        /// itself is the picker's, so that what is offered and what is marked are one answer.</summary>
         private static void Judged(FieldEdit edit, LineEdit box, string written)
         {
             box.RemoveThemeColorOverride(FontColorOverride);
@@ -525,29 +525,11 @@ namespace Tooling.Ui
             // nothing to check it against and nothing to offer instead.
             if (!edit.Offered) return;
 
-            string named = string.Join(TargetSeparator, edit.Field.RefTargets);
-            IReadOnlyList<string> unread = edit.Undescribed();
+            ReferenceVerdict verdict = ReferencePicker.Judge(edit.References, edit.Field.RefTargets, written, edit.Field.AllowEmpty);
 
-            if (unread.Count > 0)
-            {
-                box.TooltipText = Text(UncheckedReferenceFormat, string.Join(TargetSeparator, unread));
-                return;
-            }
+            box.TooltipText = verdict.Say;
 
-            if (written.Length == 0 && edit.Field.AllowEmpty)
-            {
-                box.TooltipText = named;
-                return;
-            }
-
-            if (written.Length > 0 && edit.Exists(written))
-            {
-                box.TooltipText = named;
-                return;
-            }
-
-            box.AddThemeColorOverride(FontColorOverride, BrokenReference);
-            box.TooltipText = written.Length == 0 ? EmptyReferenceText : Text(BrokenReferenceFormat, named);
+            if (verdict.Broken) box.AddThemeColorOverride(FontColorOverride, ReferencePicker.BrokenReference);
         }
 
         /// <summary>A key and, beside it, the text it stands for now. The translation follows the
@@ -758,14 +740,8 @@ namespace Tooling.Ui
 
         /// <summary>Follows one document at a time, so the panel hears about the record it is showing and
         /// about nothing else.</summary>
-        private void Follow(JsonTreeDocument? document)
-        {
-            if (ReferenceEquals(document, _document)) return;
-
-            _document?.Changed -= OnDocumentChanged;
-            _document = document;
-            _document?.Changed += OnDocumentChanged;
-        }
+        private void Follow(JsonTreeDocument? document) =>
+            _document = PanelParts.Following(_document, document, OnDocumentChanged);
 
         /// <summary>The document changed under the panel — an undo, a redo, or an edit made somewhere
         /// else. Everything on screen was copied out of the tree, and a control still showing what was
@@ -808,7 +784,7 @@ namespace Tooling.Ui
             _build = new object();
             _heading = null;
 
-            DropChildren();
+            this.DropChildren();
 
             if (_record is not { } record)
             {
@@ -834,12 +810,45 @@ namespace Tooling.Ui
 
             AddTexts(record);
 
+            // A record with a form of its own is handed over whole, keeping only the row naming it: the
+            // form answers for what the record HOLDS, while the id is what its catalog lists it under —
+            // and a catalog whose records could no longer be renamed would have lost that by being drawn
+            // better.
+            if (Forms?.Invoke(record) is { } form)
+            {
+                AddId(record, token);
+                AddChild(form);
+
+                return;
+            }
+
             int drawn = GetChildCount();
             AddRecord(this, record.Schema, token, record.Pointer, depth: 0);
 
             // A record whose every field is machinery, or none at all: the panel says so rather than
             // standing empty under a heading, which reads as the tool having failed to draw it.
             if (GetChildCount() == drawn) AddChild(new Label { Text = NoFieldsText });
+        }
+
+        /// <summary>The row naming the record, drawn ahead of a form of its own. Drawn by the same
+        /// machinery every other field is, so the word a key of a section points at — a fraction, a kind
+        /// of foe, an npc — is picked here exactly as it is picked anywhere else. Nothing at all where the
+        /// record's schema names no id field.</summary>
+        private void AddId(CatalogRecord record, JToken token)
+        {
+            if (record.Schema.IdField is not { } id) return;
+
+            foreach (FieldSchema field in record.Schema.Fields)
+            {
+                if (!string.Equals(field.JsonName, id, StringComparison.Ordinal)) continue;
+
+                JsonPointer at = record.Pointer.Append(id);
+                JToken? value = Value(token, id);
+
+                AddField(this, field, value, id, at, named: true, depth: 0, FieldGesture(field, value, at));
+
+                return;
+            }
         }
 
         /// <summary>Writes the heading: the record's id as the document holds it now, and the shape it is
@@ -856,20 +865,6 @@ namespace Tooling.Ui
         /// as it loses focus, and it loses focus while the panel is being torn down — redrawing from
         /// inside that would leave two redraws walking the same children.</summary>
         private void RebuildLater() => Callable.From(DrawRecord).CallDeferred();
-
-        /// <summary>
-        /// Drops the rows of the previous record. <see cref="Node.QueueFree"/> on its own is not
-        /// enough — it takes effect at the end of the frame, while the rebuild adds the replacements
-        /// right away, so the panel would spend a frame showing both records.
-        /// </summary>
-        private void DropChildren()
-        {
-            foreach (Node child in GetChildren())
-            {
-                RemoveChild(child);
-                child.QueueFree();
-            }
-        }
 
         private void AddRecord(Node parent, RecordSchema schema, JToken token, JsonPointer at, int depth)
         {
@@ -1045,7 +1040,7 @@ namespace Tooling.Ui
 
             empty.AddChild(new Label { Text = NothingWrittenText });
             empty.AddChild(NewEntry(binding, (document, blank) =>
-                Laid(document, at, binding.List ? new JArray(blank) : blank)));
+                document.Put(at, binding.List ? new JArray(blank) : blank)));
         }
 
         /// <summary>One entry of a vocabulary: the word naming its type, and under it the keys that type is
@@ -1138,14 +1133,6 @@ namespace Tooling.Ui
 
             return row;
         }
-
-        /// <summary>Puts a value at an address whose key the record may not hold yet, writing the key when
-        /// it does not — the reading the first edit of an absent field makes, for a structural gesture
-        /// already holding the document.</summary>
-        private static bool Laid(JsonTreeDocument document, JsonPointer at, JToken value) =>
-            document.Resolve(at) is null && at.Parent is { } holder && at.Last is { } key
-                ? document.Insert(holder, key, value)
-                : document.SetValue(at, value);
 
         // ── text ───────────────────────────────────────────────────────────────────────────────
 
@@ -1537,62 +1524,6 @@ namespace Tooling.Ui
             return changed;
         }
 
-        /// <summary>
-        /// The ids of the catalogs a field points into, offered under the box it is written in: a query
-        /// and the ids answering it, best match first. One click writes the id, which is what the author
-        /// came for — a picker asking for a second confirming press is a list read twice.
-        /// <para>Built for the press and freed when it closes. The panel is torn down and drawn again on
-        /// every change, and a list held between two of those would be offering the ids of a record that
-        /// is no longer on screen.</para>
-        /// </summary>
-        private void OpenPicker(FieldEdit edit, Control under, Action<string> chosen)
-        {
-            var popup = new PopupPanel();
-            var body = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
-            var query = new LineEdit { PlaceholderText = SearchPlaceholder, SizeFlagsHorizontal = SizeFlags.ExpandFill };
-            var results = new ItemList { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
-
-            void Fill(string typed)
-            {
-                results.Clear();
-
-                foreach (string id in edit.Search(typed)) results.AddItem(id);
-            }
-
-            void Take(int index)
-            {
-                if (index < 0 || index >= results.ItemCount) return;
-
-                chosen(results.GetItemText(index));
-                popup.Hide();
-            }
-
-            Fill(string.Empty);
-
-            query.TextChanged += Fill;
-
-            // Enter takes the best hit: typing the id of a record and pressing return is the fast path
-            // the search field exists for.
-            query.TextSubmitted += _ => Take(0);
-            results.ItemSelected += index => Take((int)index);
-
-            body.AddChild(query);
-            body.AddChild(results);
-            popup.AddChild(body);
-            popup.PopupHide += popup.QueueFree;
-
-            AddChild(popup);
-
-            var at = (Vector2I)(under.GetScreenPosition() + new Vector2(0, under.Size.Y));
-
-            popup.Popup(new Rect2I(at, new Vector2I(Math.Max(PickerWidth, (int)under.Size.X), PickerHeight)));
-
-            // Taken once the window is on screen, the way every other dialog of the tool takes it: a
-            // window still being opened has no focus to hand out, and a search field that has to be
-            // clicked before it can be typed into is a list the author scrolls instead.
-            Callable.From(query.GrabFocus).CallDeferred();
-        }
-
         /// <summary>Whether a control still speaks for what is on screen.</summary>
         private bool Stale(object build) => !ReferenceEquals(build, _build);
 
@@ -1611,7 +1542,7 @@ namespace Tooling.Ui
 
             try
             {
-                return Laid(_document, at, value);
+                return _document.Put(at, value);
             }
             finally
             {
@@ -1659,28 +1590,24 @@ namespace Tooling.Ui
             /// of what it points into have been read.</summary>
             public bool Offered => panel.References is not null && schema.RefTargets.Count > 0;
 
+            /// <summary>The ids the run knows, for the judgement on the word standing in this field.</summary>
+            public ReferenceIndex? References => panel.References;
+
             public bool Write(JToken written) => !panel.Stale(build) && panel.Write(at, written);
 
             public bool Erase() => !panel.Stale(build) && panel.Erase(at);
-
-            /// <summary>Whether one of the targets this field names writes a record under that id.</summary>
-            public bool Exists(string id) => panel.References?.Exists(schema.RefTargets, id) ?? false;
-
-            /// <summary>The targets this field names that the run cannot read — an undescribed catalog, or a
-            /// section no described catalog holds — and so cannot say anything about.</summary>
-            public IReadOnlyList<string> Undescribed() => panel.References?.Undescribed(schema.RefTargets) ?? [];
 
             /// <summary>The text a key stands for, asked of the run rather than of the engine.</summary>
             public string Translation(string key) => panel.Translation(key);
 
             /// <summary>The ids of those targets a query names, best first.</summary>
             public IReadOnlyList<string> Search(string query) =>
-                panel.References?.Search(schema.RefTargets, query, PickerRows) ?? [];
+                panel.References?.Search(schema.RefTargets, query, ReferencePicker.Rows) ?? [];
 
             /// <summary>Offers those ids under <paramref name="under"/>, and hands back the one picked.</summary>
             public void Pick(Control under, Action<string> chosen)
             {
-                if (!panel.Stale(build)) panel.OpenPicker(this, under, chosen);
+                if (!panel.Stale(build)) ReferencePicker.Open(panel, under, Search, chosen);
             }
 
             /// <summary>Ends the run of keystrokes this field was taking, so the next field edited is a

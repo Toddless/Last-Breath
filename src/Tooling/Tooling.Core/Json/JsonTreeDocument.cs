@@ -153,6 +153,19 @@ namespace Tooling.Json
             return true;
         }
 
+        /// <summary>Puts a value at an address whose key the tree may not hold yet, writing the key when it
+        /// does not: the reading the first edit of an absent field makes. One step of the history either
+        /// way, so an author who cannot see whether the file held the key never has to know which.</summary>
+        public bool Put(JsonPointer pointer, JToken value)
+        {
+            ArgumentNullException.ThrowIfNull(pointer);
+            ArgumentNullException.ThrowIfNull(value);
+
+            return Resolve(pointer) is null && pointer.Parent is { } holder && pointer.Last is { } key
+                ? Insert(holder, key, value)
+                : SetValue(pointer, value);
+        }
+
         /// <summary>Takes the node out, remembering where it stood so the undo puts it back in its place and
         /// not merely back in the file. False at the root and on a path the tree does not have.</summary>
         public bool Remove(JsonPointer pointer)

@@ -435,6 +435,34 @@ namespace Tooling.Tests.Json
             Assert.AreEqual(before, Canon(document));
         }
 
+        /// <summary>
+        /// Putting a value where the tree holds the key and where it does not: the key is written in the
+        /// second case and replaced in the first, and either way it is one step of the history. This is
+        /// what the first edit of a field the file never wrote has to mean — an author reading a default
+        /// off the screen cannot tell whether the key is there, and must not have to.
+        /// </summary>
+        [TestMethod]
+        public void Put_WritesTheKeyWhereTheTreeHasNoneAndReplacesItWhereItHas()
+        {
+            JsonTreeDocument document = JsonTreeDocument.Parse(Json);
+
+            Assert.IsTrue(document.Put(At(Level), new JValue(9)));
+            Assert.AreEqual(9, document.Resolve(At(Level))?.Value<int>());
+
+            Assert.IsTrue(document.Put(At(Trade), new JValue(FirstName)));
+            Assert.AreEqual(FirstName, document.Resolve(At(Trade))?.Value<string>());
+
+            Assert.AreEqual(2, document.History.Depth, "putting a value is more than one step of the history");
+
+            document.History.Undo();
+
+            Assert.IsNull(document.Resolve(At(Trade)), "one step back left the key the put laid down");
+
+            // The root cannot become a value and has no key to be written under: a put there is refused
+            // the way a set is, rather than replacing the document with a number.
+            Assert.IsFalse(document.Put(JsonPointer.Root, new JValue(1)));
+        }
+
         /// <summary>One edit, walked back and forward: the file has to be the same on both ends of the walk.</summary>
         private static void AssertRedoRepeats(Func<JsonTreeDocument, bool> edit)
         {
