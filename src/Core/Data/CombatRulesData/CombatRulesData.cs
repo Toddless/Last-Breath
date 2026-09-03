@@ -1,5 +1,7 @@
 namespace Core.Data.CombatRulesData
 {
+    using Core.Data.Schema;
+    using Core.Enums;
     using Newtonsoft.Json;
 
     public record CombatRulesData
@@ -24,11 +26,12 @@ namespace Core.Data.CombatRulesData
     {
         [JsonProperty("stage")] public int Stage { get; init; }
 
-        /// <summary>Chance before the caster's MulticastChance multiplies it.</summary>
-        [JsonProperty("chance")] public float Chance { get; init; }
+        /// <summary>Chance before the caster's MulticastChance multiplies it. A row naming a share
+        /// outside the ends is dropped at load, so the ends are the field's own.</summary>
+        [JsonProperty("chance")] [Range(0, 1)] public float Chance { get; init; }
 
         /// <summary>Ceiling of the final chance; a stage is guaranteed only where its row says 1.</summary>
-        [JsonProperty("cap")] public float Cap { get; init; } = 1f;
+        [JsonProperty("cap")] [Range(0, 1)] public float Cap { get; init; } = 1f;
     }
 
     /// <summary>The "effects" section: what holds for every effect instance (see EffectRules).</summary>
@@ -61,13 +64,13 @@ namespace Core.Data.CombatRulesData
     /// protected entity is shorter, applications beyond the multiplier list are resisted outright.</summary>
     public record ControlResistanceData
     {
-        [JsonProperty("hardControlStatuses")] public string[] HardControlStatuses { get; init; } = [];
+        [JsonProperty("hardControlStatuses")] [EnumOf(typeof(StatusEffects))] public string[] HardControlStatuses { get; init; } = [];
 
         /// <summary>Duration multiplier per application, in order; past the end = immune.</summary>
         [JsonProperty("durationMultipliers")] public float[] DurationMultipliers { get; init; } = [];
 
         /// <summary>Entity types the resistance is granted to (Boss, Archon...).</summary>
-        [JsonProperty("appliesTo")] public string[] AppliesTo { get; init; } = [];
+        [JsonProperty("appliesTo")] [EnumOf(typeof(EntityType))] public string[] AppliesTo { get; init; } = [];
 
         /// <summary>Turns of the bearer for FULL resistance to fade back to zero.</summary>
         [JsonProperty("resistanceDecayTurns")] public int ResistanceDecayTurns { get; init; } = 7;

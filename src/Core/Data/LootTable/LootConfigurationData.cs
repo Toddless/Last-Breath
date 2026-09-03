@@ -1,6 +1,8 @@
 namespace Core.Data.LootTable
 {
     using System.Collections.Generic;
+    using Core.Data.Schema;
+    using Core.Enums;
     using Newtonsoft.Json;
 
     public record LootConfigurationData
@@ -19,7 +21,7 @@ namespace Core.Data.LootTable
         /// <summary>Cap on the minted pile (0 = uncapped): overfed NPCs exhaust the item cap AND the
         /// quality swap, and their huge leftover would otherwise mint economy-breaking jackpots.</summary>
         [JsonProperty("maxGoldPerKill")] public int MaxGoldPerKill { get; init; }
-        [JsonProperty("baseBudget")] public Dictionary<string, float> BaseBudget { get; init; } = [];
-        [JsonProperty("rarityMultipliers")] public Dictionary<string, float> RarityMultipliers { get; init; } = [];
+        [JsonProperty("baseBudget")] [DictionaryKey(typeof(EntityType))] public Dictionary<string, float> BaseBudget { get; init; } = [];
+        [JsonProperty("rarityMultipliers")] [DictionaryKey(typeof(Rarity))] public Dictionary<string, float> RarityMultipliers { get; init; } = [];
     }
 }

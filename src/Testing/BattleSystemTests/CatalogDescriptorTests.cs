@@ -2280,5 +2280,260 @@ namespace LastBreathTest.BattleSystemTests
 
             return (dangling, routes, written);
         }
+
+        /// <summary>What the reflector may still have to say about the DTOs of the settings documents —
+        /// one list for all of them, because it is empty for all of them: a settings document is plain
+        /// properties the walk reads whole. A note appearing here is either a DTO to fix or a fact to
+        /// write down — never something to silence by widening the check.</summary>
+        private static readonly (string About, string Word)[] s_settingsNotes = [];
+
+        /// <summary>Every field of a settings document the parser turns into an enum member, addressed
+        /// the way the file writes it. The tool offers the members; a field the markup missed would take
+        /// any word and fail at load instead.</summary>
+        private static readonly (string Catalog, string Path, Type Members)[] s_settingsChoices =
+        [
+            (DataCatalog.CombatRules, "controlResistance.hardControlStatuses", typeof(StatusEffects)),
+            (DataCatalog.CombatRules, "controlResistance.appliesTo", typeof(EntityType)),
+            (DataCatalog.Formatting, FormattingCatalogDescriptor.IdField, typeof(EntityParameter)),
+            (DataCatalog.Formatting, FormattingCatalogDescriptor.UnitField, typeof(ParameterUnit)),
+        ];
+
+        /// <summary>Every map of a settings document whose KEYS are members of an enum rather than words
+        /// the author picks. Both parsers read them strictly, so a key naming no member is a throw at
+        /// load — the tool has to offer the members instead of a text box.</summary>
+        private static readonly (string Catalog, string Path, Type Members)[] s_settingsMapKeys =
+        [
+            (DataCatalog.LootConfiguration, LootConfigurationCatalogDescriptor.BaseBudgetField, typeof(EntityType)),
+            (DataCatalog.LootConfiguration, LootConfigurationCatalogDescriptor.RarityMultipliersField, typeof(Rarity)),
+            (DataCatalog.Trade, TradeCatalogDescriptor.RarityMultipliersField, typeof(Rarity)),
+        ];
+
+        /// <summary>Every number of a settings document whose ends the game enforces: a multicast row
+        /// naming a share outside them is dropped at load, so the tool has to refuse it at the keyboard
+        /// instead of letting the author write a stage that silently never rolls.</summary>
+        private static readonly (string Catalog, string Path, double Min, double Max)[] s_settingsRanges =
+        [
+            (DataCatalog.CombatRules, "multicast.stages.chance", 0, 1),
+            (DataCatalog.CombatRules, "multicast.stages.cap", 0, 1),
+        ];
+
+        /// <summary>
+        /// The settings documents: a catalog whose file is one object with nothing to add to it. Every
+        /// one is held against the same four facts — the root IS the record, it carries no id, nothing
+        /// in it is keyed off one in the localization, and it lives in the one file named here.
+        /// <para>The shape is one shape, so it is written once and the catalogs are rows: a copy per
+        /// catalog would be a copy of the thing being checked.</para>
+        /// </summary>
+        [DataTestMethod]
+        [DataRow(DataCatalog.CombatRules, "CombatRules")]
+        [DataRow(DataCatalog.LootConfiguration, "LootConfiguration")]
+        [DataRow(DataCatalog.PassiveTreeRules, "PassiveTreeRules")]
+        [DataRow(DataCatalog.Player, "PlayerLifecycle")]
+        [DataRow(DataCatalog.Raids, "Raids")]
+        [DataRow(DataCatalog.Recovery, "Recovery")]
+        [DataRow(DataCatalog.World, "WorldClock")]
+        [DataRow(DataCatalog.Trade, "TradeConfiguration")]
+        [DataRow(DataCatalog.Influence, "InfluenceMastery")]
+        [DataRow(DataCatalog.MartialArtMastery, "MartialArtMastery")]
+        public void ASettingsCatalogIsOneRecordAtTheRootOfItsOneFile(string catalog, string fileName)
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(catalog));
+
+            Assert.AreEqual(RootShape.Single, schema.Shape, $"the {catalog} file is not read as one record");
+            Assert.AreEqual(1, schema.Sections.Count, $"a settings document has one section, and {catalog} states several");
+            Assert.AreEqual(SingleObjectDescriptor.RootKey, schema.Sections[0].Key,
+                $"the one section of {catalog} is written under a key rather than at the root");
+            Assert.IsNull(schema.Sections[0].Record.IdField, $"the {catalog} document names itself, and there is only one of it");
+            Assert.AreEqual(0, schema.LocalizedSuffixes.Count,
+                $"{catalog} is tuning: nothing in it is keyed off an id it does not have");
+            Assert.AreEqual(fileName, schema.Placement.FileFor(_ => null), $"the {catalog} catalog names another file");
+            Assert.AreNotEqual(0, schema.Sections[0].Record.Fields.Count, $"the {catalog} record was read with no fields at all");
+
+            Unexpected(builder.Reflection.Notes, s_settingsNotes, builder.Reflection);
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled {catalog} catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>The shipped file of every settings catalog read back through its schema: each key it
+        /// writes is one the schema ranks, and the canonical write loses nothing. A key the tool cannot
+        /// place is a field the author is quietly locked out of.</summary>
+        [DataTestMethod]
+        [DataRow(DataCatalog.CombatRules)]
+        [DataRow(DataCatalog.LootConfiguration)]
+        [DataRow(DataCatalog.PassiveTreeRules)]
+        [DataRow(DataCatalog.Player)]
+        [DataRow(DataCatalog.Raids)]
+        [DataRow(DataCatalog.Recovery)]
+        [DataRow(DataCatalog.World)]
+        [DataRow(DataCatalog.Trade)]
+        [DataRow(DataCatalog.Influence)]
+        [DataRow(DataCatalog.MartialArtMastery)]
+        [DataRow(DataCatalog.Formatting)]
+        public void ASettingsCatalogRanksEveryKeyItsShippedFileWrites(string catalog)
+        {
+            List<string> unknown = UnknownKeys(Schema(catalog), catalog);
+
+            Assert.AreEqual(0, unknown.Count,
+                $"keys of the {catalog} file no field of the schema is written under: {string.Join(", ", unknown)}");
+        }
+
+        /// <summary>The shape of the Formatting catalog: a row per parameter, found by the parameter it
+        /// formats, in the one file. The row has no id of its own — the parameter IS the address — so a
+        /// second row for one parameter is a rule the game silently overwrites.</summary>
+        [TestMethod]
+        public void TheFormattingSchemaBuildsFromTheRealDtoWithoutAReport()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.Formatting));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape);
+            Assert.AreEqual(1, schema.Sections.Count);
+            Assert.AreEqual(FormattingCatalogDescriptor.RecordsKey, schema.Sections[0].Key);
+            Assert.AreEqual(FormattingCatalogDescriptor.IdField, schema.Sections[0].Record.IdField);
+            Assert.AreEqual(FormattingCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null));
+            CollectionAssert.AreEqual(
+                new[] { LocalizedKeyAttribute.NoSuffix },
+                schema.LocalizedSuffixes.ToArray(),
+                "a parameter is named in the localization by the very word the row is found by");
+
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Reflection.Notes.ToArray(),
+                $"reflection has something to say about the formatting DTOs:{Environment.NewLine}{builder.Reflection}");
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled Formatting catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>Every word a settings parser turns into an enum member, said so in the schema and
+        /// held against what the shipped file writes. An unmarked one reads to the tool as free text: the
+        /// author types a name nothing answers, and the miss surfaces as a throw at load.</summary>
+        [TestMethod]
+        public void EverySettingsChoiceOffersItsMembersAndTheShippedFilesStayInThem()
+        {
+            foreach ((string catalog, string path, Type members) in s_settingsChoices)
+            {
+                CatalogSchema schema = Schema(catalog);
+                Choice(Leaf(Locate(schema.Sections[0].Record, path)), members);
+
+                List<string> written = [.. Words(Root(schema, catalog), LastSegment(path)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+
+                Assert.AreNotEqual(0, written.Count, $"the shipped {catalog} file writes no '{path}' — the check is checking nothing");
+                CollectionAssert.IsSubsetOf(
+                    written,
+                    Enum.GetNames(members),
+                    $"the shipped {catalog} file writes something other than a {members.Name} at '{path}': {string.Join(", ", written)}");
+            }
+        }
+
+        /// <summary>Every map of a settings document whose keys are enum members, said so in the schema
+        /// and held against what the shipped file writes. The keys are parsed strictly, so a key naming
+        /// no member takes the whole catalog down at load rather than losing its own line.</summary>
+        [TestMethod]
+        public void EverySettingsMapOffersItsKeysAndTheShippedFilesStayInThem()
+        {
+            foreach ((string catalog, string path, Type members) in s_settingsMapKeys)
+            {
+                CatalogSchema schema = Schema(catalog);
+                FieldSchema map = Locate(schema.Sections[0].Record, path);
+
+                Assert.AreEqual(FieldKind.Dictionary, map.Kind, $"'{catalog}.{path}' is not a map");
+                Choice(
+                    map.Key ?? throw new AssertFailedException($"'{catalog}.{path}' lets the author write its keys freely"),
+                    members);
+
+                List<string> written = [.. Keys(Root(schema, catalog), LastSegment(path)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+
+                Assert.AreNotEqual(0, written.Count, $"the shipped {catalog} file keys nothing under '{path}' — the check is checking nothing");
+                CollectionAssert.IsSubsetOf(
+                    written,
+                    Enum.GetNames(members),
+                    $"the shipped {catalog} file keys '{path}' by something other than a {members.Name}: {string.Join(", ", written)}");
+            }
+        }
+
+        /// <summary>Every number whose ends the game enforces, said so in the schema and held against
+        /// what the shipped file writes. The ends are the point: a row outside them is dropped at load,
+        /// and a dropped row is a stage that never rolls with nothing on screen to say why.</summary>
+        [TestMethod]
+        public void EverySettingsRangeStatesItsEndsAndTheShippedFilesStayInside()
+        {
+            foreach ((string catalog, string path, double min, double max) in s_settingsRanges)
+            {
+                CatalogSchema schema = Schema(catalog);
+                FieldSchema field = Leaf(Locate(schema.Sections[0].Record, path));
+                NumericRange stated = field.Range
+                                      ?? throw new AssertFailedException($"'{catalog}.{path}' states no ends at all, and the game enforces {min}..{max}");
+
+                Assert.AreEqual(new NumericRange(min, max), stated, $"'{catalog}.{path}' states other ends than the ones the game enforces");
+
+                List<double> written = [.. Numbers(Root(schema, catalog), LastSegment(path))];
+
+                Assert.AreNotEqual(0, written.Count, $"the shipped {catalog} file writes no '{path}' — the check is checking nothing");
+                Assert.AreEqual(0, written.Count(value => value < min || value > max),
+                    $"the shipped {catalog} file writes '{path}' outside {min}..{max}: {string.Join(", ", written.Where(value => value < min || value > max))}");
+            }
+        }
+
+        /// <summary>The one shipped file of a catalog, parsed. Named by the schema's own placement rule,
+        /// the way every other check of a shipped document names it.</summary>
+        private static JToken Root(CatalogSchema schema, string catalog) =>
+            JsonTreeDocument.Load(CatalogFile(schema, catalog)).Root;
+
+        /// <summary>The last step of a path down a record, which is the json name the file writes.</summary>
+        private static string LastSegment(string path) => path.Split(PathSeparator)[^1];
+
+        /// <summary>Every word written under one name anywhere in a document — the value itself, or each
+        /// element when the name holds a list of them.</summary>
+        private static IEnumerable<string> Words(JToken token, string field) =>
+            Leaves(token, field).Select(value => value.Value<string>()).OfType<string>();
+
+        /// <summary>Every number written under one name anywhere in a document.</summary>
+        private static IEnumerable<double> Numbers(JToken token, string field) =>
+            Leaves(token, field)
+                .Where(value => value.Type is JTokenType.Integer or JTokenType.Float)
+                .Select(value => value.Value<double>());
+
+        /// <summary>The plain values written under one name: what stands there, and the elements of it
+        /// when a list stands there instead. A field naming enum members is written both ways.</summary>
+        private static IEnumerable<JValue> Leaves(JToken token, string field)
+        {
+            foreach (JToken written in Under(token, field))
+            {
+                if (written is JValue value) yield return value;
+
+                if (written is not JArray list) continue;
+
+                foreach (JValue element in list.OfType<JValue>()) yield return element;
+            }
+        }
+
+        /// <summary>Everything written under one name, wherever in a document it stands.</summary>
+        private static IEnumerable<JToken> Under(JToken token, string field)
+        {
+            switch (token)
+            {
+                case JObject holder:
+                    foreach (JProperty property in holder.Properties())
+                    {
+                        if (property.Name == field) yield return property.Value;
+
+                        foreach (JToken nested in Under(property.Value, field)) yield return nested;
+                    }
+
+                    break;
+
+                case JArray array:
+                    foreach (JToken item in array)
+                        foreach (JToken nested in Under(item, field))
+                            yield return nested;
+
+                    break;
+            }
+        }
     }
 }

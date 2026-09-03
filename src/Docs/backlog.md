@@ -1,5 +1,15 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из волны описателей каталогов-настроек (2026-09-03; accept with minors)
+
+- (minor) `ConfigCatalogDescriptors.cs` — Recovery описан через публичный двойник `RecoveryConfig`, а игра парсит приватный `RecoveryConfigProvider.RecoveryData`; охраны от расхождения нет (поле, добавленное только в двойник, инструмент нарисует, игра молча не прочтёт). Стало: провайдер десериализует прямо в `RecoveryConfig` и двойник удаляется, либо тест сравнивает json-имена/виды обоих типов через `SchemaReflector`.
+- (minor) `CatalogDescriptorTests.cs` — пути CombatRules голыми литералами (`"controlResistance.hardControlStatuses"`, `"multicast.stages.cap"`), у соседей волны — константы описателей через `PathSeparator`. Стало: константы полей в `CombatRulesCatalogDescriptor`.
+- (minor) `CatalogDescriptorTests.cs` — новый `Under(JToken, string)` обобщает существующий `Keys(JToken, string)`, две ручные рекурсии одного обхода. Стало: `Keys` поверх `Under`.
+- (nit) `SingleObjectDescriptor.cs` — обоснование решения в xml-доке (`<para>` про «дюжину копий»); имена файлов литералами там, где равны имени каталога, тогда как `NpcCatalogDescriptor` пишет `FileName = DataCatalog.Npc` — две конвенции в одной папке.
+- (nit) `ParameterFormatsData.cs` тянет `using Core.Localization` ради `ParameterUnit` — слой Data смотрит в Localization.
+- (nit) нет теста «папка Single-каталога держит ровно один json» — инструмент второй файл не увидит. Стало: `Assert.AreEqual(1, ShippedFiles(catalog).Count)` в `DataRow`-тесте.
+- (знать) `PlayerStats` не описан: провайдер парсит `Dictionary<string, Dictionary<string,float>>`, DTO нет — нужен DTO (правка парсера). `CraftingMastery`, `NpcSpawnRolls` по файлу тоже «один объект настроек» — следующая волна.
+
 ## Из редактора условий и действий (2026-09-03; rework → accept)
 
 - (знать) `InspectorPanel` без тестов — согласованность пикера полей и блока словаря держится общим `TypedRecords.Blank`; порядок ключей внутри `Any`-полей при сохранении — рассуждением по `SchemaKeyOrder`, теста канонической записи Dialogues/Quests нет.
