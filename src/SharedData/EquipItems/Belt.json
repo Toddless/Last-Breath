@@ -6,7 +6,10 @@
             "maxStackSize": 1,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -27,7 +30,10 @@
             "maxStackSize": 1,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -48,7 +54,10 @@
             "maxStackSize": 1,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -69,7 +78,10 @@
             "maxStackSize": 1,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -97,7 +109,10 @@
             "maxStackSize": 1,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -125,7 +140,10 @@
             "maxStackSize": 1,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -153,7 +171,10 @@
             "maxStackSize": 1,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -174,7 +195,10 @@
             "maxStackSize": 1,
             "rarity": "Unique",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -204,7 +228,10 @@
             "maxStackSize": 1,
             "rarity": "Unique",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -234,7 +261,10 @@
             "maxStackSize": 1,
             "rarity": "Unique",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -264,7 +294,10 @@
             "maxStackSize": 1,
             "rarity": "Mythic",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {

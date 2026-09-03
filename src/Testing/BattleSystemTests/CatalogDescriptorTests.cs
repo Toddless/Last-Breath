@@ -825,8 +825,9 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>
         /// A "number or {min,max}" field reaches the tool as the object alone: the contract states shapes as
         /// whole records and a bare number is not one, so the scalar form has no variant to be drawn as.
-        /// The run counts how many records are written the scalar way, which is what a decision to widen the
-        /// contract would be taken on.
+        /// The run counts how many records are written the scalar way, which the tool would hand back as raw
+        /// json; that the shipped equipment writes none of them is <see cref="EquipItemDataFormAuditTests"/>'s
+        /// to keep.
         /// </summary>
         [TestMethod]
         public void TheEquipItemsSchemaDrawsARangeAsItsObjectFormAndCountsWhatIsWrittenAsANumber()

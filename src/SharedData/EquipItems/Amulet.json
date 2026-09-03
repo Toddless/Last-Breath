@@ -4,9 +4,13 @@
             "id": "Amulet_Lazurite",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -18,16 +22,19 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 70
+            "grants": []
         },
         {
             "id": "Amulet_Garnet",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -39,16 +46,19 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 70
+            "grants": []
         },
         {
             "id": "Amulet_Malachite_Medallion",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -60,16 +70,19 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 70
+            "grants": []
         },
         {
             "id": "Amulet_Trinity",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -81,16 +94,19 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 70
+            "grants": []
         },
         {
             "id": "Amulet_Pathfinder_Sign",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -109,16 +125,19 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 70
+            "grants": []
         },
         {
             "id": "Amulet_Trapper_Talisman",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -137,16 +156,19 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 70
+            "grants": []
         },
         {
             "id": "Amulet_Symbol_Of_Faith",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -165,16 +187,19 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 70
+            "grants": []
         },
         {
             "id": "Amulet_Recovery_Source",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -193,16 +218,19 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 70
+            "grants": []
         },
         {
             "id": "Amulet_Diamond",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -214,16 +242,19 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 70
+            "grants": []
         },
         {
             "id": "Amulet_Ruby",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -235,16 +266,19 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 70
+            "grants": []
         },
         {
             "id": "Amulet_Onyx_Medallion",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -263,16 +297,19 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 70
+            "grants": []
         },
         {
             "id": "Amulet_Goliath_Seal",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Unique",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -312,22 +349,25 @@
             ],
             "grants": [
                 {
-                    "id": "Passive_Skill_Current_Health_Regeneration",
                     "kind": "Passive",
+                    "id": "Passive_Skill_Current_Health_Regeneration",
                     "properties": {
                         "percentFromCurrentHealth": 0.05
                     }
                 }
-            ],
-            "basePrice": 70
+            ]
         },
         {
             "id": "Amulet_Creators_Nature",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
+            "basePrice": 70,
             "rarity": "Mythic",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -383,16 +423,15 @@
             ],
             "grants": [
                 {
-                    "id": "Passive_Skill_Creators_Nature",
                     "kind": "Passive",
+                    "id": "Passive_Skill_Creators_Nature",
                     "properties": {
                         "manaRecovery": 0.05,
                         "healthRecovery": 0.05,
                         "recoveryEfficiency": 0.35
                     }
                 }
-            ],
-            "basePrice": 70
+            ]
         }
     ]
 }

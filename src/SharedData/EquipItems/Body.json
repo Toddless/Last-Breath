@@ -8,7 +8,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -38,7 +41,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -61,7 +67,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -84,7 +93,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -107,7 +119,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -137,7 +152,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -167,7 +185,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -190,7 +211,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -220,7 +244,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -251,7 +278,10 @@
                 "Equipment"
             ],
             "effectId": "",
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -294,7 +324,10 @@
                 "Equipment"
             ],
             "effectId": "",
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -328,7 +361,10 @@
                 "Equipment"
             ],
             "effectId": "",
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -361,7 +397,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -402,7 +441,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -442,7 +484,10 @@
                 "Body",
                 "Equipment"
             ],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {

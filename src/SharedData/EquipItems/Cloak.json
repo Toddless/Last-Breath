@@ -5,7 +5,10 @@
             "equipmentPart": "Cloak",
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -25,7 +28,10 @@
             "equipmentPart": "Cloak",
             "rarity": "Common",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "baseStats": [
                 {
@@ -45,7 +51,10 @@
             "equipmentPart": "Cloak",
             "rarity": "Unique",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -74,7 +83,10 @@
             "equipmentPart": "Cloak",
             "rarity": "Unique",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -103,7 +115,10 @@
             "equipmentPart": "Cloak",
             "rarity": "Unique",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
@@ -132,7 +147,10 @@
             "equipmentPart": "Cloak",
             "rarity": "Mythic",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
             "maxUpdateLevel": 12,
             "implicits": [
                 {
