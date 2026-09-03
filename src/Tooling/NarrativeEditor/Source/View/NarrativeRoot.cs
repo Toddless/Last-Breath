@@ -1,10 +1,13 @@
 namespace NarrativeEditor.Source.View
 {
+    using System;
     using System.Collections.Generic;
+    using System.IO;
     using App;
     using Godot;
     using Tooling.Catalogs;
     using Tooling.Json;
+    using Tooling.Localization;
     using Tooling.Narrative;
     using Tooling.Ui;
     using static Tooling.Text.Format;
@@ -29,10 +32,16 @@ namespace NarrativeEditor.Source.View
         private const string RecordRowFormat = "{0}{1}";
         private const string ReadoutFormat = "{0}   —   {1} record(s), {2} file(s), {3} note(s)";
 
+        private const string NoTextsFormat = "the locales under {0} could not be read: {1}";
+
         private readonly List<Row> _rows = [];
 
+        /// <summary>What the run could not read beyond what the narrative catalogs reported: the locales,
+        /// when the folder holding them is not there. Kept because the count of them is on the status line
+        /// and the list of them is in the dialog, and the two have to be one list.</summary>
+        private readonly List<string> _notes = [];
+
         private ItemList _recordList = null!;
-        private Tree _tree = null!;
         private OutlineTree _outline = null!;
         private InspectorPanel _inspector = null!;
 
@@ -64,14 +73,14 @@ namespace NarrativeEditor.Source.View
                 SizeFlagsVertical = SizeFlags.ExpandFill
             };
 
-            _tree = new Tree
+            var tree = new Tree
             {
                 CustomMinimumSize = new Vector2(OutlinePaneWidth, 0),
                 SizeFlagsVertical = SizeFlags.ExpandFill,
                 SizeFlagsHorizontal = SizeFlags.ExpandFill
             };
 
-            _outline = new OutlineTree(_tree);
+            _outline = new OutlineTree(tree);
             _inspector = new InspectorPanel { SizeFlagsHorizontal = SizeFlags.ExpandFill };
 
             // Two divides rather than one container holding all three panes: nested, each divider
@@ -81,11 +90,11 @@ namespace NarrativeEditor.Source.View
 
             body.AddChild(_recordList);
             body.AddChild(right);
-            right.AddChild(_tree);
+            right.AddChild(tree);
             right.AddChild(Scrolled(_inspector));
 
             _recordList.ItemSelected += index => ShowRecord((int)index);
-            _tree.ItemSelected += ShowElement;
+            tree.ItemSelected += ShowElement;
             _inspector.Said += Report;
 
             return body;
@@ -106,12 +115,43 @@ namespace NarrativeEditor.Source.View
             // npcs, items and quests, so this is most of what the inspector can say about a record here.
             _inspector.References = new ReferenceIndex(_workspace);
 
+            _notes.Clear();
+            LoadTexts();
+
             FillRecords();
 
-            Readout = Text(ReadoutFormat, root, _rows.Count - Sections(), FileCount(), _workspace.Report.Count);
+            // The notes of the narrative catalogs alone: the run reads every catalog of the game for the
+            // ids the narrative points at, and what another one could not answer is not this author's.
+            IReadOnlyList<string> report = GameNarrative.Report(_workspace);
+
+            Readout = Text(
+                ReadoutFormat, root, _rows.Count - Sections(), FileCount(), report.Count + _notes.Count);
 
             ShowRecord(First());
-            ReportIssues(_workspace);
+            ReportIssues(_workspace, _notes, report);
+        }
+
+        /// <summary>Reads the locales that sit beside the catalogs. A run that cannot open them goes on
+        /// working on the data and says so once: the wording is one part of the tool, and a folder that is
+        /// not there is no reason to refuse the rest of it — the block of text is simply not drawn, and the
+        /// rows of the outline fall back to what the engine loaded.</summary>
+        private void LoadTexts()
+        {
+            string folder = ToolPaths.LocalizationRoot;
+
+            try
+            {
+                LocalizedTexts texts = LocalizedTexts.Load(folder);
+
+                Texts = texts;
+                _inspector.Texts = texts;
+                _outline.Texts = texts;
+            }
+            catch (Exception failure) when (failure is IOException or UnauthorizedAccessException
+                                               or FormatException or ArgumentException)
+            {
+                _notes.Add(Text(NoTextsFormat, folder, failure.Message));
+            }
         }
 
         /// <summary>The marks on the records, the outline of the one on screen, and the inspector on the
@@ -200,8 +240,8 @@ namespace NarrativeEditor.Source.View
 
             if (_record is not null) Show(_recordList, index);
 
-            _outline.Show(Outlined());
-            ShowElement();
+            // The outline and the inspector are drawn by the refresh, which is what draws them after every
+            // other change too: doing it here as well would build the same tree twice per record opened.
             Refresh();
         }
 
@@ -221,13 +261,31 @@ namespace NarrativeEditor.Source.View
         {
             CatalogRecord? standing = Element(_outline.Selected);
 
-            if (_shown is { } was && standing is { } now && ReferenceEquals(was.File, now.File) && was.Pointer == now.Pointer)
-                return;
+            if (Same(_shown, standing)) return;
 
             _shown = standing;
 
-            Callable.From(() => _inspector.Rebuild(_shown)).CallDeferred();
+            Callable.From(() => _inspector.Rebuild(_shown, Suffixes(_shown))).CallDeferred();
         }
+
+        /// <summary>Whether two rows are the same place of the same file — nothing on both sides included,
+        /// which is where the tool stands while no record is open.</summary>
+        private static bool Same(CatalogRecord? one, CatalogRecord? other)
+        {
+            if (one is null || other is null) return one is null && other is null;
+
+            return ReferenceEquals(one.File, other.File) && one.Pointer == other.Pointer;
+        }
+
+        /// <summary>What the row on screen words its own text from: the suffixes the catalog declares while
+        /// the inspector stands on the record itself, and none while it stands on something inside it. A
+        /// node, a line, an option or a stage is not worded from an id — every one of them writes out the
+        /// key it is read under — and offering boxes under keys nothing reads would be inviting the author
+        /// to write into the void.</summary>
+        private IReadOnlyList<string> Suffixes(CatalogRecord? shown) =>
+            _view is { } view && shown is { } row && _record is { } record && row.Pointer == record.Pointer
+                ? view.Schema.LocalizedSuffixes
+                : [];
 
         /// <summary>
         /// What the inspector edits for one row of the outline: the very node, option, line, stage,

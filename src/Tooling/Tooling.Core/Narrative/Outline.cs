@@ -85,6 +85,8 @@ namespace Tooling.Narrative
         private const string ToName = "to";
         private const string OptionalName = "optional";
         private const string FailsName = "fails";
+        private const string SpeechCheckName = "speechCheck";
+        private const string FailNextName = "failNext";
 
         private const string EntryRulesTitle = "entry rules";
         private const string NodesTitle = "nodes";
@@ -99,6 +101,13 @@ namespace Tooling.Narrative
         /// blank: "leads nowhere" and "the author has not written where yet" look the same otherwise.</summary>
         private const string OptionEndsFormat = "{0}   ·   ends";
 
+        /// <summary>Where an option that rolls goes when the roll is lost. Written onto the row of the
+        /// option itself: the check is not a place of its own the author edits, it is the second route
+        /// out of one choice, and a row naming only the first shows half the conversation.</summary>
+        private const string OptionFailFormat = "{0}   ·   fail → {1}";
+
+        private const string OptionFailEndsFormat = "{0}   ·   fail ends";
+
         /// <summary>A node with nothing to say is not a node the game can open on, and a row that only
         /// listed its options would read as one that works.</summary>
         private const string NoLinesFormat = "{0}   ·   no lines";
@@ -111,6 +120,14 @@ namespace Tooling.Narrative
 
         /// <summary>What stands where the file wrote nothing.</summary>
         private const string Missing = "—";
+
+        /// <summary>What stands in place of the count of a collection, and of the name of an ending, when
+        /// the key is written as something else entirely. A key nobody wrote and a key holding the wrong
+        /// thing both draw no rows, and the author reading "(0)" over an object would be reading that his
+        /// nodes are gone.</summary>
+        private const string NotAList = "not a list";
+
+        private const string NotARecord = "not a record";
 
         /// <summary>Stands in for the name of an element that carries none, so every row still has a
         /// word the author can point at.</summary>
@@ -172,10 +189,14 @@ namespace Tooling.Narrative
         {
             IReadOnlyList<OutlineNode> rows = Rows(token, name, at, owner, row);
 
+            // What the heading says the collection holds: how many rows, or that the key holds no
+            // collection at all.
+            object held = Malformed(token, name) ? NotAList : rows.Count;
+
             return new OutlineNode
             {
                 Pointer = at.Append(name),
-                Label = Text(GroupFormat, title, rows.Count),
+                Label = Text(GroupFormat, title, held),
                 Kind = OutlineKind.Group,
                 Children = rows
             };
@@ -244,16 +265,32 @@ namespace Tooling.Narrative
             string? key = Written(token, KeyName);
             string? next = Written(token, NextName);
 
+            // The key while the author has written one, and otherwise what the option is named by inside
+            // its node: an option whose text is not worded yet still has an id the routes point at.
+            string named = key is { Length: > 0 } ? key : Identity(schema, token, index);
+
             return new OutlineNode
             {
                 Pointer = at,
-                Label = next is { Length: > 0 }
-                    ? Text(OptionFormat, Or(key), next)
-                    : Text(OptionEndsFormat, Or(key)),
+                Label = Rolled(token, next is { Length: > 0 }
+                    ? Text(OptionFormat, named, next)
+                    : Text(OptionEndsFormat, named)),
                 Kind = OutlineKind.Option,
                 Key = key ?? string.Empty,
                 Schema = schema
             };
+        }
+
+        /// <summary>Both routes out of an option that rolls: an Influence check runs the option's own
+        /// route when it is won and its own second one when it is lost, and a check written with no
+        /// route of its own ends the conversation there.</summary>
+        private static string Rolled(JToken token, string route)
+        {
+            if (Held(token, SpeechCheckName) is not JObject check) return route;
+
+            return Written(check, FailNextName) is { Length: > 0 } failed
+                ? Text(OptionFailFormat, route, failed)
+                : Text(OptionFailEndsFormat, route);
         }
 
         private static OutlineNode Stage(JToken token, JsonPointer at, RecordSchema? schema, int index)
@@ -263,7 +300,10 @@ namespace Tooling.Narrative
                 .. Rows(token, TransitionsName, at, schema, Transition)
             ];
 
-            if (Held(token, OutcomeName) is JObject outcome)
+            // Anything written under the key, and not an object alone: an ending the file spelled wrong
+            // is one the stage still ends on as far as its author is concerned, and a row that was simply
+            // not drawn would leave him reading a stage that goes nowhere.
+            if (Held(token, OutcomeName) is { Type: not JTokenType.Null } outcome)
                 under.Add(Outcome(outcome, at.Append(OutcomeName), Field(schema, OutcomeName)?.Record));
 
             return new OutlineNode
@@ -302,9 +342,10 @@ namespace Tooling.Narrative
             new()
             {
                 Pointer = at,
-                Label = Text(
-                    Flag(token, FailsName) ? OutcomeFailsFormat : OutcomeFormat,
-                    Identity(schema, token, index: 0)),
+                Label = token is JObject
+                    ? Text(Flag(token, FailsName) ? OutcomeFailsFormat : OutcomeFormat,
+                        Identity(schema, token, index: 0))
+                    : Text(OutcomeFormat, NotARecord),
                 Kind = OutlineKind.Outcome,
                 Schema = schema
             };
@@ -328,6 +369,12 @@ namespace Tooling.Narrative
 
             return null;
         }
+
+        /// <summary>Whether a key is written as something other than the collection it has to hold. A key
+        /// the record does not carry, and one written as nothing at all, are not malformed: the game reads
+        /// no elements there either way, and the author has simply not written them yet.</summary>
+        private static bool Malformed(JToken token, string name) =>
+            Held(token, name) is { Type: not JTokenType.Null } and not JArray;
 
         private static JToken? Held(JToken token, string name) =>
             token is JObject holder && holder.TryGetValue(name, StringComparison.Ordinal, out JToken? value)

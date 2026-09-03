@@ -8,6 +8,7 @@ namespace NarrativeEditor.Source.App
     using Tooling.Catalogs;
     using Tooling.Narrative;
     using Tooling.Schema;
+    using static Tooling.Text.Format;
 
     /// <summary>
     /// The one place this host touches the game: which catalogs hold the narrative, and how a record of
@@ -22,6 +23,9 @@ namespace NarrativeEditor.Source.App
     /// </remarks>
     public static class GameNarrative
     {
+        /// <summary>How the run's report names the catalog a note belongs to.</summary>
+        private const string NamedFormat = "{0}: ";
+
         /// <summary>The catalogs this tool lists, in the order it lists them.</summary>
         public static IReadOnlyList<string> Catalogs { get; } = [DataCatalog.Dialogues, DataCatalog.Quests];
 
@@ -42,6 +46,22 @@ namespace NarrativeEditor.Source.App
         }
 
         /// <summary>
+        /// What the narrative catalogs could not answer. Only theirs: the run reads the whole data root
+        /// for the ids the narrative points at, and a note about a catalog this tool does not open is one
+        /// its author can do nothing with.
+        /// <para>Taken out of the run's own report rather than off the catalogs, because a catalog whose
+        /// schema could not be built at all is not among them — and that note is the one an author of an
+        /// empty-looking tool most needs to read. Every note of the report is named by the catalog it
+        /// belongs to, which is what makes it possible to say which are these two's.</para>
+        /// </summary>
+        public static IReadOnlyList<string> Report(CatalogWorkspace workspace)
+        {
+            ArgumentNullException.ThrowIfNull(workspace);
+
+            return [.. workspace.Report.Where(Ours)];
+        }
+
+        /// <summary>
         /// One record read as the structure its author works in: a dialogue by its nodes, a quest by its
         /// stages. Null for a record that is no longer in its document, and for a catalog that is not one
         /// of the narrative's — the outline of a record is a reading of that record's own shape, and there
@@ -58,6 +78,10 @@ namespace NarrativeEditor.Source.App
 
             return null;
         }
+
+        /// <summary>Whether a note of the run belongs to one of the catalogs this tool edits.</summary>
+        private static bool Ours(string note) =>
+            Catalogs.Any(catalog => note.StartsWith(Text(NamedFormat, catalog), StringComparison.Ordinal));
 
         private static bool Named(CatalogView view, string catalog) =>
             string.Equals(view.Catalog, catalog, StringComparison.Ordinal);

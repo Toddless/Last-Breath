@@ -283,8 +283,11 @@ namespace Tooling.Ui
         /// <summary>Says what the run could not read: the catalogs' own notes, and whatever else the host
         /// has to add — the locales it could not open. A root that is not there at all is said on its
         /// own: every catalog under it is missing for that one reason, and a list of them names the
-        /// symptom instead of the cause.</summary>
-        protected void ReportIssues(CatalogWorkspace workspace, IReadOnlyList<string>? also = null)
+        /// symptom instead of the cause.
+        /// <para><paramref name="report"/> is for a host that reads catalogs it does not edit — it names
+        /// the notes it answers for, in place of the whole run's.</para></summary>
+        protected void ReportIssues(CatalogWorkspace workspace, IReadOnlyList<string>? also = null,
+            IReadOnlyList<string>? report = null)
         {
             if (!Directory.Exists(workspace.Root))
             {
@@ -292,7 +295,7 @@ namespace Tooling.Ui
                 return;
             }
 
-            List<string> notes = [.. workspace.Report, .. also ?? []];
+            List<string> notes = [.. report ?? workspace.Report, .. also ?? []];
 
             if (notes.Count > 0) ShowMessage(IssuesTitle, notes);
         }

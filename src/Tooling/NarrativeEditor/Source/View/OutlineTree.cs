@@ -2,8 +2,10 @@ namespace NarrativeEditor.Source.View
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Godot;
     using Tooling.Json;
+    using Tooling.Localization;
     using Tooling.Narrative;
     using static Tooling.Text.Format;
 
@@ -23,6 +25,12 @@ namespace NarrativeEditor.Source.View
 
         private readonly List<OutlineNode> _rows = [];
         private readonly List<TreeItem> _items = [];
+
+        /// <summary>The wording of the game as the run is editing it, or null while it has none. Read
+        /// here rather than from the engine so that a line retranslated in the panel beside the tree shows
+        /// in the tree: the engine loaded its translations when the tool started and answers with the word
+        /// that was there then.</summary>
+        public LocalizedTexts? Texts { get; set; }
 
         /// <summary>The row the author stands on, or nothing while the tree is empty.</summary>
         public OutlineNode? Selected => Row(tree.GetSelected());
@@ -62,17 +70,30 @@ namespace NarrativeEditor.Source.View
         }
 
         /// <summary>What one row says: what the outline calls it, and — for a row standing for something
-        /// the player is shown — the text its key says now. A key nothing translates answers with itself,
-        /// and the row says it once: the author is reading whether the text has been written yet.</summary>
-        private static string Named(OutlineNode node)
+        /// the player is shown — the text its key says now. A key nothing translates says nothing beside
+        /// the row: the author is reading whether the text has been written yet.</summary>
+        private string Named(OutlineNode node)
         {
             if (node.Key.Length == 0) return node.Label;
 
-            string translation = TranslationServer.Translate(node.Key).ToString();
+            string translation = Translation(node.Key);
 
-            return string.Equals(translation, node.Key, StringComparison.Ordinal)
-                ? node.Label
-                : Text(TranslationFormat, node.Label, translation);
+            return translation.Length == 0 ? node.Label : Text(TranslationFormat, node.Label, translation);
+        }
+
+        /// <summary>The text a key stands for, or nothing for a key nobody has written a translation for
+        /// yet. Read out of the files the run is editing whenever it has them, and out of the engine only
+        /// when it has not — the engine answers in whichever locale the tool happens to be running in, and
+        /// with the word that was there when it started.</summary>
+        private string Translation(string key)
+        {
+            if (Texts is { } texts)
+                return texts.Locales.Select(locale => texts.Read(locale, key)).FirstOrDefault(said => said is { Length: > 0 })
+                       ?? string.Empty;
+
+            string translation = TranslationServer.Translate(key).ToString();
+
+            return string.Equals(translation, key, StringComparison.Ordinal) ? string.Empty : translation;
         }
 
         /// <summary>Writes the rows again where the outline stands where it stood. False when it does

@@ -84,6 +84,49 @@ namespace Tooling.Tests.Narrative
             { "dialogues": [ { "npcId": "Npc_Silent" } ] }
             """;
 
+        /// <summary>The options that roll: one whose lost roll leads somewhere, one whose lost roll ends
+        /// the conversation, and one that has an id and no wording yet.</summary>
+        private const string Rolls = """
+            {
+                "dialogues": [
+                    {
+                        "npcId": "Npc_Bandit_Veteran",
+                        "nodes": [
+                            {
+                                "id": "Greeting",
+                                "lines": [ { "speaker": "Npc", "key": "Dlg_Veteran_Greeting_1" } ],
+                                "options": [
+                                    {
+                                        "id": "Flatter",
+                                        "key": "Dlg_Veteran_Opt_Flatter",
+                                        "next": "FlatterGood",
+                                        "speechCheck": { "difficulty": 2, "failNext": "FlatterBad" }
+                                    },
+                                    {
+                                        "id": "Bluff",
+                                        "key": "Dlg_Veteran_Opt_Bluff",
+                                        "next": "Offer",
+                                        "speechCheck": { "difficulty": 4 }
+                                    },
+                                    { "id": "Wait" }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+            """;
+
+        /// <summary>A record whose collections are written as something else: the file is what the author
+        /// opened the tool to see, and the reading of it may not answer a mistake with silence.</summary>
+        private const string MalformedDialogue = """
+            { "dialogues": [ { "npcId": "Npc_Broken", "entryRules": 3, "nodes": {} } ] }
+            """;
+
+        private const string MalformedQuest = """
+            { "quests": [ { "id": "Quest_Broken", "stages": [ { "id": "Report", "outcome": "Done" } ] } ] }
+            """;
+
         [TestMethod]
         public void Dialogue_IsNamedByTheNpcItBelongsTo_AndHoldsItsTwoBranches()
         {
@@ -169,11 +212,49 @@ namespace Tooling.Tests.Narrative
         }
 
         /// <summary>A key written as nothing is a key nobody has typed yet, and the row has to be
-        /// readable while it is: the option is still a row, named by what it has.</summary>
+        /// readable while it is: the option is named by its place, the way every element carrying no name
+        /// of its own is.</summary>
         [TestMethod]
-        public void Dialogue_OptionWithoutAKey_IsStillARow()
+        public void Dialogue_OptionWithoutAKey_IsNamedByItsPlace()
         {
-            Assert.AreEqual("—   ·   ends", Nodes()[1].Children[0].Label);
+            Assert.AreEqual("#0   ·   ends", Nodes()[1].Children[0].Label);
+        }
+
+        /// <summary>An option is named by the id its node's routes point at while its wording has not been
+        /// written: the author is reading which choice this is, and the key is only where its text lives.</summary>
+        [TestMethod]
+        public void Dialogue_OptionWithoutAKey_IsNamedByItsId()
+        {
+            Assert.AreEqual("Wait   ·   ends", Options(Rolls)[2].Label);
+        }
+
+        /// <summary>An option that rolls has two routes out of it, and the row names both: a row showing
+        /// only the won one hides half the conversation.</summary>
+        [TestMethod]
+        public void Dialogue_OptionThatRolls_NamesBothRoutes()
+        {
+            Assert.AreEqual("Dlg_Veteran_Opt_Flatter   → FlatterGood   ·   fail → FlatterBad", Options(Rolls)[0].Label);
+        }
+
+        [TestMethod]
+        public void Dialogue_OptionWhoseRollLeadsNowhere_SaysTheConversationEnds()
+        {
+            Assert.AreEqual("Dlg_Veteran_Opt_Bluff   → Offer   ·   fail ends", Options(Rolls)[1].Label);
+        }
+
+        /// <summary>A collection written as something that is not one draws no rows, and neither does a
+        /// key nobody wrote: the heading is the only place the two can be told apart.</summary>
+        [TestMethod]
+        public void Dialogue_CollectionWrittenAsSomethingElse_SaysSoInsteadOfCountingNothing()
+        {
+            OutlineNode dialogue =
+                Outline.Dialogue(DialogueSchema(), Record(MalformedDialogue, DialogueAt), At(DialogueAt));
+
+            Assert.AreEqual("entry rules   (not a list)", dialogue.Children[0].Label);
+            Assert.AreEqual(0, dialogue.Children[0].Children.Count);
+
+            Assert.AreEqual("nodes   (not a list)", dialogue.Children[1].Label);
+            Assert.AreEqual(0, dialogue.Children[1].Children.Count);
         }
 
         [TestMethod]
@@ -273,6 +354,20 @@ namespace Tooling.Tests.Narrative
             Assert.AreEqual("outcome   ·   Lost   ·   fails", Stages()[2].Children[0].Label);
         }
 
+        /// <summary>An ending written as something other than a record is still a row: the stage ends
+        /// there as far as its author is concerned, and a row simply not drawn would leave him reading a
+        /// stage that goes nowhere.</summary>
+        [TestMethod]
+        public void Quest_OutcomeWrittenAsSomethingElse_IsStillARow()
+        {
+            OutlineNode outcome = Outline.Quest(QuestSchema(), Record(MalformedQuest, QuestAt), At(QuestAt))
+                .Children[0].Children[0].Children[0];
+
+            Assert.AreEqual("outcome   ·   not a record", outcome.Label);
+            Assert.AreEqual(OutlineKind.Outcome, outcome.Kind);
+            Assert.AreEqual(At("/quests/0/stages/0/outcome"), outcome.Pointer);
+        }
+
         /// <summary>A stage that carries no name of its own is named by its place, so the row can still
         /// be pointed at while the author is writing it.</summary>
         [TestMethod]
@@ -285,8 +380,14 @@ namespace Tooling.Tests.Narrative
 
         private static JToken Record(string json, string at) => At(at).Resolve(JToken.Parse(json))!;
 
-        private static IReadOnlyList<OutlineNode> Nodes() =>
-            Outline.Dialogue(DialogueSchema(), Record(Dialogues, DialogueAt), At(DialogueAt)).Children[1].Children;
+        private static IReadOnlyList<OutlineNode> Nodes() => Nodes(Dialogues);
+
+        private static IReadOnlyList<OutlineNode> Nodes(string json) =>
+            Outline.Dialogue(DialogueSchema(), Record(json, DialogueAt), At(DialogueAt)).Children[1].Children;
+
+        /// <summary>The options of the first node, which stand under it after its one line.</summary>
+        private static IReadOnlyList<OutlineNode> Options(string json) =>
+            [.. Nodes(json)[0].Children.Where(row => row.Kind == OutlineKind.Option)];
 
         private static IReadOnlyList<OutlineNode> Stages() =>
             Outline.Quest(QuestSchema(), Record(Quests, QuestAt), At(QuestAt)).Children[0].Children;
