@@ -62,7 +62,11 @@ namespace Core.Data.NpcData
         /// <summary>Boss stages; a broken entry drops the whole section (see NpcStageParser).</summary>
         [JsonProperty("stages")] public List<NpcStageData> Stages { get; init; } = [];
 
-        [JsonProperty("baseParameters")] public Dictionary<string, float> BaseParameters { get; init; } = [];
+        /// <summary>Starting values of the entity's parameters, keyed by the parameter's own name: the
+        /// provider parses every key strictly, so a key naming no member fails the spawn.</summary>
+        [JsonProperty("baseParameters")]
+        [DictionaryKey(typeof(EntityParameter))]
+        public Dictionary<string, float> BaseParameters { get; init; } = [];
 
         /// <summary>World behavior (perception, movement, activity). Null = static NPC (no world brain).</summary>
         [JsonProperty("world")] public NpcWorldData? World { get; init; }

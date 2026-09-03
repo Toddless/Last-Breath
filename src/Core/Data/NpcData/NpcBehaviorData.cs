@@ -2,6 +2,7 @@ namespace Core.Data.NpcData
 {
     using System.Collections.Generic;
     using Ai;
+    using Enums;
     using GameData;
     using Newtonsoft.Json;
     using Schema;
@@ -13,7 +14,9 @@ namespace Core.Data.NpcData
     public record NpcBehaviorData
     {
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
-        [JsonProperty("stance")] public string Stance { get; init; } = string.Empty;
+        /// <summary>The stance this archetype answers for; the provider keys the archetypes by it, so
+        /// two records naming one stance leave only the last one reachable.</summary>
+        [JsonProperty("stance")][EnumOf(typeof(Stance))] public string Stance { get; init; } = string.Empty;
         [JsonProperty("maxCastsPerTurn")] public int MaxCastsPerTurn { get; init; } = 1;
         [JsonProperty("temperature")] public float Temperature { get; init; } = 0.15f;
         [JsonProperty("aggression")] public float Aggression { get; init; } = 1f;

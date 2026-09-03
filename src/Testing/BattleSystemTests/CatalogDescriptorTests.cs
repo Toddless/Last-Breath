@@ -62,6 +62,10 @@ namespace LastBreathTest.BattleSystemTests
 
         private const string RarityField = "rarity";
 
+        /// <summary>What an npc writes its starting parameter values under. No descriptor names it — it is
+        /// the DTO's own field, the way a table's tiers are, so the walk spells it out.</summary>
+        private const string BaseParametersField = "baseParameters";
+
         /// <summary>What the reflector may still have to say about the real NPC DTOs. Empty: everything
         /// the walk meets there is a plain property it can read whole. A note appearing here is either a
         /// DTO to fix or a fact to write down — never something to silence by widening the check.</summary>
@@ -113,6 +117,28 @@ namespace LastBreathTest.BattleSystemTests
             ("abilityBehaviors.role", typeof(AbilityRole)),
             ("reactions.trigger", typeof(ReactionTrigger)),
             ("stages.attackEffects.effect", typeof(StageAttackEffectKind)),
+        ];
+
+        /// <summary>What the reflector may still have to say about the real behaviour DTOs. Empty: an
+        /// archetype and the weighted casts under it are plain properties it can read whole. A note
+        /// appearing here is either a DTO to fix or a fact to write down — never something to silence by
+        /// widening the check.</summary>
+        private static readonly string[] s_allowedNpcBehaviorNotes = [];
+
+        /// <summary>Every reference the behaviour parser resolves by id, addressed the way the file writes
+        /// it. An archetype scores casts it names by id and nothing else.</summary>
+        private static readonly (string Path, string Catalog)[] s_npcBehaviorReferences =
+        [
+            (Cast("id"), DataCatalog.Abilities),
+        ];
+
+        /// <summary>Every field the behaviour parser turns into an enum member. The stance is the one an
+        /// archetype is FOUND by — the provider keys the archetypes with it — so a word naming no member
+        /// loses the whole catalog at load, not just its own record.</summary>
+        private static readonly (string Path, Type Members)[] s_npcBehaviorChoices =
+        [
+            (NpcBehaviorsCatalogDescriptor.StanceField, typeof(Stance)),
+            (Cast("role"), typeof(AbilityRole)),
         ];
 
         /// <summary>What a note about a member the file does not hold turns on.</summary>
@@ -379,6 +405,93 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(
                 JToken.DeepEquals(root, JsonTreeDocument.Parse(CanonicalJsonWriter.Write(root, order, CanonicalJsonOptions.Default)).Root),
                 "the canonical write of Npc.json says something other than the file it was given");
+        }
+
+        /// <summary>
+        /// The starting values an npc is spawned with are a map, and its keys are the schema's answer
+        /// rather than free words: the provider parses every one of them into a parameter strictly, so a
+        /// key naming no member fails the spawn instead of being ignored. The shipped file is held against
+        /// the same members.
+        /// </summary>
+        [TestMethod]
+        public void TheNpcSchemaKeysTheBaseParametersByTheEntityParameters()
+        {
+            CatalogSchema schema = Schema(DataCatalog.Npc);
+            FieldSchema parameters = Locate(schema.Sections[0].Record, BaseParametersField);
+
+            Assert.AreEqual(FieldKind.Dictionary, parameters.Kind, $"'{BaseParametersField}' is not a map");
+            Choice(
+                parameters.Key ?? throw new AssertFailedException($"'{BaseParametersField}' lets the author write its keys freely"),
+                typeof(EntityParameter));
+
+            JToken root = JsonTreeDocument.Load(CatalogFile(schema, DataCatalog.Npc)).Root;
+            List<string> written = [.. Keys(root, BaseParametersField).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+
+            Assert.AreNotEqual(0, written.Count, "no record of the shipped file states a starting value — the check is checking nothing");
+            CollectionAssert.IsSubsetOf(
+                written,
+                Enum.GetNames<EntityParameter>(),
+                $"the shipped file starts npcs on something other than an {nameof(EntityParameter)}: {string.Join(", ", written)}");
+        }
+
+        /// <summary>The schema of the behaviour archetypes, built from the shipped DTOs. Both reports
+        /// gather what neither reflection nor the assembled parts could vouch for, and an editor drawn from
+        /// a schema with holes in it draws those holes as fields the author may not touch.</summary>
+        [TestMethod]
+        public void TheNpcBehaviorsSchemaBuildsFromTheRealDtoWithoutAReport()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.NpcBehaviors));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape);
+            Assert.AreEqual(1, schema.Sections.Count);
+            Assert.AreEqual(NpcBehaviorsCatalogDescriptor.RecordsKey, schema.Sections[0].Key);
+            Assert.AreEqual(NpcBehaviorsCatalogDescriptor.IdField, schema.Sections[0].Record.IdField);
+            Assert.AreEqual(0, schema.LocalizedSuffixes.Count, "an archetype is scored against and never shown: nothing about it reaches the player");
+            Assert.AreEqual(NpcBehaviorsCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null));
+
+            CollectionAssert.AreEqual(
+                s_allowedNpcBehaviorNotes,
+                builder.Reflection.Notes.ToArray(),
+                $"reflection has something to say about the NPC behaviour DTOs:{Environment.NewLine}{builder.Reflection}");
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled NpcBehaviors catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>Every id the behaviour parser resolves against another catalog, and every name it
+        /// parses into an enum, said so in the schema. An unmarked one reads to the tool as free text: the
+        /// author types a name nothing answers, and the miss surfaces when an npc takes its turn.</summary>
+        [TestMethod]
+        public void TheNpcBehaviorsSchemaNamesTheReferencesAndChoicesTheParserResolves()
+        {
+            RecordSchema record = Schema(DataCatalog.NpcBehaviors).Sections[0].Record;
+
+            foreach ((string path, string catalog) in s_npcBehaviorReferences) Points(Leaf(Locate(record, path)), path, catalog);
+
+            foreach ((string path, Type members) in s_npcBehaviorChoices) Choice(Leaf(Locate(record, path)), members);
+        }
+
+        /// <summary>The shipped file read back through the schema, the way the NPC one is: every key it
+        /// writes is one the schema ranks, and the canonical write loses nothing.</summary>
+        [TestMethod]
+        public void TheNpcBehaviorsSchemaRanksEveryKeyTheShippedFileWrites()
+        {
+            CatalogSchema schema = Schema(DataCatalog.NpcBehaviors);
+            JToken root = JsonTreeDocument.Load(CatalogFile(schema, DataCatalog.NpcBehaviors)).Root;
+            SchemaKeyOrder order = new(schema);
+
+            (List<string> unknown, List<string> reordered) = Written(root, schema, order);
+
+            Report($"Keys of {NpcBehaviorsCatalogDescriptor.FileName} the schema does not know", unknown);
+            Report("Records the canonical write would reorder", reordered);
+
+            Assert.AreEqual(0, unknown.Count,
+                $"keys of {NpcBehaviorsCatalogDescriptor.FileName} no field of the schema is written under: {string.Join(", ", unknown)}");
+            Assert.IsTrue(
+                JToken.DeepEquals(root, JsonTreeDocument.Parse(CanonicalJsonWriter.Write(root, order, CanonicalJsonOptions.Default)).Root),
+                $"the canonical write of {NpcBehaviorsCatalogDescriptor.FileName} says something other than the file it was given");
         }
 
         /// <summary>
@@ -885,6 +998,11 @@ namespace LastBreathTest.BattleSystemTests
         /// holds its entries in, and everything about it is addressed from there.</summary>
         private static string Entry(string path) =>
             $"{ModifierPoolsCatalogDescriptor.EntriesField}{PathSeparator}{path}";
+
+        /// <summary>The address of a field of one weighted cast: a cast is written under the field an
+        /// archetype holds its casts in, and everything about it is addressed from there.</summary>
+        private static string Cast(string path) =>
+            $"{NpcBehaviorsCatalogDescriptor.AbilitiesField}{PathSeparator}{path}";
 
         /// <summary>The records of one section, which is where a path down a catalog of several starts.</summary>
         private static RecordSchema Section(CatalogSchema schema, string section) =>

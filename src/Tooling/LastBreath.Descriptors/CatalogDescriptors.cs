@@ -12,6 +12,7 @@ namespace LastBreath.Descriptors
         public static IReadOnlyList<ICatalogDescriptor> All { get; } =
         [
             new NpcCatalogDescriptor(),
+            new NpcBehaviorsCatalogDescriptor(),
             new LootTablesCatalogDescriptor(),
             new EquipItemsCatalogDescriptor(),
             new ModifierPoolsCatalogDescriptor(),
@@ -24,7 +25,6 @@ namespace LastBreath.Descriptors
         [
             DataCatalog.Abilities,
             DataCatalog.CombatRules,
-            DataCatalog.NpcBehaviors,
             DataCatalog.NpcBuffs,
             DataCatalog.NpcModifiers,
             DataCatalog.NpcSpawnRolls,
