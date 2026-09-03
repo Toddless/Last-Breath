@@ -5,7 +5,6 @@ namespace Core.Narrative.Conditions
     using Data.GameData;
     using Newtonsoft.Json.Linq;
     using Quests;
-    using Tooling.Schema.Model;
 
     /// <summary>
     /// Quest-vocabulary conditions. All factories take Func-providers: the quest/dialogue data
@@ -23,14 +22,14 @@ namespace Core.Narrative.Conditions
         private const string StatusKey = "status";
         private const string NotTakenStatus = "NotTaken";
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             QuestIdParameter.Field,
             NarrativeParameterSchema.Choice(StatusKey, required: true, [.. Enum.GetNames<QuestStatus>(), NotTakenStatus]));
 
         public string Type => TypeName;
 
         /// <summary>The offered statuses are the enum's plus the absence of one.</summary>
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {
@@ -57,11 +56,11 @@ namespace Core.Narrative.Conditions
     {
         private const string TypeName = "CanAcceptQuest";
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName, QuestIdParameter.Field);
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName, QuestIdParameter.Field);
 
         public string Type => TypeName;
 
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser) =>
             QuestIdParameter.Require(json, Type) is { } questId ? new CanAcceptQuestCondition(log, questId) : null;
@@ -76,11 +75,11 @@ namespace Core.Narrative.Conditions
     {
         private const string TypeName = "CanTurnInQuest";
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName, QuestIdParameter.Field);
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName, QuestIdParameter.Field);
 
         public string Type => TypeName;
 
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser) =>
             QuestIdParameter.Require(json, Type) is { } questId ? new CanTurnInQuestCondition(log, questId) : null;
@@ -92,7 +91,7 @@ namespace Core.Narrative.Conditions
     {
         public const string Key = "questId";
 
-        public static readonly FieldSchema Field = NarrativeParameterSchema.Text(Key, required: true, DataCatalog.Quests);
+        public static readonly NarrativeParameterSpec Field = NarrativeParameterSchema.Text(Key, required: true, DataCatalog.Quests);
 
         public static string? Require(JObject json, string type)
         {

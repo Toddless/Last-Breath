@@ -2,7 +2,6 @@ namespace Core.Narrative.Conditions
 {
     using Influence;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema.Model;
 
     public class InfluenceCondition(IInfluenceMastery mastery, int atLeast) : INarrativeCondition
     {
@@ -15,12 +14,12 @@ namespace Core.Narrative.Conditions
         private const string AtLeastKey = "atLeast";
         private const int DefaultAtLeast = 0;
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Integer(AtLeastKey, DefaultAtLeast));
 
         public string Type => TypeName;
 
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser) =>
             new InfluenceCondition(mastery, json.Value<int?>(AtLeastKey) ?? DefaultAtLeast);

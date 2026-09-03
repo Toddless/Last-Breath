@@ -2,7 +2,6 @@ namespace Core.Narrative.Actions
 {
     using Battle;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema.Model;
 
     /// <summary>
     /// Pays a quest reward in passive tree POINTS. Not in experience: experience buys a level, and a
@@ -28,12 +27,12 @@ namespace Core.Narrative.Actions
         private const string TypeName = "GrantTreePoints";
         private const string AmountKey = "amount";
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Integer(AmountKey, required: true));
 
         public string Type => TypeName;
 
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         /// <summary>The amount is read as a whole number and nothing else: a quoted or fractional
         /// amount is a typo in an entry that hands out a budget, and a budget silently rounded down

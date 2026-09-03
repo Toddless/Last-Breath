@@ -1,7 +1,6 @@
 namespace Core.Narrative.Actions
 {
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema.Model;
 
     /// <summary>Builds one action type from its json entry. New type = new factory class +
     /// DI registration (registry instead of a switch).</summary>
@@ -12,7 +11,7 @@ namespace Core.Narrative.Actions
 
         /// <summary>The keys <see cref="Create"/> reads: what an editor draws the entry from, and what a
         /// test holds against the parser.</summary>
-        RecordSchema Parameters { get; }
+        NarrativeRecordSpec Parameters { get; }
 
         /// <summary>Null when the entry is broken (missing field, bad enum) — report first.</summary>
         INarrativeAction? Create(JObject json, INarrativeActionParser parser);

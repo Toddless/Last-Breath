@@ -5,7 +5,6 @@ namespace Core.Narrative.Actions
     using Godot;
     using Newtonsoft.Json.Linq;
     using Services;
-    using Tooling.Schema.Model;
 
     /// <summary>
     /// Relation effects of a dialogue choice go through the deed pipeline — personal reputation,
@@ -32,12 +31,12 @@ namespace Core.Narrative.Actions
         private const string TypeName = "Deed";
         private const string DeedIdKey = "deedId";
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Text(DeedIdKey, required: true, DataCatalog.ReputationDeeds));
 
         public string Type => TypeName;
 
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {

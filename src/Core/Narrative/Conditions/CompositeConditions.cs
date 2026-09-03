@@ -3,7 +3,6 @@ namespace Core.Narrative.Conditions
     using System.Collections.Generic;
     using System.Linq;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema.Model;
 
     /// <summary>Composites are strict: one broken child breaks the whole composite (null from the
     /// factory). A silently dropped clause would soften a gate — fail closed instead.</summary>
@@ -29,7 +28,7 @@ namespace Core.Narrative.Conditions
         public abstract string Type { get; }
 
         /// <summary>Built once per factory: the shape is the same for every composite, the name is not.</summary>
-        public RecordSchema Parameters => field ??= NarrativeParameterSchema.Of(Type, NarrativeParameterSchema.Conditions(ConditionsKey));
+        public NarrativeRecordSpec Parameters => field ??= NarrativeParameterSchema.Of(Type, NarrativeParameterSchema.Conditions(ConditionsKey));
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {
@@ -67,12 +66,12 @@ namespace Core.Narrative.Conditions
         private const string TypeName = "Not";
         private const string ConditionKey = "condition";
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Condition(ConditionKey));
 
         public string Type => TypeName;
 
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {

@@ -7,7 +7,6 @@ namespace Core.Narrative.Conditions
     using Influence;
     using Newtonsoft.Json.Linq;
     using Quests;
-    using Tooling.Schema.Model;
 
     /// <summary>
     /// "Does the NPC bring the job up at all?" — an INVISIBLE Influence roll cached in the facts
@@ -45,13 +44,13 @@ namespace Core.Narrative.Conditions
         private const string CooldownHoursKey = "cooldownHours";
         private const int DefaultCooldownHours = 24;
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             QuestIdParameter.Field,
             NarrativeParameterSchema.Integer(CooldownHoursKey, DefaultCooldownHours));
 
         public string Type => TypeName;
 
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {

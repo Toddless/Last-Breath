@@ -2,7 +2,6 @@ namespace Core.Narrative.Conditions
 {
     using Facts;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema.Model;
 
     /// <summary>One entry covers flags and counters: a flag is a count of at least 1.</summary>
     public class FactCondition(IWorldFactsService facts, string key, int count) : INarrativeCondition
@@ -17,13 +16,13 @@ namespace Core.Narrative.Conditions
         private const string CountKey = "count";
         private const int DefaultCount = 1;
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Text(FactKey, required: true),
             NarrativeParameterSchema.Integer(CountKey, DefaultCount));
 
         public string Type => TypeName;
 
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {

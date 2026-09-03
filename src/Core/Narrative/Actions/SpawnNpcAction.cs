@@ -10,7 +10,6 @@ namespace Core.Narrative.Actions
     using Godot;
     using Newtonsoft.Json.Linq;
     using Services;
-    using Tooling.Schema.Model;
 
     /// <summary>
     /// Puts a named NPC into the world: the quest vocabulary's way of producing a trial target.
@@ -155,7 +154,7 @@ namespace Core.Narrative.Actions
         private const string PointIdKey = "pointId";
         private const string ModifiersKey = "modifiers";
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Text(NpcIdKey, required: true, DataCatalog.Npc),
             NarrativeParameterSchema.FreeText(PointIdKey, required: true),
             NarrativeParameterSchema.References(ModifiersKey, DataCatalog.NpcModifiers));
@@ -165,7 +164,7 @@ namespace Core.Narrative.Actions
         /// <summary>The point is named by a scene's own spawn point and no catalog holds those ids. The
         /// modifiers list carries no default: absent leaves the record's own roll standing, while the
         /// property present names the exact set, an empty array included.</summary>
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {

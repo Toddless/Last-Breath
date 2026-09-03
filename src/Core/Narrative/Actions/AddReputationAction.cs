@@ -4,7 +4,6 @@ namespace Core.Narrative.Actions
     using Entity;
     using Enums;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema.Model;
 
     /// <summary>
     /// Direct faction reputation delta, bypassing the deed pipeline on purpose: quest rewards
@@ -24,7 +23,7 @@ namespace Core.Narrative.Actions
         private const string ReasonKey = "reason";
         private const string DefaultReason = "Narrative";
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Enum<Fractions>(FactionKey),
             NarrativeParameterSchema.Integer(DeltaKey, required: true),
             NarrativeParameterSchema.Text(ReasonKey, DefaultReason));
@@ -33,7 +32,7 @@ namespace Core.Narrative.Actions
 
         /// <summary>A delta of zero is refused along with an absent one: an entry that moves nothing is a
         /// number left unwritten, not a reward of none.</summary>
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {

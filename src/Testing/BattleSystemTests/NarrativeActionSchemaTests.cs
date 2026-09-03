@@ -18,7 +18,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Services;
     using Moq;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema.Model;
 
     /// <summary>
     /// Holds every action factory's declared parameters against the parser that actually reads them: a
@@ -132,7 +131,7 @@ namespace LastBreathTest.BattleSystemTests
                 var schema = factory.Parameters;
                 Assert.AreEqual(factory.Type, schema.TypeName, $"'{factory.GetType().Name}' declares its parameters under another type");
 
-                var names = schema.Fields.Select(field => field.JsonName).ToList();
+                var names = schema.Parameters.Select(field => field.JsonName).ToList();
                 Assert.IsFalse(names.Any(string.IsNullOrWhiteSpace), $"'{factory.Type}' declares a nameless parameter");
                 CollectionAssert.AllItemsAreUnique(names, $"'{factory.Type}' declares one json key twice");
             }
@@ -145,7 +144,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             foreach (var factory in _factories)
             {
-                var declared = factory.Parameters.Fields.Select(field => field.JsonName).ToList();
+                var declared = factory.Parameters.Parameters.Select(field => field.JsonName).ToList();
 
                 foreach (var constant in JsonKeyConstants(factory.GetType()))
                     CollectionAssert.Contains(declared, (string)constant.GetRawConstantValue()!,
@@ -179,7 +178,7 @@ namespace LastBreathTest.BattleSystemTests
         public void AnAbsentOptionalField_ReadsAsItsDeclaredDefault()
         {
             foreach (var factory in _factories)
-                foreach (var field in factory.Parameters.Fields.Where(field => !field.Required))
+                foreach (var field in factory.Parameters.Parameters.Where(field => !field.Required))
                 {
                     string address = $"{factory.Type}.{field.JsonName}";
                     if (s_unwatchableDefaults.Contains(address)) continue;
@@ -209,8 +208,8 @@ namespace LastBreathTest.BattleSystemTests
             }
         }
 
-        private static IEnumerable<FieldSchema> Required(INarrativeActionFactory factory) =>
-            factory.Parameters.Fields.Where(field => field.Required);
+        private static IEnumerable<NarrativeParameterSpec> Required(INarrativeActionFactory factory) =>
+            factory.Parameters.Parameters.Where(field => field.Required);
 
         /// <summary>A factory's own json-key constants, its base classes' included.</summary>
         private static IEnumerable<FieldInfo> JsonKeyConstants(Type factory)
@@ -277,18 +276,18 @@ namespace LastBreathTest.BattleSystemTests
             return json;
         }
 
-        private static JToken Stub(FieldSchema field) => field.Kind switch
+        private static JToken Stub(NarrativeParameterSpec field) => field.Kind switch
         {
-            FieldKind.String => StubText,
-            FieldKind.Reference => StubReference,
-            FieldKind.Integer or FieldKind.Number => StubNumber,
-            FieldKind.Boolean => true,
-            FieldKind.Enum => First(field),
+            NarrativeParameterKind.Text => StubText,
+            NarrativeParameterKind.Reference => StubReference,
+            NarrativeParameterKind.Integer or NarrativeParameterKind.Number => StubNumber,
+            NarrativeParameterKind.Boolean => true,
+            NarrativeParameterKind.Choice => First(field),
             _ => throw Unstubbable(field.JsonName, $"a {field.Kind} this probe has no stand-in for"),
         };
 
-        private static JToken First(FieldSchema field) =>
-            field.EnumValues.Count > 0 ? field.EnumValues[0] : throw Unstubbable(field.JsonName, "a choice offering no members");
+        private static JToken First(NarrativeParameterSpec field) =>
+            field.Choices.Count > 0 ? field.Choices[0] : throw Unstubbable(field.JsonName, "a choice offering no members");
 
         private static AssertFailedException Unstubbable(string address, string what) => new($"'{address}' is {what}");
     }

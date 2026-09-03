@@ -3,7 +3,6 @@ namespace Core.Narrative.Actions
     using Data.GameData;
     using Inventory;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema.Model;
 
     /// <summary>Mints the item into the player's inventory (equip rewards are fresh rolls, resources
     /// plain copies). Capacity is the CALLER's problem: a quest turn-in must be gated on free space
@@ -17,14 +16,14 @@ namespace Core.Narrative.Actions
     {
         private const string TypeName = "GiveItem";
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             ItemIdParameter.Field, NarrativeParameterSchema.Integer(ItemIdParameter.AmountKey, ItemIdParameter.DefaultAmount));
 
         public string Type => TypeName;
 
         /// <summary>The minter is asked for the raw id, so an item minted outside any catalog is named
         /// here just as well as a catalogued one — the catalogs are what an editor offers, not a gate.</summary>
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser) =>
             ItemIdParameter.Require(json, TypeName) is { } itemId
@@ -40,7 +39,7 @@ namespace Core.Narrative.Actions
         public const string AmountKey = "amount";
         public const int DefaultAmount = 1;
 
-        public static readonly FieldSchema Field = NarrativeParameterSchema.Text(Key, required: true,
+        public static readonly NarrativeParameterSpec Field = NarrativeParameterSchema.Text(Key, required: true,
             DataCatalog.EquipItems, DataCatalog.Resources, DataCatalog.Items, DataCatalog.Ornaments);
 
         public static int Amount(JObject json) => json.Value<int?>(AmountKey) ?? DefaultAmount;

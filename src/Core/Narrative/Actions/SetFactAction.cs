@@ -2,7 +2,6 @@ namespace Core.Narrative.Actions
 {
     using Facts;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema.Model;
 
     /// <summary>Raises a free-form flag ("count" turns it into a counter increment).</summary>
     public class SetFactAction(IWorldFactsService facts, string key, int count) : INarrativeAction
@@ -21,14 +20,14 @@ namespace Core.Narrative.Actions
         private const string CountKey = "count";
         private const int DefaultCount = 1;
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Text(FactKey, required: true),
             NarrativeParameterSchema.Integer(CountKey, DefaultCount));
 
         public string Type => TypeName;
 
         /// <summary>The same free-form key the Fact condition reads back, declared the same way.</summary>
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {

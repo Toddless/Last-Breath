@@ -4,7 +4,6 @@ namespace Core.Narrative.Actions
     using Conditions;
     using Newtonsoft.Json.Linq;
     using Quests;
-    using Tooling.Schema.Model;
 
     /// <summary>Quest-vocabulary actions (dialogue options are the normal path for all four).
     /// Func-injected log for the same DI-cycle reason as the quest conditions.</summary>
@@ -37,7 +36,7 @@ namespace Core.Narrative.Actions
 
         /// <summary>Built once per factory: all four kinds are addressed by the one quest reference the
         /// conditions read back, and only the name under which it is declared differs.</summary>
-        public RecordSchema Parameters => field ??= NarrativeParameterSchema.Of(Type, QuestIdParameter.Field);
+        public NarrativeRecordSpec Parameters => field ??= NarrativeParameterSchema.Of(Type, QuestIdParameter.Field);
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {

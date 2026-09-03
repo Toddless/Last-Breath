@@ -4,7 +4,6 @@ namespace Core.Narrative.Actions
     using MessageBus;
     using MessageBus.Messages;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema.Model;
 
     /// <summary>Dialogue action "StartTrade": hands the conversation over to the trader's shop.
     /// Authors put it on a node that ends the dialogue — the trade window opens as it closes.</summary>
@@ -18,12 +17,12 @@ namespace Core.Narrative.Actions
         private const string TypeName = "StartTrade";
         private const string TraderIdKey = "traderId";
 
-        private static readonly RecordSchema s_parameters = NarrativeParameterSchema.Of(TypeName,
+        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Text(TraderIdKey, required: true, DataCatalog.Traders));
 
         public string Type => TypeName;
 
-        public RecordSchema Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => s_parameters;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {

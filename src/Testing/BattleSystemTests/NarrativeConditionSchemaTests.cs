@@ -14,7 +14,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Services;
     using Moq;
     using Newtonsoft.Json.Linq;
-    using Tooling.Schema.Model;
 
     /// <summary>
     /// Holds every condition factory's declared parameters against the parser that actually reads them:
@@ -96,7 +95,7 @@ namespace LastBreathTest.BattleSystemTests
                 var schema = factory.Parameters;
                 Assert.AreEqual(factory.Type, schema.TypeName, $"'{factory.GetType().Name}' declares its parameters under another type");
 
-                var names = schema.Fields.Select(field => field.JsonName).ToList();
+                var names = schema.Parameters.Select(field => field.JsonName).ToList();
                 Assert.IsFalse(names.Any(string.IsNullOrWhiteSpace), $"'{factory.Type}' declares a nameless parameter");
                 CollectionAssert.AllItemsAreUnique(names, $"'{factory.Type}' declares one json key twice");
             }
@@ -109,7 +108,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             foreach (var factory in _factories)
             {
-                var declared = factory.Parameters.Fields.Select(field => field.JsonName).ToList();
+                var declared = factory.Parameters.Parameters.Select(field => field.JsonName).ToList();
 
                 foreach (var constant in JsonKeyConstants(factory.GetType()))
                     CollectionAssert.Contains(declared, (string)constant.GetRawConstantValue()!,
@@ -143,7 +142,7 @@ namespace LastBreathTest.BattleSystemTests
         public void AnAbsentOptionalField_ReadsAsItsDeclaredDefault()
         {
             foreach (var factory in _factories)
-                foreach (var field in factory.Parameters.Fields.Where(field => !field.Required))
+                foreach (var field in factory.Parameters.Parameters.Where(field => !field.Required))
                 {
                     string address = $"{factory.Type}.{field.JsonName}";
                     Assert.IsNotNull(field.Default, $"'{address}' is optional and must name what the parser reads in its place");
@@ -175,8 +174,8 @@ namespace LastBreathTest.BattleSystemTests
             }
         }
 
-        private static IEnumerable<FieldSchema> Required(INarrativeConditionFactory factory) =>
-            factory.Parameters.Fields.Where(field => field.Required);
+        private static IEnumerable<NarrativeParameterSpec> Required(INarrativeConditionFactory factory) =>
+            factory.Parameters.Parameters.Where(field => field.Required);
 
         /// <summary>A factory's own json-key constants, its base classes' included: a composite reads the
         /// key its base declares, and FlattenHierarchy does not reach a private one.</summary>
@@ -208,9 +207,6 @@ namespace LastBreathTest.BattleSystemTests
             return accessor.Object;
         }
 
-        private static bool IsNestedCondition(FieldSchema? field) =>
-            field?.Record?.TypeName == NarrativeParameterSchema.NestedConditionRecord;
-
         private bool Met(INarrativeConditionFactory factory, string jsonName, int? written)
         {
             var json = Minimal(factory);
@@ -233,24 +229,24 @@ namespace LastBreathTest.BattleSystemTests
             return json;
         }
 
-        private JToken Stub(FieldSchema field) => field.Kind switch
+        private JToken Stub(NarrativeParameterSpec field) => field.Kind switch
         {
-            FieldKind.String => StubText,
-            FieldKind.Reference => StubReference,
-            FieldKind.Integer or FieldKind.Number => StubNumber,
-            FieldKind.Boolean => true,
-            FieldKind.Enum => First(field),
+            NarrativeParameterKind.Text => StubText,
+            NarrativeParameterKind.Reference => StubReference,
+            NarrativeParameterKind.Integer or NarrativeParameterKind.Number => StubNumber,
+            NarrativeParameterKind.Boolean => true,
+            NarrativeParameterKind.Choice => First(field),
             // A nested condition names the vocabulary rather than a record of its own; the fact counter is
             // the simplest entry that vocabulary can build.
-            FieldKind.Object when IsNestedCondition(field) => Minimal(_fact),
-            FieldKind.Array when IsNestedCondition(field.Item) => new JArray(Minimal(_fact)),
+            NarrativeParameterKind.NestedCondition => Minimal(_fact),
+            NarrativeParameterKind.NestedConditions => new JArray(Minimal(_fact)),
             _ => throw Unstubbable(field, $"a {field.Kind} this probe has no stand-in for"),
         };
 
-        private static JToken First(FieldSchema field) =>
-            field.EnumValues.Count > 0 ? field.EnumValues[0] : throw Unstubbable(field, "a choice offering no members");
+        private static JToken First(NarrativeParameterSpec field) =>
+            field.Choices.Count > 0 ? field.Choices[0] : throw Unstubbable(field, "a choice offering no members");
 
-        private static AssertFailedException Unstubbable(FieldSchema field, string what) =>
+        private static AssertFailedException Unstubbable(NarrativeParameterSpec field, string what) =>
             new($"'{field.JsonName}' is {what}");
     }
 }
