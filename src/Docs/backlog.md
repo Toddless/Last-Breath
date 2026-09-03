@@ -1,13 +1,17 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из полировки хоста 2 (2026-09-03; accept with minors) — предыдущий раздел «Из создания/дубля/удаления записей» закрыт этой задачей, кроме отмеченного ниже
+
+- (minor) `src/Tooling/DataEditor/Source/View/EditorRoot.cs:550` — обнуление `_touched` в `ShowCatalog` закрыло undo чужого каталога, но при возврате в каталог после удаления единственной записи `Stepped` = null: удаление неотменяемо из интерфейса, Ctrl+S его запишет. Стало: `Stepped => _record?.File.Document ?? (Owns(_touched) ? _touched : null)`, `Owns(doc) => _catalog?.Files.Any(f => ReferenceEquals(f.Document, doc)) == true`.
+- (minor, домен) `src/Tooling/Tooling.Core/Catalogs/CatalogEditing.cs:93` — `RemoveRecord` формы `Single` не проверяет (в отличие от `AddRecord`/`Beside`): у `Single` с именованной секцией указатель `/key`, `Remove` унесёт всё содержимое; ворота только погашенная кнопка. Стало: первой строкой `if (view.Schema.Shape == RootShape.Single) return Refused(Notes.OneRecordOnly);`.
+- (nit) `EditorRoot.cs:783-785` комментарий про «имя файла» вместо «id при чтении»; `:547-551` `_recordIndex` не сбрасывается при смене каталога (спасает кламп); `:705-708` посев `_fileBox.Text` в `FillFilePicker` затирается сменой секции (недостижимо сегодня); `:758` имя с расширением даёт `X.json.json` — срезать `FileExtension`; README раздел «Границы» — висячий огрызок «exe (плагин .NET…)» и «нет экспорта» против описанного запуска exe.
+
 ## Из ветвления квестов (2026-09-03; accept with minors) — два пункта ждут владельца
 
 - (ВОПРОС владельцу) `src/Core/Narrative/Quests/QuestLogService.cs:296-299,341-352` — `canFail: false` + исход `fails: true` = зомби-квест: `OutcomeId` выставлен, `Fail` отказал, статус навсегда `Active`, журнал не узнаёт о конце. Варианты: провайдер отвергает такой квест на загрузке (дефект данных) либо `ReachOutcome` при отказе `Fail` ставит `ReadyToTurnIn`.
 - (ВОПРОС владельцу, имя) `decisions.md` называет поле перехода `toStage`, DTO читает `to` (`QuestsData.cs:62`); данных с переходами ещё нет — выровнять в любую сторону одним словом.
-- (minor) `QuestLogService.cs:304-317` — `onComplete` выполняется до резолва целевой стадии; при висячем `to` (недостижимо благодаря валидатору) сгорал бы повторно. Стало: `NextStageId` отдаёт `QuestStageDefinition?`, выход до `Execute(OnComplete)`.
 - (minor, дубль правила) `QuestProvider.cs:193-200` vs `QuestLogService.cs:327-337` — «нет переходов = следующая по списку, исход = никуда» написано дважды; на их совпадении держится ацикличность. Одна точка на `QuestDefinition` (`Successors(stage)`), ручной `StageIndex` в сервисе исчезает.
 - (minor, сейв) `QuestLogSaveParticipant.cs:36-44,69-92` — гейт миграции по пустому `stageId`, а не по `savedVersion < 3`; v3 тоже пишет пустой `stageId` у Declined. Единственный гейт — версия.
-- (minor) `QuestLogService.cs:230-231` — неизвестный `OutcomeId` из сейва молча платит общие награды; `TrackError` в `RestoreState`.
 - (minor, авторинг) `QuestsData.cs:60-66` — безусловный переход не последним молча съедает следующие маршруты; `TrackInfo` в `ParseTransitions`.
 - (nit) `Abandon` не чистит `OutcomeId`; `CurrentStage` резолвится дважды за итерацию; тесты: повторное принятие `Repeatable` после исхода, `Abandon`/`Decline` после исхода, сейв с пропавшим исходом, переход НАЗАД (легален только если у стадий на пути есть явные переходы в обход источника — иначе «reachable from itself»; зафиксировать строкой в доке).
 
@@ -18,11 +22,8 @@
 
 ## Из создания/дубля/удаления записей и пикера ссылок (2026-09-03; accept with minors после доработки)
 
-- (minor) `src/Tooling/DataEditor/Source/View/EditorRoot.cs:508` — `_touched` переживает смену каталога: после удаления единственной записи A и переходе в пустой каталог B Ctrl+Z уезжает в A. Стало: `ShowCatalog` обнуляет `_touched`.
 - (minor) `EditorRoot.cs:718` — `record.CurrentId` читается после удаления (аргументы слева направо) → статус называет старое имя переименованной записи; снять имя до вызова.
 - (minor) `EditorRoot.cs:904` — `×` включена для `RootShape.Single`, отказ не той причиной; гасить как `⧉`.
-- (minor, функция) `EditorRoot.cs:660-672` — для `FreeFilePlacement` пикер файла предлагает только существующие файлы; новый файл пулов из хоста создать нельзя, пустая папка free-каталога — тупик. Стало: редактируемая строка файла (`LineEdit` + подсказка существующих).
-- (minor, док) `src/Tooling/DataEditor/README.md:7-8` — «только чтение… правок и сохранения нет» — устарело: правка полей, история на файл, три жеста над записями, пикер ссылок.
 - (уточнение отчёта) тест `RemoveRecord_LeavesTheStepOnTheFileTheRecordWasTakenFrom` пинит доменную посылку, а не хостовую логику `_touched` — регрессия хоста тестами не ловится.
 - (nit) `InspectorPanel.cs:330-335` док `Box` противоречит `ReferenceBox`; `Reread` на каждый `Refresh` и полный обход индекса ссылок на символ (`ReferenceIndex.cs:177`) — инвалидация по каталогу; «имя файла без расширения» тремя выражениями — `CatalogFile.BaseName`; после undo удаления запись не выбирается; xml-доки абзацами (`CatalogEditing.cs:11-14,34-41,241-244,257-261`, `CatalogView.cs:28-31`, `EditorRoot.cs:152-155,873-876`); `CatalogEditingTests.cs:408` `Mythic*Modifiers` — на POSIX не упадёт.
 
