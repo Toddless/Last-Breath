@@ -1,5 +1,10 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из описателя NpcBehaviors (2026-09-03; accept with minors)
+
+- (minor, дубль) `src/Testing/BattleSystemTests/CatalogDescriptorTests.cs:479-499` — `TheNpcBehaviorsSchemaRanksEveryKeyTheShippedFileWrites` посимвольная копия Npc-теста и оба перекрывают хелпер `UnknownKeys`; общий `RanksEveryKey(catalog, file)` либо `Assert.AreEqual(0, UnknownKeys(...).Count)`.
+- (nit) `:490,494,498` — сообщения называют файл без расширения (`FileName + CatalogWorkspace.FileExtension`).
+
 ## Из создания/дубля/удаления записей и пикера ссылок (2026-09-03; accept with minors после доработки)
 
 - (minor) `src/Tooling/DataEditor/Source/View/EditorRoot.cs:508` — `_touched` переживает смену каталога: после удаления единственной записи A и переходе в пустой каталог B Ctrl+Z уезжает в A. Стало: `ShowCatalog` обнуляет `_touched`.
