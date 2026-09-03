@@ -115,6 +115,15 @@ namespace DataEditor.Source.View
         private const string FileHint = "the file the record is written to";
         private const string SlotHint = "the value the catalog splits its files by; it is written into the record";
 
+        /// <summary>What the author is told about a file he may name himself: a catalog nothing splits is
+        /// split by hand, so a name it does not carry yet is a new file and not a mistake.</summary>
+        private const string NewFileHint =
+            "the file the record is written to; a name this catalog has not got yet lays a new one down";
+
+        /// <summary>What the list beside the name is for where the name is typed: the files that are
+        /// there already, so the author writes into one of them without remembering how it is spelled.</summary>
+        private const string HeldFilesHint = "the files this catalog is already written across";
+
         /// <summary>What a copy is offered under before the author names it. A name is required and no
         /// catalog may write one twice, so the copy has to arrive already carrying a free one.</summary>
         private const string CopySuffix = "_Copy";
@@ -138,6 +147,7 @@ namespace DataEditor.Source.View
 
         private ConfirmationDialog _recordDialog = null!;
         private LineEdit _idBox = null!;
+        private LineEdit _fileBox = null!;
         private OptionButton _sectionPicker = null!;
         private OptionButton _filePicker = null!;
         private Control _sectionRow = null!;
@@ -160,8 +170,9 @@ namespace DataEditor.Source.View
         /// written once it is given.</summary>
         private bool _copying;
 
-        /// <summary>Where the record on screen sits in the list, so its row can be written again when the
-        /// id it is named by is edited.</summary>
+        /// <summary>Where the list is standing: the row of the record on screen, so it can be written
+        /// again when the id it is named by is edited, and the row the last record stood in while there
+        /// is none — a record taken out leaves a place, and an undo that puts it back puts it there.</summary>
         private int _recordIndex = NoSelection;
 
         /// <summary>What the run last did, for the status line. Kept apart from what it read: the
@@ -393,6 +404,11 @@ namespace DataEditor.Source.View
         /// not answer it on its own — the section it is written under and the file it goes to. Built once
         /// and filled per catalog; the rows the catalog answers itself are hidden rather than shown
         /// empty, because a picker with one entry is a question that was never asked.
+        /// <para>The file is asked for two ways in one row, and which of them is shown is the catalog's
+        /// to say. A catalog split by a field of the record may only be answered with a value of that
+        /// field, so it gets the list; a catalog split by nothing at all is split by the author, so it
+        /// gets a box he may type a name the catalog has never had into — otherwise the first record of
+        /// an empty folder is one the tool cannot be asked to write.</para>
         /// </summary>
         private void BuildRecordDialog()
         {
@@ -401,11 +417,24 @@ namespace DataEditor.Source.View
             var body = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
 
             _idBox = new LineEdit { SizeFlagsHorizontal = SizeFlags.ExpandFill, PlaceholderText = IdName };
+
+            _fileBox = new LineEdit
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                PlaceholderText = FileName,
+                TooltipText = NewFileHint
+            };
+
             _sectionPicker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             _filePicker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
 
+            var file = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+
+            file.AddChild(_fileBox);
+            file.AddChild(_filePicker);
+
             _sectionRow = DialogRow(SectionName, _sectionPicker, SectionHint);
-            _fileRow = DialogRow(FileName, _filePicker, FileHint);
+            _fileRow = DialogRow(FileName, file, FileHint);
 
             body.AddChild(DialogRow(IdName, _idBox, IdHint));
             body.AddChild(_sectionRow);
@@ -416,10 +445,12 @@ namespace DataEditor.Source.View
             // The section decides which record schema is being written, and the value a catalog splits
             // its files by is a field of that schema: change one and the other has to be offered again.
             _sectionPicker.ItemSelected += _ => FillFilePicker();
+            _filePicker.ItemSelected += index => TakeFileName((int)index);
 
             // Enter answers the dialog: a name typed into the box and submitted to nothing reads as the
             // tool having refused the word.
             _recordDialog.RegisterTextEnter(_idBox);
+            _recordDialog.RegisterTextEnter(_fileBox);
             _recordDialog.Confirmed += WriteRecord;
 
             AddChild(_recordDialog);
@@ -513,6 +544,11 @@ namespace DataEditor.Source.View
 
             if (_catalog is not null) Show(_catalogList, index);
 
+            // The file of the last gesture belongs to the catalog it was made in. Carried across a
+            // change of catalog, it would point the history keys at a file the author has left — and an
+            // undo pressed over a catalog that shows nothing would take back a step in another one.
+            _touched = null;
+
             FillRecords();
 
             ShowRecord(_catalog is { Records.Count: > 0 } ? 0 : NoSelection);
@@ -553,9 +589,13 @@ namespace DataEditor.Source.View
                 ? _catalog.Records[index]
                 : null;
 
-            _recordIndex = _record is null ? NoSelection : index;
-
-            if (_record is not null) Show(_recordList, index);
+            // The place is kept when the record goes: a row that stood for a record taken out is where
+            // the author is looking, and where an undo puts the record back.
+            if (_record is not null)
+            {
+                _recordIndex = index;
+                Show(_recordList, index);
+            }
 
             _inspector.Rebuild(_record);
             Refresh();
@@ -639,7 +679,9 @@ namespace DataEditor.Source.View
 
         /// <summary>Offers what decides the file: the files the catalog is written across when nothing
         /// about a record says which of them it belongs in, or the values it is split by when something
-        /// does. A catalog whose rule answers on its own is asked nothing.</summary>
+        /// does. A catalog whose rule answers on its own is asked nothing.
+        /// <para>Where the author names the file himself the list stands beside the box as a reminder and
+        /// not as the answer, so a catalog with no files yet still has the question put to it.</para></summary>
         private void FillFilePicker()
         {
             _filePicker.Clear();
@@ -651,13 +693,30 @@ namespace DataEditor.Source.View
             }
 
             bool split = view.Schema.Placement is FieldFilePlacement;
+            bool named = view.Schema.Placement is FreeFilePlacement;
             IReadOnlyList<string> offered = Offers(view, CatalogEditing.Section(view, ChosenSection(view)));
 
             foreach (string name in offered) _filePicker.AddItem(name);
 
             _filePicker.Selected = offered.Count > 0 ? 0 : NoSelection;
-            _filePicker.TooltipText = split ? SlotHint : FileHint;
-            _fileRow.Visible = offered.Count > 0;
+            _filePicker.TooltipText = split ? SlotHint : HeldFilesHint;
+            _filePicker.Visible = offered.Count > 0;
+
+            // The box opens on the file the list stands on: a record is written into one the catalog
+            // already has far more often than into one it has not.
+            _fileBox.Visible = named;
+            _fileBox.Text = named && offered.Count > 0 ? offered[0] : string.Empty;
+
+            _fileRow.Visible = named || offered.Count > 0;
+        }
+
+        /// <summary>Writes the file the author picked out of the ones the catalog has into the box he
+        /// answers with: where the name is typed, the list is how it is typed without spelling it.</summary>
+        private void TakeFileName(int index)
+        {
+            if (!_fileBox.Visible || index < 0 || index >= _filePicker.ItemCount) return;
+
+            _fileBox.Text = _filePicker.GetItemText(index);
         }
 
         /// <summary>What the author may be offered as the file of a new record: the values the catalog
@@ -667,7 +726,7 @@ namespace DataEditor.Source.View
             view.Schema.Placement switch
             {
                 FieldFilePlacement placed => Members(section, placed.FieldName),
-                FreeFilePlacement => [.. view.Files.Select(file => Path.GetFileNameWithoutExtension(file.Path))],
+                FreeFilePlacement => [.. view.Files.Select(file => file.BaseName)],
                 _ => []
             };
 
@@ -690,8 +749,16 @@ namespace DataEditor.Source.View
                 ? view.Schema.Sections[_sectionPicker.Selected].Key
                 : null;
 
-        private string? ChosenFile() =>
-            _fileRow.Visible && _filePicker.Selected >= 0 ? _filePicker.GetItemText(_filePicker.Selected) : null;
+        /// <summary>What the dialog was answered with about the file: the name the author typed where he
+        /// names it, and the value he picked where the catalog splits its files by one. An empty box is
+        /// handed on as it is — the refusal and its reason belong to the rules and not to the window.</summary>
+        private string? ChosenFile()
+        {
+            if (!_fileRow.Visible) return null;
+            if (_fileBox.Visible) return _fileBox.Text.Trim();
+
+            return _filePicker.Selected >= 0 ? _filePicker.GetItemText(_filePicker.Selected) : null;
+        }
 
         /// <summary>Writes what the dialog was asked for: a fresh record, or a copy of the one on screen.</summary>
         private void WriteRecord()
@@ -713,9 +780,14 @@ namespace DataEditor.Source.View
         {
             if (_catalog is not { } view || _record is not { } record) return;
 
+            // The name is read before the record is taken out: the id is asked of the document, and a
+            // record no longer in it falls back to the name the file was opened under — so a record
+            // renamed during the run would be reported gone under a word nobody on screen can see.
+            string id = record.CurrentId;
+
             // The record's own file is named, because the gesture leaves no record to be asked for it:
             // what is taken out is the last thing that knew which history the step went onto.
-            Told(CatalogEditing.RemoveRecord(view, record), RemovedFormat, record.CurrentId, record.File.Document);
+            Told(CatalogEditing.RemoveRecord(view, record), RemovedFormat, id, record.File.Document);
         }
 
         /// <summary>Says on the status line what the gesture came to — the record it wrote, or the reason
@@ -733,8 +805,9 @@ namespace DataEditor.Source.View
             int index = IndexOf(result.Record);
 
             // Refresh has already put the list right, and it may have landed on this very record: the
-            // panel is built again only when there is another one to show.
-            if (index != NoSelection && index != _recordIndex) ShowRecord(index);
+            // panel is built again only when there is another one to show. Asked of the record on
+            // screen and not of the place the list stands in, because the place outlives the record.
+            if (index != NoSelection && index != IndexOf(_record)) ShowRecord(index);
         }
 
         /// <summary>Where a record stands in the catalog now. Found by its file and its address rather
@@ -873,13 +946,14 @@ namespace DataEditor.Source.View
         /// <summary>The place the record that has gone stood in: the row that took it, or the one just
         /// above it, as long as that row is a record of the same file. A row of another file is not the
         /// place the author was standing in, and the history keys answer for the file on screen — landing
-        /// on it would point undo at a file the author never worked in, so nothing is selected instead.</summary>
+        /// on it would point undo at a file the author never worked in, so nothing is selected instead.
+        /// <para>With no record on screen at all the place itself is the answer: the list grew back under
+        /// an undo of the gesture that emptied it, and the row it stood in is the record put back.</para></summary>
         private int Neighbour(CatalogView view)
         {
-            if (_record is not { } gone) return NoSelection;
-
             int taken = Math.Min(_recordIndex, view.Records.Count - 1);
 
+            if (_record is not { } gone) return taken;
             if (Holds(view, taken, gone.File)) return taken;
 
             return Holds(view, taken - 1, gone.File) ? taken - 1 : NoSelection;
@@ -893,15 +967,17 @@ namespace DataEditor.Source.View
         /// nothing: a button that answers a press with silence reads as the tool having missed it.</summary>
         private void EnableActions()
         {
-            // A catalog written as one record is the file itself: there is nothing to add to it and
-            // nothing to copy, and saying so on the button is what keeps a press from being answered
-            // with a dialog that can only end in a refusal.
+            // A catalog written as one record is the file itself: there is nothing to add to it, nothing
+            // to copy and nothing to take out of it, and saying so on the button is what keeps a press
+            // from being answered with a dialog that can only end in a refusal.
             bool listed = _catalog is { Schema.Shape: not RootShape.Single };
             string why = _catalog is null ? NoCatalogHint : OneRecordHint;
+            bool standing = listed && _record is not null;
+            string nothing = listed ? NoRecordHint : why;
 
             Enable(_addButton, listed, AddRecordHint, why);
-            Enable(_copyButton, listed && _record is not null, CopyRecordHint, listed ? NoRecordHint : why);
-            Enable(_removeButton, _record is not null, RemoveRecordHint, NoRecordHint);
+            Enable(_copyButton, standing, CopyRecordHint, nothing);
+            Enable(_removeButton, standing, RemoveRecordHint, nothing);
         }
 
         private static void Enable(Button button, bool can, string hint, string why)

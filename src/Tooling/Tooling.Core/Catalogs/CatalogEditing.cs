@@ -156,7 +156,7 @@ namespace Tooling.Catalogs
         private static CatalogFile? Held(CatalogView view, string name)
         {
             foreach (CatalogFile file in view.Files)
-                if (string.Equals(Path.GetFileNameWithoutExtension(file.Path), name, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(file.BaseName, name, StringComparison.OrdinalIgnoreCase))
                     return file;
 
             return null;
