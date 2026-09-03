@@ -3,6 +3,7 @@ namespace Tooling.Tests.DataEditor
     using System.IO;
     using Newtonsoft.Json.Linq;
     using Tooling.Catalogs;
+    using Tooling.Editing.History;
     using Tooling.Json;
     using Tooling.Schema;
     using Tooling.Schema.Model;
@@ -81,6 +82,8 @@ namespace Tooling.Tests.DataEditor
         private const string BrokenFile = "{ \"pools\": ";
 
         private const string ManaKey = "Mana";
+        private const string HealthKey = "Health";
+        private const string RowId = "Row_First";
 
         private const string TwoNpcs = """
             {
@@ -273,6 +276,29 @@ namespace Tooling.Tests.DataEditor
 
             Assert.AreEqual(0, saved.Notes.Count);
             Assert.IsTrue(File.Exists(Path.Combine(_root, EquipCatalog, BeltFile)));
+        }
+
+        /// <summary>A file the run lays down is written into before it joins the catalog, and the gesture
+        /// that created it is a gesture like any other: it arrives on the run's own stack, so one press of
+        /// undo takes it back and the file is left holding nothing to save.</summary>
+        [TestMethod]
+        public void AddRecord_PutsTheFileItLaidDownOnTheRunsHistory()
+        {
+            Write(EquipCatalog, RingFile, OneRing);
+
+            EditHistory history = new();
+            CatalogView view = CatalogWorkspace.Load(_root, [EquipmentDescriptor()], history).Catalogs[0];
+            CatalogEditResult result = CatalogEditing.AddRecord(view, sectionKey: null, BeltSlot, NewId);
+
+            Assert.IsTrue(result.Done, result.Note);
+            Assert.AreEqual(2, view.Files.Count);
+
+            CatalogFile laid = result.Record!.File;
+
+            Assert.AreSame(history, laid.Document.History, "the file records where the rest of the run does");
+            Assert.IsFalse(laid.Document.IsClean);
+            Assert.IsNotNull(history.Undo());
+            Assert.IsTrue(laid.Document.IsClean, "the file laid down holds nothing the author has not taken back");
         }
 
         [TestMethod]
@@ -697,6 +723,30 @@ namespace Tooling.Tests.DataEditor
             Assert.IsFalse(CatalogEditing.Taken(view, IndividualKey, GeneralTableId));
         }
 
+        /// <summary>A catalog whose records stand at the root has one section and no word for it. The name
+        /// is answered for all the same — the empty key IS that section — and a record asking for a name
+        /// already written is refused without a section to name in the refusal.</summary>
+        [TestMethod]
+        public void Taken_AnswersForASectionWithNoKeyOfItsOwn()
+        {
+            Write(MapCatalog, MapFile, TwoUnits);
+            Write(RowsCatalog, RowsFile, OneRow);
+
+            CatalogView units = Units();
+            CatalogView rows = Rows();
+
+            Assert.IsTrue(CatalogEditing.Taken(units, RootKey, HealthKey));
+            Assert.IsTrue(CatalogEditing.Taken(units, RootKey, "health"), "case is not part of the answer");
+            Assert.IsFalse(CatalogEditing.Taken(units, RootKey, ManaKey));
+            Assert.IsTrue(CatalogEditing.Taken(rows, RootKey, RowId));
+
+            CatalogEditResult refused = CatalogEditing.AddRecord(units, sectionKey: null, fileChoice: null, HealthKey);
+
+            Assert.IsFalse(refused.Done);
+            StringAssert.Contains(refused.Note, HealthKey);
+            Assert.AreEqual(2, units.Records.Count);
+        }
+
         /// <summary>The array one section of a file holds.</summary>
         private static JArray Section(CatalogFile file, string key) =>
             (JArray)file.Document.Resolve(JsonPointer.Root.Append(key))!;
@@ -717,8 +767,10 @@ namespace Tooling.Tests.DataEditor
             ]));
 
         /// <summary>A catalog with a file per value of one of its fields.</summary>
-        private CatalogView Equipment() =>
-            Catalog(CatalogFixture.Descriptor(EquipCatalog, RootShape.ArrayUnderKey,
+        private CatalogView Equipment() => Catalog(EquipmentDescriptor());
+
+        private static ICatalogDescriptor EquipmentDescriptor() =>
+            CatalogFixture.Descriptor(EquipCatalog, RootShape.ArrayUnderKey,
                 [
                     CatalogFixture.Section(ItemsKey, CatalogFixture.Record(IdField,
                         CatalogFixture.Required(IdField, FieldKind.String),
@@ -730,7 +782,7 @@ namespace Tooling.Tests.DataEditor
                             EnumValues = [RingSlot, BeltSlot]
                         }))
                 ],
-                new FieldFilePlacement { FieldName = SlotField }));
+                new FieldFilePlacement { FieldName = SlotField });
 
         /// <summary>A catalog nothing about a record places: the tool is told which file.</summary>
         private CatalogView Pools() =>

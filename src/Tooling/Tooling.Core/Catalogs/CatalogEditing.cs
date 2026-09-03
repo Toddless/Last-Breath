@@ -118,15 +118,15 @@ namespace Tooling.Catalogs
             return null;
         }
 
-        /// <summary>Whether the named section already writes a record under this name. Asked of the
-        /// section and of every file at once: the game reads a section across the whole folder into a
-        /// table of its own, so a name is one record's inside its section and free in every other — a
-        /// catalog written under one section is its whole self here, as it was before.
+        /// <summary>Whether the section already writes a record under this name, asked across every file
+        /// at once: the game reads a section over the whole folder into one table.
         /// <para>Case is not part of the answer: two ids differing only in it are one word to the author,
-        /// and the record he meant to point at would be whichever the game read second.</para></summary>
+        /// and a reference he writes by hand would land in whichever of the two he was not looking
+        /// at.</para></summary>
         public static bool Taken(CatalogView view, string section, string id)
         {
             ArgumentNullException.ThrowIfNull(view);
+            ArgumentNullException.ThrowIfNull(section);
 
             return view.Records.Any(record =>
                 string.Equals(record.Section, section, StringComparison.Ordinal)
@@ -140,8 +140,12 @@ namespace Tooling.Catalogs
         private static string? Refusal(CatalogView view, string section, RecordSchema schema, string id)
         {
             if (CatalogRecords.Names(view.Schema, schema) && id.Length == 0) return Notes.NoId;
+            if (id.Length == 0 || !Taken(view, section, id)) return null;
 
-            return id.Length > 0 && Taken(view, section, id) ? Text(Notes.IdTaken, id) : null;
+            // Named where the catalog has a word for it: an author told a name is taken has to be able to
+            // go and look at the record holding it, and a catalog written as one nameless section shows
+            // him no section to look in.
+            return section.Length > 0 ? Text(Notes.IdTakenIn, id, section) : Text(Notes.IdTaken, id);
         }
 
         private static string? Named(string? text) => string.IsNullOrWhiteSpace(text) ? null : text.Trim();
@@ -297,7 +301,8 @@ namespace Tooling.Catalogs
             public const string OneRecordOnly = "this catalog is one record and has nothing to add to.";
             public const string NoSection = "the catalog writes no section called '{0}'.";
             public const string NoId = "name the record before adding it.";
-            public const string IdTaken = "'{0}' is already written in this section.";
+            public const string IdTaken = "'{0}' is already written in this catalog.";
+            public const string IdTakenIn = "'{0}' is already written in '{1}'.";
             public const string Gone = "the record is no longer in the document.";
             public const string NotRemoved = "'{0}' could not be taken out.";
             public const string NoFileNamed = "nothing says which file the record goes to.";

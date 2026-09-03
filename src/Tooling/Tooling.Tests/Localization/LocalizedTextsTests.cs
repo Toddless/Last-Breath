@@ -372,8 +372,6 @@ namespace Tooling.Tests.Localization
         public void IsDirty_FollowsTheFilesOwnHistories_AndSaveAllWritesTheChangedOnes()
         {
             LocalizedTexts texts = Load();
-            int moved = 0;
-            texts.Changed += () => moved++;
 
             Assert.IsFalse(texts.IsDirty);
 
@@ -381,7 +379,6 @@ namespace Tooling.Tests.Localization
 
             Assert.IsTrue(texts.IsDirty);
             Assert.AreEqual(1, texts.DirtyCount, "the locale nobody wrote in has nothing to save");
-            Assert.IsTrue(moved > 0, "the run heard that a history moved");
 
             CatalogSaveResult result = texts.SaveAll();
 

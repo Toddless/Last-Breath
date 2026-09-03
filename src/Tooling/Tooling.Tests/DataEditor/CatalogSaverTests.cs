@@ -236,24 +236,24 @@ namespace Tooling.Tests.DataEditor
             StringAssert.StartsWith(result.Notes[0], TablesCatalog);
         }
 
+        /// <summary>What is unsaved is read after every move of the stack the run records onto — an edit,
+        /// a step back through it, and a save alike. The saver answers the question; it does not announce
+        /// it, because the host already hears the stack.</summary>
         [TestMethod]
-        public void Changed_SpeaksForEveryFileOfTheRun()
+        public void AnyDirty_SpeaksForEveryFileOfTheRun()
         {
             Write(NpcCatalog, NpcFile, CanonicalNpc);
 
             CatalogWorkspace workspace = Load();
             var saver = new CatalogSaver(workspace);
-            int heard = 0;
 
-            saver.Changed += () => heard++;
+            Assert.IsFalse(saver.AnyDirty);
 
             workspace.Catalogs[0].Files[0].Document.SetValue(JsonPointer.Parse(NamePointer), new JValue(NewName));
-            Assert.AreEqual(1, heard);
+            Assert.IsTrue(saver.AnyDirty);
 
-            // A save is a change of what is unsaved, so it is heard too: what the host draws from this
-            // is the mark on a name, and the mark has to come off.
             CatalogSaver.SaveDirty(workspace.Catalogs[0]);
-            Assert.AreEqual(2, heard);
+            Assert.IsFalse(saver.AnyDirty);
         }
 
         /// <summary>The keys of the one record of a written file, in the order the file writes them.</summary>

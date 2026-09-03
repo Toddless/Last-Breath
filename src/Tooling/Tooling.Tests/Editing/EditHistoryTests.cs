@@ -391,7 +391,7 @@ namespace Tooling.Tests.Editing
         public void RenameSwap_ReachesTheHistoryStep()
         {
             EditHistory history = new();
-            history.Record(new RenamingEdit(LabelRename, OldId, NewId));
+            history.Record(new RenamingEdit(new Cell(Initial), LabelRename, OldId, NewId));
 
             HistoryStep? undone = Taken(history.Undo(), undoing: true);
 
@@ -487,7 +487,7 @@ namespace Tooling.Tests.Editing
 
             history.Record(Write(record, TitleField, First, LabelFirst));
 
-            using (history.GroupWithNewest(LabelRename))
+            using (history.GroupWithNewest(LabelRename, record))
             {
                 history.Record(Write(locale, TitleField, Second, LabelSecond));
             }
@@ -499,6 +499,180 @@ namespace Tooling.Tests.Editing
 
             Assert.AreEqual(Initial, record.Value);
             Assert.AreEqual(Initial, locale.Value, "the locale was stepped back with the id");
+        }
+
+        /// <summary>Which step is newest depends on the order the engine delivers its signals in. A step
+        /// filed by another document is not the gesture's to take: swallowed, it would be undone by a key
+        /// pressed over a record it was never made in, and the file it belongs to would go clean.</summary>
+        [TestMethod]
+        public void GroupWithNewest_LeavesAStepOfAnotherDocumentWhereItIs()
+        {
+            EditHistory history = new();
+            Cell record = new(Initial);
+            Cell elsewhere = new(Initial);
+            Cell locale = new(Initial);
+
+            history.Record(Write(elsewhere, TitleField, First, LabelFirst));
+
+            using (history.GroupWithNewest(LabelRename, record))
+            {
+                history.Record(Write(locale, TitleField, Second, LabelSecond));
+            }
+
+            Assert.AreEqual(2, history.Depth, "the other document's step is still a step of its own");
+            Assert.AreEqual(LabelRename, history.NextUndo);
+
+            history.Undo();
+
+            Assert.AreEqual(Initial, locale.Value);
+            Assert.AreEqual(First, elsewhere.Value, "a gesture made elsewhere was not taken back");
+            Assert.IsFalse(history.IsCleanFor(elsewhere));
+        }
+
+        /// <summary>Asked of an empty stack it has nothing to take, and the gesture is filed on its own —
+        /// a record renamed as the first thing a run does is a rename like any other.</summary>
+        [TestMethod]
+        public void GroupWithNewest_OnAnEmptyStack_FilesTheGestureAlone()
+        {
+            EditHistory history = new();
+            Cell record = new(Initial);
+
+            using (history.GroupWithNewest(LabelRename, record))
+            {
+                history.Record(Write(record, TitleField, First, LabelFirst));
+            }
+
+            Assert.AreEqual(1, history.Depth);
+            Assert.AreEqual(LabelRename, history.NextUndo);
+
+            history.Undo();
+
+            Assert.AreEqual(Initial, record.Value);
+        }
+
+        /// <summary>Inside a gesture nothing is merged: a step holds exactly the changes its gesture made,
+        /// and two writes of one field are taken back together with the rest of it rather than folded into
+        /// each other and reported as one.</summary>
+        [TestMethod]
+        public void Group_DoesNotMergeARunOnOneTarget()
+        {
+            EditHistory history = new();
+            Cell cell = new(Initial);
+            List<string> written = [];
+
+            using (history.Group(LabelRename))
+            {
+                history.Record(Typed(cell, written, First, LabelFirst));
+                history.Record(Typed(cell, written, Second, LabelSecond));
+            }
+
+            Assert.AreEqual(1, history.Depth);
+
+            history.Undo();
+
+            Assert.AreEqual(Initial, cell.Value);
+            CollectionAssert.AreEqual(new[] { First, Initial }, written, "both writes of the field are in the step");
+        }
+
+        /// <summary>A stack taken over is a stack emptied: the steps of the document that joined the tool
+        /// are stepped by the tool's key from here on, and a step left behind on a stack nothing steps is
+        /// a gesture nobody can take back.</summary>
+        [TestMethod]
+        public void Take_EmptiesTheSource()
+        {
+            EditHistory tool = new();
+            EditHistory own = new();
+            Cell cell = new(Initial);
+
+            own.Record(Write(cell, TitleField, First, LabelFirst));
+            tool.Take(own);
+
+            Assert.AreEqual(0, own.Depth);
+            Assert.IsFalse(own.CanUndo);
+            Assert.AreEqual(1, tool.Depth);
+            Assert.AreEqual(LabelFirst, tool.NextUndo);
+            Assert.IsFalse(tool.IsCleanFor(cell), "the step that laid the file down is waiting to be written");
+
+            tool.Undo();
+
+            Assert.AreEqual(Initial, cell.Value);
+        }
+
+        /// <summary>Everything the source held moves, not only what can be taken back: a step already
+        /// stepped out of is still ahead of the author, and a document that reached the tool already
+        /// written is not one to be offered for saving forever.</summary>
+        [TestMethod]
+        public void Take_CarriesTheUndoneStepsAndTheSavePoints()
+        {
+            EditHistory tool = new();
+            EditHistory own = new();
+            Cell cell = new(Initial);
+
+            own.Record(Write(cell, TitleField, First, LabelFirst));
+            own.MarkSaved(cell);
+            own.Record(Write(cell, BudgetField, Second, LabelSecond));
+            own.Undo();
+
+            tool.Take(own);
+
+            Assert.IsTrue(tool.CanRedo, "the step stepped out of is still ahead of the author");
+            Assert.AreEqual(LabelSecond, tool.NextRedo);
+            Assert.IsTrue(tool.IsCleanFor(cell), "the file on disk holds what the document holds");
+
+            tool.Redo();
+
+            Assert.AreEqual(Second, cell.Value);
+            Assert.IsFalse(tool.IsCleanFor(cell));
+        }
+
+        /// <summary>A file adopted in the middle of a gesture was laid down by it: its step joins the
+        /// gesture rather than standing beside it, or one press of undo would take back the record and
+        /// leave the file it was written into behind.</summary>
+        [TestMethod]
+        public void Take_InsideAnOpenGesture_JoinsTheStepBeingMade()
+        {
+            EditHistory tool = new();
+            EditHistory own = new();
+            Cell laid = new(Initial);
+            Cell record = new(Initial);
+
+            own.Record(Write(laid, TitleField, First, LabelFirst));
+
+            using (tool.Group(LabelRename))
+            {
+                tool.Take(own);
+                tool.Record(Write(record, TitleField, Second, LabelSecond));
+            }
+
+            Assert.AreEqual(1, tool.Depth);
+            Assert.AreEqual(LabelRename, tool.NextUndo);
+
+            tool.Undo();
+
+            Assert.AreEqual(Initial, laid.Value);
+            Assert.AreEqual(Initial, record.Value);
+        }
+
+        /// <summary>The step is closed once however often it is disposed. A gesture disposed twice would
+        /// otherwise close a step nobody opened, and the next thing recorded would be gathered into a
+        /// gesture that is never filed.</summary>
+        [TestMethod]
+        public void OpenStep_DisposedTwice_ClosesTheGestureOnce()
+        {
+            EditHistory history = new();
+            Cell cell = new(Initial);
+
+            IDisposable step = history.Group(LabelRename);
+            history.Record(Write(cell, TitleField, First, LabelFirst));
+
+            step.Dispose();
+            step.Dispose();
+
+            Assert.AreEqual(1, history.Depth);
+
+            history.Record(Write(cell, BudgetField, Second, LabelSecond));
+
+            Assert.AreEqual(2, history.Depth, "the next edit is a step of its own and not part of a gesture nobody opened");
         }
 
         /// <summary>A step made of several changes is dirty in every document any of them touched, or a
@@ -592,6 +766,20 @@ namespace Tooling.Tests.Editing
             return new ValueEdit<string>(new EditTarget(cell, field), before, value, written => cell.Value = written, label);
         }
 
+        /// <summary>A keystroke in a field, writing down every value it puts back: two of them merged into
+        /// one command restore the field once, and two kept apart restore it twice.</summary>
+        private static ValueEdit<string> Typed(Cell cell, List<string> written, string value, string label)
+        {
+            string before = cell.Value;
+            cell.Value = value;
+
+            return new ValueEdit<string>(new EditTarget(cell, TitleField), before, value, put =>
+            {
+                cell.Value = put;
+                written.Add(put);
+            }, label);
+        }
+
         /// <summary>The step as the rest of a tool hears about it — the one line of composition every host
         /// writes, and the reason a command has to declare that it moved an id.</summary>
         private static HistoryStep? Taken(IEditCommand? command, bool undoing) =>
@@ -620,7 +808,7 @@ namespace Tooling.Tests.Editing
         }
 
         /// <summary>A step that moves a record from one id to another and says so.</summary>
-        private sealed class RenamingEdit(string label, string from, string to) : IIdChangingEdit
+        private sealed class RenamingEdit(Cell owner, string label, string from, string to) : IIdChangingEdit, IOwnedEdit
         {
             public string Label => label;
 
@@ -631,6 +819,8 @@ namespace Tooling.Tests.Editing
             public void Redo()
             {
             }
+
+            public bool Touches(object asked) => ReferenceEquals(asked, owner);
 
             public IdSwap Swap(bool undoing) => undoing ? new IdSwap(to, from) : new IdSwap(from, to);
         }

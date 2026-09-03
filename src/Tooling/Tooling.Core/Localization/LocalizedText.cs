@@ -25,6 +25,8 @@ namespace Tooling.Localization
     /// every catalog and about the game's own code besides, and a tool answering it one record at a time
     /// would delete the text of an id something else still names; the orphans are swept by an audit over
     /// the whole data root, which is the only place the question can be asked whole.</para>
+    /// <para>That a locale has changed is heard from the stack its edits are filed on — the tool's own,
+    /// where it handed one over — and never announced again from here.</para>
     /// </summary>
     public sealed class LocalizedTexts
     {
@@ -46,16 +48,7 @@ namespace Tooling.Localization
             ArgumentNullException.ThrowIfNull(set);
 
             _set = set;
-
-            // Once per stack and not once per locale: the files may be sharing the tool's own history, and
-            // a second subscription to it would answer every keystroke with two refreshes.
-            foreach (EditHistory history in Documents().Select(document => document.History).Distinct())
-                history.Changed += Raise;
         }
-
-        /// <summary>A history moved: a text was written, taken back, put back or saved. What is unsaved is
-        /// read after this, so one event answers for all of it.</summary>
-        public event Action? Changed;
 
         public IReadOnlyList<string> Locales => _set.Locales;
 
@@ -268,7 +261,5 @@ namespace Tooling.Localization
         }
 
         private IEnumerable<PoDocument> Documents() => _set.Locales.Select(_set.Get);
-
-        private void Raise() => Changed?.Invoke();
     }
 }

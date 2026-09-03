@@ -1,5 +1,12 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из чистки бэклога тулинга, волна A (2026-09-03; accept with minors) — закрыты 9 пунктов разделов «общая история», «занятость id по секции», «форма столов» (Record(IOwnedEdit), GroupWithNewest с владельцем, Take переносит _undone/_savedFor, мёртвые события снесены, EditorRoot.Stepped отложенно, тесты границ, Dispose идемпотентен, клауза Taken/ThrowIfNull/имя секции, ранний выход пикера редкости)
+
+- (minor) `EditHistory.Take:169-171` — усыновление через `Adopt`→`Push` не чистит `_undone`: Ctrl+Z в поле, затем «добавить запись» в новый файл → брошенная ветка redo жива, Ctrl+Y повторит отменённый шаг поверх создания. Стало: `_undone.Clear()` перед `AddRange(other._undone)`.
+- (minor) `CatalogEditingTests.Taken_AnswersForASectionWithNoKeyOfItsOwn` не закрепляет ветку `IdTaken`/`IdTakenIn` (при `section == ""` заметка «in ''» прошла бы). Стало: ассерт, что заметка секцию не называет.
+- (nit) `Take` в открытую группу переносит `_savedFor` по ссылке на вложенную команду, а `NewestFor` вернёт группу — документ грязный навсегда (недостижимо сегодня); `Take` поднимает `Changed` N+1 раз; `EditorRoot.Neighbour(_recordIndex)` расходится на пути `NoSelection` (безвредно); четвёртая копия «отложить перерисовку один раз» (`DryRunPanel._pending`, `NarrativeRoot`, `InspectorPanel.RebuildLater` без дедупа, `EditorRoot._rebuilding`) — один хелпер в `Tooling.Ui`; `_rebuilding = false` до `Rebuild` — реентрантный запрос ставит ещё кадр; `Close` файлит группу из одного украденного шага с чужой меткой у каталогов без локализации; нет теста «файл, положенный по ходу прогона, попадает в `DirtyCount`/`SaveAll`»; implicit usings в `EditHistoryTests`.
+- (знать, отступление от бэклога) `GroupWithNewest` проверяет владельца на уровне документа (`object owner`), не поля: шаг в том же документе в другом поле всё ещё может быть украден — через `RenameKeys` недостижимо.
+
 ## Из перекрёстных проверок нарратива, карточка #249 (2026-09-03; accept with minors)
 
 - (minor, первым в чистку) `NarrativeChecks.cs:303`, `ChecksPanel.cs:131-147`, `NarrativeDocuments.cs:70` — `line.Key.Length` роняет NRE на `"key": null` (Newtonsoft кладёт null несмотря на `= string.Empty`); загрузчик такую строку принимает; `ChecksPanel.Start` не ловит — необработанное исключение из обработчика кнопки в Godot. Стало: `is { Length: > 0 }`-паттерны и `catch` вокруг прогона в панели.

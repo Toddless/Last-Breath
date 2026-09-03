@@ -116,6 +116,10 @@ namespace DataEditor.Source.View
         /// written once it is given.</summary>
         private bool _copying;
 
+        /// <summary>Whether a redraw of the inspector is already waiting. One change reaches it by
+        /// several roads at once, and each of them asks for the same panel.</summary>
+        private bool _rebuilding;
+
         /// <summary>Where the list is standing: the row of the record on screen, so it can be written
         /// again when the id it is named by is edited, and the row the last record stood in while there
         /// is none — a record taken out leaves a place, and an undo that puts it back puts it there.</summary>
@@ -437,8 +441,29 @@ namespace DataEditor.Source.View
                 Show(_recordList, index);
             }
 
-            _inspector.Rebuild(_record, Suffixes(), Neighbour(index));
+            RebuildLater();
             Refresh();
+        }
+
+        /// <summary>
+        /// Draws the record on screen again, once, and after the gesture that asked for it is over.
+        /// <para>One press of undo reaches the panel by three roads — the stack telling the tool it
+        /// moved, the refresh the step itself makes, and the step's own call — and a panel torn down and
+        /// built three times per press is one whose boxes lose the caret. Deferred as well as counted
+        /// once, for the reason the inspector defers its own redraws: a row can go while the author is
+        /// taking it out from inside the panel.</para>
+        /// </summary>
+        private void RebuildLater()
+        {
+            if (_rebuilding) return;
+
+            _rebuilding = true;
+
+            Callable.From(() =>
+            {
+                _rebuilding = false;
+                _inspector.Rebuild(_record, Suffixes(), Neighbour(_recordIndex));
+            }).CallDeferred();
         }
 
         /// <summary>What the open catalog words its records' localization keys with — a name, a name and a
@@ -688,7 +713,7 @@ namespace DataEditor.Source.View
 
         /// <summary>A step through the history may have moved a text of a locale: the inspector copied it
         /// into its boxes, and nothing about the record's own file would say it has changed.</summary>
-        protected override void Stepped() => _inspector.Rebuild(_record, Suffixes(), Neighbour(_recordIndex));
+        protected override void Stepped() => RebuildLater();
 
         /// <summary>
         /// Brings the list of records up to what the catalog holds now. The catalog is read again first:

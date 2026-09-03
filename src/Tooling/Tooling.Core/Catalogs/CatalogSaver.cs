@@ -4,7 +4,6 @@ namespace Tooling.Catalogs
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Tooling.Editing.History;
     using Tooling.Json;
     using Tooling.Schema.Reflection;
     using static Tooling.Text.Format;
@@ -43,34 +42,20 @@ namespace Tooling.Catalogs
     /// the state that was written makes it clean again — an answer that a flag, which can only ever be
     /// turned on, could not give.</para>
     /// <para>The questions about one catalog are static because they are functions of it and of nothing
-    /// else. The instance exists for the one thing a caller cannot work out from a view — that some
-    /// history, in some file, has just moved.</para>
+    /// else. The instance exists to hold the run whose files those questions are asked of.</para>
+    /// <para>That a file has changed is heard from the stack it records onto: the run shares one, the
+    /// host listens to it, and a second announcement made here would answer one keystroke twice.</para>
     /// </summary>
     public sealed class CatalogSaver
     {
         private readonly CatalogWorkspace _workspace;
-
-        /// <summary>The stacks already listened to. The files of a run may share one, and a second
-        /// subscription to it would answer every keystroke with two refreshes.</summary>
-        private readonly HashSet<EditHistory> _watched = [];
 
         public CatalogSaver(CatalogWorkspace workspace)
         {
             ArgumentNullException.ThrowIfNull(workspace);
 
             _workspace = workspace;
-
-            foreach (CatalogFile file in Files(workspace)) Watch(file);
-
-            // A file the run lays down is watched the same way the ones read from disk are: it is dirty
-            // from its first record onwards, and a status line that never heard of it would say the run
-            // has nothing to write while a whole file waits to be created.
-            foreach (CatalogView catalog in workspace.Catalogs) catalog.FileAdded += Watch;
         }
-
-        /// <summary>A history moved: something was edited, undone, redone or written out. What is unsaved
-        /// and what the next step back would be are both read after this, so one event answers for both.</summary>
-        public event Action? Changed;
 
         /// <summary>Whether anything at all in the run is waiting to be written.</summary>
         public bool AnyDirty => Files(_workspace).Any(IsDirty);
@@ -145,13 +130,6 @@ namespace Tooling.Catalogs
 
         private static string? Save(CatalogFile file, SchemaKeyOrder order) =>
             CatalogSaveResult.Guarded(() => file.Document.Save(file.Path, order, CanonicalJsonOptions.Default));
-
-        private void Watch(CatalogFile file)
-        {
-            if (_watched.Add(file.Document.History)) file.Document.History.Changed += Raise;
-        }
-
-        private void Raise() => Changed?.Invoke();
 
         private static class Notes
         {

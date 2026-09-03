@@ -1241,7 +1241,9 @@ namespace Tooling.Ui
             // the history, so a record stepped back to its old name is read under that name in every locale
             // too — a record whose id says one word and whose wording is written under another is exactly
             // what the author cannot see and cannot repair.
-            using (record.File.Document.History.GroupWithNewest(Text(RenameStepFormat, _idBefore, now)))
+            JsonTreeDocument written = record.File.Document;
+
+            using (written.History.GroupWithNewest(Text(RenameStepFormat, _idBefore, now), written))
             {
                 LocalizedRename rename = texts.RenameRecord(_idBefore, now, _suffixes);
 

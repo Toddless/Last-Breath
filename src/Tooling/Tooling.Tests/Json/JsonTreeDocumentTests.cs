@@ -512,6 +512,50 @@ namespace Tooling.Tests.Json
             Assert.AreEqual(3, document.Resolve(At(Level))?.Value<int>());
         }
 
+        /// <summary>The stack the document came with is emptied and left behind: everything it goes on to
+        /// record is filed on the tool's, so one key steps the author's last change and the stack nothing
+        /// steps holds nothing to step.</summary>
+        [TestMethod]
+        public void Follow_EmptiesTheOldStackAndRecordsOnlyIntoTheNewOne()
+        {
+            EditHistory history = new();
+            JsonTreeDocument document = JsonTreeDocument.Parse(Json);
+            EditHistory own = document.History;
+
+            Assert.IsTrue(document.SetValue(At(Level), new JValue(9)));
+
+            document.Follow(history);
+
+            Assert.AreEqual(0, own.Depth, "the stack the document came with was emptied");
+            Assert.IsFalse(own.CanUndo);
+            Assert.AreSame(history, document.History);
+
+            Assert.IsTrue(document.SetValue(At(Id), new JValue(SecondName)));
+
+            Assert.AreEqual(0, own.Depth, "the document records nowhere but on the stack it follows");
+            Assert.AreEqual(2, history.Depth);
+        }
+
+        /// <summary>A document written before it joined the tool is not one waiting to be saved: where its
+        /// own stack stood when the file was written moves with the steps.</summary>
+        [TestMethod]
+        public void Follow_CarriesWhereTheDocumentStoodWhenItWasWritten()
+        {
+            EditHistory history = new();
+            JsonTreeDocument document = JsonTreeDocument.Parse(Json);
+
+            Assert.IsTrue(document.SetValue(At(Level), new JValue(9)));
+
+            document.Save(_file, FileKeyOrder.Instance);
+            document.Follow(history);
+
+            Assert.IsTrue(document.IsClean, "the file on disk holds what the document holds");
+
+            Assert.IsTrue(document.SetValue(At(Level), new JValue(11)));
+
+            Assert.IsFalse(document.IsClean);
+        }
+
         /// <summary>One edit, walked back and forward: the file has to be the same on both ends of the walk.</summary>
         private static void AssertRedoRepeats(Func<JsonTreeDocument, bool> edit)
         {

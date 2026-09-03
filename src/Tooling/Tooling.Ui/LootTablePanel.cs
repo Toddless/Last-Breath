@@ -409,7 +409,13 @@ namespace Tooling.Ui
             row.AddChild(NumberBox(at, form.Layout.AugmentTierKey, group.Tier, AugmentTierHint));
             row.AddChild(Caption(RarityCaption));
             row.AddChild(Rarity(group.Rarity, chosen =>
-                Change(document => document.Put(at.Append(form.Layout.RarityKey), new JValue(chosen)))));
+            {
+                // The picker speaks for the item picked whether or not it was already the one selected,
+                // and writing back what stands would redraw the panel for a press that changed nothing.
+                if (string.Equals(chosen, group.Rarity, StringComparison.Ordinal)) return;
+
+                Change(document => document.Put(at.Append(form.Layout.RarityKey), new JValue(chosen)));
+            }));
 
             return row;
         }
