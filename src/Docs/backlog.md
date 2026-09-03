@@ -1,5 +1,14 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из секционных ссылок (2026-09-03; rework → accept) и описателей Dialogues/Quests (accept with minors)
+
+- (minor, дубль ×3) список четырёх каталогов предмета живёт в `QuestsData.cs:126-129`, `GiveItemAction.cs:42-43` (`ItemIdParameter`) и `CatalogDescriptorTests.cs` (`s_handedOutCatalogs`); плюс нарративные `GiveItem`/`HasItem` и `rewards.items[].itemId` указывают в `Resources` целиком, а лут уже сужен до `upgradeResources`+`craftingResources`. Одна задача: `NarrativeParameterSpec.Catalogs` несёт секцию, `ItemIdParameter` — источник правды, разметка наград и тест сверяются с ним.
+- (minor, тест) `CatalogDescriptorTests.cs:1982-1984` — пин награды квеста через `Points` по одному каталогу; форма `NamesADrop` (набор целиком + `AllowEmpty`).
+- (minor, тест) `CatalogDescriptorTests.cs:2045` — квестовый обход по шипнутым файлам холостой (0 маршрутов); дешевле и шире — пин «провайдер не уронил ни одной записи» (сколько записей в файлах, столько в `_dialogues`/`_quests` после `Apply`).
+- (nit) новые константы/таблицы блока Dialogues/Quests приписаны после методов (поднять в поле-регион после слияния); `typeof(Core.Narrative.Dialogues.DialogueSpeaker)` полностью квалифицированы; `s_questReferences`/`s_questChoices` литералами; `giverNpcId` без `AllowEmpty` при терпимом провайдере (`GiverNpcId` никто не читает) — зафиксировать строгость как решение; `<remarks>` описателей на 6–8 строк; отчёт занизил счётчик (+10, не +8).
+- (знать) `LocalizationAuditTests.CollectDataIds` квесты и диалоги не собирает — их локализация ничем не аудируется; `_Outcome_<id>` объявлен в доке, но UI не читает.
+- (знать, контракт) секция, названная для каталога без описателя, на сборке не проверяется; ключи карт (`DictionaryKey`) сузить до секции нечем.
+
 ## Из описателя Abilities (2026-09-03; accept with minors)
 
 - (minor, комментарий врёт) `src/Tooling/LastBreath.Descriptors/AbilitiesCatalogDescriptor.cs:61` (+ `CatalogDescriptorTests.cs:1103,1125,1468`) — комментарий утверждает порядок форм «как читает правило, от узкого», а `AugmentFit.CheckBinding` читает `fitsAnyAbility` → `abilityId` → теги; безопасно только благодаря `ContradictoryDeclaration`. Сказать факт: несущий только `tags` — последним, порядок первых двух выбран для инспектора.
