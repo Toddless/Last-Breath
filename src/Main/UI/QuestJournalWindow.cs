@@ -138,8 +138,7 @@ namespace LastBreath.UI
 
         private void RenderObjectives(QuestDefinition quest, QuestState state)
         {
-            if (_details == null || state.StageIndex >= quest.Stages.Count) return;
-            var stage = quest.Stages[state.StageIndex];
+            if (_details == null || quest.Stage(state.StageId) is not { } stage) return;
 
             _details.AppendText($"\n[b]{Localization.Localize($"{quest.Id}_Stage_{stage.Id}")}[/b]\n");
             foreach (var objective in stage.Objectives.Where(entry => !entry.IsHidden))

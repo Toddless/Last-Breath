@@ -420,8 +420,7 @@ namespace LastBreath.Helpers
 
         private string ProgressOf(IQuestLogService log, QuestDefinition quest, QuestState state)
         {
-            if (state.Status != QuestStatus.Active) return string.Empty;
-            var stage = quest.Stages[state.StageIndex];
+            if (state.Status != QuestStatus.Active || quest.Stage(state.StageId) is not { } stage) return string.Empty;
             var parts = stage.Objectives.Select(objective =>
             {
                 (int current, int required) = log.GetObjectiveProgress(quest.Id, objective.Id);

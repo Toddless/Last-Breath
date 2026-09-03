@@ -212,7 +212,7 @@ namespace LastBreathTest.BattleSystemTests
             int timeLimitHours = 0, INarrativeCondition? objective = null) =>
             new(QuestId, TurnInNpcId, Fractions.Human, 1, false, [TurnInNpcId], policy, 0, canFail, timeLimitHours,
                 [],
-                [new QuestStageDefinition("Stage", [new QuestObjectiveDefinition("Objective", objective ?? new ToggleCondition(), null, false, false)], [], [])],
+                [new QuestStageDefinition("Stage", [new QuestObjectiveDefinition("Objective", objective ?? new ToggleCondition(), null, false, false)], [], [], [], null)],
                 new QuestRewards(0, [], []), [], [], []);
 
         private static ISkirmishParticipant Npc(Fractions faction)

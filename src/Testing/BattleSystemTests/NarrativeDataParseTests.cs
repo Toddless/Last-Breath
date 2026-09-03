@@ -24,6 +24,7 @@ namespace LastBreathTest.BattleSystemTests
         private const string TraderNpcId = "Npc_Ronald";
         private const string QuestId = "Quest_Field_Of_Bones";
         private const string TrialQuestId = "Quest_Trial_Of_The_Fang";
+        private const string SecondStageId = "GatherProof";
 
         private WorldFactsService _facts = null!;
         private InfluenceMastery _influence = null!;
@@ -133,7 +134,7 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(QuestStatus.Active, _questLog.GetStatus(QuestId));
 
             _facts.SetFact(FactKeys.LocationDiscovered("Old_Battlefield"));
-            Assert.AreEqual(1, _questLog.GetState(QuestId)!.StageIndex, "discovering the battlefield must advance to stage 2");
+            Assert.AreEqual(SecondStageId, _questLog.GetState(QuestId)!.StageId, "discovering the battlefield must advance to stage 2");
         }
 
         private static void ApplyCatalog(IGameDataParticipant participant, string catalog)

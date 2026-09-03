@@ -23,6 +23,7 @@ namespace Core.Narrative.Quests
         private const string AbandonedReason = "Abandoned";
         private const string TimeOutReason = "TimeOut";
         private const string TurnInPoolGoneReason = "LastTurnInNpcGone";
+        private const string OutcomeReason = "Outcome:";
 
         private readonly Dictionary<string, QuestState> _states = [];
         private readonly IQuestProvider _quests;
@@ -92,6 +93,7 @@ namespace Core.Narrative.Quests
 
             var state = NewAttempt(questId);
             state.AcceptedAtMinutes = NowMinutes();
+            state.StageId = quest.Stages[0].Id;
             _states[questId] = state;
             SnapshotBaselines(state, quest.Stages[0]);
 
@@ -163,9 +165,10 @@ namespace Core.Narrative.Quests
             // The gate must not answer yes twice: paying items wakes the inventory event, and a turn-in is an
             // authorable action, so the quest stops being turn-innable before a single reward is minted.
             state.Status = QuestStatus.Completed;
+            var rewards = RewardsOf(quest, state);
             GrantRewardItems(quest, state);
-            if (quest.Rewards.InfluenceExp > 0) _influence.AddExperience(quest.Rewards.InfluenceExp);
-            Execute(quest.Rewards.Actions, context);
+            if (rewards.InfluenceExp > 0) _influence.AddExperience(rewards.InfluenceExp);
+            Execute(rewards.Actions, context);
             Publish(state);
             return true;
         }
@@ -190,10 +193,20 @@ namespace Core.Narrative.Quests
             foreach (var state in states)
             {
                 // A quest removed from the game by a patch: log and drop the state.
-                if (_quests.Get(state.QuestId) == null)
+                if (_quests.Get(state.QuestId) is not { } quest)
                 {
                     Tracker.TrackInfo($"Quest '{state.QuestId}' is no longer in the catalog: its state is dropped, the ledger of unique rewards with it");
                     continue;
+                }
+
+                // A state naming no stage stands on the first one; a stage a patch renamed away is
+                // reported and the quest is put back on the first stage as the safe place to stand.
+                var stage = quest.Stages.Count > 0 ? quest.Stage(state.StageId) ?? quest.Stages[0] : null;
+                if (stage != null && stage.Id != state.StageId)
+                {
+                    if (state.StageId.Length > 0)
+                        Tracker.TrackError($"Quest '{quest.Id}' has no stage '{state.StageId}' any more: it restarts on '{stage.Id}'");
+                    state.StageId = stage.Id;
                 }
 
                 _states[state.QuestId] = state;
@@ -212,11 +225,16 @@ namespace Core.Narrative.Quests
             return state;
         }
 
+        /// <summary>What this turn-in pays: a quest that ended on a named outcome pays that ending's
+        /// rewards INSTEAD of its quest-wide ones — an outcome declaring none pays nothing.</summary>
+        private static QuestRewards RewardsOf(QuestDefinition quest, QuestState state) =>
+            quest.Outcome(state.OutcomeId)?.Rewards ?? quest.Rewards;
+
         /// <summary>Reward items this turn-in still owes — everything but the one-of-a-kind rewards the
         /// quest already paid. The gate and the payout read the same list, so the bag is asked to hold
         /// exactly what is about to be minted.</summary>
         private static List<QuestRewardItem> OwedRewardItems(QuestDefinition quest, QuestState state) =>
-            quest.Rewards.Items.Where(reward => !state.GrantedUniqueRewards.Contains(reward.ItemId)).ToList();
+            RewardsOf(quest, state).Items.Where(reward => !state.GrantedUniqueRewards.Contains(reward.ItemId)).ToList();
 
         /// <summary>Mints what the turn-in owes and writes every one-of-a-kind item down as handed over.
         /// That note is the whole of the guarantee: a repeat turn-in reads it and pays around it.</summary>
@@ -273,24 +291,86 @@ namespace Core.Narrative.Quests
             // A quest that refused to fail keeps advancing past its deadline.
             if (DeadlinePassed(quest, state) && Fail(quest.Id, TimeOutReason)) return;
 
-            while (state.Status == QuestStatus.Active && StageCompleted(quest, state))
+            // An ending is terminal even when the quest refused to be buried by it: a reached outcome
+            // must not send the stage through its exit a second time.
+            while (state.Status == QuestStatus.Active && state.OutcomeId == null
+                && CurrentStage(quest, state) is { } stage && StageCompleted(quest, state))
+                if (!LeaveStage(quest, state, stage)) return;
+        }
+
+        /// <summary>Walks a finished stage's route out; false = the quest goes no further this pass.
+        /// A branch whose every route is still shut stays on its stage with its objectives met — the
+        /// next change of the world asks again — so onComplete runs exactly once, on leaving.</summary>
+        private bool LeaveStage(QuestDefinition quest, QuestState state, QuestStageDefinition stage)
+        {
+            string? next = NextStageId(quest, stage);
+            if (next == null && stage.Transitions.Count > 0) return false;
+
+            Execute(stage.OnComplete, NarrativeContext.Empty);
+
+            if (stage.Outcome is { } outcome)
             {
-                var stage = quest.Stages[state.StageIndex];
-                Execute(stage.OnComplete, NarrativeContext.Empty);
-
-                if (state.StageIndex + 1 >= quest.Stages.Count)
-                {
-                    state.Status = QuestStatus.ReadyToTurnIn;
-                    Publish(state);
-                    return;
-                }
-
-                state.StageIndex++;
-                var next = quest.Stages[state.StageIndex];
-                SnapshotBaselines(state, next);
-                Execute(next.OnEnter, NarrativeContext.Empty);
-                _events.Publish(new QuestStageAdvancedEvent(quest.Id, state.StageIndex));
+                ReachOutcome(quest, state, outcome);
+                return false;
             }
+
+            if (next != null) return EnterStage(quest, state, next);
+
+            state.Status = QuestStatus.ReadyToTurnIn;
+            Publish(state);
+            return false;
+        }
+
+        /// <summary>Where a finished stage leads: the first transition whose conditions all hold, or the
+        /// next stage of the list when it declares none. Null = nowhere — an ending, the last stage, or
+        /// a branch still waiting for one of its routes to open.</summary>
+        private static string? NextStageId(QuestDefinition quest, QuestStageDefinition stage)
+        {
+            if (stage.Outcome != null) return null;
+            if (stage.Transitions.Count > 0)
+                return stage.Transitions
+                    .FirstOrDefault(transition => transition.Conditions.All(condition => condition.IsMet(NarrativeContext.Empty)))
+                    ?.ToStageId;
+
+            int index = StageIndex(quest, stage.Id) + 1;
+            return index > 0 && index < quest.Stages.Count ? quest.Stages[index].Id : null;
+        }
+
+        /// <summary>The quest ends on a named ending: a failing one buries it through the single failure
+        /// gate (onFail included), the rest wait for the turn-in that pays the ending's own rewards.</summary>
+        private void ReachOutcome(QuestDefinition quest, QuestState state, QuestOutcomeDefinition outcome)
+        {
+            state.OutcomeId = outcome.Id;
+            if (outcome.Fails)
+            {
+                Fail(quest.Id, OutcomeReason + outcome.Id);
+                return;
+            }
+
+            state.Status = QuestStatus.ReadyToTurnIn;
+            Publish(state);
+        }
+
+        private bool EnterStage(QuestDefinition quest, QuestState state, string stageId)
+        {
+            if (quest.Stage(stageId) is not { } stage)
+            {
+                Tracker.TrackError($"Quest '{quest.Id}' has no stage '{stageId}': the route out of '{state.StageId}' leads nowhere");
+                return false;
+            }
+
+            state.StageId = stageId;
+            SnapshotBaselines(state, stage);
+            Execute(stage.OnEnter, NarrativeContext.Empty);
+            _events.Publish(new QuestStageAdvancedEvent(quest.Id, stageId));
+            return true;
+        }
+
+        private static int StageIndex(QuestDefinition quest, string stageId)
+        {
+            for (int index = 0; index < quest.Stages.Count; index++)
+                if (quest.Stages[index].Id == stageId) return index;
+            return -1;
         }
 
         private bool StageCompleted(QuestDefinition quest, QuestState state) =>
@@ -312,7 +392,7 @@ namespace Core.Narrative.Quests
                     state.CounterBaselines[BaselineKey(state, counter)] = _facts.GetCount(counter.FactKey);
         }
 
-        private static string BaselineKey(QuestState state, QuestCounter counter) => $"{state.StageIndex}:{counter.FactKey}";
+        private static string BaselineKey(QuestState state, QuestCounter counter) => QuestState.BaselineKey(state.StageId, counter.FactKey);
 
         /// <summary>The A+B policy: one turn-in candidate left alive → a ghostly hint to hurry;
         /// the pool gone entirely (burned or risen with another face) → the quest fails unless it
@@ -350,8 +430,7 @@ namespace Core.Narrative.Quests
         private bool DeadlinePassed(QuestDefinition quest, QuestState state) =>
             quest.TimeLimitHours > 0 && NowMinutes() >= state.AcceptedAtMinutes + quest.TimeLimitHours * MinutesPerHour;
 
-        private static QuestStageDefinition? CurrentStage(QuestDefinition quest, QuestState state) =>
-            state.StageIndex < quest.Stages.Count ? quest.Stages[state.StageIndex] : null;
+        private static QuestStageDefinition? CurrentStage(QuestDefinition quest, QuestState state) => quest.Stage(state.StageId);
 
         private static int CooldownMinutes(QuestDefinition quest) =>
             quest.DeclinePolicy == DeclinePolicy.Cooldown ? quest.DeclineCooldownHours * MinutesPerHour : 0;

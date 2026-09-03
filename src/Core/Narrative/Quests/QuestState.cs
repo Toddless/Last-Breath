@@ -10,11 +10,21 @@ namespace Core.Narrative.Quests
     /// </summary>
     public class QuestState(string questId)
     {
+        /// <summary>Separates the stage from the fact key in a baseline key; a save written before
+        /// stages had ids puts the stage position in front of it.</summary>
+        public const char BaselineSeparator = ':';
+
         public string QuestId { get; } = questId;
         public QuestStatus Status { get; set; } = QuestStatus.Active;
-        public int StageIndex { get; set; }
 
-        /// <summary>Fact snapshots for non-retroactive counters, keyed "stageIndex:factKey".</summary>
+        /// <summary>Stage the quest stands on, by id — branching makes the position in the list
+        /// meaningless. Empty reads as "the first stage".</summary>
+        public string StageId { get; set; } = string.Empty;
+
+        /// <summary>Name of the ending the quest reached; null while it is still walking its stages.</summary>
+        public string? OutcomeId { get; set; }
+
+        /// <summary>Fact snapshots for non-retroactive counters, keyed by <see cref="BaselineKey"/>.</summary>
         public Dictionary<string, int> CounterBaselines { get; } = [];
 
         /// <summary>The one-candidate-left warning fired; never repeat it.</summary>
@@ -30,5 +40,8 @@ namespace Core.Narrative.Quests
 
         /// <summary>Declined quests may be offered again from this world-clock minute on.</summary>
         public int NextOfferAtMinutes { get; set; }
+
+        /// <summary>Key of one counter snapshot: the stage owns what it saw when the player entered it.</summary>
+        public static string BaselineKey(string stageId, string factKey) => $"{stageId}{BaselineSeparator}{factKey}";
     }
 }

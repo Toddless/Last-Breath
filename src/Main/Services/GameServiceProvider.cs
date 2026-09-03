@@ -217,7 +217,7 @@ namespace LastBreath.Services
             var saveManager = provider.GetService<ISaveManager>();
             saveManager.Register(new WorldFactsSaveParticipant(provider.GetService<IWorldFactsService>()));
             saveManager.Register(new InfluenceMasterySaveParticipant(provider.GetService<IInfluenceMastery>()));
-            saveManager.Register(new QuestLogSaveParticipant(provider.GetService<IQuestLogService>()));
+            saveManager.Register(new QuestLogSaveParticipant(provider.GetService<IQuestLogService>(), provider.GetService<IQuestProvider>()));
             saveManager.Register(new WalletSaveParticipant(provider.GetService<IWalletService>())); // trade is Main-owned
             saveManager.Register(new TraderShelfSaveParticipant(
                 provider.GetService<ITraderService>(),

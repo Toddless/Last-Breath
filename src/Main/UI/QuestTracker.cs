@@ -78,8 +78,8 @@ namespace LastBreath.UI
                 return;
             }
 
-            if (state.StageIndex >= quest.Stages.Count) return;
-            foreach (var objective in quest.Stages[state.StageIndex].Objectives.Where(entry => !entry.IsHidden && !entry.IsOptional))
+            if (quest.Stage(state.StageId) is not { } stage) return;
+            foreach (var objective in stage.Objectives.Where(entry => !entry.IsHidden && !entry.IsOptional))
             {
                 (int current, int required) = _questLog!.GetObjectiveProgress(quest.Id, objective.Id);
                 string mark = current >= required ? "[color=green]✔[/color]" : "•";

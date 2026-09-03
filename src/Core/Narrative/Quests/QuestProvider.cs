@@ -57,6 +57,8 @@ namespace Core.Narrative.Quests
                 foreach (var stage in entry.Stages)
                     stages.Add(ParseStage(entry.Id, stage));
 
+                ValidateStageGraph(entry.Id, stages);
+
                 return new QuestDefinition(
                     entry.Id,
                     entry.GiverNpcId,
@@ -91,7 +93,110 @@ namespace Core.Narrative.Quests
             if (objectives.Count == 0)
                 throw new InvalidOperationException($"stage '{stage.Id}' has no objectives");
 
-            return new QuestStageDefinition(stage.Id, objectives, ParseActions(stage.OnEnter), ParseActions(stage.OnComplete));
+            return new QuestStageDefinition(stage.Id, objectives, ParseActions(stage.OnEnter), ParseActions(stage.OnComplete),
+                ParseTransitions(stage), ParseOutcome(stage));
+        }
+
+        private List<QuestStageTransition> ParseTransitions(QuestStageEntry stage)
+        {
+            var transitions = new List<QuestStageTransition>();
+            foreach (var transition in stage.Transitions)
+            {
+                if (transition.To.Length == 0)
+                    throw new InvalidOperationException($"stage '{stage.Id}' has a transition without a target stage");
+                transitions.Add(new QuestStageTransition(transition.To, ParseConditions(transition.Conditions)));
+            }
+
+            return transitions;
+        }
+
+        private QuestOutcomeDefinition? ParseOutcome(QuestStageEntry stage)
+        {
+            if (stage.Outcome is not { } outcome) return null;
+            if (outcome.Id.Length == 0)
+                throw new InvalidOperationException($"stage '{stage.Id}' has an outcome without an id");
+
+            return new QuestOutcomeDefinition(outcome.Id, outcome.Fails, ParseRewards(outcome.Rewards ?? new QuestRewardsEntry()));
+        }
+
+        /// <summary>Routes have to lead somewhere and forward: a stage id used twice, an ending that
+        /// also declares routes, a target no stage answers to, a duplicated outcome name (the save
+        /// keeps the outcome by name) or a stage reachable from itself drops the whole quest. A stage
+        /// nothing leads to is only reported — unfinished authoring, not a broken quest.</summary>
+        private static void ValidateStageGraph(string questId, List<QuestStageDefinition> stages)
+        {
+            var byId = new Dictionary<string, QuestStageDefinition>(StringComparer.Ordinal);
+            foreach (var stage in stages)
+            {
+                if (stage.Id.Length == 0) throw new InvalidOperationException("a stage without an id");
+                if (!byId.TryAdd(stage.Id, stage)) throw new InvalidOperationException($"two stages share the id '{stage.Id}'");
+            }
+
+            ValidateOutcomes(stages);
+            foreach (var stage in stages)
+                foreach (var transition in stage.Transitions)
+                    if (!byId.ContainsKey(transition.ToStageId))
+                        throw new InvalidOperationException($"stage '{stage.Id}' leads to the unknown stage '{transition.ToStageId}'");
+
+            ValidateNoCycle(stages, byId);
+            ReportUnreachableStages(questId, stages, byId);
+        }
+
+        private static void ValidateOutcomes(List<QuestStageDefinition> stages)
+        {
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var stage in stages)
+            {
+                if (stage.Outcome == null) continue;
+                if (stage.Transitions.Count > 0)
+                    throw new InvalidOperationException($"stage '{stage.Id}' declares both an outcome and transitions: an ending leads nowhere");
+                if (!names.Add(stage.Outcome.Id))
+                    throw new InvalidOperationException($"two stages end on the outcome '{stage.Outcome.Id}': the reward it pays would be ambiguous");
+            }
+        }
+
+        private static void ValidateNoCycle(List<QuestStageDefinition> stages, Dictionary<string, QuestStageDefinition> byId)
+        {
+            var visited = new HashSet<string>(StringComparer.Ordinal);
+            var onPath = new HashSet<string>(StringComparer.Ordinal);
+
+            void Walk(QuestStageDefinition stage)
+            {
+                if (!onPath.Add(stage.Id))
+                    throw new InvalidOperationException($"stage '{stage.Id}' is reachable from itself: the quest would never end");
+                if (visited.Add(stage.Id))
+                    foreach (string next in Successors(stages, stage))
+                        Walk(byId[next]);
+                onPath.Remove(stage.Id);
+            }
+
+            foreach (var stage in stages)
+                Walk(stage);
+        }
+
+        private static void ReportUnreachableStages(string questId, List<QuestStageDefinition> stages, Dictionary<string, QuestStageDefinition> byId)
+        {
+            var reached = new HashSet<string>(StringComparer.Ordinal) { stages[0].Id };
+            var pending = new Queue<QuestStageDefinition>([stages[0]]);
+            while (pending.Count > 0)
+                foreach (string next in Successors(stages, pending.Dequeue()))
+                    if (reached.Add(next))
+                        pending.Enqueue(byId[next]);
+
+            var orphans = stages.Where(stage => !reached.Contains(stage.Id)).Select(stage => stage.Id).ToList();
+            if (orphans.Count > 0)
+                Tracker.TrackInfo($"Quest '{questId}': no route reaches the stages {string.Join(", ", orphans)}");
+        }
+
+        /// <summary>Stages a finished stage can lead to: its own routes, or the next of the list when it
+        /// declares none. An ending leads nowhere.</summary>
+        private static IEnumerable<string> Successors(List<QuestStageDefinition> stages, QuestStageDefinition stage)
+        {
+            if (stage.Outcome != null) return [];
+            if (stage.Transitions.Count > 0) return stage.Transitions.Select(transition => transition.ToStageId);
+
+            int next = stages.IndexOf(stage) + 1;
+            return next < stages.Count ? [stages[next].Id] : [];
         }
 
         private QuestObjectiveDefinition ParseObjective(string questId, string stageId, QuestObjectiveEntry objective)

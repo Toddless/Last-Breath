@@ -35,7 +35,7 @@ namespace LastBreathTest.BattleSystemTests
         private const string OrdinaryRewardId = "Coal";
         private const int InfluenceReward = 40;
         private const int LedgerlessSaveVersion = 1;
-        private const int CurrentSaveVersion = 2;
+        private const int CurrentSaveVersion = 3;
 
         private QuestCatalog _quests = null!;
         private WorldFactsService _facts = null!;
@@ -155,10 +155,10 @@ namespace LastBreathTest.BattleSystemTests
         public void TheLedger_SurvivesCaptureAndRestore()
         {
             TurnInOnce();
-            JToken saved = new QuestLogSaveParticipant(_questLog).Capture();
+            JToken saved = new QuestLogSaveParticipant(_questLog, _quests).Capture();
 
             var reloaded = CreateQuestLog();
-            new QuestLogSaveParticipant(reloaded).Restore(saved, CurrentSaveVersion);
+            new QuestLogSaveParticipant(reloaded, _quests).Restore(saved, CurrentSaveVersion);
 
             CollectionAssert.Contains(reloaded.GetState(QuestId)!.GrantedUniqueRewards.ToList(), UniqueRewardId);
 
@@ -172,7 +172,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void ASaveWrittenBeforeTheLedger_ReadsAsNothingHandedOut()
         {
-            new QuestLogSaveParticipant(_questLog).Restore(JToken.Parse(LedgerlessSaveJson), LedgerlessSaveVersion);
+            new QuestLogSaveParticipant(_questLog, _quests).Restore(JToken.Parse(LedgerlessSaveJson), LedgerlessSaveVersion);
 
             var state = _questLog.GetState(QuestId);
 
@@ -183,7 +183,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void ASavedQuestCutFromTheData_IsDropped()
         {
-            new QuestLogSaveParticipant(_questLog).Restore(JToken.Parse(BuriedQuestSaveJson), CurrentSaveVersion);
+            new QuestLogSaveParticipant(_questLog, _quests).Restore(JToken.Parse(BuriedQuestSaveJson), CurrentSaveVersion);
 
             Assert.IsNull(_questLog.GetState(BuriedQuestId), "a quest a patch removed must not restore as a live state");
         }
@@ -268,7 +268,7 @@ namespace LastBreathTest.BattleSystemTests
                 [], [Stage()], new QuestRewards(0, [], []), [], [], []);
 
         private static QuestStageDefinition Stage() =>
-            new("Stage", [new QuestObjectiveDefinition("Objective", new MetCondition(), null, false, false)], [], []);
+            new("Stage", [new QuestObjectiveDefinition("Objective", new MetCondition(), null, false, false)], [], [], [], null);
 
         private const string OrnamentCatalogJson = """
         { "ornaments": [ { "id": "Ornament_Test", "tier": 1, "rarity": "Unique" } ] }

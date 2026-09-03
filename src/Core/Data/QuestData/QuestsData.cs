@@ -45,8 +45,34 @@ namespace Core.Data.QuestData
     {
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
         [JsonProperty("objectives")] public List<QuestObjectiveEntry> Objectives { get; init; } = [];
+
+        /// <summary>Routes out of the stage, tried in order. Empty or absent = the next stage of the
+        /// list, which is what a linear quest writes.</summary>
+        [JsonProperty("transitions")] public List<QuestTransitionEntry> Transitions { get; init; } = [];
+
+        /// <summary>Present = the stage ends the quest with this named outcome. Mutually exclusive
+        /// with transitions: an ending leads nowhere.</summary>
+        [JsonProperty("outcome")] public QuestOutcomeEntry? Outcome { get; init; }
+
         [JsonProperty("onEnter")] public JToken? OnEnter { get; init; }
         [JsonProperty("onComplete")] public JToken? OnComplete { get; init; }
+    }
+
+    /// <summary>One route out of a stage. No conditions = unconditional, so such a route belongs
+    /// last — the first transition whose conditions all hold wins.</summary>
+    public record QuestTransitionEntry
+    {
+        [JsonProperty("to")] public string To { get; init; } = string.Empty;
+        [JsonProperty("conditions")] public JToken? Conditions { get; init; }
+    }
+
+    /// <summary>A named ending of the quest. Its rewards are paid instead of the quest-wide ones;
+    /// "fails": true buries the quest on the spot instead of offering a turn-in.</summary>
+    public record QuestOutcomeEntry
+    {
+        [JsonProperty("id")] public string Id { get; init; } = string.Empty;
+        [JsonProperty("fails")] public bool Fails { get; init; }
+        [JsonProperty("rewards")] public QuestRewardsEntry? Rewards { get; init; }
     }
 
     /// <summary>Exactly one of condition/counter: a condition is a boolean predicate (retroactive

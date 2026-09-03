@@ -92,10 +92,14 @@ namespace LastBreathTest.BattleSystemTests
                     .Select(itemId => $"{quest.Id} -> {itemId}"))
                 .ToList();
 
-        /// <summary>Every id a quest puts in the player's hands: the reward list plus every GiveItem action
-        /// it runs — rewards, the accept/decline/fail hooks and the stage hooks are all the same door.</summary>
+        /// <summary>Every id a quest puts in the player's hands: the quest-wide reward list, the reward
+        /// list of every outcome it can end on, plus every GiveItem action it runs — rewards, the
+        /// accept/decline/fail hooks and the stage hooks are all the same door.</summary>
         private static IEnumerable<string> HandedOutItemIds(QuestEntry quest) =>
-            quest.Rewards.Items.Select(reward => reward.ItemId).Concat(GivenItemIds(quest));
+            RewardLists(quest).SelectMany(rewards => rewards.Items).Select(reward => reward.ItemId).Concat(GivenItemIds(quest));
+
+        private static IEnumerable<QuestRewardsEntry> RewardLists(QuestEntry quest) =>
+            [quest.Rewards, .. quest.Stages.Select(stage => stage.Outcome?.Rewards).OfType<QuestRewardsEntry>()];
 
         private static IEnumerable<string> GivenItemIds(QuestEntry quest) =>
             ActionLists(quest)
@@ -106,7 +110,7 @@ namespace LastBreathTest.BattleSystemTests
 
         private static IEnumerable<JToken?> ActionLists(QuestEntry quest) =>
         [
-            quest.Rewards.Actions, quest.OnAccept, quest.OnDecline, quest.OnFail,
+            .. RewardLists(quest).Select(rewards => rewards.Actions), quest.OnAccept, quest.OnDecline, quest.OnFail,
             .. quest.Stages.SelectMany(stage => new[] { stage.OnEnter, stage.OnComplete }),
         ];
 
