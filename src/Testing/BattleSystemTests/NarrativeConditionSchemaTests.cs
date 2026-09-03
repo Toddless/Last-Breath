@@ -12,6 +12,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Narrative.Quests;
     using Core.Reputation;
     using Core.Services;
+    using LastBreath.Descriptors;
     using Moq;
     using Newtonsoft.Json.Linq;
 
@@ -55,7 +56,7 @@ namespace LastBreathTest.BattleSystemTests
             var inventory = new Mock<IInventory>();
             inventory.Setup(bag => bag.GetTotalItemAmount(It.IsAny<string>())).Returns(StubNumber);
 
-            _factories = NarrativeTestFactories.Conditions(
+            _factories = NarrativeFactories.Conditions(
                 inventory.Object,
                 _facts,
                 Mock.Of<IFactionRelationService>(),
@@ -63,6 +64,7 @@ namespace LastBreathTest.BattleSystemTests
                 PlayerAtZero(),
                 Mock.Of<IInfluenceMastery>(),
                 Mock.Of<IWorldClock>(),
+                new DefaultRandomNumberGenerator(seed: 11),
                 Mock.Of<IQuestLogService>,
                 Mock.Of<IQuestProvider>);
 

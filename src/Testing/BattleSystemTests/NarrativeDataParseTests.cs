@@ -1,6 +1,7 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Core.Data.GameData;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Narrative;
     using Core.Narrative.Actions;
@@ -10,6 +11,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Narrative.Influence;
     using Core.Narrative.Quests;
     using Core.Services;
+    using LastBreath.Descriptors;
     using Moq;
 
     /// <summary>
@@ -45,7 +47,7 @@ namespace LastBreathTest.BattleSystemTests
             var inventory = new Mock<Core.Inventory.IInventory>();
             inventory.Setup(mock => mock.GetAvailableCapacity()).Returns(100);
 
-            var conditionFactories = NarrativeTestFactories.Conditions(
+            var conditionFactories = NarrativeFactories.Conditions(
                 inventory.Object,
                 _facts,
                 new Core.Reputation.FactionRelationService(FactionTestData.Create()),
@@ -53,10 +55,11 @@ namespace LastBreathTest.BattleSystemTests
                 Mock.Of<IPlayerAccessor>(),
                 _influence,
                 clock.Object,
+                new DefaultRandomNumberGenerator(seed: 22),
                 () => _questLog,
                 () => _quests);
 
-            var actionFactories = NarrativeTestFactories.Actions(
+            var actionFactories = NarrativeFactories.Actions(
                 _facts,
                 inventory.Object,
                 Mock.Of<Core.Items.IItemMinter>(),
@@ -119,7 +122,7 @@ namespace LastBreathTest.BattleSystemTests
             _facts.SetCount(FactKeys.QuestOfferRollUntil(QuestId), int.MaxValue);
             _facts.SetCount(FactKeys.QuestOfferRollPassed(QuestId), 1);
 
-            var service = new DialogueService(_dialogues, _facts, _influence, null!, _events);
+            var service = new DialogueService(_dialogues, _facts, _influence, new DefaultRandomNumberGenerator(seed: 22), _events);
             bool started = service.Start(VeteranNpcId, npcInstanceId: null, Fractions.Human);
 
             Assert.IsTrue(started, "no entry rule matched a fresh state — the priority-0 fallback is broken");

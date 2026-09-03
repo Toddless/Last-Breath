@@ -5,6 +5,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Battle;
     using Core.Data;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Events;
     using Core.Inventory;
     using Core.Items;
@@ -41,7 +42,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestInitialize]
         public void Setup()
         {
-            _conditions = NarrativeTestFactories.Conditions(
+            _conditions = NarrativeFactories.Conditions(
                 Mock.Of<IInventory>(),
                 Mock.Of<IWorldFactsService>(),
                 Mock.Of<IFactionRelationService>(),
@@ -49,10 +50,11 @@ namespace LastBreathTest.BattleSystemTests
                 Mock.Of<IPlayerAccessor>(),
                 Mock.Of<IInfluenceMastery>(),
                 Mock.Of<IWorldClock>(),
+                new DefaultRandomNumberGenerator(seed: 44),
                 Mock.Of<IQuestLogService>,
                 Mock.Of<IQuestProvider>);
 
-            _actions = NarrativeTestFactories.Actions(
+            _actions = NarrativeFactories.Actions(
                 Mock.Of<IWorldFactsService>(),
                 Mock.Of<IInventory>(),
                 Mock.Of<IItemMinter>(),
@@ -104,15 +106,17 @@ namespace LastBreathTest.BattleSystemTests
                 "the action schemas read from the vocabulary are not the ones the registered factories give");
         }
 
-        /// <summary>Names first, so a missing or surplus word is reported as itself; identity second,
-        /// because a registry stating the same shape twice would let the two drift apart.</summary>
+        /// <summary>Names first and in order, so a missing, surplus or displaced word is reported as
+        /// itself; identity second, because a registry stating the same shape twice would let the two
+        /// drift apart. The order is the one the game registers the factories in — a tool building the
+        /// same list in another order is building a different list.</summary>
         private static void AssertVocabularyMatches(
             IReadOnlyList<NarrativeRecordSpec> vocabulary, List<NarrativeRecordSpec> declared, string what)
         {
-            CollectionAssert.AreEquivalent(
+            CollectionAssert.AreEqual(
                 declared.Select(spec => spec.TypeName).ToList(),
                 vocabulary.Select(spec => spec.TypeName).ToList(),
-                $"the {what} vocabulary is not the registered {what}s");
+                $"the {what} vocabulary is not the registered {what}s, in the order they are registered");
 
             foreach (var spec in declared)
                 Assert.AreSame(spec, vocabulary.Single(entry => entry.TypeName == spec.TypeName),

@@ -3,10 +3,10 @@ namespace Core.Narrative.Dialogues
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Entity.Components;
     using Enums;
     using Events;
     using Facts;
-    using Godot;
     using Influence;
 
     public class DialogueService : IDialogueService
@@ -14,14 +14,14 @@ namespace Core.Narrative.Dialogues
         private readonly IDialogueProvider _dialogues;
         private readonly IWorldFactsService _facts;
         private readonly IInfluenceMastery _influence;
-        private readonly RandomNumberGenerator _rnd;
+        private readonly IRandomNumberGenerator _rnd;
         private readonly HashSet<string> _usedThisConversation = [];
         private DialogueDefinition? _dialogue;
         private DialogueNode? _node;
         private NarrativeContext _context = NarrativeContext.Empty;
 
         public DialogueService(IDialogueProvider dialogues, IWorldFactsService facts, IInfluenceMastery influence,
-            RandomNumberGenerator rnd, IGameEventBus events)
+            IRandomNumberGenerator rnd, IGameEventBus events)
         {
             _dialogues = dialogues;
             _facts = facts;
@@ -153,7 +153,7 @@ namespace Core.Narrative.Dialogues
         /// <summary>The chance is INVISIBLE by design; a passed check pays Influence exp once per option.</summary>
         private bool RollSpeechCheck(DialogueOption option, DialogueSpeechCheck check)
         {
-            bool passed = _rnd.Randf() < _influence.GetSpeechCheckChance(check.Difficulty);
+            bool passed = _rnd.RandFloat() < _influence.GetSpeechCheckChance(check.Difficulty);
             if (!passed) return false;
 
             string rewardKey = FactKeys.SpeechCheckRewarded(_dialogue!.NpcId, _node!.Id, option.Id);

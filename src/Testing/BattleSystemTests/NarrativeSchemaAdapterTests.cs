@@ -4,6 +4,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Battle;
     using Core.Data;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Events;
     using Core.Inventory;
     using Core.Items;
@@ -40,7 +41,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestInitialize]
         public void Setup()
         {
-            _conditions = NarrativeTestFactories.Conditions(
+            _conditions = NarrativeFactories.Conditions(
                 Mock.Of<IInventory>(),
                 Mock.Of<IWorldFactsService>(),
                 Mock.Of<IFactionRelationService>(),
@@ -48,10 +49,11 @@ namespace LastBreathTest.BattleSystemTests
                 Mock.Of<IPlayerAccessor>(),
                 Mock.Of<IInfluenceMastery>(),
                 Mock.Of<IWorldClock>(),
+                new DefaultRandomNumberGenerator(seed: 33),
                 Mock.Of<IQuestLogService>,
                 Mock.Of<IQuestProvider>);
 
-            _actions = NarrativeTestFactories.Actions(
+            _actions = NarrativeFactories.Actions(
                 Mock.Of<IWorldFactsService>(),
                 Mock.Of<IInventory>(),
                 Mock.Of<IItemMinter>(),

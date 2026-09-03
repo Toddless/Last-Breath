@@ -1,13 +1,18 @@
-namespace LastBreathTest.BattleSystemTests
+namespace LastBreath.Descriptors
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Core.Ai.World.Time;
     using Core.Battle;
     using Core.Data;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Events;
     using Core.Inventory;
     using Core.Items;
     using Core.MessageBus;
+    using Core.Narrative;
     using Core.Narrative.Actions;
     using Core.Narrative.Conditions;
     using Core.Narrative.Facts;
@@ -17,15 +22,17 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Services;
 
     /// <summary>
-    /// The narrative vocabulary as GameServiceProvider registers it, in one place: the tests cannot
-    /// reference the game project, and two hand-written copies of these lists would drift apart.
-    /// The reflection pins in <see cref="NarrativeConditionSchemaTests"/> and
-    /// <see cref="NarrativeActionSchemaTests"/> are what keep them level with Core.
+    /// The narrative vocabulary as the game's service provider registers it, built over whatever
+    /// services the caller has: the running game's, a sandbox's, or a test's mocks. Nothing outside the
+    /// game may register these itself — a second hand-written copy of the list is a language that drifts
+    /// from the one the parsers actually speak.
     /// </summary>
-    internal static class NarrativeTestFactories
+    /// <remarks>Written out rather than reflected, for the reason <see cref="NarrativeVocabulary"/> is:
+    /// a factory the game stopped registering is not part of the language any more, and reflection
+    /// cannot tell the two apart. The ORDER is the order the game registers them in, and it is held
+    /// against <see cref="NarrativeVocabulary"/> by a test.</remarks>
+    public static class NarrativeFactories
     {
-        /// <summary>Godot's RandomNumberGenerator cannot exist outside the engine, so the offer roll is
-        /// handed none; nothing but its own IsMet ever reaches for it.</summary>
         public static List<INarrativeConditionFactory> Conditions(
             IInventory inventory,
             IWorldFactsService facts,
@@ -34,6 +41,7 @@ namespace LastBreathTest.BattleSystemTests
             IPlayerAccessor player,
             IInfluenceMastery influence,
             IWorldClock clock,
+            IRandomNumberGenerator rnd,
             Func<IQuestLogService> log,
             Func<IQuestProvider> quests) =>
         [
@@ -49,7 +57,7 @@ namespace LastBreathTest.BattleSystemTests
             new QuestStatusConditionFactory(log),
             new CanAcceptQuestConditionFactory(log),
             new CanTurnInQuestConditionFactory(log),
-            new QuestOfferRollConditionFactory(facts, influence, clock, rnd: null!, quests),
+            new QuestOfferRollConditionFactory(facts, influence, clock, rnd, quests),
         ];
 
         /// <summary>One factory per quest kind, exactly as the registration loop builds them.</summary>
@@ -62,7 +70,7 @@ namespace LastBreathTest.BattleSystemTests
             IFactionRelationService relations,
             IInfluenceMastery influence,
             IMartialArtMastery mastery,
-            IGameMessageBus messageBus,
+            IGameMessageBus messages,
             INpcProvider npcs,
             INpcModifierProvider npcModifiers,
             INpcWorldSpawner spawner,
@@ -76,9 +84,9 @@ namespace LastBreathTest.BattleSystemTests
             new PublishDeedActionFactory(events, player),
             new AddReputationActionFactory(relations),
             new AddInfluenceExpActionFactory(influence),
-            new GrantTreePointsActionFactory(mastery),
-            new StartTradeActionFactory(messageBus),
+            new StartTradeActionFactory(messages),
             new SpawnNpcActionFactory(npcs, npcModifiers, spawner, population, points),
+            new GrantTreePointsActionFactory(mastery),
             .. Enum.GetValues<QuestActionKind>().Select(kind => new QuestActionFactory(log, kind)),
         ];
     }

@@ -45,6 +45,7 @@ namespace NarrativeEditor.Source.View
         private ItemList _recordList = null!;
         private OutlineTree _outline = null!;
         private InspectorPanel _inspector = null!;
+        private DryRunPanel _dryRun = null!;
 
         private CatalogWorkspace? _workspace;
 
@@ -83,20 +84,32 @@ namespace NarrativeEditor.Source.View
 
             _outline = new OutlineTree(tree);
             _inspector = new InspectorPanel { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            _dryRun = new DryRunPanel();
 
             // Two divides rather than one container holding all three panes: nested, each divider
             // starts at the minimum width of the pane before it and moves without touching the other.
             HSplitContainer body = Split();
             HSplitContainer right = Split();
 
+            // The run stands under the panel that edits, on a divide of its own: an author reads a
+            // dialogue by walking it and writes it in the fields above, and the two are one gesture.
+            var edited = new VSplitContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                SizeFlagsVertical = SizeFlags.ExpandFill
+            };
+
             body.AddChild(_recordList);
             body.AddChild(right);
             right.AddChild(tree);
-            right.AddChild(Scrolled(_inspector));
+            right.AddChild(edited);
+            edited.AddChild(Scrolled(_inspector));
+            edited.AddChild(Scrolled(_dryRun));
 
             _recordList.ItemSelected += index => ShowRecord((int)index);
             tree.ItemSelected += ShowElement;
             _inspector.Said += Report;
+            _dryRun.Said += Report;
 
             return body;
         }
@@ -107,6 +120,7 @@ namespace NarrativeEditor.Source.View
 
             Root = root;
             _workspace = GameNarrative.Load(root);
+            _dryRun.Workspace = _workspace;
 
             var saver = new CatalogSaver(_workspace);
             saver.Changed += Refresh;
@@ -151,6 +165,7 @@ namespace NarrativeEditor.Source.View
                 Texts = texts;
                 _inspector.Texts = texts;
                 _outline.Texts = texts;
+                _dryRun.Texts = texts;
             }
             catch (Exception failure) when (failure is IOException or UnauthorizedAccessException
                                                or FormatException or ArgumentException)
@@ -166,7 +181,12 @@ namespace NarrativeEditor.Source.View
             MarkRecords();
             _outline.Show(Outlined());
             ShowElement();
+            _dryRun.Standing(_record, IsDialogue());
         }
+
+        /// <summary>Whether the record on screen is a conversation. Only those can be walked: a quest is
+        /// read through the dialogue that offers it.</summary>
+        private bool IsDialogue() => _view is { } view && GameNarrative.IsDialogue(view);
 
         /// <summary>Writes a row for every record of every narrative catalog, under a heading naming the
         /// catalog and counting them. The headings are rows of the same list rather than a second list:

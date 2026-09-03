@@ -10,6 +10,7 @@ namespace LastBreath.Services
     using Core.Data;
     using Core.Data.GameData;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Interfaces;
     using Core.Inventory;
     using Core.Items;
@@ -192,7 +193,7 @@ namespace LastBreath.Services
                 sp.GetRequiredService<IWorldFactsService>(),
                 sp.GetRequiredService<IInfluenceMastery>(),
                 sp.GetRequiredService<IWorldClock>(),
-                sp.GetRequiredService<Godot.RandomNumberGenerator>(),
+                sp.GetRequiredService<IRandomNumberGenerator>(),
                 sp.GetRequiredService<IQuestProvider>));
 
             services.AddSingleton<INarrativeActionParser, NarrativeActionParser>();

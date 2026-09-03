@@ -2,8 +2,8 @@ namespace Core.Narrative.Conditions
 {
     using System;
     using Ai.World.Time;
+    using Entity.Components;
     using Facts;
-    using Godot;
     using Influence;
     using Newtonsoft.Json.Linq;
     using Quests;
@@ -14,7 +14,7 @@ namespace Core.Narrative.Conditions
     /// IsMet deliberately writes the cache — the condition is a gate that remembers slamming shut.
     /// </summary>
     public class QuestOfferRollCondition(
-        IWorldFactsService facts, IInfluenceMastery influence, IWorldClock clock, RandomNumberGenerator rnd,
+        IWorldFactsService facts, IInfluenceMastery influence, IWorldClock clock, IRandomNumberGenerator rnd,
         Func<IQuestProvider> quests, string questId, int cooldownHours) : INarrativeCondition
     {
         private const int MinutesPerHour = 60;
@@ -29,7 +29,7 @@ namespace Core.Narrative.Conditions
             var quest = quests().Get(questId);
             if (quest == null) return false;
 
-            bool passed = rnd.Randf() < influence.GetQuestOfferChance(quest.Tier);
+            bool passed = rnd.RandFloat() < influence.GetQuestOfferChance(quest.Tier);
             facts.SetCount(FactKeys.QuestOfferRollUntil(questId), now + cooldownHours * MinutesPerHour);
             facts.SetCount(FactKeys.QuestOfferRollPassed(questId), passed ? 1 : 0);
             return passed;
@@ -37,7 +37,7 @@ namespace Core.Narrative.Conditions
     }
 
     public class QuestOfferRollConditionFactory(
-        IWorldFactsService facts, IInfluenceMastery influence, IWorldClock clock, RandomNumberGenerator rnd,
+        IWorldFactsService facts, IInfluenceMastery influence, IWorldClock clock, IRandomNumberGenerator rnd,
         Func<IQuestProvider> quests) : INarrativeConditionFactory
     {
         private const string TypeName = "QuestOfferRoll";

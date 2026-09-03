@@ -16,6 +16,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Narrative.Quests;
     using Core.Reputation;
     using Core.Services;
+    using LastBreath.Descriptors;
     using Moq;
     using Newtonsoft.Json.Linq;
 
@@ -68,7 +69,7 @@ namespace LastBreathTest.BattleSystemTests
             relations.Setup(service => service.AddReputation(It.IsAny<Fractions>(), It.IsAny<int>(), It.IsAny<string>()))
                 .Callback<Fractions, int, string>((_, _, reason) => _recordedReason = reason);
 
-            _factories = NarrativeTestFactories.Actions(
+            _factories = NarrativeFactories.Actions(
                 _facts,
                 inventory.Object,
                 Mock.Of<IItemMinter>(),

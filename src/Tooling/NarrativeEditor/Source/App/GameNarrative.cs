@@ -79,6 +79,14 @@ namespace NarrativeEditor.Source.App
             return null;
         }
 
+        /// <summary>Whether this catalog holds conversations — the records a dry run can walk.</summary>
+        public static bool IsDialogue(CatalogView view)
+        {
+            ArgumentNullException.ThrowIfNull(view);
+
+            return Named(view, DataCatalog.Dialogues);
+        }
+
         /// <summary>Whether a note of the run belongs to one of the catalogs this tool edits.</summary>
         private static bool Ours(string note) =>
             Catalogs.Any(catalog => note.StartsWith(Text(NamedFormat, catalog), StringComparison.Ordinal));
