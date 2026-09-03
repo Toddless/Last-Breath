@@ -57,7 +57,7 @@ namespace Core.Narrative.Quests
                 foreach (var stage in entry.Stages)
                     stages.Add(ParseStage(entry.Id, stage));
 
-                ValidateStageGraph(entry.Id, stages);
+                ValidateStageGraph(entry.Id, stages, entry.CanFail);
 
                 return new QuestDefinition(
                     entry.Id,
@@ -121,9 +121,10 @@ namespace Core.Narrative.Quests
 
         /// <summary>Routes have to lead somewhere and forward: a stage id used twice, an ending that
         /// also declares routes, a target no stage answers to, a duplicated outcome name (the save
-        /// keeps the outcome by name) or a stage reachable from itself drops the whole quest. A stage
-        /// nothing leads to is only reported — unfinished authoring, not a broken quest.</summary>
-        private static void ValidateStageGraph(string questId, List<QuestStageDefinition> stages)
+        /// keeps the outcome by name), a failing ending on a quest that cannot fail or a stage
+        /// reachable from itself drops the whole quest. A stage nothing leads to is only reported —
+        /// unfinished authoring, not a broken quest.</summary>
+        private static void ValidateStageGraph(string questId, List<QuestStageDefinition> stages, bool canFail)
         {
             var byId = new Dictionary<string, QuestStageDefinition>(StringComparer.Ordinal);
             foreach (var stage in stages)
@@ -132,7 +133,7 @@ namespace Core.Narrative.Quests
                 if (!byId.TryAdd(stage.Id, stage)) throw new InvalidOperationException($"two stages share the id '{stage.Id}'");
             }
 
-            ValidateOutcomes(stages);
+            ValidateOutcomes(stages, canFail);
             foreach (var stage in stages)
                 foreach (var transition in stage.Transitions)
                     if (!byId.ContainsKey(transition.ToStageId))
@@ -142,7 +143,7 @@ namespace Core.Narrative.Quests
             ReportUnreachableStages(questId, stages, byId);
         }
 
-        private static void ValidateOutcomes(List<QuestStageDefinition> stages)
+        private static void ValidateOutcomes(List<QuestStageDefinition> stages, bool canFail)
         {
             var names = new HashSet<string>(StringComparer.Ordinal);
             foreach (var stage in stages)
@@ -150,6 +151,8 @@ namespace Core.Narrative.Quests
                 if (stage.Outcome == null) continue;
                 if (stage.Transitions.Count > 0)
                     throw new InvalidOperationException($"stage '{stage.Id}' declares both an outcome and transitions: an ending leads nowhere");
+                if (stage.Outcome.Fails && !canFail)
+                    throw new InvalidOperationException($"stage '{stage.Id}' declares a failing outcome, but the quest cannot fail");
                 if (!names.Add(stage.Outcome.Id))
                     throw new InvalidOperationException($"two stages end on the outcome '{stage.Outcome.Id}': the reward it pays would be ambiguous");
             }

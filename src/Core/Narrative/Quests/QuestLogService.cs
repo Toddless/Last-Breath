@@ -337,13 +337,16 @@ namespace Core.Narrative.Quests
         }
 
         /// <summary>The quest ends on a named ending: a failing one buries it through the single failure
-        /// gate (onFail included), the rest wait for the turn-in that pays the ending's own rewards.</summary>
+        /// gate (onFail included), the rest wait for the turn-in that pays the ending's own rewards.
+        /// The catalog refuses a failing ending on a quest that cannot fail, so a refusal here means
+        /// the definition came from somewhere the check does not guard.</summary>
         private void ReachOutcome(QuestDefinition quest, QuestState state, QuestOutcomeDefinition outcome)
         {
             state.OutcomeId = outcome.Id;
             if (outcome.Fails)
             {
-                Fail(quest.Id, OutcomeReason + outcome.Id);
+                if (!Fail(quest.Id, OutcomeReason + outcome.Id))
+                    Tracker.TrackError($"Quest '{quest.Id}': outcome '{outcome.Id}' declares a failing outcome, but the quest cannot fail: it stops on the ending unfinished");
                 return;
             }
 

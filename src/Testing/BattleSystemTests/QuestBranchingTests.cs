@@ -152,25 +152,6 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0, _minted.Count, "a failed quest pays nothing");
         }
 
-        /// <summary>A quest that declares it cannot fail refuses the burial, but the ending is still an
-        /// ending: it stays where it stopped instead of walking out of the stage again on every change
-        /// of the world.</summary>
-        [TestMethod]
-        public void AFailingOutcome_OnAnUnloseableQuest_StopsTheQuestWithoutRepeatingItself()
-        {
-            _quests.Add(BranchingQuest(unconditionalFallback: true, canFail: false));
-            Accept();
-
-            MeetSideObjective();
-            Poke();
-            Poke();
-
-            Assert.AreEqual(QuestStatus.Active, _questLog.GetStatus(QuestId), "an unloseable quest must not be buried by an ending");
-            Assert.AreEqual(BetrayalOutcomeId, _questLog.GetState(QuestId)!.OutcomeId, "the ending was reached and has to be remembered");
-            Assert.AreEqual(0, _onFail.Executions, "a refused failure runs nothing");
-            Assert.AreEqual(1, _sideCompleted.Executions, "the stage that reached the ending walked out of itself again on the next change of the world");
-        }
-
         /// <summary>The shape every shipped quest has today: no transitions, no outcome. It must keep
         /// walking its list and paying its quest-wide rewards.</summary>
         [TestMethod]
@@ -270,6 +251,7 @@ namespace LastBreathTest.BattleSystemTests
         [DataRow(OutcomeWithTransitionsJson, DisplayName = "an ending that also declares routes")]
         [DataRow(DuplicateStageIdJson, DisplayName = "two stages sharing an id")]
         [DataRow(DuplicateOutcomeIdJson, DisplayName = "two stages ending on the same outcome")]
+        [DataRow(FailingOutcomeWithoutCanFailJson, DisplayName = "a failing ending on a quest that cannot fail")]
         public void TheCatalog_DropsAQuestItCannotWalk(string json)
         {
             Assert.IsNull(Parse(json).Get("Quest_Broken"), "a quest whose stages cannot be walked must be dropped whole");
@@ -317,12 +299,12 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>One choice and two endings: the loyal branch pays its own rewards, the other buries
         /// the quest. Without the unconditional fallback the choice stage has nowhere to go until the
         /// fact is set.</summary>
-        private QuestDefinition BranchingQuest(bool unconditionalFallback, bool canFail = true)
+        private QuestDefinition BranchingQuest(bool unconditionalFallback)
         {
             List<QuestStageTransition> routes = [new(LoyalStageId, [new FactCondition(_facts, ChoiceFact, 1)])];
             if (unconditionalFallback) routes.Add(new QuestStageTransition(BetrayalStageId, []));
 
-            return Quest(canFail,
+            return Quest(
                 new QuestStageDefinition(ChoiceStageId, [Objective(new MetCondition())], [], [_choiceCompleted], routes, null),
                 new QuestStageDefinition(LoyalStageId, [Counter()], [], [_sideCompleted], [],
                     new QuestOutcomeDefinition(LoyalOutcomeId, false,
@@ -332,12 +314,12 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         private QuestDefinition LinearQuest(INarrativeCondition first) =>
-            Quest(canFail: true,
+            Quest(
                 new QuestStageDefinition(FirstStageId, [Objective(first)], [], [], [], null),
                 new QuestStageDefinition(SecondStageId, [Counter()], [], [], [], null));
 
-        private QuestDefinition Quest(bool canFail, params QuestStageDefinition[] stages) =>
-            new(QuestId, string.Empty, Fractions.Human, 1, false, [], DeclinePolicy.CanReturn, 0, canFail, 0,
+        private QuestDefinition Quest(params QuestStageDefinition[] stages) =>
+            new(QuestId, string.Empty, Fractions.Human, 1, false, [], DeclinePolicy.CanReturn, 0, CanFail: true, 0,
                 [], stages,
                 new QuestRewards(QuestInfluence, [new QuestRewardItem(QuestRewardItemId, 1)], [_questReward]),
                 [], [], [_onFail]);
@@ -540,6 +522,24 @@ namespace LastBreathTest.BattleSystemTests
                   "id": "C",
                   "objectives": [ { "id": "O", "counter": { "key": "K", "amount": 1 } } ],
                   "outcome": { "id": "Done" }
+                }
+              ]
+            }
+          ]
+        }
+        """;
+
+        private const string FailingOutcomeWithoutCanFailJson = """
+        {
+          "quests": [
+            {
+              "id": "Quest_Broken",
+              "canFail": false,
+              "stages": [
+                {
+                  "id": "A",
+                  "objectives": [ { "id": "O", "counter": { "key": "K", "amount": 1 } } ],
+                  "outcome": { "id": "Betrayed", "fails": true }
                 }
               ]
             }

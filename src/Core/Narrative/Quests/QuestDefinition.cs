@@ -53,6 +53,7 @@ namespace Core.Narrative.Quests
 
     /// <summary>A named ending. Its rewards are paid INSTEAD of the quest-wide ones, so an outcome
     /// declaring none pays nothing. Fails buries the quest instead of offering a turn-in.</summary>
+    /// <param name="Fails">Requires the quest to declare canFail: true; the catalog refuses the pair.</param>
     public record QuestOutcomeDefinition(string Id, bool Fails, QuestRewards Rewards);
 
     /// <summary>Either Condition (boolean predicate, retroactive by nature) or Counter is set.</summary>
