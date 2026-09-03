@@ -1,5 +1,9 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из разворота зависимости, шаг 3: спеки нарратива в Core (2026-09-02; accept)
+
+- (nit) `src/Core/Narrative/NarrativeParameterSpec.cs:15` — вид назван `Choice`, не `Enum` (коллизия с хелпером `Enum<T>`), в отчёте отступление не названо; `:35` — `JsonName` без гуарда пустой строки (держится хелпером и пином ключей); `:46,49` — `Choices`/`Catalogs` как `IReadOnlyList<string>` сравниваются по ссылке, равенство record не контентное (латентно). `LastBreath.Descriptors/NarrativeSchemas.cs:47-56` — `Default` протекает на составные виды (рефлектор обнуляет для Array/Object); `:20,24,27` — нет `ArgumentNullException.ThrowIfNull`. `NarrativeSchemaAdapterTests.cs:118` — декоративный `IsNotNull`.
+
 ## Из разворота зависимости, шаг 2: описатели в адаптере (2026-09-02; accept with minors)
 
 - (minor, док) `src/Tooling/DataEditor/README.md:5,15` — говорит, что хост берёт схему из `Core.Data.Schema.CatalogDescriptors` и что ссылок две; теперь реестр в `LastBreath.Descriptors`, ссылок три (после шага 4 — две: адаптер и Tooling.Core). Переписать на шаге 4.
