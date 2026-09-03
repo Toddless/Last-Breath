@@ -1,7 +1,9 @@
 namespace Core.Data.ReputationData
 {
     using System.Collections.Generic;
+    using Enums;
     using Newtonsoft.Json;
+    using Schema;
 
     /// <summary>ReputationDeeds.json: what each player deed does to faction standings.</summary>
     public record ReputationDeedsData
@@ -24,7 +26,7 @@ namespace Core.Data.ReputationData
 
         /// <summary>Anti-death-spiral floor: a negative deed costs nothing when the player's standing
         /// with the target faction is already at or below this level (killing enemies is fair game).</summary>
-        [JsonProperty("noPenaltyAtOrBelow")] public string? NoPenaltyAtOrBelow { get; init; }
+        [JsonProperty("noPenaltyAtOrBelow")][EnumOf(typeof(RelationLevel))] public string? NoPenaltyAtOrBelow { get; init; }
 
         /// <summary>Factions whose matrix relation TO the target faction is hostile approve — each gets this many points.</summary>
         [JsonProperty("hostileToTargetBonus")] public int HostileToTargetBonus { get; init; }

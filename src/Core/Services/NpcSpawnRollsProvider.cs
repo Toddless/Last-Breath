@@ -4,6 +4,7 @@ namespace Core.Services
     using System.Collections.Generic;
     using Data;
     using Data.GameData;
+    using Data.Schema;
     using Enums;
     using Newtonsoft.Json;
 
@@ -92,16 +93,18 @@ namespace Core.Services
 
         private readonly record struct SlotLadder(float FirstSlotChance, float NextSlotChance, float Decay);
 
-        private record SpawnRollsData
+        /// <summary>The document this catalog is one of. Public so the authoring tool can be handed its
+        /// shape: the file is a settings document with no record type of its own anywhere else.</summary>
+        public record SpawnRollsData
         {
-            [JsonProperty("modifiers")] public Dictionary<string, SlotLadderData> Modifiers { get; init; } = [];
-            [JsonProperty("abilities")] public Dictionary<string, SlotLadderData> Abilities { get; init; } = [];
-            [JsonProperty("rarityMultipliers")] public Dictionary<string, float> RarityMultipliers { get; init; } = [];
+            [JsonProperty("modifiers")][DictionaryKey(typeof(EntityType))] public Dictionary<string, SlotLadderData> Modifiers { get; init; } = [];
+            [JsonProperty("abilities")][DictionaryKey(typeof(EntityType))] public Dictionary<string, SlotLadderData> Abilities { get; init; } = [];
+            [JsonProperty("rarityMultipliers")][DictionaryKey(typeof(Rarity))] public Dictionary<string, float> RarityMultipliers { get; init; } = [];
         }
 
         /// <summary>Nullable on purpose: absent is a question the file has to answer (see
         /// <see cref="Field"/>), not a number to guess at.</summary>
-        private record SlotLadderData
+        public record SlotLadderData
         {
             [JsonProperty("firstSlotChance")] public float? FirstSlotChance { get; init; }
             [JsonProperty("nextSlotChance")] public float? NextSlotChance { get; init; }

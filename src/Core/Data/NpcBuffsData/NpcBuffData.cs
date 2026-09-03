@@ -1,7 +1,10 @@
 namespace Core.Data.NpcBuffsData
 {
     using System.Collections.Generic;
+    using Enums;
+    using GameData;
     using Newtonsoft.Json;
+    using Schema;
 
     /// <summary>NpcBuffs.json: the parameter side of NPC modifiers, keyed by NpcBuffId.</summary>
     public record NpcBuffsData
@@ -24,8 +27,8 @@ namespace Core.Data.NpcBuffsData
 
     public record NpcBuffModifierData
     {
-        [JsonProperty("parameter")] public string Parameter { get; init; } = string.Empty;
-        [JsonProperty("type")] public string Type { get; init; } = "Increase";
+        [JsonProperty("parameter")][EnumOf(typeof(EntityParameter))] public string Parameter { get; init; } = string.Empty;
+        [JsonProperty("type")][EnumOf(typeof(ModifierValueType))] public string Type { get; init; } = "Increase";
         [JsonProperty("value")] public float Value { get; init; }
     }
 
@@ -34,7 +37,12 @@ namespace Core.Data.NpcBuffsData
     /// factory declares — a missing key is a refusal at mint, not a silent no-op.</summary>
     public record NpcBuffGrantData
     {
-        [JsonProperty("kind")] public string Kind { get; init; } = "Passive";
+        [JsonProperty("kind")][EnumOf(typeof(GrantKind))] public string Kind { get; init; } = "Passive";
+
+        /// <summary>The behaviour handed over, answered from whichever catalog declares it — the kind
+        /// beside it says which.</summary>
+        [CatalogRef(DataCatalog.PassiveSkills)]
+        [CatalogRef(DataCatalog.Effects)]
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
         [JsonProperty("properties")] public Dictionary<string, float> Properties { get; init; } = [];
     }

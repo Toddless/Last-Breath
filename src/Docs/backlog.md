@@ -1,5 +1,21 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из волны описателей репутации, торговли и NPC (2026-09-03; accept)
+
+Находки владельцу по данным:
+- **`Trader_Ronald` без ключа .po** — окно торговли титулуется `Localization.Localize(traderId)`, есть только `Trader_Human_Merchant`; лавка Роналда покажет сырой ключ. `LocalizationAuditTests.CollectDataIds` каталог `Traders` не перечисляет — дыру ничто не сторожит. Стало: строка `("Traders", CatalogIds("Traders", "traders"), false)` в аудит; ключ — за Todd.
+- `ReputationDeeds.json`: `witnessRadius` одиноким числом в корне файла записей — инструмент пронесёт как есть; если чисел станет больше — отдельный настроечный документ.
+- `NpcSpawnRolls.json`: 7 авторских заметок ключами `_comment`/`_formula`/… — читатель игнорирует, запинены поимённо.
+- **`NpcModifiers` не описан** (развилка владельца): группы `mods[]{key, uniqueScope, modifiers[]}` — id модификаторов двумя уровнями ниже корня, контракт знает секцию как один ключ корня; описать = 7 групп как записи и пять ложных `UnknownReference` на `SpawnNpc` вместо честного `UndescribedTarget`. Либо файл получает секции корня, либо контракт — вложенные секции.
+
+Код:
+- (minor) `NpcSpawnRollsProvider.cs:96-112` — `SpawnRollsData`/`SlotLadderData` стали public вложенными типами сервиса ниже приватных членов; DTO прочих каталогов живут в `Core/Data/<X>Data/`. Стало: вынести в `Core/Data/NpcSpawnRollsData/`.
+- (minor) `CatalogDescriptorTests.Words` сужен до строк — старый пин `s_settingsChoices` перестал ловить «член enum числом»; точный инструмент — `ValuesAt(root, path)`; смягчение — `AreNotEqual(0, written.Count)`.
+- (minor) `EveryStandingChoiceOffers…`/`EveryStandingMapOffers…` — построчные копии settings-тестов (различие `Strangers` vs `IsSubsetOf`); таблицы взаимозаменяемы, `Factions`/`NpcSpawnRolls` запинены дважды.
+- (nit) `NpcBuffData.cs:42-46` — дока гранта без оговорки про `GrantKind.Modifier` (как у `GrantData`/`CraftingEffectsData`); `ReputationPerksCatalogDescriptor.PerksField`/`PerkField` никто не читает.
+- (знать) `IdField` на enum-поле (ReputationPerks `level`, как Formatting `parameter`) — инспектор рисует пикер; свободный ввод id в `CatalogEditing.AddRecord` — предсуществующая дыра, общая с Formatting.
+- (знать) ссылки волны наружу (`catalog[].itemId` → Items, `grants[].id` → PassiveSkills/Effects) не проверяются, пока цели не описаны.
+
 ## Из чистки бэклога тулинга, волна A (2026-09-03; accept with minors) — закрыты 9 пунктов разделов «общая история», «занятость id по секции», «форма столов» (Record(IOwnedEdit), GroupWithNewest с владельцем, Take переносит _undone/_savedFor, мёртвые события снесены, EditorRoot.Stepped отложенно, тесты границ, Dispose идемпотентен, клауза Taken/ThrowIfNull/имя секции, ранний выход пикера редкости)
 
 - (minor) `EditHistory.Take:169-171` — усыновление через `Adopt`→`Push` не чистит `_undone`: Ctrl+Z в поле, затем «добавить запись» в новый файл → брошенная ветка redo жива, Ctrl+Y повторит отменённый шаг поверх создания. Стало: `_undone.Clear()` перед `AddRange(other._undone)`.

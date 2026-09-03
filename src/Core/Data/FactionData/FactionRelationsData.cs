@@ -1,7 +1,9 @@
 namespace Core.Data.FactionData
 {
     using System.Collections.Generic;
+    using Enums;
     using Newtonsoft.Json;
+    using Schema;
 
     /// <summary>FactionRelations.json: directed faction entries, the reputation scale, faction traits
     /// and the player's default standings (in points).</summary>
@@ -29,9 +31,9 @@ namespace Core.Data.FactionData
 
     public record FactionRelationEntry
     {
-        [JsonProperty("from")] public string From { get; init; } = string.Empty;
-        [JsonProperty("to")] public string To { get; init; } = string.Empty;
-        [JsonProperty("level")] public string Level { get; init; } = string.Empty;
+        [JsonProperty("from")][EnumOf(typeof(Fractions))] public string From { get; init; } = string.Empty;
+        [JsonProperty("to")][EnumOf(typeof(Fractions))] public string To { get; init; } = string.Empty;
+        [JsonProperty("level")][EnumOf(typeof(RelationLevel))] public string Level { get; init; } = string.Empty;
     }
 
     /// <summary>The numeric reputation scale: the points range and the level thresholds.</summary>
@@ -49,13 +51,13 @@ namespace Core.Data.FactionData
     /// <summary>A level owns the points band from <see cref="From"/> up to where the next level begins.</summary>
     public record ReputationLevelEntry
     {
-        [JsonProperty("level")] public string Level { get; init; } = string.Empty;
+        [JsonProperty("level")][EnumOf(typeof(RelationLevel))] public string Level { get; init; } = string.Empty;
         [JsonProperty("from")] public int From { get; init; }
     }
 
     public record FactionTraitsEntry
     {
-        [JsonProperty("fraction")] public string Fraction { get; init; } = string.Empty;
+        [JsonProperty("fraction")][EnumOf(typeof(Fractions))] public string Fraction { get; init; } = string.Empty;
 
         /// <summary>False freezes the standing at its default — deeds are ignored (animals).</summary>
         [JsonProperty("hasReputation")] public bool HasReputation { get; init; } = true;
@@ -66,7 +68,7 @@ namespace Core.Data.FactionData
 
     public record PlayerReputationEntry
     {
-        [JsonProperty("fraction")] public string Fraction { get; init; } = string.Empty;
+        [JsonProperty("fraction")][EnumOf(typeof(Fractions))] public string Fraction { get; init; } = string.Empty;
         [JsonProperty("points")] public int Points { get; init; }
     }
 }

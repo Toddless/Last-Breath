@@ -5,11 +5,13 @@ namespace LastBreath.Descriptors
     using Core.Battle;
     using Core.Data.CombatRulesData;
     using Core.Data.CraftingData;
+    using Core.Data.FactionData;
     using Core.Data.GameData;
     using Core.Data.InfluenceData;
     using Core.Data.LootTable;
     using Core.Data.WorldData;
     using Core.PassiveTree.Rules;
+    using Core.Services;
     using Core.Trade;
 
     // The catalogs whose file is one settings document. Each states only what cannot be read off a
@@ -72,6 +74,73 @@ namespace LastBreath.Descriptors
     {
         /// <summary>Json name of the map of rarity to what it multiplies a price by — what
         /// <see cref="TradeConfig.RarityMultipliers"/> is written as.</summary>
+        public const string RarityMultipliersField = "rarityMultipliers";
+    }
+
+    /// <summary>Who stands where: the directed matrix of faction against faction, the points scale the
+    /// player's own standing is measured on, the traits that freeze a faction's standing or let it raid,
+    /// and the standings a new game starts at. The folder is named for whose relations they are and the
+    /// file for what it holds, which are two different facts.</summary>
+    /// <remarks>One document and not a catalog of factions: the factions themselves are members of an
+    /// enum, and every list in the file is keyed by one of them rather than by an id of its own.</remarks>
+    public sealed class FactionsCatalogDescriptor()
+        : SingleObjectDescriptor(DataCatalog.Factions, typeof(FactionRelationsData), "FactionRelations")
+    {
+        /// <summary>Json name of the directed matrix — what <see cref="FactionRelationsData.Relations"/>
+        /// is written as.</summary>
+        public const string RelationsField = "relations";
+
+        /// <summary>Json name of the faction one entry of the matrix speaks for — what
+        /// <see cref="FactionRelationEntry.From"/> is written as.</summary>
+        public const string FromField = "from";
+
+        /// <summary>Json name of the faction it speaks about — what
+        /// <see cref="FactionRelationEntry.To"/> is written as.</summary>
+        public const string ToField = "to";
+
+        /// <summary>Json name of the standing an entry states, on the matrix and on a threshold of the
+        /// scale alike — what <see cref="FactionRelationEntry.Level"/> is written as.</summary>
+        public const string LevelField = "level";
+
+        /// <summary>Json name of the points scale — what <see cref="FactionRelationsData.Reputation"/> is
+        /// written as.</summary>
+        public const string ScaleField = "reputation";
+
+        /// <summary>Json name of the thresholds on that scale — what
+        /// <see cref="ReputationScaleData.Levels"/> is written as.</summary>
+        public const string ThresholdsField = "levels";
+
+        /// <summary>Json name of the faction traits — what <see cref="FactionRelationsData.Factions"/> is
+        /// written as.</summary>
+        public const string TraitsField = "factions";
+
+        /// <summary>Json name of the standings a new game starts at — what
+        /// <see cref="FactionRelationsData.PlayerDefaults"/> is written as.</summary>
+        public const string DefaultsField = "playerDefaults";
+
+        /// <summary>Json name of the faction a traits row and a starting standing are written for — what
+        /// <see cref="FactionTraitsEntry.Fraction"/> is written as.</summary>
+        public const string FractionField = "fraction";
+    }
+
+    /// <summary>How MANY of an npc's modifier and ability slots are actually filled: a chance ladder per
+    /// kind of foe and the rarity ladder scaling all of them at once. WHICH modifier lands in a filled
+    /// slot is the NpcModifiers catalog's answer, which is why this one is a folder of its own.</summary>
+    /// <remarks>Read off the document the provider parses the file into, which is the only shape of it
+    /// there is: nothing downstream sees the file, only the chances worked out from it.</remarks>
+    public sealed class NpcSpawnRollsCatalogDescriptor()
+        : SingleObjectDescriptor(DataCatalog.NpcSpawnRolls, typeof(NpcSpawnRollsProvider.SpawnRollsData), "NpcSpawnRolls")
+    {
+        /// <summary>Json name of the map of foe kind to the ladder its modifier slots are rolled on — what
+        /// <see cref="NpcSpawnRollsProvider.SpawnRollsData.Modifiers"/> is written as.</summary>
+        public const string ModifiersField = "modifiers";
+
+        /// <summary>Json name of the same map for the ability slots — what
+        /// <see cref="NpcSpawnRollsProvider.SpawnRollsData.Abilities"/> is written as.</summary>
+        public const string AbilitiesField = "abilities";
+
+        /// <summary>Json name of the map of rarity to what it multiplies every chance by — what
+        /// <see cref="NpcSpawnRollsProvider.SpawnRollsData.RarityMultipliers"/> is written as.</summary>
         public const string RarityMultipliersField = "rarityMultipliers";
     }
 

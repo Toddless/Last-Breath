@@ -30,6 +30,13 @@ namespace LastBreath.Descriptors
             new ItemEffectsCatalogDescriptor(),
             new OrnamentsCatalogDescriptor(),
 
+            // Standing and trade: what a deed does to it, what a level of it buys, and the shops whose
+            // prices it moves. The buffs stand here beside them because an npc modifier is what pulls one.
+            new TradersCatalogDescriptor(),
+            new ReputationDeedsCatalogDescriptor(),
+            new ReputationPerksCatalogDescriptor(),
+            new NpcBuffsCatalogDescriptor(),
+
             // The settings documents: one object each, and one shape between them.
             new CombatRulesCatalogDescriptor(),
             new LootConfigurationCatalogDescriptor(),
@@ -41,19 +48,22 @@ namespace LastBreath.Descriptors
             new TradeCatalogDescriptor(),
             new InfluenceCatalogDescriptor(),
             new MartialArtMasteryCatalogDescriptor(),
-            new CraftingMasteryCatalogDescriptor()
+            new CraftingMasteryCatalogDescriptor(),
+            new FactionsCatalogDescriptor(),
+            new NpcSpawnRollsCatalogDescriptor()
         ];
 
         /// <summary>Catalogs with no descriptor yet, named one by one rather than counted: a name added
         /// to <see cref="DataCatalog"/> has to be put on one of the two lists by hand.</summary>
         public static IReadOnlyList<string> NotYetDescribed { get; } =
         [
-            DataCatalog.NpcBuffs,
+            // The npc modifiers. The file writes its groups as ELEMENTS of one array — a group carrying
+            // the kind of modifier under it, the reach of its uniqueness, and the modifiers themselves —
+            // so the ids anything points at stand two levels below the root. A section of a catalog is one
+            // key of the root here, and records are found directly under it: describing this file would
+            // hand the tool the seven groups as its records and answer every id naming a modifier with
+            // "nothing is called that". Either the file grows sections of its own or the shape does.
             DataCatalog.NpcModifiers,
-            DataCatalog.NpcSpawnRolls,
-            DataCatalog.Factions,
-            DataCatalog.ReputationDeeds,
-            DataCatalog.ReputationPerks,
 
             // A map of named stat profiles, each a map of parameter to number: the game reads it
             // without a DTO at all, so there is no type to read a record off.
@@ -69,7 +79,6 @@ namespace LastBreath.Descriptors
             // the game reads and the shape the file is in.
             DataCatalog.Items,
             DataCatalog.Effects,
-            DataCatalog.Traders,
             DataCatalog.Conditions,
         ];
     }

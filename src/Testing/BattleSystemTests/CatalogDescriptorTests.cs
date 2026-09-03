@@ -1211,6 +1211,10 @@ namespace LastBreathTest.BattleSystemTests
         /// Across every described catalog: a field written under a name ending in "id" either points into
         /// a catalog or says out loud that it does not. The one exception is the field a record IS found
         /// by, which names its own record rather than another.
+        /// <para>Only what is written as a WORD is asked: a number, a flag or a nested object cannot name a
+        /// record whatever it is called, and a faction's <c>canRaid</c> ends in those two letters by
+        /// accident of English. Demanding a refusal of it would put markup on a field about which there was
+        /// never a question.</para>
         /// <para>Keys of a map are not covered — the contract has no way of refusing them — so a map keyed
         /// by ids is still a silence this cannot see.</para>
         /// </summary>
@@ -1228,6 +1232,7 @@ namespace LastBreathTest.BattleSystemTests
 
                         FieldSchema leaf = Leaf(field);
                         if (leaf.Kind == FieldKind.Reference || leaf.RefusedAsReference) continue;
+                        if (leaf.Kind != FieldKind.String) continue;
 
                         silent.Add($"{descriptor.Catalog}: {record.TypeName}.{field.JsonName}");
                     }
@@ -2345,6 +2350,8 @@ namespace LastBreathTest.BattleSystemTests
         [DataRow(DataCatalog.Influence, "InfluenceMastery")]
         [DataRow(DataCatalog.MartialArtMastery, "MartialArtMastery")]
         [DataRow(DataCatalog.CraftingMastery, "CraftingMastery")]
+        [DataRow(DataCatalog.Factions, "FactionRelations")]
+        [DataRow(DataCatalog.NpcSpawnRolls, "NpcSpawnRolls")]
         public void ASettingsCatalogIsOneRecordAtTheRootOfItsOneFile(string catalog, string fileName)
         {
             CatalogSchemaBuilder builder = new(new SchemaReflector());
@@ -2499,9 +2506,15 @@ namespace LastBreathTest.BattleSystemTests
         private static string LastSegment(string path) => path.Split(PathSeparator)[^1];
 
         /// <summary>Every word written under one name anywhere in a document — the value itself, or each
-        /// element when the name holds a list of them.</summary>
+        /// element when the name holds a list of them. Only what is written AS a word: one name may stand
+        /// for a member of an enum in one record and for a number in another (a threshold's
+        /// <c>from</c>), and reading the number as the text it prints as would call the digits a
+        /// stranger to the enum.</summary>
         private static IEnumerable<string> Words(JToken token, string field) =>
-            Leaves(token, field).Select(value => value.Value<string>()).OfType<string>();
+            Leaves(token, field)
+                .Where(value => value.Type == JTokenType.String)
+                .Select(value => value.Value<string>())
+                .OfType<string>();
 
         /// <summary>Every number written under one name anywhere in a document.</summary>
         private static IEnumerable<double> Numbers(JToken token, string field) =>
@@ -3240,6 +3253,309 @@ namespace LastBreathTest.BattleSystemTests
             if (holder[path[step]] is not { } child) yield break;
 
             foreach (string nested in ValuesAt(child, path, step + 1)) yield return nested;
+        }
+
+        /// <summary>What the reflector may still have to say about the DTOs of the standing wave — one
+        /// list for all of them, because it is empty for all of them: every record there is plain
+        /// properties the walk reads whole. A note appearing here is either a DTO to fix or a fact to
+        /// write down — never something to silence by widening the check.</summary>
+        private static readonly (string About, string Word)[] s_allowedStandingNotes = [];
+
+        /// <summary>
+        /// Every field of the standing wave a parser turns into an enum member, addressed the way the file
+        /// writes it. All of them are read strictly: a faction, a level or a value type naming no member
+        /// takes its whole file down at load, and a trader naming no faction loses that trader. The tool
+        /// has to offer the members rather than a text box, or the author types the miss himself.
+        /// </summary>
+        private static readonly (string Catalog, string Path, Type Members)[] s_standingChoices =
+        [
+            (DataCatalog.Traders, TradersCatalogDescriptor.FractionField, typeof(Fractions)),
+            (DataCatalog.ReputationDeeds, ReputationDeedsCatalogDescriptor.FloorField, typeof(RelationLevel)),
+            (DataCatalog.ReputationPerks, ReputationPerksCatalogDescriptor.IdField, typeof(RelationLevel)),
+            (DataCatalog.NpcBuffs,
+                $"{NpcBuffsCatalogDescriptor.ModifiersField}{PathSeparator}{NpcBuffsCatalogDescriptor.ParameterField}",
+                typeof(EntityParameter)),
+            (DataCatalog.NpcBuffs,
+                $"{NpcBuffsCatalogDescriptor.ModifiersField}{PathSeparator}{NpcBuffsCatalogDescriptor.ValueTypeField}",
+                typeof(ModifierValueType)),
+            (DataCatalog.NpcBuffs,
+                $"{NpcBuffsCatalogDescriptor.GrantsField}{PathSeparator}{NpcBuffsCatalogDescriptor.KindField}",
+                typeof(GrantKind)),
+            (DataCatalog.Factions,
+                $"{FactionsCatalogDescriptor.RelationsField}{PathSeparator}{FactionsCatalogDescriptor.FromField}",
+                typeof(Fractions)),
+            (DataCatalog.Factions,
+                $"{FactionsCatalogDescriptor.RelationsField}{PathSeparator}{FactionsCatalogDescriptor.ToField}",
+                typeof(Fractions)),
+            (DataCatalog.Factions,
+                $"{FactionsCatalogDescriptor.RelationsField}{PathSeparator}{FactionsCatalogDescriptor.LevelField}",
+                typeof(RelationLevel)),
+            (DataCatalog.Factions,
+                $"{FactionsCatalogDescriptor.ScaleField}{PathSeparator}{FactionsCatalogDescriptor.ThresholdsField}" +
+                $"{PathSeparator}{FactionsCatalogDescriptor.LevelField}",
+                typeof(RelationLevel)),
+            (DataCatalog.Factions,
+                $"{FactionsCatalogDescriptor.TraitsField}{PathSeparator}{FactionsCatalogDescriptor.FractionField}",
+                typeof(Fractions)),
+            (DataCatalog.Factions,
+                $"{FactionsCatalogDescriptor.DefaultsField}{PathSeparator}{FactionsCatalogDescriptor.FractionField}",
+                typeof(Fractions)),
+        ];
+
+        /// <summary>Every map of the wave whose KEYS are members of an enum rather than words the author
+        /// picks. A key naming no member is dropped with a report where the shelf is weighed and takes the
+        /// whole file down where the spawn ladders are read — either way it is a rule that never fires,
+        /// which is exactly what a picker instead of a text box prevents.</summary>
+        private static readonly (string Catalog, string Path, Type Members)[] s_standingMapKeys =
+        [
+            (DataCatalog.Traders,
+                $"{TradersCatalogDescriptor.RandomEquipField}{PathSeparator}{TradersCatalogDescriptor.RarityWeightsField}",
+                typeof(Rarity)),
+            (DataCatalog.NpcSpawnRolls, NpcSpawnRollsCatalogDescriptor.ModifiersField, typeof(EntityType)),
+            (DataCatalog.NpcSpawnRolls, NpcSpawnRollsCatalogDescriptor.AbilitiesField, typeof(EntityType)),
+            (DataCatalog.NpcSpawnRolls, NpcSpawnRollsCatalogDescriptor.RarityMultipliersField, typeof(Rarity)),
+        ];
+
+        /// <summary>
+        /// The keys the shipped files of the wave write that no field of a schema is written under, by the
+        /// catalog and the key. Two facts and not a leniency: a deed catalog states one tuning number
+        /// beside its records and the shape has room for sections of records only, and the spawn ladders
+        /// carry the author's own commentary in keys the reader ignores, json having no comments.
+        /// <para>Held as the whole list so that one arriving fails and one going away fails just as
+        /// loudly: a key the tool cannot place is a field the author is quietly locked out of.</para>
+        /// </summary>
+        private static readonly (string Catalog, string Key)[] s_standingUnknownKeys =
+        [
+            (DataCatalog.ReputationDeeds, ReputationDeedsCatalogDescriptor.WitnessRadiusField),
+            (DataCatalog.NpcSpawnRolls, "_comment"),
+            (DataCatalog.NpcSpawnRolls, "_formula"),
+            (DataCatalog.NpcSpawnRolls, "_seedWarning"),
+            (DataCatalog.NpcSpawnRolls, "_requiredFields"),
+            (DataCatalog.NpcSpawnRolls, "_modifiersNote"),
+            (DataCatalog.NpcSpawnRolls, "_abilitiesNote"),
+            (DataCatalog.NpcSpawnRolls, "_rarityNote"),
+        ];
+
+        /// <summary>A deed whose no-penalty floor names a rung of the ladder nobody wrote, beside two
+        /// deeds spelling their own fields right: the walk has to say the first and stay quiet about the
+        /// rest.</summary>
+        private const string ForgedDeedJson = """
+        {
+          "witnessRadius": 600,
+          "deeds": [
+            { "id": "Deed_Forged", "reputation": -50, "noPenaltyAtOrBelow": "Loathing" },
+            { "id": "Deed_Sound", "reputation": -50, "noPenaltyAtOrBelow": "Hostility" }
+          ]
+        }
+        """;
+
+        /// <summary>A trader weighing a rarity nobody wrote, beside a shelf whose own faction is spelled
+        /// right. The weight is a KEY and not a value — the half a walk reading only what is written
+        /// under a name would never see.</summary>
+        private const string ForgedTraderJson = """
+        {
+          "traders": [
+            {
+              "id": "Trader_Forged",
+              "fraction": "Human",
+              "catalog": [ { "itemId": "Crafting_Resource_Iron_Ore", "count": 1 } ],
+              "randomEquip": { "count": 1, "rarityWeights": { "Common": 50, "Mythical": 5 } }
+            }
+          ]
+        }
+        """;
+
+        /// <summary>The catalogs whose records stand in one array under one key: the shops, the deeds a
+        /// standing is moved by, the perks a standing buys and the buffs an npc modifier pulls. Each is
+        /// held to the same five facts — the shape, the key, the field a record is found by, whether
+        /// anything in it is worded for the player, and the one file it lives in.</summary>
+        [DataTestMethod]
+        [DataRow(DataCatalog.Traders, TradersCatalogDescriptor.RecordsKey, TradersCatalogDescriptor.IdField,
+            TradersCatalogDescriptor.FileName, true)]
+        [DataRow(DataCatalog.ReputationDeeds, ReputationDeedsCatalogDescriptor.RecordsKey,
+            ReputationDeedsCatalogDescriptor.IdField, ReputationDeedsCatalogDescriptor.FileName, false)]
+        [DataRow(DataCatalog.ReputationPerks, ReputationPerksCatalogDescriptor.RecordsKey,
+            ReputationPerksCatalogDescriptor.IdField, ReputationPerksCatalogDescriptor.FileName, false)]
+        [DataRow(DataCatalog.NpcBuffs, NpcBuffsCatalogDescriptor.RecordsKey, NpcBuffsCatalogDescriptor.IdField,
+            NpcBuffsCatalogDescriptor.FileName, false)]
+        public void AStandingCatalogIsOneArrayUnderAKeyOfItsOneFile(
+            string catalog, string recordsKey, string idField, string fileName, bool named)
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(catalog));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape, $"the {catalog} file is not read as one array under a key");
+            Assert.AreEqual(1, schema.Sections.Count, $"{catalog} states several sections where its file holds one");
+            Assert.AreEqual(recordsKey, schema.Sections[0].Key, $"the records of {catalog} are read from another key");
+            Assert.AreEqual(idField, schema.Sections[0].Record.IdField, $"a record of {catalog} is found by another field");
+            Assert.AreNotEqual(0, schema.Sections[0].Record.Fields.Count, $"the {catalog} record was read with no fields at all");
+            CollectionAssert.AreEqual(
+                named ? new[] { LocalizedKeyAttribute.NoSuffix } : [],
+                schema.LocalizedSuffixes.ToArray(),
+                $"{catalog} words another part of itself for the player than it is read for");
+            Assert.AreEqual(fileName, schema.Placement.FileFor(_ => null), $"the {catalog} catalog names another file");
+            CollectionAssert.AreEqual(
+                new[] { fileName },
+                ShippedFiles(catalog).Select(Path.GetFileNameWithoutExtension).ToArray(),
+                $"the {catalog} catalog ships other files than the one its placement names");
+
+            Unexpected(builder.Reflection.Notes, s_allowedStandingNotes, builder.Reflection);
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled {catalog} catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>The shipped files of the wave read back through their schemas: every key they write is
+        /// one the schema ranks, save the two known cases, and the canonical write loses nothing.</summary>
+        [TestMethod]
+        public void EveryStandingCatalogRanksEveryKeyItsShippedFileWritesBarTheKnownOnes()
+        {
+            List<string> named = [];
+
+            foreach (string catalog in s_standingCatalogs)
+                named.AddRange(UnknownKeys(Schema(catalog), catalog).Select(LastKey).Distinct(StringComparer.Ordinal)
+                    .Select(key => Named(catalog, key)));
+
+            named.Sort(StringComparer.Ordinal);
+            Report("Keys the shipped standing files write that no field of a schema is written under", named);
+
+            CollectionAssert.AreEquivalent(
+                s_standingUnknownKeys.Select(known => Named(known.Catalog, known.Key)).ToArray(),
+                named.ToArray(),
+                $"the shipped files write other unplaceable keys than the known ones:{Environment.NewLine}  "
+                + string.Join($"{Environment.NewLine}  ", named));
+        }
+
+        /// <summary>Every word a parser of the wave turns into an enum member, said so in the schema and
+        /// held against what the shipped file writes. An unmarked one reads to the tool as free text: the
+        /// author types a name nothing answers, and the miss surfaces as a dropped record at load.</summary>
+        [TestMethod]
+        public void EveryStandingChoiceOffersItsMembersAndTheShippedFilesStayInThem()
+        {
+            foreach ((string catalog, string path, Type members) in s_standingChoices)
+            {
+                CatalogSchema schema = Schema(catalog);
+                Choice(Leaf(Locate(schema.Sections[0].Record, path)), members);
+
+                List<string> written = [.. Words(Root(schema, catalog), LastSegment(path))];
+
+                Assert.AreNotEqual(0, written.Count, $"the shipped {catalog} file writes no '{path}' — the check is checking nothing");
+                CollectionAssert.AreEqual(
+                    Array.Empty<string>(),
+                    Strangers(written, members).ToArray(),
+                    $"the shipped {catalog} file writes something other than a {members.Name} at '{path}'");
+            }
+        }
+
+        /// <summary>Every map of the wave whose keys are enum members, said so in the schema and held
+        /// against what the shipped file keys it by.</summary>
+        [TestMethod]
+        public void EveryStandingMapOffersItsKeysAndTheShippedFilesStayInThem()
+        {
+            foreach ((string catalog, string path, Type members) in s_standingMapKeys)
+            {
+                CatalogSchema schema = Schema(catalog);
+                FieldSchema map = Locate(schema.Sections[0].Record, path);
+
+                Assert.AreEqual(FieldKind.Dictionary, map.Kind, $"'{catalog}.{path}' is not a map");
+                Choice(
+                    map.Key ?? throw new AssertFailedException($"'{catalog}.{path}' lets the author write its keys freely"),
+                    members);
+
+                List<string> written = [.. Keys(Root(schema, catalog), LastSegment(path))];
+
+                Assert.AreNotEqual(0, written.Count, $"the shipped {catalog} file keys nothing under '{path}' — the check is checking nothing");
+                CollectionAssert.AreEqual(
+                    Array.Empty<string>(),
+                    Strangers(written, members).ToArray(),
+                    $"the shipped {catalog} file keys '{path}' by something other than a {members.Name}");
+            }
+        }
+
+        /// <summary>
+        /// What a shelf sells and what a buff hands over: the two references of the wave, said so in the
+        /// schema. The shelf answers from exactly where a kill's drop does — a shop resolves an equipment
+        /// template through the minter and everything else out of the item store, which is the same store
+        /// a drop is copied from — so the targets are one list and not two copies of one.
+        /// </summary>
+        [TestMethod]
+        public void TheShelfAndTheBuffNameWhatTheyHandOver()
+        {
+            string good = $"{TradersCatalogDescriptor.ShelfField}{PathSeparator}{TradersCatalogDescriptor.GoodField}";
+            FieldSchema sold = Leaf(Locate(Schema(DataCatalog.Traders).Sections[0].Record, good));
+
+            Assert.AreEqual(FieldKind.Reference, sold.Kind, $"'{good}' names nothing");
+            Assert.IsFalse(sold.AllowEmpty, $"'{good}' may be left empty, which is a seat on the shelf selling nothing");
+            CollectionAssert.AreEquivalent(
+                s_dropTargets,
+                sold.RefTargets.ToArray(),
+                $"'{good}' points somewhere other than where sellable things are written: {string.Join(", ", sold.RefTargets)}");
+
+            string granted = $"{NpcBuffsCatalogDescriptor.GrantsField}{PathSeparator}{NpcBuffsCatalogDescriptor.IdField}";
+            RecordSchema buff = Schema(DataCatalog.NpcBuffs).Sections[0].Record;
+
+            foreach (string catalog in new[] { DataCatalog.PassiveSkills, DataCatalog.Effects })
+                Points(Leaf(Locate(buff, granted)), granted, catalog, WholeCatalog);
+
+            FieldSchema properties = Locate(
+                buff, $"{NpcBuffsCatalogDescriptor.GrantsField}{PathSeparator}{NpcBuffsCatalogDescriptor.PropertiesField}");
+            Assert.AreEqual(FieldKind.Dictionary, properties.Kind, $"'{NpcBuffsCatalogDescriptor.PropertiesField}' is not a map");
+            Assert.IsNull(properties.Key, "the payload's keys are the grant factory's own, and the schema offers a list of them");
+        }
+
+        /// <summary>The first mutation: a deed floored at a rung of the ladder nobody wrote. The parser
+        /// reads that word strictly and takes the whole catalog down with it, so nothing in the game says
+        /// which deed did it — while the two deeds spelling their own right have to stay unremarked.</summary>
+        [TestMethod]
+        public void ADeedFlooredAtALevelNobodyNamed_IsCaught()
+        {
+            List<string> written = [.. Words(JsonTreeDocument.Parse(ForgedDeedJson).Root, ReputationDeedsCatalogDescriptor.FloorField)];
+            List<string> strangers = Strangers(written, typeof(RelationLevel));
+
+            Assert.AreEqual(2, written.Count, "the forged deeds write another number of floors than the walk read");
+            CollectionAssert.AreEqual(new[] { "Loathing" }, strangers.ToArray(),
+                $"a deed floored at a rung nobody wrote went unnoticed: {string.Join(", ", strangers)}");
+        }
+
+        /// <summary>The second mutation, on the other half of a document: a rarity nobody wrote standing as
+        /// the KEY of a weight. The shelf drops that weight with a report and rolls on without it, so the
+        /// author gets the mix he never asked for and no error at all.</summary>
+        [TestMethod]
+        public void ATraderWeighingARarityNobodyNamed_IsCaught()
+        {
+            JToken root = JsonTreeDocument.Parse(ForgedTraderJson).Root;
+            List<string> keyed = [.. Keys(root, TradersCatalogDescriptor.RarityWeightsField)];
+            List<string> sold = [.. Words(root, TradersCatalogDescriptor.FractionField)];
+
+            Assert.AreEqual(2, keyed.Count, "the forged trader weighs another number of rarities than the walk read");
+            CollectionAssert.AreEqual(new[] { "Mythical" }, Strangers(keyed, typeof(Rarity)).ToArray(),
+                "a weight keyed by a rarity nobody wrote went unnoticed");
+            CollectionAssert.AreEqual(Array.Empty<string>(), Strangers(sold, typeof(Fractions)).ToArray(),
+                "the walk called the forged trader's own faction a stranger");
+        }
+
+        /// <summary>The catalogs of the standing wave, named once: the shops, the deeds, the perks, the
+        /// buffs, the faction ledger and the spawn ladders.</summary>
+        private static readonly string[] s_standingCatalogs =
+        [
+            DataCatalog.Traders,
+            DataCatalog.ReputationDeeds,
+            DataCatalog.ReputationPerks,
+            DataCatalog.NpcBuffs,
+            DataCatalog.Factions,
+            DataCatalog.NpcSpawnRolls
+        ];
+
+        /// <summary>The words of a document that name no member of the enum they were written for, each of
+        /// them once and in one order. One walk for the shipped files and for the forged ones: a check
+        /// whose mutation is caught by other code than the one holding the data proves nothing about
+        /// it.</summary>
+        private static List<string> Strangers(IEnumerable<string> written, Type members)
+        {
+            HashSet<string> named = [.. Enum.GetNames(members)];
+
+            return [.. written.Where(word => !named.Contains(word)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
         }
     }
 }

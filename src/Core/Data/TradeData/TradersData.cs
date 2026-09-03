@@ -1,7 +1,11 @@
 namespace Core.Data.TradeData
 {
     using System.Collections.Generic;
+    using CraftingData;
+    using Enums;
+    using GameData;
     using Newtonsoft.Json;
+    using Schema;
 
     public record TradersData
     {
@@ -15,7 +19,7 @@ namespace Core.Data.TradeData
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
 
         /// <summary>Faction whose standing prices the shop (reputation multipliers + perks).</summary>
-        [JsonProperty("fraction")] public string Fraction { get; init; } = string.Empty;
+        [JsonProperty("fraction")][EnumOf(typeof(Fractions))] public string Fraction { get; init; } = string.Empty;
 
         /// <summary>Game minutes between restocks (at default clock speed one real second = one game minute).</summary>
         [JsonProperty("restockGameMinutes")] public float RestockGameMinutes { get; init; } = 1440f;
@@ -27,6 +31,15 @@ namespace Core.Data.TradeData
 
     public record TraderCatalogEntryData
     {
+        /// <summary>Names one thing to put on the shelf, out of every catalog a sellable thing is written
+        /// in: the shop resolves an equipment template through the minter and everything else out of the
+        /// item store, so any one of them knowing the id fills the seat. In the resources that is the two
+        /// sections holding things — a material category is what a resource belongs to, never a good.</summary>
+        [CatalogRef(DataCatalog.EquipItems)]
+        [CatalogRef(DataCatalog.Items)]
+        [CatalogRef(DataCatalog.Recipes)]
+        [CatalogRef(DataCatalog.Resources, Section = ResourcesData.UpgradeResourcesSection)]
+        [CatalogRef(DataCatalog.Resources, Section = ResourcesData.CraftingResourcesSection)]
         [JsonProperty("itemId")] public string ItemId { get; init; } = string.Empty;
         [JsonProperty("count")] public int Count { get; init; } = 1;
 
@@ -39,6 +52,6 @@ namespace Core.Data.TradeData
         [JsonProperty("count")] public int Count { get; init; }
 
         /// <summary>Rarity roll weights for the minted pieces (keys = Rarity names).</summary>
-        [JsonProperty("rarityWeights")] public Dictionary<string, float> RarityWeights { get; init; } = [];
+        [JsonProperty("rarityWeights")][DictionaryKey(typeof(Rarity))] public Dictionary<string, float> RarityWeights { get; init; } = [];
     }
 }

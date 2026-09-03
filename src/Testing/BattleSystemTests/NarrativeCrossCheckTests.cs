@@ -44,17 +44,16 @@ namespace LastBreathTest.BattleSystemTests
         /// nothing else: the wording of a message is the tool's to improve, while the sort of thing and
         /// the place it is in are the fact.
         /// </summary>
-        /// <remarks>A row is taken out when the data is fixed, never to quiet a run. The four here are the
+        /// <remarks>A row is taken out when the data is fixed, never to quiet a run. The two here are the
         /// tool's own gap and not the author's: no descriptor is written for those catalogs
-        /// (<c>CatalogDescriptors.NotYetDescribed</c>), so every item, trader, deed and npc-modifier id
-        /// the narrative names is left unanswered rather than called broken. Describing them turns these
-        /// four rows into real answers with nothing else to change.</remarks>
+        /// (<c>CatalogDescriptors.NotYetDescribed</c>), so every item and npc-modifier id the narrative
+        /// names is left unanswered rather than called broken. Describing them turns these two rows into
+        /// real answers with nothing else to change — as describing the traders and the deeds already
+        /// has: the shop a dialogue opens and the deed it publishes are now answered, not passed over.</remarks>
         private static readonly (NarrativeFindingKind Kind, string Where)[] s_known =
         [
             (NarrativeFindingKind.UndescribedTarget, "Items"),
             (NarrativeFindingKind.UndescribedTarget, "NpcModifiers"),
-            (NarrativeFindingKind.UndescribedTarget, "ReputationDeeds"),
-            (NarrativeFindingKind.UndescribedTarget, "Traders"),
         ];
 
         private static NarrativeCheckReport s_report = null!;
