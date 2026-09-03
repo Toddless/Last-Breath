@@ -1,5 +1,12 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из отказа провайдера на провальный исход у canFail:false (2026-09-03; accept)
+
+- (nit) `src/Core/Narrative/Quests/QuestLogService.cs:348-349` — `if (!Fail(...))` печатает причину, которую `Fail` не сообщает (четыре повода вернуть false); честнее `if (!quest.CanFail) TrackError` перед `Fail`; формулировка с повтором «outcome … failing outcome» и двумя двоеточиями — привести к форме соседей.
+- (nit, док) `src/Core/Data/QuestData/QuestsData.cs:79-80` — док DTO у `fails` не говорит про требование `canFail: true` (сказано только на рантайм-записи).
+- (знать) ветка `TrackError` в `ReachOutcome` и клауза `OutcomeId == null` в `EvaluateQuest` без покрытия после замены теста (состояние недостижимо через провайдер).
+
+
 ## Из подключения локализации к хосту нарратива (2026-09-03; accept with minors) — minor'ы раздела «Из скелета NarrativeEditor» (двойной Refresh, (not a list)/outcome, опция без key, failNext, заметки чужих каталогов, страж инспектора, `_tree`, перевод из TranslationServer) закрыты
 
 - (minor) `src/Tooling/NarrativeEditor/Source/View/NarrativeRoot.cs:264,273-278` — `Same(null, null)` = true → `Rebuild(null)` не зовётся никогда: при пустых каталогах инспектор — голый прямоугольник вместо «nothing selected»; посеять `_inspector.Rebuild(null)` в `BuildBody`.
