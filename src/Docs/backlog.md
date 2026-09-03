@@ -1,5 +1,13 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из статического словаря нарратива (2026-09-03; accept with minors)
+
+- (minor, док) `src/Tooling/NarrativeEditor/Source/App/GameNarrative.cs:19-21` — ремарка утверждает, что словарь вне игры перечислить нельзя; теперь `NarrativeSchemas.Conditions()/Actions()` читают его без игры — переписать одной строкой (условия/действия пока рисуются сырым json).
+- (minor) `src/Core/Narrative/Conditions/CompositeConditions.cs:26` — `ConditionsKey` расширен до `protected` без нужды; вернуть `private`.
+- (minor, порядок) `NarrativeVocabulary.cs:14-15` обещает порядок регистрации игры, но тест сравнивает множества, потому что `NarrativeTestFactories.Actions` ставит `GrantTreePoints` раньше `StartTrade`/`SpawnNpc` (игра — после); поправить тестовое зеркало под `GameServiceProvider:200-208` и сравнивать `AreEqual`.
+- (minor, дубль ×3) `NarrativeVocabularyTests.cs:136-138` — рефлексивный обход фабрик повторяет `NarrativeConditionSchemaTests:78-79`/`ActionSchemaTests:105-106`; `NarrativeTestFactories.FactoriesInCore<T>()`.
+- (nit) `DeclaredSpecs` делает `yield break` после `Spec` (тип с обоими `Spec`/`SpecFor` проверится наполовину); xml-док реестра на 8 строк; отчёт занизил счётчик (22, не 21).
+
 ## Из локализации в инспекторе (2026-09-03; rework → accept)
 
 - (карточка) undo правки id не откатывает переименование ключей .po — теперь только предупреждение в статусе; нужен либо шаг .po в общую историю, либо журнал переименований, отматываемый вместе с json.
