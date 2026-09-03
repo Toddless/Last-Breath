@@ -1,5 +1,14 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из описателя Abilities (2026-09-03; accept with minors)
+
+- (minor, комментарий врёт) `src/Tooling/LastBreath.Descriptors/AbilitiesCatalogDescriptor.cs:61` (+ `CatalogDescriptorTests.cs:1103,1125,1468`) — комментарий утверждает порядок форм «как читает правило, от узкого», а `AugmentFit.CheckBinding` читает `fitsAnyAbility` → `abilityId` → теги; безопасно только благодаря `ContradictoryDeclaration`. Сказать факт: несущий только `tags` — последним, порядок первых двух выбран для инспектора.
+- (КОНТРАКТ, второй случай) `AbilitiesCatalogDescriptor.cs:72-77` — обе секции с `IdField = "id"` → `ReferenceIndex` для каталога Abilities отдаёт 25 способностей ∪ 97 аугментов: пикер `abilityId`/`abilities[]` у NPC предлагает `Augment_*` и считает их валидными. Первый случай — `MaterialData.categoryId` → секция `materialCategories`. Решение ведущего: завести секционно-ограниченную ссылку `CatalogRef(catalog, section)` в разметке, рефлекторе, `ReferenceIndex` и пикере — отдельной задачей.
+- (minor, док) `AugmentForms.cs:30-34` — форма «универсальный» надевается наличием ключа, а игра читает значение: переключение в форму впишет `"fitsAnyAbility": false`, и запись привяжется тегами; строка в xml-доке формы.
+- (nit) `Shape(key, record)` продублирован в `AbilitiesCatalogDescriptor.cs:83` и `LootTablesCatalogDescriptor.cs:72` — общий `internal static` в адаптере; `tier` без `[Range]` (максимум живёт в `NodeKindRules` без именованной константы).
+- (ДАННЫЕ → владельцу) `BaseAbilityData.json`: enum'ы секции `abilities` записаны числами (`stance` 0/1/2, `costType` 1, `targetType` 0/2), а `minRarity`/`maxRarity` у аугментов — именами; первый сейв из тула перепишет числа именами (десериализатор читает оба вида — проверено). Все 97 аугментов пишут `tags`, 45 — рядом с более сильным ключом (31 из них `"tags": []`).
+- (контракт, вход для решения) три оси аугмента (форма значений, `effectId`/`effectPool`, поведение) описаны плоско — `VariantSet` одноосевой; `tags`/`grantsTags` и ключи `upgradeProperties`/`rarityLadder` (имена `AbilityParameter` — класс констант, не enum) размечать нечем.
+
 ## Из полировки хоста 2 (2026-09-03; accept with minors) — предыдущий раздел «Из создания/дубля/удаления записей» закрыт этой задачей, кроме отмеченного ниже
 
 - (minor) `src/Tooling/DataEditor/Source/View/EditorRoot.cs:550` — обнуление `_touched` в `ShowCatalog` закрыло undo чужого каталога, но при возврате в каталог после удаления единственной записи `Stepped` = null: удаление неотменяемо из интерфейса, Ctrl+S его запишет. Стало: `Stepped => _record?.File.Document ?? (Owns(_touched) ? _touched : null)`, `Owns(doc) => _catalog?.Files.Any(f => ReferenceEquals(f.Document, doc)) == true`.
