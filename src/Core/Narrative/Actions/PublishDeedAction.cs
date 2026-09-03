@@ -31,12 +31,12 @@ namespace Core.Narrative.Actions
         private const string TypeName = "Deed";
         private const string DeedIdKey = "deedId";
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Text(DeedIdKey, required: true, DataCatalog.ReputationDeeds));
 
         public string Type => TypeName;
 
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {

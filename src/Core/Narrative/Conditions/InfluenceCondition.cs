@@ -14,12 +14,12 @@ namespace Core.Narrative.Conditions
         private const string AtLeastKey = "atLeast";
         private const int DefaultAtLeast = 0;
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Integer(AtLeastKey, DefaultAtLeast));
 
         public string Type => TypeName;
 
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser) =>
             new InfluenceCondition(mastery, json.Value<int?>(AtLeastKey) ?? DefaultAtLeast);

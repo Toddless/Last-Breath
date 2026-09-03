@@ -154,7 +154,7 @@ namespace Core.Narrative.Actions
         private const string PointIdKey = "pointId";
         private const string ModifiersKey = "modifiers";
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Text(NpcIdKey, required: true, DataCatalog.Npc),
             NarrativeParameterSchema.FreeText(PointIdKey, required: true),
             NarrativeParameterSchema.References(ModifiersKey, DataCatalog.NpcModifiers));
@@ -164,7 +164,7 @@ namespace Core.Narrative.Actions
         /// <summary>The point is named by a scene's own spawn point and no catalog holds those ids. The
         /// modifiers list carries no default: absent leaves the record's own roll standing, while the
         /// property present names the exact set, an empty array included.</summary>
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {

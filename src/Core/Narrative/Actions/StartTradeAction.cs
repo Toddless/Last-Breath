@@ -17,12 +17,12 @@ namespace Core.Narrative.Actions
         private const string TypeName = "StartTrade";
         private const string TraderIdKey = "traderId";
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Text(TraderIdKey, required: true, DataCatalog.Traders));
 
         public string Type => TypeName;
 
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {

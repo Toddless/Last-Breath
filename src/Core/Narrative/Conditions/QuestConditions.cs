@@ -22,14 +22,14 @@ namespace Core.Narrative.Conditions
         private const string StatusKey = "status";
         private const string NotTakenStatus = "NotTaken";
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             QuestIdParameter.Field,
             NarrativeParameterSchema.Choice(StatusKey, required: true, [.. Enum.GetNames<QuestStatus>(), NotTakenStatus]));
 
         public string Type => TypeName;
 
         /// <summary>The offered statuses are the enum's plus the absence of one.</summary>
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {
@@ -56,11 +56,11 @@ namespace Core.Narrative.Conditions
     {
         private const string TypeName = "CanAcceptQuest";
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName, QuestIdParameter.Field);
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName, QuestIdParameter.Field);
 
         public string Type => TypeName;
 
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser) =>
             QuestIdParameter.Require(json, Type) is { } questId ? new CanAcceptQuestCondition(log, questId) : null;
@@ -75,11 +75,11 @@ namespace Core.Narrative.Conditions
     {
         private const string TypeName = "CanTurnInQuest";
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName, QuestIdParameter.Field);
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName, QuestIdParameter.Field);
 
         public string Type => TypeName;
 
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser) =>
             QuestIdParameter.Require(json, Type) is { } questId ? new CanTurnInQuestCondition(log, questId) : null;

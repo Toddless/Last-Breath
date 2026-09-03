@@ -23,12 +23,16 @@ namespace Core.Narrative.Conditions
 
     public abstract class CompositeConditionFactory : INarrativeConditionFactory
     {
-        private const string ConditionsKey = "conditions";
+        protected const string ConditionsKey = "conditions";
 
         public abstract string Type { get; }
 
-        /// <summary>Built once per factory: the shape is the same for every composite, the name is not.</summary>
-        public NarrativeRecordSpec Parameters => field ??= NarrativeParameterSchema.Of(Type, NarrativeParameterSchema.Conditions(ConditionsKey));
+        public abstract NarrativeRecordSpec Parameters { get; }
+
+        /// <summary>The shape is the same for every composite, the name is not: each one declares its own
+        /// spec through this, so the vocabulary names the object rather than building one.</summary>
+        protected static NarrativeRecordSpec SpecFor(string type) =>
+            NarrativeParameterSchema.Of(type, NarrativeParameterSchema.Conditions(ConditionsKey));
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {
@@ -51,13 +55,27 @@ namespace Core.Narrative.Conditions
 
     public class AllOfConditionFactory : CompositeConditionFactory
     {
-        public override string Type => "AllOf";
+        private const string TypeName = "AllOf";
+
+        public static readonly NarrativeRecordSpec Spec = SpecFor(TypeName);
+
+        public override string Type => TypeName;
+
+        public override NarrativeRecordSpec Parameters => Spec;
+
         protected override INarrativeCondition Build(List<INarrativeCondition> children) => new AllOfCondition(children);
     }
 
     public class AnyOfConditionFactory : CompositeConditionFactory
     {
-        public override string Type => "AnyOf";
+        private const string TypeName = "AnyOf";
+
+        public static readonly NarrativeRecordSpec Spec = SpecFor(TypeName);
+
+        public override string Type => TypeName;
+
+        public override NarrativeRecordSpec Parameters => Spec;
+
         protected override INarrativeCondition Build(List<INarrativeCondition> children) => new AnyOfCondition(children);
     }
 
@@ -66,12 +84,12 @@ namespace Core.Narrative.Conditions
         private const string TypeName = "Not";
         private const string ConditionKey = "condition";
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Condition(ConditionKey));
 
         public string Type => TypeName;
 
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {

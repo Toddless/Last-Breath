@@ -16,13 +16,13 @@ namespace Core.Narrative.Conditions
         private const string FactionKey = "faction";
         private const string AtLeastKey = "atLeast";
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Enum<Fractions>(FactionKey),
             NarrativeParameterSchema.Enum<RelationLevel>(AtLeastKey));
 
         public string Type => TypeName;
 
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser) =>
             new FactionStandingCondition(relations,

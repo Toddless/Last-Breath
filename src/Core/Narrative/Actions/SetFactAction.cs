@@ -20,14 +20,14 @@ namespace Core.Narrative.Actions
         private const string CountKey = "count";
         private const int DefaultCount = 1;
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Text(FactKey, required: true),
             NarrativeParameterSchema.Integer(CountKey, DefaultCount));
 
         public string Type => TypeName;
 
         /// <summary>The same free-form key the Fact condition reads back, declared the same way.</summary>
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {

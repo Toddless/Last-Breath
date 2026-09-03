@@ -13,14 +13,14 @@ namespace Core.Narrative.Actions
         private const string TypeName = "AddInfluenceExp";
         private const string AmountKey = "amount";
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Integer(AmountKey, required: true));
 
         public string Type => TypeName;
 
         /// <summary>Only a positive amount is read: a missing one and a zero are the same entry, one
         /// that hands out nothing.</summary>
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {

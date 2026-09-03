@@ -13,13 +13,13 @@ namespace Core.Narrative.Actions
     {
         private const string TypeName = "TakeItem";
 
-        private static readonly NarrativeRecordSpec s_parameters =
+        public static readonly NarrativeRecordSpec Spec =
             NarrativeParameterSchema.Of(TypeName, ItemReference.Field, ItemReference.AmountField);
 
         public string Type => TypeName;
 
         /// <summary>The bag is emptied by raw id, the same id the giving side mints by.</summary>
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser) =>
             ItemReference.Require(json, TypeName) is { } itemId

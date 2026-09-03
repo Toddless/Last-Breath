@@ -1,6 +1,8 @@
 namespace Core.Narrative.Actions
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Conditions;
     using Newtonsoft.Json.Linq;
     using Quests;
@@ -32,11 +34,21 @@ namespace Core.Narrative.Actions
 
     public class QuestActionFactory(Func<IQuestLogService> log, QuestActionKind kind) : INarrativeActionFactory
     {
-        public string Type => $"{kind}Quest";
+        /// <summary>What every kind's discriminator ends in: the kind names the verb, this names the noun.</summary>
+        private const string TypeSuffix = "Quest";
 
-        /// <summary>Built once per factory: all four kinds are addressed by the one quest reference the
-        /// conditions read back, and only the name under which it is declared differs.</summary>
-        public NarrativeRecordSpec Parameters => field ??= NarrativeParameterSchema.Of(Type, QuestIdParameter.Field);
+        private static readonly Dictionary<QuestActionKind, NarrativeRecordSpec> s_specs =
+            Enum.GetValues<QuestActionKind>().ToDictionary(action => action,
+                action => NarrativeParameterSchema.Of(TypeNameFor(action), QuestIdParameter.Field));
+
+        public string Type => TypeNameFor(kind);
+
+        public NarrativeRecordSpec Parameters => SpecFor(kind);
+
+        /// <summary>All four kinds are addressed by the one quest reference the conditions read back, and
+        /// only the name under which it is declared differs. Declared per kind rather than per factory, so
+        /// the vocabulary names the same object the registered factory hands out.</summary>
+        public static NarrativeRecordSpec SpecFor(QuestActionKind kind) => s_specs[kind];
 
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {
@@ -46,5 +58,7 @@ namespace Core.Narrative.Actions
             Tracker.TrackError($"{Type} action: {QuestIdParameter.Key} is required");
             return null;
         }
+
+        private static string TypeNameFor(QuestActionKind kind) => $"{kind}{TypeSuffix}";
     }
 }

@@ -27,12 +27,12 @@ namespace Core.Narrative.Actions
         private const string TypeName = "GrantTreePoints";
         private const string AmountKey = "amount";
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Integer(AmountKey, required: true));
 
         public string Type => TypeName;
 
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         /// <summary>The amount is read as a whole number and nothing else: a quoted or fractional
         /// amount is a typo in an entry that hands out a budget, and a budget silently rounded down

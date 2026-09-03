@@ -30,7 +30,7 @@ namespace Core.Narrative.Conditions
         private const string AtLeastKey = "atLeast";
         private const int DefaultAtLeast = 0;
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Choice(AttributeKey, required: true,
                 nameof(AttributeType.Strength), nameof(AttributeType.Dexterity), nameof(AttributeType.Intelligence)),
             NarrativeParameterSchema.Integer(AtLeastKey, DefaultAtLeast));
@@ -39,7 +39,7 @@ namespace Core.Narrative.Conditions
 
         /// <summary>Only the three attributes an entity carries are offered: the condition resolves any
         /// other member of the enum to nothing and is then never met.</summary>
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser) =>
             new AttributeCondition(playerAccessor,

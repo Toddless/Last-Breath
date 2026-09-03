@@ -16,13 +16,13 @@ namespace Core.Narrative.Conditions
         private const string CountKey = "count";
         private const int DefaultCount = 1;
 
-        private static readonly NarrativeRecordSpec s_parameters = NarrativeParameterSchema.Of(TypeName,
+        public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
             NarrativeParameterSchema.Text(FactKey, required: true),
             NarrativeParameterSchema.Integer(CountKey, DefaultCount));
 
         public string Type => TypeName;
 
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {

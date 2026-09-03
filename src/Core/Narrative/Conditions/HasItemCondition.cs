@@ -20,12 +20,12 @@ namespace Core.Narrative.Conditions
         private const string AmountKey = ItemReference.AmountKey;
         private const int DefaultAmount = ItemReference.DefaultAmount;
 
-        private static readonly NarrativeRecordSpec s_parameters =
+        public static readonly NarrativeRecordSpec Spec =
             NarrativeParameterSchema.Of(TypeName, ItemReference.Field, ItemReference.AmountField);
 
         public string Type => TypeName;
 
-        public NarrativeRecordSpec Parameters => s_parameters;
+        public NarrativeRecordSpec Parameters => Spec;
 
         public INarrativeCondition? Create(JObject json, INarrativeConditionParser parser)
         {
