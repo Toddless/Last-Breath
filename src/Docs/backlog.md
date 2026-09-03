@@ -22,8 +22,6 @@
 
 ## Из создания/дубля/удаления записей и пикера ссылок (2026-09-03; accept with minors после доработки)
 
-- (minor) `EditorRoot.cs:718` — `record.CurrentId` читается после удаления (аргументы слева направо) → статус называет старое имя переименованной записи; снять имя до вызова.
-- (minor) `EditorRoot.cs:904` — `×` включена для `RootShape.Single`, отказ не той причиной; гасить как `⧉`.
 - (уточнение отчёта) тест `RemoveRecord_LeavesTheStepOnTheFileTheRecordWasTakenFrom` пинит доменную посылку, а не хостовую логику `_touched` — регрессия хоста тестами не ловится.
 - (nit) `InspectorPanel.cs:330-335` док `Box` противоречит `ReferenceBox`; `Reread` на каждый `Refresh` и полный обход индекса ссылок на символ (`ReferenceIndex.cs:177`) — инвалидация по каталогу; «имя файла без расширения» тремя выражениями — `CatalogFile.BaseName`; после undo удаления запись не выбирается; xml-доки абзацами (`CatalogEditing.cs:11-14,34-41,241-244,257-261`, `CatalogView.cs:28-31`, `EditorRoot.cs:152-155,873-876`); `CatalogEditingTests.cs:408` `Mythic*Modifiers` — на POSIX не упадёт.
 
