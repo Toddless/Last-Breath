@@ -1,5 +1,11 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из нормализации диапазонов экипировки (2026-09-03; accept)
+
+- (minor) `src/Testing/BattleSystemTests/EquipItemDataFormAuditTests.cs:57-58` — `Bounded` принимает `Integer or Float` для обеих записей, а `LevelRangeDataConverter.TryReadBound` берёт только `Integer`: `{"min": 0.0, "max": 2}` пройдёт аудит и выкинет предмет на загрузке. Стало: род границы следует за записью (пара «запись → допустимый род» рядом с `s_rangeRecords`).
+- (nit) имена границ `min`/`max` в четырёх местах (два конвертера, два теста); `<para>` теста на четыре строки.
+- (знать) в `ModifierPools` диапазоны и так объектные; аудит сторожит только `EquipItems`.
+
 ## Из отказа провайдера на провальный исход у canFail:false (2026-09-03; accept)
 
 - (nit) `src/Core/Narrative/Quests/QuestLogService.cs:348-349` — `if (!Fail(...))` печатает причину, которую `Fail` не сообщает (четыре повода вернуть false); честнее `if (!quest.CanFail) TrackError` перед `Fail`; формулировка с повтором «outcome … failing outcome» и двумя двоеточиями — привести к форме соседей.
