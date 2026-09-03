@@ -1,5 +1,15 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из создания/дубля/удаления записей и пикера ссылок (2026-09-03; accept with minors после доработки)
+
+- (minor) `src/Tooling/DataEditor/Source/View/EditorRoot.cs:508` — `_touched` переживает смену каталога: после удаления единственной записи A и переходе в пустой каталог B Ctrl+Z уезжает в A. Стало: `ShowCatalog` обнуляет `_touched`.
+- (minor) `EditorRoot.cs:718` — `record.CurrentId` читается после удаления (аргументы слева направо) → статус называет старое имя переименованной записи; снять имя до вызова.
+- (minor) `EditorRoot.cs:904` — `×` включена для `RootShape.Single`, отказ не той причиной; гасить как `⧉`.
+- (minor, функция) `EditorRoot.cs:660-672` — для `FreeFilePlacement` пикер файла предлагает только существующие файлы; новый файл пулов из хоста создать нельзя, пустая папка free-каталога — тупик. Стало: редактируемая строка файла (`LineEdit` + подсказка существующих).
+- (minor, док) `src/Tooling/DataEditor/README.md:7-8` — «только чтение… правок и сохранения нет» — устарело: правка полей, история на файл, три жеста над записями, пикер ссылок.
+- (уточнение отчёта) тест `RemoveRecord_LeavesTheStepOnTheFileTheRecordWasTakenFrom` пинит доменную посылку, а не хостовую логику `_touched` — регрессия хоста тестами не ловится.
+- (nit) `InspectorPanel.cs:330-335` док `Box` противоречит `ReferenceBox`; `Reread` на каждый `Refresh` и полный обход индекса ссылок на символ (`ReferenceIndex.cs:177`) — инвалидация по каталогу; «имя файла без расширения» тремя выражениями — `CatalogFile.BaseName`; после undo удаления запись не выбирается; xml-доки абзацами (`CatalogEditing.cs:11-14,34-41,241-244,257-261`, `CatalogView.cs:28-31`, `EditorRoot.cs:152-155,873-876`); `CatalogEditingTests.cs:408` `Mythic*Modifiers` — на POSIX не упадёт.
+
 ## Из разворота зависимости, шаг 3: спеки нарратива в Core (2026-09-02; accept)
 
 - (nit) `src/Core/Narrative/NarrativeParameterSpec.cs:15` — вид назван `Choice`, не `Enum` (коллизия с хелпером `Enum<T>`), в отчёте отступление не названо; `:35` — `JsonName` без гуарда пустой строки (держится хелпером и пином ключей); `:46,49` — `Choices`/`Catalogs` как `IReadOnlyList<string>` сравниваются по ссылке, равенство record не контентное (латентно). `LastBreath.Descriptors/NarrativeSchemas.cs:47-56` — `Default` протекает на составные виды (рефлектор обнуляет для Array/Object); `:20,24,27` — нет `ArgumentNullException.ThrowIfNull`. `NarrativeSchemaAdapterTests.cs:118` — декоративный `IsNotNull`.
