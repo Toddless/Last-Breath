@@ -1,5 +1,12 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из единого источника ссылок на предмет (2026-09-03; accept with minors) — пункт «дубль ×3» предыдущего раздела закрыт
+
+- (minor) `src/Core/Narrative/Conditions/HasItemCondition.cs:19-21,32-39` — три константы-алиаса и рукописная копия `Require`/`Amount` только из-за слова «action» в тексте трекера `ItemReference.Require`; убрать род записи из сообщения и свернуть `Create` на `ItemReference.Require/Amount`.
+- (minor) `src/Core/Data/QuestData/QuestsData.cs:126,135` — разметка награды пишет `"itemId"`, `"amount"`, `= 1` литералами при наличии `ItemReference.Key/AmountKey/DefaultAmount`.
+- (nit) `NarrativeSchemas.cs:64-65` — тернарник с `Whole` ничем не отличается от `new ReferenceTarget(c, s)`; `CatalogDescriptorTests.cs:1589-1609` — `NamesAHandOut` копия `NamesADrop` (общий `Names(field, what, where, emptyNote)`); `ItemReference.cs:46` — приватный `s_targets` между публичными; xml-док на 8 строк.
+- (знать) `Items`, `Recipes`, `Ornaments` в `NotYetDescribed` — пикер `itemId` по-прежнему «непроверяем», сужение видимого эффекта не даёт, пока эти каталоги не описаны.
+
 ## Из секционных ссылок (2026-09-03; rework → accept) и описателей Dialogues/Quests (accept with minors)
 
 - (minor, дубль ×3) список четырёх каталогов предмета живёт в `QuestsData.cs:126-129`, `GiveItemAction.cs:42-43` (`ItemIdParameter`) и `CatalogDescriptorTests.cs` (`s_handedOutCatalogs`); плюс нарративные `GiveItem`/`HasItem` и `rewards.items[].itemId` указывают в `Resources` целиком, а лут уже сужен до `upgradeResources`+`craftingResources`. Одна задача: `NarrativeParameterSpec.Catalogs` несёт секцию, `ItemIdParameter` — источник правды, разметка наград и тест сверяются с ним.
