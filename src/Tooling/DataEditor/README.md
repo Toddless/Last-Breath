@@ -1,8 +1,8 @@
 # Data Editor
 
 Внешний редактор JSON-каталогов игры. Отдельный Godot-проект рядом с игрой (как
-`src/PassiveTreeEditor`), тонкий хост: схему каталогов он берёт рефлексией из `Core`
-(`Core.Data.Schema.CatalogDescriptors.All`), документы — из `src/SharedData`.
+`src/PassiveTreeEditor`), тонкий хост: схему каталогов он берёт у описателей адаптера
+(`LastBreath.Descriptors.CatalogDescriptors.All`), документы — из `src/SharedData`.
 
 Текущее состояние — **только чтение**: список описанных каталогов, список записей выбранного
 каталога и инспектор записи по её `RecordSchema`. Правок и сохранения ещё нет.
@@ -12,7 +12,8 @@
 1. Открыть Godot 4.7 mono → **Import** → выбрать `src/Tooling/DataEditor/project.godot`.
    Первый импорт долгий: через симлинк `Data/Shared` в проект попадает весь `SharedData`.
 2. Godot предложит собрать C#-решение (**Build**). Собирается `DataEditor.csproj` с
-   `ProjectReference` на `..\..\Core\Core.csproj` и `..\Tooling.Core\Tooling.Core.csproj`.
+   `ProjectReference` на `..\LastBreath.Descriptors\LastBreath.Descriptors.csproj` и
+   `..\Tooling.Core\Tooling.Core.csproj`; игра приезжает транзитивно через адаптер.
 3. **F5** (главная сцена — `main.tscn`).
 
 Из командной строки код проверяется вместе со всей библиотекой тулинга:

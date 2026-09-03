@@ -4,12 +4,6 @@
 
 - (nit) `src/Core/Narrative/NarrativeParameterSpec.cs:15` — вид назван `Choice`, не `Enum` (коллизия с хелпером `Enum<T>`), в отчёте отступление не названо; `:35` — `JsonName` без гуарда пустой строки (держится хелпером и пином ключей); `:46,49` — `Choices`/`Catalogs` как `IReadOnlyList<string>` сравниваются по ссылке, равенство record не контентное (латентно). `LastBreath.Descriptors/NarrativeSchemas.cs:47-56` — `Default` протекает на составные виды (рефлектор обнуляет для Array/Object); `:20,24,27` — нет `ArgumentNullException.ThrowIfNull`. `NarrativeSchemaAdapterTests.cs:118` — декоративный `IsNotNull`.
 
-## Из разворота зависимости, шаг 2: описатели в адаптере (2026-09-02; accept with minors)
-
-- (minor, док) `src/Tooling/DataEditor/README.md:5,15` — говорит, что хост берёт схему из `Core.Data.Schema.CatalogDescriptors` и что ссылок две; теперь реестр в `LastBreath.Descriptors`, ссылок три (после шага 4 — две: адаптер и Tooling.Core). Переписать на шаге 4.
-- (minor, экспорт) `DataEditor.sln:49-52` — новый проект скопировал маппинг `ExportDebug→ExportDebug` у `Tooling.Schema`/`Tooling.Core` (пункт бэклога про Debug/Release не выполнен ни у кого) — чинить все три GUID одним заходом.
-- (minor → шаг 4) `DataEditor.csproj:20` — прямая ссылка хоста на `Core.csproj` мёртвая (в `Source/` ни одного `Core.*`); снять, Core приедет транзитивно через адаптер.
-
 ## Из правки коллекций в инспекторе (2026-09-02; accept)
 
 - (minor) `src/Tooling/DataEditor/Source/View/InspectorPanel.cs:810` — подсказка поля свободного ключа берётся из схемы ЗНАЧЕНИЯ (`Hint(item)` при `field.Key == null`) — рекламирует каталоги значения как требование к ключу; передавать готовую подсказку, при отсутствии `Key` — `KeyPlaceholder`.
@@ -56,7 +50,7 @@
 
 - (minor) `src/Tooling/DataEditor/Source/View/InspectorPanel.cs:210,214,222` — `Documentation` навешивается только на скалярные строки; `Section(parent, name, documentation)` + общий `Described(Label, string?)` для заголовков Object/Array/Dictionary.
 - (minor) `src/Tooling/Tooling.Core/Catalogs/CatalogWorkspace.cs:100` — нота из `broken.Message` без имени типа исключения (после `catch (Exception)` `NullReferenceException` чужого описателя даёт бессмысленную строку): `"{0}: the schema could not be built: {1}: {2}"` с `broken.GetType().Name`.
-- (minor, экспорт) `src/Tooling/DataEditor/DataEditor.sln:44-67` — `Tooling.Core`/`Tooling.Schema` (Microsoft.NET.Sdk) отображены в `ExportDebug|ExportRelease`, для которых SDK не применяет ни Debug-, ни Release-блок (`Optimize=false`, без `DEFINE`): в экспортном билде библиотеки едут неоптимизированными. Стало: в sln маппить `ExportDebug → Debug|Any CPU`, `ExportRelease → Release|Any CPU` для обоих GUID (как `Tooling.sln` маппит платформы). То же для `PassiveTreeEditor.sln`, когда он переподключится к библиотеке.
+- (minor, экспорт)  — когда редактор дерева переподключится к , отобразить библиотеку ,  (как сделано в ).
 - (nit) `JsonScalars.Written`: `Date`/`Guid`/`TimeSpan` вернутся в кавычках — ветвить по `value is JValue { Value: string text }`; тест культуры — `[DoNotParallelize]` и сообщение к `AreNotEqual`; `ScrollVertical` диалога сбрасывать перед показом; `InspectorPanel.cs:196` `Wears` сравнивает дискриминатор через `ToString()` — через `JsonScalars.Written`; xml-доки на 3–4 строки в `GameCatalogs.cs:15-17`, `EditorRoot.cs:27-29`, `CatalogWorkspace.cs:86-90`, `InspectorPanel.cs:259-261`.
 
 ## Из описателя LootTables (2026-09-02; accept with minors)
@@ -104,8 +98,7 @@
 - (minor, не удержано) `CatalogDescriptorTests.cs:104-118` — тест (б) не пинит `LocalizedSuffixes` (только имя) и `Sections.Count`.
 - (minor, не удержано) `CatalogDescriptorTests.cs:39-46,130` — ссылки проверяются `Contains` без `AllowEmpty` и без точного состава `RefCatalogs`; тройка `(Path, Catalog, AllowEmpty)` + `AreEquivalent`.
 - (minor → следующий описатель) пин «поле с суффиксом Id — ссылка либо отказ» теперь пишется по схеме: `FieldSchema.RefusedAsReference` появился (T2.7); добавить в `CatalogDescriptorTests` общий проход по `CatalogDescriptors.All`.
-- (риск владельцу) `src/Core/Core.csproj` — `Tooling.Schema` первый не-Godot проект под `Godot.NET.Sdk`-ссылкой, у него нет `<Configurations>Debug;ExportDebug;ExportRelease;Release</Configurations>`; сборка проверена только в Debug. Прогнать `dotnet build -c ExportRelease src/Main/LastBreath.csproj`; если конфигурация не подхватывается — дописать `<Configurations>` в `Tooling.Schema.csproj` (и `Tooling.Core.csproj`, его тянет тест-проект).
-- (nit) `src/Main/LastBreath.sln` не содержит `Tooling.Schema`/`Tooling.Core`, на которые ссылаются Core и тесты — добавить в решение.
+- (nit) `src/Main/LastBreath.sln` не содержит `LastBreath.Descriptors`/`Tooling.Core`, на которые ссылаются тесты — добавить в решение.
 - (nit) `NpcBehaviorData.cs:16` — `NpcBehaviorData.Stance` парсится `ParseEnum<Stance>`, не размечен (каталог NpcBehaviors без описателя); `NpcData.cs:211-213` — атрибуты разнесены на три строки; `NpcCatalogDescriptor.cs:36` — имя файла взято из константы имени каталога, завести `FileName`.
 - (данные, находка владельцу) `Npc.json`: у `Npc_Boss_Digri`, `Npc_Boss_Zigri`, `Npc_Boss_Rat_King`, `Npc_Boss_Bone_Pack_Leader` ключи стоят не в порядке DTO (`rarity`/`authored` после `entityType`; у последнего `passives` перед `abilityBehaviors`) — первый сейв из тула переставит их (ожидаемо по политике записи).
 

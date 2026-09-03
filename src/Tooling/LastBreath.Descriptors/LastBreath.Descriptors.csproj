@@ -10,6 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Core.csproj" />
-    <ProjectReference Include="..\Tooling.Schema\Tooling.Schema.csproj" />
+    <ProjectReference Include="..\Tooling.Core\Tooling.Core.csproj" />
   </ItemGroup>
 </Project>
