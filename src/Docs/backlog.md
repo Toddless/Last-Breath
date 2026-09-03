@@ -1,5 +1,16 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из скелета NarrativeEditor и общей оболочки ToolShell (2026-09-03; accept with minors)
+
+- (minor) `src/Tooling/NarrativeEditor/Source/View/NarrativeRoot.cs:203-204` — `ShowRecord` строит аутлайн и открывает элемент, а следующий `Refresh()` → `Redraw()` делает то же ещё раз; оставить один `Refresh()`.
+- (minor, граница) `src/Tooling/Tooling.Core/Narrative/Outline.cs:170-201,266` — `Rows`/`Branch` не различают «ключа нет» и «ключ есть, но не список» (`nodes (0)` при `"nodes": {}`), `outcome` не объектом не даёт строки; подпись `(not a list)` и тесты.
+- (minor) `Outline.cs:242-257` — опция без `key` подписывается `—`, хотя несёт `id`; `Or(key)` → `Identity(schema, token, index)`.
+- (minor, структура) там же — `speechCheck.failNext` (вторая ветка беседы, в данных `Flatter → FlatterGood/FlatterBad`) в аутлайне не виден; строка опции называет оба маршрута либо `speechCheck` — дочерняя строка со своим указателем.
+- (minor) `NarrativeEditor/Source/App/GameNarrative.cs:33` + `NarrativeRoot.cs:111,114` — чтение всего корня оправдано (ReferenceIndex), но заметки ВСЕХ каталогов уезжают в стартовый диалог и счётчик нарративщика; фильтровать по `GameNarrative.Catalogs`.
+- (карточка/задача) `LastBreath.Descriptors/NarrativeSchemas.cs:20-25` — словарь условий/действий берётся из ЭКЗЕМПЛЯРОВ фабрик, которых вне игры нет (единственный список без игры — тестовый `NarrativeTestFactories` на моках); тулу нужен статический реестр `NarrativeRecordSpec` в Core, фабрика читает свой спек из него — задача P1.9.
+- (nit) `NarrativeRoot.cs:224` страж инспектора не покрывает `_shown == null && standing == null`; `:35` `_tree` — поле только для `BuildBody`; `OutlineKind` без потребителя; `ToolShell.cs:95-104` сеттер `Texts` не отписывает прежнее; `ToolShell.cs:24-27,79-121` порядок членов (protected const перед private, чередование); `.uid` для `ToolShell.cs`, `GameNarrative.cs`, `NarrativeRoot.cs`, `OutlineTree.cs` появятся при первом импорте — закоммитить вместе.
+- (знать) перевод в строках аутлайна — из `TranslationServer` на старте; когда блок «Текст» приедет в NarrativeEditor, правка .po не отразится в дереве без чтения из `LocalizedTexts`.
+
 ## Из единого источника ссылок на предмет (2026-09-03; accept with minors) — пункт «дубль ×3» предыдущего раздела закрыт
 
 - (minor) `src/Core/Narrative/Conditions/HasItemCondition.cs:19-21,32-39` — три константы-алиаса и рукописная копия `Require`/`Amount` только из-за слова «action» в тексте трекера `ItemReference.Require`; убрать род записи из сообщения и свернуть `Create` на `ItemReference.Require/Amount`.
