@@ -5,6 +5,7 @@ namespace NarrativeEditor.Source.View
     using System.IO;
     using App;
     using Godot;
+    using LastBreath.Descriptors;
     using Tooling.Catalogs;
     using Tooling.Json;
     using Tooling.Localization;
@@ -114,6 +115,10 @@ namespace NarrativeEditor.Source.View
             // The ids of every catalog of the run, for the fields that point at one. A dialogue names
             // npcs, items and quests, so this is most of what the inspector can say about a record here.
             _inspector.References = new ReferenceIndex(_workspace);
+
+            // The conditions and the actions: the schema can only call them free json, and this is what
+            // tells the inspector which key is written from which of the two vocabularies.
+            _inspector.Vocabularies = NarrativeFieldVocabularies.Resolve;
 
             _notes.Clear();
             LoadTexts();

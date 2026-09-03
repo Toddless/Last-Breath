@@ -99,6 +99,7 @@ namespace Tooling.Ui
         private const string AddElementText = "+ element";
         private const string AddKeyText = "+ key";
         private const string AddFieldText = "+ field";
+        private const string AddRecordText = "+ record";
         private const string RemoveText = "×";
         private const string UpText = "↑";
         private const string DownText = "↓";
@@ -117,6 +118,29 @@ namespace Tooling.Ui
         private const string RemoveFieldHint = "take this key out; the game reads the default in its place";
         private const string RequiredFieldHint = "the schema requires this key: it can be emptied, not removed";
         private const string AbsentFieldHint = "the record does not hold this key";
+
+        // ── entries of a vocabulary ────────────────────────────────────────────────────────────
+
+        private const string AddRecordHint = "write an entry of this vocabulary here";
+        private const string NoTypesHint = "this run knows no type this key may be written as";
+        private const string EntryTypeHint =
+            "which entry of the vocabulary this is; the keys both types are written with keep their values";
+
+        private const string UnknownTypeFormat = "“{0}” is a type this run does not know; nothing written under it is touched";
+        private const string NoTypeText = "this entry names no type, so the game reads nothing here";
+        private const string NotAnEntryText = "an entry of the vocabulary is written as an object, and this is not one";
+        private const string NothingWrittenText = "nothing is written here yet";
+
+        /// <summary>What is said where the file wrote a lone entry under a key the game reads as a list.
+        /// The game reads nothing at all there — a list is what it walks, and an object is not one — so the
+        /// row says the file is wrong rather than describing it. The entry is still edited where it
+        /// stands, and the press below the block is what puts the key right.</summary>
+        private const string LoneEntryText =
+            "an object stands here and this key is read as a list: the game reads nothing of this entry, and the press below puts that right";
+
+        private const string MakeListText = "make it a list";
+
+        private const string MakeListHint = "write this entry as a list of one, which is the shape the game reads here";
 
         /// <summary>What an empty key box says while the schema has nothing to say about the keys.</summary>
         private const string KeyPlaceholder = "key";
@@ -148,9 +172,10 @@ namespace Tooling.Ui
         /// them, and the one that points nowhere has to be the one the eye stops on.</summary>
         private static readonly Color BrokenReference = new(0.93f, 0.42f, 0.38f);
 
-        /// <summary>Which control answers for which kind of value — the one place a kind and a widget
-        /// are put together. A kind absent from here has no editor and is drawn as text, which is what
-        /// keeps objects, lists, maps and free json read-only without a second rule saying so.</summary>
+        /// <summary>Which control answers for which kind of value — the one place a kind and a widget are
+        /// put together. A kind absent from here has no editor and is drawn as text, which is what keeps
+        /// objects, lists and maps read-only without a second rule saying so. Free json is read too, unless
+        /// a vocabulary answers for the key: those are drawn as the entries they hold.</summary>
         private static readonly Dictionary<FieldKind, Func<FieldEdit, Control>> s_editors = new()
         {
             [FieldKind.String] = TextBox,
@@ -219,6 +244,16 @@ namespace Tooling.Ui
         /// box.</summary>
         public LocalizedTexts? Texts { get; set; }
 
+        /// <summary>
+        /// Which fields hold entries of a vocabulary — a set of types named by a word the entry carries —
+        /// rather than a value of the catalog's own. The panel asks about a field and is answered with the
+        /// types, the key naming them and whether the field holds one entry or a list; what the words mean
+        /// is the host's business and never this panel's.
+        /// <para>Null, or an answer of null, leaves the field the raw json it always was: a field the run
+        /// has no vocabulary for is one the tool cannot vouch for writing.</para>
+        /// </summary>
+        public Func<FieldSchema, VocabularyBinding?>? Vocabularies { get; set; }
+
         /// <summary>Draws the record, or says why there is nothing to draw.
         /// <paramref name="suffixes"/> is what its catalog words the record's localization keys with, and
         /// <paramref name="after"/> the id of the record standing before it — the place a key this record
@@ -250,11 +285,26 @@ namespace Tooling.Ui
         /// it already is. What may be done to the block as a whole hangs off its heading, where the block
         /// is named — a button under the last row of a long list would be answering about nothing
         /// visible.</summary>
-        private static Node Section(Node parent, string name, Control? actions)
+        private static Node Section(Node parent, string name, Control? actions, string? documentation = null)
         {
-            parent.AddChild(actions is null ? Header(name) : Headed(name, actions));
+            Label header = Meaning(Header(name), documentation);
+
+            parent.AddChild(actions is null ? header : Headed(header, actions));
 
             return Indented(parent);
+        }
+
+        /// <summary>Hangs what a thing means off the label naming it. A label ignores the mouse, and a
+        /// tooltip is only ever shown for a control the mouse can land on; a label with nothing to say goes
+        /// on ignoring it.</summary>
+        private static Label Meaning(Label label, string? documentation)
+        {
+            if (documentation is not { Length: > 0 }) return label;
+
+            label.TooltipText = documentation;
+            label.MouseFilter = MouseFilterEnum.Pass;
+
+            return label;
         }
 
         /// <summary>A block stepped in under the row above it, with nothing heading it: what it holds
@@ -273,10 +323,9 @@ namespace Tooling.Ui
         }
 
         /// <summary>A heading with what may be done to what it names beside it.</summary>
-        private static Control Headed(string name, Control actions)
+        private static Control Headed(Label header, Control actions)
         {
             var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-            Label header = Header(name);
 
             header.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 
@@ -300,15 +349,7 @@ namespace Tooling.Ui
                 VerticalAlignment = VerticalAlignment.Top
             };
 
-            // A label ignores the mouse, and a tooltip is only ever shown for a control the mouse can
-            // land on; a row with nothing to say goes on ignoring it.
-            if (documentation is { Length: > 0 })
-            {
-                label.TooltipText = documentation;
-                label.MouseFilter = MouseFilterEnum.Pass;
-            }
-
-            row.AddChild(label);
+            row.AddChild(Meaning(label, documentation));
             row.AddChild(value);
 
             if (actions is not null) row.AddChild(actions);
@@ -887,6 +928,14 @@ namespace Tooling.Ui
                 return;
             }
 
+            // Before the value is asked about too: a key of a vocabulary the file does not hold yet is
+            // still one, and the row under it is how the author writes the first entry into it.
+            if (depth < MaxDepth && _document is not null && Vocabularies?.Invoke(field) is { } vocabulary)
+            {
+                AddVocabulary(parent, field, value, name, at, vocabulary, depth, actions);
+                return;
+            }
+
             if (depth >= MaxDepth || value is null || value.Type == JTokenType.Null)
             {
                 parent.AddChild(Row(name, Editor(field, value, at, named), field.Documentation, actions));
@@ -937,6 +986,166 @@ namespace Tooling.Ui
                 ? build(new FieldEdit(this, _build, field, value, at, named))
                 : ValueLabel(Scalar(field, value));
         }
+
+        // ── vocabularies ───────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// A field written from a vocabulary, drawn as the entries it holds: a block, one entry per row of
+        /// it, and under them the row that writes another. An entry standing where the game reads a list,
+        /// and a value that is neither, are said out loud rather than redrawn as something they are not.
+        /// </summary>
+        private void AddVocabulary(Node parent, FieldSchema field, JToken? value, string name, JsonPointer at,
+            VocabularyBinding binding, int depth, Control? actions)
+        {
+            string? meaning = field.Documentation;
+
+            if (binding.List && value is JArray written)
+            {
+                Node entries = Section(parent, Text(CountFormat, name, written.Count), actions, meaning);
+
+                for (int index = 0; index < written.Count; index++)
+                    AddEntry(entries, binding, written[index], Text(IndexFormat, index), at.Append(index),
+                        depth + 1, ElementGestures(at, index, written.Count));
+
+                entries.AddChild(NewEntry(binding, (document, blank) => document.Insert(at, written.Count, blank)));
+                return;
+            }
+
+            // One entry standing where the game reads a list. It is edited where it is; a second one needs
+            // a list to stand in, and the press under the block is what makes the room for it.
+            if (binding.List && value is JObject)
+            {
+                Node lone = Section(parent, name, actions, meaning);
+                Button list = Gesture(MakeListText, MakeListHint, enabled: true, document => TypedRecords.AsList(document, at));
+
+                list.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+
+                lone.AddChild(new Label { Text = LoneEntryText });
+                AddEntry(lone, binding, value, Text(IndexFormat, 0), at, depth + 1, actions: null);
+                lone.AddChild(list);
+
+                return;
+            }
+
+            if (!binding.List && value is JObject)
+            {
+                AddEntry(parent, binding, value, name, at, depth + 1, actions, meaning);
+                return;
+            }
+
+            // Anything else the file wrote here is read as the json it is and left alone: a row offering to
+            // write an entry over it would lose what the author actually put there.
+            if (value is not null && value.Type != JTokenType.Null)
+            {
+                parent.AddChild(Row(name, ValueLabel(Raw(value)), NotAnEntryText, actions));
+                return;
+            }
+
+            Node empty = Section(parent, name, actions, meaning);
+
+            empty.AddChild(new Label { Text = NothingWrittenText });
+            empty.AddChild(NewEntry(binding, (document, blank) =>
+                Laid(document, at, binding.List ? new JArray(blank) : blank)));
+        }
+
+        /// <summary>One entry of a vocabulary: the word naming its type, and under it the keys that type is
+        /// written with — the same fields, and so the same controls, a record of a catalog is drawn by. A
+        /// type holding entries of its own is answered by the very same block one level down.</summary>
+        private void AddEntry(Node parent, VocabularyBinding binding, JToken? value, string name, JsonPointer at,
+            int depth, Control? actions, string? documentation = null)
+        {
+            if (value is not JObject holder)
+            {
+                parent.AddChild(Row(name, ValueLabel(value is null ? Missing : Raw(value)), NotAnEntryText, actions));
+                return;
+            }
+
+            Node body = Section(parent, name, actions, documentation);
+            string standing = TypedRecords.Standing(binding, holder);
+            RecordSchema? worn = TypedRecords.Worn(binding, holder);
+
+            body.AddChild(Row(binding.TypeKey, TypePicker(binding, standing, at), EntryTypeHint, actions: null));
+
+            if (standing.Length == 0) body.AddChild(new Label { Text = NoTypeText });
+            else if (worn is null) body.AddChild(new Label { Text = Text(UnknownTypeFormat, standing) });
+
+            if (worn is { } type) AddRecord(body, type, holder, at, depth);
+            else AddUnknownKeys(body, holder, binding.TypeKey);
+        }
+
+        /// <summary>The keys of an entry no known type answers for, read as the json they hold. Nothing is
+        /// offered over them and nothing is dropped: the run cannot say what any of them means, and an
+        /// author who cannot see them cannot tell the entry came through whole.</summary>
+        private static void AddUnknownKeys(Node parent, JObject holder, string typeKey)
+        {
+            foreach (JProperty pair in holder.Properties())
+                if (!string.Equals(pair.Name, typeKey, StringComparison.Ordinal))
+                    parent.AddChild(Row(pair.Name, ValueLabel(Raw(pair.Value)), documentation: null, actions: null));
+        }
+
+        /// <summary>The type an entry is written as, picked out of the vocabulary. A word the run does not
+        /// know stays on offer where the file wrote one — the tool never quietly rewrites what it does not
+        /// understand — and nothing is selected where the entry names no type at all.</summary>
+        private Control TypePicker(VocabularyBinding binding, string standing, JsonPointer at)
+        {
+            var picker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = EntryTypeHint };
+            object build = _build;
+            List<string> types = [.. binding.Types.Select(type => type.TypeName)];
+
+            if (standing.Length > 0 && !types.Contains(standing, StringComparer.Ordinal)) types.Add(standing);
+
+            foreach (string type in types) picker.AddItem(type);
+
+            picker.Selected = standing.Length == 0 ? NoChoice : types.IndexOf(standing);
+
+            picker.ItemSelected += index =>
+            {
+                if (Stale(build)) return;
+
+                string chosen = types[(int)index];
+
+                if (!string.Equals(chosen, standing, StringComparison.Ordinal))
+                    Restructure(document => TypedRecords.Switch(document, at, binding, chosen));
+            };
+
+            return picker;
+        }
+
+        /// <summary>The row that writes an entry: the type it is to be written as, and the press that lays
+        /// the blank of that type wherever the caller puts it.</summary>
+        private Control NewEntry(VocabularyBinding binding, Func<JsonTreeDocument, JToken, bool> lay)
+        {
+            var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            bool any = binding.Types.Count > 0;
+            string hint = any ? AddRecordHint : NoTypesHint;
+
+            var picker = new OptionButton
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                Disabled = !any,
+                TooltipText = hint
+            };
+
+            foreach (RecordSchema type in binding.Types) picker.AddItem(type.TypeName);
+
+            picker.Selected = any ? 0 : NoChoice;
+
+            row.AddChild(picker);
+            row.AddChild(Gesture(AddRecordText, hint, any, document =>
+                picker.Selected >= 0
+                && picker.Selected < binding.Types.Count
+                && lay(document, TypedRecords.Blank(binding, binding.Types[picker.Selected].TypeName))));
+
+            return row;
+        }
+
+        /// <summary>Puts a value at an address whose key the record may not hold yet, writing the key when
+        /// it does not — the reading the first edit of an absent field makes, for a structural gesture
+        /// already holding the document.</summary>
+        private static bool Laid(JsonTreeDocument document, JsonPointer at, JToken value) =>
+            document.Resolve(at) is null && at.Parent is { } holder && at.Last is { } key
+                ? document.Insert(holder, key, value)
+                : document.SetValue(at, value);
 
         // ── text ───────────────────────────────────────────────────────────────────────────────
 
@@ -1133,11 +1342,16 @@ namespace Tooling.Ui
             return Gesture(RemoveText, RemoveFieldHint, enabled: true, document => document.Remove(at));
         }
 
+        /// <summary>The value a key of this panel is written with the moment the author asks for it. One
+        /// place, so that the picker adding a key and the block drawing it never disagree about the shape
+        /// the game reads there: a key answered by a vocabulary read as a list opens as a list.</summary>
+        private JToken Blank(FieldSchema field) => TypedRecords.Blank(Vocabularies?.Invoke(field), field);
+
         /// <summary>The row that adds an element to a list, at the end of the list it adds to.</summary>
         private Control NewElement(FieldSchema item, JsonPointer at, int count)
         {
             Button add = Gesture(AddElementText, AddElementHint, enabled: true,
-                document => document.Insert(at, count, RecordTemplates.Blank(item)));
+                document => document.Insert(at, count, Blank(item)));
 
             add.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 
@@ -1229,7 +1443,7 @@ namespace Tooling.Ui
                 return false;
             }
 
-            return document.Insert(at, wanted, RecordTemplates.Blank(item));
+            return document.Insert(at, wanted, Blank(item));
         }
 
         /// <summary>The row that writes one of the record's own keys into it, offering the keys the schema
@@ -1253,7 +1467,7 @@ namespace Tooling.Ui
             row.AddChild(Gesture(AddFieldText, AddFieldHint, enabled: true, document =>
                 picker.Selected >= 0
                 && picker.Selected < absent.Count
-                && document.Insert(at, absent[picker.Selected].JsonName, RecordTemplates.Blank(absent[picker.Selected]))));
+                && document.Insert(at, absent[picker.Selected].JsonName, Blank(absent[picker.Selected]))));
 
             return row;
         }
@@ -1397,9 +1611,7 @@ namespace Tooling.Ui
 
             try
             {
-                return _document.Resolve(at) is null && at.Parent is { } holder && at.Last is { } key
-                    ? _document.Insert(holder, key, value)
-                    : _document.SetValue(at, value);
+                return Laid(_document, at, value);
             }
             finally
             {

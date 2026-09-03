@@ -15,11 +15,11 @@ namespace NarrativeEditor.Source.App
     /// one of them is read as an outline. Below it the tool works on schemas and json documents alone.
     /// </summary>
     /// <remarks>
-    /// The conditions and actions written into a dialogue or a quest are free-form json here, and the
-    /// inspector draws them as such. The vocabulary they would be drawn from is the narrative
-    /// factories' own — <see cref="NarrativeSchemas"/> turns those into record schemas — but the
-    /// factories are built over live game services in the game's own service provider, so nothing
-    /// outside a running game can list them yet.
+    /// The conditions and actions written into a dialogue or a quest are free-form json to the schema: the
+    /// vocabulary they are drawn from is the narrative factories' own and not a record of either catalog.
+    /// <see cref="NarrativeSchemas"/> reads that vocabulary without a running game and
+    /// <see cref="NarrativeFieldVocabularies"/> says which key is written from which half of it, so the
+    /// inspector edits them as entries rather than as text.
     /// </remarks>
     public static class GameNarrative
     {

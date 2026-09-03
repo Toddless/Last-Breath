@@ -6,6 +6,7 @@ namespace DataEditor.Source.View
     using System.Linq;
     using App;
     using Godot;
+    using LastBreath.Descriptors;
     using Tooling.Catalogs;
     using Tooling.Json;
     using Tooling.Localization;
@@ -315,6 +316,10 @@ namespace DataEditor.Source.View
             // The ids of every catalog of the run, for the fields that point at one. Built here because
             // it answers about the run as a whole and the panel is shown one record at a time.
             _inspector.References = new ReferenceIndex(_workspace);
+
+            // The conditions and the actions of the narrative: the dialogues and the quests are among the
+            // catalogs listed here, and their vocabulary keys read as free json without this.
+            _inspector.Vocabularies = NarrativeFieldVocabularies.Resolve;
 
             _notes.Clear();
             LoadTexts();
