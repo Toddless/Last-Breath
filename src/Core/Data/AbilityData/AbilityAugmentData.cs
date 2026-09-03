@@ -4,7 +4,9 @@ namespace Core.Data.AbilityData
     using System.Collections.Generic;
     using System.Linq;
     using Enums;
+    using GameData;
     using Newtonsoft.Json;
+    using Schema;
 
     /// <summary>
     /// One augment as its own record declares it. Every field describes the augment itself and never
@@ -44,7 +46,7 @@ namespace Core.Data.AbilityData
 
         /// <summary>Hard binding to a single ability — the exception kept for augments too strong to be
         /// handed to a whole family. Set, it decides alone; empty, the augment is bound to nothing.</summary>
-        [JsonProperty("abilityId")] public string AbilityId { get; init; } = string.Empty;
+        [JsonProperty("abilityId")][CatalogRef(DataCatalog.Abilities, AllowEmpty = true)] public string AbilityId { get; init; } = string.Empty;
 
         /// <summary>Declares the augment at home on every ability — for records working through the base
         /// contract (cost, cooldown). Universality must be CLAIMED: a record naming no tag is simply
@@ -64,20 +66,23 @@ namespace Core.Data.AbilityData
 
         /// <summary>What the augment DOES, named out of the behaviour registry — the road that needs no
         /// code of its own. Empty means the augment is one of the named ones and a factory answers its id.</summary>
-        [JsonProperty("behaviour")] public string Behaviour { get; init; } = string.Empty;
+        [JsonProperty("behaviour")][NotARef] public string Behaviour { get; init; } = string.Empty;
 
         /// <summary>Effect the behaviour lays, built by the effect registry from
         /// <see cref="UpgradeProperties"/>. Read by the behaviours that lay one.</summary>
-        [JsonProperty("effectId")] public string EffectId { get; init; } = string.Empty;
+        [JsonProperty("effectId")][CatalogRef(DataCatalog.Effects, AllowEmpty = true)] public string EffectId { get; init; } = string.Empty;
 
         /// <summary>The effects a copy of this record may turn out to lay, and the genus each adds to
         /// <see cref="GrantsTags"/>. Which one a copy lays is drawn at the mint and belongs to the COPY.
         /// Written INSTEAD of <see cref="EffectId"/> and never beside it.</summary>
-        [JsonProperty("effectPool")] public Dictionary<string, string[]> EffectPool { get; init; } = [];
+        [JsonProperty("effectPool")][DictionaryKey(DataCatalog.Effects)] public Dictionary<string, string[]> EffectPool { get; init; } = [];
 
         /// <summary>The pool in the order the draw walks it — ordinal, so which effect an index means is
         /// decided by the ids themselves and not by where a hand put a line in the file.</summary>
-        public IReadOnlyList<string> PoolEffects => [.. EffectPool.Keys.Order(StringComparer.Ordinal)];
+        /// <remarks>Said to be no part of the file out loud: a get-only COLLECTION is what a reader pours
+        /// values into rather than something worked out, so a walk reading the type would take it for a
+        /// key an author writes.</remarks>
+        [JsonIgnore] public IReadOnlyList<string> PoolEffects => [.. EffectPool.Keys.Order(StringComparer.Ordinal)];
 
         /// <summary>The effect the record lays when no copy has been drawn — its own, or the first of its
         /// pool: a representative, which is all a declaration alone can offer.</summary>
@@ -87,15 +92,16 @@ namespace Core.Data.AbilityData
         /// <summary>Every tag a copy of this record MIGHT grant. The copy grants what IT rolled
         /// (<see cref="Battle.Abilities.AugmentInstance.Applied"/>); this is the union across the pool,
         /// which is what a ledger of reachable board states has to measure.</summary>
-        public IReadOnlyCollection<string> GrantableTags =>
+        /// <remarks>Kept out of the file for the reason <see cref="PoolEffects"/> is.</remarks>
+        [JsonIgnore] public IReadOnlyCollection<string> GrantableTags =>
             [.. GrantsTags.Concat(EffectPool.Values.SelectMany(tags => tags)).Distinct(StringComparer.OrdinalIgnoreCase)];
 
         /// <summary>Which touches the behaviour works on: "Attack", "Hit", "Projectile", "ChainJump",
         /// "Splash", or empty for every one of them. The design list tells attacks from hits.</summary>
-        [JsonProperty("impactKind")] public string ImpactKind { get; init; } = string.Empty;
+        [JsonProperty("impactKind")][EnumOf(typeof(Data.ImpactKind))] public string ImpactKind { get; init; } = string.Empty;
 
         /// <summary>Attack modifier the behaviour installs, named out of the modifier registry.</summary>
-        [JsonProperty("attackModifier")] public string AttackModifier { get; init; } = string.Empty;
+        [JsonProperty("attackModifier")][NotARef] public string AttackModifier { get; init; } = string.Empty;
 
         /// <summary>Says the damage-over-time effect this record lays pools the WHOLE blow instead of the
         /// component its kind feeds on — what a record declares when it burns for a share of any hit rather
@@ -106,7 +112,7 @@ namespace Core.Data.AbilityData
         /// key to a shared <see cref="Battle.Abilities.AbilityParameter"/> name, read decorated at the
         /// moment of use. The record still carries a number for each — what the ability does not own it
         /// falls back to.</summary>
-        [JsonProperty("propertyRefs")] public Dictionary<string, string> PropertyRefs { get; init; } = [];
+        [JsonProperty("propertyRefs")][NotARef] public Dictionary<string, string> PropertyRefs { get; init; } = [];
 
         [JsonProperty("upgradeProperties")] public Dictionary<string, float> UpgradeProperties { get; init; } = [];
 

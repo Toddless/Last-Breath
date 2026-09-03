@@ -11,6 +11,7 @@ namespace LastBreath.Descriptors
     {
         public static IReadOnlyList<ICatalogDescriptor> All { get; } =
         [
+            new AbilitiesCatalogDescriptor(),
             new NpcCatalogDescriptor(),
             new NpcBehaviorsCatalogDescriptor(),
             new LootTablesCatalogDescriptor(),
@@ -23,7 +24,6 @@ namespace LastBreath.Descriptors
         /// to <see cref="DataCatalog"/> has to be put on one of the two lists by hand.</summary>
         public static IReadOnlyList<string> NotYetDescribed { get; } =
         [
-            DataCatalog.Abilities,
             DataCatalog.CombatRules,
             DataCatalog.NpcBuffs,
             DataCatalog.NpcModifiers,

@@ -2,6 +2,7 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Core.Ai;
     using Core.Ai.World;
+    using Core.Data.AbilityData;
     using Core.Data.CraftingData;
     using Core.Data.EquipData;
     using Core.Data.GameData;
@@ -302,6 +303,104 @@ namespace LastBreathTest.BattleSystemTests
         /// walk stops at the second one and what is under it is carried through as the file had it.</summary>
         private static readonly string[] s_unknownKeysInsideComposites =
             ["parameter", "modifierType", "scope", "value", "min", "max"];
+
+        /// <summary>What an ability writes its stance, its cost currency and the way it picks targets
+        /// under. No descriptor names them — they are the DTO's own fields, the way a table's tiers are —
+        /// so the walk spells them out.</summary>
+        private const string StanceField = "stance";
+
+        private const string CostTypeField = "costType";
+
+        private const string TargetTypeField = "targetType";
+
+        /// <summary>The two ends of the rarity band an augment's copies are drawn from.</summary>
+        private const string MinRarityField = "minRarity";
+
+        private const string MaxRarityField = "maxRarity";
+
+        /// <summary>What an augment writes the effect its behaviour lays under, and the pool it draws one
+        /// out of instead.</summary>
+        private const string EffectField = "effectId";
+
+        private const string EffectPoolField = "effectPool";
+
+        /// <summary>The three fields an augment names something out of a registry of CODE under — a
+        /// behaviour, an attack modifier, and the host parameters its properties are read off. No catalog
+        /// holds any of them, which the records say out loud rather than leaving unmarked.</summary>
+        private static readonly string[] s_augmentRefusals = ["behaviour", "attackModifier", "propertyRefs"];
+
+        /// <summary>Which touches an augment's behaviour works on.</summary>
+        private const string ImpactKindField = "impactKind";
+
+        /// <summary>
+        /// What the reflector has to say about the real ability DTOs. Both are facts about the shipped
+        /// types: an augment works its rarity band and the effect a bare record stands for out of the
+        /// fields around them, so neither is written to the file.
+        /// </summary>
+        /// <remarks>The two members worked out the same way that hold COLLECTIONS say so to the serializer
+        /// instead: a get-only list is what a reader pours values INTO, so the walk cannot tell one from a
+        /// key the author writes and would have offered both as fields.</remarks>
+        private static readonly (string About, string Word)[] s_allowedAbilityNotes =
+        [
+            ($"{nameof(AbilityAugmentData)}.{nameof(AbilityAugmentData.RarityBand)}", WorkedOut),
+            ($"{nameof(AbilityAugmentData)}.{nameof(AbilityAugmentData.LaidEffectId)}", WorkedOut),
+        ];
+
+        /// <summary>Every id the ability parser resolves against another catalog, under the section whose
+        /// records write it. An augment names the one ability it is written for and the effect its
+        /// behaviour lays; an ability names nothing outside itself.</summary>
+        private static readonly (string Section, string Path, string Catalog)[] s_abilityReferences =
+        [
+            (AbilitiesCatalogDescriptor.AugmentsKey, AbilitiesCatalogDescriptor.AbilityField, DataCatalog.Abilities),
+            (AbilitiesCatalogDescriptor.AugmentsKey, EffectField, DataCatalog.Effects),
+        ];
+
+        /// <summary>Every field the ability parser turns into an enum member, under the section whose
+        /// records write it. An unmarked one reads to the tool as free text: the author types a name
+        /// nothing answers, and the miss surfaces when the cast is built.</summary>
+        private static readonly (string Section, string Path, Type Members)[] s_abilityChoices =
+        [
+            (AbilitiesCatalogDescriptor.AbilitiesKey, StanceField, typeof(Stance)),
+            (AbilitiesCatalogDescriptor.AbilitiesKey, CostTypeField, typeof(Costs)),
+            (AbilitiesCatalogDescriptor.AbilitiesKey, TargetTypeField, typeof(AbilityTargetType)),
+            (AbilitiesCatalogDescriptor.AugmentsKey, RarityField, typeof(Rarity)),
+            (AbilitiesCatalogDescriptor.AugmentsKey, MinRarityField, typeof(Rarity)),
+            (AbilitiesCatalogDescriptor.AugmentsKey, MaxRarityField, typeof(Rarity)),
+            (AbilitiesCatalogDescriptor.AugmentsKey, ImpactKindField, typeof(Core.Data.ImpactKind)),
+        ];
+
+        /// <summary>Everything an ability is written with, in the order a canonical file writes it.</summary>
+        private static readonly string[] s_abilityFields =
+        [
+            "id", "tags", "cooldown", "costValue", CostTypeField, StanceField, TargetTypeField, "maxTargets",
+            "hidden", "damage", "weaponDamageScale", "spellDamageScale", "abilityProperties"
+        ];
+
+        /// <summary>
+        /// Everything an augment is written with, in the order a canonical file writes it — the whole of
+        /// what the tool would offer an author. Held as a list because the walk cannot see the one way a
+        /// field arrives by mistake: a member worked out from the others that happens to hold a COLLECTION
+        /// reads to reflection exactly like one a file fills, and would be offered as a key nobody may
+        /// write. Nothing else names it, since the shipped file does not write it either.
+        /// </summary>
+        /// <remarks>Three axes are written here flat, every key of them optional, because the shapes tell
+        /// records apart by ONE thing and the binding is what they were spent on: how a value is written
+        /// (<c>upgradeProperties</c> alone, with <c>bestRarityProperties</c>, or as an authored
+        /// <c>rarityLadder</c>), what the augment lays (<c>effectId</c> or <c>effectPool</c>), and which
+        /// road its behaviour works on.</remarks>
+        private static readonly string[] s_augmentFields =
+        [
+            "id", AbilitiesCatalogDescriptor.TagsField, TierField, RarityField, MinRarityField, MaxRarityField,
+            AbilitiesCatalogDescriptor.AbilityField, AbilitiesCatalogDescriptor.AnyAbilityField, "exclusionGroup",
+            "grantsTags", "behaviour", EffectField, EffectPoolField, ImpactKindField, "attackModifier",
+            "poolFromWholeHit", "propertyRefs", "upgradeProperties", "bestRarityProperties", "rarityLadder"
+        ];
+
+        /// <summary>How many records carry the tags key BESIDE the key their form is picked by. Every
+        /// augment writes tags, so the tag-judged shape is the one nothing else claimed rather than one of
+        /// three keys only one of which is ever there — which is the whole of what a one-axis contract can
+        /// say here, and the number is held so the overlap cannot grow unnoticed.</summary>
+        private const int AugmentsCarryingTagsBesideAStrongerKey = 45;
 
         /// <summary>Every catalog a loot position may name its drop out of; any one of them knowing the
         /// id makes the position real, which is why the field carries them all at once.</summary>
@@ -924,6 +1023,166 @@ namespace LastBreathTest.BattleSystemTests
                 DataCatalog.Resources);
         }
 
+        /// <summary>The schema of the abilities and the augments beside them: two sections of one file,
+        /// each record found by its own id and both named and described in the localization by it. What the
+        /// walk has to say is held as pairs of subject and keyword rather than whole sentences: which
+        /// members earn a note is the fact being pinned, while the wording belongs to the library.</summary>
+        [TestMethod]
+        public void TheAbilitiesSchemaBuildsFromTheRealDtosWithTheNotesItsAugmentsWorkedOutMembersAreKnownFor()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.Abilities));
+
+            Assert.AreEqual(RootShape.SectionsOfArrays, schema.Shape);
+            CollectionAssert.AreEqual(
+                new[] { AbilitiesCatalogDescriptor.AbilitiesKey, AbilitiesCatalogDescriptor.AugmentsKey },
+                schema.Sections.Select(section => section.Key).ToArray());
+
+            foreach (SectionSchema section in schema.Sections)
+                Assert.AreEqual(AbilitiesCatalogDescriptor.IdField, section.Record.IdField, $"a record of '{section.Key}' is found by another field");
+
+            CollectionAssert.AreEqual(
+                new[] { LocalizedKeyAttribute.NoSuffix, LocalizationService.DescriptionSuffix },
+                schema.LocalizedSuffixes.ToArray(),
+                "a cast and an augment alike are named and described in the localization by their own id");
+            Assert.AreEqual(AbilitiesCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null));
+            CollectionAssert.AreEqual(
+                new[] { AbilitiesCatalogDescriptor.FileName },
+                ShippedFiles(DataCatalog.Abilities).Select(Path.GetFileNameWithoutExtension).ToArray(),
+                "the catalog ships other files than the one its placement names");
+
+            CollectionAssert.AreEqual(
+                s_abilityFields,
+                Section(schema, AbilitiesCatalogDescriptor.AbilitiesKey).Fields.Select(field => field.JsonName).ToArray(),
+                "an ability is written with other keys than the ones the tool offers for it");
+            CollectionAssert.AreEqual(
+                s_augmentFields,
+                Section(schema, AbilitiesCatalogDescriptor.AugmentsKey).Fields.Select(field => field.JsonName).ToArray(),
+                "an augment is written with other keys than the ones the tool offers for it");
+
+            Unexpected(builder.Reflection.Notes, s_allowedAbilityNotes, builder.Reflection);
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled Abilities catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>Every id the ability parser resolves against another catalog, every name it parses into
+        /// an enum, and every field naming something out of a registry of code rather than a catalog, said
+        /// so in the schema. An unmarked one reads to the tool as free text; a field named like a reference
+        /// and left unmarked reads as one nobody got to yet.</summary>
+        [TestMethod]
+        public void TheAbilitiesSchemaNamesTheReferencesChoicesAndRefusalsTheParserResolves()
+        {
+            CatalogSchema schema = Schema(DataCatalog.Abilities);
+
+            foreach ((string section, string path, string catalog) in s_abilityReferences)
+                Points(Leaf(Locate(Section(schema, section), path)), $"{section}.{path}", catalog);
+
+            foreach ((string section, string path, Type members) in s_abilityChoices)
+                Choice(Leaf(Locate(Section(schema, section), path)), members);
+
+            RecordSchema augment = Section(schema, AbilitiesCatalogDescriptor.AugmentsKey);
+
+            foreach (string path in s_augmentRefusals)
+                Assert.IsTrue(Leaf(Locate(augment, path)).RefusedAsReference,
+                    $"'{path}' names something out of a registry of code and neither points anywhere nor says it does not");
+
+            FieldSchema pool = Locate(augment, EffectPoolField);
+            Assert.AreEqual(FieldKind.Dictionary, pool.Kind, $"'{EffectPoolField}' is not a map");
+            Points(
+                pool.Key ?? throw new AssertFailedException($"'{EffectPoolField}' lets the author write its keys freely"),
+                EffectPoolField,
+                DataCatalog.Effects);
+        }
+
+        /// <summary>
+        /// An augment answers the question of where it belongs in one of three ways, and the tool has to
+        /// find all three under the augments section — that is what registering the shapes against the DTO
+        /// buys. Which shape stands in a file is told by the key that is there, not by a value, and the
+        /// shapes are offered narrowest first because that is the order the fitting rule reads them in.
+        /// <para>The shipped file is walked with the tool's own reading: every record wears a shape, the
+        /// shape it wears is the one the rule would read, and no record answers the question twice. How
+        /// many carry the tags key beside a stronger one is a finding about the data — every augment writes
+        /// tags — and the number is held rather than failed on.</para>
+        /// </summary>
+        [TestMethod]
+        public void TheAbilitiesSchemaWearsOneBindingFormOnEveryAugmentTheShippedFileWrites()
+        {
+            CatalogSchema schema = Schema(DataCatalog.Abilities);
+            RecordSchema record = Section(schema, AbilitiesCatalogDescriptor.AugmentsKey);
+            VariantSet shapes = record.Variants ?? throw new AssertFailedException("an augment takes one shape only");
+
+            Assert.IsNull(shapes.Discriminator, "the shapes are told apart by the key that is there, not by a value");
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    AbilitiesCatalogDescriptor.AbilityField,
+                    AbilitiesCatalogDescriptor.AnyAbilityField,
+                    AbilitiesCatalogDescriptor.TagsField
+                },
+                shapes.Variants.Select(variant => variant.DiscriminatorValue).ToArray(),
+                "the shapes are no longer offered in the order the rule reads the declaration in");
+
+            Assert.AreEqual(nameof(AugmentBoundToAbility), Shape(shapes, AbilitiesCatalogDescriptor.AbilityField).TypeName);
+            Assert.AreEqual(nameof(AugmentForAnyAbility), Shape(shapes, AbilitiesCatalogDescriptor.AnyAbilityField).TypeName);
+            Assert.AreEqual(nameof(AugmentBoundByTags), Shape(shapes, AbilitiesCatalogDescriptor.TagsField).TypeName);
+
+            FieldSchema bound = Field(Shape(shapes, AbilitiesCatalogDescriptor.AbilityField), AbilitiesCatalogDescriptor.AbilityField);
+            Assert.AreEqual(FieldKind.Reference, bound.Kind, "the shape binding an augment to one ability names no ability");
+            Assert.IsFalse(bound.AllowEmpty, "the shape binding an augment to one ability may be written naming none");
+
+            Dictionary<string, int> worn = shapes.Variants.ToDictionary(variant => variant.DiscriminatorValue, _ => 0, StringComparer.Ordinal);
+            List<string> alongside = [];
+            List<string> shapeless = [];
+            int records = 0;
+
+            foreach (JObject augment in SectionRecords(
+                         JsonTreeDocument.Load(CatalogFile(schema, DataCatalog.Abilities)).Root,
+                         AbilitiesCatalogDescriptor.AugmentsKey))
+            {
+                string id = Id(augment, AbilitiesCatalogDescriptor.IdField);
+                records++;
+
+                if (RecordTemplates.Worn(shapes, augment) is not { } form)
+                {
+                    shapeless.Add(id);
+                    continue;
+                }
+
+                worn[form.DiscriminatorValue]++;
+                Assert.AreEqual(Declares(augment), form.DiscriminatorValue,
+                    $"'{id}' is worn in another shape than the one the fitting rule reads it in");
+
+                string[] written = [.. shapes.Variants.Select(variant => variant.DiscriminatorValue).Where(augment.ContainsKey)];
+                if (written.Length > 1) alongside.Add($"{id}: {string.Join(", ", written)} → {form.DiscriminatorValue}");
+            }
+
+            Assert.AreNotEqual(0, records, "the shipped file declares no augment, so the walk proves nothing");
+            Assert.AreEqual(0, shapeless.Count,
+                $"augments written in none of the shapes the schema lists: {string.Join(", ", shapeless)}");
+
+            Report("Augments by the shape they are worn in",
+                [.. worn.Select(shape => $"{shape.Key}: {shape.Value}")]);
+            Report("Augments carrying the tags key beside the key their shape is picked by", alongside);
+
+            Assert.AreEqual(AugmentsCarryingTagsBesideAStrongerKey, alongside.Count,
+                "another number of augments writes tags beside a stronger key than the walk was pinned to");
+        }
+
+        /// <summary>The shipped file read back through the schema, the way the NPC one is: every key it
+        /// writes is one the schema ranks, the shapes' keys included, and the canonical write loses
+        /// nothing. The keys of a map are the exception the schema itself names — an augment's numbers are
+        /// keyed by property names the author picks.</summary>
+        [TestMethod]
+        public void TheAbilitiesSchemaRanksEveryKeyTheShippedFileWrites()
+        {
+            List<string> unknown = UnknownKeys(Schema(DataCatalog.Abilities), DataCatalog.Abilities);
+
+            Assert.AreEqual(0, unknown.Count,
+                $"keys of {AbilitiesCatalogDescriptor.FileName} no field of the schema is written under:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", unknown)}");
+        }
+
         /// <summary>
         /// Across every described catalog: a field written under a name ending in "id" either points into
         /// a catalog or says out loud that it does not. The one exception is the field a record IS found
@@ -1201,6 +1460,19 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>The seats of a table: two arrays down, whichever section the table stands in.</summary>
         private static RecordSchema Position(RecordSchema table) => Nested(Nested(table, TiersField), ItemsField);
+
+        /// <summary>Which of the three the fitting rule reads a shipped augment as, in the rule's own
+        /// order: a claim on the whole book settles it, a named ability is otherwise the whole answer, and
+        /// everything else is tag work. Written out here rather than asked of the rule so that the shapes
+        /// are held against what the game DOES with the file and not against another reading of it.</summary>
+        private static string Declares(JObject augment)
+        {
+            if (augment.Value<bool?>(AbilitiesCatalogDescriptor.AnyAbilityField) == true) return AbilitiesCatalogDescriptor.AnyAbilityField;
+
+            return string.IsNullOrWhiteSpace(augment.Value<string>(AbilitiesCatalogDescriptor.AbilityField))
+                ? AbilitiesCatalogDescriptor.TagsField
+                : AbilitiesCatalogDescriptor.AbilityField;
+        }
 
         private static RecordSchema Shape(VariantSet shapes, string key) =>
             shapes.Variants.FirstOrDefault(variant => variant.DiscriminatorValue == key)?.Record
