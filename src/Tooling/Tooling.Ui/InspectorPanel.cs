@@ -1,4 +1,4 @@
-namespace DataEditor.Source.View
+namespace Tooling.Ui
 {
     using System;
     using System.Collections.Generic;
@@ -9,6 +9,7 @@ namespace DataEditor.Source.View
     using Newtonsoft.Json.Linq;
     using Tooling.Catalogs;
     using Tooling.Json;
+    using Tooling.Localization;
     using Tooling.Schema.Model;
     using static Tooling.Text.Format;
 
@@ -81,6 +82,20 @@ namespace DataEditor.Source.View
         /// <summary>The name the shape of a polymorphic record is picked under.</summary>
         private const string FormName = "form";
 
+        /// <summary>What the block holding the record's own wording is called.</summary>
+        private const string TextsName = "text";
+
+        /// <summary>How tall a box holding a sentence opens. Fixed rather than grown to fit what is in
+        /// it: a description of a few lines would otherwise push the record's own fields off screen, and
+        /// the author reads the wording and the numbers of a record together.</summary>
+        private const int TextBlockHeight = 68;
+
+        private const string TextHint = "what this key says in this locale; it is written to that locale's .po";
+        private const string TextRefusedFormat = "“{0}” could not be written in {1}";
+        private const string RenamedKeysFormat = "renamed {0} localization key(s)";
+        private const string KeysNotMovedFormat = "keys for “{0}” were not moved: “{1}” is already written";
+        private const string KeysLeftBehindFormat = "localization keys stay under “{0}”";
+
         private const string AddElementText = "+ element";
         private const string AddKeyText = "+ key";
         private const string AddFieldText = "+ field";
@@ -150,6 +165,30 @@ namespace DataEditor.Source.View
         private CatalogRecord? _record;
         private JsonTreeDocument? _document;
 
+        /// <summary>The suffixes the open catalog words its records' keys with. Held beside the record
+        /// because it is the catalog's answer and not the record's, and the two are handed over
+        /// together.</summary>
+        private IReadOnlyList<string> _suffixes = [];
+
+        /// <summary>The id the record carried when the last run of keystrokes over it began. The keys of
+        /// the .po files are worded from it, so what they have to be named again from is the word that
+        /// was there before the author started typing — not the one the file was opened under.</summary>
+        private string _idBefore = string.Empty;
+
+        /// <summary>The id of the record standing before this one in its catalog, which is where this
+        /// record's own keys are laid down after.</summary>
+        private string? _after;
+
+        /// <summary>Where the next key this record lays down goes: after the last key the record itself
+        /// has written, or the one before it in the catalog. Walked forward as the panel draws, so a
+        /// second line of dialogue lands under the first rather than at the end of the file.</summary>
+        private string? _keyAnchor;
+
+        /// <summary>The id this panel last named the localization keys under. An undo steps the record's
+        /// own file and nothing else — the keys stay where the rename put them, and this is the one place
+        /// the author would otherwise not be told.</summary>
+        private string? _renamedTo;
+
         /// <summary>The row naming the record. Held because it is the one thing rewritten without a
         /// redraw: it carries the id, and the id is edited from a box in this very panel.</summary>
         private Label? _heading;
@@ -175,10 +214,24 @@ namespace DataEditor.Source.View
         /// reference the plain box it always was.</summary>
         public ReferenceIndex? References { get; set; }
 
-        /// <summary>Draws the record, or says why there is nothing to draw.</summary>
-        public void Rebuild(CatalogRecord? record)
+        /// <summary>The wording of the game, in every locale at once. Null while the run has none — the
+        /// block of text is then not drawn at all, because a box that writes nowhere is worse than no
+        /// box.</summary>
+        public LocalizedTexts? Texts { get; set; }
+
+        /// <summary>Draws the record, or says why there is nothing to draw.
+        /// <paramref name="suffixes"/> is what its catalog words the record's localization keys with, and
+        /// <paramref name="after"/> the id of the record standing before it — the place a key this record
+        /// lays down belongs after.</summary>
+        public void Rebuild(CatalogRecord? record, IReadOnlyList<string>? suffixes = null, string? after = null)
         {
             _record = record;
+            _suffixes = suffixes ?? [];
+            _after = after;
+
+            // A rename belongs to the record it was made on. Carried across a change of record it would
+            // warn about an id nothing on screen carries.
+            _renamedTo = null;
 
             Follow(record?.File.Document);
             DrawRecord();
@@ -201,6 +254,13 @@ namespace DataEditor.Source.View
         {
             parent.AddChild(actions is null ? Header(name) : Headed(name, actions));
 
+            return Indented(parent);
+        }
+
+        /// <summary>A block stepped in under the row above it, with nothing heading it: what it holds
+        /// belongs to that row, and naming it again would be the same word written twice.</summary>
+        private static Node Indented(Node parent)
+        {
             var margin = new MarginContainer();
             margin.AddThemeConstantOverride(MarginLeftOverride, Indent);
 
@@ -272,7 +332,7 @@ namespace DataEditor.Source.View
 
         /// <summary>One field as a line of text. A value the file does not hold is named by the default
         /// the game will read instead, which is the answer to "what happens if I leave this out".</summary>
-        private static string Scalar(FieldSchema field, JToken? value)
+        private string Scalar(FieldSchema field, JToken? value)
         {
             if (value is null || value.Type == JTokenType.Null)
                 return field.Default is { } fallback ? Text(DefaultFormat, fallback) : Missing;
@@ -297,18 +357,28 @@ namespace DataEditor.Source.View
         /// <summary>A localization key together with the text it stands for. A key nothing translates
         /// answers with itself, and the panel says it once: the author is reading whether the key has
         /// been written yet, and a line repeating it says that as clearly as a line saying nothing.</summary>
-        private static string Translated(string key)
+        private string Translated(string key)
         {
             string translation = Translation(key);
 
             return translation.Length == 0 ? key : Text(TranslationFormat, key, translation);
         }
 
-        /// <summary>The text a key stands for, or nothing when it stands for itself — a key nobody has
-        /// written a translation for yet.</summary>
-        private static string Translation(string key)
+        /// <summary>
+        /// The text a key stands for, or nothing when it stands for itself — a key nobody has written a
+        /// translation for yet.
+        /// <para>Read out of the files the run is editing whenever it has them, and out of the engine only
+        /// when it has not. The engine loaded its translations when the tool started and in one locale:
+        /// asked after an edit it answers with the word that was there an hour ago, and asked at all it
+        /// answers in whichever locale the tool happens to be running in.</para>
+        /// </summary>
+        private string Translation(string key)
         {
             if (key.Length == 0) return string.Empty;
+
+            if (Texts is { } texts)
+                return texts.Locales.Select(locale => texts.Read(locale, key)).FirstOrDefault(said => said is { Length: > 0 })
+                       ?? string.Empty;
 
             string translation = TranslationServer.Translate(key).ToString();
 
@@ -450,7 +520,7 @@ namespace DataEditor.Source.View
 
             void Show(string key)
             {
-                string text = Translation(key);
+                string text = edit.Translation(key);
 
                 translation.Text = text.Length == 0 ? string.Empty : Text(QuotedFormat, text);
             }
@@ -671,6 +741,23 @@ namespace DataEditor.Source.View
             }
 
             DrawRecord();
+
+            // Asked here and not inside the draw: only a change this panel did not make can step an id
+            // away from the keys named after it, and an undo is exactly that.
+            WarnIfKeysLeftBehind();
+        }
+
+        /// <summary>Says so when the record's id no longer matches the id its localization keys were named
+        /// under. An undo steps the record's own file and nothing else — the .po files carry their own
+        /// histories — so a record stepped back to its old name would go into the game with no name at
+        /// all, and nothing else on screen would say why.</summary>
+        private void WarnIfKeysLeftBehind()
+        {
+            if (_renamedTo is not { } named) return;
+            if (string.Equals(named, _record?.CurrentId, StringComparison.Ordinal)) return;
+
+            _renamedTo = null;
+            Say(Text(KeysLeftBehindFormat, named));
         }
 
         private void DrawRecord()
@@ -697,6 +784,14 @@ namespace DataEditor.Source.View
             _heading = Header(string.Empty);
             AddChild(_heading);
             NameRecord();
+
+            _idBefore = record.CurrentId;
+
+            // The keys of the record itself where it has written any, and otherwise those of the record
+            // before it: whatever a key laid down further down this panel belongs under.
+            _keyAnchor = Texts?.AnchorOf(record.CurrentId, _suffixes) ?? Texts?.AnchorOf(_after, _suffixes);
+
+            AddTexts(record);
 
             int drawn = GetChildCount();
             AddRecord(this, record.Schema, token, record.Pointer, depth: 0);
@@ -783,6 +878,15 @@ namespace DataEditor.Source.View
         private void AddField(Node parent, FieldSchema field, JToken? value, string name, JsonPointer at,
             bool named, int depth, Control? actions)
         {
+            // Before the value is asked about at all: a key field the file does not hold yet is still a key
+            // field, and the boxes under it are how the author writes the first word of it. A row that only
+            // became editable on the second visit would read as the tool having missed the first.
+            if (depth < MaxDepth && Keyed(field, value))
+            {
+                AddKeyed(parent, field, value, name, at, named, actions);
+                return;
+            }
+
             if (depth >= MaxDepth || value is null || value.Type == JTokenType.Null)
             {
                 parent.AddChild(Row(name, Editor(field, value, at, named), field.Documentation, actions));
@@ -833,6 +937,151 @@ namespace DataEditor.Source.View
                 ? build(new FieldEdit(this, _build, field, value, at, named))
                 : ValueLabel(Scalar(field, value));
         }
+
+        // ── text ───────────────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// The record's own wording, in every locale, under the keys its catalog words from the id: the
+        /// first thing about a record its author reads, so the first thing the panel draws.
+        /// <para>Nothing at all where the run has no .po files, where the catalog words no keys from an
+        /// id, or where the record carries none — there is no key to write under in any of the three.</para>
+        /// </summary>
+        private void AddTexts(CatalogRecord record)
+        {
+            if (Texts is not { } texts) return;
+
+            List<LocalizedTextKey> family = [.. LocalizedTexts.Keys(record.CurrentId, _suffixes, texts.AnchorOf(_after, _suffixes))];
+
+            if (family.Count == 0) return;
+
+            Node body = Section(this, TextsName, actions: null);
+
+            // A heading per key, because the key is what the author checks: the name of a record and its
+            // description are two keys and reading which box belongs to which is the whole question.
+            for (int index = 0; index < family.Count; index++)
+                AddPair(Section(body, family[index].Key, actions: null),
+                    new TextKey(family, index, block: family[index].Suffix.Length > 0));
+        }
+
+        /// <summary>Whether the field is a key the author writes out in full and this run can write the
+        /// text under it. A field whose suffix is not empty has its key worded from the record's id — the
+        /// block above already draws that one, and drawing it twice would be two boxes over one key.</summary>
+        private bool Keyed(FieldSchema field, JToken? value) =>
+            field.Kind == FieldKind.LocalizedKey
+            && field.LocalizationSuffix is { Length: 0 }
+            && Texts is not null
+            && _document is not null
+            && value is null or JValue;
+
+        /// <summary>
+        /// A field naming a key in full, and under it what that key says in every locale. The read-only
+        /// preview such a row otherwise carries is left off: the boxes below say the same thing and are
+        /// the ones the author may correct.
+        /// <para>The boxes follow the key as it is retyped. A dialogue's key is a box of its own, and
+        /// boxes bound to the word it held a moment ago would show one key's text and write it under
+        /// another.</para>
+        /// </summary>
+        private void AddKeyed(Node parent, FieldSchema field, JToken? value, string name, JsonPointer at,
+            bool named, Control? actions)
+        {
+            var edit = new FieldEdit(this, _build, field, value, at, named);
+            LineEdit box = Box(edit);
+
+            // Always in a block: a key a field spells out in full is where a line of dialogue is worded,
+            // and those run to sentences.
+            var key = new TextKey([new LocalizedTextKey(string.Empty, edit.Written, _keyAnchor)], 0, block: true);
+
+            box.TextChanged += key.Retype;
+
+            // The next key this record lays down goes under this one, so a dialogue's lines arrive in the
+            // file in the order they are read rather than one per end of file.
+            if (edit.Written.Length > 0) _keyAnchor = edit.Written;
+
+            parent.AddChild(Row(name, box, field.Documentation, actions));
+            AddPair(Indented(parent), key);
+        }
+
+        /// <summary>The one way a key is written: a box per locale, in the order the files were read, the
+        /// authoring one first. Both a record's own wording and a field naming a key are drawn through
+        /// here, so there is one answer to what editing a translation looks like.</summary>
+        private void AddPair(Node parent, TextKey key)
+        {
+            if (Texts is not { } texts) return;
+
+            foreach (string locale in texts.Locales)
+            {
+                var text = new LocaleText(this, _build, key, locale);
+
+                parent.AddChild(Row(locale, key.Block ? TextBlock(text) : TextLine(text), TextHint, actions: null));
+            }
+        }
+
+        /// <summary>A name, on one line.</summary>
+        private static Control TextLine(LocaleText text)
+        {
+            var box = new LineEdit { Text = text.Read(), SizeFlagsHorizontal = SizeFlags.ExpandFill };
+
+            box.TextChanged += text.Write;
+            box.FocusExited += text.Seal;
+            text.Follow(() => box.Text = text.Read());
+
+            return box;
+        }
+
+        /// <summary>A description or a line of dialogue, in a block: the game's own wording runs to
+        /// sentences, and a sentence read through a slot the width of a name is one nobody proofreads.</summary>
+        private static Control TextBlock(LocaleText text)
+        {
+            var box = new TextEdit
+            {
+                Text = text.Read(),
+                CustomMinimumSize = new Vector2(0, TextBlockHeight),
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                WrapMode = TextEdit.LineWrappingMode.Boundary
+            };
+
+            box.TextChanged += () => text.Write(box.Text);
+            box.FocusExited += text.Seal;
+            text.Follow(() => box.Text = text.Read());
+
+            return box;
+        }
+
+        /// <summary>
+        /// Names the record's localization keys again once the run of keystrokes over its id is over.
+        /// Done at the end of the run and not as the letters arrive: every half-typed word would
+        /// otherwise be a rename of its own, and the keys would follow the author's hesitation into the
+        /// files.
+        /// <para>Only the id does this. A record taken out leaves its keys standing — whether a key is
+        /// still read is a question about every catalog at once, and it is asked by an audit over the
+        /// whole data root, not by the panel showing one record.</para>
+        /// </summary>
+        private void RenameKeys(JsonPointer at)
+        {
+            if (Texts is not { } texts || _record is not { } record) return;
+            if (record.Schema.IdField is not { } id || at != record.Pointer.Append(id)) return;
+
+            string now = record.CurrentId;
+
+            if (string.Equals(now, _idBefore, StringComparison.Ordinal)) return;
+
+            LocalizedRename rename = texts.RenameRecord(_idBefore, now, _suffixes);
+
+            if (rename.Taken is { } taken) Say(Text(KeysNotMovedFormat, _idBefore, taken));
+            else if (rename.Renamed > 0) Say(Text(RenamedKeysFormat, rename.Renamed));
+
+            _idBefore = now;
+            _renamedTo = rename.Renamed > 0 ? now : null;
+
+            // Whether a key moved or not: the boxes on screen are written under the keys the OLD id worded,
+            // and a record that has just been given another id would go on writing its wording into them —
+            // into nothing at all where the new id is fresh, and over somebody else's text where it is not.
+            RebuildLater();
+        }
+
+        /// <summary>What a gesture came to when the record itself cannot show it, on the line that says
+        /// what the run last did.</summary>
+        private void Say(string what) => Said?.Invoke(what);
 
         // ── gestures ───────────────────────────────────────────────────────────────────────────
 
@@ -1209,6 +1458,9 @@ namespace DataEditor.Source.View
             /// section no described catalog holds — and so cannot say anything about.</summary>
             public IReadOnlyList<string> Undescribed() => panel.References?.Undescribed(schema.RefTargets) ?? [];
 
+            /// <summary>The text a key stands for, asked of the run rather than of the engine.</summary>
+            public string Translation(string key) => panel.Translation(key);
+
             /// <summary>The ids of those targets a query names, best first.</summary>
             public IReadOnlyList<string> Search(string query) =>
                 panel.References?.Search(schema.RefTargets, query, PickerRows) ?? [];
@@ -1220,10 +1472,81 @@ namespace DataEditor.Source.View
             }
 
             /// <summary>Ends the run of keystrokes this field was taking, so the next field edited is a
-            /// step of its own.</summary>
-            public void Seal() => panel._document?.History.Seal();
+            /// step of its own — and, where the run was over the record's id, names the localization keys
+            /// worded from it again.</summary>
+            public void Seal()
+            {
+                panel._document?.History.Seal();
+
+                // Not from a control that has outlived its build: it speaks for a record no longer on
+                // screen, and the word the keys would be named from is another record's.
+                if (!panel.Stale(build)) panel.RenameKeys(at);
+            }
 
             public void Redraw() => panel.RebuildLater();
+        }
+
+        /// <summary>The key a pair of boxes is written under, and the news that it has been retyped. A
+        /// record's own key stands still; a key a field spells out changes under the boxes as the author
+        /// types it, and they have to follow or they write his words under a key nothing reads.</summary>
+        private sealed class TextKey(List<LocalizedTextKey> family, int index, bool block)
+        {
+            public event Action? Retyped;
+
+            /// <summary>The record's keys in the order its catalog words them, shared by every pair of
+            /// boxes of that record: where a key is laid down depends on which of its neighbours are
+            /// written already, and that is a question about the family and not about one key.</summary>
+            public IReadOnlyList<LocalizedTextKey> Family => family;
+
+            public int Index => index;
+
+            public LocalizedTextKey Key => family[index];
+
+            /// <summary>Whether the text is written in a block rather than on a line.</summary>
+            public bool Block => block;
+
+            public void Retype(string written)
+            {
+                if (string.Equals(written, Key.Key, StringComparison.Ordinal)) return;
+
+                family[index] = Key with { Key = written };
+                Retyped?.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// One locale's text under one key: what a box shows, and what it writes back. Held apart from
+        /// the control because a line and a block share no base that carries their text — this is what
+        /// makes them two ways of showing one behaviour rather than two behaviours.
+        /// </summary>
+        private sealed class LocaleText(InspectorPanel panel, object build, TextKey key, string locale)
+        {
+            public string Read() => panel.Texts?.Read(locale, key.Key.Key) ?? string.Empty;
+
+            /// <summary>Writes the text as it is typed. The key is laid down in every locale by the first
+            /// letter of it; a refusal is said out loud, because a box that swallows what is typed into
+            /// it reads as the tool having lost the words.</summary>
+            public void Write(string text)
+            {
+                if (panel.Stale(build) || panel.Texts is not { } texts) return;
+
+                string at = key.Key.Key;
+
+                // Nothing to say about a field naming no key yet: the author is still typing it into the
+                // row above, and that is where the question is answered.
+                if (at.Length == 0) return;
+
+                if (texts.Write(locale, key.Family, key.Index, text) || text.Length == 0) return;
+
+                panel.Say(Text(TextRefusedFormat, at, locale));
+            }
+
+            /// <summary>Ends the run of keystrokes this box was taking, so the next text written is a step
+            /// of its own.</summary>
+            public void Seal() => panel.Texts?.Seal();
+
+            /// <summary>Shows the text again whenever the key the box is written under changes.</summary>
+            public void Follow(Action show) => key.Retyped += show;
         }
     }
 }

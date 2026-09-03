@@ -16,13 +16,23 @@ namespace LastBreath.Descriptors
         private static readonly RecordSchema s_nestedCondition =
             new() { TypeName = NarrativeParameterSchema.NestedConditionRecord, Fields = [] };
 
-        /// <summary>Every condition type the vocabulary was registered with.</summary>
-        public static IReadOnlyList<RecordSchema> Conditions(IEnumerable<INarrativeConditionFactory> factories) =>
-            [.. factories.Select(factory => ToSchema(factory.Parameters))];
+        /// <summary>Every condition type the vocabulary holds, read without a running game.</summary>
+        public static IReadOnlyList<RecordSchema> Conditions() => Schemas(NarrativeVocabulary.Conditions);
 
-        /// <summary>Every action type the vocabulary was registered with.</summary>
+        /// <summary>Every condition type the given factories were registered with — the same schemas the
+        /// vocabulary hands out, asked of a live registry instead.</summary>
+        public static IReadOnlyList<RecordSchema> Conditions(IEnumerable<INarrativeConditionFactory> factories) =>
+            Schemas(factories.Select(factory => factory.Parameters));
+
+        /// <summary>Every action type the vocabulary holds, read without a running game.</summary>
+        public static IReadOnlyList<RecordSchema> Actions() => Schemas(NarrativeVocabulary.Actions);
+
+        /// <summary>Every action type the given factories were registered with.</summary>
         public static IReadOnlyList<RecordSchema> Actions(IEnumerable<INarrativeActionFactory> factories) =>
-            [.. factories.Select(factory => ToSchema(factory.Parameters))];
+            Schemas(factories.Select(factory => factory.Parameters));
+
+        private static IReadOnlyList<RecordSchema> Schemas(IEnumerable<NarrativeRecordSpec> records) =>
+            [.. records.Select(record => ToSchema(record))];
 
         public static RecordSchema ToSchema(NarrativeRecordSpec record) =>
             new() { TypeName = record.TypeName, Fields = [.. record.Parameters.Select(ToSchema)] };

@@ -9,7 +9,31 @@ namespace Tooling.Catalogs
     using static Tooling.Text.Format;
 
     /// <summary>What a save did: the files it wrote, and what it could not write and why.</summary>
-    public sealed record CatalogSaveResult(IReadOnlyList<string> Saved, IReadOnlyList<string> Notes);
+    public sealed record CatalogSaveResult(IReadOnlyList<string> Saved, IReadOnlyList<string> Notes)
+    {
+        /// <summary>How a file that stayed where it was is named.</summary>
+        public const string UnwritableFormat = "{0} could not be written: {1}";
+
+        /// <summary>Writes one file, or says why it stayed where it was. Everything a path can refuse —
+        /// gone, taken by a folder, read-only, too long — arrives as one of these; a number no json can
+        /// spell arrives as an argument being out of range, which is the same kind of answer. One place,
+        /// because a catalog and a locale refusing to be written are the same refusal.</summary>
+        public static string? Guarded(Action write)
+        {
+            ArgumentNullException.ThrowIfNull(write);
+
+            try
+            {
+                write();
+                return null;
+            }
+            catch (Exception failure) when (failure is IOException or UnauthorizedAccessException
+                                                or ArgumentException or NotSupportedException)
+            {
+                return failure.Message;
+            }
+        }
+    }
 
     /// <summary>
     /// What a run has changed and how it gets back to disk. Godot-free like everything else the host
@@ -85,7 +109,7 @@ namespace Tooling.Catalogs
             {
                 if (!IsDirty(file)) continue;
 
-                if (Save(file, order) is { } refusal) notes.Add(Text(Notes.Unwritable, file.Name, refusal));
+                if (Save(file, order) is { } refusal) notes.Add(Text(CatalogSaveResult.UnwritableFormat, file.Name, refusal));
                 else saved.Add(file.Path);
             }
 
@@ -114,22 +138,8 @@ namespace Tooling.Catalogs
         private static IEnumerable<CatalogFile> Files(CatalogWorkspace workspace) =>
             workspace.Catalogs.SelectMany(catalog => catalog.Files);
 
-        /// <summary>Writes one file, or says why it stayed where it was. Everything a path can refuse —
-        /// gone, taken by a folder, read-only, too long — arrives as one of these; a number no json can
-        /// spell arrives as an argument being out of range, which is the same kind of answer.</summary>
-        private static string? Save(CatalogFile file, SchemaKeyOrder order)
-        {
-            try
-            {
-                file.Document.Save(file.Path, order, CanonicalJsonOptions.Default);
-                return null;
-            }
-            catch (Exception failure) when (failure is IOException or UnauthorizedAccessException
-                                                or ArgumentException or NotSupportedException)
-            {
-                return failure.Message;
-            }
-        }
+        private static string? Save(CatalogFile file, SchemaKeyOrder order) =>
+            CatalogSaveResult.Guarded(() => file.Document.Save(file.Path, order, CanonicalJsonOptions.Default));
 
         private void Watch(CatalogFile file) => file.Document.History.Changed += Raise;
 
@@ -138,7 +148,6 @@ namespace Tooling.Catalogs
         private static class Notes
         {
             public const string Named = "{0}: {1}";
-            public const string Unwritable = "{0} could not be written: {1}";
         }
     }
 }

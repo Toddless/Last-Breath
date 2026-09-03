@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tooling.Tests", "Tooling.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEditor", "DataEditor\DataEditor.csproj", "{63A7785E-25CE-42A7-9C65-CCABEB184785}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NarrativeEditor", "NarrativeEditor\NarrativeEditor.csproj", "{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{63A7785E-25CE-42A7-9C65-CCABEB184785}.Release|x64.Build.0 = Release|Any CPU
 		{63A7785E-25CE-42A7-9C65-CCABEB184785}.Release|x86.ActiveCfg = Release|Any CPU
 		{63A7785E-25CE-42A7-9C65-CCABEB184785}.Release|x86.Build.0 = Release|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Debug|x64.Build.0 = Debug|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Debug|x86.Build.0 = Debug|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Release|x64.ActiveCfg = Release|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Release|x64.Build.0 = Release|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Release|x86.ActiveCfg = Release|Any CPU
+		{8F2C1B4A-3D67-4E52-9A18-7C0B5E9D2461}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
