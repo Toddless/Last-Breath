@@ -41,7 +41,15 @@ namespace Core.Narrative.Facts
 
         /// <summary>The head every key of the family carries, the separator included; null for a family of
         /// one, whose template IS the key.</summary>
-        public string? Head => Template.IndexOf(FactKeys.Separator) is var at && at >= 0 ? Template[..(at + 1)] : null;
+        public string? Head
+        {
+            get
+            {
+                int separator = Template.IndexOf(FactKeys.Separator);
+
+                return separator < 0 ? null : Template[..(separator + 1)];
+            }
+        }
 
         /// <summary>Whether a written key belongs to the family. A head with nothing after it does not:
         /// the family named without one of its members is not a member of it, and folding such a word in
@@ -204,11 +212,11 @@ namespace Core.Narrative.Facts
     /// </summary>
     public sealed class FactKeyRegistry
     {
-        private FactKeyRegistry(IReadOnlyList<FactKeyEntry> keys) => Keys = keys;
-
         /// <summary>The declared families first, in the order the code declares them, and then the words
         /// the documents write, in the order they were met. Fixed, so a reading can be pinned.</summary>
         public IReadOnlyList<FactKeyEntry> Keys { get; }
+
+        private FactKeyRegistry(IReadOnlyList<FactKeyEntry> keys) => Keys = keys;
 
         /// <summary>Builds the registry over the uses one walk of the documents found. Blank keys are
         /// passed over: an empty word is the key left half-typed, which the walk itself names.</summary>

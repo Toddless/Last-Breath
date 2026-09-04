@@ -88,6 +88,11 @@ namespace DataEditor.Source.View
 
         private const string NoTextsFormat = "the locales under {0} could not be read: {1}";
 
+        private const string RemoveQuestionFormat = "Take “{0}” out of {1}?";
+        private const string AddedFormat = "added {0}";
+        private const string CopiedFormat = "duplicated as {0}";
+        private const string RemovedFormat = "took {0} out";
+
         /// <summary>The rarities a template may be read at, the fullest first: a preview opening on a
         /// piece with no lines rolled onto it is a preview of nothing. The authored rarities are not
         /// offered — a unique and a mythic ARE their lines, and the roll never touches them.</summary>
@@ -96,11 +101,6 @@ namespace DataEditor.Source.View
 
         /// <summary>Those rarities as the panel offers them, which is also how they are read back.</summary>
         private static readonly string[] s_rarityNames = [.. s_previewRarities.Select(rarity => rarity.ToString())];
-
-        private const string RemoveQuestionFormat = "Take “{0}” out of {1}?";
-        private const string AddedFormat = "added {0}";
-        private const string CopiedFormat = "duplicated as {0}";
-        private const string RemovedFormat = "took {0} out";
 
         private ItemList _catalogList = null!;
         private ItemList _recordList = null!;

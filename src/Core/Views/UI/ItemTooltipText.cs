@@ -106,14 +106,14 @@ namespace Core.Views.UI
         public static string Subtitle(IItem item) => item switch
         {
             IWeaponItem weapon => EquipItemText.WeaponSubtitle(Rarity(item), weapon.WeaponType, weapon.Handedness),
-            IEquipItem equip => string.Join(
-                EquipItemText.Separator, Rarity(item), Localization.Localize(equip.EquipmentPiece.ToString())),
+            IEquipItem equip => EquipItemText.PieceSubtitle(Rarity(item), equip.EquipmentPiece),
             _ => Rarity(item),
         };
 
         /// <summary>The caption a block of rolled lines opens under, or null for the family that shows
         /// none — the leftovers of legacy saves and authored fodder sit under the suffixes as a bare
-        /// tail, and the ascension gift is drawn as a card whose frame is the label.</summary>
+        /// tail. The ascension gift has a caption of its own; a surface drawing it as a card in the
+        /// Mythic colour instead is reading that caption as a frame, which is its own doing.</summary>
         public static string? AffixHeaderKey(AffixKind affix) => affix switch
         {
             AffixKind.Prefix => PrefixesKey,
@@ -174,7 +174,10 @@ namespace Core.Views.UI
         private static IEnumerable<string> Granted(ItemGrantText grant) =>
             grant.Description.Length > 0 ? [grant.Name, grant.Description] : [grant.Name];
 
-        private static string Caption(string key) => Localization.Localize(key).ToUpperInvariant();
+        /// <summary>A section caption, raised the way every other caption of the interface is raised:
+        /// worded text is cased by the culture that is reading it, and the invariant form is kept for
+        /// machine words — keys, ids and file names.</summary>
+        private static string Caption(string key) => Localization.Localize(key).ToUpper();
 
         /// <summary>The piece's typed base channel: a weapon opens with its combat triple, and every piece
         /// then reads one row per typed stat with its own local lines folded in.</summary>

@@ -619,5 +619,55 @@ namespace LastBreathTest.BattleSystemTests
               ]
             }
             """;
+
+        /// <summary>A catalog writing its list as null is a shape json takes and the reader is handed
+        /// nothing for: the run says so of that one file and reads the rest of the narrative, where it
+        /// used to throw out of the whole pass and leave the author with a panel that only said it had
+        /// refused.</summary>
+        [TestMethod]
+        public void ACatalogWritingItsListAsNull_IsNotedAndTheRunReadsOn()
+        {
+            var workspace = CatalogWorkspace.Load(NullListRoot(), CatalogDescriptors.All);
+
+            NarrativeCheckReport report = NarrativeCheckRun.Over(workspace, new ReferenceIndex(workspace), null);
+
+            Assert.IsTrue(report.Notes.Any(note => note.Contains(NullDialoguesFile, StringComparison.Ordinal)
+                                                   && note.Contains("null", StringComparison.Ordinal)),
+                $"nothing about the file the run could read no record out of:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", report.Notes)}");
+
+            Assert.AreEqual(0, report.Read.Dialogues.Count, "a null list was read as records");
+            Assert.AreEqual(1, report.Read.Quests.Count, "the rest of the narrative was not read");
+        }
+
+        private const string NullDialoguesFile = "Dialogues.json";
+
+        /// <summary>A data root whose dialogues are written as null and whose quests are written whole:
+        /// the run has to pass over the one and read the other.</summary>
+        private static string NullListRoot()
+        {
+            string root = Path.Combine(Path.GetTempPath(), "LastBreath", "NarrativeCrossCheckTests", "NullList");
+
+            Directory.CreateDirectory(Path.Combine(root, "Dialogues"));
+            Directory.CreateDirectory(Path.Combine(root, "Quests"));
+            File.WriteAllText(Path.Combine(root, "Dialogues", NullDialoguesFile), """{"dialogues": null}""");
+            File.WriteAllText(Path.Combine(root, "Quests", "Quests.json"), NullListQuestJson);
+
+            return root;
+        }
+
+        private const string NullListQuestJson =
+            """
+            {
+              "quests": [
+                {
+                  "id": "Quest_Forged",
+                  "giverNpcId": "Npc_Forged",
+                  "stages": [
+                    { "id": "Only", "objectives": [ { "id": "Talk", "counter": { "key": "Fact_Forged", "amount": 1 } } ] }
+                  ]
+                }
+              ]
+            }
+            """;
     }
 }

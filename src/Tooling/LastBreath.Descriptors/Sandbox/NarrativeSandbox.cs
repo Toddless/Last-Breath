@@ -29,11 +29,15 @@ namespace LastBreath.Descriptors.Sandbox
         private const string NoCurvesFormat =
             "'{0}' holds no file: the speech-check and quest-offer chances fall back to their built-in defaults";
 
+        /// <summary>What every run is silent about. Private where <see cref="SeededQuestNote"/> is not,
+        /// and for the reason that one is public: this caveat is on every run, so no reader has to pick
+        /// it out of the list.</summary>
         private const string NoPlayerNote =
             "the Attribute condition is never met here: a sandbox holds no character sheet to ask";
 
-        /// <summary>What a world holding a quest is silent about. Public because a reader holding the run
-        /// has to be able to tell this caveat from the rest without matching on its wording.</summary>
+        /// <summary>What a world holding a quest is silent about. Public because it is said only of some
+        /// runs, and a reader holding one has to be able to tell this caveat from the rest without
+        /// matching on its wording.</summary>
         public const string SeededQuestNote =
             "a seeded quest stands on the first stage of its record and its journal is not re-evaluated: "
             + "stages are entered and left when a choice moves the world, not when the world is typed";
@@ -131,8 +135,8 @@ namespace LastBreath.Descriptors.Sandbox
             QuestCatalog = quests;
             _dialogue = new DialogueService(dialogues, _facts, _influence, Rnd, events);
 
-            NarrativeDocuments.Read(workspace, DataCatalog.Quests, quests, _notes);
-            NarrativeDocuments.Read(workspace, DataCatalog.Dialogues, dialogues, _notes);
+            WorkspaceDocuments.Read(workspace, DataCatalog.Quests, quests, _notes);
+            WorkspaceDocuments.Read(workspace, DataCatalog.Dialogues, dialogues, _notes);
         }
 
         /// <summary>Opens a sandbox over the documents this tool has open. Read afresh on every run: a
@@ -172,7 +176,7 @@ namespace LastBreath.Descriptors.Sandbox
 
             if (CatalogWorkspace.FilePaths(folder).Count == 0) _notes.Add(Text(NoCurvesFormat, folder));
 
-            NarrativeDocuments.Read(folder, DataCatalog.Influence, mastery, _notes);
+            WorkspaceDocuments.Read(folder, DataCatalog.Influence, mastery, _notes);
 
             return mastery;
         }

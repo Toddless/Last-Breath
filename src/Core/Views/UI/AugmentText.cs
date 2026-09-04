@@ -100,15 +100,15 @@ namespace Core.Views.UI
                 });
         }
 
-        private static Color RarityColor(Rarity rarity) => Color.FromHtml(TextPalette.RarityColor(rarity));
-
         /// <summary>The tier, worded — and nothing at all where there is no tier to word. Tiers start at
         /// one, so a zero is a composition that supplies no records rather than an augment of tier zero,
         /// and "Tier 0" would be a number the catalog never wrote.</summary>
-        private static string TierLine(int tier) =>
+        public static string TierLine(int tier) =>
             tier < LowestTier
                 ? string.Empty
                 : Localization.Render(Tier, new Dictionary<string, object?> { [TierValue] = tier });
+
+        private static Color RarityColor(Rarity rarity) => Color.FromHtml(TextPalette.RarityColor(rarity));
 
         private static string Body(AugmentCellView cell) =>
             StateLine(cell) is { Length: > 0 } state ? $"{cell.Description}\n{state}" : cell.Description;

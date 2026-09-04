@@ -1,9 +1,11 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using Core.Data.GameData;
     using Core.Enums;
+    using Core.Views.UI;
     using LastBreath.Descriptors;
     using LastBreath.Descriptors.Preview;
     using Newtonsoft.Json.Linq;
@@ -38,6 +40,12 @@ namespace LastBreathTest.BattleSystemTests
         /// carrying this one is a card that reached the balance file.</summary>
         private const string LaidFigure = "15%";
 
+        /// <summary>The tier that augment's record is written at, and the one tag it declares — the two
+        /// halves of the card that are the record's own and not its effect's.</summary>
+        private const string AugmentTier = "3";
+
+        private const string AugmentTag = "attack";
+
         /// <summary>An effect the wording gives a card of its own — the key a keyword link opens.</summary>
         private const string Charge = "Effect_Charge";
 
@@ -55,6 +63,22 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>A number no shipped template carries, so finding it on a card can only mean the
         /// reading came from the document the test wrote it into.</summary>
         private const int Retyped = 4242;
+
+        /// <summary>Every preview a case here opened. The line builders reach the wording through the
+        /// game's static facade, which each reading pins to the preview that made it: a locale switched
+        /// for one case and left switched is Russian text in the next class that pins no service of its
+        /// own.</summary>
+        private readonly List<TooltipPreview> _opened = [];
+
+        /// <summary>Puts every preview this case opened back into the locale it opened in, so the one
+        /// still pinned to the facade reads as it did before the case ran.</summary>
+        [TestCleanup]
+        public void ReadInTheLocaleTheyOpenedIn()
+        {
+            foreach (TooltipPreview preview in _opened) preview.Wording.Locale = PreviewWording.Fallback;
+
+            _opened.Clear();
+        }
 
         [TestMethod]
         public void AnEquipTemplate_ReadsItsNameItsBaseStatAndTheLinesItsRarityRolls()
@@ -106,6 +130,25 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsFalse(line.Contains('{'), $"the augment's line kept a placeholder: {line}");
             Assert.IsTrue(line.Contains(LaidFigure, System.StringComparison.Ordinal),
                 $"the figure the canon balances the laid effect at is not on the line: {line}");
+        }
+
+        /// <summary>The card of an augment is the card the game shows: the tier over the line and, under
+        /// it, where the record declares the copy may sit. A tool assembling those two itself is a tool
+        /// free to promise a fit the game refuses.</summary>
+        [TestMethod]
+        public void AnAugment_ReadsItsTierAndWhereItMaySitAboveItsLine()
+        {
+            LocalizedTexts texts = Texts();
+
+            PreviewText card = Preview(Workspace(), texts).Describe(DataCatalog.Abilities, Augment, Rarity.Legendary);
+
+            string tier = texts.Read(PreviewWording.Fallback, AugmentText.Tier)!
+                .Replace($"{{{AugmentText.TierValue}}}", AugmentTier, System.StringComparison.Ordinal);
+
+            Assert.AreEqual(3, card.Lines.Count, $"the card is not the game's three parts:\n  {string.Join("\n  ", card.Lines)}");
+            Assert.AreEqual(tier, card.Lines[0], "the tier the record is written at does not open the card");
+            Assert.AreEqual(texts.Read(PreviewWording.Fallback, TagText.KeyOf(AugmentTag)), card.Lines[1],
+                "the tag the record binds itself by is not read under the tier");
         }
 
         /// <summary>An effect reads its rule and, under it, the standing card a keyword link opens.</summary>
@@ -213,8 +256,14 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(record.File.Document.SetValue(at, new JValue(value)), $"the document refused to take '{at}'");
         }
 
-        private static TooltipPreview Preview(CatalogWorkspace workspace, LocalizedTexts texts) =>
-            TooltipPreview.Load(workspace, texts);
+        private TooltipPreview Preview(CatalogWorkspace workspace, LocalizedTexts texts)
+        {
+            TooltipPreview preview = TooltipPreview.Load(workspace, texts);
+
+            _opened.Add(preview);
+
+            return preview;
+        }
 
         private static CatalogWorkspace Workspace() =>
             CatalogWorkspace.Load(SharedData.Root(), CatalogDescriptors.All);

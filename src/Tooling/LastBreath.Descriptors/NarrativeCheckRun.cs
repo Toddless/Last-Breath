@@ -38,6 +38,8 @@ namespace LastBreath.Descriptors
     {
         private const string UnreadableFormat = "{0} could not be read as a {1} document: {2}";
 
+        private const string NullListFormat = "{0} writes its {1} as null, so the run read no record out of it";
+
         private const string DialogueWord = "dialogues";
 
         private const string QuestWord = "quests";
@@ -80,7 +82,8 @@ namespace LastBreath.Descriptors
 
         /// <summary>Every record one catalog WRITES, whether or not the loader kept it. A document that is
         /// not the shape the catalog expects is a note: the rest of the run reads on, the way the sandbox
-        /// does with the same files.</summary>
+        /// does with the same files. A file writing its list as null is one such shape — json takes the
+        /// word and the reader is handed nothing, which is no records rather than a run that stops.</summary>
         private static IReadOnlyList<TRecord> Written<TData, TRecord>(
             CatalogWorkspace workspace,
             string catalog,
@@ -90,11 +93,17 @@ namespace LastBreath.Descriptors
         {
             List<TRecord> written = [];
 
-            foreach (GameDataFile file in NarrativeDocuments.Open(workspace, catalog, notes))
+            foreach (GameDataFile file in WorkspaceDocuments.Open(workspace, catalog, notes))
             {
                 try
                 {
-                    if (JsonConvert.DeserializeObject<TData>(file.Json) is { } data) written.AddRange(records(data));
+                    if (JsonConvert.DeserializeObject<TData>(file.Json) is not { } data) continue;
+
+                    IEnumerable<TRecord>? list = records(data);
+
+                    if (list is null) notes.Add(Text(NullListFormat, file.FileName, word));
+
+                    written.AddRange(list ?? []);
                 }
                 catch (JsonException failure)
                 {

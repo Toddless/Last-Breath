@@ -1,5 +1,8 @@
 namespace NarrativeEditor.Source.View
 {
+    using System;
+    using Core.Narrative.Validation;
+
     /// <summary>The record a place in the data belongs to. Written the same way wherever the game names a
     /// place — a finding, the address a fact key is written at — so one reading of it answers for both.</summary>
     internal static class Place
@@ -23,6 +26,7 @@ namespace NarrativeEditor.Source.View
 
             if (steps.Length < RecordSteps) return null;
             if (steps[0].Length == 0 || steps[0].Contains(Index)) return null;
+            if (string.Equals(steps[0], NarrativeChecks.FactsWhere, StringComparison.Ordinal)) return null;
             if (steps[1].Length == 0 || steps[1][0] == Index) return null;
 
             return (steps[0], steps[1]);

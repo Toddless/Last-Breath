@@ -209,14 +209,12 @@ namespace LastBreath.Descriptors.Preview
             foreach (IItemGrant grant in sink.Grants) item.AddGrant(grant);
         }
 
-        /// <summary>An augment's line in the numbers its record declares, filled the way every surface
-        /// showing an augment fills it; failing that, an ability's own line in the numbers it writes.</summary>
+        /// <summary>An augment's card as every surface showing an augment assembles it; failing that, an
+        /// ability's own line in the numbers it writes.</summary>
         private PreviewText Ability(string recordId)
         {
             if (_abilities.Find(recordId) is { } augment)
-                return new PreviewText(
-                    Localization.Localize(recordId),
-                    [Localization.RenderDescription(recordId, AugmentDescription.Values(augment, _canon))]);
+                return new PreviewText(Localization.Localize(recordId), Augment(augment));
 
             if (_abilities.FindAbility(recordId) is { } ability)
                 return new PreviewText(
@@ -225,6 +223,21 @@ namespace LastBreath.Descriptors.Preview
 
             return PreviewText.Says(Text(NoAugmentFormat, recordId));
         }
+
+        /// <summary>The card of one augment record, in the parts the game's own card carries: its tier,
+        /// where its record declares it may sit, and what it does in the numbers it declares. Read
+        /// through the assembly the screens read it through — a second reading of a tier or of a binding
+        /// is how the tool ends up promising a fit the game refuses. A part the record leaves unsaid
+        /// leaves no blank line behind it, the way the carried card joins its own.</summary>
+        private IReadOnlyList<string> Augment(AbilityAugmentData augment) =>
+        [
+            .. new[]
+            {
+                AugmentText.TierLine(augment.Tier),
+                AugmentText.FitLine(augment.Tags, augment.AbilityId, augment.FitsAnyAbility),
+                Localization.RenderDescription(augment.Id, AugmentDescription.Values(augment, _canon)),
+            }.Where(part => part.Length > 0)
+        ];
 
         /// <summary>What an ability record can answer about itself: the numbers it writes, under the
         /// keys the ability book registers them as. Whatever a cast's own parameters add beyond these
@@ -300,6 +313,6 @@ namespace LastBreath.Descriptors.Preview
         /// <summary>Hands one catalog's open documents to a reader of the game's, and keeps whatever it
         /// could not read as a note of this run.</summary>
         private void Read(CatalogWorkspace workspace, string catalog, IGameDataParticipant participant) =>
-            NarrativeDocuments.Read(workspace, catalog, participant, _notes);
+            WorkspaceDocuments.Read(workspace, catalog, participant, _notes);
     }
 }

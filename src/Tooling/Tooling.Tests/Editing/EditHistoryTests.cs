@@ -600,6 +600,28 @@ namespace Tooling.Tests.Editing
             Assert.AreEqual(Initial, cell.Value);
         }
 
+        /// <summary>A stack taken over is one thing that happened, however many steps arrive with it: the
+        /// news is told once, or every reader of the stack redraws itself once per step of a file joining
+        /// the tool.</summary>
+        [TestMethod]
+        public void Take_TellsTheOutsideOnce()
+        {
+            EditHistory tool = new();
+            EditHistory own = new();
+            Cell cell = new(Initial);
+            int notified = 0;
+
+            own.Record(Write(cell, TitleField, First, LabelFirst));
+            own.Record(Write(cell, BudgetField, Second, LabelSecond));
+            own.Record(Write(cell, TitleField, Third, LabelThird));
+
+            tool.Changed += () => notified++;
+            tool.Take(own);
+
+            Assert.AreEqual(3, tool.Depth, "the steps of the file that joined the tool are not all on the stack");
+            Assert.AreEqual(1, notified, "the stack told the outside once per step it adopted");
+        }
+
         /// <summary>Everything the source held moves, not only what can be taken back: a step already
         /// stepped out of is still ahead of the author, and a document that reached the tool already
         /// written is not one to be offered for saving forever.</summary>

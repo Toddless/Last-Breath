@@ -118,15 +118,17 @@ namespace Core.Narrative.Validation
 
         private const string MissingTextFormat = "'{0}' is in no locale this run read";
 
-        /// <summary>Where the run says what it found about the facts themselves, which belong to no one
-        /// record: the key is the second step, the way a record's id is under its catalog.</summary>
-        private const string FactsWhere = "facts";
-
         private const string NeverWrittenFormat = "'{0}' is asked about and nothing ever writes it, so the clause gated on it can never be met";
 
         private const string NeverReadFormat = "'{0}' is written and nothing ever reads it back";
 
         private const string UntranslatedFormat = "'{0}' is missing from the '{1}' locale";
+
+        /// <summary>Where the run says what it found about the facts themselves, which belong to no one
+        /// record: the key is the second step, the way a record's id is under its catalog. Public because
+        /// such a place is shaped like a record's and opens nothing, and a reader telling the two apart
+        /// by spelling the word a second time would drift the day it is spelled differently.</summary>
+        public const string FactsWhere = "facts";
 
         /// <summary>Everywhere an npc is named by the narrative: the whole of the one catalog holding them.</summary>
         private static readonly NarrativeReferenceTarget[] s_npcTargets = [NarrativeReferenceTarget.Whole(DataCatalog.Npc)];
@@ -525,16 +527,16 @@ namespace Core.Narrative.Validation
                 string at = Named(where, QuestStageEntry.ObjectivesKey, objective.Id, index);
 
                 bool condition = objective.Condition is not null;
-                bool counter = objective.Counter is { Key: { Length: > 0 } };
+                string? counter = objective.Counter is { Key: { Length: > 0 } written } ? written : null;
 
-                if (condition == counter)
+                if (condition == (counter is not null))
                     Add(NarrativeFindingKind.Incomplete, at, string.Format(ObjectiveShapeFormat, condition ? BothWord : NeitherWord));
 
                 _vocabulary.Condition(objective.Condition, Under(at, QuestObjectiveEntry.ConditionKey));
 
                 // The one fact key of the narrative written outside the vocabulary: a counter is a field of
                 // the record, so the walk over the conditions and the actions never sees it.
-                if (objective.Counter is { Key: { Length: > 0 } key })
+                if (counter is { } key)
                     _facts.Add(new FactKeyUse(
                         key,
                         FactKeyUseKind.Read,

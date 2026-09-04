@@ -1348,8 +1348,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>Every shipped file of a catalog folder, in the order the game's own data source reads
         /// them — a catalog is the union of its files, and one of them is not the catalog.</summary>
-        private static List<string> ShippedFiles(string catalog) =>
-            [.. CatalogWorkspace.FilePaths(SharedData.Catalog(catalog))];
+        private static List<string> ShippedFiles(string catalog) => [.. SharedData.Files(catalog)];
 
         /// <summary>The records one section of a file holds.</summary>
         private static List<JObject> SectionRecords(JToken root, string section) =>

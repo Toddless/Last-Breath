@@ -11,11 +11,11 @@ namespace LastBreath.Descriptors
 
     /// <summary>
     /// The documents a tool has open, handed to the game's own readers. One place, because everything
-    /// this adapter does with the narrative starts the same way — the catalog as it is written THIS
-    /// second, read by the loader that will read it in the game — and a second copy of that step would
-    /// be a second answer to what a dialogue currently says.
+    /// this adapter does with a catalog starts the same way — the catalog as it is written THIS second,
+    /// read by the loader that will read it in the game — and a second copy of that step would be a
+    /// second answer to what a record currently says.
     /// </summary>
-    public static class NarrativeDocuments
+    public static class WorkspaceDocuments
     {
         private const string ReadFailedFormat = "{0} could not be read: {1}";
 

@@ -29,10 +29,10 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>The npc every forged record is written for.</summary>
         private const string ForgedNpc = "Npc_Forged";
 
-        /// <summary>The two folders of the game's own code that keep facts. A test walking source is
-        /// walking these and nothing else: a tool or a test writing a key as a literal is writing a fixture
-        /// and not a fact of the world.</summary>
-        private static readonly string[] s_sourceFolders = ["Core", "Main"];
+        /// <summary>The folders of the game's own code that keep facts — every project a fact is written
+        /// or read in. A test walking source is walking these and nothing else: a tool or a test writing a
+        /// key as a literal is writing a fixture and not a fact of the world.</summary>
+        private static readonly string[] s_sourceFolders = ["Core", "Main", "Battle", "Crafting"];
 
         /// <summary>A fact key written as a literal straight into one of the service's own calls. What the
         /// builders exist to stop: a word spelt in two places drifts apart on the first rename, and the
@@ -186,7 +186,10 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>No code of the game writes a fact key as a literal: every key it keeps is built, which
         /// is what lets the registry name who writes each one. A call the builders do not go through is a
-        /// key the tool cannot offer and the checks answer for by halves.</summary>
+        /// key the tool cannot offer and the checks answer for by halves.
+        /// <para>A lint and not an invariant. The walk reads one line at a time and matches the call as it
+        /// is spelt, so a key handed over through a local of another name, or a call broken across lines,
+        /// goes past it. It catches the way the mistake is actually made and claims nothing more.</para></summary>
         [TestMethod]
         public void NoCodeOfTheGame_WritesAFactKeyAsALiteral()
         {
