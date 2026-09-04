@@ -8,6 +8,7 @@ namespace NarrativeEditor.Source.View
     using Tooling.Catalogs;
     using Tooling.Editing.History;
     using Tooling.Localization;
+    using Tooling.Ui;
     using static Tooling.Text.Format;
 
     /// <summary>

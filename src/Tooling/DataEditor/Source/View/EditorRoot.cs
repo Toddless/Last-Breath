@@ -41,6 +41,11 @@ namespace DataEditor.Source.View
 
         private const string ToolTitle = "data editor";
 
+        /// <summary>What the two readings under the inspector are called on their tabs.</summary>
+        private const string PreviewTabName = "preview";
+
+        private const string ChecksTabName = "checks";
+
         private const string CatalogRowFormat = "{0}{1}   ({2})";
         private const string RecordRowFormat = "{0}   ·  {1}";
         private const string ReadoutFormat =
@@ -111,6 +116,7 @@ namespace DataEditor.Source.View
         private ItemList _recordList = null!;
         private InspectorPanel _inspector = null!;
         private PreviewPanel _preview = null!;
+        private CatalogChecksPanel _checks = null!;
 
         private Button _addButton = null!;
         private Button _copyButton = null!;
@@ -199,6 +205,7 @@ namespace DataEditor.Source.View
 
             _inspector = new InspectorPanel { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             _preview = new PreviewPanel { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            _checks = new CatalogChecksPanel { Name = ChecksTabName };
 
             // Two divides rather than one container holding all three panes: nested, each divider
             // starts at the minimum width of the pane before it and moves without touching the other.
@@ -217,8 +224,23 @@ namespace DataEditor.Source.View
             body.AddChild(right);
             right.AddChild(RecordPane());
             right.AddChild(edited);
+
+            // Two readings of the data under the same divide: what one record comes out as, and what the
+            // whole run owes. Tabs and not panes of their own — an author does one at a time, and both at
+            // once would leave neither enough of the window to be read in.
+            var read = new TabContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                SizeFlagsVertical = SizeFlags.ExpandFill
+            };
+
+            ScrollContainer previewed = Scrolled(_preview);
+            previewed.Name = PreviewTabName;
+
             edited.AddChild(Scrolled(_inspector));
-            edited.AddChild(Scrolled(_preview));
+            edited.AddChild(read);
+            read.AddChild(previewed);
+            read.AddChild(_checks);
 
             BuildRecordDialog();
             BuildRemoveDialog();
@@ -228,8 +250,45 @@ namespace DataEditor.Source.View
             _inspector.Said += Report;
             _inspector.Settled = FollowDialogueKeys;
             _preview.Source = Previewed;
+            _checks.Said += Report;
+            _checks.Chose += OpenRecord;
 
             return body;
+        }
+
+        /// <summary>Opens the record a finding belongs to: its catalog, then the row carrying that id.
+        /// Nothing at all when the run no longer holds either — the documents move while the rows on
+        /// screen stand still, and a finding is an answer about the data as it was read.</summary>
+        private void OpenRecord(string catalog, string id)
+        {
+            if (_workspace is not { } workspace) return;
+
+            int at = IndexOf(workspace.Catalogs, catalog);
+
+            if (at == NoSelection) return;
+
+            ShowCatalog(at);
+            ShowRecord(_catalog is { } view ? RowOf(view, id) : NoSelection);
+        }
+
+        private static int IndexOf(IReadOnlyList<CatalogView> catalogs, string catalog)
+        {
+            for (int index = 0; index < catalogs.Count; index++)
+                if (string.Equals(catalogs[index].Catalog, catalog, StringComparison.Ordinal))
+                    return index;
+
+            return NoSelection;
+        }
+
+        /// <summary>The row of the record answering to one id now. Asked of the id the record CARRIES: a
+        /// finding names a record by its name, and the name is a field the author may have retyped since.</summary>
+        private static int RowOf(CatalogView view, string id)
+        {
+            for (int index = 0; index < view.Records.Count; index++)
+                if (string.Equals(view.Records[index].CurrentId, id, StringComparison.Ordinal))
+                    return index;
+
+            return NoSelection;
         }
 
         /// <summary>
@@ -377,6 +436,12 @@ namespace DataEditor.Source.View
 
             _inspector.References = references;
 
+            // The same ids the pickers are answered from, and the same stack every document steps on: the
+            // checks read the whole run and go out of date the moment any of it is typed into.
+            _checks.Workspace = _workspace;
+            _checks.References = references;
+            _checks.History = History;
+
             // The same question turned round, for a record renamed: every place the run writes the old id
             // is rewritten with the new one. The narrative's own finder is handed over with it — a quest
             // named inside a condition is a word no schema of this run can see, and a rename passing it
@@ -461,6 +526,7 @@ namespace DataEditor.Source.View
 
                 Texts = texts;
                 _inspector.Texts = texts;
+                _checks.Texts = texts;
             }
             catch (Exception failure) when (failure is IOException or UnauthorizedAccessException
                                                or FormatException or ArgumentException)

@@ -52,7 +52,13 @@ namespace LastBreath.Descriptors
                 // A name, the rule text a bearer reads, and the standing card a keyword link opens: an
                 // effect is the one thing in the game written about in all three places.
                 [LocalizedKeyAttribute.NoSuffix, LocalizationService.DescriptionSuffix, LocalizationService.TooltipSuffix],
-                new SingleFilePlacement { FileName = FileName });
+                new SingleFilePlacement { FileName = FileName })
+            {
+                // The card is the one of the three that is owed to nobody: it opens from a description
+                // writing {@Effect_X} and from nowhere else, so most effects are never linked to and a
+                // card written for each of them would be text no player can reach.
+                RequiredSuffixes = [LocalizedKeyAttribute.NoSuffix, LocalizationService.DescriptionSuffix]
+            };
         }
     }
 }

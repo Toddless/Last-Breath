@@ -1,4 +1,4 @@
-namespace NarrativeEditor.Source.View
+namespace Tooling.Ui
 {
     using System;
     using System.Collections.Generic;
@@ -7,12 +7,14 @@ namespace NarrativeEditor.Source.View
     using Tooling.Json;
 
     /// <summary>
-    /// Everything a reading of the whole narrative can go out of date under: every document the run has
-    /// open, every file laid down while it is, and the stack the tool files its steps on.
-    /// <para>Every catalog and not the narrative ones alone — an id a dialogue points at is written in
+    /// Everything a reading of the whole run can go out of date under: every document the run has open,
+    /// every file laid down while it is, and the stack the tool files its steps on.
+    /// <para>Every catalog and not the ones a panel is about — an id a record points at is written in
     /// another catalog, so an answer is stale as soon as ANY of them is typed into. The stack covers what
     /// announces nothing of its own, the .po files among them, whose wording is the very thing a
     /// missing-text finding is about.</para>
+    /// <para>Shared by every panel that reads the whole run at once: what makes an answer stale is a fact
+    /// about the documents, and two readings of it would be two answers.</para>
     /// </summary>
     internal sealed class DocumentWatch
     {

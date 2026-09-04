@@ -108,6 +108,11 @@ namespace Tooling.Localization
             return Keys(id, suffixes).Select(key => key.Key).LastOrDefault(Taken);
         }
 
+        /// <summary>Everything one locale writes, in the order its file has it — the header among them,
+        /// and a key written twice written twice. Read by whoever asks about the FILE rather than about a
+        /// key: nothing addressed by key can reach the second entry under one word.</summary>
+        public IEnumerable<PoEntry> Entries(string locale) => _set.Get(locale).Entries;
+
         /// <summary>What one locale says under a key, or null when that locale has no such key at all —
         /// told apart from the empty string, which is a key that is there and says nothing.</summary>
         public string? Read(string locale, string key)

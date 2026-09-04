@@ -46,7 +46,13 @@ namespace LastBreath.Descriptors
                 // A name and a description: an ornament is a named artefact read in a tooltip, not a row
                 // in a list of materials.
                 [LocalizedKeyAttribute.NoSuffix, LocalizationService.DescriptionSuffix],
-                new SingleFilePlacement { FileName = FileName });
+                new SingleFilePlacement { FileName = FileName })
+            {
+                // The name is owed — an unworded ornament reaches the player as its own id. The flavour
+                // under it is offered and not owed: what the ornament DOES is the socket it opens, and
+                // the tooltip reads whole without a sentence beneath the name.
+                RequiredSuffixes = [LocalizedKeyAttribute.NoSuffix]
+            };
         }
     }
 }

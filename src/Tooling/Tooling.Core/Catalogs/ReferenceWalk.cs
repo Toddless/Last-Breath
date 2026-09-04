@@ -12,6 +12,13 @@ namespace Tooling.Catalogs
     /// the host and nothing at all here.</summary>
     public delegate VocabularyBinding? FieldVocabulary(FieldSchema field);
 
+    /// <summary>One field of a record as the walk met it: where it stands, the schema it is drawn by, and
+    /// what the file holds there. Taken down for whoever asks about the SHAPE a value is written in rather
+    /// than about the words inside it — a range written as a number, a record wearing two shapes at once.
+    /// The two questions are one descent, and a second walk over the same schemas would be a second answer
+    /// to keep in step.</summary>
+    public sealed record SchemaNode(CatalogFile File, JsonPointer At, FieldSchema Field, JToken Token);
+
     /// <summary>
     /// Every id a record writes where another catalog's record is meant, at the address the FILE holds it
     /// at. One walk, driven by the schema: a catalog whose DTO grows a reference is walked without anyone
@@ -25,13 +32,16 @@ namespace Tooling.Catalogs
         /// <summary>Every reference one record writes, <paramref name="at"/> being where the record itself
         /// stands in its file. A token that is not a record writes nothing: the file said so when it was
         /// read, and a walk that guessed would address nodes nobody wrote.</summary>
+        /// <param name="nodes">Where every field met on the way is taken down as well, for a caller asking
+        /// about the shape of what is written; null for one asking only about the words.</param>
         public static void Record(
             CatalogFile file,
             RecordSchema record,
             JToken? token,
             JsonPointer at,
             FieldVocabulary? vocabulary,
-            ICollection<ReferenceMention> found)
+            ICollection<ReferenceMention> found,
+            ICollection<SchemaNode>? nodes = null)
         {
             ArgumentNullException.ThrowIfNull(file);
             ArgumentNullException.ThrowIfNull(record);
@@ -41,7 +51,7 @@ namespace Tooling.Catalogs
             if (token is not JObject holder) return;
 
             foreach (FieldSchema field in Fields(record, holder))
-                Field(file, field, holder[field.JsonName], at.Append(field.JsonName), ReferenceUseKind.Value, vocabulary, found);
+                Field(file, field, holder[field.JsonName], at.Append(field.JsonName), ReferenceUseKind.Value, vocabulary, found, nodes);
         }
 
         /// <summary>Every reference the entries standing at <paramref name="at"/> write. A key the game
@@ -53,7 +63,8 @@ namespace Tooling.Catalogs
             JToken? token,
             JsonPointer at,
             FieldVocabulary? vocabulary,
-            ICollection<ReferenceMention> found)
+            ICollection<ReferenceMention> found,
+            ICollection<SchemaNode>? nodes = null)
         {
             ArgumentNullException.ThrowIfNull(binding);
             ArgumentNullException.ThrowIfNull(at);
@@ -61,12 +72,12 @@ namespace Tooling.Catalogs
             if (binding.List && token is JArray written)
             {
                 for (int index = 0; index < written.Count; index++)
-                    Entry(file, binding, written[index], at.Append(index), vocabulary, found);
+                    Entry(file, binding, written[index], at.Append(index), vocabulary, found, nodes);
 
                 return;
             }
 
-            Entry(file, binding, token, at, vocabulary, found);
+            Entry(file, binding, token, at, vocabulary, found, nodes);
         }
 
         /// <summary>One entry of a vocabulary, read by the type it names. An entry naming a type this
@@ -78,11 +89,12 @@ namespace Tooling.Catalogs
             JToken? token,
             JsonPointer at,
             FieldVocabulary? vocabulary,
-            ICollection<ReferenceMention> found)
+            ICollection<ReferenceMention> found,
+            ICollection<SchemaNode>? nodes)
         {
             if (TypedRecords.Worn(binding, token) is not { } type) return;
 
-            Record(file, type, token, at, vocabulary, found);
+            Record(file, type, token, at, vocabulary, found, nodes);
         }
 
         private static void Field(
@@ -92,16 +104,22 @@ namespace Tooling.Catalogs
             JsonPointer at,
             ReferenceUseKind kind,
             FieldVocabulary? vocabulary,
-            ICollection<ReferenceMention> found)
+            ICollection<ReferenceMention> found,
+            ICollection<SchemaNode>? nodes)
         {
             if (token is null || token.Type == JTokenType.Null) return;
+
+            // Taken down before the kind decides what to do with it: a range written as a plain number is
+            // a field whose schema says object and whose token says otherwise, and a walk that took nodes
+            // down only where it descended would never meet the one case worth reporting.
+            nodes?.Add(new SchemaNode(file, at, field, token));
 
             // Asked before the kind, the way the panel drawing these asks it: a key the schema can only
             // call free json, and a condition nested inside another condition, are both answered by the
             // vocabulary and by nothing the schema holds.
             if (vocabulary?.Invoke(field) is { } binding)
             {
-                Entries(file, binding, token, at, vocabulary, found);
+                Entries(file, binding, token, at, vocabulary, found, nodes);
                 return;
             }
 
@@ -112,17 +130,17 @@ namespace Tooling.Catalogs
                     break;
 
                 case FieldKind.Object when field.Record is { } record:
-                    Record(file, record, token, at, vocabulary, found);
+                    Record(file, record, token, at, vocabulary, found, nodes);
                     break;
 
                 case FieldKind.Array when field.Item is { } item && token is JArray array:
                     for (int index = 0; index < array.Count; index++)
-                        Field(file, item, array[index], at.Append(index), ReferenceUseKind.ListItem, vocabulary, found);
+                        Field(file, item, array[index], at.Append(index), ReferenceUseKind.ListItem, vocabulary, found, nodes);
 
                     break;
 
                 case FieldKind.Dictionary when token is JObject map:
-                    Map(file, field, map, at, vocabulary, found);
+                    Map(file, field, map, at, vocabulary, found, nodes);
                     break;
 
                 default:
@@ -139,7 +157,8 @@ namespace Tooling.Catalogs
             JObject map,
             JsonPointer at,
             FieldVocabulary? vocabulary,
-            ICollection<ReferenceMention> found)
+            ICollection<ReferenceMention> found,
+            ICollection<SchemaNode>? nodes)
         {
             foreach (JProperty pair in map.Properties())
             {
@@ -150,7 +169,7 @@ namespace Tooling.Catalogs
                 if (field.Key is { Kind: FieldKind.Reference } key)
                     Named(file, under, ReferenceUseKind.MapKey, pair.Name, key.RefTargets, found);
 
-                if (field.Item is { } item) Field(file, item, pair.Value, under, ReferenceUseKind.Value, vocabulary, found);
+                if (field.Item is { } item) Field(file, item, pair.Value, under, ReferenceUseKind.Value, vocabulary, found, nodes);
             }
         }
 

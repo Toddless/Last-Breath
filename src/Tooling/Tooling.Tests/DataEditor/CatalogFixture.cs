@@ -24,9 +24,15 @@ namespace Tooling.Tests.DataEditor
             RootShape shape,
             SchemaList<SectionSchema> sections,
             FilePlacement? placement = null,
-            SchemaList<string> localizedSuffixes = default) =>
+            SchemaList<string> localizedSuffixes = default,
+            string[]? requiredSuffixes = null) =>
             new HandWritten(
-                catalog, shape, sections, placement ?? new SingleFilePlacement { FileName = catalog }, localizedSuffixes);
+                catalog,
+                shape,
+                sections,
+                placement ?? new SingleFilePlacement { FileName = catalog },
+                localizedSuffixes,
+                requiredSuffixes);
 
         public static SectionSchema Section(string key, RecordSchema record) => new() { Key = key, Record = record };
 
@@ -64,13 +70,20 @@ namespace Tooling.Tests.DataEditor
             RootShape shape,
             SchemaList<SectionSchema> sections,
             FilePlacement placement,
-            SchemaList<string> localizedSuffixes)
+            SchemaList<string> localizedSuffixes,
+            string[]? requiredSuffixes)
             : ICatalogDescriptor
         {
             public string Catalog => catalog;
 
-            public CatalogSchema Describe(ISchemaBuilder builder) =>
-                new(shape, sections, localizedSuffixes, placement);
+            /// <summary>The schema as the test spells it. A catalog naming no required suffixes owes every
+            /// one it declares, which is the schema's own reading and not a default written twice.</summary>
+            public CatalogSchema Describe(ISchemaBuilder builder)
+            {
+                var schema = new CatalogSchema(shape, sections, localizedSuffixes, placement);
+
+                return requiredSuffixes is { } required ? schema with { RequiredSuffixes = required } : schema;
+            }
         }
     }
 }

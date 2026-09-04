@@ -23,6 +23,7 @@ namespace LastBreathTest.BattleSystemTests
     using Moq;
     using Newtonsoft.Json.Linq;
     using Tooling.Catalogs;
+    using Tooling.Catalogs.Checks;
     using Tooling.Json;
     using Tooling.Schema;
     using Tooling.Schema.Model;
@@ -2671,7 +2672,10 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>The catalogs of the bench whose ids are held against the files that answer them. Only
         /// the catalogs are named: WHERE each writes a reference is read off its schema, so a
         /// <see cref="CatalogRefAttribute"/> added to a crafting DTO joins the walk without anyone
-        /// remembering to add it here.</summary>
+        /// remembering to add it here.
+        /// <para>What one of them writes where a BEHAVIOUR is meant is the grants' pin and not this one:
+        /// the item effects are a catalog of grants and of ids of its own at once, and one word answered
+        /// by two pins is a fact stated twice.</para></summary>
         private static readonly string[] s_craftingCatalogs =
         [
             DataCatalog.Recipes,
@@ -2687,13 +2691,16 @@ namespace LastBreathTest.BattleSystemTests
         /// an equipment template no file declares.
         /// </summary>
         /// <remarks>Held as the whole list rather than as a count, so that one going away is as loud as
-        /// one arriving: a pin nothing matches any more is a fact that has moved on.</remarks>
-        private static readonly string[] s_unansweredCraftingIds =
+        /// one arriving: a pin nothing matches any more is a fact that has moved on. The FIELD is pinned
+        /// beside the catalog and the word — a recipe MINTING a template nobody wrote and one PAID in a
+        /// resource nobody wrote are two different facts, and a pin naming only the two ends would be
+        /// answered by either.</remarks>
+        private static readonly (string Catalog, string Field, string Id)[] s_unansweredCraftingIds =
         [
-            $"{DataCatalog.Recipes} {RecipesCatalogDescriptor.ResultField} → 'Body_Iron_Bastion'",
-            $"{DataCatalog.Recipes} {RecipesCatalogDescriptor.ResultField} → 'Boots_Iron_Bastion'",
-            $"{DataCatalog.Recipes} {RecipesCatalogDescriptor.ResultField} → 'Gloves_Iron_Bastion'",
-            $"{DataCatalog.Recipes} {RecipesCatalogDescriptor.ResultField} → 'Helmet_Iron_Bastion'",
+            (DataCatalog.Recipes, RecipesCatalogDescriptor.ResultField, "Body_Iron_Bastion"),
+            (DataCatalog.Recipes, RecipesCatalogDescriptor.ResultField, "Boots_Iron_Bastion"),
+            (DataCatalog.Recipes, RecipesCatalogDescriptor.ResultField, "Gloves_Iron_Bastion"),
+            (DataCatalog.Recipes, RecipesCatalogDescriptor.ResultField, "Helmet_Iron_Bastion"),
         ];
 
         /// <summary>Records the shipped data writes twice under one id, by the catalog and the id. A
@@ -3036,38 +3043,46 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void EveryIdTheShippedCraftingFilesNameIsOneItsCatalogWrites()
         {
-            List<string> unanswered = [];
-            int walked = 0;
-            int addressed = 0;
+            HashSet<string> grants = HandedOverAt(s_grantSites);
+            List<string> named = [.. Unanswered(s_craftingCatalogs, where => !grants.Contains(where))];
 
-            foreach (string catalog in s_craftingCatalogs)
-            {
-                CatalogSchema schema = Schema(catalog);
-
-                foreach (SectionSchema section in schema.Sections)
-                    foreach (string[] path in References(section.Record))
-                    {
-                        addressed++;
-
-                        foreach (string file in ShippedFiles(catalog))
-                        {
-                            (List<string> missing, int read) = Unanswered(JsonTreeDocument.Load(file).Root, section, catalog, path);
-                            unanswered.AddRange(missing);
-                            walked += read;
-                        }
-                    }
-            }
-
-            Assert.AreNotEqual(0, addressed, "the crafting schemas write no reference at all — the walk has nothing to read");
-            Assert.AreNotEqual(0, walked, "the shipped crafting files name nothing at all — the walk proves nothing");
-
-            List<string> named = [.. unanswered.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
             Report("Ids the shipped crafting files name that nothing answers", named);
 
             CollectionAssert.AreEquivalent(
-                s_unansweredCraftingIds,
+                s_unansweredCraftingIds.Select(known => Named(known.Catalog, known.Field, known.Id)).ToArray(),
                 named.ToArray(),
                 $"the shipped crafting files name other ids than the known ones nothing answers:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", named)}");
+        }
+
+        /// <summary>The ids the shipped run writes in the named catalogs, at the places <paramref name="at"/>
+        /// answers for, that nothing answers — as the pins spell them. One run of the checks answers for
+        /// every catalog of the game, so a walk of this test's own would be a second reading of the same
+        /// files; WHICH of its findings a pin is about is the only thing left to say, and two catalogs
+        /// carry both grants and ids of their own.</summary>
+        private static IEnumerable<string> Unanswered(IReadOnlyList<string> catalogs, Func<string, bool> at) =>
+            CatalogCrossCheckTests.Shipped.Findings
+                .Where(finding => finding.Kind == CatalogFindingKind.UnknownReference
+                                  && catalogs.Contains(finding.Catalog)
+                                  && at(finding.Where))
+                .Select(finding => Named(finding.Catalog, FieldOf(finding.Where), finding.Named))
+                .Distinct(StringComparer.Ordinal)
+                .Order(StringComparer.Ordinal);
+
+        /// <summary>The field a finding stands at: the last step of its address that names one. A step
+        /// that is an INDEX names no field — a word written in a list stands under the list's own name —
+        /// so the numbers are stepped back over. The file and the place a record happens to sit in are its
+        /// author's to move, and the field is the half of the address that says what the word was written
+        /// AS.</summary>
+        private static string FieldOf(string where)
+        {
+            string[] steps = where.Split(JsonPointer.Separator);
+
+            // Never the first step, which is the file the finding stands in and no field of anything.
+            for (int step = steps.Length - 1; step > 0; step--)
+                if (!JsonPointer.TryReadIndex(steps[step], out _))
+                    return steps[step];
+
+            return string.Empty;
         }
 
         /// <summary>The mutation the walk exists for: a recipe minting a template nobody wrote is the one
@@ -3076,18 +3091,12 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void ARecipeMintingATemplateNobodyWrote_IsCaught()
         {
-            CatalogSchema schema = Schema(DataCatalog.Recipes);
-            JToken root = JsonTreeDocument.Parse(ForgedRecipeJson).Root;
+            IReadOnlyList<CatalogFinding> found = CatalogCrossCheckTests.Forged(DataCatalog.Recipes, ForgedRecipeJson);
 
-            SectionSchema section = schema.Sections[0];
-            (List<string> minted, int mints) = Unanswered(root, section, DataCatalog.Recipes, [RecipesCatalogDescriptor.ResultField]);
-            (List<string> paid, int lines) = Unanswered(
-                root, section, DataCatalog.Recipes, [RecipesCatalogDescriptor.RequirementsField, RequirementIdField]);
-
-            Assert.AreEqual(1, mints, "the forged recipe mints another number of things than the walk read");
-            Assert.AreEqual(1, lines, "the forged recipe is paid in another number of resources than the walk read");
-            Assert.AreEqual(1, minted.Count, $"a recipe minting a template nobody wrote went unnoticed: {string.Join(", ", minted)}");
-            Assert.AreEqual(0, paid.Count, $"the walk called a shipped resource broken: {string.Join(", ", paid)}");
+            CollectionAssert.AreEqual(
+                new[] { "Ring_Nobody_Wrote" },
+                CatalogCrossCheckTests.Words(found, CatalogFindingKind.UnknownReference),
+                $"the forged recipe was read as: {CatalogCrossCheckTests.Lines(found)}");
         }
 
         /// <summary>The second mutation, one level below the first: a rarity override paid in a resource
@@ -3096,26 +3105,16 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void AnUpgradeCostOverriddenIntoAResourceNobodyWrote_IsCaught()
         {
-            CatalogSchema schema = Schema(DataCatalog.UpgradeCosts);
-            JToken root = JsonTreeDocument.Parse(ForgedUpgradeCostJson).Root;
+            IReadOnlyList<CatalogFinding> found = CatalogCrossCheckTests.Forged(DataCatalog.UpgradeCosts, ForgedUpgradeCostJson);
 
-            SectionSchema section = Part(schema, UpgradeCostsCatalogDescriptor.UpgradeKey);
-            (List<string> defaults, int lines) = Unanswered(
-                root, section, DataCatalog.UpgradeCosts, [UpgradeCostsCatalogDescriptor.RequirementsField, RequirementIdField]);
-            (List<string> overridden, int rarities) = Unanswered(
-                root,
-                section,
-                DataCatalog.UpgradeCosts,
-                [
-                    UpgradeCostsCatalogDescriptor.RequirementsField, UpgradeCostsCatalogDescriptor.ByRarityField,
-                    AnyKey, RequirementIdField
-                ]);
+            CollectionAssert.AreEqual(
+                new[] { "Upgrade_Resource_Nobody_Wrote" },
+                CatalogCrossCheckTests.Words(found, CatalogFindingKind.UnknownReference),
+                $"the forged cost was read as: {CatalogCrossCheckTests.Lines(found)}");
 
-            Assert.AreEqual(1, lines, "the forged cost writes another number of default resources than the walk read");
-            Assert.AreEqual(1, rarities, "the forged cost writes another number of rarity overrides than the walk read");
-            Assert.AreEqual(0, defaults.Count, $"the walk called a shipped resource broken: {string.Join(", ", defaults)}");
-            Assert.AreEqual(1, overridden.Count,
-                $"a rarity paid in a resource nobody wrote went unnoticed: {string.Join(", ", overridden)}");
+            Assert.IsTrue(
+                found.Any(finding => finding.Where.Contains(UpgradeCostsCatalogDescriptor.ByRarityField, StringComparison.Ordinal)),
+                $"the finding names the cost line rather than the rarity override inside it: {CatalogCrossCheckTests.Lines(found)}");
         }
 
         /// <summary>
@@ -3129,37 +3128,16 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void NoSectionOfADescribedCatalogWritesTwoRecordsUnderOneId()
         {
-            List<string> twice = [];
-            int counted = 0;
+            Assert.AreNotEqual(0, CatalogCrossCheckTests.Shipped.Workspace.RecordCount,
+                "no record of any described catalog was read — the check is checking nothing");
 
-            foreach (ICatalogDescriptor descriptor in CatalogDescriptors.All)
-            {
-                CatalogSchema schema = Schema(descriptor.Catalog);
-
-                if (schema.Shape is not (RootShape.ArrayUnderKey or RootShape.SectionsOfArrays)) continue;
-
-                foreach (SectionSchema section in schema.Sections)
-                {
-                    if (section.Record.IdField is not { } idField) continue;
-
-                    Dictionary<string, int> written = new(StringComparer.Ordinal);
-
-                    foreach (string file in ShippedFiles(descriptor.Catalog))
-                        foreach (JObject record in SectionRecords(JsonTreeDocument.Load(file).Root, section.Key))
-                        {
-                            if (Id(record, idField) is not { Length: > 0 } id) continue;
-
-                            counted++;
-                            written[id] = written.GetValueOrDefault(id) + 1;
-                        }
-
-                    twice.AddRange(written.Where(pair => pair.Value > 1).Select(pair => Named(descriptor.Catalog, pair.Key)));
-                }
-            }
-
-            Assert.AreNotEqual(0, counted, "no record of any described catalog was read — the check is checking nothing");
-
-            List<string> named = [.. twice.Order(StringComparer.Ordinal)];
+            List<string> named =
+            [
+                .. CatalogCrossCheckTests.Shipped.Findings
+                    .Where(finding => finding.Kind == CatalogFindingKind.DuplicateId)
+                    .Select(finding => Named(finding.Catalog, finding.Record))
+                    .Order(StringComparer.Ordinal)
+            ];
             Report("Records the shipped data writes twice under one id", named);
 
             CollectionAssert.AreEquivalent(
@@ -3171,143 +3149,9 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>One record of one catalog, as both the finding and the pin spell it.</summary>
         private static string Named(string catalog, string id) => $"{catalog}: {id}";
 
-        /// <summary>One keyed part of a catalog, where the walk needs the key as much as the record.</summary>
-        private static SectionSchema Part(CatalogSchema schema, string section) =>
-            schema.Sections.FirstOrDefault(candidate => candidate.Key == section)
-            ?? throw new AssertFailedException($"the catalog holds no '{section}' section.");
-
-        /// <summary>
-        /// Every address one record writes a reference at, read off the schema rather than listed: a
-        /// catalog whose DTO gains a reference joins the walk without anyone remembering it. The addresses
-        /// are the FILE's — a map is a step of its own in a document and none in a path down a record — so
-        /// every map met on the way puts an <see cref="AnyKey"/> in.
-        /// <para>What a map is KEYED by is not among them: a key is not written where a value is, and no
-        /// catalog of the bench points into one.</para>
-        /// </summary>
-        private static IEnumerable<string[]> References(RecordSchema record, string[] at, HashSet<RecordSchema>? reading = null)
-        {
-            reading ??= new HashSet<RecordSchema>(ReferenceEqualityComparer.Instance);
-
-            if (!reading.Add(record)) yield break;
-
-            foreach (RecordSchema shape in Shapes(record))
-                foreach (FieldSchema field in shape.Fields)
-                {
-                    string[] address = [.. at, field.JsonName, .. MapSteps(field)];
-                    FieldSchema leaf = Leaf(field);
-
-                    if (leaf.Kind == FieldKind.Reference) yield return address;
-
-                    if (leaf.Record is not { } nested) continue;
-
-                    foreach (string[] found in References(nested, address, reading)) yield return found;
-                }
-
-            reading.Remove(record);
-        }
-
-        /// <summary>The addresses of one section's record, without duplicates: two shapes writing one key
-        /// name one place in the file.</summary>
-        private static IEnumerable<string[]> References(RecordSchema record) =>
-            References(record, []).DistinctBy(address => string.Join(PathSeparator, address), StringComparer.Ordinal);
-
-        /// <summary>A record and the shapes it may take: a reference belongs to whichever of them a record
-        /// on disk turns out to be.</summary>
-        private static IEnumerable<RecordSchema> Shapes(RecordSchema record)
-        {
-            yield return record;
-
-            if (record.Variants is not { } variants) yield break;
-
-            foreach (VariantSchema variant in variants.Variants) yield return variant.Record;
-        }
-
-        /// <summary>An <see cref="AnyKey"/> for every map standing between a field and what it holds.</summary>
-        private static IEnumerable<string> MapSteps(FieldSchema field)
-        {
-            for (FieldSchema node = field; node.Kind is FieldKind.Array or FieldKind.Dictionary && node.Item is { } item; node = item)
-                if (node.Kind == FieldKind.Dictionary)
-                    yield return AnyKey;
-        }
-
-        /// <summary>The ids one section of a document writes at one address that nothing answers, and how
-        /// many were read at all. A field pointing into a catalog this build cannot read is passed over
-        /// whole: half an answer would call every id of the other half broken.</summary>
-        private static (List<string> Unanswered, int Walked) Unanswered(JToken root, SectionSchema section, string catalog, string[] path)
-        {
-            List<string> unanswered = [];
-            int walked = 0;
-            string address = string.Join(PathSeparator, path.Where(step => step != AnyKey));
-
-            FieldSchema field = Leaf(Locate(section.Record, address));
-            Assert.AreEqual(FieldKind.Reference, field.Kind, $"'{catalog}.{address}' is not a reference");
-
-            List<HashSet<string>> answering = [.. field.RefTargets.Select(Answers).OfType<HashSet<string>>()];
-            if (answering.Count != field.RefTargets.Count) return (unanswered, walked);
-
-            foreach (JObject record in SectionRecords(root, section.Key))
-                foreach (string id in ValuesAt(record, path, NamesNoRecord))
-                {
-                    if (id.Length == 0) continue;
-
-                    walked++;
-
-                    if (answering.Exists(ids => ids.Contains(id))) continue;
-
-                    unanswered.Add($"{catalog} {address} → '{id}'");
-                }
-
-            return (unanswered, walked);
-        }
-
-        /// <summary>
-        /// Records whose id the walk must not read as a reference. Two cases, and both are the price of a
-        /// markup that cannot see the field beside it: a requirement demanding a level of mastery writes a
-        /// LOCALIZATION KEY where its siblings write a resource, and a grant handing over a MODIFIER names
-        /// no record anywhere — its id is the label its own lines are minted under. The markup states the
-        /// catalogs without regard to the field that says which, so the shipped word answering nothing
-        /// there is the limit of the contract and not broken data.
-        /// </summary>
-        private static bool NamesNoRecord(JObject holder) =>
-            string.Equals(holder.Value<string>(RequirementTypeField), nameof(RequirementType.MasteryLevel), StringComparison.Ordinal)
-            || string.Equals(holder.Value<string>(GrantKindField), nameof(GrantKind.Modifier), StringComparison.Ordinal);
-
-        /// <summary>Every id one target answers with, read out of the shipped files of the catalog it names
-        /// and off that catalog's own schema. Null for a catalog no descriptor covers: what that one is
-        /// written in is not this build's to know, and reading it as no ids at all would report every
-        /// reference into it broken.</summary>
-        private static HashSet<string>? Answers(ReferenceTarget target)
-        {
-            if (CatalogDescriptors.All.All(descriptor => descriptor.Catalog != target.Catalog)) return null;
-
-            CatalogSchema schema = Schema(target.Catalog);
-
-            // The ids are gathered out of arrays under a section key, which is the one shape that holds
-            // several records. A catalog whose records are keyed by the author, or which is one record,
-            // would answer with nothing at all and call every reference into it broken.
-            Assert.IsTrue(
-                schema.Shape is RootShape.ArrayUnderKey or RootShape.SectionsOfArrays,
-                $"the {target.Catalog} catalog is written as {schema.Shape}, which this walk cannot read ids out of");
-
-            HashSet<string> ids = new(StringComparer.Ordinal);
-
-            foreach (string file in ShippedFiles(target.Catalog))
-            {
-                JToken root = JsonTreeDocument.Load(file).Root;
-
-                foreach (SectionSchema section in schema.Sections)
-                {
-                    if (target.Section is { } named && section.Key != named) continue;
-                    if (section.Record.IdField is not { } idField) continue;
-
-                    foreach (JObject record in SectionRecords(root, section.Key))
-                        if (Id(record, idField) is { Length: > 0 } written)
-                            ids.Add(written);
-                }
-            }
-
-            return ids;
-        }
+        /// <summary>One id of one catalog written under one field, as both the finding and the pin spell
+        /// it: which field a word stands in is what says what the word was meant to be.</summary>
+        private static string Named(string catalog, string field, string id) => $"{catalog} {field} → '{id}'";
 
         /// <summary>
         /// Every value one address reaches inside a record, as the text it is written as: through the
@@ -3315,15 +3159,12 @@ namespace LastBreathTest.BattleSystemTests
         /// <see cref="AnyKey"/>. A number met where a word was expected is read as its digits rather than
         /// passed over — that is the miss the walk exists to name.
         /// </summary>
-        /// <param name="stepOver">Records the walk must not read, with everything under them. Named by the
-        /// caller and not by the walk: what a REFERENCE may skip is the reference walk's own rule, and a
-        /// walk reading what is simply written skips nothing.</param>
-        private static IEnumerable<string> ValuesAt(JToken token, string[] path, Func<JObject, bool>? stepOver = null, int step = 0)
+        private static IEnumerable<string> ValuesAt(JToken token, string[] path, int step = 0)
         {
             if (token is JArray array)
             {
                 foreach (JToken item in array)
-                    foreach (string found in ValuesAt(item, path, stepOver, step))
+                    foreach (string found in ValuesAt(item, path, step))
                         yield return found;
 
                 yield break;
@@ -3336,12 +3177,12 @@ namespace LastBreathTest.BattleSystemTests
                 yield break;
             }
 
-            if (token is not JObject holder || stepOver?.Invoke(holder) == true) yield break;
+            if (token is not JObject holder) yield break;
 
             if (path[step] == AnyKey)
             {
                 foreach (JProperty property in holder.Properties())
-                    foreach (string found in ValuesAt(property.Value, path, stepOver, step + 1))
+                    foreach (string found in ValuesAt(property.Value, path, step + 1))
                         yield return found;
 
                 yield break;
@@ -3349,7 +3190,7 @@ namespace LastBreathTest.BattleSystemTests
 
             if (holder[path[step]] is not { } child) yield break;
 
-            foreach (string nested in ValuesAt(child, path, stepOver, step + 1)) yield return nested;
+            foreach (string nested in ValuesAt(child, path, step + 1)) yield return nested;
         }
 
         /// <summary>What the reflector may still have to say about the DTOs of the standing wave — one
@@ -3615,16 +3456,9 @@ namespace LastBreathTest.BattleSystemTests
             return [.. written.Where(word => !named.Contains(word)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
         }
 
-        /// <summary>What a record holding several grants writes them under, and what one grant names the
-        /// behaviour it hands over by. Both are the DTOs' own fields — the equipment template's and the npc
-        /// buff's alike — so the walks spell them out.</summary>
+        /// <summary>What a record holding several grants writes them under — the DTOs' own field, the
+        /// equipment template's and the npc buff's alike, so the walks spell it out.</summary>
         private const string GrantsField = "grants";
-
-        private const string GrantIdField = "id";
-
-        /// <summary>What a grant writes the KIND of behaviour it hands over under — the field that says
-        /// whether its id names a record at all.</summary>
-        private const string GrantKindField = "kind";
 
         /// <summary>What the reflector may still have to say about the DTOs of the grant-target wave — one
         /// list for all three catalogs, because it is empty for all three: an effect row, a passive entry
@@ -3721,22 +3555,24 @@ namespace LastBreathTest.BattleSystemTests
             (ConditionTypes.BattleTurn, nameof(ConditionOverTheBattleTurn)),
         ];
 
-        /// <summary>The three places the shipped data hands a behaviour over, addressed the way each file
-        /// writes it: the roll an item effect IS, the grants an npc buff carries, and the grants written on
-        /// an equipment template. Until the two catalogs behind them were described, every one of these ids
-        /// was passed over whole — the walk could not tell a renamed passive from one it simply could not
-        /// read.</summary>
-        private static readonly (string Catalog, string Section, string[] Path)[] s_grantSites =
+        /// <summary>The three catalogs the shipped data hands a behaviour over from: the roll an item
+        /// effect IS, the grants an npc buff carries, and the grants written on an equipment template.
+        /// WHERE each of them writes the id is read off its schema; until the two catalogs behind them were
+        /// described, every one of these ids was passed over whole — the walk could not tell a renamed
+        /// passive from one it simply could not read.</summary>
+        private static readonly string[] s_grantSites =
         [
-            (DataCatalog.ItemEffects, ItemEffectsCatalogDescriptor.RecordsKey, [ItemEffectsCatalogDescriptor.IdField]),
-            (DataCatalog.NpcBuffs, NpcBuffsCatalogDescriptor.RecordsKey, [NpcBuffsCatalogDescriptor.GrantsField, NpcBuffsCatalogDescriptor.IdField]),
-            (DataCatalog.EquipItems, EquipItemsCatalogDescriptor.RecordsKey, [GrantsField, GrantIdField]),
+            DataCatalog.ItemEffects,
+            DataCatalog.NpcBuffs,
+            DataCatalog.EquipItems
         ];
 
-        /// <summary>The grants the shipped data writes that nothing declares. Empty, and held as the whole
-        /// list rather than as a count: one arriving fails, and one going away fails just as loudly. Grants
-        /// of kind Modifier are not among them at all — they name no record anywhere, and the walk steps
-        /// over them the way it steps over a requirement asking for a level of mastery.</summary>
+        /// <summary>The grants the shipped data writes that nothing declares — the grants, and not every id
+        /// these catalogs happen to write: a finding is one of these only where it stands at a word the
+        /// walk read as pointing at a behaviour. Empty, and held as the whole list rather than as a count:
+        /// one arriving fails, and one going away fails just as loudly. Grants of kind Modifier are not
+        /// among them at all — they name no record anywhere, and the walk steps over them the way it steps
+        /// over a requirement asking for a level of mastery.</summary>
         private static readonly string[] s_unansweredGrants = [];
 
         /// <summary>A grant naming a passive nobody wrote, beside one naming a passive the catalog does
@@ -4066,30 +3902,46 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void EveryGrantTheShippedDataWritesNamesABehaviourItsCatalogDeclares()
         {
-            List<string> unanswered = [];
-            int walked = 0;
+            HashSet<string> grants = HandedOverAt(s_grantSites);
+            List<string> named = [.. Unanswered(s_grantSites, grants.Contains)];
 
-            foreach ((string catalog, string section, string[] path) in s_grantSites)
-            {
-                SectionSchema handing = Part(Schema(catalog), section);
+            Assert.AreNotEqual(0, grants.Count,
+                "the shipped data hands nothing over at all — a run that read no grant reports no grant broken");
 
-                foreach (string file in ShippedFiles(catalog))
-                {
-                    (List<string> missing, int read) = Unanswered(JsonTreeDocument.Load(file).Root, handing, catalog, path);
-                    unanswered.AddRange(missing);
-                    walked += read;
-                }
-            }
-
-            Assert.AreNotEqual(0, walked, "the shipped data hands nothing over at all — the walk proves nothing");
-
-            List<string> named = [.. unanswered.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
             Report("Grants the shipped data writes that no catalog declares", named);
 
             CollectionAssert.AreEquivalent(
                 s_unansweredGrants,
                 named.ToArray(),
                 $"the shipped data hands over other behaviours than the known ones nothing declares:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", named)}");
+        }
+
+        /// <summary>WHERE the shipped files of the named catalogs hand a behaviour over: the address of
+        /// every word they write where a passive, an effect or a condition is meant. Walked by the schemas
+        /// the checks walk, so where a grant writes its id stays the schema's to say — and the addresses
+        /// are what tells a finding about a grant from a finding about the same catalog's other ids, two
+        /// of these catalogs writing both.</summary>
+        private static HashSet<string> HandedOverAt(IReadOnlyList<string> catalogs)
+        {
+            HashSet<string> sites = new(StringComparer.Ordinal);
+
+            foreach (CatalogView view in CatalogCrossCheckTests.Shipped.Workspace.Catalogs)
+            {
+                if (!catalogs.Contains(view.Catalog)) continue;
+
+                foreach (CatalogRecord record in view.Records)
+                {
+                    List<ReferenceMention> mentions = [];
+
+                    ReferenceWalk.Record(record.File, record.Schema, record.Token, record.Pointer, vocabulary: null, mentions);
+
+                    foreach (ReferenceMention mention in mentions)
+                        if (mention.Targets.Any(target => s_grantTargetCatalogs.Contains(target.Catalog)))
+                            sites.Add($"{mention.Where.File.Name}{mention.Where.At}");
+                }
+            }
+
+            return sites;
         }
 
         /// <summary>The first mutation, and the one the whole wave exists for: a grant naming a passive
@@ -4099,16 +3951,12 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void AGrantNamingAPassiveNobodyWrote_IsCaught()
         {
-            SectionSchema section = Part(Schema(DataCatalog.ItemEffects), ItemEffectsCatalogDescriptor.RecordsKey);
+            IReadOnlyList<CatalogFinding> found = CatalogCrossCheckTests.Forged(DataCatalog.ItemEffects, ForgedItemEffectsJson);
 
-            (List<string> missing, int read) = Unanswered(
-                JsonTreeDocument.Parse(ForgedItemEffectsJson).Root, section, DataCatalog.ItemEffects, [ItemEffectsCatalogDescriptor.IdField]);
-
-            Assert.AreEqual(2, read, "the forged catalog hands over another number of behaviours than the walk read");
             CollectionAssert.AreEqual(
-                new[] { $"{DataCatalog.ItemEffects} {ItemEffectsCatalogDescriptor.IdField} → 'Passive_Skill_Nobody_Wrote'" },
-                missing.ToArray(),
-                $"a grant naming a passive nobody wrote went unnoticed: {string.Join(", ", missing)}");
+                new[] { "Passive_Skill_Nobody_Wrote" },
+                CatalogCrossCheckTests.Words(found, CatalogFindingKind.UnknownReference),
+                $"the forged grants were read as: {CatalogCrossCheckTests.Lines(found)}");
         }
 
         /// <summary>The other half of that rule: a grant of kind Modifier is not a reference at all. Its id
@@ -4117,16 +3965,12 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void AGrantHandingOverAModifier_IsNotReadAsAReference()
         {
-            SectionSchema section = Part(Schema(DataCatalog.ItemEffects), ItemEffectsCatalogDescriptor.RecordsKey);
+            IReadOnlyList<CatalogFinding> found = CatalogCrossCheckTests.Forged(DataCatalog.ItemEffects, ForgedModifierGrantJson);
 
-            (List<string> missing, int read) = Unanswered(
-                JsonTreeDocument.Parse(ForgedModifierGrantJson).Root, section, DataCatalog.ItemEffects, [ItemEffectsCatalogDescriptor.IdField]);
-
-            Assert.AreEqual(1, read, "the walk read the modifier grant's own label as an id it could answer");
             CollectionAssert.AreEqual(
-                new[] { $"{DataCatalog.ItemEffects} {ItemEffectsCatalogDescriptor.IdField} → 'Passive_Skill_Nobody_Wrote'" },
-                missing.ToArray(),
-                $"the walk said other grants than the passive one naming nothing: {string.Join(", ", missing)}");
+                new[] { "Passive_Skill_Nobody_Wrote" },
+                CatalogCrossCheckTests.Words(found, CatalogFindingKind.UnknownReference),
+                $"the walk said other grants than the passive one naming nothing: {CatalogCrossCheckTests.Lines(found)}");
         }
 
         /// <summary>The second mutation, on the other half of the wave and on the other kind of miss: an
@@ -4152,12 +3996,15 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void EveryGrantTargetCatalogAnswersWithTheIdsItsShippedFileWrites()
         {
+            var references = new ReferenceIndex(CatalogCrossCheckTests.Shipped.Workspace);
+
             foreach (string catalog in s_grantTargetCatalogs)
             {
-                HashSet<string>? ids = Answers(ReferenceTarget.Whole(catalog));
+                ReferenceTarget[] whole = [ReferenceTarget.Whole(catalog)];
 
-                Assert.IsNotNull(ids, $"the {catalog} catalog is described and still answers nothing");
-                Assert.AreNotEqual(0, ids.Count, $"the shipped {catalog} file writes no id at all — every reference into it would read as broken");
+                Assert.AreEqual(0, references.Undescribed(whole).Count, $"the {catalog} catalog is not described at all");
+                Assert.AreNotEqual(0, references.IdsOf(whole).Count,
+                    $"the shipped {catalog} file writes no id at all — every reference into it would read as broken");
             }
         }
     }

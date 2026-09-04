@@ -19,6 +19,19 @@ namespace Tooling.Schema.Model
             return value;
         }
 
+        /// <summary>A catalog owes only what it offers: a suffix required and never declared is a key no
+        /// record is ever worded under, and the misspelling that wrote it made the key it meant optional
+        /// without saying so.</summary>
+        public static SchemaList<string> Among(SchemaList<string> required, SchemaList<string> offered, string name)
+        {
+            foreach (string suffix in required)
+                if (!Declared(offered, suffix))
+                    throw new ArgumentException(
+                        $"'{suffix}' is owed and is none of the suffixes the catalog words its records under.", name);
+
+            return required;
+        }
+
         public static SchemaList<T> NotEmpty<T>(SchemaList<T> items, string name) =>
             items.Count > 0 ? items : throw new ArgumentException($"'{name}' must hold at least one entry.", name);
 
@@ -70,6 +83,15 @@ namespace Tooling.Schema.Model
                     $"The variant '{variant.DiscriminatorValue}' has no field '{field}' to be told apart by.",
                     nameof(variants));
             }
+        }
+
+        private static bool Declared(SchemaList<string> offered, string suffix)
+        {
+            foreach (string declared in offered)
+                if (string.Equals(declared, suffix, StringComparison.Ordinal))
+                    return true;
+
+            return false;
         }
 
         private static bool Names(RecordSchema record, string field)

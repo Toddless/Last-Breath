@@ -22,9 +22,15 @@ namespace LastBreathTest.BattleSystemTests
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// The localization audit: keys required by SharedData ids vs en.po, and en.po vs ru.po.
-    /// Reports gaps to the test output (Inconclusive, never red); the only hard failure is a
-    /// duplicate msgid — that corrupts the .po.
+    /// The localization audit: the keys the CODE words itself by against en.po, and en.po against ru.po.
+    /// Reports gaps to the test output (Inconclusive, never red).
+    /// <para>What a DESCRIBED catalog words its records under is not read here any more: the describers say
+    /// which suffixes each of them spells, and <see cref="CatalogCrossCheckTests"/> holds every one of those
+    /// keys through the checks the authoring tool runs. A hand-written list beside them drifted, and two
+    /// readings of one question are two answers.</para>
+    /// <para>The catalogs no describer covers yet are still read here, because nothing else reads them at
+    /// all: a run of the checks does not open a catalog it cannot describe, so its keys would go unheld
+    /// the day the list beside them was taken out.</para>
     /// </summary>
     [TestClass]
     public class LocalizationAuditTests
@@ -45,16 +51,6 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         private static string Shared => Path.Combine(SrcRoot, "SharedData");
-
-        [TestMethod]
-        public void PoFilesHaveNoDuplicateKeys()
-        {
-            foreach (string po in new[] { "en.po", "ru.po" })
-            {
-                var duplicates = ReadMsgIds(po).GroupBy(id => id).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
-                Assert.AreEqual(0, duplicates.Count, $"{po} duplicate msgids: {string.Join(", ", duplicates)}");
-            }
-        }
 
         [TestMethod]
         public void ReportMissingKeys()
@@ -548,23 +544,27 @@ namespace LastBreathTest.BattleSystemTests
             return [];
         }
 
+        /// <summary>
+        /// The keys the described catalogs do not word for themselves. Everything a DESCRIBED catalog
+        /// declares suffixes for — a template's name, an ability's description, a shop's title — is read
+        /// off its schema by <see cref="CatalogCrossCheckTests"/> through the very same checks the
+        /// authoring tool runs, and a second list of catalogs and suffixes here would drift away from the
+        /// describers the day one of them grew a key.
+        /// <para>Two families are keys no record's id spells at all: the parameter names the modifier
+        /// templates fill themselves in with, which come from an ENUM and not from a file, and the clause a
+        /// gated line is joined to, which is worded under a key DERIVED from a condition's id rather than
+        /// under the id itself.</para>
+        /// <para>The last two are catalogs no describer covers yet
+        /// (<c>CatalogDescriptors.NotYetDescribed</c>): a workspace never opens them, so the checks say
+        /// nothing about their wording and this list is the only thing holding it. They go the day their
+        /// describers are written and not before.</para>
+        /// </summary>
         private static List<(string Domain, List<string> Ids, bool NeedsDescription)> CollectDataIds() =>
         [
-            // Modifier and ParameterChange templates localize parameter names by enum member
             ("EntityParameter", [.. Enum.GetNames<Core.Enums.EntityParameter>()], false),
-            ("EquipItems", CatalogIds("EquipItems", "items"), true),
-            ("Items", CatalogIds("Items", "items"), true),
-            ("Recipes", CatalogIds("Recipes", "craftingRecipes"), false),
-            ("Resources", [.. CatalogIds("Resources", "upgradeResources"), .. CatalogIds("Resources", "craftingResources")], false),
-            ("Abilities", CatalogIds("Abilities", "abilities"), true),
-            // Augments are records of their own in the same catalog, not a nested list under an ability
-            ("Augments", CatalogIds("Abilities", "augments"), true),
-            ("Npc", CatalogIds("Npc", "npcs"), false),
-            // The trade window titles itself by the trader's id, so an unworded shop shows the raw key
-            ("Traders", CatalogIds("Traders", "traders"), false),
-            ("NpcModifiers", NestedIds("NpcModifiers", "mods", "modifiers"), true),
-            // A condition is worded under a key derived from its id, not under the id itself
             ("Conditions", CatalogIds("Conditions", "conditions").Select(Core.Localization.ConditionalLineText.ClauseKey).ToList(), false),
+            ("Items", CatalogIds("Items", "items"), true),
+            ("NpcModifiers", NestedIds("NpcModifiers", "mods", "modifiers"), true),
         ];
 
         private static List<string> CatalogIds(string catalog, string arrayProperty) =>
@@ -576,6 +576,8 @@ namespace LastBreathTest.BattleSystemTests
                 .Distinct()
                 .ToList();
 
+        /// <summary>The ids of records written one list inside another — an npc modifier stands under the
+        /// pool it belongs to, and the pool answers to no name of its own.</summary>
         private static List<string> NestedIds(string catalog, string outerProperty, string innerProperty) =>
             CatalogRoots(catalog)
                 .SelectMany(root => root[outerProperty] as JArray ?? [])
