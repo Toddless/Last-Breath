@@ -77,8 +77,10 @@ namespace Core.Narrative.Facts
         /// <summary>How an address in the code is told apart from an address in the data.</summary>
         public const string CodePrefix = "code:";
 
-        /// <summary>How a parameter of a family is named inside its template.</summary>
-        private const string ParameterFormat = "<{0}>";
+        /// <summary>How a parameter of a family is written inside its template.</summary>
+        private const char ParameterOpen = '<';
+
+        private const char ParameterClose = '>';
 
         private const string LocationParameter = "locationId";
 
@@ -180,13 +182,23 @@ namespace Core.Narrative.Facts
         /// <summary>One address in the code, told apart from every address in the data.</summary>
         public static string Code(string name) => CodePrefix + name;
 
+        /// <summary>Whether a written key still carries a parameter of the family it is spelled after — a
+        /// template taken out of a list and written down as it stood. The game raises the KEYS of a family
+        /// and never the spelling of one, so such a word is a key nothing will ever answer.</summary>
+        public static bool Unfilled(string key)
+        {
+            ArgumentNullException.ThrowIfNull(key);
+
+            return key.Contains(ParameterOpen) || key.Contains(ParameterClose);
+        }
+
         /// <summary>The template of one family: the head its builder writes, and its parameters named the
         /// way the builder names them. A test calls every builder and holds what comes out against these,
         /// so a family renamed is not renamed on one side only.</summary>
         private static string Family(string head, params string[] parameters) =>
             string.Join(
                 FactKeys.Separator,
-                parameters.Select(parameter => string.Format(ParameterFormat, parameter)).Prepend(head));
+                parameters.Select(parameter => $"{ParameterOpen}{parameter}{ParameterClose}").Prepend(head));
     }
 
     /// <summary>One key of a reading of the game: the word itself, the family it belongs to, and every
@@ -231,12 +243,15 @@ namespace Core.Narrative.Facts
         private FactKeyRegistry(IReadOnlyList<FactKeyEntry> keys) => Keys = keys;
 
         /// <summary>Builds the registry over the uses one walk of the documents found. Blank keys are
-        /// passed over: an empty word is the key left half-typed, which the walk itself names.</summary>
+        /// passed over, and so are the templates of a family written as they stand: both are a key left
+        /// half-typed, which the walk itself names where it is written. Taking a template in would fold it
+        /// into the very family it is spelled after, and the word nothing raises would read as raised.</summary>
         public static FactKeyRegistry Over(IEnumerable<FactKeyUse> uses)
         {
             ArgumentNullException.ThrowIfNull(uses);
 
-            List<FactKeyUse> written = [.. uses.Where(use => use.Key is { Length: > 0 })];
+            List<FactKeyUse> written =
+                [.. uses.Where(use => use.Key is { Length: > 0 } key && !FactKeyDeclarations.Unfilled(key))];
 
             List<FactKeyEntry> keys = [.. FactKeyDeclarations.All.Select(declaration => Declared(declaration, written))];
             HashSet<string> named = [.. keys.Select(key => key.Key)];

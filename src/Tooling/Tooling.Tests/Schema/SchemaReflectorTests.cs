@@ -73,6 +73,12 @@ namespace Tooling.Tests.Schema
         private const string PrimaryField = "primary";
         private const string FallbackField = "fallback";
         private const string PassivesField = "passives";
+        private const string FactField = "fact";
+        private const string FactsField = "facts";
+        private const string NamedField = "named";
+
+        /// <summary>The list of words a suggested field is answered from, as a test names one.</summary>
+        private const string FactsSource = "factKeys";
 
         /// <summary>Enough of a note to tell it from the others said about the same field.</summary>
         private const string SaidComputed = "worked out from other fields";
@@ -84,6 +90,8 @@ namespace Tooling.Tests.Schema
         private const string SaidNotText = "is not text";
         private const string SaidNotANumber = "is not a number";
         private const string SaidNotAMap = "is not a map";
+        private const string SaidNotSuggestable = "the words it is answered from";
+        private const string SaidSuggestedAndNarrowed = "nothing offers them under a narrowed field";
         private const string SaidAlreadyKeyed = "rather than by words";
         private const string SaidKeyedTwice = "keyed both by";
 
@@ -256,6 +264,45 @@ namespace Tooling.Tests.Schema
             Assert.IsFalse(tags.RefusedAsReference, "the list is not the thing that could have been an id");
             Assert.AreEqual(FieldKind.String, tags.Item?.Kind);
             Assert.IsTrue(tags.Item?.RefusedAsReference);
+        }
+
+        /// <summary>The words a field is answered from ride where everything else said about a string does:
+        /// on the field, and on the elements of a list of them. They narrow nothing — the field stays plain
+        /// text, because a word the list does not know is written and read exactly as any other.</summary>
+        [TestMethod]
+        public void TheWordsAFieldIsAnsweredFrom_AreCarriedOntoIt()
+        {
+            RecordSchema record = _reflector.Record(typeof(TextDto));
+            FieldSchema fact = Field(record, FactField);
+            FieldSchema facts = Field(record, FactsField);
+
+            Assert.AreEqual(FieldKind.String, fact.Kind, "an open list of words narrows nothing");
+            Assert.AreEqual(FactsSource, fact.Suggests);
+            Assert.IsTrue(fact.RefusedAsReference, "a refusal and a list of words are two answers, not one");
+            Assert.IsNull(Field(record, TitleField).Suggests, "and nothing is offered where nothing was written");
+
+            Assert.IsNull(facts.Suggests, "the list is not the thing a word is written into");
+            Assert.AreEqual(FactsSource, facts.Item?.Suggests);
+            NothingSaid(nameof(TextDto), FactField);
+        }
+
+        /// <summary>Words offered where no word is written: markup that does nothing looks exactly like a
+        /// field nobody has marked up yet, so it is named rather than passed over.</summary>
+        [TestMethod]
+        public void WordsOfferedForSomethingThatIsNotText_AreSaidOutLoud()
+        {
+            Assert.IsNull(Field(_reflector.Record(typeof(AwkwardDto)), PriceField).Suggests);
+            Said(nameof(AwkwardDto), PriceField, SaidNotSuggestable);
+        }
+
+        /// <summary>And words offered under a field narrowed to something else: a reference is drawn as the
+        /// ids of its catalogs, and nothing ever reads the open list written beside them. Said out loud for
+        /// the same reason — the author wrote a list nobody offers and has no way of telling.</summary>
+        [TestMethod]
+        public void WordsOfferedUnderANarrowedField_AreSaidOutLoud()
+        {
+            Assert.AreEqual(FieldKind.Reference, Field(_reflector.Record(typeof(AwkwardDto)), NamedField).Kind);
+            Said(nameof(AwkwardDto), NamedField, SaidSuggestedAndNarrowed);
         }
 
         /// <summary>A field named and refused at once keeps the refusal, and says so in the model as well as
@@ -906,6 +953,12 @@ namespace Tooling.Tests.Schema
 
             [NotARef] public List<string> Tags { get; init; } = [];
 
+            /// <summary>Answered from an open list of words: not a reference, not an enum, and a word the
+            /// list does not know is written all the same.</summary>
+            [NotARef][Suggests(FactsSource)] public string Fact { get; init; } = string.Empty;
+
+            [Suggests(FactsSource)] public List<string> Facts { get; init; } = [];
+
             [LocalizedKey] public string Title { get; init; } = string.Empty;
 
             [LocalizedKey(DescriptionSuffix)] public string Summary { get; init; } = string.Empty;
@@ -1067,7 +1120,13 @@ namespace Tooling.Tests.Schema
             [NotARef]
             public string Key { get; init; } = string.Empty;
 
-            [CatalogRef(EquipItemsCatalog)] public int Price { get; init; }
+            /// <summary>Named as a reference and answered from a list of words, and it is a number: both
+            /// pieces of markup have nothing to apply themselves to.</summary>
+            [CatalogRef(EquipItemsCatalog)][Suggests(FactsSource)] public int Price { get; init; }
+
+            /// <summary>Text pointed into a catalog and answered from a list of words at once: the field is
+            /// drawn as the reference it was narrowed to, and the words are offered by nobody.</summary>
+            [CatalogRef(EquipItemsCatalog)][Suggests(FactsSource)] public string Named { get; init; } = string.Empty;
 
             /// <summary>Narrowed to a section with no name, which no file writes anything under.</summary>
             [CatalogRef(AbilitiesCatalog, Section = " ")] public string Sectionless { get; init; } = string.Empty;

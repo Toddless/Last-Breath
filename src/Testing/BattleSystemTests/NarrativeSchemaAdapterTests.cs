@@ -150,6 +150,26 @@ namespace LastBreathTest.BattleSystemTests
                 "a list of references crossed pointing somewhere other than where the vocabulary sent it");
         }
 
+        /// <summary>The two entries whose value IS a fact key cross saying so: a key is text like any other
+        /// text, and a role lost on the way would leave the author typing the words of the world's memory
+        /// out of his own head, with nothing to tell him a key is spelled the way the game writes it.</summary>
+        [TestMethod]
+        public void TheKeyOfAFactEntry_CrossesAnsweredFromTheFactsOfTheRun()
+        {
+            Assert.AreEqual(FactKeySuggestions.Source, Key(FactConditionFactory.Spec).Suggests,
+                "the key a condition asks about crossed answered from nothing");
+            Assert.AreEqual(FactKeySuggestions.Source, Key(SetFactActionFactory.Spec).Suggests,
+                "the key an action writes crossed answered from nothing");
+
+            Assert.AreEqual(FieldKind.String, Key(SetFactActionFactory.Spec).Kind,
+                "a fact key is plain text: an open list of words is a help and never a gate");
+            Assert.IsNull(NarrativeSchemas.ToSchema(SetFactActionFactory.Spec).Fields[1].Suggests,
+                "the count beside the key is answered from nothing");
+        }
+
+        /// <summary>The first key of an entry, which is the one holding the fact.</summary>
+        private static FieldSchema Key(NarrativeRecordSpec spec) => NarrativeSchemas.ToSchema(spec).Fields[0];
+
         private static void AssertConverted(NarrativeRecordSpec spec)
         {
             var schema = NarrativeSchemas.ToSchema(spec);
@@ -171,6 +191,7 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(parameter.Required, field.Required, $"'{address}' crossed with another answer on whether it must be written");
             Assert.AreEqual(parameter.Default, field.Default, $"'{address}' crossed with another fallback");
             Assert.AreEqual(parameter.RefusedAsReference, field.RefusedAsReference, $"'{address}' crossed with another answer on being a reference");
+            Assert.AreEqual(Suggested(parameter.Role), field.Suggests, $"'{address}' crossed answered from other words");
             Assert.AreEqual(parameter.Documentation, field.Documentation, $"'{address}' crossed without what it means");
 
             switch (parameter.Kind)
@@ -208,6 +229,13 @@ namespace LastBreathTest.BattleSystemTests
                     break;
             }
         }
+
+        /// <summary>What the adapter answers a parameter from: the fact keys of the run wherever the
+        /// vocabulary says the value IS one, and nothing at all everywhere else.</summary>
+        private static string? Suggested(NarrativeParameterRole role) =>
+            role is NarrativeParameterRole.FactRead or NarrativeParameterRole.FactWritten
+                ? FactKeySuggestions.Source
+                : null;
 
         /// <summary>Where the parameter points, as the adapter states them: the same catalog, and the same
         /// section wherever the vocabulary narrowed one.</summary>

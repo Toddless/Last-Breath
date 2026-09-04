@@ -17,6 +17,7 @@ namespace Tooling.Schema.Reflection
         public const string LocalizedKey = "LocalizedKeyAttribute";
         public const string Discriminator = "DiscriminatorAttribute";
         public const string Hidden = "HiddenAttribute";
+        public const string Suggests = "SuggestsAttribute";
 
         /// <summary>Catalog a reference points into, on <see cref="CatalogRef"/> and on
         /// <see cref="DictionaryKey"/>.</summary>
@@ -43,5 +44,8 @@ namespace Tooling.Schema.Reflection
 
         /// <summary>Json name of the field telling shapes apart, on <see cref="Discriminator"/>.</summary>
         public const string Field = "Field";
+
+        /// <summary>Name of the list of words a field is answered from, on <see cref="Suggests"/>.</summary>
+        public const string Source = "Source";
     }
 }

@@ -126,6 +126,9 @@ namespace Core.Narrative.Validation
 
         private const string NeverReadFormat = "'{0}' is written and nothing ever reads it back";
 
+        private const string UnfilledKeyFormat =
+            "'{0}' is written with the parameter of a family still in it, where the word it stands for is meant: nothing ever raises such a key";
+
         private const string UntranslatedFormat = "'{0}' is missing from the '{1}' locale";
 
         /// <summary>Where the run says what it found about the facts themselves, which belong to no one
@@ -207,9 +210,21 @@ namespace Core.Narrative.Validation
                 for (int index = 0; index < _input.Quests.Count; index++) Quest(_input.Quests[index], index);
 
                 FactKeyRegistry facts = FactKeyRegistry.Over(_facts);
+
+                Unfilled();
                 Facts(facts);
 
                 return new NarrativeReading(_findings, facts);
+            }
+
+            /// <summary>The keys written with a family's parameter still in them — a template offered under
+            /// the box, picked, and never filled in. Said where each one is written, the way an empty key
+            /// is: the registry never takes such a word in, so nothing else would ever name it, and the
+            /// place is what the author has to open.</summary>
+            private void Unfilled()
+            {
+                foreach (FactKeyUse use in _facts.Where(use => FactKeyDeclarations.Unfilled(use.Key)))
+                    Add(NarrativeFindingKind.Incomplete, use.Where, string.Format(UnfilledKeyFormat, use.Key));
             }
 
             /// <summary>The two ends a fact key can be loose at. Said of the registry rather than of the

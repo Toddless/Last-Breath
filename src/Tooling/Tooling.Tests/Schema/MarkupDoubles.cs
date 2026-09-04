@@ -68,6 +68,12 @@ namespace Tooling.Tests.Schema
     internal sealed class HiddenAttribute : Attribute
     {
     }
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    internal sealed class SuggestsAttribute(string source) : Attribute
+    {
+        public string Source { get; } = source;
+    }
 }
 
 namespace Tooling.Tests.Schema.Broken

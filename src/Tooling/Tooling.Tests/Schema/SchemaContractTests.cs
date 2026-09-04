@@ -76,6 +76,9 @@ namespace Tooling.Tests.Schema
         /// <summary>Markup that is the whole answer by being written at all.</summary>
         private const string NothingCarried = "";
 
+        /// <summary>The list of words a suggested field is answered from, as a test names one.</summary>
+        private const string FactsSource = "factKeys";
+
         /// <summary>The tool reads the markup off the properties and draws a picker, a range or a text
         /// box accordingly. Read back one by one: an attribute carrying the wrong argument fails here
         /// and nowhere earlier.</summary>
@@ -98,6 +101,7 @@ namespace Tooling.Tests.Schema
             Assert.AreEqual(AbilitiesCatalog, Attribute<DictionaryKeyAttribute>(typeof(NpcDto), nameof(NpcDto.AbilityWeights)).Catalog);
             Assert.IsNull(Attribute<DictionaryKeyAttribute>(typeof(NpcDto), nameof(NpcDto.AbilityWeights)).EnumType);
             Assert.IsNotNull(Attribute<NotARefAttribute>(typeof(DialogueNodeDto), nameof(DialogueNodeDto.NodeId)));
+            Assert.AreEqual(FactsSource, Attribute<SuggestsAttribute>(typeof(DialogueNodeDto), nameof(DialogueNodeDto.FactKey)).Source);
             Assert.IsNotNull(Attribute<HiddenAttribute>(typeof(NpcDto), nameof(NpcDto.Version)));
         }
 
@@ -485,6 +489,7 @@ namespace Tooling.Tests.Schema
             (MarkupNames.Range, MarkupNames.Max, typeof(double)),
             (MarkupNames.LocalizedKey, MarkupNames.Suffix, typeof(string)),
             (MarkupNames.Discriminator, MarkupNames.Field, typeof(string)),
+            (MarkupNames.Suggests, MarkupNames.Source, typeof(string)),
             (MarkupNames.NotARef, NothingCarried, typeof(void)),
             (MarkupNames.Hidden, NothingCarried, typeof(void))
         ];
@@ -668,6 +673,10 @@ namespace Tooling.Tests.Schema
         private sealed record DialogueNodeDto
         {
             [NotARef] public string NodeId { get; init; } = string.Empty;
+
+            /// <summary>Answered from an open list of words rather than from a catalog: a fact key is
+            /// text, and the words already in use are a help and never a gate.</summary>
+            [NotARef][Suggests(FactsSource)] public string FactKey { get; init; } = string.Empty;
 
             [LocalizedKey] public string Text { get; init; } = string.Empty;
 

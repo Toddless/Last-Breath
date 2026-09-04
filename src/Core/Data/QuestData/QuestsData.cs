@@ -153,7 +153,7 @@ namespace Core.Data.QuestData
 
         /// <summary>The fact whose count the objective watches — the same free-form key a dialogue writes
         /// and a Fact condition asks about. Points into no catalog.</summary>
-        [JsonProperty(KeyKey)][NotARef] public string Key { get; init; } = string.Empty;
+        [JsonProperty(KeyKey)][NotARef][Suggests(SuggestionSources.FactKeys)] public string Key { get; init; } = string.Empty;
         [JsonProperty("amount")] public int Amount { get; init; } = 1;
 
         /// <summary>True: kills from before the quest count. False: the counter starts at the

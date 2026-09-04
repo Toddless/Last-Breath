@@ -134,6 +134,18 @@ namespace Tooling.Ui
         private const string RequiredFieldHint = "the schema requires this key: it can be emptied, not removed";
         private const string AbsentFieldHint = "the record does not hold this key";
 
+        // ── suggested words ────────────────────────────────────────────────────────────────────
+
+        private const string SuggestHint = "pick one of the words this field is usually answered with";
+
+        /// <summary>What a word no source of this run has met is said to be. Never "broken": the list is
+        /// an open one, and the first place a word is written is a field like this one.</summary>
+        private const string NewWordText = "no run of this tool has met this word yet: it is written all the same";
+
+        /// <summary>What a family's template written as it stands is said to be. A word still waiting for
+        /// what it stands for: the game raises the keys of a family and never the spelling of one.</summary>
+        private const string UnfilledWordText = "template: fill in the parameter written between < and >, or nothing answers this word";
+
         // ── entries of a vocabulary ────────────────────────────────────────────────────────────
 
         private const string AddRecordHint = "write an entry of this vocabulary here";
@@ -180,6 +192,24 @@ namespace Tooling.Ui
             [FieldKind.Number] = Fraction,
             [FieldKind.Boolean] = Flag,
             [FieldKind.Enum] = Member
+        };
+
+        /// <summary>What a word no source has met is written in. Deliberately not the red a broken
+        /// reference wears: the author is being told he is writing something new, not something wrong.</summary>
+        private static Color NewWord => new(0.55f, 0.78f, 0.62f);
+
+        /// <summary>What a template nobody filled in is written in: not the green of a new word, because
+        /// this one IS unfinished, and not the red of a broken reference, because it is one keystroke from
+        /// being right.</summary>
+        private static Color UnfilledWord => new(0.92f, 0.78f, 0.42f);
+
+        /// <summary>Which mark answers for which verdict — the one place a judgement and a colour are put
+        /// together. A verdict absent from here wears the colour of the theme, which is what leaves a word
+        /// the run has met looking like every other value of the record.</summary>
+        private static readonly Dictionary<SuggestedWordKind, (Color Colour, string Say)> s_marks = new()
+        {
+            [SuggestedWordKind.New] = (NewWord, NewWordText),
+            [SuggestedWordKind.Unfilled] = (UnfilledWord, UnfilledWordText)
         };
 
         private CatalogRecord? _record;
@@ -239,6 +269,16 @@ namespace Tooling.Ui
         /// block of text is then not drawn at all, because a box that writes nowhere is worse than no
         /// box.</summary>
         public LocalizedTexts? Texts { get; set; }
+
+        /// <summary>
+        /// The words a field is usually answered with: asked with the name of the source its schema names
+        /// and what the author has typed, answered with the words matching, best first. What a source name
+        /// means is the host's business and never this panel's.
+        /// <para>Null, or a source answering with nothing at all, leaves the field the plain box it always
+        /// was: a list with nothing in it offers nothing, and every word typed into it would be marked as
+        /// one nobody has met.</para>
+        /// </summary>
+        public Func<string, string, IReadOnlyList<SuggestedWord>>? Suggestions { get; set; }
 
         /// <summary>
         /// Which fields hold entries of a vocabulary — a set of types named by a word the entry carries —
@@ -497,7 +537,67 @@ namespace Tooling.Ui
             return DefaultText(field.Default);
         }
 
-        private static Control TextBox(FieldEdit edit) => Box(edit);
+        /// <summary>A box of text, and the words it is usually answered with behind it wherever the run
+        /// has any.</summary>
+        private static Control TextBox(FieldEdit edit) => SuggestedBox(edit) ?? Box(edit);
+
+        /// <summary>
+        /// A box of text with the words the run has met behind it: the word may be typed, and it may be
+        /// picked out of what has already been written elsewhere. A word none of them names is marked
+        /// where it stands as one nobody has met — never as a broken one, because the list is open and a
+        /// field like this is where the first use of a word is written — and a family's template picked
+        /// and left as it stands is marked as the unfinished word it is.
+        /// <para>Null where the field names no source, where the run has none, and where the source
+        /// answers with nothing at all: all three leave the plain box, and the last one because a list
+        /// with nothing in it would mark every word the author writes.</para>
+        /// </summary>
+        private static Control? SuggestedBox(FieldEdit edit)
+        {
+            if (edit.Known() is not { Count: > 0 } known) return null;
+
+            var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            LineEdit box = Box(edit);
+            var pick = new Button { Text = ReferencePicker.PickText, TooltipText = SuggestHint };
+            IReadOnlySet<string> met = SuggestedWords.Met(known);
+
+            void Mark(string written) => Marked(box, met, edit.Field, written);
+
+            // Marked as it is typed: the author is asking exactly whether the word he is writing is one
+            // the run already knows, and a mark that only arrived on the next record would answer about
+            // another.
+            Mark(edit.Written);
+            box.TextChanged += Mark;
+
+            pick.Pressed += () => edit.Offer(box, word =>
+            {
+                if (!edit.Write(new JValue(word))) return;
+
+                box.Text = word;
+                edit.Seal();
+                Mark(word);
+            });
+
+            row.AddChild(box);
+            row.AddChild(pick);
+
+            return row;
+        }
+
+        /// <summary>Marks a word the offered ones do not answer for — one nobody has met, or a family's
+        /// template nobody filled in — and says on the box what that means.</summary>
+        private static void Marked(LineEdit box, IReadOnlySet<string> met, FieldSchema field, string written)
+        {
+            box.RemoveThemeColorOverride(FontColorOverride);
+
+            if (!s_marks.TryGetValue(SuggestedWords.Judge(written, met), out (Color Colour, string Say) mark))
+            {
+                box.TooltipText = Hint(field);
+                return;
+            }
+
+            box.TooltipText = mark.Say;
+            box.AddThemeColorOverride(FontColorOverride, mark.Colour);
+        }
 
         /// <summary>
         /// A box of text with the catalogs it points into behind it: the word may be typed, and it may be
@@ -1844,6 +1944,28 @@ namespace Tooling.Ui
             {
                 if (!panel.Stale(build)) ReferencePicker.Open(panel, under, Search, chosen);
             }
+
+            /// <summary>The words a query names, at most as many as one list is read to the end of — the
+            /// very cap the ids of a reference are offered under, because a query of one letter answers
+            /// with most of a source either way.</summary>
+            public IReadOnlyList<SuggestedWord> Suggest(string query) => [.. Ask(query).Take(ReferencePicker.Rows)];
+
+            /// <summary>Every word the source has, uncapped: what the box holds is read against ALL of
+            /// them, and a list cut to what a picker shows would mark every word below the cut as one
+            /// nobody has met.</summary>
+            public IReadOnlyList<SuggestedWord> Known() => Ask(string.Empty);
+
+            /// <summary>Offers those words under <paramref name="under"/>, in the very list the ids of a
+            /// reference are picked out of: one list read one way, whatever fills it.</summary>
+            public void Offer(Control under, Action<string> chosen)
+            {
+                if (!panel.Stale(build)) ReferencePicker.Open(panel, under, Suggest, chosen);
+            }
+
+            /// <summary>The source this field is answered from, asked; none at all where the field names
+            /// no source or the run has nobody to ask.</summary>
+            private IReadOnlyList<SuggestedWord> Ask(string query) =>
+                panel.Suggestions is { } ask && schema.Suggests is { Length: > 0 } source ? ask(source, query) : [];
 
             /// <summary>Ends the run of keystrokes this field was taking, so the next field edited is a
             /// step of its own — and, where the run was over the record's id, carries that name everywhere

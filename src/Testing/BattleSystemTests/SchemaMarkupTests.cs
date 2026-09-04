@@ -23,6 +23,7 @@ namespace LastBreathTest.BattleSystemTests
         private const string LocalizedKeyName = "LocalizedKeyAttribute";
         private const string DiscriminatorName = "DiscriminatorAttribute";
         private const string HiddenName = "HiddenAttribute";
+        private const string SuggestsName = "SuggestsAttribute";
 
         private const string CatalogProperty = "Catalog";
         private const string SectionProperty = "Section";
@@ -32,6 +33,7 @@ namespace LastBreathTest.BattleSystemTests
         private const string MaxProperty = "Max";
         private const string SuffixProperty = "Suffix";
         private const string FieldProperty = "Field";
+        private const string SourceProperty = "Source";
 
         /// <summary>Markup that is the whole answer by being written at all.</summary>
         private const string NothingCarried = "";
@@ -125,6 +127,7 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsNull(Written<DictionaryKeyAttribute>(nameof(MarkedDto.BaseParameters)).Catalog);
             Assert.AreEqual(AbilitiesCatalog, Written<DictionaryKeyAttribute>(nameof(MarkedDto.AbilityWeights)).Catalog);
             Assert.IsNull(Written<DictionaryKeyAttribute>(nameof(MarkedDto.AbilityWeights)).EnumType);
+            Assert.AreEqual(SuggestionSources.FactKeys, Written<SuggestsAttribute>(nameof(MarkedDto.Fact)).Source);
             Assert.IsNotNull(Written<NotARefAttribute>(nameof(MarkedDto.Key)));
             Assert.IsNotNull(Written<HiddenAttribute>(nameof(MarkedDto.Version)));
         }
@@ -175,6 +178,12 @@ namespace LastBreathTest.BattleSystemTests
         public void DictionaryKey_OfSomethingThatIsNotAnEnum_IsRefused() =>
             Assert.ThrowsException<ArgumentException>(() => new DictionaryKeyAttribute(typeof(MarkedDto)));
 
+        /// <summary>A field answered from a list with no name is answered by nobody: the tool matches the
+        /// source by the word written here, and a blank one would offer an empty list forever.</summary>
+        [TestMethod]
+        public void Suggests_NamingNoSource_IsRefused() =>
+            Assert.ThrowsException<ArgumentException>(() => new SuggestsAttribute(" "));
+
         [TestMethod]
         public void Discriminator_NamingNoField_IsRefused() =>
             Assert.ThrowsException<ArgumentException>(() => new DiscriminatorAttribute(" "));
@@ -200,6 +209,7 @@ namespace LastBreathTest.BattleSystemTests
             (RangeName, MaxProperty, typeof(double)),
             (LocalizedKeyName, SuffixProperty, typeof(string)),
             (DiscriminatorName, FieldProperty, typeof(string)),
+            (SuggestsName, SourceProperty, typeof(string)),
             (NotARefName, NothingCarried, typeof(void)),
             (HiddenName, NothingCarried, typeof(void))
         ];
@@ -237,6 +247,10 @@ namespace LastBreathTest.BattleSystemTests
         private sealed record MarkedDto
         {
             [NotARef] public string Key { get; init; } = string.Empty;
+
+            /// <summary>Answered from an open list of words rather than from a catalog: what the list does
+            /// not know is still written, which is what tells a suggestion from a reference.</summary>
+            [NotARef][Suggests(SuggestionSources.FactKeys)] public string Fact { get; init; } = string.Empty;
 
             [CatalogRef(EquipItemsCatalog), CatalogRef(ResourcesCatalog), CatalogRef(RecipesCatalog)]
             public string Id { get; init; } = string.Empty;

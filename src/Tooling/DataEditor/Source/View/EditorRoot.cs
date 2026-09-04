@@ -88,6 +88,11 @@ namespace DataEditor.Source.View
 
         private const string NoTextsFormat = "the locales under {0} could not be read: {1}";
 
+        /// <summary>What the conversations following an npc's name is told as, beside what the pass over
+        /// their keys itself came to: the author renamed an npc here and the lines that moved are in
+        /// another catalog's files, which is the part he cannot see from where he is standing.</summary>
+        private const string KeysFollowedFormat = "{0}; keys of {1} dialogue(s) followed";
+
         private const string RemoveQuestionFormat = "Take “{0}” out of {1}?";
         private const string AddedFormat = "added {0}";
         private const string CopiedFormat = "duplicated as {0}";
@@ -221,6 +226,7 @@ namespace DataEditor.Source.View
             _catalogList.ItemSelected += index => ShowCatalog((int)index);
             _recordList.ItemSelected += index => ShowRecord((int)index);
             _inspector.Said += Report;
+            _inspector.Settled = FollowDialogueKeys;
             _preview.Source = Previewed;
 
             return body;
@@ -367,7 +373,9 @@ namespace DataEditor.Source.View
 
             // The ids of every catalog of the run, for the fields that point at one. Built here because
             // it answers about the run as a whole and the panel is shown one record at a time.
-            _inspector.References = new ReferenceIndex(_workspace);
+            var references = new ReferenceIndex(_workspace);
+
+            _inspector.References = references;
 
             // The same question turned round, for a record renamed: every place the run writes the old id
             // is rewritten with the new one. The narrative's own finder is handed over with it — a quest
@@ -384,6 +392,17 @@ namespace DataEditor.Source.View
 
             _notes.Clear();
             LoadTexts();
+
+            // The fact keys of the narrative, for the quest counters and the dialogue keys among these
+            // catalogs: the workspace is one, so a counter is offered the very words the conversations raise.
+            var facts = new FactKeySuggestions(_workspace, references, Texts);
+
+            facts.Said += Report;
+            _inspector.Suggestions = facts.For;
+
+            // The list is of the documents as they stand, and every step of the run writes them: a key
+            // raised in a conversation a minute ago has to be under the box of the quest counting it.
+            History.Changed += facts.Invalidate;
 
             _catalogList.Clear();
 
@@ -448,6 +467,32 @@ namespace DataEditor.Source.View
             {
                 _notes.Add(Text(NoTextsFormat, folder, failure.Message));
             }
+        }
+
+        /// <summary>
+        /// Brings the conversations of the run back to the keys their structure words, once a gesture over
+        /// an npc is over. An npc renamed here is written into every dialogue that names him — that is the
+        /// rename carrying itself — but the lines he speaks are read under keys worded from his id, and
+        /// those live in the Dialogues catalog where nothing was renamed.
+        /// <para>Only the npcs: no other catalog of this run words a key from a record's id in another
+        /// catalog's file, and asking after every gesture in every catalog would walk every conversation
+        /// per keystroke.</para>
+        /// <para>The step is filed with the record's own document, which is where the edit that caused it
+        /// landed — the rename and the wording that followed it are one thing to take back.</para>
+        /// </summary>
+        private bool FollowDialogueKeys()
+        {
+            if (_workspace is not { } workspace || _record is not { } record) return false;
+            if (_catalog is not { } view || !string.Equals(view.Catalog, DataCatalog.Npc, StringComparison.Ordinal))
+                return false;
+
+            DialogueKeysFollowed followed =
+                DialogueKeyFollow.All(workspace, Texts, History, record.File.Document);
+
+            if (DialogueKeyFollow.Said(followed.Keys) is { } said)
+                Report(Text(KeysFollowedFormat, said, followed.Conversations));
+
+            return followed.Keys.Written + followed.Keys.Moved > 0;
         }
 
         /// <summary>Shows the records of one catalog, and the first of them. Selecting the row in the

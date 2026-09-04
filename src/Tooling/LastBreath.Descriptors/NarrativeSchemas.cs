@@ -62,8 +62,17 @@ namespace LastBreath.Descriptors
                 Required = parameter.Required,
                 Default = parameter.Default,
                 RefusedAsReference = parameter.RefusedAsReference,
+                Suggests = Suggested(parameter.Role),
                 Documentation = parameter.Documentation
             };
+
+        /// <summary>What answers a parameter the game says holds a fact key. The role is the only thing
+        /// that tells one from any other text — a tool reading the shape alone would offer the world's
+        /// facts under every word an author writes.</summary>
+        private static string? Suggested(NarrativeParameterRole role) =>
+            role is NarrativeParameterRole.FactRead or NarrativeParameterRole.FactWritten
+                ? FactKeySuggestions.Source
+                : null;
 
         private static FieldSchema ReferenceItem(NarrativeParameterSpec parameter) =>
             new() { JsonName = FieldSchema.Unnamed, Kind = FieldKind.Reference, RefTargets = Targets(parameter) };

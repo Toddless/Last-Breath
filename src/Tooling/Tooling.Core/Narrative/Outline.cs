@@ -67,26 +67,17 @@ namespace Tooling.Narrative
     /// </summary>
     public static class Outline
     {
-        private const string EntryRulesName = "entryRules";
-        private const string NodesName = "nodes";
-        private const string LinesName = "lines";
-        private const string OptionsName = "options";
         private const string StagesName = "stages";
         private const string ObjectivesName = "objectives";
         private const string TransitionsName = "transitions";
         private const string OutcomeName = "outcome";
 
-        private const string IdName = "id";
-        private const string NodeName = "node";
         private const string PriorityName = "priority";
         private const string SpeakerName = "speaker";
         private const string KeyName = "key";
-        private const string NextName = "next";
         private const string ToName = "to";
         private const string OptionalName = "optional";
         private const string FailsName = "fails";
-        private const string SpeechCheckName = "speechCheck";
-        private const string FailNextName = "failNext";
 
         private const string EntryRulesTitle = "entry rules";
         private const string NodesTitle = "nodes";
@@ -155,8 +146,8 @@ namespace Tooling.Narrative
                 Schema = schema,
                 Children =
                 [
-                    Branch(token, EntryRulesName, EntryRulesTitle, at, schema, EntryRule),
-                    Branch(token, NodesName, NodesTitle, at, schema, Node)
+                    Branch(token, NarrativeDocument.EntryRules, EntryRulesTitle, at, schema, EntryRule),
+                    Branch(token, NarrativeDocument.Nodes, NodesTitle, at, schema, Node)
                 ]
             };
         }
@@ -210,7 +201,7 @@ namespace Tooling.Narrative
         {
             List<OutlineNode> rows = [];
 
-            if (Held(token, name) is not JArray array) return rows;
+            if (NarrativeDocument.Held(token, name) is not JArray array) return rows;
 
             JsonPointer list = at.Append(name);
             RecordSchema? element = Field(owner, name)?.Item?.Record;
@@ -225,15 +216,18 @@ namespace Tooling.Narrative
             new()
             {
                 Pointer = at,
-                Label = Text(EntryRuleFormat, Or(Written(token, NodeName)), Or(Written(token, PriorityName))),
+                Label = Text(
+                    EntryRuleFormat,
+                    Or(NarrativeDocument.Written(token, NarrativeDocument.Node)),
+                    Or(NarrativeDocument.Written(token, PriorityName))),
                 Kind = OutlineKind.EntryRule,
                 Schema = schema
             };
 
         private static OutlineNode Node(JToken token, JsonPointer at, RecordSchema? schema, int index)
         {
-            List<OutlineNode> lines = Rows(token, LinesName, at, schema, Line);
-            List<OutlineNode> options = Rows(token, OptionsName, at, schema, Option);
+            List<OutlineNode> lines = Rows(token, NarrativeDocument.Lines, at, schema, Line);
+            List<OutlineNode> options = Rows(token, NarrativeDocument.Options, at, schema, Option);
             string id = Identity(schema, token, index);
 
             return new OutlineNode
@@ -248,12 +242,12 @@ namespace Tooling.Narrative
 
         private static OutlineNode Line(JToken token, JsonPointer at, RecordSchema? schema, int index)
         {
-            string? key = Written(token, KeyName);
+            string? key = NarrativeDocument.Written(token, KeyName);
 
             return new OutlineNode
             {
                 Pointer = at,
-                Label = Text(LineFormat, Or(Written(token, SpeakerName)), Or(key)),
+                Label = Text(LineFormat, Or(NarrativeDocument.Written(token, SpeakerName)), Or(key)),
                 Kind = OutlineKind.Line,
                 Key = key ?? string.Empty,
                 Schema = schema
@@ -262,8 +256,8 @@ namespace Tooling.Narrative
 
         private static OutlineNode Option(JToken token, JsonPointer at, RecordSchema? schema, int index)
         {
-            string? key = Written(token, KeyName);
-            string? next = Written(token, NextName);
+            string? key = NarrativeDocument.Written(token, KeyName);
+            string? next = NarrativeDocument.Written(token, NarrativeDocument.Next);
 
             // The key while the author has written one, and otherwise what the option is named by inside
             // its node: an option whose text is not worded yet still has an id the routes point at.
@@ -286,9 +280,9 @@ namespace Tooling.Narrative
         /// route of its own ends the conversation there.</summary>
         private static string Rolled(JToken token, string route)
         {
-            if (Held(token, SpeechCheckName) is not JObject check) return route;
+            if (NarrativeDocument.Held(token, NarrativeDocument.SpeechCheck) is not JObject check) return route;
 
-            return Written(check, FailNextName) is { Length: > 0 } failed
+            return NarrativeDocument.Written(check, NarrativeDocument.FailNext) is { Length: > 0 } failed
                 ? Text(OptionFailFormat, route, failed)
                 : Text(OptionFailEndsFormat, route);
         }
@@ -303,7 +297,7 @@ namespace Tooling.Narrative
             // Anything written under the key, and not an object alone: an ending the file spelled wrong
             // is one the stage still ends on as far as its author is concerned, and a row that was simply
             // not drawn would leave him reading a stage that goes nowhere.
-            if (Held(token, OutcomeName) is { Type: not JTokenType.Null } outcome)
+            if (NarrativeDocument.Held(token, OutcomeName) is { Type: not JTokenType.Null } outcome)
                 under.Add(Outcome(outcome, at.Append(OutcomeName), Field(schema, OutcomeName)?.Record));
 
             return new OutlineNode
@@ -321,7 +315,7 @@ namespace Tooling.Narrative
             {
                 Pointer = at,
                 Label = Text(
-                    Flag(token, OptionalName) ? OptionalObjectiveFormat : ObjectiveFormat,
+                    NarrativeDocument.Flag(token, OptionalName) ? OptionalObjectiveFormat : ObjectiveFormat,
                     Identity(schema, token, index)),
                 Kind = OutlineKind.Objective,
                 Schema = schema
@@ -331,7 +325,7 @@ namespace Tooling.Narrative
             new()
             {
                 Pointer = at,
-                Label = Text(TransitionFormat, Or(Written(token, ToName))),
+                Label = Text(TransitionFormat, Or(NarrativeDocument.Written(token, ToName))),
                 Kind = OutlineKind.Transition,
                 Schema = schema
             };
@@ -343,7 +337,7 @@ namespace Tooling.Narrative
             {
                 Pointer = at,
                 Label = token is JObject
-                    ? Text(Flag(token, FailsName) ? OutcomeFailsFormat : OutcomeFormat,
+                    ? Text(NarrativeDocument.Flag(token, FailsName) ? OutcomeFailsFormat : OutcomeFormat,
                         Identity(schema, token, index: 0))
                     : Text(OutcomeFormat, NotARecord),
                 Kind = OutlineKind.Outcome,
@@ -354,7 +348,7 @@ namespace Tooling.Narrative
         /// every nested record of the narrative writes its own name under, or its place among its
         /// neighbours when it carries neither.</summary>
         private static string Identity(RecordSchema? schema, JToken token, int index) =>
-            Written(token, schema?.IdField ?? IdName) is { Length: > 0 } written
+            NarrativeDocument.Written(token, schema?.IdField ?? NarrativeDocument.Id) is { Length: > 0 } written
                 ? written
                 : Text(IndexFormat, index);
 
@@ -374,22 +368,7 @@ namespace Tooling.Narrative
         /// the record does not carry, and one written as nothing at all, are not malformed: the game reads
         /// no elements there either way, and the author has simply not written them yet.</summary>
         private static bool Malformed(JToken token, string name) =>
-            Held(token, name) is { Type: not JTokenType.Null } and not JArray;
-
-        private static JToken? Held(JToken token, string name) =>
-            token is JObject holder && holder.TryGetValue(name, StringComparison.Ordinal, out JToken? value)
-                ? value
-                : null;
-
-        /// <summary>The text a key holds, spelled the way the file spells it; null for a key the record
-        /// does not hold and for one written as nothing at all.</summary>
-        private static string? Written(JToken token, string name) =>
-            Held(token, name) is JValue { Value: not null } value ? JsonScalars.Written(value) : null;
-
-        /// <summary>Whether a key is written true. An absent switch is off, which is what the game reads
-        /// in its place.</summary>
-        private static bool Flag(JToken token, string name) =>
-            Held(token, name) is JValue { Type: JTokenType.Boolean } value && value.Value<bool>();
+            NarrativeDocument.Held(token, name) is { Type: not JTokenType.Null } and not JArray;
 
         private static string Or(string? written) => written is { Length: > 0 } ? written : Missing;
     }

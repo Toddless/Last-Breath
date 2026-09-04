@@ -418,6 +418,7 @@ namespace Tooling.Schema.Reflection
                 Bounds(One(written, MarkupNames.Range), at),
                 One(written, MarkupNames.Hidden) is not null,
                 Word(One(written, MarkupNames.Discriminator), MarkupNames.Field, at),
+                Word(One(written, MarkupNames.Suggests), MarkupNames.Source, at),
                 // A key names nothing on purpose in no file: json writes no empty key.
                 new Narrowing(
                     keys.Select(key => EnumOf(key, at)).FirstOrDefault(enumType => enumType is not null),
@@ -597,9 +598,16 @@ namespace Tooling.Schema.Reflection
 
             FieldSchema narrowed = Narrow(jsonName, markup.Holds) ?? Localized(field, markup.LocalizationSuffix);
 
+            // A narrowed field is drawn by the control its narrowing asks for — the ids of a catalog, the
+            // members of an enum — and none of them offers an open list of words beside it. The markup
+            // rides along all the same, so what was written can still be read back; nothing acts on it.
+            if (markup.Suggests is not null && narrowed.Kind != FieldKind.String)
+                Note(Notes.SuggestedAndNarrowed, walk.Owner, jsonName, narrowed.Kind);
+
             // The refusal rides on whatever the text turned out to be: a field marked and reading as
-            // unmarked is what a check for "a reference or a refusal" would never find.
-            return narrowed with { RefusedAsReference = markup.NotARef };
+            // unmarked is what a check for "a reference or a refusal" would never find. So does the list
+            // the text is answered from — it narrows nothing, and a word it does not know is still written.
+            return narrowed with { RefusedAsReference = markup.NotARef, Suggests = markup.Suggests };
         }
 
         /// <summary>What text is narrowed to: the members of an enum, or the ids of records in catalogs.
@@ -657,6 +665,7 @@ namespace Tooling.Schema.Reflection
         private void Unapplied(Walk walk, string jsonName, Markup markup, bool text, bool number)
         {
             if (!text && markup.Narrowings > 0) Note(Notes.NotAString, walk.Owner, jsonName);
+            if (!text && markup.Suggests is not null) Note(Notes.NotSuggestable, walk.Owner, jsonName);
             if (!number && markup.Range is not null) Note(Notes.NotANumber, walk.Owner, jsonName);
 
             // A map is the one thing read for its keys, and a map never comes through here.
@@ -748,6 +757,7 @@ namespace Tooling.Schema.Reflection
             NumericRange? Range,
             bool Hidden,
             string? Discriminator,
+            string? Suggests,
             Narrowing Keys)
         {
             /// <summary>How many ways the markup says to read the text. More than one is a contradiction.</summary>
@@ -786,6 +796,8 @@ namespace Tooling.Schema.Reflection
             public const string NotAMap = "'{0}.{1}' is not a map, so the markup saying what its keys hold was not applied.";
             public const string NarrowedTwice = "'{0}.{1}' is marked as more than one of enum, reference and localization key.";
             public const string NotAString = "'{0}.{1}' is not text, so the markup saying what its text means was not applied.";
+            public const string NotSuggestable = "'{0}.{1}' is not text, so the markup naming the words it is answered from was not applied.";
+            public const string SuggestedAndNarrowed = "'{0}.{1}' is answered from a list of words and narrowed to {2}; nothing offers them under a narrowed field.";
             public const string NotANumber = "'{0}.{1}' is not a number, so its range was not applied.";
             public const string RefusedAndNamed = "'{0}.{1}' is marked both a reference and not one; the refusal was taken.";
             public const string Disagrees = "'{0}.{1}' says '{2}' tells the shapes apart, while the shapes registered for '{3}' are told apart by '{4}'.";

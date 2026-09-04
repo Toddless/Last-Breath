@@ -2,6 +2,7 @@ namespace Tooling.Ui
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Godot;
     using Tooling.Catalogs;
     using Tooling.Schema.Model;
@@ -33,6 +34,10 @@ namespace Tooling.Ui
 
         private const string SearchPlaceholder = "search";
         private const string TargetSeparator = ", ";
+
+        /// <summary>How a row standing for a whole family of words is read apart from the words themselves:
+        /// picking it writes the template, which is a word still waiting for its parameter.</summary>
+        private const string FamilyFormat = "{0}   — family";
 
         private const string BrokenFormat = "nothing in {0} is written under this id";
         private const string EmptyText = "this field has to name something";
@@ -81,6 +86,17 @@ namespace Tooling.Ui
         /// </summary>
         public static void Open(Node owner, Control under, Func<string, IReadOnlyList<string>> search, Action<string> chosen)
         {
+            ArgumentNullException.ThrowIfNull(search);
+
+            Open(owner, under, query => Plain(search(query)), chosen);
+        }
+
+        /// <summary>The same list, for words some of which stand for a family rather than for themselves:
+        /// a family is read apart from the words beside it, and picking one writes the template it is
+        /// spelled as — which is what the box holding it then says out loud.</summary>
+        public static void Open(
+            Node owner, Control under, Func<string, IReadOnlyList<SuggestedWord>> search, Action<string> chosen)
+        {
             ArgumentNullException.ThrowIfNull(owner);
             ArgumentNullException.ThrowIfNull(under);
             ArgumentNullException.ThrowIfNull(search);
@@ -91,18 +107,27 @@ namespace Tooling.Ui
             var query = new LineEdit { PlaceholderText = SearchPlaceholder, SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
             var results = new ItemList { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, SizeFlagsVertical = Control.SizeFlags.ExpandFill };
 
+            // What each row stands for, kept beside the list: a family is read with a mark on it, and the
+            // word written is the one the source named and never the line the author read.
+            List<string> words = [];
+
             void Fill(string typed)
             {
                 results.Clear();
+                words.Clear();
 
-                foreach (string id in search(typed)) results.AddItem(id);
+                foreach (SuggestedWord word in search(typed))
+                {
+                    results.AddItem(word.Family ? Text(FamilyFormat, word.Word) : word.Word);
+                    words.Add(word.Word);
+                }
             }
 
             void Take(int index)
             {
-                if (index < 0 || index >= results.ItemCount) return;
+                if (index < 0 || index >= words.Count) return;
 
-                chosen(results.GetItemText(index));
+                chosen(words[index]);
                 popup.Hide();
             }
 
@@ -131,5 +156,9 @@ namespace Tooling.Ui
             // clicked before it can be typed into is a list the author scrolls instead.
             Callable.From(query.GrabFocus).CallDeferred();
         }
+
+        /// <summary>Words none of which stands for a family, which is what a list of ids is.</summary>
+        private static IReadOnlyList<SuggestedWord> Plain(IEnumerable<string> ids) =>
+            [.. ids.Select(id => new SuggestedWord(id, Family: false))];
     }
 }

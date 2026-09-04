@@ -1,5 +1,29 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из автодополнения ключа факта, карточка #248 (2026-09-04; rework → accept) — закрыт пункт «пикер ключа у SetFact/Fact не подключён» из раздела реестра фактов
+
+- (minor) правило «незаполненный шаблон» (`<`/`>`) живёт двумя копиями — `SuggestedWords.Unfilled` (тул) и `FactKeyDeclarations.Unfilled` (игра); ни один тест их не сводит. Стало: ассерт в `LastBreastTest` (видит обе) на общем наборе слов.
+- (minor) `ReferencePicker.cs:40,121` — метка «— family» ставится по `Declared`, а не по незаполненности: `Item_Equipped_Any` (семья без параметра) рисуется как семейство, тултип просит заполнить параметр, которого нет. Стало: `word.Family && Unfilled(word.Word)` либо переписать док константы.
+- (minor) `FactKeySuggestions.cs:37-40,72` — док «Said once» неверен после `Invalidate()`: на воркспейсе с нечитаемым каталогом жалоба печатается после каждой правки-и-перехода. Стало: помнить сказанное либо поправить док.
+- (карточка #256) два независимых полных прогона нарратива на воркспейс (`FactKeySuggestions.Read` и `FactsPanel.Start`), каждый со своей инвалидацией.
+- (nit) `UnfilledWordText` пишет `<`/`>` прозой при приватных константах `ParameterOpen/Close`.
+- (Godot-прогон владельца) NarrativeEditor: опция → `SetFact` → `key` → кнопка «…»: список с `Npc_Talked:<npcId> — family`, `Kill_Count:Npc_Wolf`; выбор семейства пишет шаблон и красит янтарным; новое слово — зелёным; `kill_count:Npc_Wolf` — зелёным (не встречено). DataEditor: Quests → objective → `counter.key` — тот же список.
+
+## Из графа диалога (read-only карта) и подтягивания ключей реплик из DataEditor (2026-09-04; accept with minors)
+
+Граф (`Tooling.Core/Narrative/DialogueGraph.cs`, вкладка `graph`):
+- (minor) `NarrativeEditor/README.md:8` всё ещё говорит «граф — позже». Стало: описать вкладку и чистую часть.
+- (minor) `GraphPanel.cs:363, :446` — `"font_color"` литералом (у `InspectorPanel`/`LootTablePanel` — `FontColorOverride`); `Holds` (:320-329) — дубль `LootTablePanel.Within` (префикс `JsonPointer`) → `JsonPointer.Within(of)` в `Tooling.Core/Json`; `Same` (:133-138) — третья копия (`DryRunPanel`, `NarrativeRoot`) → расширение над `CatalogRecord?`; `IndexFormat "#{0}"` дублирует `Outline.cs:125` → константа в `NarrativeDocument`.
+- (minor) тесты не пинят «два узла под одним id → маршруты в первый» и «правило входа на несуществующий узел не открывает ничего».
+- (nit) `DryRunRows.Clear(this)` вместо `this.DropChildren()`; `OutlineTree.Stand` public внизу после приватных; `DocumentWatch` шире нужного (одна запись); ребро между узлами одной колонки рисуется как петля; несколько dangling из одного узла накладываются, ширина канвы не учитывает подпись; удалённая запись → «not a dialogue» вместо «open a dialogue».
+- (знать) `NarrativeDocument` — вторая копия 12 json-слов диалога (Tooling.Core не видит Core) — закрыта поведенчески семью тестами ветерана; `#index` может совпасть с реальным id `#N` (нереально при конвенции).
+
+Подтягивание ключей (`LastBreath.Descriptors/DialogueKeyFollow.cs`, `EditorRoot.Settled`):
+- (minor) `NarrativeRoot.cs:6` — мёртвый `using System.Linq;` (оставлен из-за параллельных правок).
+- (minor) `DialogueKeysTests.Renamed()` куёт переименование руками; продовая цепочка `RenameEverywhere` → поглощение шага `GroupWithNewest` не проверяется — один тест поверх `RenameEverywhere` либо строка в доке.
+- (nit) ворота `!string.Equals(view.Catalog, DataCatalog.Npc, Ordinal)` → паттерн `{ Catalog: DataCatalog.Npc }`; `Settled` возвращает true → перерисовка панели Npc из-за записи в другой каталог; `taken`/`parked` без дедупа между документами; ярлык шага из `NextUndo` может назвать чужую правку (строка в доке); `DialogueKeyPlan.Follow` в проде не зовётся (только тест-хелпер) — ~30 прежних кейсов не трогают `Over`; дока `InspectorPanel.Carried` про «ключи другого каталога стоят на месте» устарела; `RenameStepText` перепечатывает константу.
+- (знать) цена `All` на каждый blur в каталоге Npc — `OffPattern` по 9 документам без чтения локалей; дорогая часть только при `off.Count > 0`.
+
 ## Из факта экипировки, карточка #250 (2026-09-04; accept with minors)
 
 Закрыт пробел «Equip any piece of gear»: семейства `Item_Equipped:<piece>` (флаг по роду вещи, не слоту) и `Item_Equipped_Any` (счётчик надеваний); `EquipFactTracker` идёт за куклой игрока через `IPlayerAccessor`, гвард `IsLoading`. Остались за владельцем: крафт-трекер (против дизайна наставника), обыск тела (решение о системе).

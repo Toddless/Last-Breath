@@ -29,10 +29,16 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>The npc every forged record is written for.</summary>
         private const string ForgedNpc = "Npc_Forged";
 
+        /// <summary>Where the forged conversation writes a family's template as it stands.</summary>
+        private const string TemplateWhere = "Dialogues/Npc_Forged/nodes/Greeting/options/Ask/visibleConditions[0]/key";
+
         /// <summary>The folders of the game's own code that keep facts — every project a fact is written
         /// or read in. A test walking source is walking these and nothing else: a tool or a test writing a
         /// key as a literal is writing a fixture and not a fact of the world.</summary>
         private static readonly string[] s_sourceFolders = ["Core", "Main", "Battle", "Crafting"];
+
+        /// <summary>One family as the tool offers it, with its parameter named rather than filled in.</summary>
+        private static readonly string KillTemplate = $"{FactKeys.KillCountHead}{FactKeys.Separator}<npcId>";
 
         /// <summary>A fact key written as a literal straight into one of the service's own calls. What the
         /// builders exist to stop: a word spelt in two places drifts apart on the first rename, and the
@@ -169,6 +175,32 @@ namespace LastBreathTest.BattleSystemTests
                 Assert.IsNull(key.Family, $"'{written}' was folded into a family it names no member of");
                 Assert.IsTrue(key.NeverWritten, $"'{written}' was answered by code that writes another key");
             }
+        }
+
+        /// <summary>A family's template written into a document as it stands: the word offered under the
+        /// box, picked, and never filled in. The game raises the KEYS of a family and never the spelling of
+        /// one, so the word is named where it is written and taken into the registry nowhere — folding it
+        /// into the family it is spelled after would read a key nothing ever raises as one the code keeps,
+        /// and the author would be told nothing at all.</summary>
+        [TestMethod]
+        public void AFamilysTemplateWrittenAsItStands_IsNamedAndNotFoldedIntoTheFamily()
+        {
+            IReadOnlyList<NarrativeFinding> findings = Checked(TemplateDialogueJson, NoQuestsJson);
+
+            Assert.AreEqual(1, findings.Count(finding => finding.Kind == NarrativeFindingKind.Incomplete
+                                                        && finding.Where == TemplateWhere
+                                                        && finding.Message.Contains(KillTemplate, StringComparison.Ordinal)),
+                Lines(findings));
+
+            FactKeyRegistry registry = Read(TemplateDialogueJson, NoQuestsJson);
+
+            Assert.IsFalse(registry.Keys.Any(key => !key.Declared && FactKeyDeclarations.Unfilled(key.Key)),
+                "a template nobody filled in was taken into the registry as a key of its own");
+
+            FactKeyEntry family = Key(registry, KillTemplate);
+
+            Assert.IsFalse(family.Readers.Any(reader => reader.Contains(ForgedNpc, StringComparison.Ordinal)),
+                "the template was folded into the very family it is spelled after");
         }
 
         [TestMethod]
@@ -364,6 +396,33 @@ namespace LastBreathTest.BattleSystemTests
                             { "type": "Fact", "key": "Kill_Count" },
                             { "type": "Fact", "key": "Kill_Count:" }
                           ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        /// <summary>A conversation asking about a family by the way it is spelled: the template as the tool
+        /// offers it, with the parameter left standing where the npc's own name belongs.</summary>
+        private const string TemplateDialogueJson =
+            """
+            {
+              "dialogues": [
+                {
+                  "npcId": "Npc_Forged",
+                  "entryRules": [ { "priority": 0, "node": "Greeting" } ],
+                  "nodes": [
+                    {
+                      "id": "Greeting",
+                      "lines": [ { "speaker": "Npc", "key": "Dialogue_Forged_Greeting" } ],
+                      "options": [
+                        {
+                          "id": "Ask",
+                          "key": "Dialogue_Forged_Ask",
+                          "visibleConditions": [ { "type": "Fact", "key": "Kill_Count:<npcId>" } ]
                         }
                       ]
                     }

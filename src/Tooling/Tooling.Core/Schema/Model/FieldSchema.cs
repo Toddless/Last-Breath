@@ -37,6 +37,12 @@ namespace Tooling.Schema.Model
         /// told apart from a silence, which is what lets a check demand one or the other.</summary>
         public bool RefusedAsReference { get; init; }
 
+        /// <summary>The list of words this text is usually answered with, by name; null where the author
+        /// answers it out of his own head alone. An OPEN list, which is what tells it from an enum and a
+        /// reference: a word the source does not know is written all the same, and only marked as one
+        /// nobody has met. What the name means is the host's answer and never the schema's.</summary>
+        public string? Suggests { get; init; }
+
         public NumericRange? Range
         {
             get => field;

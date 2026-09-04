@@ -41,6 +41,33 @@ namespace Core.Data.Schema
     {
     }
 
+    /// <summary>
+    /// The words this string is usually answered with, offered under the box it is typed in. An OPEN
+    /// list, unlike an enum or a reference: what the source does not know is still written and still
+    /// read, and the tool marks it as a word nobody has met rather than as a broken one.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public sealed class SuggestsAttribute : Attribute
+    {
+        public SuggestsAttribute(string source)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(source);
+            Source = source;
+        }
+
+        /// <summary>Name of the list of words the tool answers this field from.</summary>
+        public string Source { get; }
+    }
+
+    /// <summary>The lists of words a suggested field is answered from. Named here because the markup
+    /// names one and whoever answers it has to answer to the same word.</summary>
+    public static class SuggestionSources
+    {
+        /// <summary>Every fact key of the world one reading of the narrative met — the families the code
+        /// keeps, and the words the documents themselves write.</summary>
+        public const string FactKeys = "factKeys";
+    }
+
     /// <summary>The string holds the name of a member of the given enum, parsed strictly. The tool
     /// offers the members instead of a text box.</summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]

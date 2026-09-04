@@ -7,6 +7,8 @@ namespace LastBreathTest.BattleSystemTests
     using LastBreath.Descriptors;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using Tooling.Catalogs;
+    using Tooling.Editing.History;
     using Tooling.Json;
     using Tooling.Localization;
 
@@ -21,6 +23,12 @@ namespace LastBreathTest.BattleSystemTests
         private const string Npc = "Npc_Bandit_Veteran";
 
         private const string Node = "Greeting";
+
+        /// <summary>The name an npc of the forged run is renamed to, and what the step is called on the
+        /// history — the data editor names it after the word the author typed.</summary>
+        private const string Peasant = "Npc_Peasant";
+
+        private const string RenameStepText = "renamed to Npc_Peasant";
 
         /// <summary>How a name a wording waits under is written in a locale file, read as the whole of a
         /// key and not as a mark somewhere in a sentence. No key of the game is written with it, so a file
@@ -549,6 +557,149 @@ namespace LastBreathTest.BattleSystemTests
                 "the line carried the shared sentence away from the options offering it");
         }
 
+        // ── the whole run walked after an npc is renamed ────────────────────────────────────────
+
+        /// <summary>An npc renamed in the data editor: his id is written into the conversation he speaks,
+        /// and every line and option of it goes on being read under keys worded from the name he no longer
+        /// has. The walk over the run brings them back — in the file and in every locale at once.</summary>
+        [TestMethod]
+        public void AnNpcRenamed_CarriesTheKeysOfHisLinesWithHim()
+        {
+            (CatalogWorkspace workspace, LocalizedTexts texts, EditHistory history) = Forged();
+            JsonTreeDocument npcs = Renamed(workspace, history);
+
+            DialogueKeysFollowed followed = DialogueKeyFollow.All(workspace, texts, history, npcs);
+
+            Assert.AreEqual(1, followed.Conversations);
+            Assert.AreEqual(2, followed.Keys.Moved, "the lines and options of the renamed npc did not follow him");
+            Assert.AreEqual(0, followed.Keys.Taken.Count, string.Join(", ", followed.Keys.Taken));
+
+            JsonTreeDocument spoken = Conversations(workspace)[0].File.Document;
+
+            Assert.AreEqual("Dlg_Peasant_Greeting_1", Key(spoken, "/dialogues/0/nodes/0/lines/0/key"));
+            Assert.AreEqual("Dlg_Peasant_Greeting_Ask", Key(spoken, "/dialogues/0/nodes/0/options/0/key"));
+
+            Assert.AreEqual("Good day.", texts.Read(LocalizedTexts.ReferenceLocale, "Dlg_Peasant_Greeting_1"));
+            Assert.AreEqual("What is the news?", texts.Read(LocalizedTexts.ReferenceLocale, "Dlg_Peasant_Greeting_Ask"));
+            Assert.IsNull(texts.Read(LocalizedTexts.ReferenceLocale, "Dlg_Villager_Greeting_1"),
+                "the old key was left standing beside the new one");
+        }
+
+        /// <summary>The sentence every conversation shares stays where it is, and so does the conversation
+        /// of the npc nobody renamed: the walk reads every record of the catalog and writes only the places
+        /// whose own structure has stopped wording the key they carry.</summary>
+        [TestMethod]
+        public void ARenameLeavesTheSharedOptionAndTheOtherConversationsAlone()
+        {
+            (CatalogWorkspace workspace, LocalizedTexts texts, EditHistory history) = Forged();
+            JsonTreeDocument npcs = Renamed(workspace, history);
+
+            DialogueKeysFollowed followed = DialogueKeyFollow.All(workspace, texts, history, npcs);
+
+            Assert.AreEqual(1, followed.Conversations, "a conversation nobody renamed was written into");
+
+            JsonTreeDocument spoken = Conversations(workspace)[0].File.Document;
+
+            Assert.AreEqual(DialogueKeys.Leave, Key(spoken, "/dialogues/0/nodes/0/options/1/key"));
+            Assert.AreEqual("Leave.", texts.Read(LocalizedTexts.ReferenceLocale, DialogueKeys.Leave));
+
+            Assert.AreEqual("Dlg_Hunter_Greeting_1", Key(spoken, "/dialogues/1/nodes/0/lines/0/key"));
+            Assert.AreEqual("Quiet today.", texts.Read(LocalizedTexts.ReferenceLocale, "Dlg_Hunter_Greeting_1"));
+        }
+
+        /// <summary>The rename and the wording that followed it are one thing to take back: a step of its
+        /// own would leave one press of undo showing an npc under his old name with his lines read under
+        /// the new one, which is a state nobody asked for and nothing on screen explains.</summary>
+        [TestMethod]
+        public void TheKeysFollowingARename_AreOneStepWithIt()
+        {
+            (CatalogWorkspace workspace, LocalizedTexts texts, EditHistory history) = Forged();
+            JsonTreeDocument npcs = Renamed(workspace, history);
+
+            DialogueKeyFollow.All(workspace, texts, history, npcs);
+
+            Assert.AreEqual(1, history.Depth, "the wording was filed beside the rename instead of with it");
+
+            history.Undo();
+
+            JsonTreeDocument spoken = Conversations(workspace)[0].File.Document;
+
+            Assert.AreEqual("Dlg_Villager_Greeting_1", Key(spoken, "/dialogues/0/nodes/0/lines/0/key"));
+            Assert.AreEqual("Good day.", texts.Read(LocalizedTexts.ReferenceLocale, "Dlg_Villager_Greeting_1"));
+            Assert.AreEqual(0, history.Depth);
+        }
+
+        /// <summary>Nothing is done without the locales: the keys would be written into the files alone
+        /// and every line would be left pointing at a text no locale holds.</summary>
+        [TestMethod]
+        public void WithoutTheLocales_NothingIsWritten()
+        {
+            (CatalogWorkspace workspace, _, EditHistory history) = Forged();
+            JsonTreeDocument npcs = Renamed(workspace, history);
+
+            DialogueKeysFollowed followed = DialogueKeyFollow.All(workspace, texts: null, history, npcs);
+
+            Assert.AreEqual(0, followed.Conversations);
+            Assert.AreEqual("Dlg_Villager_Greeting_1",
+                Key(Conversations(workspace)[0].File.Document, "/dialogues/0/nodes/0/lines/0/key"));
+            Assert.AreEqual(1, history.Depth, "a walk that wrote nothing still filed a step");
+        }
+
+        /// <summary>A run holding the conversations of the whole game: an npc catalog and a dialogue
+        /// catalog on one history, with the locales the lines are read in beside them.</summary>
+        private (CatalogWorkspace Workspace, LocalizedTexts Texts, EditHistory History) Forged()
+        {
+            var history = new EditHistory();
+            string root = Path.Combine(Path.GetTempPath(), "LastBreath", "DialogueKeysTests", Guid.NewGuid().ToString("N"));
+
+            _folders.Add(root);
+
+            Written(root, DataCatalog.Npc, ForgedNpcsJson);
+            Written(root, DataCatalog.Dialogues, ForgedDialoguesJson);
+
+            CatalogWorkspace workspace = CatalogWorkspace.Load(
+                root, [new NpcCatalogDescriptor(), new DialoguesCatalogDescriptor()], history);
+
+            (LocalizedTexts texts, _) = Locales(history,
+                ("Dlg_Villager_Greeting_1", "Good day."), ("Dlg_Villager_Greeting_Ask", "What is the news?"),
+                ("Dlg_Hunter_Greeting_1", "Quiet today."), (DialogueKeys.Leave, "Leave."));
+
+            return (workspace, texts, history);
+        }
+
+        /// <summary>The npc renamed as the data editor renames him: his own id, and the word every record
+        /// naming him is written with — one step of the history, and the conversation left reading keys
+        /// worded from the name he had. Answers with his document, which is where the step was filed.</summary>
+        private static JsonTreeDocument Renamed(CatalogWorkspace workspace, EditHistory history)
+        {
+            CatalogRecord npc = Records(workspace, DataCatalog.Npc)[0];
+            CatalogRecord conversation = Conversations(workspace)[0];
+            JsonTreeDocument npcs = npc.File.Document;
+
+            using (history.Group(RenameStepText))
+            {
+                npcs.SetValue(npc.Pointer.Append(NpcCatalogDescriptor.IdField), new JValue(Peasant));
+                conversation.File.Document.SetValue(
+                    conversation.Pointer.Append(DialoguesCatalogDescriptor.IdField), new JValue(Peasant));
+            }
+
+            return npcs;
+        }
+
+        private static IReadOnlyList<CatalogRecord> Conversations(CatalogWorkspace workspace) =>
+            Records(workspace, DataCatalog.Dialogues);
+
+        private static IReadOnlyList<CatalogRecord> Records(CatalogWorkspace workspace, string catalog) =>
+            workspace.Catalogs.Single(view => view.Catalog == catalog).Records;
+
+        private static void Written(string root, string catalog, string json)
+        {
+            string folder = Path.Combine(root, catalog);
+
+            Directory.CreateDirectory(folder);
+            File.WriteAllText(Path.Combine(folder, catalog + ".json"), json);
+        }
+
         private static DialogueKeyResult Followed(JsonTreeDocument document, LocalizedTexts? texts = null)
         {
             JsonPointer at = JsonPointer.Parse("/dialogues/0");
@@ -573,7 +724,13 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>Two locale files in a folder of their own, written with the keys a case needs, and the
         /// folder they were written into — what a pass wrote back is read from there.</summary>
-        private (LocalizedTexts Texts, string Folder) Locales(params (string Key, string Text)[] written)
+        private (LocalizedTexts Texts, string Folder) Locales(params (string Key, string Text)[] written) =>
+            Locales(history: null, written);
+
+        /// <summary>The same, on the stack a run of the tool keeps: what the locales record joins whatever
+        /// step the gesture that moved the keys is being filed as.</summary>
+        private (LocalizedTexts Texts, string Folder) Locales(
+            EditHistory? history, params (string Key, string Text)[] written)
         {
             string folder = Path.Combine(Path.GetTempPath(), "LastBreath", "DialogueKeysTests", Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(folder);
@@ -585,7 +742,7 @@ namespace LastBreathTest.BattleSystemTests
             foreach (string locale in new[] { LocalizedTexts.AuthoringLocale, LocalizedTexts.ReferenceLocale })
                 File.WriteAllText(Path.Combine(folder, locale + ".po"), body);
 
-            return (LocalizedTexts.Load(folder), folder);
+            return (LocalizedTexts.Load(folder, history), folder);
         }
 
         /// <summary>One forged conversation run through the rules with every id and every key answered:
@@ -937,6 +1094,47 @@ namespace LastBreathTest.BattleSystemTests
                       "id": "Hello",
                       "lines": [ { "speaker": "Npc", "key": "Dlg_Forged_Greeting_1" } ],
                       "options": [ { "id": "Ask", "key": "Dlg_Forged_Greeting_Ask" } ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        /// <summary>The npc catalog of the forged run: the one record an author renames.</summary>
+        private const string ForgedNpcsJson =
+            """
+            {
+              "npcs": [ { "id": "Npc_Villager" } ]
+            }
+            """;
+
+        /// <summary>The conversations of the forged run: the one the renamed npc speaks — a line, an
+        /// option of its own and the option every conversation shares — and one belonging to somebody
+        /// nobody renamed.</summary>
+        private const string ForgedDialoguesJson =
+            """
+            {
+              "dialogues": [
+                {
+                  "npcId": "Npc_Villager",
+                  "nodes": [
+                    {
+                      "id": "Greeting",
+                      "lines": [ { "speaker": "Npc", "key": "Dlg_Villager_Greeting_1" } ],
+                      "options": [
+                        { "id": "Ask", "key": "Dlg_Villager_Greeting_Ask" },
+                        { "id": "Leave", "key": "Dlg_Opt_Leave" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "npcId": "Npc_Hunter",
+                  "nodes": [
+                    {
+                      "id": "Greeting",
+                      "lines": [ { "speaker": "Npc", "key": "Dlg_Hunter_Greeting_1" } ]
                     }
                   ]
                 }

@@ -37,31 +37,13 @@ namespace NarrativeEditor.Source.View
 
         private const string FactsTabName = "facts";
 
+        private const string GraphTabName = "graph";
+
         private const string SectionRowFormat = "{0}   ({1})";
         private const string RecordRowFormat = "{0}{1}";
         private const string ReadoutFormat = "{0}   —   {1} record(s), {2} file(s), {3} note(s)";
 
         private const string NoTextsFormat = "the locales under {0} could not be read: {1}";
-
-        /// <summary>What the keys following the structure is called where the stack has nothing to name
-        /// the step by: the pass is one gesture with the edit that moved them, and that edit's own name is
-        /// what an author looks for.</summary>
-        private const string KeysStepText = "the wording follows the conversation";
-
-        private const string KeysWrittenFormat = "worded {0} key(s), moved {1}";
-
-        /// <summary>What a pass that left places standing says: what it did get done, and every name that
-        /// stopped one — a refusal naming the first of them reads as the only one.</summary>
-        private const string KeysNotMovedFormat = "{0}; {1} place(s) left as they stand — {2} already written";
-
-        /// <summary>What a pass that could not put a wording back says. Loud on purpose and never left to
-        /// the count above: the text is under a name nothing reads, and only the author knows which of the
-        /// two texts fighting over the key is which.</summary>
-        private const string KeysParkedFormat = "{0}; {1} wording(s) left parked and read by nothing — {2}";
-
-        private const string KeyNameFormat = "“{0}”";
-
-        private const string KeyNamesSeparator = ", ";
 
         private readonly List<Row> _rows = [];
 
@@ -76,6 +58,7 @@ namespace NarrativeEditor.Source.View
         private DryRunPanel _dryRun = null!;
         private ChecksPanel _checks = null!;
         private FactsPanel _facts = null!;
+        private GraphPanel _graph = null!;
 
         private CatalogWorkspace? _workspace;
 
@@ -113,6 +96,7 @@ namespace NarrativeEditor.Source.View
             _dryRun = new DryRunPanel();
             _checks = new ChecksPanel { Name = ChecksTabName };
             _facts = new FactsPanel { Name = FactsTabName };
+            _graph = new GraphPanel { Name = GraphTabName };
 
             // Two divides rather than one container holding all three panes: nested, each divider
             // starts at the minimum width of the pane before it and moves without touching the other.
@@ -149,6 +133,7 @@ namespace NarrativeEditor.Source.View
             read.AddChild(walked);
             read.AddChild(_checks);
             read.AddChild(_facts);
+            read.AddChild(_graph);
 
             _recordList.ItemSelected += index => ShowRecord((int)index);
             tree.ItemSelected += ShowElement;
@@ -159,6 +144,7 @@ namespace NarrativeEditor.Source.View
             _checks.Chose += OpenRecord;
             _facts.Said += Report;
             _facts.Chose += OpenRecord;
+            _graph.Chose += Stand;
 
             return body;
         }
@@ -193,12 +179,27 @@ namespace NarrativeEditor.Source.View
             _facts.History = History;
             _facts.Workspace = _workspace;
 
+            _graph.History = History;
+            _graph.Workspace = _workspace;
+
             // The conditions and the actions: the schema can only call them free json, and this is what
             // tells the inspector which key is written from which of the two vocabularies.
             _inspector.Vocabularies = NarrativeFieldVocabularies.Resolve;
 
             _notes.Clear();
             LoadTexts();
+
+            // The fact keys the narrative already writes and asks about, for the fields whose value IS one.
+            // A key is the whole of what one conversation says to another, and no document spells out which
+            // words are in use anywhere else.
+            var facts = new FactKeySuggestions(_workspace, references, Texts);
+
+            facts.Said += Report;
+            _inspector.Suggestions = facts.For;
+
+            // The list is of the documents as they stand, and every step of the run writes them: a key
+            // raised in a conversation a minute ago has to be under the box of the quest counting it.
+            History.Changed += facts.Invalidate;
 
             FillRecords();
 
@@ -249,6 +250,14 @@ namespace NarrativeEditor.Source.View
             _dryRun.Standing(_record, IsDialogue());
         }
 
+        /// <summary>Puts the author on the row of the outline standing for a place of the record — where
+        /// the map of the conversation hands one over, which is what makes it a way in and not a picture.</summary>
+        private void Stand(JsonPointer at)
+        {
+            _outline.Stand(at);
+            ShowElement();
+        }
+
         /// <summary>A step through the history may have moved a line of a locale: the inspector copied it
         /// into its boxes, and nothing about the record's own file would say it has changed.</summary>
         protected override void Stepped()
@@ -280,61 +289,13 @@ namespace NarrativeEditor.Source.View
         {
             if (!IsDialogue() || _record is not { } record) return false;
 
-            // Nothing is done without the locales: the keys would be written into the file alone and every
-            // line of the conversation would be left pointing at a text no locale holds, which is the one
-            // state this whole gesture exists to prevent.
-            if (Texts is not { } texts) return false;
+            DialogueKeysFollowed followed =
+                DialogueKeyFollow.Over([record], Texts, History, record.File.Document);
 
-            JsonTreeDocument document = record.File.Document;
-            IReadOnlyList<DialogueTextPlace> off = DialogueKeyPlan.OffPattern(document, record.Pointer);
+            if (DialogueKeyFollow.Said(followed.Keys) is { } said) Report(said);
 
-            if (off.Count == 0) return false;
-
-            // Settled before a step is opened: a pass may refuse every place it was asked about, and a
-            // step opened for one would take the author's own edit into a group of the tool's making and
-            // leave the file called changed by a gesture that wrote nothing into it.
-            DialogueKeyPass pass = DialogueKeyPlan.Plan(off, texts);
-
-            // Named after the edit that caused it, which is the one this step takes in: the keys move
-            // because a node was renamed or a line added, and an author reading back what he can undo is
-            // looking for the gesture he made and not for what the tool did about it.
-            IDisposable? step = pass.Writes
-                ? History.GroupWithNewest(History.NextUndo ?? KeysStepText, document)
-                : null;
-
-            DialogueKeyResult result;
-
-            try
-            {
-                result = DialogueKeyPlan.Apply(document, pass, texts);
-            }
-            finally
-            {
-                step?.Dispose();
-            }
-
-            Report(Said(result));
-
-            return result.Written + result.Moved > 0;
+            return followed.Keys.Written + followed.Keys.Moved > 0;
         }
-
-        /// <summary>What a pass over the wording is told as: what it wrote and moved, then the places it
-        /// left standing and the names that stopped them, then any wording it could not put back. Every
-        /// half and not one — a pass that moved four keys and refused a fifth did something, and a line
-        /// saying only the refusal reads as if the gesture had done nothing at all.</summary>
-        private static string Said(DialogueKeyResult result)
-        {
-            string done = Text(KeysWrittenFormat, result.Written, result.Moved);
-
-            if (result.Taken.Count > 0) done = Text(KeysNotMovedFormat, done, result.Taken.Count, Names(result.Taken));
-
-            if (result.Parked.Count == 0) return done;
-
-            return Text(KeysParkedFormat, done, result.Parked.Count, Names(result.Parked));
-        }
-
-        private static string Names(IReadOnlyList<string> names) =>
-            string.Join(KeyNamesSeparator, names.Select(name => Text(KeyNameFormat, name)));
 
         /// <summary>Writes a row for every record of every narrative catalog, under a heading naming the
         /// catalog and counting them. The headings are rows of the same list rather than a second list:
@@ -446,6 +407,8 @@ namespace NarrativeEditor.Source.View
         private void ShowElement()
         {
             CatalogRecord? standing = Element(_outline.Selected);
+
+            _graph.Standing(_record, IsDialogue(), _outline.Selected?.Pointer);
 
             if (Same(_shown, standing)) return;
 

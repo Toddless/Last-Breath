@@ -144,9 +144,10 @@ namespace NarrativeEditor.Source.View
             return index >= 0 && index < _rows.Count ? _rows[index] : null;
         }
 
-        /// <summary>Puts the author back where he was standing, or on the record itself when what he
-        /// stood on is no longer written.</summary>
-        private void Stand(JsonPointer? standing)
+        /// <summary>Puts the author on the row written at an address — back where he was standing after a
+        /// rebuild, or on the place another reading of the record hands over — and on the record itself
+        /// when nothing is written there any more.</summary>
+        public void Stand(JsonPointer? standing)
         {
             if (_items.Count == 0) return;
 
