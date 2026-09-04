@@ -1,7 +1,10 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Data.GameData;
+    using Core.Data.LootTable;
+    using Core.Data.Validation;
     using Newtonsoft.Json.Linq;
     using Tooling.Catalogs;
     using Tooling.Catalogs.Checks;
@@ -22,17 +25,30 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class LootTablesAuditTests
     {
-        /// <summary>The key a loot table position writes its augment filter under.</summary>
-        private const string GroupProperty = "augments";
-
         /// <summary>The key a loot table position writes the one thing it drops under.</summary>
         private const string IdProperty = "id";
 
-        /// <summary>The section of the ability catalog the augment records live in.</summary>
-        private const string AugmentSection = "augments";
-
         /// <summary>A drop named after nothing any catalog of the game holds.</summary>
         private const string ForgedDropId = "Weapon_Nobody_Wrote";
+
+        /// <summary>The filter the forged seat asks for, named the way a finding names it.</summary>
+        private const string ForgedBand = "tier 99 / Common";
+
+        private const string ForgedGroupTableJson = """
+        {
+            "general": [
+                {
+                    "key": "forged",
+                    "tiers": [
+                        {
+                            "tier": 0,
+                            "items": [ { "augments": { "tier": 99, "rarity": "Common" }, "price": 100 } ]
+                        }
+                    ]
+                }
+            ]
+        }
+        """;
 
         [TestMethod]
         public void EveryLootTableIdExistsInTheCatalogs()
@@ -154,7 +170,10 @@ namespace LastBreathTest.BattleSystemTests
         /// leave EVERY position id unanswered rather than calling it broken: no <c>UnknownReference</c> can
         /// arrive out of the loot tables while that holds, and the gate stands on the ids it puts to the
         /// four described catalogs on its own. The pin says so out loud — the day that catalog is described
-        /// the two halves change places.</summary>
+        /// the two halves change places.
+        /// <para>The band rule below reads the same tables and is no exception to this: what the game's own
+        /// rules find comes back under <see cref="CatalogFindingKind.Rule"/>, so the sort the gate above
+        /// reads stays about the ids alone.</para></summary>
         [TestMethod]
         public void TheIdsOfALootPositionAreLeftUnansweredWhileTheItemsCatalogIsUndescribed()
         {
@@ -165,23 +184,64 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>A group is expanded at mint time, so a filter no augment answers is not a load
-        /// error at all — it is a kill that quietly drops one item fewer, forever. Membership is
-        /// COVERAGE, not equality: a record declares a band and belongs to every seat inside it.</summary>
+        /// error at all — it is a kill that quietly drops one item fewer, forever. The rule is the game's
+        /// own (<see cref="LootBandRules"/>), which the authoring tool reads over the documents an author
+        /// has open; it stays a GATE here.</summary>
         [TestMethod]
         public void EveryLootTableGroupIsAnsweredByAShippedAugment()
         {
-            var bands = AugmentBands();
-            var unanswered = Positions()
-                .Select(position => position[GroupProperty])
-                .OfType<JObject>()
-                .Select(group => ((int?)group["tier"], Rarity: Parse((string?)group["rarity"] ?? DefaultRarity)))
-                .Where(filter => !bands.Any(band => band.Tier == filter.Item1 && Covers(band, filter.Rarity)))
-                .Select(filter => $"tier {filter.Item1?.ToString() ?? "(none)"} / {filter.Rarity}")
-                .Distinct()
-                .ToList();
+            IReadOnlyList<LootTableSeats> tables = ShippedTables();
+            IReadOnlyList<AbilityAugmentData> augments = ShippedAugments();
 
-            Assert.AreEqual(0, unanswered.Count, $"Loot table groups no shipped augment answers: {string.Join(", ", unanswered)}");
+            Assert.AreNotEqual(0, augments.Count, "the shipped catalogs hold no augment at all — the gate holds nothing");
+            Assert.IsTrue(Seats(tables).Any(position => position.Augments is not null),
+                "no shipped seat names a set of augments — the gate holds nothing");
+
+            IReadOnlyList<DataFinding> unanswered = LootBandRules.Check(tables, augments);
+
+            Assert.AreEqual(0, unanswered.Count,
+                $"Loot table groups no shipped augment answers: {string.Join(", ", unanswered.Select(finding => finding.Named))}");
         }
+
+        /// <summary>The mutation the gate exists for: a seat asking for a tier nothing is written at.
+        /// Membership is COVERAGE and not equality, so the band's own edges have to hold — a filter at
+        /// either end of a declared band is answered, and one a step outside it is not.</summary>
+        [TestMethod]
+        public void ASeatOutsideEveryDeclaredBand_IsCaught()
+        {
+            AbilityAugmentData band = new()
+            {
+                Id = "Forged_Augment",
+                Tier = 1,
+                MinRarity = Core.Enums.Rarity.Rare,
+                MaxRarity = Core.Enums.Rarity.Epic
+            };
+
+            Assert.AreEqual(0, Asked(band, 1, Core.Enums.Rarity.Rare).Count, "the worst end of the band went unanswered");
+            Assert.AreEqual(0, Asked(band, 1, Core.Enums.Rarity.Epic).Count, "the best end of the band went unanswered");
+            Assert.AreEqual(1, Asked(band, 1, Core.Enums.Rarity.Uncommon).Count, "a rarity below the band was answered");
+            Assert.AreEqual(1, Asked(band, 1, Core.Enums.Rarity.Legendary).Count, "a rarity above the band was answered");
+            Assert.AreEqual(1, Asked(band, 2, Core.Enums.Rarity.Rare).Count, "another tier answered the seat");
+        }
+
+        /// <summary>The same rule over the documents the authoring tool has open: a seat written into the
+        /// loot tables that nothing answers reaches the panel's Check as a finding of its own.</summary>
+        [TestMethod]
+        public void AnUnansweredSeatInTheDocuments_ReachesTheChecksOfTheTool()
+        {
+            IReadOnlyList<CatalogFinding> added = CatalogCrossCheckTests.Added(DataCatalog.LootTables, ForgedGroupTableJson);
+
+            CollectionAssert.AreEqual(
+                new[] { ForgedBand },
+                added.Select(finding => finding.Named).ToArray(),
+                $"the forged table was read by the tool's checks as:\n  {CatalogCrossCheckTests.Lines(added)}");
+        }
+
+        /// <summary>What one seat comes to against one declared band, both forged.</summary>
+        private static IReadOnlyList<DataFinding> Asked(AbilityAugmentData band, int tier, Core.Enums.Rarity rarity) =>
+            LootBandRules.Check(
+                [new LootTableSeats("Forged", [new LootTableTierData { Tier = 0, Items = [new TableRecord(string.Empty, 1f, new AugmentGroup(tier, rarity))] }])],
+                [band]);
 
         /// <summary>What the checks found in the loot tables of one sort, as a line naming the position.</summary>
         private static IEnumerable<string> Findings(CatalogFindingKind kind) =>
@@ -189,40 +249,40 @@ namespace LastBreathTest.BattleSystemTests
                 .Where(finding => finding.Kind == kind && finding.Catalog == DataCatalog.LootTables)
                 .Select(finding => $"{finding.Record} {finding.Where} {finding.Named}".Trim());
 
-        /// <summary>An augment record leaving its rarity unstated is the plainest augment there is —
-        /// the same reading <see cref="AbilityAugmentData"/> gives it.</summary>
-        private const string DefaultRarity = nameof(Core.Enums.Rarity.Common);
+        /// <summary>Every seat of every shipped table, read the way the drop pipeline reads them.</summary>
+        private static IEnumerable<TableRecord> Seats(IEnumerable<LootTableSeats> tables) =>
+            tables.SelectMany(table => table.Tiers).SelectMany(tier => tier.Items);
 
-        /// <summary>The scale runs downward — Legendary is zero — so the best end is the smaller
-        /// number and a band contains everything between the two.</summary>
-        private static bool Covers((int? Tier, Core.Enums.Rarity Worst, Core.Enums.Rarity Best) band, Core.Enums.Rarity rarity) =>
-            (int)band.Best <= (int)rarity && (int)rarity <= (int)band.Worst;
+        /// <summary>The shipped tables under the keys their own file names them by, put to the same reader
+        /// the authoring tool hands its open documents to — a position that reader refuses is one no kill
+        /// will ever price, so it is no business of this gate either.</summary>
+        private static IReadOnlyList<LootTableSeats> ShippedTables() =>
+            [.. CatalogFiles(DataCatalog.LootTables).SelectMany(file => LootTableSeats.From(File.ReadAllText(file)))];
 
-        /// <summary>The tier and rarity band of every shipped augment record. A record naming no band
-        /// is a band of one around the field it does name.</summary>
-        private static List<(int? Tier, Core.Enums.Rarity Worst, Core.Enums.Rarity Best)> AugmentBands() =>
-            [.. CatalogRoots("Abilities")
-                .SelectMany(root => root[AugmentSection] as JArray ?? [])
-                .Select(augment => (
-                    (int?)augment["tier"],
-                    Parse((string?)augment["minRarity"] ?? (string?)augment["rarity"] ?? DefaultRarity),
-                    Parse((string?)augment["maxRarity"] ?? (string?)augment["rarity"] ?? DefaultRarity)))];
-
-        private static Core.Enums.Rarity Parse(string rarity)
+        /// <summary>Every shipped augment record, read by the catalog every composition reads them
+        /// through.</summary>
+        private static IReadOnlyList<AbilityAugmentData> ShippedAugments()
         {
-            Assert.IsTrue(Enum.TryParse(rarity, out Core.Enums.Rarity parsed), $"'{rarity}' is not a rarity the game knows");
-            return parsed;
+            var catalog = new AbilityAugmentCatalog();
+
+            foreach (string file in CatalogFiles(DataCatalog.Abilities))
+                catalog.Apply(DataCatalog.Abilities, new GameDataFile(Path.GetFileName(file), File.ReadAllText(file)));
+
+            return [.. catalog.All];
         }
 
+        /// <summary>Every file of a catalog, subfolders and all — the way the game and the authoring tool
+        /// both walk one: a record filed a folder deeper is a record either of them reads.</summary>
+        private static IEnumerable<string> CatalogFiles(string catalog) =>
+            Directory.EnumerateFiles(SharedData.Catalog(catalog), "*.json", SearchOption.AllDirectories);
+
+        /// <summary>Every seat of every shipped file as it is WRITTEN — the ids are put to the catalogs
+        /// straight out of the json, because a converter that refused a seat would hide the very id this
+        /// gate is about.</summary>
         private static IEnumerable<JObject> Positions() =>
-            CatalogRoots("LootTables").SelectMany(root => root.SelectTokens("$..items[*]")).OfType<JObject>();
-
-        private static IEnumerable<JObject> CatalogRoots(string catalog)
-        {
-            string path = Path.Combine(SharedData.Root(), catalog);
-            if (!Directory.Exists(path)) yield break;
-            foreach (string file in Directory.EnumerateFiles(path, "*.json", SearchOption.AllDirectories))
-                yield return JObject.Parse(File.ReadAllText(file));
-        }
+            CatalogFiles(DataCatalog.LootTables)
+                .Select(file => JObject.Parse(File.ReadAllText(file)))
+                .SelectMany(root => root.SelectTokens("$..items[*]"))
+                .OfType<JObject>();
     }
 }

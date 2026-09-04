@@ -15,10 +15,10 @@ namespace LastBreathTest.BattleSystemTests
 
     /// <summary>
     /// The shipped catalogs held against each other and against the wording beside them: the ids they
-    /// name, the names they are found by, the shapes their records are written in and the keys their text
-    /// is read under. The rules are the library's own and the authoring tool presses its Check button on
-    /// the very same entry point, so what an author sees in the panel and what this run reports are one
-    /// answer.
+    /// name, the names they are found by, the shapes their records are written in, the keys their text is
+    /// read under — and what the data MEANS where a shape alone cannot say it, which is the game's own
+    /// rules over what its parsers made of the files. The authoring tool presses its Check button on the
+    /// very same entry point, so what an author sees in the panel and what this run reports are one answer.
     /// <para>A report and not a gate: what the data owes today is PINNED, so a finding arriving fails and
     /// a finding going away fails just as loudly — the second is how a pin outlives the thing it pinned.
     /// The gates that were gates before this run existed are still gates, in the audits that own them.</para>
@@ -70,6 +70,8 @@ namespace LastBreathTest.BattleSystemTests
         /// for: an effect's standing card opens from a description writing <c>{@Effect_X}</c> and from
         /// nowhere else, so the describer says the effects catalog does not require it and the forty
         /// cards nobody links to are not rows here.</item>
+        /// <item>The rules over what the data MEANS write no row at all today: every audit owning one of
+        /// them is a green gate, and each is put to a mutation of its own through this same entry point.</item>
         /// </list>
         /// Two rows are alike where a record owes the same thing twice — the two ranges of one pool — and
         /// that is the fact, not a repetition.
@@ -211,18 +213,76 @@ namespace LastBreathTest.BattleSystemTests
         /// <remarks>Only what the forged file itself owes comes back: everything else the run has to say
         /// is what the shipped data already owed, and it is pinned above. The run is its own — a file laid
         /// into the shared one would be there for every audit after it.</remarks>
-        internal static IReadOnlyList<CatalogFinding> Forged(string catalog, string json)
+        internal static IReadOnlyList<CatalogFinding> Forged(string catalog, string json) =>
+            [.. Laid(catalog, json).Where(finding => finding.Where.StartsWith(ForgedFileName, StringComparison.Ordinal))];
+
+        /// <summary>
+        /// Everything one forged file ADDS to what the run already had to say. Held against a run with no
+        /// forged file in it rather than picked out by address, because the rules reading the catalogs
+        /// through the game's own parsers answer about a pool, a table or a quest — the file a record was
+        /// typed into is not what such a finding is about, and several of them stand at no file at all.
+        /// </summary>
+        /// <remarks>The rules over the MEANING of the data are the only ones a mutation can be put to this
+        /// way, and putting one to them through this entry point is what proves the authoring tool reads
+        /// the same rule over the same catalogs as the audit that owns the gate.</remarks>
+        internal static IReadOnlyList<CatalogFinding> Added(string catalog, string json)
+        {
+            List<CatalogFinding> before = [.. s_bare.Value];
+            List<CatalogFinding> added = [];
+
+            // Struck off one at a time rather than filtered against the list: two findings alike are two
+            // facts, and asking a list whether it holds one at all would drop both or keep both.
+            foreach (CatalogFinding finding in Laid(catalog, json))
+                if (!before.Remove(finding))
+                    added.Add(finding);
+
+            return added;
+        }
+
+        /// <summary>One run over the shipped catalogs with one forged file laid into them. The wording is
+        /// left unread: a run held against another run has to differ by the forged file alone.</summary>
+        private static IReadOnlyList<CatalogFinding> Laid(string catalog, string json)
         {
             var workspace = CatalogWorkspace.Load(SharedData.Root(), CatalogDescriptors.All);
             CatalogView view = workspace.Catalogs.Single(open => open.Catalog == catalog);
 
             view.AddFile(new CatalogFile(Path.Combine(view.Folder, ForgedFileName), JsonTreeDocument.Parse(json)));
 
-            return
-            [
-                .. CatalogCheckRun.Over(workspace, new ReferenceIndex(workspace), texts: null)
-                    .Where(finding => finding.Where.StartsWith(ForgedFileName, StringComparison.Ordinal))
-            ];
+            return CatalogCheckRun.Over(workspace, new ReferenceIndex(workspace), texts: null);
+        }
+
+        /// <summary>A resource whose id was typed before its material was — what a record looks like
+        /// halfway through being written.</summary>
+        private const string HalfWrittenResourceJson = """
+        {
+            "craftingResources": [ { "id": "Resource_Half_Written", "maxStackSize": 1, "tags": [], "rarity": "Common" } ]
+        }
+        """;
+
+        /// <summary>
+        /// A record halfway through being written reaches the game's own parsers as a field that is not
+        /// there yet. This run is a REPORT, pressed over documents being typed into: such a record costs
+        /// its own family's answer and nothing else — not the families beside it, and not the shape rules
+        /// spread into the same list — so the button an author presses answers instead of throwing.
+        /// </summary>
+        [TestMethod]
+        public void AHalfWrittenRecordDoesNotTakeTheRunDown()
+        {
+            IReadOnlyList<CatalogFinding> added = Added(DataCatalog.Resources, HalfWrittenResourceJson);
+
+            Assert.AreEqual(0, added.Count(finding => finding.Kind == CatalogFindingKind.Rule),
+                $"a resource with no material was read as a finding of the game's own rules:{Environment.NewLine}  {Lines(added)}");
+        }
+
+        /// <summary>What the shipped catalogs come to with no forged file and no wording read — the run
+        /// every mutation is held against. Read once for the whole assembly, the way the shipped run is.</summary>
+        private static readonly Lazy<IReadOnlyList<CatalogFinding>> s_bare = new(Bare);
+
+        private static IReadOnlyList<CatalogFinding> Bare()
+        {
+            var workspace = CatalogWorkspace.Load(SharedData.Root(), CatalogDescriptors.All);
+
+            return CatalogCheckRun.Over(workspace, new ReferenceIndex(workspace), texts: null);
         }
 
         /// <summary>The words one sort of finding is about, in the order the run met them.</summary>

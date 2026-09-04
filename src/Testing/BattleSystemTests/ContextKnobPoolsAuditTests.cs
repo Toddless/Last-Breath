@@ -3,9 +3,11 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Crafting;
     using Core.Data;
     using Core.Data.GameData;
+    using Core.Data.Validation;
     using Core.Enums;
     using Core.Modifiers;
     using LootGeneration.Internal;
+    using Tooling.Catalogs.Checks;
 
     /// <summary>
     /// A context knob's binding is picked by the parameter and reads the line's number; the value type the
@@ -14,81 +16,123 @@ namespace LastBreathTest.BattleSystemTests
     /// written in two of them is two identities. An item may then roll both entries, each attaches on its
     /// own, the handler applies them one after the other and they multiply — a bonus larger than either line
     /// says, that no duplicate check can see.
-    /// <para>This audit keeps that unreachable from the shipped data: across every pool an item's lines can
-    /// come from, a knob is written in ONE value type. Composite parts count as their own entries — the
-    /// schema lets a bundle carry a knob among its parts, and such a part attaches like any other line.</para>
+    /// <para>The rule keeping that unreachable is the game's own (<see cref="ContextKnobRules"/>), which the
+    /// authoring tool reads over the documents an author has open. It stays a GATE here — the tool reports
+    /// and the game refuses.</para>
     /// </summary>
     [TestClass]
     public class ContextKnobPoolsAuditTests
     {
+        /// <summary>The pool a mutation is written into: one knob written both ways, the second of them
+        /// buried in a bundle, because a part of a composite attaches like any other line.</summary>
+        private const string SplitKnobPoolJson = """
+        {
+            "pools": [
+                {
+                    "id": "Forged_Split_Knob",
+                    "modifiersPool": [
+                        {
+                            "parameter": "HealingEfficiency",
+                            "modifierType": "flat",
+                            "value": { "min": 0.1, "max": 0.2 },
+                            "weight": 50,
+                            "affix": "Prefix"
+                        },
+                        {
+                            "weight": 50,
+                            "affix": "Suffix",
+                            "parts": [
+                                {
+                                    "parameter": "HealingEfficiency",
+                                    "modifierType": "increase",
+                                    "value": { "min": 0.1, "max": 0.2 }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        """;
+
         [TestMethod]
         public void EveryContextKnob_IsWrittenInOneValueTypeAcrossTheRollablePools()
         {
-            var entries = ShippedContextEntries();
-            Assert.IsTrue(entries.Count > 0, "No context lines in the shipped pools — the audit has nothing to audit.");
+            IReadOnlyList<RollablePool> pools = ShippedPools();
 
-            var split = entries
-                .GroupBy(entry => entry.Parameter)
-                .Where(knob => knob.Select(entry => entry.ValueType).Distinct().Count() > 1)
-                .OrderBy(knob => knob.Key)
-                .Select(Describe)
-                .ToList();
+            // The knobs and not the lines: the pools are full of plain parameters, and a run that met no
+            // knob at all would agree with itself forever.
+            Assert.AreNotEqual(0, ContextKnobRules.Knobs(pools), "No shipped pool holds a context knob — the audit has nothing to audit.");
+
+            IReadOnlyList<DataFinding> split = ContextKnobRules.Check(pools);
 
             Assert.AreEqual(0, split.Count,
                 "A context knob is applied by its parameter alone — entries of one knob written in different value types "
                 + "are the same bonus twice, and an item that rolls both wears them multiplied. Write each knob's entries "
-                + $"in one value type:\n  {string.Join("\n  ", split)}");
+                + $"in one value type:\n  {string.Join("\n  ", split.Select(finding => finding.Message))}");
         }
 
-        /// <summary>What the data author has to fix: the knob, each value type it is written in, and the
-        /// pool, material category or resource id every one of those entries sits under.</summary>
-        private static string Describe(IGrouping<ContextParameter, ContextEntry> knob) =>
-            $"'{knob.Key}' is written as " + string.Join(" and as ", knob
-                .GroupBy(entry => entry.ValueType)
-                .OrderBy(bucket => bucket.Key)
-                .Select(bucket => $"{bucket.Key} in [{string.Join(", ", bucket.Select(entry => entry.Source).Distinct().Order())}]"));
-
-        private static List<ContextEntry> ShippedContextEntries()
+        /// <summary>The mutation the gate exists for, put to the rule itself: one knob written flat in one
+        /// pool and increased inside a bundle in another is one finding naming that knob.</summary>
+        [TestMethod]
+        public void AKnobWrittenBothFlatAndIncreased_IsCaught()
         {
-            var found = new List<ContextEntry>();
-            var counted = new HashSet<IModifierDescriptor>(ReferenceEqualityComparer.Instance);
-            foreach ((string source, var pool) in RollablePools())
-                foreach (var entry in pool)
-                    Collect(entry, source, counted, found);
+            IReadOnlyList<DataFinding> split = ContextKnobRules.Check(
+            [
+                new RollablePool("Forged_Flat", [Knob(ModifierValueType.Flat)]),
+                new RollablePool("Forged_Increase", [new CompositeDescriptor([Knob(ModifierValueType.Increase)])]),
+            ]);
 
-            return found;
+            Assert.AreEqual(1, split.Count, $"the forged split was read as: {Lines(split)}");
+            Assert.AreEqual(DataFindingKind.SplitValueType, split[0].Kind);
+            Assert.AreEqual(nameof(ContextParameter.HealingEfficiency), split[0].Named);
         }
 
-        /// <summary>Descriptors are gathered once per instance: a material category's entries are the very
-        /// objects every material of that category carries, so counting by instance reports them under the
-        /// category instead of once per resource that shares them.</summary>
-        private static void Collect(IModifierDescriptor descriptor, string source, HashSet<IModifierDescriptor> counted, List<ContextEntry> found)
+        /// <summary>A pool holding no knob at all, and a run holding no pool: neither is a finding, and a
+        /// rule that reported one would be a gate every empty catalog fails.</summary>
+        [TestMethod]
+        public void PoolsWithNoContextKnobs_AreNothingToReport()
         {
-            if (!counted.Add(descriptor)) return;
+            Assert.AreEqual(0, ContextKnobRules.Check([]).Count, "an empty run found something to say");
 
-            switch (descriptor)
-            {
-                case CompositeDescriptor composite:
-                    foreach (var part in composite.Parts) Collect(part, source, counted, found);
-                    break;
-                case ContextDescriptor context:
-                    found.Add(new ContextEntry(context.Parameter, context.ValueType, source));
-                    break;
-            }
+            IReadOnlyList<DataFinding> plain = ContextKnobRules.Check(
+                [new RollablePool("Forged_Plain", [new ParameterDescriptor(EntityParameter.Health, ModifierValueType.Flat, new ValueRange(1, 2), ModifierScope.Local)])]);
+
+            Assert.AreEqual(0, plain.Count, $"a pool of plain lines was read as: {Lines(plain)}");
         }
+
+        /// <summary>The same rule over the documents the authoring tool has open: a split written into the
+        /// modifier pools reaches the panel's Check as a finding of its own.</summary>
+        [TestMethod]
+        public void ASplitKnobInTheDocuments_ReachesTheChecksOfTheTool()
+        {
+            IReadOnlyList<CatalogFinding> added = CatalogCrossCheckTests.Added(DataCatalog.ModifierPools, SplitKnobPoolJson);
+
+            CollectionAssert.AreEqual(
+                new[] { nameof(ContextParameter.HealingEfficiency) },
+                added.Select(finding => finding.Named).ToArray(),
+                $"the forged pool was read by the tool's checks as:\n  {CatalogCrossCheckTests.Lines(added)}");
+        }
+
+        private static ContextDescriptor Knob(ModifierValueType valueType) =>
+            new(ContextParameter.HealingEfficiency, valueType, new ValueRange(1, 1));
+
+        private static string Lines(IReadOnlyList<DataFinding> found) =>
+            string.Join("\n  ", found.Select(finding => $"{finding.Kind}  {finding.Named}  {finding.Message}"));
 
         /// <summary>The shipped pools an item's lines are rolled from, each labelled by the id an author will
         /// search the data for. Item, family and mythic pools live in one catalog; material and category
         /// descriptors in the other — a reroll unions them, so for a single item they are one pool. Read
         /// through the real parser: the entries an author writes are exactly the entries the game rolls,
         /// value-type aliases resolved and refused entries already dropped.</summary>
-        private static IEnumerable<(string Source, IReadOnlyList<IModifierDescriptor> Pool)> RollablePools()
+        private static IReadOnlyList<RollablePool> ShippedPools()
         {
             var parser = new DataParser(new ItemGameDataFactory());
+            List<RollablePool> pools = [];
 
             foreach (string file in CatalogFiles(DataCatalog.ModifierPools))
                 foreach ((string id, var pool) in parser.ParseEquipItemModifierPools(File.ReadAllText(file)))
-                    yield return (id, pool);
+                    pools.Add(new RollablePool(id, pool));
 
             foreach (string file in CatalogFiles(DataCatalog.Resources))
             {
@@ -101,18 +145,16 @@ namespace LastBreathTest.BattleSystemTests
                     .Select(resource => resource.Material!.MaterialCategory)
                     .OfType<IMaterialCategory>()
                     .DistinctBy(category => category.Id))
-                {
-                    yield return (category.Id, category.Modifiers);
-                }
+                    pools.Add(new RollablePool(category.Id, category.Modifiers));
 
                 foreach (var resource in materials)
-                    yield return (resource.Id, resource.Material!.Modifiers);
+                    pools.Add(new RollablePool(resource.Id, resource.Material!.Modifiers));
             }
+
+            return pools;
         }
 
         private static IEnumerable<string> CatalogFiles(string catalog) =>
             Directory.EnumerateFiles(SharedData.Catalog(catalog), "*.json", SearchOption.AllDirectories);
-
-        private readonly record struct ContextEntry(ContextParameter Parameter, ModifierValueType ValueType, string Source);
     }
 }

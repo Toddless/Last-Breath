@@ -40,7 +40,14 @@ namespace Tooling.Catalogs.Checks
         /// <summary>A record whose shapes are told apart by the PRESENCE of a key wears none of them or
         /// more than one. Naming both leaves what the record means undecided and naming neither describes
         /// nothing, so the reader refuses the record either way.</summary>
-        AmbiguousShape
+        AmbiguousShape,
+
+        /// <summary>A rule of the GAME over the meaning of its own data, run beside these and reported in
+        /// one list. The shape of a record says nothing about such a fact — a knob written two ways, a
+        /// filter nothing answers, an artefact handed out again on every turn-in — so the rules live with
+        /// the game and this is the one sort the checks carry them under. Which rule spoke stands beside
+        /// the finding.</summary>
+        Rule
     }
 
     /// <summary>
@@ -53,6 +60,9 @@ namespace Tooling.Catalogs.Checks
     /// words, the target nobody described; empty where the finding is about a shape rather than a word.</param>
     /// <param name="Where">The address: the file and the pointer inside it, or the locale and the line
     /// for a finding about the wording. Empty for a finding that stands at no one place.</param>
+    /// <param name="Rule">Which rule spoke, for a finding of the game's own rules over the meaning of its
+    /// data; empty for every rule over a shape, whose sort already names it. Four different facts share
+    /// one sort, and a row saying only <see cref="CatalogFindingKind.Rule"/> would call them one thing.</param>
     /// <remarks>The first four are written the same way every run, so a finding can be pinned as known
     /// without pinning either the wording of a message or a record's place in its file.</remarks>
     public sealed record CatalogFinding(
@@ -61,5 +71,6 @@ namespace Tooling.Catalogs.Checks
         string Record,
         string Named,
         string Where,
-        string Message);
+        string Message,
+        string Rule = "");
 }

@@ -30,6 +30,10 @@ namespace Tooling.Ui
 
         private const string TooltipBreak = "\n";
 
+        /// <summary>How a finding of one of the game's own rules is labelled: the sort, and the rule that
+        /// spoke. Four different facts share one sort, and the sort alone would call them one thing.</summary>
+        private const string RuledFormat = "{0} {1}";
+
         protected override string NotRunText => NotRun;
 
         /// <summary>Reads every catalog through the same rules the game's own tests run.</summary>
@@ -49,9 +53,14 @@ namespace Tooling.Ui
         private static Row Written(CatalogFinding finding) =>
             new(
                 finding.Catalog.Length == 0
-                    ? Text(RowFormat, finding.Kind, finding.Named)
-                    : Text(NamedRowFormat, finding.Kind, finding.Catalog, finding.Record, finding.Named),
+                    ? Text(RowFormat, Sort(finding), finding.Named)
+                    : Text(NamedRowFormat, Sort(finding), finding.Catalog, finding.Record, finding.Named),
                 Text(TooltipFormat, finding.Message, finding.Where.Length == 0 ? string.Empty : TooltipBreak, finding.Where),
                 finding.Catalog.Length > 0 && finding.Record.Length > 0 ? (finding.Catalog, finding.Record) : null);
+
+        /// <summary>What the row calls the finding: its sort, and beside it the rule that spoke where the
+        /// finding is one of the game's own rules over the meaning of its data.</summary>
+        private static string Sort(CatalogFinding finding) =>
+            finding.Rule.Length == 0 ? finding.Kind.ToString() : Text(RuledFormat, finding.Kind, finding.Rule);
     }
 }
