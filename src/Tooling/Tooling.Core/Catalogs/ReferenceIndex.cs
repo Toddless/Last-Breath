@@ -54,6 +54,21 @@ namespace Tooling.Catalogs
             }
         }
 
+        /// <summary>The catalog of the run one of its files belongs to, or null for a file no catalog
+        /// here holds. Whether a name is free is a question about the catalog writing it, and something
+        /// shown one record at a time is handed the record and not the catalog around it.</summary>
+        public CatalogView? Holding(CatalogFile file)
+        {
+            ArgumentNullException.ThrowIfNull(file);
+
+            foreach (CatalogView catalog in _workspace.Catalogs)
+                foreach (CatalogFile held in catalog.Files)
+                    if (ReferenceEquals(held, file))
+                        return catalog;
+
+            return null;
+        }
+
         /// <summary>Every id the named targets write, as one list: a field naming several of them is
         /// answered by any one, and an author picking an id does not care which. An id written by two of
         /// them is offered once. A target naming a section is answered by that section's ids alone.</summary>

@@ -1220,6 +1220,50 @@ namespace Tooling.Ui
         }
 
         /// <summary>
+        /// Whether the name just typed into the record's id is one another record of its section is
+        /// already listed under, and the run of keystrokes was therefore taken back. The catalog is the
+        /// judge of it: a section is read over the whole folder into one table, and the second record of
+        /// a name is the one the game drops.
+        /// <para>Asked only where the id actually changed, and only of the id: the run just sealed is
+        /// what an undo takes back here, and a field nobody typed in has no run of its own to lose.</para>
+        /// </summary>
+        private bool Refused(JsonPointer at)
+        {
+            if (_record is not { } record || References?.Holding(record.File) is not { } view) return false;
+            if (record.Schema.IdField is not { } id || at != record.Pointer.Append(id)) return false;
+
+            string now = record.CurrentId;
+
+            if (string.Equals(now, _idBefore, StringComparison.Ordinal)) return false;
+            if (CatalogEditing.RenameRefusal(view, record, now) is not { } refusal) return false;
+
+            TakeBack(record);
+            Say(refusal);
+
+            return true;
+        }
+
+        /// <summary>Takes back the run of keystrokes just sealed, which is the newest step of the tool:
+        /// a refused rename costs the author nothing to undo and leaves nothing on the stack. Guarded and
+        /// redrawn the way every write of this panel is — a redraw from inside the box being left would
+        /// tear it down under the hand that left it.</summary>
+        private void TakeBack(CatalogRecord record)
+        {
+            _writing = true;
+
+            try
+            {
+                record.File.Document.History.Undo();
+            }
+            finally
+            {
+                _writing = false;
+            }
+
+            RebuildLater();
+        }
+
+        /// <summary>
         /// Names the record's localization keys again once the run of keystrokes over its id is over.
         /// Done at the end of the run and not as the letters arrive: every half-typed word would
         /// otherwise be a rename of its own, and the keys would follow the author's hesitation into the
@@ -1603,7 +1647,13 @@ namespace Tooling.Ui
 
                 // Not from a control that has outlived its build: it speaks for a record no longer on
                 // screen, and the word the keys would be named from is another record's.
-                if (!panel.Stale(build)) panel.RenameKeys(at);
+                if (panel.Stale(build)) return;
+
+                // A name the record's section already writes is taken back where it was typed, and the
+                // keys stand where they are: the record is called what it was called a moment ago.
+                if (panel.Refused(at)) return;
+
+                panel.RenameKeys(at);
             }
 
             public void Redraw() => panel.RebuildLater();

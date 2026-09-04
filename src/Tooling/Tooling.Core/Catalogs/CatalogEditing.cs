@@ -122,18 +122,55 @@ namespace Tooling.Catalogs
         /// at once: the game reads a section over the whole folder into one table.
         /// <para>Case is not part of the answer: two ids differing only in it are one word to the author,
         /// and a reference he writes by hand would land in whichever of the two he was not looking
-        /// at.</para></summary>
-        public static bool Taken(CatalogView view, string section, string id)
+        /// at.</para>
+        /// <para><paramref name="except"/> is the record the question is asked on behalf of, where there
+        /// is one: a record being renamed already carries the name being asked about, and a record does
+        /// not take its own name.</para></summary>
+        public static bool Taken(CatalogView view, string section, string id, CatalogRecord? except = null)
         {
             ArgumentNullException.ThrowIfNull(view);
             ArgumentNullException.ThrowIfNull(section);
 
             return view.Records.Any(record =>
-                string.Equals(record.Section, section, StringComparison.Ordinal)
+                !Itself(record, except)
+                && string.Equals(record.Section, section, StringComparison.Ordinal)
                 && string.Equals(record.CurrentId, id, StringComparison.OrdinalIgnoreCase));
         }
 
+        /// <summary>
+        /// Why the record may not be listed under the name typed into its id, or null when it may. The
+        /// question a rename asks is the one an addition asks — a section is read into one table, and the
+        /// second record of a name is the one the game drops — so it is answered by the same judge and
+        /// said in the same words.
+        /// <para>The record is never in its own way: the name is written into it as it is typed, and a
+        /// record renamed to what it is already called, or to the same word in another case, has taken
+        /// nothing from anybody. A name nobody typed is no rename at all — a record without one is listed
+        /// under the place it stands in, which no other record can be spoken for.</para>
+        /// </summary>
+        public static string? RenameRefusal(CatalogView view, CatalogRecord record, string? typed)
+        {
+            ArgumentNullException.ThrowIfNull(view);
+            ArgumentNullException.ThrowIfNull(record);
+
+            string wanted = (typed ?? string.Empty).Trim();
+
+            if (wanted.Length == 0) return null;
+
+            return Taken(view, record.Section, wanted, record) ? TakenNote(record.Section, wanted) : null;
+        }
+
         private static CatalogEditResult Refused(string note) => new(null, note);
+
+        /// <summary>Whether two records are the same one, asked by where it stands and not by what it
+        /// holds: the id a record was listed under is exactly what a rename changes.</summary>
+        private static bool Itself(CatalogRecord record, CatalogRecord? asking) =>
+            asking is not null && ReferenceEquals(record.File, asking.File) && record.Pointer == asking.Pointer;
+
+        /// <summary>That a name is spoken for, named where the catalog has a word for the section holding
+        /// it: an author told a name is taken has to be able to go and look at the record holding it, and
+        /// a catalog written as one nameless section shows him no section to look in.</summary>
+        private static string TakenNote(string section, string id) =>
+            section.Length > 0 ? Text(Notes.IdTakenIn, id, section) : Text(Notes.IdTaken, id);
 
         /// <summary>Why a name will not do, or null when it will. A record the shape or the schema names
         /// by its id has to have one, and no section may write the same name twice.</summary>
@@ -142,10 +179,7 @@ namespace Tooling.Catalogs
             if (CatalogRecords.Names(view.Schema, schema) && id.Length == 0) return Notes.NoId;
             if (id.Length == 0 || !Taken(view, section, id)) return null;
 
-            // Named where the catalog has a word for it: an author told a name is taken has to be able to
-            // go and look at the record holding it, and a catalog written as one nameless section shows
-            // him no section to look in.
-            return section.Length > 0 ? Text(Notes.IdTakenIn, id, section) : Text(Notes.IdTaken, id);
+            return TakenNote(section, id);
         }
 
         private static string? Named(string? text) => string.IsNullOrWhiteSpace(text) ? null : text.Trim();

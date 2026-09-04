@@ -747,6 +747,66 @@ namespace Tooling.Tests.DataEditor
             Assert.AreEqual(2, units.Records.Count);
         }
 
+        /// <summary>A record renamed into a name its own section already writes: the name is in the
+        /// record by the time the typing is over — the id is written as it is typed — and the refusal is
+        /// worded like every other one, naming the record standing in the way and where to look for it.</summary>
+        [TestMethod]
+        public void RenameRefusal_RefusesANameItsOwnSectionAlreadyWrites()
+        {
+            Write(NpcCatalog, NpcFile, TwoNpcs);
+
+            CatalogView view = Npcs();
+            CatalogRecord record = view.Records[0];
+
+            Assert.IsTrue(record.File.Document.Put(record.Pointer.Append(IdField), new JValue(SkeletonId)));
+
+            string? refusal = CatalogEditing.RenameRefusal(view, record, SkeletonId);
+
+            Assert.IsNotNull(refusal);
+            StringAssert.Contains(refusal, SkeletonId);
+            StringAssert.Contains(refusal, NpcsKey);
+        }
+
+        /// <summary>The same word under another section is another record, and a catalog written that way
+        /// on purpose can be renamed within its own section as freely as it can be added to.</summary>
+        [TestMethod]
+        public void RenameRefusal_TakesANameAnotherSectionOfTheCatalogWrites()
+        {
+            Write(TablesCatalog, TablesFile, TwoSections);
+
+            CatalogView view = Tables();
+
+            Assert.IsNull(CatalogEditing.RenameRefusal(view, view.Records[0], IndividualTableId));
+        }
+
+        /// <summary>A record is never in its own way: the name is already written into it, and retyping it
+        /// — or the same word in another case — has taken nothing from anybody.</summary>
+        [TestMethod]
+        public void RenameRefusal_TakesTheRecordsOwnNameWhateverItsCase()
+        {
+            Write(NpcCatalog, NpcFile, TwoNpcs);
+
+            CatalogView view = Npcs();
+            CatalogRecord record = view.Records[0];
+
+            Assert.IsNull(CatalogEditing.RenameRefusal(view, record, RonaldId));
+            Assert.IsNull(CatalogEditing.RenameRefusal(view, record, "npc_ronald"));
+        }
+
+        [TestMethod]
+        public void RenameRefusal_TakesANameNobodyWrites()
+        {
+            Write(NpcCatalog, NpcFile, TwoNpcs);
+
+            CatalogView view = Npcs();
+
+            Assert.IsNull(CatalogEditing.RenameRefusal(view, view.Records[0], NewId));
+
+            // A record left without a name is listed under the place it stands in, which nobody else can
+            // be spoken for: an emptied box is not a rename to refuse.
+            Assert.IsNull(CatalogEditing.RenameRefusal(view, view.Records[0], "   "));
+        }
+
         /// <summary>The array one section of a file holds.</summary>
         private static JArray Section(CatalogFile file, string key) =>
             (JArray)file.Document.Resolve(JsonPointer.Root.Append(key))!;
