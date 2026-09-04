@@ -162,13 +162,20 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>The boundaries a registry must not swallow: a family named without one of its members,
-        /// a head with nothing written after it, and a key left empty.</summary>
+        /// a head with nothing written after it, and a word spelled onto the end of a family of ONE — whose
+        /// template IS its key, so nothing at all is written after it and a longer word is somebody
+        /// else's.</summary>
         [TestMethod]
         public void TheKeysThatAreNotMembersOfTheirFamily_AreNotFoldedIntoIt()
         {
             FactKeyRegistry registry = Read(BoundaryDialogueJson, NoQuestsJson);
 
-            foreach (string written in new[] { FactKeys.KillCountHead, $"{FactKeys.KillCountHead}{FactKeys.Separator}" })
+            foreach (string written in new[]
+                     {
+                         FactKeys.KillCountHead,
+                         $"{FactKeys.KillCountHead}{FactKeys.Separator}",
+                         $"{FactKeys.ItemEquippedAnyKey}{FactKeys.Separator}Extra"
+                     })
             {
                 FactKeyEntry key = Key(registry, written);
 
@@ -394,7 +401,8 @@ namespace LastBreathTest.BattleSystemTests
                           "key": "Dialogue_Forged_Ask",
                           "visibleConditions": [
                             { "type": "Fact", "key": "Kill_Count" },
-                            { "type": "Fact", "key": "Kill_Count:" }
+                            { "type": "Fact", "key": "Kill_Count:" },
+                            { "type": "Fact", "key": "Item_Equipped_Any:Extra" }
                           ]
                         }
                       ]

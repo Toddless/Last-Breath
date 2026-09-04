@@ -103,6 +103,23 @@ namespace Tooling.Json
 
         public JsonPointer Append(int index) => Append(index.ToString(CultureInfo.InvariantCulture));
 
+        /// <summary>Whether this address lies at or below <paramref name="of"/>: the node itself and
+        /// everything written inside it. Read segment by segment and never off the text — <c>/nodes/10</c>
+        /// is no part of <c>/nodes/1</c>, and whoever asked by the letter would answer for the neighbour of
+        /// the node he means.</summary>
+        public bool Within(JsonPointer of)
+        {
+            ArgumentNullException.ThrowIfNull(of);
+
+            if (_segments.Length < of._segments.Length) return false;
+
+            for (int index = 0; index < of._segments.Length; index++)
+                if (!string.Equals(_segments[index], of._segments[index], StringComparison.Ordinal))
+                    return false;
+
+            return true;
+        }
+
         /// <summary>The node this pointer addresses, or null when the tree has nothing there. A missing
         /// path is an answer, not a failure: a tool asks about paths the author has not typed yet.</summary>
         public JToken? Resolve(JToken root)

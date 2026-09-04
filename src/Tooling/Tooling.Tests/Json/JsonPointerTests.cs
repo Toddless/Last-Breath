@@ -155,5 +155,25 @@ namespace Tooling.Tests.Json
         {
             Assert.AreNotEqual(JsonPointer.Root.Append(SlashKey), JsonPointer.Root.Append("a").Append("b"));
         }
+
+        /// <summary>What lies inside an address: the node itself and everything written under it, and
+        /// nothing standing beside it. Read segment by segment, which is the whole of the question — a
+        /// neighbour whose name merely begins with the same letters is a different node, and a panel asking
+        /// off the text would go stale for edits it has nothing to do with.</summary>
+        [TestMethod]
+        public void Within_TakesInTheNodeAndWhatIsWrittenUnderIt_AndNothingBesideThem()
+        {
+            JsonPointer node = JsonPointer.Parse("/nodes/1");
+
+            Assert.IsTrue(node.Within(node), "a node was called no part of itself");
+            Assert.IsTrue(JsonPointer.Parse("/nodes/1/lines/0/key").Within(node));
+            Assert.IsTrue(node.Within(JsonPointer.Root), "the whole document holds nothing");
+
+            Assert.IsFalse(JsonPointer.Parse("/nodes/10").Within(node),
+                "an address was read off the text: '/nodes/10' is no part of '/nodes/1'");
+            Assert.IsFalse(JsonPointer.Parse("/nodes/2").Within(node));
+            Assert.IsFalse(JsonPointer.Parse("/nodes").Within(node), "a list was called part of one of its elements");
+            Assert.IsFalse(JsonPointer.Parse("/nodesmore/1").Within(JsonPointer.Parse("/nodes/1")));
+        }
     }
 }

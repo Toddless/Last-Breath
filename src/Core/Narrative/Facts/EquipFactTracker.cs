@@ -38,7 +38,9 @@ namespace Core.Narrative.Facts
             _equipment?.EquipmentChanged += OnEquipmentChanged;
         }
 
-        private void OnEquipmentChanged(EquipmentPiece slot, IEquipItem? item)
+        /// <summary>The slot the piece landed in is nothing to the world: the fact is about the KIND of
+        /// thing put on, and a helmet is a helmet whichever hook it hangs from.</summary>
+        private void OnEquipmentChanged(EquipmentPiece _, IEquipItem? item)
         {
             if (_loadScope.IsLoading) return; // a restored paperdoll re-equips everything the file held
             if (item == null) return; // taking a piece off is not a thing the world stops remembering

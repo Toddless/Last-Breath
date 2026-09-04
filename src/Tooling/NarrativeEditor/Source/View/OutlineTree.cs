@@ -62,6 +62,27 @@ namespace NarrativeEditor.Source.View
             Stand(standing);
         }
 
+        /// <summary>Puts the author on the row written at an address — back where he was standing after a
+        /// rebuild, or on the place another reading of the record hands over — and on the record itself
+        /// when nothing is written there any more.</summary>
+        public void Stand(JsonPointer? standing)
+        {
+            if (_items.Count == 0) return;
+
+            int at = 0;
+
+            if (standing is not null)
+                for (int index = 0; index < _rows.Count; index++)
+                    if (_rows[index].Pointer == standing)
+                    {
+                        at = index;
+                        break;
+                    }
+
+            _items[at].Select(LabelColumn);
+            tree.ScrollToItem(_items[at]);
+        }
+
         private static void Flatten(OutlineNode node, List<OutlineNode> rows)
         {
             rows.Add(node);
@@ -142,27 +163,6 @@ namespace NarrativeEditor.Source.View
             int index = written.AsInt32();
 
             return index >= 0 && index < _rows.Count ? _rows[index] : null;
-        }
-
-        /// <summary>Puts the author on the row written at an address — back where he was standing after a
-        /// rebuild, or on the place another reading of the record hands over — and on the record itself
-        /// when nothing is written there any more.</summary>
-        public void Stand(JsonPointer? standing)
-        {
-            if (_items.Count == 0) return;
-
-            int at = 0;
-
-            if (standing is not null)
-                for (int index = 0; index < _rows.Count; index++)
-                    if (_rows[index].Pointer == standing)
-                    {
-                        at = index;
-                        break;
-                    }
-
-            _items[at].Select(LabelColumn);
-            tree.ScrollToItem(_items[at]);
         }
     }
 }

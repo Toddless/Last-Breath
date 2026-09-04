@@ -102,6 +102,29 @@ namespace LastBreathTest.BattleSystemTests
                 "a key a document writes is offered as a family");
         }
 
+        /// <summary>
+        /// What counts as a template nobody filled in is written twice — once for the game, which refuses
+        /// such a word entry into the registry, and once for the tool, which paints the box holding one and
+        /// marks the row offering it. The two are held to one answer over every word this run can put to
+        /// them: a rule read one way by the game and another by the tool shows the author a key painted as
+        /// met that the world will never raise.
+        /// </summary>
+        [TestMethod]
+        public void WhatCountsAsAWordStillWaitingForItsParameter_IsOneRuleForTheGameAndTheTool()
+        {
+            string[] words =
+            [
+                .. FactKeyDeclarations.All.Select(declaration => declaration.Template),
+                .. Words(s_facts.Matching(string.Empty)),
+                string.Empty, WolfKey, FactKeys.KillCountHead, FactKeys.ItemEquippedAnyKey,
+                "<npcId>", "Kill_Count:<", "Kill_Count:>", "Kill_Count:<npcId", "Kill_Count:npcId>"
+            ];
+
+            foreach (string word in words)
+                Assert.AreEqual(FactKeyDeclarations.Unfilled(word), SuggestedWords.Unfilled(word),
+                    $"the game and the tool read “{word}” differently");
+        }
+
         /// <summary>The list answers for its own name and for no other. A source answering about words it
         /// does not keep would offer the world's facts under a field that has nothing to do with them.</summary>
         [TestMethod]

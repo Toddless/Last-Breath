@@ -38,6 +38,11 @@ namespace Tooling.Narrative
 
         public const string EnabledConditions = "enabledConditions";
 
+        /// <summary>Stands in for the name of an element carrying none, so that every row of the outline
+        /// and every place of the map still has a word a reader can point at. One spelling, because the two
+        /// readings name the same nameless node and an author moves between them.</summary>
+        public const string IndexFormat = "#{0}";
+
         /// <summary>What a key holds, or null for a key the record does not carry.</summary>
         public static JToken? Held(JToken token, string name) =>
             token is JObject holder && holder.TryGetValue(name, StringComparison.Ordinal, out JToken? value)

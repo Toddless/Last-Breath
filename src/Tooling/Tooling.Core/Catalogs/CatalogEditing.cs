@@ -148,7 +148,7 @@ namespace Tooling.Catalogs
             ArgumentNullException.ThrowIfNull(section);
 
             return view.Records.Any(record =>
-                !Itself(record, except)
+                !record.SameAs(except)
                 && string.Equals(record.Section, section, StringComparison.Ordinal)
                 && string.Equals(record.CurrentId, id, StringComparison.OrdinalIgnoreCase));
         }
@@ -312,11 +312,6 @@ namespace Tooling.Catalogs
 
             return null;
         }
-
-        /// <summary>Whether two records are the same one, asked by where it stands and not by what it
-        /// holds: the id a record was listed under is exactly what a rename changes.</summary>
-        private static bool Itself(CatalogRecord record, CatalogRecord? asking) =>
-            asking is not null && ReferenceEquals(record.File, asking.File) && record.Pointer == asking.Pointer;
 
         /// <summary>That a name is spoken for, named where the catalog has a word for the section holding
         /// it: an author told a name is taken has to be able to go and look at the record holding it, and

@@ -11,6 +11,7 @@ namespace NarrativeEditor.Source.View
     using Tooling.Catalogs;
     using Tooling.Json;
     using Tooling.Localization;
+    using Tooling.Ui;
     using static Tooling.Text.Format;
 
     /// <summary>
@@ -180,7 +181,7 @@ namespace NarrativeEditor.Source.View
         /// rewritten is a reading of something that no longer exists.</summary>
         public void Standing(CatalogRecord? record, bool isDialogue)
         {
-            bool moved = !Same(_record, record);
+            bool moved = !_record.SameAs(record);
 
             _record = record;
             _isDialogue = isDialogue;
@@ -200,15 +201,6 @@ namespace NarrativeEditor.Source.View
         public override void _ExitTree()
         {
             if (_file is { } held) held.Document.Changed -= Stale;
-        }
-
-        /// <summary>Whether two rows are the same place of the same file — nothing on both sides
-        /// included, which is where the panel stands while no record is open.</summary>
-        private static bool Same(CatalogRecord? one, CatalogRecord? other)
-        {
-            if (one is null || other is null) return one is null && other is null;
-
-            return ReferenceEquals(one.File, other.File) && one.Pointer == other.Pointer;
         }
 
         private static Label Heading(string text) => new() { Text = text };
@@ -465,8 +457,8 @@ namespace NarrativeEditor.Source.View
 
             _shown = step;
 
-            DryRunRows.Clear(_lines);
-            DryRunRows.Clear(_options);
+            _lines.DropChildren();
+            _options.DropChildren();
 
             if (step is not { } run || _sandbox is not { } sandbox)
             {
@@ -552,25 +544,11 @@ namespace NarrativeEditor.Source.View
 
         public event Action<string>? Removed;
 
-        /// <summary>Empties a box of the rows it drew last time. Taken out of the tree before it is
-        /// freed: the free itself waits for the end of the frame, and a row still standing there would
-        /// be counted among the ones drawn next.</summary>
-        public static void Clear(Node box)
-        {
-            ArgumentNullException.ThrowIfNull(box);
-
-            foreach (Node child in box.GetChildren())
-            {
-                box.RemoveChild(child);
-                child.QueueFree();
-            }
-        }
-
         public void Show(IReadOnlyList<(string Key, string Text)> rows)
         {
             ArgumentNullException.ThrowIfNull(rows);
 
-            Clear(this);
+            this.DropChildren();
 
             foreach ((string key, string text) in rows)
                 AddChild(Row(key, text));

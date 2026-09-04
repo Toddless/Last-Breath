@@ -8,6 +8,7 @@ namespace NarrativeEditor.Source.View
     using Tooling.Editing.History;
     using Tooling.Json;
     using Tooling.Narrative;
+    using Tooling.Ui;
     using static Tooling.Text.Format;
 
     /// <summary>
@@ -119,22 +120,13 @@ namespace NarrativeEditor.Source.View
         /// the tool refreshes this panel for keystrokes that never reached the record it is drawing.</summary>
         public void Standing(CatalogRecord? record, bool isDialogue, JsonPointer? standing)
         {
-            if (Same(_record, record) && _isDialogue == isDialogue && _standing == standing) return;
+            if (_record.SameAs(record) && _isDialogue == isDialogue && _standing == standing) return;
 
             _record = record;
             _isDialogue = isDialogue;
             _standing = standing;
 
             Redraw();
-        }
-
-        /// <summary>Whether two rows are the same place of the same file — nothing on both sides included,
-        /// which is where the panel stands while no record is open.</summary>
-        private static bool Same(CatalogRecord? one, CatalogRecord? other)
-        {
-            if (one is null || other is null) return one is null && other is null;
-
-            return ReferenceEquals(one.File, other.File) && one.Pointer == other.Pointer;
         }
 
         /// <summary>Asks for a redraw at the end of the frame, for the reason the run and the inspector
@@ -221,6 +213,9 @@ namespace NarrativeEditor.Source.View
         private const string LayerFormat = "layer {0}";
         private const string UnreachedTitle = "nothing opens these";
 
+        /// <summary>The theme colour a label and a button are written in.</summary>
+        private const string FontColorOverride = "font_color";
+
         private const string NodeFormat = "{0}   ·   {1} line(s) / {2} option(s)";
         private const string EntryFormat = "→ {0}";
         private const string RouteFormat = "{0} → {1}";
@@ -261,7 +256,7 @@ namespace NarrativeEditor.Source.View
         /// changed in it may be any of the three.</summary>
         public void Show(DialogueGraph? graph, JsonPointer? standing)
         {
-            DryRunRows.Clear(this);
+            this.DropChildren();
 
             _routes.Clear();
             _placed.Clear();
@@ -300,7 +295,9 @@ namespace NarrativeEditor.Source.View
                     _placed.TryAdd(node.Id, rect);
                     AddChild(Pressable(node, graph, rect));
 
-                    if (Holds(node.Pointer, standing)) _standing = rect;
+                    // The whole node is marked wherever inside it the author stands: a line is not a place
+                    // of the map, and reading a field of one is reading the node holding it.
+                    if (standing is { } at && at.Within(node.Pointer)) _standing = rect;
                 }
 
                 rows = Math.Max(rows, layer.Count);
@@ -312,20 +309,6 @@ namespace NarrativeEditor.Source.View
                 (Margin * 2) + (graph.Layers.Count * NodeWidth) + (Math.Max(graph.Layers.Count - 1, 0) * ColumnGap)
                 + StubLength,
                 (Margin * 2) + HeadingHeight + (rows * (NodeHeight + RowGap)) + BackLane);
-        }
-
-        /// <summary>Whether a node holds the place the author is standing on — the node itself, or one of
-        /// the lines and options written inside it. The whole node is marked either way: a line is not a
-        /// place of the map, and its author reading a field of it is reading that node.</summary>
-        private static bool Holds(JsonPointer node, JsonPointer? standing)
-        {
-            if (standing is null || standing.Segments.Count < node.Segments.Count) return false;
-
-            for (int step = 0; step < node.Segments.Count; step++)
-                if (!string.Equals(node.Segments[step], standing.Segments[step], StringComparison.Ordinal))
-                    return false;
-
-            return true;
         }
 
         /// <summary>What a column is called: the nodes the rules open on, the choices away from them, and
@@ -360,7 +343,7 @@ namespace NarrativeEditor.Source.View
                 Size = rect.Size
             };
 
-            if (!node.Reached) button.AddThemeColorOverride("font_color", s_unreached);
+            if (!node.Reached) button.AddThemeColorOverride(FontColorOverride, s_unreached);
 
             button.Pressed += () => Chose?.Invoke(node.Pointer);
 
@@ -443,7 +426,7 @@ namespace NarrativeEditor.Source.View
         {
             var label = new Label { Text = edge.To, Position = at + new Vector2(StubLength, -HeadingHeight) };
 
-            label.AddThemeColorOverride("font_color", s_dangling);
+            label.AddThemeColorOverride(FontColorOverride, s_dangling);
 
             return label;
         }

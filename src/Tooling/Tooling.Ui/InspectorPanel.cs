@@ -1442,20 +1442,7 @@ namespace Tooling.Ui
 
             if (string.Equals(now, _idBefore, StringComparison.Ordinal)) return null;
 
-            return new Rename(view, record, now, Lists(view, record));
-        }
-
-        /// <summary>Whether the catalog lists this record itself rather than something standing inside
-        /// one. A rename carries the references of a RECORD: a node of a conversation or a stage of a
-        /// quest is named by nothing outside its own file, and asking the catalogs to rewrite every field
-        /// holding that word would rewrite words that mean something else entirely.</summary>
-        private static bool Lists(CatalogView view, CatalogRecord record)
-        {
-            foreach (CatalogRecord listed in view.Records)
-                if (ReferenceEquals(listed.File, record.File) && listed.Pointer == record.Pointer)
-                    return true;
-
-            return false;
+            return new Rename(view, record, now, view.Lists(record));
         }
 
         /// <summary>Takes back the run of keystrokes just sealed, which is the newest step of the tool:
@@ -1485,7 +1472,8 @@ namespace Tooling.Ui
         /// a node of a conversation or a stage of a quest, and how such a row is worded at all is the
         /// host's answer rather than a suffix of the record's id.</para>
         /// <para>Keys ANOTHER catalog words from this id — the lines of a conversation keyed by the npc it
-        /// belongs to — stand where they are: they are that catalog's own plan, run where it is edited.</para>
+        /// belongs to — are none of this: they are that catalog's own plan, and the host runs it through
+        /// <see cref="Settled"/> once this is over.</para>
         /// <para>Answers whether anything moved. The boxes on screen are written under the keys the OLD id
         /// worded and have to be drawn again — but the drawing is one decision taken once the gesture is
         /// over, not one per thing that wrote.</para>
@@ -1518,19 +1506,26 @@ namespace Tooling.Ui
                     uses, rename.View, rename.Record, _idBefore, rename.Now, Texts, _suffixes);
 
             // A refusal reaching this far means the run answered one way while the word was being judged
-            // and another while it was being carried: said out loud rather than swallowed, and nothing on
-            // screen is redrawn, because nothing was written.
+            // and another while it was being carried. The rename itself is whole — nothing of it was
+            // written — but the id is already standing in the record's own box, so the run of keystrokes
+            // that put it there is taken back and the record goes on being called what it was called.
             if (result.Refused is { } refusal)
             {
+                TakeBack(rename.Record);
                 Say(refusal);
 
                 return false;
             }
 
-            string done = Text(RenamedFormat, result.Uses, result.Files, result.Keys.Renamed);
+            // What the gesture carried, or nothing at all: a fresh record nothing points at yet moves no
+            // reference and no key, and a line saying it renamed none of them reads as a rename that failed.
+            string? carried = Moved(result) ? Text(RenamedFormat, result.Uses, result.Files, result.Keys.Renamed) : null;
 
-            if (result.Keys.Taken is { } taken) Say(Text(KeysStayedFormat, done, _idBefore, taken));
-            else if (Moved(result)) Say(done);
+            if (result.Keys.Taken is { } taken)
+                Say(carried is { } done
+                    ? Text(KeysStayedFormat, done, _idBefore, taken)
+                    : Text(KeysNotMovedFormat, _idBefore, taken));
+            else if (carried is { } moved) Say(moved);
 
             return true;
         }
@@ -1564,7 +1559,8 @@ namespace Tooling.Ui
         /// <summary>Lets the host word the record again now that the gesture is over, and answers whether
         /// it wrote anything. Guarded the way every write of this panel is: what the host writes goes into
         /// the very document the panel follows, and hearing about it from inside a box being left would
-        /// tear that box down under the hand leaving it.</summary>
+        /// tear that box down under the hand leaving it. The guard is handed back the way it was found, so
+        /// this is the one road in from a gesture already holding it as much as from a box being left.</summary>
         private bool Settle()
         {
             if (Settled is not { } settled) return false;
@@ -1810,10 +1806,9 @@ namespace Tooling.Ui
         {
             if (_document is not { } document) return false;
 
-            _writing = true;
             bool changed;
 
-            try
+            using (Writing())
             {
                 document.History.Seal();
                 changed = change(document);
@@ -1821,13 +1816,9 @@ namespace Tooling.Ui
                 // Before the seal, so that what the host writes about the wording is part of the gesture
                 // the author made and not a step of its own standing after it. What it answers is not
                 // asked here: the shape of the record changed, so the panel is drawn again either way.
-                if (changed) _ = Settled?.Invoke();
+                if (changed) _ = Settle();
 
                 document.History.Seal();
-            }
-            finally
-            {
-                _writing = false;
             }
 
             if (changed) RebuildLater();
@@ -1849,16 +1840,7 @@ namespace Tooling.Ui
         {
             if (_document is null) return false;
 
-            _writing = true;
-
-            try
-            {
-                return _document.Put(at, value);
-            }
-            finally
-            {
-                _writing = false;
-            }
+            using (Writing()) return _document.Put(at, value);
         }
 
         /// <summary>Takes a key out of its record. False when there was none there to take.</summary>
@@ -1866,16 +1848,7 @@ namespace Tooling.Ui
         {
             if (_document is null || _document.Resolve(at) is null) return false;
 
-            _writing = true;
-
-            try
-            {
-                return _document.Remove(at);
-            }
-            finally
-            {
-                _writing = false;
-            }
+            using (Writing()) return _document.Remove(at);
         }
 
         /// <summary>A record whose id has just been retyped: the catalog holding its file, the record

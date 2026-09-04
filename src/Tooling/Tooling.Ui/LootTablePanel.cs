@@ -262,21 +262,9 @@ namespace Tooling.Ui
         private void Touched(JsonPointer at)
         {
             if (_writing || _record is not { } record || _tiers is not { } tiers) return;
-            if (!Within(at, tiers) && !Within(record.Pointer, at)) return;
+            if (!at.Within(tiers) && !record.Pointer.Within(at)) return;
 
             _stale = true;
-        }
-
-        /// <summary>Whether one address lies at or below another.</summary>
-        private static bool Within(JsonPointer at, JsonPointer of)
-        {
-            if (at.Segments.Count < of.Segments.Count) return false;
-
-            for (int index = 0; index < of.Segments.Count; index++)
-                if (!string.Equals(at.Segments[index], of.Segments[index], StringComparison.Ordinal))
-                    return false;
-
-            return true;
         }
 
         private void DrawTable()

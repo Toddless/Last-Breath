@@ -41,4 +41,21 @@ namespace Tooling.Catalogs
                 : null;
         }
     }
+
+    /// <summary>Where a record stands, as the one question everything holding one asks about it.</summary>
+    public static class RecordPlaces
+    {
+        /// <summary>
+        /// Whether two rows are the same place of the same file — nothing on both sides included, which is
+        /// where a panel stands while no record is open.
+        /// <para>Asked by place and never by what the record holds: an id is exactly what a rename changes,
+        /// and a catalog reread hands out fresh instances of rows that have not moved anywhere.</para>
+        /// </summary>
+        public static bool SameAs(this CatalogRecord? one, CatalogRecord? other)
+        {
+            if (one is null || other is null) return one is null && other is null;
+
+            return ReferenceEquals(one.File, other.File) && one.Pointer == other.Pointer;
+        }
+    }
 }

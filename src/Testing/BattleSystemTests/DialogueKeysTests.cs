@@ -28,7 +28,10 @@ namespace LastBreathTest.BattleSystemTests
         /// history — the data editor names it after the word the author typed.</summary>
         private const string Peasant = "Npc_Peasant";
 
-        private const string RenameStepText = "renamed to Npc_Peasant";
+        private const string RenameStepText = "renamed to " + Peasant;
+
+        /// <summary>Where the one forged conversation of a case is written.</summary>
+        private const string ConversationAt = "/dialogues/0";
 
         /// <summary>How a name a wording waits under is written in a locale file, read as the whole of a
         /// key and not as a mark somewhere in a sentence. No key of the game is written with it, so a file
@@ -629,6 +632,83 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0, history.Depth);
         }
 
+        /// <summary>
+        /// The chain the tool actually calls: the name carried everywhere by the catalogs, and the wording
+        /// brought after it by the pass. One step of the history for both — the pass groups with the newest
+        /// step instead of filing one of its own — so a record stepped back to its old name is read under
+        /// that name by its conversation too.
+        /// </summary>
+        [TestMethod]
+        public void ARenameCarriedByTheCatalogs_IsOneStepWithTheKeysThatFollowIt()
+        {
+            (CatalogWorkspace workspace, LocalizedTexts texts, EditHistory history) = Forged();
+            CatalogView npcs = workspace.Catalogs.Single(view => view.Catalog == DataCatalog.Npc);
+            CatalogRecord npc = npcs.Records[0];
+            JsonTreeDocument document = npc.File.Document;
+            string was = npc.CurrentId;
+
+            // The id in the record's own file is written by whoever renamed it — the box the author types
+            // in — and taken into the step the catalogs open around everything naming him.
+            document.SetValue(npc.Pointer.Append(NpcCatalogDescriptor.IdField), new JValue(Peasant));
+
+            CatalogRenameResult carried = CatalogEditing.RenameEverywhere(
+                new ReferenceUses(workspace, [new NarrativeReferenceUses()]), npcs, npc, was, Peasant, texts);
+
+            Assert.IsNull(carried.Refused, carried.Refused);
+            Assert.AreNotEqual(0, carried.Uses, "the conversation was left naming an npc under his old name");
+
+            DialogueKeysFollowed followed = DialogueKeyFollow.Over(Conversations(workspace), texts, history, document);
+
+            Assert.AreEqual(1, followed.Conversations, "the lines were left reading keys worded from the old name");
+            Assert.AreEqual("Dlg_Peasant_Greeting_1",
+                Key(Conversations(workspace)[0].File.Document, "/dialogues/0/nodes/0/lines/0/key"));
+            Assert.AreEqual(1, history.Depth, "the rename and the wording that followed it are two steps to take back");
+
+            history.Undo();
+
+            Assert.AreEqual(was, npc.CurrentId, "the name itself was not taken back with the wording");
+            Assert.AreEqual("Dlg_Villager_Greeting_1",
+                Key(Conversations(workspace)[0].File.Document, "/dialogues/0/nodes/0/lines/0/key"));
+            Assert.AreEqual("Good day.", texts.Read(LocalizedTexts.ReferenceLocale, "Dlg_Villager_Greeting_1"));
+            Assert.AreEqual(0, history.Depth);
+        }
+
+        /// <summary>Whether a settled pass is going to write anything is what decides that a step of the
+        /// history is opened at all. A pass that refused every place changed no file, and a step opened for
+        /// it would take the author's own edit into a gesture of the tool's making and leave files called
+        /// changed by a pass that wrote nothing.</summary>
+        [TestMethod]
+        public void APassRefusingEveryPlace_SaysItWillWriteNothing()
+        {
+            JsonTreeDocument stopped = JsonTreeDocument.Parse(ShiftedLinesDialogueJson);
+            (LocalizedTexts stalled, _) = Locales(
+                ("Dlg_Forged_Greeting_9", "Ninth."), ("Dlg_Forged_Greeting_1", "First."),
+                ("Dlg_Forged_Greeting_2", "Second."), (StoppedPassKey, "Left by a pass that stopped."));
+
+            Assert.IsFalse(Planned(stopped, stalled).Writes,
+                "a pass with every place refused would still have opened a step of the history");
+
+            JsonTreeDocument swapped = JsonTreeDocument.Parse(SwappedLinesDialogueJson);
+            (LocalizedTexts texts, _) = Locales(
+                ("Dlg_Forged_Greeting_1", "First."), ("Dlg_Forged_Greeting_2", "Second."));
+
+            Assert.IsTrue(Planned(swapped, texts).Writes, "a pass trading two keys said it would write nothing");
+        }
+
+        /// <summary>The name a wording waits under while the places of a node trade names is written
+        /// outside the word every key of a conversation begins with. Nothing else keeps the two apart: a
+        /// mark a real key could carry would let a pass park a wording under a name some line is read by,
+        /// and the author would lose that line's text to the parking.</summary>
+        [TestMethod]
+        public void TheNameAWordingWaitsUnder_IsSpelledOutsideTheKeysOfEveryConversation()
+        {
+            Assert.IsFalse(DialogueKeys.Prefix.StartsWith(DialogueKeyPlan.ParkingWord, StringComparison.Ordinal),
+                "a key of a conversation is spelled the way a parked wording is");
+
+            Assert.IsFalse(DialogueKeys.Leave.StartsWith(DialogueKeyPlan.ParkingWord, StringComparison.Ordinal),
+                "the option every conversation shares is spelled the way a parked wording is");
+        }
+
         /// <summary>Nothing is done without the locales: the keys would be written into the files alone
         /// and every line would be left pointing at a text no locale holds.</summary>
         [TestMethod]
@@ -700,12 +780,15 @@ namespace LastBreathTest.BattleSystemTests
             File.WriteAllText(Path.Combine(folder, catalog + ".json"), json);
         }
 
-        private static DialogueKeyResult Followed(JsonTreeDocument document, LocalizedTexts? texts = null)
-        {
-            JsonPointer at = JsonPointer.Parse("/dialogues/0");
+        private static DialogueKeyResult Followed(JsonTreeDocument document, LocalizedTexts? texts = null) =>
+            DialogueKeyPlan.Follow(document, Off(document), texts);
 
-            return DialogueKeyPlan.Follow(document, DialogueKeyPlan.OffPattern(document, at), texts);
-        }
+        /// <summary>What a pass over the conversation would do, settled and not written.</summary>
+        private static DialogueKeyPass Planned(JsonTreeDocument document, LocalizedTexts? texts) =>
+            DialogueKeyPlan.Plan(Off(document), texts);
+
+        private static IReadOnlyList<DialogueTextPlace> Off(JsonTreeDocument document) =>
+            DialogueKeyPlan.OffPattern(document, JsonPointer.Parse(ConversationAt));
 
         /// <summary>Whether any locale, once written back, still holds a name a wording waits under. The
         /// pass is done when the files hold the keys of the conversation and nothing else: a name a wording

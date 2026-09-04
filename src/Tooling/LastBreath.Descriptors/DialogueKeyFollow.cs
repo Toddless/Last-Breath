@@ -33,8 +33,10 @@ namespace LastBreath.Descriptors
         private const string WrittenFormat = "worded {0} key(s), moved {1}";
 
         /// <summary>What a pass that left places standing says: what it did get done, and every name that
-        /// stopped one — a refusal naming the first of them reads as the only one.</summary>
-        private const string NotMovedFormat = "{0}; {1} place(s) left as they stand — {2} already written";
+        /// stopped one — a refusal naming the first of them reads as the only one. Spoken for and not
+        /// "already written": a name is as much in the way when another place of this very pass is keeping
+        /// it as when a locale holds words under it, and the author has to look at both.</summary>
+        private const string NotMovedFormat = "{0}; {1} place(s) left as they stand — {2} spoken for";
 
         /// <summary>What a pass that could not put a wording back says. Loud on purpose and never left to
         /// the count above: the text is under a name nothing reads, and only the author knows which of the

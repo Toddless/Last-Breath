@@ -62,15 +62,16 @@ namespace LastBreath.Descriptors
     /// </summary>
     public static class DialogueKeyPlan
     {
-        /// <summary>What a wording on the move is parked under while the places of a node trade names.
-        /// Written outside the word every conversation's keys begin with, so nothing the files hold and
-        /// nothing this pass writes can land on one.</summary>
-        private const string ParkingWord = "~";
-
         /// <summary>How a single key is handed to <see cref="LocalizedTexts.RenameRecord"/>: one suffix,
         /// and that suffix nothing. A line's key is not worded from a record's id, so the family it forms
         /// is the key itself.</summary>
         private static readonly string[] s_wholeKey = [string.Empty];
+
+        /// <summary>What a wording on the move is parked under while the places of a node trade names.
+        /// Written outside the word every conversation's keys begin with, so nothing the files hold and
+        /// nothing this pass writes can land on one — which is a claim about <see cref="DialogueKeys.Prefix"/>
+        /// and is held as one.</summary>
+        public const string ParkingWord = "~";
 
         /// <summary>The places whose key no longer answers to where they stand: a line added and not yet
         /// worded, a node renamed with its wording left behind. An option every conversation shares is
@@ -158,7 +159,7 @@ namespace LastBreath.Descriptors
         private static IReadOnlyList<DialogueTextPlace> Over(JToken dialogue, JsonPointer at)
         {
             List<DialogueTextPlace> places = [];
-            string npcId = Written(dialogue, DialoguesCatalogDescriptor.IdField);
+            string npcId = Written(dialogue, DialogueEntry.NpcIdKey);
 
             if (Held(dialogue, DialogueEntry.NodesKey) is not JArray nodes) return places;
 
@@ -317,7 +318,7 @@ namespace LastBreath.Descriptors
             int written = 0;
             int moved = 0;
 
-            foreach ((DialogueTextPlace place, string? name, string? blocked) in Parked(moving, texts))
+            foreach ((DialogueTextPlace place, string? name, string? blocked) in Aside(moving, texts))
             {
                 if (blocked is { } inTheWayOfParking)
                 {
@@ -356,7 +357,7 @@ namespace LastBreath.Descriptors
 
         /// <summary>Takes every wording about to move out of the way of every other, before any of them
         /// is named again.</summary>
-        private static List<DialogueKeyMove> Parked(IReadOnlyList<DialogueKeyCarry> moving, LocalizedTexts? texts)
+        private static List<DialogueKeyMove> Aside(IReadOnlyList<DialogueKeyCarry> moving, LocalizedTexts? texts)
         {
             List<DialogueKeyMove> moves = [];
 

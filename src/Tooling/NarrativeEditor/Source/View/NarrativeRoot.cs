@@ -3,7 +3,6 @@ namespace NarrativeEditor.Source.View
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using App;
     using Godot;
     using LastBreath.Descriptors;
@@ -410,20 +409,11 @@ namespace NarrativeEditor.Source.View
 
             _graph.Standing(_record, IsDialogue(), _outline.Selected?.Pointer);
 
-            if (Same(_shown, standing)) return;
+            if (_shown.SameAs(standing)) return;
 
             _shown = standing;
 
             Callable.From(() => _inspector.Rebuild(_shown, Suffixes(_shown))).CallDeferred();
-        }
-
-        /// <summary>Whether two rows are the same place of the same file — nothing on both sides included,
-        /// which is where the tool stands while no record is open.</summary>
-        private static bool Same(CatalogRecord? one, CatalogRecord? other)
-        {
-            if (one is null || other is null) return one is null && other is null;
-
-            return ReferenceEquals(one.File, other.File) && one.Pointer == other.Pointer;
         }
 
         /// <summary>What the row on screen words its own text from: the suffixes the catalog declares while

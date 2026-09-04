@@ -483,8 +483,7 @@ namespace DataEditor.Source.View
         private bool FollowDialogueKeys()
         {
             if (_workspace is not { } workspace || _record is not { } record) return false;
-            if (_catalog is not { } view || !string.Equals(view.Catalog, DataCatalog.Npc, StringComparison.Ordinal))
-                return false;
+            if (_catalog is not { Catalog: DataCatalog.Npc }) return false;
 
             DialogueKeysFollowed followed =
                 DialogueKeyFollow.All(workspace, Texts, History, record.File.Document);

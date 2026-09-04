@@ -64,6 +64,26 @@ namespace LastBreathTest.BattleSystemTests
                 "a player who arrived after the tracker was never listened to");
         }
 
+        /// <summary>A replaced player takes the ear with him: the old paperdoll is heard no more, and the
+        /// new one is heard at once. A tracker still listening to the doll left behind would write the
+        /// world's facts off a body nobody is playing.</summary>
+        [TestMethod]
+        public void APlayerReplaced_TakesTheEarWithHim()
+        {
+            IEquipmentComponent left = Paperdoll();
+            Track();
+            IEquipmentComponent arrived = Paperdoll();
+
+            left.TryEquip(Gear(EquipmentPiece.Helmet, HelmetId), out _);
+
+            Assert.AreEqual(0, _facts.Snapshot.Count, "the paperdoll of a replaced player was still listened to");
+
+            arrived.TryEquip(Gear(EquipmentPiece.Ring, RingId), out _);
+
+            Assert.AreEqual(1, _facts.GetCount(FactKeys.ItemEquipped(EquipmentPiece.Ring)),
+                "the player who arrived in the old one's place was never listened to");
+        }
+
         [TestMethod]
         public void TheGearOfSomebodyElse_IsNotRememberedAsThePlayers()
         {

@@ -25,7 +25,7 @@ namespace LastBreath.Descriptors
 
         /// <summary>Json name of the field a dialogue is found by: the npc that speaks it, one dialogue
         /// per npc definition — what <see cref="DialogueEntry.NpcId"/> is written as.</summary>
-        public const string IdField = "npcId";
+        public const string IdField = DialogueEntry.NpcIdKey;
 
         public string Catalog => DataCatalog.Dialogues;
 

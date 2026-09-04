@@ -36,7 +36,10 @@ namespace Tooling.Ui
         private const string TargetSeparator = ", ";
 
         /// <summary>How a row standing for a whole family of words is read apart from the words themselves:
-        /// picking it writes the template, which is a word still waiting for its parameter.</summary>
+        /// picking it writes the template, which is a word still waiting for its parameter. Marked by that
+        /// waiting and not by the row's own kind — a family of ONE is spelled with no parameter at all, and
+        /// its template IS the key, so telling the author to fill one in would name a parameter that does
+        /// not exist.</summary>
         private const string FamilyFormat = "{0}   — family";
 
         private const string BrokenFormat = "nothing in {0} is written under this id";
@@ -118,7 +121,8 @@ namespace Tooling.Ui
 
                 foreach (SuggestedWord word in search(typed))
                 {
-                    results.AddItem(word.Family ? Text(FamilyFormat, word.Word) : word.Word);
+                    results.AddItem(
+                        word.Family && SuggestedWords.Unfilled(word.Word) ? Text(FamilyFormat, word.Word) : word.Word);
                     words.Add(word.Word);
                 }
             }

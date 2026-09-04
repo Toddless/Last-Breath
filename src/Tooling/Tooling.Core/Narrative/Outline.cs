@@ -120,10 +120,6 @@ namespace Tooling.Narrative
 
         private const string NotARecord = "not a record";
 
-        /// <summary>Stands in for the name of an element that carries none, so every row still has a
-        /// word the author can point at.</summary>
-        private const string IndexFormat = "#{0}";
-
         /// <summary>One element of a collection as a row: what the file holds there, where it is
         /// written, what the schema says it is, and its place in the collection.</summary>
         private delegate OutlineNode Row(JToken token, JsonPointer at, RecordSchema? schema, int index);
@@ -350,7 +346,7 @@ namespace Tooling.Narrative
         private static string Identity(RecordSchema? schema, JToken token, int index) =>
             NarrativeDocument.Written(token, schema?.IdField ?? NarrativeDocument.Id) is { Length: > 0 } written
                 ? written
-                : Text(IndexFormat, index);
+                : Text(NarrativeDocument.IndexFormat, index);
 
         /// <summary>One field of a record's schema, or null when this build does not describe it.</summary>
         private static FieldSchema? Field(RecordSchema? owner, string name)

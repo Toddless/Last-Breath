@@ -32,11 +32,14 @@ namespace LastBreath.Descriptors
         private const string RefusedFormat =
             "the fact keys could not be read over the documents as they stand, so none are offered: {0}";
 
+        private readonly HashSet<string> _said = new(StringComparer.Ordinal);
+
         private FactKeyRegistry? _read;
 
         /// <summary>What a reading came to besides the keys: what the run could not read of the documents
-        /// behind them, and the refusal of a run that threw. Said once — the reading is held, so a run over
-        /// half-written documents does not repeat itself per keystroke.</summary>
+        /// behind them, and the refusal of a run that threw. Said ONCE for each note, however many readings
+        /// meet it: a workspace holding a document nothing can read complains at every step the tool files,
+        /// and the same line on the status bar per gesture is noise the author reads past.</summary>
         public event Action<string>? Said;
 
         /// <summary>The words a query names, for a host handing this to an inspector. Nothing at all for
@@ -69,15 +72,23 @@ namespace LastBreath.Descriptors
 
                 // What the run could not read is why a word is missing from the list under the box: said
                 // out loud, because a shorter list looks exactly like a narrative nobody has written yet.
-                foreach (string note in reading.Notes) Said?.Invoke(note);
+                foreach (string note in reading.Notes) Say(note);
             }
             catch (Exception failure)
             {
                 _read = FactKeyRegistry.Over([]);
-                Said?.Invoke(Text(RefusedFormat, failure.Message));
+                Say(Text(RefusedFormat, failure.Message));
             }
 
             return _read;
+        }
+
+        /// <summary>Says a note the first time a reading meets it. Held for the life of this list and not
+        /// dropped with the reading: what is wrong with a document survives the step that invalidated it,
+        /// and the author has already been told.</summary>
+        private void Say(string note)
+        {
+            if (_said.Add(note)) Said?.Invoke(note);
         }
     }
 }

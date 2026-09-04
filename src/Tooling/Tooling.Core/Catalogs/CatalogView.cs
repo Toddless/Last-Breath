@@ -56,6 +56,20 @@ namespace Tooling.Catalogs
 
         public string Catalog => Descriptor.Catalog;
 
+        /// <summary>Whether the catalog lists this record itself rather than a row standing inside one. A
+        /// node of a conversation and a stage of a quest are named by nothing outside their own file: no
+        /// section lists them, no map is keyed by them, and a rename of one carries no reference.</summary>
+        public bool Lists(CatalogRecord record)
+        {
+            ArgumentNullException.ThrowIfNull(record);
+
+            foreach (CatalogRecord listed in _records)
+                if (listed.SameAs(record))
+                    return true;
+
+            return false;
+        }
+
         /// <summary>Takes a file into the catalog. The document is the run's from here on: it is written
         /// with the rest on the next save, and it joins the catalog's history bringing the step that wrote
         /// it along — a file is laid down by being written into, and that first record is as much a thing

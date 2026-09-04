@@ -89,10 +89,6 @@ namespace Tooling.Narrative
     /// </summary>
     public sealed record DialogueGraph
     {
-        /// <summary>Stands in for the name of a node or an option that carries none, so that every place
-        /// of the map still has a word a reader can point at.</summary>
-        private const string IndexFormat = "#{0}";
-
         /// <summary>What the layer of a node is while no walk has arrived at it.</summary>
         private const int Unwalked = -1;
 
@@ -156,7 +152,7 @@ namespace Tooling.Narrative
                 string? id = Named(node);
 
                 places.Add(new Place(
-                    id ?? Text(IndexFormat, index),
+                    id ?? Text(NarrativeDocument.IndexFormat, index),
                     id,
                     node,
                     list.Append(index),
@@ -198,7 +194,7 @@ namespace Tooling.Narrative
                     var choice = new Choice(
                         index,
                         place.Name,
-                        Named(written) ?? Text(IndexFormat, option),
+                        Named(written) ?? Text(NarrativeDocument.IndexFormat, option),
                         list.Append(option),
                         Gated(written));
 

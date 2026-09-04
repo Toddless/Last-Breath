@@ -1,5 +1,11 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из чистки бэклога, волна E (2026-09-04; accept with minors) — закрыты миноры разделов «автодополнение» (пин `Unfilled`, метка family, «Said once»), «граф/ключи» (`JsonPointer.Within`, `FontColorOverride`, `SameAs`, `IndexFormat`, два теста графа, `DropChildren`, `Stand`, using, ворота, `RenameStepText`, дока `Carried`, тест поверх `RenameEverywhere`), «подключение переименования» (`TakeBack`, `done` при `Moved`, `CatalogView.Lists`, `using (Writing())`), «экипировка» (смена игрока, граница семьи из одного, `_`), «миграция ключей» (`Writes` пины, `Settle()` в `Restructure`, `Aside`, «spoken for», `IdField` из константы, ассерт `~`)
+
+- (minor) `FactKeySuggestions.cs:54` — `SuggestedWord.Family` кормится `Declared` (семья из одного → флаг true без параметра); правка ушла в потребителя. Стало: `key.Declared && FactKeyDeclarations.Unfilled(key.Key)` в производителе, пикер — `word.Family`.
+- (minor) `EditorRoot.IndexOf:819` — четвёртая копия «то же место того же файла» пережила консолидацию. Стало: `view.Records[index].SameAs(record)`.
+- (nit) `"rename {0} → {1}"` дважды (`InspectorPanel:112`, `CatalogEditing:498`) — обязаны совпадать для `GroupWithNewest`; `_said` не чистится `Invalidate()`; тест цепочки зовёт `Over`, прод — `All`; литерал указателя дважды в `DialogueKeysTests:663,672`; третья `"#{0}"` в `CatalogRecords.IndexIdFormat`.
+
 ## Из пресетов экспорта exe (2026-09-04; accept with minors) — закрыт пункт «exe-сборки не заведены»
 
 - (владельцу) `build/` не в `.gitignore` — оба README утверждают «в git не едет»; после первого экспорта `build/tools/<Tool>/` вылезет в `git status`. Стало: строка `/build/` в `.gitignore` (файл в ваших правках). То же про `Export/` в `PassiveTreeEditor/README.md:37`.

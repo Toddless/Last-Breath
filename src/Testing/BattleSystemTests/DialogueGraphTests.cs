@@ -105,6 +105,43 @@ namespace LastBreathTest.BattleSystemTests
             }
             """;
 
+        /// <summary>A conversation writing two nodes under one name — what the loader refuses the whole
+        /// record over, and what an author looking at the map is trying to find.</summary>
+        private const string TwiceNamedJson =
+            """
+            {
+              "dialogues": [
+                {
+                  "npcId": "Npc_Twice",
+                  "entryRules": [ { "priority": 0, "node": "Greeting" } ],
+                  "nodes": [
+                    { "id": "Greeting", "options": [ { "id": "On", "next": "Second" } ] },
+                    { "id": "Second", "lines": [ { "speaker": "Npc", "key": "Dlg_Twice_Second_1" } ] },
+                    { "id": "Second", "options": [ { "id": "Away", "next": "Greeting" } ] }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        /// <summary>A conversation whose only entry rule names a node nobody wrote: the game opens it on
+        /// nothing, and every node of it is written and never played.</summary>
+        private const string RuleToNowhereJson =
+            """
+            {
+              "dialogues": [
+                {
+                  "npcId": "Npc_Nowhere",
+                  "entryRules": [ { "priority": 0, "node": "Missing" } ],
+                  "nodes": [
+                    { "id": "Greeting", "options": [ { "id": "On", "next": "Second" } ] },
+                    { "id": "Second", "options": [] }
+                  ]
+                }
+              ]
+            }
+            """;
+
         /// <summary>A record whose nodes are written as something that is not a collection: the game reads
         /// no node out of it, and neither may a map — least of all by refusing to be drawn at all while its
         /// author is in the middle of typing.</summary>
@@ -304,6 +341,41 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(1, graph.Layers.Count, Drawn(graph));
             CollectionAssert.AreEqual(new[] { "Greeting", "Second" }, Named(graph.Layers[0]), Drawn(graph));
             Assert.IsTrue(graph.Nodes.All(node => !node.Reached && !node.Entry), Drawn(graph));
+        }
+
+        /// <summary>Two nodes under one name: every route naming it arrives at the FIRST, and the second is
+        /// drawn whole in the band nothing opens. One answer and not two — the loader refuses such a record
+        /// outright, and a map routing to both would show the author a conversation the game never plays.</summary>
+        [TestMethod]
+        public void TwoNodesUnderOneName_AreRoutedToByTheFirstOfThem()
+        {
+            DialogueGraph graph = Read(TwiceNamedJson);
+
+            Assert.AreEqual(3, graph.Nodes.Count, Drawn(graph));
+
+            DialogueGraphEdge on = Out(graph, "On")[0];
+
+            Assert.IsFalse(on.Dangling, "a route to a name written twice was drawn as leading out of the dialogue");
+
+            Assert.AreEqual(1, graph.Nodes[1].Layer, Drawn(graph));
+            Assert.IsTrue(graph.Nodes[1].Reached, "the first node of the name was not the one the route arrives at");
+            Assert.IsFalse(graph.Nodes[2].Reached, "the second node of the name was drawn as one a route reaches");
+
+            CollectionAssert.AreEqual(new[] { "Second" }, Named(graph.Layers[2]), Drawn(graph));
+        }
+
+        /// <summary>An entry rule naming a node nobody wrote opens nothing: there is no place to start a
+        /// walk at, so the conversation is drawn as the unplayed thing it is rather than as one opening on
+        /// whichever node happens to be written first.</summary>
+        [TestMethod]
+        public void AnEntryRuleNamingANodeNobodyWrote_OpensNothing()
+        {
+            DialogueGraph graph = Read(RuleToNowhereJson);
+
+            Assert.AreEqual(1, graph.Layers.Count, Drawn(graph));
+            CollectionAssert.AreEqual(new[] { "Greeting", "Second" }, Named(graph.Layers[0]), Drawn(graph));
+            Assert.IsTrue(graph.Nodes.All(node => !node.Entry), "a rule opening on nothing marked a node as an opening");
+            Assert.IsTrue(graph.Nodes.All(node => !node.Reached), Drawn(graph));
         }
 
         /// <summary>A collection written as something else holds no node, the way the game reads none out
