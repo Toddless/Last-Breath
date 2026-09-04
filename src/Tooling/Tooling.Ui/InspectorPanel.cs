@@ -99,6 +99,15 @@ namespace Tooling.Ui
         private const string RenamedKeysFormat = "renamed {0} localization key(s)";
         private const string KeysNotMovedFormat = "keys for “{0}” were not moved: “{1}” is already written";
 
+        /// <summary>What a rename carried: where the name was rewritten, and how much of the wording went
+        /// with it.</summary>
+        private const string RenamedFormat = "renamed {0} use(s) in {1} file(s); {2} key(s) moved";
+
+        /// <summary>What a rename whose wording would not follow says. Said together with what it did
+        /// carry: the references have moved by then, and a line saying only the refusal reads as if the
+        /// gesture had done nothing at all.</summary>
+        private const string KeysStayedFormat = "{0}; the wording stayed with “{1}”: “{2}” is already written";
+
         /// <summary>What a rename is called on the status line, in both directions of the history.</summary>
         private const string RenameStepFormat = "rename {0} → {1}";
 
@@ -219,6 +228,12 @@ namespace Tooling.Ui
         /// word standing in it answers to nothing. Null while nothing has been read, which leaves a
         /// reference the plain box it always was.</summary>
         public ReferenceIndex? References { get; set; }
+
+        /// <summary>Where the run writes each id, which is what a rename of one has to carry with it: the
+        /// record's new name is written into every field of every catalog holding the old one, as part of
+        /// the same gesture. Null while the run has none, which leaves a rename the record's own file and
+        /// its wording — everything naming it goes on naming what it was called.</summary>
+        public ReferenceUses? Uses { get; set; }
 
         /// <summary>The wording of the game, in every locale at once. Null while the run has none — the
         /// block of text is then not drawn at all, because a box that writes nowhere is worse than no
@@ -1286,27 +1301,61 @@ namespace Tooling.Ui
         }
 
         /// <summary>
-        /// Whether the name just typed into the record's id is one another record of its section is
-        /// already listed under, and the run of keystrokes was therefore taken back. The catalog is the
-        /// judge of it: a section is read over the whole folder into one table, and the second record of
-        /// a name is the one the game drops.
+        /// Whether the name just typed into the record's id is one the run refuses, and the run of
+        /// keystrokes was therefore taken back. The catalogs are the judge of it, and the whole question
+        /// is asked at once: a section is read over the whole folder into one table, so the second record
+        /// of a name is the one the game drops, and a map some file already keys by the word would have
+        /// one key swallow the other. Both are asked BEFORE anything is carried — a rename stopped
+        /// halfway through the files is a state nobody asked for.
         /// <para>Asked only where the id actually changed, and only of the id: the run just sealed is
         /// what an undo takes back here, and a field nobody typed in has no run of its own to lose.</para>
         /// </summary>
         private bool Refused(JsonPointer at)
         {
-            if (_record is not { } record || References?.Holding(record.File) is not { } view) return false;
-            if (record.Schema.IdField is not { } id || at != record.Pointer.Append(id)) return false;
+            if (Renaming(at) is not { } rename) return false;
+            if (Refusal(rename) is not { } refusal) return false;
 
-            string now = record.CurrentId;
-
-            if (string.Equals(now, _idBefore, StringComparison.Ordinal)) return false;
-            if (CatalogEditing.RenameRefusal(view, record, now) is not { } refusal) return false;
-
-            TakeBack(record);
+            TakeBack(rename.Record);
             Say(refusal);
 
             return true;
+        }
+
+        /// <summary>Why the word will not do, or null when it will. Asked only of a record the catalog
+        /// lists: a row standing inside one is named by nothing outside its own file, so no section lists
+        /// it and no map anywhere is keyed by it — and the section's own table, asked about such a row,
+        /// would refuse it the name of the very record hosting it.</summary>
+        private string? Refusal(Rename rename) =>
+            !rename.Listed ? null
+                : Uses is { } uses
+                    ? CatalogEditing.RenameRefusal(uses, rename.View, rename.Record, _idBefore, rename.Now)
+                    : CatalogEditing.RenameRefusal(rename.View, rename.Record, rename.Now);
+
+        /// <summary>The rename this seal is about, or nothing at all: the address has to be the record's
+        /// own id, and the word standing in it has to have changed since the run of keystrokes began.</summary>
+        private Rename? Renaming(JsonPointer at)
+        {
+            if (_record is not { } record || References?.Holding(record.File) is not { } view) return null;
+            if (record.Schema.IdField is not { } id || at != record.Pointer.Append(id)) return null;
+
+            string now = record.CurrentId;
+
+            if (string.Equals(now, _idBefore, StringComparison.Ordinal)) return null;
+
+            return new Rename(view, record, now, Lists(view, record));
+        }
+
+        /// <summary>Whether the catalog lists this record itself rather than something standing inside
+        /// one. A rename carries the references of a RECORD: a node of a conversation or a stage of a
+        /// quest is named by nothing outside its own file, and asking the catalogs to rewrite every field
+        /// holding that word would rewrite words that mean something else entirely.</summary>
+        private static bool Lists(CatalogView view, CatalogRecord record)
+        {
+            foreach (CatalogRecord listed in view.Records)
+                if (ReferenceEquals(listed.File, record.File) && listed.Pointer == record.Pointer)
+                    return true;
+
+            return false;
         }
 
         /// <summary>Takes back the run of keystrokes just sealed, which is the newest step of the tool:
@@ -1318,56 +1367,96 @@ namespace Tooling.Ui
         /// being left, and the gesture that renames the keys is opened only after the answer.</para></summary>
         private void TakeBack(CatalogRecord record)
         {
-            _writing = true;
-
-            try
-            {
-                record.File.Document.History.Undo();
-            }
-            finally
-            {
-                _writing = false;
-            }
+            using (Writing()) record.File.Document.History.Undo();
 
             RebuildLater();
         }
 
         /// <summary>
-        /// Names the record's localization keys again once the run of keystrokes over its id is over.
-        /// Done at the end of the run and not as the letters arrive: every half-typed word would
-        /// otherwise be a rename of its own, and the keys would follow the author's hesitation into the
-        /// files.
+        /// Carries the record's new name everywhere the run holds the old one, once the run of keystrokes
+        /// over its id is over: every field of every catalog pointing at it, and the localization keys it
+        /// is worded under. Done at the end of the run and not as the letters arrive — every half-typed
+        /// word would otherwise be a rename of its own, and the files would follow the author's
+        /// hesitation.
         /// <para>Only the id does this. A record taken out leaves its keys standing — whether a key is
         /// still read is a question about every catalog at once, and it is asked by an audit over the
         /// whole data root, not by the panel showing one record.</para>
-        /// <para>Answers whether the record was renamed at all. Whether a key of it moved or not, the
-        /// boxes on screen are written under the keys the OLD id worded and have to be drawn again — but
-        /// the drawing is one decision taken once the gesture is over, not one per thing that wrote.</para>
+        /// <para>A row standing INSIDE a record carries its wording alone: nothing outside the file names
+        /// a node of a conversation or a stage of a quest, and how such a row is worded at all is the
+        /// host's answer rather than a suffix of the record's id.</para>
+        /// <para>Keys ANOTHER catalog words from this id — the lines of a conversation keyed by the npc it
+        /// belongs to — stand where they are: they are that catalog's own plan, run where it is edited.</para>
+        /// <para>Answers whether anything moved. The boxes on screen are written under the keys the OLD id
+        /// worded and have to be drawn again — but the drawing is one decision taken once the gesture is
+        /// over, not one per thing that wrote.</para>
         /// </summary>
-        private bool RenameKeys(JsonPointer at)
+        private bool Carried(JsonPointer at)
         {
-            if (Texts is not { } texts || _record is not { } record) return false;
-            if (record.Schema.IdField is not { } id || at != record.Pointer.Append(id)) return false;
+            if (Renaming(at) is not { } rename) return false;
 
-            string now = record.CurrentId;
+            bool moved = Uses is { } uses && rename.Listed ? Everywhere(uses, rename) : Worded(rename);
 
-            if (string.Equals(now, _idBefore, StringComparison.Ordinal)) return false;
+            if (moved) _idBefore = rename.Now;
 
-            // The id was written into the record a moment ago and the keys move because of it: one step of
-            // the history, so a record stepped back to its old name is read under that name in every locale
-            // too — a record whose id says one word and whose wording is written under another is exactly
-            // what the author cannot see and cannot repair.
-            JsonTreeDocument written = record.File.Document;
+            return moved;
+        }
 
-            using (written.History.GroupWithNewest(Text(RenameStepFormat, _idBefore, now), written))
+        /// <summary>The whole rename: the references and the wording in one step of the history with the
+        /// id the author typed, so a record stepped back to its old name is named under that name by
+        /// everything again. What it came to is said out loud — an author renaming a record written in a
+        /// dozen places has to see that they moved, and that the wording either followed or did not.</summary>
+        private bool Everywhere(ReferenceUses uses, Rename rename)
+        {
+            CatalogRenameResult result;
+
+            // Guarded: the new word is written into every file holding the old one, and one of them is
+            // often the very document this panel follows — a record naming another of its own catalog, or
+            // two sections of one file. Hearing about that from inside the box being left would tear the
+            // box down under the hand that left it, and the panel is drawn once the gesture is over.
+            using (Writing())
+                result = CatalogEditing.RenameEverywhere(
+                    uses, rename.View, rename.Record, _idBefore, rename.Now, Texts, _suffixes);
+
+            // A refusal reaching this far means the run answered one way while the word was being judged
+            // and another while it was being carried: said out loud rather than swallowed, and nothing on
+            // screen is redrawn, because nothing was written.
+            if (result.Refused is { } refusal)
             {
-                LocalizedRename rename = texts.RenameRecord(_idBefore, now, _suffixes);
+                Say(refusal);
 
-                if (rename.Taken is { } taken) Say(Text(KeysNotMovedFormat, _idBefore, taken));
-                else if (rename.Renamed > 0) Say(Text(RenamedKeysFormat, rename.Renamed));
+                return false;
             }
 
-            _idBefore = now;
+            string done = Text(RenamedFormat, result.Uses, result.Files, result.Keys.Renamed);
+
+            if (result.Keys.Taken is { } taken) Say(Text(KeysStayedFormat, done, _idBefore, taken));
+            else if (Moved(result)) Say(done);
+
+            return true;
+        }
+
+        /// <summary>Whether the rename came to anything at all. The run reads a word the panel calls a
+        /// rename as none — a space typed onto the end of a name, the first name of a record that had none
+        /// — and a line saying that nothing moved anywhere reads as a gesture that failed.</summary>
+        private static bool Moved(CatalogRenameResult result) =>
+            result.Uses + result.Files + result.Keys.Renamed > 0;
+
+        /// <summary>The wording alone, for a row of a record the catalog does not list. One step of the
+        /// history with the word the author typed, for the reason the whole rename is one: a row read
+        /// under one word by the file and under another by every locale is what nobody can see.</summary>
+        private bool Worded(Rename rename)
+        {
+            if (Texts is not { } texts) return false;
+
+            JsonTreeDocument written = rename.Record.File.Document;
+
+            using (written.History.GroupWithNewest(Text(RenameStepFormat, _idBefore, rename.Now), written))
+            {
+                LocalizedRename moved = texts.RenameRecord(_idBefore, rename.Now, _suffixes);
+
+                if (moved.Taken is { } taken) Say(Text(KeysNotMovedFormat, _idBefore, taken));
+                else if (moved.Renamed > 0) Say(Text(RenamedKeysFormat, moved.Renamed));
+            }
 
             return true;
         }
@@ -1380,17 +1469,15 @@ namespace Tooling.Ui
         {
             if (Settled is not { } settled) return false;
 
-            _writing = true;
-
-            try
-            {
-                return settled();
-            }
-            finally
-            {
-                _writing = false;
-            }
+            using (Writing()) return settled();
         }
+
+        /// <summary>Holds the panel through a write of its own and gives back what it was holding when the
+        /// write is over: the document tells everyone it changed, this panel included, and redrawing from
+        /// inside the gesture doing the writing would tear down the control the author's hand is on.
+        /// <para>Given back rather than lowered, so a write standing inside another leaves the outer one
+        /// guarded to its own end.</para></summary>
+        private WriteGuard Writing() => new(this);
 
         /// <summary>What a gesture came to when the record itself cannot show it, on the line that says
         /// what the run last did.</summary>
@@ -1691,6 +1778,30 @@ namespace Tooling.Ui
             }
         }
 
+        /// <summary>A record whose id has just been retyped: the catalog holding its file, the record
+        /// itself, the word now standing in the box, and whether the catalog lists the record or something
+        /// inside one. Worked out again for each of the two questions the seal asks — whether the word may
+        /// stand, and what carrying it comes to — so that neither is asked in the other's terms.</summary>
+        private sealed record Rename(CatalogView View, CatalogRecord Record, string Now, bool Listed);
+
+        /// <summary>The panel held through a write of its own, for as long as the write lasts, and put
+        /// back the way it was found.</summary>
+        private readonly struct WriteGuard : IDisposable
+        {
+            private readonly InspectorPanel _panel;
+
+            private readonly bool _held;
+
+            public WriteGuard(InspectorPanel panel)
+            {
+                _panel = panel;
+                _held = panel._writing;
+                panel._writing = true;
+            }
+
+            public void Dispose() => _panel._writing = _held;
+        }
+
         /// <summary>One field of the record as a control writes it: what the schema says about it, what
         /// stands there now, where it goes, and which build of the panel it belongs to.</summary>
         private sealed class FieldEdit(InspectorPanel panel, object build, FieldSchema schema, JToken? value,
@@ -1735,11 +1846,11 @@ namespace Tooling.Ui
             }
 
             /// <summary>Ends the run of keystrokes this field was taking, so the next field edited is a
-            /// step of its own — and, where the run was over the record's id, names the localization keys
-            /// worded from it again.
-            /// <para>Both the record's own keys and the host's are asked, and the panel is drawn once for
-            /// whichever of them wrote: the boxes are written under keys that may have moved, and drawing
-            /// them twice is a panel the author cannot keep his place in. Not drawn at all where nothing
+            /// step of its own — and, where the run was over the record's id, carries that name everywhere
+            /// the run writes it and names the localization keys worded from it again.
+            /// <para>Both the record's own rename and the host's wording are asked, and the panel is drawn
+            /// once for whichever of them wrote: the boxes are written under keys that may have moved, and
+            /// drawing them twice is a panel the author cannot keep his place in. Not drawn at all where nothing
             /// moved — a gesture ends every time a box is left, and most of them leave the wording where
             /// it was.</para></summary>
             public void Seal()
@@ -1750,11 +1861,12 @@ namespace Tooling.Ui
                 // screen, and the word the keys would be named from is another record's.
                 if (panel.Stale(build)) return;
 
-                // A name the record's section already writes is taken back where it was typed, and the
-                // keys stand where they are: the record is called what it was called a moment ago.
+                // A name the run refuses — one the section already writes, one a map is already keyed by —
+                // is taken back where it was typed, and nothing else moves: the record is called what it
+                // was called a moment ago.
                 if (panel.Refused(at)) return;
 
-                bool renamed = panel.RenameKeys(at);
+                bool renamed = panel.Carried(at);
                 bool worded = panel.Settle();
 
                 if (renamed || worded) Redraw();

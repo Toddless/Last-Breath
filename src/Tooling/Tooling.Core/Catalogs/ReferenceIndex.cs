@@ -2,7 +2,6 @@ namespace Tooling.Catalogs
 {
     using System;
     using System.Collections.Generic;
-    using Tooling.Json;
     using Tooling.Schema.Model;
 
     /// <summary>
@@ -35,23 +34,16 @@ namespace Tooling.Catalogs
         /// sections they stand in.</summary>
         private readonly Dictionary<string, CatalogIds> _ids = new(StringComparer.Ordinal);
 
-        /// <summary>Something in some document moved, so what is held answers for a run that no longer
-        /// exists. Rebuilt when it is next asked for and not when it is invalidated: a keystroke
-        /// invalidates it, and a walk over every catalog per keystroke is a walk nobody reads.</summary>
-        private bool _stale = true;
+        /// <summary>Whether something in some document moved, which means what is held answers for a run
+        /// that no longer exists. Rebuilt when it is next asked for and not when it is invalidated.</summary>
+        private readonly CatalogChanges _changes;
 
         public ReferenceIndex(CatalogWorkspace workspace)
         {
             ArgumentNullException.ThrowIfNull(workspace);
 
             _workspace = workspace;
-
-            foreach (CatalogView catalog in workspace.Catalogs)
-            {
-                foreach (CatalogFile file in catalog.Files) Watch(file);
-
-                catalog.FileAdded += Watch;
-            }
+            _changes = new CatalogChanges(workspace);
         }
 
         /// <summary>The catalog of the run one of its files belongs to, or null for a file no catalog
@@ -188,19 +180,10 @@ namespace Tooling.Catalogs
             return id.Contains(needle, StringComparison.OrdinalIgnoreCase) ? Inside : NoMatch;
         }
 
-        private void Watch(CatalogFile file)
-        {
-            file.Document.Changed += Touched;
-            _stale = true;
-        }
-
-        private void Touched(JsonPointer pointer) => _stale = true;
-
         private void Refreshed()
         {
-            if (!_stale) return;
+            if (!_changes.TakeChange()) return;
 
-            _stale = false;
             _ids.Clear();
 
             foreach (CatalogView catalog in _workspace.Catalogs) _ids[catalog.Catalog] = Written(catalog);

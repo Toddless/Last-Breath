@@ -62,7 +62,8 @@ namespace Tooling.Catalogs
         /// <summary>Every use of the run, filed under the word it writes.</summary>
         private readonly Dictionary<string, List<ReferenceMention>> _written = new(StringComparer.Ordinal);
 
-        private bool _stale = true;
+        /// <summary>Whether anything has been written since the uses were worked out.</summary>
+        private readonly CatalogChanges _changes;
 
         public ReferenceUses(CatalogWorkspace workspace, IEnumerable<IReferenceUseSource>? sources = null)
         {
@@ -70,13 +71,7 @@ namespace Tooling.Catalogs
 
             _workspace = workspace;
             _sources = sources is null ? [] : [.. sources];
-
-            foreach (CatalogView catalog in workspace.Catalogs)
-            {
-                foreach (CatalogFile file in catalog.Files) Watch(file);
-
-                catalog.FileAdded += Watch;
-            }
+            _changes = new CatalogChanges(workspace);
         }
 
         /// <summary>What a record answers to, as a reference names it: its catalog, narrowed to the
@@ -144,19 +139,10 @@ namespace Tooling.Catalogs
                     ReferenceWalk.Record(file, record.Schema, record.Token, record.Pointer, vocabulary: null, found);
         }
 
-        private void Watch(CatalogFile file)
-        {
-            file.Document.Changed += Touched;
-            _stale = true;
-        }
-
-        private void Touched(JsonPointer pointer) => _stale = true;
-
         private void Refreshed()
         {
-            if (!_stale) return;
+            if (!_changes.TakeChange()) return;
 
-            _stale = false;
             _written.Clear();
 
             List<ReferenceMention> found = [];

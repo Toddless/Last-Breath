@@ -2,7 +2,10 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Core.Data.GameData;
     using LastBreath.Descriptors;
+    using Newtonsoft.Json.Linq;
     using Tooling.Catalogs;
+    using Tooling.Editing.History;
+    using Tooling.Json;
     using Tooling.Schema.Model;
 
     /// <summary>
@@ -33,6 +36,12 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>A word no file of the run writes.</summary>
         private const string UnwrittenId = "Npc_Nobody_Writes_This";
 
+        /// <summary>What the two of them are renamed to: words nothing writes and no section lists, so the
+        /// rename is refused by nothing and every place holding the old name is one the tool moved.</summary>
+        private const string RenamedVeteranId = "Npc_Bandit_Veteran_Renamed";
+
+        private const string RenamedQuestId = "Quest_Field_Of_Bones_Renamed";
+
         private const string VeteranDialogueFile = "Npc_Bandit_Veteran.json";
         private const string FieldOfBonesFile = "Quest_Field_Of_Bones.json";
         private const string FangFile = "Quest_Trial_Of_The_Fang.json";
@@ -52,6 +61,12 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>The npc a stage of a quest puts into the world — written inside an action, which no
         /// catalog schema reads.</summary>
         private const string SpawnedAt = "/quests/0/stages/0/onEnter/0/npcId";
+
+        /// <summary>The quest a conversation opens on, and the one an option of it offers: both written
+        /// inside conditions, where only the narrative's own finder can see them.</summary>
+        private const string EntryQuestAt = "/dialogues/0/entryRules/0/conditions/0/questId";
+
+        private const string OptionQuestAt = "/dialogues/0/nodes/0/options/0/visibleConditions/0/questId";
 
         private static CatalogWorkspace s_workspace = null!;
 
@@ -141,11 +156,109 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0, s_uses.UsesOf(ReferenceTarget.Whole(DataCatalog.Npc), string.Empty).Count);
         }
 
+        /// <summary>The rename as the tool carries it, over the data the game ships: the npc's new name is
+        /// written into his own record and goes from there into the conversation that belongs to him and
+        /// the quest he hands out — two catalogs and three shapes of field, none of which the panel
+        /// showing the npc knows anything about.</summary>
+        [TestMethod]
+        public void RenameEverywhere_CarriesAnNpcIntoTheDialogueAndTheQuestThatNameHim()
+        {
+            Renaming run = ARename(DataCatalog.Npc, VeteranId);
+            CatalogRenameResult result = Carried(run, RenamedVeteranId);
+
+            Assert.IsTrue(result.Done, result.Refused);
+            Assert.AreEqual(RenamedVeteranId, Word(run, DataCatalog.Dialogues, VeteranDialogueFile, DialogueNpcAt));
+            Assert.AreEqual(RenamedVeteranId, Word(run, DataCatalog.Quests, FieldOfBonesFile, GiverAt));
+            Assert.AreEqual(RenamedVeteranId, Word(run, DataCatalog.Quests, FieldOfBonesFile, TurnInAt));
+            Assert.AreEqual(0, run.Uses.UsesOf(ReferenceTarget.Whole(DataCatalog.Npc), VeteranId).Count,
+                "nothing of the run goes on naming him");
+
+            AssertOneStepTakesItBack(run, VeteranId);
+            Assert.AreEqual(VeteranId, Word(run, DataCatalog.Dialogues, VeteranDialogueFile, DialogueNpcAt));
+            Assert.AreEqual(VeteranId, Word(run, DataCatalog.Quests, FieldOfBonesFile, GiverAt));
+            Assert.AreEqual(VeteranId, Word(run, DataCatalog.Quests, FieldOfBonesFile, TurnInAt));
+        }
+
+        /// <summary>The half of the same gesture no schema can see: a quest is named inside the conditions
+        /// of the conversation offering it, and a rename reaching only what the catalogs declare would
+        /// leave that conversation gating itself on a quest nobody has.</summary>
+        [TestMethod]
+        public void RenameEverywhere_CarriesAQuestIntoTheConditionsThatGateOnIt()
+        {
+            Renaming run = ARename(DataCatalog.Quests, FieldOfBonesId);
+            CatalogRenameResult result = Carried(run, RenamedQuestId);
+
+            Assert.IsTrue(result.Done, result.Refused);
+            Assert.AreEqual(RenamedQuestId, Word(run, DataCatalog.Dialogues, VeteranDialogueFile, EntryQuestAt));
+            Assert.AreEqual(RenamedQuestId, Word(run, DataCatalog.Dialogues, VeteranDialogueFile, OptionQuestAt));
+            Assert.AreEqual(0, run.Uses.UsesOf(ReferenceTarget.Whole(DataCatalog.Quests), FieldOfBonesId).Count,
+                "nothing of the run goes on gating itself on the old name");
+
+            AssertOneStepTakesItBack(run, FieldOfBonesId);
+            Assert.AreEqual(FieldOfBonesId, Word(run, DataCatalog.Dialogues, VeteranDialogueFile, EntryQuestAt));
+            Assert.AreEqual(FieldOfBonesId, Word(run, DataCatalog.Dialogues, VeteranDialogueFile, OptionQuestAt));
+        }
+
+        /// <summary>The id and everything naming it are one thing the author did: one press of undo, and
+        /// the record answers to the word it was opened under.</summary>
+        private static void AssertOneStepTakesItBack(Renaming run, string id)
+        {
+            Assert.AreEqual(1, run.History.Depth, "the rename is one step and not one per file");
+
+            run.History.Undo();
+
+            Assert.AreEqual(id, run.Record.CurrentId);
+        }
+
+        /// <summary>One run of the tool over the shipped data, with a record of it about to be renamed:
+        /// every document on one stack, and the index a host builds — the catalogs' own schemas and the
+        /// finder that reads what they cannot.</summary>
+        private static Renaming ARename(string catalog, string id)
+        {
+            var history = new EditHistory();
+            CatalogWorkspace workspace = CatalogWorkspace.Load(SharedData.Root(), CatalogDescriptors.All, history);
+            CatalogView view = View(workspace, catalog);
+
+            return new Renaming(
+                workspace,
+                new ReferenceUses(workspace, [new NarrativeReferenceUses()]),
+                view,
+                view.Records.First(record => record.CurrentId == id),
+                history);
+        }
+
+        /// <summary>The gesture as a host makes it: the id is written into the record the way an author
+        /// types it, and the rename is asked to carry everything else into the same step. In memory and
+        /// nowhere else — nothing here saves, so the files the game reads are the files on disk.</summary>
+        private static CatalogRenameResult Carried(Renaming run, string to)
+        {
+            CatalogRecord record = run.Record;
+            string from = record.CurrentId;
+
+            Assert.IsNotNull(record.Schema.IdField);
+            Assert.IsTrue(record.File.Document.Put(record.Pointer.Append(record.Schema.IdField), new JValue(to)));
+
+            return CatalogEditing.RenameEverywhere(run.Uses, run.View, record, from, to);
+        }
+
+        /// <summary>The word standing at an address of one named file of one catalog.</summary>
+        private static string? Word(Renaming run, string catalog, string file, string at) =>
+            View(run.Workspace, catalog).Files.First(one => one.Name == file)
+                .Document.Resolve(JsonPointer.Parse(at))?.ToString();
+
+        private static CatalogView View(CatalogWorkspace workspace, string catalog) =>
+            workspace.Catalogs.First(one => one.Catalog == catalog);
+
         private static string[] Places(string id, string catalog) =>
             Places(s_uses.UsesOf(ReferenceTarget.Whole(catalog), id));
 
         /// <summary>What came back, one row per place, named the way an author would point at it.</summary>
         private static string[] Places(IReadOnlyList<ReferenceUse> uses) =>
             [.. uses.Select(use => $"{use.File.Name}{use.At}")];
+
+        /// <summary>What one run of the tool has open while a record of the shipped data is renamed.</summary>
+        private sealed record Renaming(
+            CatalogWorkspace Workspace, ReferenceUses Uses, CatalogView View, CatalogRecord Record,
+            EditHistory History);
     }
 }

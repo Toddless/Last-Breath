@@ -369,6 +369,12 @@ namespace DataEditor.Source.View
             // it answers about the run as a whole and the panel is shown one record at a time.
             _inspector.References = new ReferenceIndex(_workspace);
 
+            // The same question turned round, for a record renamed: every place the run writes the old id
+            // is rewritten with the new one. The narrative's own finder is handed over with it — a quest
+            // named inside a condition is a word no schema of this run can see, and a rename passing it
+            // over would leave the conversation gating itself on a quest nobody has.
+            _inspector.Uses = new ReferenceUses(_workspace, [new NarrativeReferenceUses()]);
+
             // The conditions and the actions of the narrative: the dialogues and the quests are among the
             // catalogs listed here, and their vocabulary keys read as free json without this.
             _inspector.Vocabularies = NarrativeFieldVocabularies.Resolve;

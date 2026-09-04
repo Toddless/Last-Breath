@@ -181,6 +181,11 @@ namespace Tooling.Tests.DataEditor
         private const string GuardsField = "guards";
         private const string DropsField = "drops";
 
+        /// <summary>A map whose key and whose value are both the name being renamed: the value is
+        /// addressed BY the key, so the two stand exactly as deep as each other and the key has to move
+        /// last of the two.</summary>
+        private const string OwnersField = "owners";
+
         /// <summary>A field standing INSIDE a map keyed by the name being renamed: it has to be written
         /// before the key moves, or its address goes with the key and the word is left standing.</summary>
         private const string ByField = "by";
@@ -192,6 +197,12 @@ namespace Tooling.Tests.DataEditor
 
         /// <summary>The address of the map a record is keyed into, for the tests that read it back.</summary>
         private const string DropsAt = "/quests/0/drops";
+
+        private const string OwnersAt = "/quests/0/owners";
+
+        /// <summary>A place no schema of the run reads: only a finder the host hands over knows the word
+        /// is an id at all.</summary>
+        private const string HiddenAt = "/quests/0/notes/hidden";
 
         /// <summary>The field of the OTHER npc pointing at the one being renamed: what makes the rename
         /// reach a second record of the record's own file.</summary>
@@ -240,7 +251,9 @@ namespace Tooling.Tests.DataEditor
                         "drops": {
                             "Npc_Ronald": { "by": "Npc_Ronald" },
                             "Npc_Free": { "by": "Npc_Skeleton" }
-                        }
+                        },
+                        "owners": { "Npc_Ronald": "Npc_Ronald" },
+                        "notes": { "hidden": "Npc_Ronald" }
                     }
                 ]
             }
@@ -933,6 +946,41 @@ namespace Tooling.Tests.DataEditor
             Assert.IsNull(CatalogEditing.RenameRefusal(view, view.Records[0], "   "));
         }
 
+        /// <summary>The whole question a host asks before it lets a retyped id stand: the name the section
+        /// may already write, and the word some map of the run may already be keyed by. A gate asking only
+        /// the first lets the second through, and the author hears about it after the fact — from a rename
+        /// that carried nothing while his box kept the word.</summary>
+        [TestMethod]
+        public void RenameRefusal_AskedOfTheRun_RefusesAWordAMapIsAlreadyKeyedBy()
+        {
+            Renaming run = ARun();
+            CatalogRecord record = run.Ronald;
+
+            string? blocked = CatalogEditing.RenameRefusal(run.Uses, run.Npcs, record, RonaldId, FreeId);
+
+            Assert.IsNotNull(blocked);
+            StringAssert.Contains(blocked, FreeId);
+            StringAssert.Contains(blocked, QuestFile);
+
+            // The section's own answer is asked first and said in its own words, and a word nothing writes
+            // and nothing keys is no refusal at all.
+            StringAssert.Contains(
+                CatalogEditing.RenameRefusal(run.Uses, run.Npcs, record, RonaldId, SkeletonId), SkeletonId);
+
+            Assert.IsNull(CatalogEditing.RenameRefusal(run.Uses, run.Npcs, record, RonaldId, NewId));
+        }
+
+        /// <summary>A word nobody typed either side is no rename, so there is nothing to refuse: the maps
+        /// of the run are asked about a rename and not about a record standing still.</summary>
+        [TestMethod]
+        public void RenameRefusal_AskedOfTheRun_TakesAWordThatMovesNothing()
+        {
+            Renaming run = ARun();
+
+            Assert.IsNull(CatalogEditing.RenameRefusal(run.Uses, run.Npcs, run.Ronald, RonaldId, RonaldId));
+            Assert.IsNull(CatalogEditing.RenameRefusal(run.Uses, run.Npcs, run.Ronald, string.Empty, FreeId));
+        }
+
         /// <summary>Every place the run wrote the old word is written again: a field of the record's own
         /// catalog, a field of another one, both elements of a list writing it twice, and the key a map
         /// stands under — which keeps the place it held among its neighbours.</summary>
@@ -943,7 +991,7 @@ namespace Tooling.Tests.DataEditor
             CatalogRenameResult result = Rename(run, NewId);
 
             Assert.IsTrue(result.Done, result.Refused);
-            Assert.AreEqual(6, result.Uses);
+            Assert.AreEqual(8, result.Uses);
             Assert.AreEqual(2, result.Files, "the record's own catalog and the one pointing into it");
 
             Assert.AreEqual(NewId, Written(run.Npcs, AllyAt));
@@ -956,6 +1004,36 @@ namespace Tooling.Tests.DataEditor
             // would have gone with it.
             CollectionAssert.AreEqual(new[] { NewId, FreeId }, Keys(run.Quests, DropsAt));
             Assert.AreEqual(NewId, Under(run.Quests, DropsAt, NewId));
+        }
+
+        /// <summary>A map whose key and whose value are the same name: the value is addressed BY the key,
+        /// so the two stand as deep as each other and only the order between them says whether both moved.
+        /// The key goes last, or the value is left standing at an address nothing holds any more.</summary>
+        [TestMethod]
+        public void RenameEverywhere_WritesTheValueUnderAKeyBeforeTheKeyItself()
+        {
+            Renaming run = ARun();
+
+            Assert.IsTrue(Rename(run, NewId).Done);
+
+            CollectionAssert.AreEqual(new[] { NewId }, Keys(run.Quests, OwnersAt));
+            Assert.AreEqual(NewId, Beside(run.Quests, OwnersAt, NewId));
+        }
+
+        /// <summary>The words only the host can see travel with the rest: the narrative writes ids inside
+        /// its conditions, no schema of the run says they are ids, and a rename passing them over would
+        /// leave a conversation gating itself on a record nobody has.</summary>
+        [TestMethod]
+        public void RenameEverywhere_CarriesThePlacesOnlyAFinderOfTheHostKnows()
+        {
+            Renaming run = ARun(workspace =>
+                new Finder(workspace.Catalogs[1].Files[0], HiddenAt, RonaldId, ReferenceTarget.Whole(NpcCatalog)));
+
+            CatalogRenameResult result = Rename(run, NewId);
+
+            Assert.IsTrue(result.Done, result.Refused);
+            Assert.AreEqual(9, result.Uses, "the eight places the schemas read, and the one only the host does");
+            Assert.AreEqual(NewId, Written(run.Quests, HiddenAt));
         }
 
         /// <summary>The wording the catalog builds out of the id travels with it: every suffix, in every
@@ -971,6 +1049,30 @@ namespace Tooling.Tests.DataEditor
             Assert.IsNotNull(run.Texts.Read(LocalizedTexts.AuthoringLocale, NewId + DescriptionSuffix));
             Assert.IsNull(run.Texts.Read(LocalizedTexts.ReferenceLocale, RonaldId));
             Assert.IsNull(run.Texts.Read(LocalizedTexts.AuthoringLocale, RonaldId + DescriptionSuffix));
+        }
+
+        /// <summary>How a record is worded is the HOST's answer and not always the catalog's: the same
+        /// panel shows a record and the rows standing inside it, and a row of one words no key from the
+        /// record's id. The suffixes it names are the ones that move, and no others.</summary>
+        [TestMethod]
+        public void RenameEverywhere_WordsTheKeysWithTheSuffixesItWasGiven()
+        {
+            Renaming run = ARun();
+            CatalogRecord record = run.Ronald;
+
+            Assert.IsTrue(record.File.Document.Put(record.Pointer.Append(IdField), new JValue(NewId)));
+
+            CatalogRenameResult result = CatalogEditing.RenameEverywhere(
+                run.Uses, run.Npcs, record, RonaldId, NewId, run.Texts, suffixes: [DescriptionSuffix]);
+
+            Assert.IsTrue(result.Done, result.Refused);
+            Assert.AreEqual(new LocalizedRename(1, null), result.Keys);
+            Assert.IsNotNull(run.Texts.Read(LocalizedTexts.ReferenceLocale, NewId + DescriptionSuffix));
+
+            // The catalog words its records under a name as well, and the name was not asked for: a key
+            // the caller did not name is a key that belongs to something else on screen.
+            Assert.AreEqual(RonaldName, run.Texts.Read(LocalizedTexts.ReferenceLocale, RonaldId));
+            Assert.IsNull(run.Texts.Read(LocalizedTexts.ReferenceLocale, NewId));
         }
 
         /// <summary>The id, the references and the wording are one thing the author did. Taken back half
@@ -1035,7 +1137,7 @@ namespace Tooling.Tests.DataEditor
             CatalogRenameResult result = Rename(run, WordedId);
 
             Assert.IsTrue(result.Done, result.Refused);
-            Assert.AreEqual(6, result.Uses);
+            Assert.AreEqual(8, result.Uses);
             Assert.AreEqual(new LocalizedRename(0, WordedId), result.Keys);
             Assert.AreEqual(WordedId, Written(run.Quests, QuestNpcAt));
             Assert.IsNotNull(run.Texts.Read(LocalizedTexts.ReferenceLocale, RonaldId), "the old keys stand where they were");
@@ -1079,6 +1181,9 @@ namespace Tooling.Tests.DataEditor
             Assert.IsTrue(run.Quests.Files[0].Document.IsClean);
             Assert.IsFalse(run.Texts.IsDirty);
         }
+
+        /// <summary>The word standing directly under one key of a map.</summary>
+        private static string? Beside(CatalogView view, string at, string key) => Map(view, at)[key]?.ToString();
 
         /// <summary>The word standing at an address of a catalog's only file.</summary>
         private static string? Written(CatalogView view, string at) =>
@@ -1216,12 +1321,22 @@ namespace Tooling.Tests.DataEditor
                             Kind = FieldKind.Object,
                             Record = CatalogFixture.Record(null, PointsAtAnNpc(ByField))
                         }
+                    },
+                    new FieldSchema
+                    {
+                        JsonName = OwnersField,
+                        Kind = FieldKind.Dictionary,
+                        Key = PointsAtAnNpc(FieldSchema.Unnamed),
+                        Item = PointsAtAnNpc(FieldSchema.Unnamed)
                     }))
             ]);
 
         /// <summary>The run a rename is made inside: two catalogs writing one npc's name, both locales
-        /// wording it, and one stack under all of them — the way a host holds them.</summary>
-        private Renaming ARun()
+        /// wording it, and one stack under all of them — the way a host holds them.
+        /// <para><paramref name="finder"/> is a source of the host's own, over the run once it is open:
+        /// the narrative hands one over for the words its conditions write, and a rename has to reach
+        /// those too.</para></summary>
+        private Renaming ARun(Func<CatalogWorkspace, IReferenceUseSource>? finder = null)
         {
             Write(NpcCatalog, NpcFile, TwoAlliedNpcs);
             Write(QuestCatalog, QuestFile, OneQuest);
@@ -1233,9 +1348,18 @@ namespace Tooling.Tests.DataEditor
 
             return new Renaming(
                 workspace,
-                new ReferenceUses(workspace),
+                new ReferenceUses(workspace, finder is null ? null : [finder(workspace)]),
                 LocalizedTexts.Load(Path.Combine(_root, LocalizationFolder), history),
                 history);
+        }
+
+        /// <summary>A finder of the host's own: one word, at a place the schemas of the run read straight
+        /// past. Anything else about it is the host's business — the point is that the rename reaches
+        /// what the host found.</summary>
+        private sealed class Finder(CatalogFile file, string at, string id, ReferenceTarget target) : IReferenceUseSource
+        {
+            public IEnumerable<ReferenceMention> Uses(CatalogWorkspace workspace) =>
+                [new ReferenceMention(new ReferenceUse(file, JsonPointer.Parse(at), ReferenceUseKind.Value), id, [target])];
         }
 
         /// <summary>What one run of the tool has open while a record is renamed.</summary>

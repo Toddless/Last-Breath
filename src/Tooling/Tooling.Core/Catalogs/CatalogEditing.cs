@@ -168,11 +168,37 @@ namespace Tooling.Catalogs
             ArgumentNullException.ThrowIfNull(view);
             ArgumentNullException.ThrowIfNull(record);
 
-            string wanted = (typed ?? string.Empty).Trim();
+            string wanted = Trimmed(typed);
 
             if (wanted.Length == 0) return null;
 
             return Taken(view, record.Section, wanted, record) ? TakenNote(record.Section, wanted) : null;
+        }
+
+        /// <summary>
+        /// Why the record may not be listed under the name typed into its id, asked of the whole run: the
+        /// name its own section already writes, and the word some map the record is keyed into is already
+        /// keyed by. Two reasons and one question — a host asking whether the word may stand has to be
+        /// told about both, or it lets one of them stand and hears about it only once
+        /// <see cref="RenameEverywhere"/> has refused to carry anything.
+        /// <para><paramref name="oldId"/> is the name the record answered to before the typing: the maps
+        /// asked about are the ones keyed by THAT word, because those are the keys a rename would move.</para>
+        /// </summary>
+        public static string? RenameRefusal(
+            ReferenceUses uses, CatalogView view, CatalogRecord record, string? oldId, string? typed)
+        {
+            ArgumentNullException.ThrowIfNull(uses);
+            ArgumentNullException.ThrowIfNull(view);
+            ArgumentNullException.ThrowIfNull(record);
+
+            if (RenameRefusal(view, record, typed) is { } refusal) return refusal;
+
+            string from = Trimmed(oldId);
+            string to = Trimmed(typed);
+
+            if (!Moving(from, to)) return null;
+
+            return Blocked(uses.UsesOf(ReferenceUses.Naming(view, record), from), to);
         }
 
         /// <summary>
@@ -190,6 +216,14 @@ namespace Tooling.Catalogs
         /// would be the tool making a state nobody asked for.</para>
         /// <para>A word nobody typed is no rename: an empty name either side, and a record renamed to what
         /// it is already called, move nothing and refuse nothing.</para>
+        /// <para><paramref name="record"/> is a record <paramref name="view"/> lists, and the two names are
+        /// what its id field carried and carries: the references are looked up by what the record answers
+        /// to, and something standing INSIDE a record — a node of a conversation, a stage of a quest — is
+        /// named by no reference of another catalog and is not renamed from here.</para>
+        /// <para><paramref name="suffixes"/> is how the HOST words this record's keys, which is not always
+        /// what the catalog declares: the same panel shows a record and the rows inside it, and a row of
+        /// one words no key from the record's id. The catalog's own answer is used where the caller names
+        /// none.</para>
         /// </summary>
         public static CatalogRenameResult RenameEverywhere(
             ReferenceUses uses,
@@ -197,21 +231,20 @@ namespace Tooling.Catalogs
             CatalogRecord record,
             string oldId,
             string newId,
-            LocalizedTexts? texts = null)
+            LocalizedTexts? texts = null,
+            IReadOnlyList<string>? suffixes = null)
         {
             ArgumentNullException.ThrowIfNull(uses);
             ArgumentNullException.ThrowIfNull(view);
             ArgumentNullException.ThrowIfNull(record);
 
-            string from = (oldId ?? string.Empty).Trim();
-            string to = (newId ?? string.Empty).Trim();
+            string from = Trimmed(oldId);
+            string to = Trimmed(newId);
 
-            if (RenameRefusal(view, record, to) is { } refusal) return Nothing(refusal);
-            if (from.Length == 0 || to.Length == 0 || string.Equals(from, to, StringComparison.Ordinal)) return Nothing(null);
+            if (RenameRefusal(uses, view, record, from, to) is { } refusal) return Nothing(refusal);
+            if (!Moving(from, to)) return Nothing(null);
 
             IReadOnlyList<ReferenceUse> written = uses.UsesOf(ReferenceUses.Naming(view, record), from);
-
-            if (Blocked(written, to) is { } blocked) return Nothing(blocked);
 
             JsonTreeDocument owner = record.File.Document;
             HashSet<CatalogFile> files = [];
@@ -228,7 +261,8 @@ namespace Tooling.Catalogs
                     files.Add(use.File);
                 }
 
-                if (texts is { } wording) keys = wording.RenameRecord(from, to, view.Schema.LocalizedSuffixes);
+                if (texts is { } wording)
+                    keys = wording.RenameRecord(from, to, suffixes ?? view.Schema.LocalizedSuffixes);
             }
 
             return new CatalogRenameResult(rewritten, files.Count, keys, null);
@@ -238,12 +272,22 @@ namespace Tooling.Catalogs
 
         private static CatalogRenameResult Nothing(string? refused) => new(0, 0, default, refused);
 
+        private static string Trimmed(string? word) => (word ?? string.Empty).Trim();
+
+        /// <summary>Whether the two names are a rename at all: a word nobody typed either side, and a
+        /// record renamed to what it is already called, move nothing and refuse nothing.</summary>
+        private static bool Moving(string from, string to) =>
+            from.Length > 0 && to.Length > 0 && !string.Equals(from, to, StringComparison.Ordinal);
+
         /// <summary>The uses in an order they can all be written in: the deepest first, so that whatever
         /// stands INSIDE a map keyed by the old word is written before the key itself moves and carries
-        /// the addresses of everything under it away. A value written over keeps its address, so nothing
-        /// else here depends on the order.</summary>
+        /// the addresses of everything under it away — and, among places of one depth, the key of a map
+        /// last, because the value written directly under such a key is addressed by the key itself and
+        /// stands exactly as deep as it does. A value written over keeps its address, so nothing else here
+        /// depends on the order.</summary>
         private static IEnumerable<ReferenceUse> Writable(IReadOnlyList<ReferenceUse> uses) =>
-            uses.OrderByDescending(use => use.At.Segments.Count);
+            uses.OrderByDescending(use => use.At.Segments.Count)
+                .ThenBy(use => use.Kind == ReferenceUseKind.MapKey ? 1 : 0);
 
         /// <summary>Writes the new word where one use of the old one stands. A key of a map is given
         /// another key rather than another value: the word IS the address there, and writing over it

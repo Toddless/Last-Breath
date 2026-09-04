@@ -178,6 +178,13 @@ namespace NarrativeEditor.Source.View
             var references = new ReferenceIndex(_workspace);
 
             _inspector.References = references;
+
+            // The same question turned round, for a record renamed: every place the run writes the old id
+            // is rewritten with the new one. The narrative's own finder is handed over with it — a quest
+            // named inside a condition is a word no schema can see, and a rename passing it over would
+            // leave the conversation gating itself on a quest nobody has.
+            _inspector.Uses = new ReferenceUses(_workspace, [new NarrativeReferenceUses()]);
+
             _checks.References = references;
             _checks.History = History;
             _checks.Workspace = _workspace;
