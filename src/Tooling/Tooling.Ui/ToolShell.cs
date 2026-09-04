@@ -61,7 +61,6 @@ namespace Tooling.Ui
         private const string LineBreak = "\n";
 
         private const string NoRootTitle = "Data root not found";
-        private const string NoRootHint = "Data/Shared is a symlink to src/SharedData; restore-links.ps1 puts it back.";
         private const string IssuesTitle = "Data issues";
         private const string SaveIssuesTitle = "Not everything could be written";
 
@@ -283,7 +282,8 @@ namespace Tooling.Ui
         /// <summary>Says what the run could not read: the catalogs' own notes, and whatever else the host
         /// has to add — the locales it could not open. A root that is not there at all is said on its
         /// own: every catalog under it is missing for that one reason, and a list of them names the
-        /// symptom instead of the cause.
+        /// symptom instead of the cause. What to do about it is asked of the paths, which are the one
+        /// place that knows how this run's root was decided.
         /// <para><paramref name="report"/> is for a host that reads catalogs it does not edit — it names
         /// the notes it answers for, in place of the whole run's.</para></summary>
         protected void ReportIssues(CatalogWorkspace workspace, IReadOnlyList<string>? also = null,
@@ -291,7 +291,7 @@ namespace Tooling.Ui
         {
             if (!Directory.Exists(workspace.Root))
             {
-                ShowMessage(NoRootTitle, [workspace.Root, NoRootHint]);
+                ShowMessage(NoRootTitle, [workspace.Root, ToolPaths.RootHint]);
                 return;
             }
 

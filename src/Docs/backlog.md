@@ -1,5 +1,14 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из пресетов экспорта exe (2026-09-04; accept with minors) — закрыт пункт «exe-сборки не заведены»
+
+- (владельцу) `build/` не в `.gitignore` — оба README утверждают «в git не едет»; после первого экспорта `build/tools/<Tool>/` вылезет в `git status`. Стало: строка `/build/` в `.gitignore` (файл в ваших правках). То же про `Export/` в `PassiveTreeEditor/README.md:37`.
+- (minor) `DataEditor/README.md:20` — «нет: локализация имён, переименование с распространением» — оба уже есть; верно только «панели проверок» (заходит с половиной A проверок).
+- (minor) команда `godot --headless --path … --export-release "Windows Desktop"` без выходного пути — образец `PassiveTreeEditor/export.ps1` передаёт путь явно; не проверено, подставит ли 4.7 `export_path` пресета.
+- (minor) `dotnet/embed_build_outputs=false` расходится с образцом (`true`) без причины: артефактов три (exe + .pck + `data_<Tool>_windows_x86_64/`), README не говорит, что без папки сборок exe умирает до первого кадра.
+- (знать) `exclude_filter` — перечисление десяти папок ассетов (негации у Godot нет): новая `SharedData/Assets/<Foo>` поедет в оба тула; `--data` только раздельной формой (`--data=path` и висящий `--data` уходят в автопоиск — лучше «названный корень не найден»); парсер `Named(string[])` мог бы жить в `Tooling.Core` с тестом; образец делает `dotnet build -c ExportRelease` перед экспортом (`export.ps1`) — у тулов скрипта нет.
+- (Godot-прогон владельца) Project → Export → пресет виден; экспорт в `build/tools/<Tool>/`; запуск exe из папки репо находит данные; `--data D:\…\src\SharedData`; несуществующий путь → диалог `Data root not found`.
+
 ## Из автодополнения ключа факта, карточка #248 (2026-09-04; rework → accept) — закрыт пункт «пикер ключа у SetFact/Fact не подключён» из раздела реестра фактов
 
 - (minor) правило «незаполненный шаблон» (`<`/`>`) живёт двумя копиями — `SuggestedWords.Unfilled` (тул) и `FactKeyDeclarations.Unfilled` (игра); ни один тест их не сводит. Стало: ассерт в `LastBreastTest` (видит обе) на общем наборе слов.
