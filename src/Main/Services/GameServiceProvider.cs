@@ -65,6 +65,7 @@ namespace LastBreath.Services
             provider.GetService<KillFactTracker>(); // eager: same, bus subscriptions only
             provider.GetService<LocationFactTracker>();
             provider.GetService<NpcFinalDeathFactTracker>();
+            provider.GetService<EquipFactTracker>();
             provider.GetService<IQuestLogService>(); // eager: lives on facts/inventory/clock subscriptions
             provider.GetService<QuestNotificationBroadcaster>();
             RegisterUiFactories(provider);
@@ -165,6 +166,7 @@ namespace LastBreath.Services
             services.AddSingleton<KillFactTracker>();
             services.AddSingleton<LocationFactTracker>();
             services.AddSingleton<NpcFinalDeathFactTracker>();
+            services.AddSingleton<EquipFactTracker>();
             services.AddGameDataParticipant<IInfluenceMastery, InfluenceMastery>();
             services.AddGameDataParticipant<IQuestProvider, QuestProvider>();
             services.AddSingleton<IQuestLogService, QuestLogService>();

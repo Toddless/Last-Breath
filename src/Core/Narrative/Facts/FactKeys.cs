@@ -33,6 +33,12 @@ namespace Core.Narrative.Facts
 
         public const string QuestOfferRollPassedHead = "Quest_Offer_Passed";
 
+        public const string ItemEquippedHead = "Item_Equipped";
+
+        /// <summary>A family of one: the key IS the head, because "wearing anything at all" has no record
+        /// to be about.</summary>
+        public const string ItemEquippedAnyKey = "Item_Equipped_Any";
+
         public static string LocationDiscovered(string locationId) => Key(LocationDiscoveredHead, locationId);
 
         /// <summary>Player kills of an NPC definition (counted per npc data id, not per instance).</summary>
@@ -61,6 +67,14 @@ namespace Core.Narrative.Facts
 
         /// <summary>1 = the cached quest-offer roll passed.</summary>
         public static string QuestOfferRollPassed(string questId) => Key(QuestOfferRollPassedHead, questId);
+
+        /// <summary>The player has ever worn gear of this kind. A ring answers under
+        /// <see cref="EquipmentPiece.Ring"/> whichever of the two slots took it.</summary>
+        public static string ItemEquipped(EquipmentPiece piece) => Key(ItemEquippedHead, piece.ToString());
+
+        /// <summary>How many pieces of gear the player has ever put on — raised beside the slot's own
+        /// flag, so "equip something" is one key instead of a clause over every slot.</summary>
+        public static string ItemEquippedAny() => Key(ItemEquippedAnyKey);
 
         /// <summary>One key, written the one way every key of every family is written.</summary>
         private static string Key(string head, params string[] parts) =>

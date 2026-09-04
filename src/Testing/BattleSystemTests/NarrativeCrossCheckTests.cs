@@ -50,15 +50,18 @@ namespace LastBreathTest.BattleSystemTests
         /// names is left unanswered rather than called broken. Describing them turns these two rows into
         /// real answers with nothing else to change — as describing the traders and the deeds already
         /// has: the shop a dialogue opens and the deed it publishes are now answered, not passed over.
-        /// <para>The last two are the author's, and owed rather than broken: the game counts kills per
-        /// faction and remembers who has been spoken to, and no quest and no dialogue asks about either
-        /// yet. Both are families a narrative would read the day one is written around them.</para></remarks>
+        /// <para>The last four are the author's, and owed rather than broken: the game counts kills per
+        /// faction, remembers who has been spoken to and remembers the gear the player has ever put on,
+        /// and no quest and no dialogue asks about any of it yet. All are families a narrative would read
+        /// the day one is written around them.</para></remarks>
         private static readonly (NarrativeFindingKind Kind, string Where)[] s_known =
         [
             (NarrativeFindingKind.UndescribedTarget, "Items"),
             (NarrativeFindingKind.UndescribedTarget, "NpcModifiers"),
             (NarrativeFindingKind.FactNeverRead, "facts/Kill_Count_Faction:<faction>"),
             (NarrativeFindingKind.FactNeverRead, "facts/Npc_Talked:<npcId>"),
+            (NarrativeFindingKind.FactNeverRead, "facts/Item_Equipped:<piece>"),
+            (NarrativeFindingKind.FactNeverRead, "facts/Item_Equipped_Any"),
         ];
 
         private static NarrativeCheckReport s_report = null!;

@@ -94,6 +94,8 @@ namespace Core.Narrative.Facts
 
         private const string QuestParameter = "questId";
 
+        private const string PieceParameter = "piece";
+
         /// <summary>The world map marks a place found, and the marker in the world asks whether it already
         /// has been before publishing the event a second time.</summary>
         private const string LocationMarkerCode = "LocationMarker";
@@ -162,6 +164,16 @@ namespace Core.Narrative.Facts
                 Template = Family(FactKeys.QuestOfferRollPassedHead, QuestParameter),
                 Writers = [Code(nameof(QuestOfferRollCondition))],
                 Readers = [Code(nameof(QuestOfferRollCondition))]
+            },
+            new()
+            {
+                Template = Family(FactKeys.ItemEquippedHead, PieceParameter),
+                Writers = [Code(nameof(EquipFactTracker))]
+            },
+            new()
+            {
+                Template = Family(FactKeys.ItemEquippedAnyKey),
+                Writers = [Code(nameof(EquipFactTracker))]
             },
         ];
 
