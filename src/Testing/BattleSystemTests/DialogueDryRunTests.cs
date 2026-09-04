@@ -21,8 +21,9 @@ namespace LastBreathTest.BattleSystemTests
         private const string Broken = "Npc_Broken";
         private const string Looping = "Npc_Looping";
 
-        /// <summary>The notes a sandbox always carries: the two things it is silent about by nature.</summary>
-        private const int StandingNotes = 2;
+        /// <summary>What a sandbox is silent about by nature with no quest seeded into it: the player's
+        /// attributes alone. The journal caveat belongs to a world that actually holds a quest.</summary>
+        private const int StandingCaveats = 1;
 
         /// <summary>A dialogue written for these tests, laid out in a data root of its own: the shipped
         /// catalogs answer what the game ships, and a boundary needs a document nobody else reads.</summary>
@@ -52,12 +53,33 @@ namespace LastBreathTest.BattleSystemTests
         ]}
         """;
 
+        /// <summary>The notes are what a run could not READ, and the shipped narrative is read whole: what
+        /// a sandbox is silent about by nature stands apart, or a report of what the data owes would be
+        /// padded with two lines that are true of every run there will ever be.</summary>
         [TestMethod]
-        public void Sandbox_ReadsTheShippedNarrativeWithNothingButItsStandingNotes()
+        public void Sandbox_ReadsTheShippedNarrativeWithNothingLeftUnread()
         {
             var sandbox = Shipped(new SandboxWorldState());
 
-            Assert.AreEqual(StandingNotes, sandbox.Notes.Count, string.Join("; ", sandbox.Notes));
+            Assert.AreEqual(0, sandbox.Notes.Count, string.Join("; ", sandbox.Notes));
+            Assert.AreEqual(StandingCaveats, sandbox.Caveats.Count, string.Join("; ", sandbox.Caveats));
+        }
+
+        /// <summary>The journal caveat is about a quest standing on a stage nobody walked into, so it is
+        /// owed only where a quest was actually seeded.</summary>
+        [TestMethod]
+        public void ASeededQuest_IsWhatTheJournalCaveatIsSaidFor()
+        {
+            var state = new SandboxWorldState();
+            state.Quests[FieldOfBones] = QuestStatus.Active;
+
+            NarrativeSandbox seeded = Shipped(state);
+            NarrativeSandbox empty = Shipped(new SandboxWorldState());
+
+            Assert.IsTrue(seeded.Caveats.Any(note => note.Contains("seeded quest", StringComparison.Ordinal)),
+                string.Join("; ", seeded.Caveats));
+            Assert.IsFalse(empty.Caveats.Any(note => note.Contains("seeded quest", StringComparison.Ordinal)),
+                string.Join("; ", empty.Caveats));
         }
 
         /// <summary>A root without the influence catalog falls back to built-in curves, and a chance

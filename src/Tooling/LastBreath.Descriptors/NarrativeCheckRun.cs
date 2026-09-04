@@ -7,9 +7,9 @@ namespace LastBreath.Descriptors
     using Core.Data.GameData;
     using Core.Data.QuestData;
     using Core.Narrative;
-    using Core.Narrative.Validation;
     using Core.Narrative.Dialogues;
     using Core.Narrative.Quests;
+    using Core.Narrative.Validation;
     using LastBreath.Descriptors.Sandbox;
     using Newtonsoft.Json;
     using Tooling.Catalogs;
@@ -17,8 +17,10 @@ namespace LastBreath.Descriptors
     using Tooling.Schema.Model;
     using static Tooling.Text.Format;
 
-    /// <summary>What one run of the checks came to: the narrative it was run over, what it found, and
-    /// what it could not read or cannot answer for.</summary>
+    /// <summary>What one run of the checks came to: the narrative it was run over, what it found, and what
+    /// it could not read. The notes are that and nothing else — a catalog missing, a document of the wrong
+    /// shape — so that a clean report means the run read everything, and not that a sandbox has said again
+    /// what it is silent about by nature.</summary>
     public sealed record NarrativeCheckReport(
         NarrativeCheckInput Read, IReadOnlyList<NarrativeFinding> Findings, IReadOnlyList<string> Notes);
 

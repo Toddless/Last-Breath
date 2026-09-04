@@ -478,7 +478,7 @@ namespace NarrativeEditor.Source.View
             }
 
             _node.Text = Text(NodeFormat, run.NodeId ?? string.Empty);
-            _note.Text = string.Join(LineBreak, [run.Note, .. sandbox.Notes]).Trim();
+            _note.Text = string.Join(LineBreak, [run.Note, .. sandbox.Notes, .. sandbox.Caveats]).Trim();
             _now.Text = World(sandbox);
             _log.Text = string.Join(LineBreak, run.Log);
 

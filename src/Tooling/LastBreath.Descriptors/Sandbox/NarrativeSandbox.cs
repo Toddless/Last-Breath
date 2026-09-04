@@ -43,6 +43,7 @@ namespace LastBreath.Descriptors.Sandbox
         private readonly IDialogueProvider _dialogues;
         private readonly IDialogueService _dialogue;
         private readonly List<string> _notes = [];
+        private readonly List<string> _caveats = [];
 
         /// <summary>The world its author typed. Written into the services by <see cref="Restore"/>;
         /// a run mutates the services and leaves this alone, which is what a reset goes back to.</summary>
@@ -50,10 +51,16 @@ namespace LastBreath.Descriptors.Sandbox
 
         public SandboxLog Log { get; } = new();
 
-        /// <summary>What the run could not read or cannot answer for: a catalog missing, a document that
-        /// is not a dialogue, a vocabulary that has drifted from the game's, and the two things a
-        /// sandbox is silent about by nature — the player's attributes and a quest's own journal.</summary>
+        /// <summary>What the run could not read: a catalog missing, a document that is not a dialogue, a
+        /// vocabulary that has drifted from the game's. Every one of them is about THIS reading of the
+        /// documents, which is why a report of the checks carries them and nothing else.</summary>
         public IReadOnlyList<string> Notes => _notes;
+
+        /// <summary>What a sandbox is silent about by nature — the player's attributes, a seeded quest's
+        /// own journal. Held apart from the notes because they are true of every run whatever the
+        /// documents say: a reader walking a conversation needs them, and a report of what the data owes
+        /// would only be padded by them.</summary>
+        public IReadOnlyList<string> Caveats => _caveats;
 
         public IDialogueProvider Dialogues => _dialogues;
 
@@ -102,8 +109,11 @@ namespace LastBreath.Descriptors.Sandbox
                 world, world, world, world, world, () => log!));
 
             _notes.AddRange(SandboxVocabulary.Notes(conditionFactories, actionFactories));
-            _notes.Add(NoPlayerNote);
-            _notes.Add(SeededQuestNote);
+            _caveats.Add(NoPlayerNote);
+
+            // Only where a quest was actually seeded: the stage a run starts one on is a fact about the
+            // world its author typed, and a run with no quests in it has nothing to be silent about.
+            if (State.Quests.Count > 0) _caveats.Add(SeededQuestNote);
 
             var conditions = new NarrativeConditionParser(conditionFactories);
             var actions = new NarrativeActionParser(actionFactories);

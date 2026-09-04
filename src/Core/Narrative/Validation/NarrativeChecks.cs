@@ -6,6 +6,9 @@ namespace Core.Narrative.Validation
     using Data.DialogueData;
     using Data.GameData;
     using Data.QuestData;
+    using Dialogues;
+    using Enums;
+    using Quests;
 
     /// <summary>
     /// Everything one narrative catalog can only be held to against the others: the ids it names, the
@@ -18,72 +21,6 @@ namespace Core.Narrative.Validation
     /// </summary>
     public static class NarrativeChecks
     {
-        /// <summary>Json names of the parts a dialogue is written in. Said here because a finding is
-        /// addressed the way the file is written, and the DTO states them as attribute arguments, which
-        /// nothing can be shared with.</summary>
-        private const string EntryRulesKey = "entryRules";
-
-        private const string NodesKey = "nodes";
-
-        private const string LinesKey = "lines";
-
-        private const string OptionsKey = "options";
-
-        private const string NpcIdKey = "npcId";
-
-        private const string NodeKey = "node";
-
-        private const string NextKey = "next";
-
-        private const string SpeechCheckKey = "speechCheck";
-
-        private const string FailNextKey = "failNext";
-
-        private const string FailActionsKey = "failActions";
-
-        private const string TextKey = "key";
-
-        private const string ConditionsKey = "conditions";
-
-        private const string ConditionKey = "condition";
-
-        private const string VisibleConditionsKey = "visibleConditions";
-
-        private const string EnabledConditionsKey = "enabledConditions";
-
-        private const string ActionsKey = "actions";
-
-        private const string OnEnterKey = "onEnter";
-
-        /// <summary>Json names of the parts a quest is written in.</summary>
-        private const string GiverKey = "giverNpcId";
-
-        private const string TurnInKey = "turnInNpcIds";
-
-        private const string StagesKey = "stages";
-
-        private const string ObjectivesKey = "objectives";
-
-        private const string TransitionsKey = "transitions";
-
-        private const string ToKey = "to";
-
-        private const string OutcomeKey = "outcome";
-
-        private const string RewardsKey = "rewards";
-
-        private const string ItemsKey = "items";
-
-        private const string AcceptConditionsKey = "acceptConditions";
-
-        private const string OnCompleteKey = "onComplete";
-
-        private const string OnAcceptKey = "onAccept";
-
-        private const string OnDeclineKey = "onDecline";
-
-        private const string OnFailKey = "onFail";
-
         /// <summary>Where the run says what it could not read of the wording itself.</summary>
         private const string TextsWhere = "localization";
 
@@ -93,6 +30,12 @@ namespace Core.Narrative.Validation
         private const string DroppedDialogueFormat = "the loader kept no dialogue under '{0}': the npc says nothing at all";
 
         private const string DroppedQuestFormat = "the loader kept no quest under '{0}': it is out of the game";
+
+        private const string DuplicateDialogueFormat =
+            "two dialogues are written for '{0}': the loader keeps the last of them and the rest are out of the game";
+
+        private const string DuplicateQuestFormat =
+            "two quests answer to '{0}': the loader keeps the last of them and the rest are out of the game";
 
         private const string UnnamedDialogueText = "the dialogue names no npc, so nobody can be made to speak it";
 
@@ -141,6 +84,15 @@ namespace Core.Narrative.Validation
         private const string ObjectiveShapeFormat =
             "the objective writes {0} of a condition and a counter, where the quest log reads exactly one";
 
+        private const string OutcomeAndRoutesFormat =
+            "the stage writes both '{0}' and '{1}', where an ending leads nowhere: the loader refuses the quest whole";
+
+        private const string FailingOutcomeText =
+            "the ending buries the quest, which is written unable to fail: the loader refuses the quest whole";
+
+        private const string LoopingStageFormat =
+            "the routes lead back to '{0}': the quest would never end, so the loader refuses it whole";
+
         private const string TakenWord = "taken";
 
         private const string HandedInWord = "handed in";
@@ -164,6 +116,14 @@ namespace Core.Narrative.Validation
         /// <summary>Everywhere an npc is named by the narrative: the whole of the one catalog holding them.</summary>
         private static readonly NarrativeReferenceTarget[] s_npcTargets = [NarrativeReferenceTarget.Whole(DataCatalog.Npc)];
 
+        /// <summary>The members the game parses the record fields marked as enums into. The parsers are
+        /// strict, so a word outside these sets takes the whole record out of the game.</summary>
+        private static readonly string[] s_speakers = Enum.GetNames<DialogueSpeaker>();
+
+        private static readonly string[] s_factions = Enum.GetNames<Fractions>();
+
+        private static readonly string[] s_declinePolicies = Enum.GetNames<DeclinePolicy>();
+
         /// <summary>Runs every rule over one reading of the narrative, in the order the records are
         /// written. The findings come back as they were made — sorting them is the reader's business, and
         /// a run whose order changes with the phase of the moon cannot be pinned.</summary>
@@ -176,27 +136,42 @@ namespace Core.Narrative.Validation
 
         /// <summary>One run of the rules. A class rather than a pile of arguments: every rule writes into
         /// the same list and asks the same two sources, and the walk of one record is a dozen steps deep.</summary>
-        private sealed class Pass(NarrativeCheckInput input)
+        private sealed class Pass
         {
             private readonly List<NarrativeFinding> _findings = [];
             private readonly HashSet<NarrativeReferenceTarget> _undescribed = [];
 
-            private NarrativeVocabularyWalk _vocabulary = null!;
+            /// <summary>The ids each catalog has already written a record under. Two records sharing one
+            /// leaves the loader keeping one of them, and everything written under the other silently
+            /// out of the game.</summary>
+            private readonly HashSet<string> _dialogueIds = new(StringComparer.Ordinal);
+
+            private readonly HashSet<string> _questIds = new(StringComparer.Ordinal);
+
+            private readonly NarrativeCheckInput _input;
+
+            private readonly NarrativeVocabularyWalk _vocabulary;
 
             /// <summary>The npcs a dialogue is written for, whether or not the loader kept it: a quest
             /// whose giver has a dialogue that was dropped is answered by that drop, not by a second
             /// finding saying the npc never had one.</summary>
-            private HashSet<string> _speaking = null!;
+            private readonly HashSet<string> _speaking;
+
+            /// <summary>A pass is built whole: the vocabulary reader writes into the pass's own list of
+            /// findings, so it cannot be made before there is one.</summary>
+            internal Pass(NarrativeCheckInput input)
+            {
+                _input = input;
+                _vocabulary = new NarrativeVocabularyWalk(input.Ids, _findings, _undescribed);
+                _speaking = [.. input.Dialogues.Select(dialogue => dialogue.NpcId).Where(npcId => npcId is { Length: > 0 })];
+            }
 
             internal IReadOnlyList<NarrativeFinding> Walk()
             {
-                _vocabulary = new NarrativeVocabularyWalk(input.Ids, _findings, _undescribed);
-                _speaking = [.. input.Dialogues.Select(dialogue => dialogue.NpcId)];
+                if (_input.Texts.Locales.Count == 0) Add(NarrativeFindingKind.Incomplete, TextsWhere, NoLocalesText);
 
-                if (input.Texts.Locales.Count == 0) Add(NarrativeFindingKind.Incomplete, TextsWhere, NoLocalesText);
-
-                for (int index = 0; index < input.Dialogues.Count; index++) Dialogue(input.Dialogues[index], index);
-                for (int index = 0; index < input.Quests.Count; index++) Quest(input.Quests[index], index);
+                for (int index = 0; index < _input.Dialogues.Count; index++) Dialogue(_input.Dialogues[index], index);
+                for (int index = 0; index < _input.Quests.Count; index++) Quest(_input.Quests[index], index);
 
                 return _findings;
             }
@@ -207,21 +182,27 @@ namespace Core.Narrative.Validation
 
             /// <summary>The address of a record, a node or a stage: its own id where it has one, and its
             /// place in the file where it has not.</summary>
-            private static string Named(string where, string key, string id, int index) =>
-                id.Length > 0 ? Under(Under(where, key), id) : At(Under(where, key), index);
+            private static string Named(string where, string key, string? id, int index) =>
+                id is { Length: > 0 } named ? Under(Under(where, key), named) : At(Under(where, key), index);
 
             private void Add(NarrativeFindingKind kind, string where, string message) =>
                 _findings.Add(new NarrativeFinding(kind, where, message));
 
             private void Dialogue(DialogueEntry entry, int index)
             {
-                string where = entry.NpcId.Length > 0 ? Under(DataCatalog.Dialogues, entry.NpcId) : At(DataCatalog.Dialogues, index);
+                string where = entry.NpcId is { Length: > 0 } npcId ? Under(DataCatalog.Dialogues, npcId) : At(DataCatalog.Dialogues, index);
 
-                if (entry.NpcId.Length == 0) Add(NarrativeFindingKind.Incomplete, where, UnnamedDialogueText);
-                else Npc(entry.NpcId, Under(where, NpcIdKey), NpcIdKey);
+                if (entry.NpcId is not { Length: > 0 }) Add(NarrativeFindingKind.Incomplete, where, UnnamedDialogueText);
+                else
+                {
+                    Npc(entry.NpcId, Under(where, DialogueEntry.NpcIdKey), DialogueEntry.NpcIdKey);
 
-                if (entry.NpcId.Length > 0 && !input.LoadedDialogues.Contains(entry.NpcId))
-                    Add(NarrativeFindingKind.Dropped, where, string.Format(DroppedDialogueFormat, entry.NpcId));
+                    if (!_dialogueIds.Add(entry.NpcId))
+                        Add(NarrativeFindingKind.DuplicateId, where, string.Format(DuplicateDialogueFormat, entry.NpcId));
+
+                    if (!_input.LoadedDialogues.Contains(entry.NpcId))
+                        Add(NarrativeFindingKind.Dropped, where, string.Format(DroppedDialogueFormat, entry.NpcId));
+                }
 
                 if (entry.EntryRules.Count == 0) Add(NarrativeFindingKind.Incomplete, where, NoEntryRulesText);
                 if (entry.Nodes.Count == 0) Add(NarrativeFindingKind.Incomplete, where, NoNodesText);
@@ -235,16 +216,16 @@ namespace Core.Narrative.Validation
             }
 
             /// <summary>The nodes one dialogue writes, and what it costs to write two of them alike: the
-            /// loader keeps whichever comes second and the routes to the first lead nowhere anybody
-            /// authored.</summary>
+            /// loader reads them into a map keyed by id, which refuses the second one outright, so the
+            /// whole dialogue is dropped and the npc says nothing at all.</summary>
             private HashSet<string> Nodes(DialogueEntry entry, string where)
             {
                 HashSet<string> nodes = new(StringComparer.Ordinal);
 
                 foreach (DialogueNodeEntry node in entry.Nodes)
-                    if (node.Id.Length > 0 && !nodes.Add(node.Id))
-                        Add(NarrativeFindingKind.DuplicateId, Under(Under(where, NodesKey), node.Id),
-                            string.Format(DuplicateNodeFormat, node.Id));
+                    if (node.Id is { Length: > 0 } id && !nodes.Add(id))
+                        Add(NarrativeFindingKind.DuplicateId, Under(Under(where, DialogueEntry.NodesKey), id),
+                            string.Format(DuplicateNodeFormat, id));
 
                 return nodes;
             }
@@ -254,10 +235,10 @@ namespace Core.Narrative.Validation
                 for (int index = 0; index < entry.EntryRules.Count; index++)
                 {
                     DialogueEntryRuleEntry rule = entry.EntryRules[index];
-                    string at = At(Under(where, EntryRulesKey), index);
+                    string at = At(Under(where, DialogueEntry.EntryRulesKey), index);
 
-                    _vocabulary.Conditions(rule.Conditions, Under(at, ConditionsKey));
-                    Route(rule.Node, nodes, at, NodeKey, required: true);
+                    _vocabulary.Conditions(rule.Conditions, Under(at, DialogueEntryRuleEntry.ConditionsKey));
+                    Route(rule.Node, nodes, at, DialogueEntryRuleEntry.NodeKey, required: true);
                 }
             }
 
@@ -285,12 +266,12 @@ namespace Core.Narrative.Validation
 
             private void Node(DialogueNodeEntry node, string where, int index, HashSet<string> nodes)
             {
-                string at = Named(where, NodesKey, node.Id, index);
+                string at = Named(where, DialogueEntry.NodesKey, node.Id, index);
 
-                if (node.Id.Length == 0) Add(NarrativeFindingKind.Incomplete, at, UnnamedNodeText);
+                if (node.Id is not { Length: > 0 }) Add(NarrativeFindingKind.Incomplete, at, UnnamedNodeText);
                 if (node.Options.Count == 0) Add(NarrativeFindingKind.Incomplete, at, NoOptionsText);
 
-                _vocabulary.Actions(node.OnEnter, Under(at, OnEnterKey));
+                _vocabulary.Actions(node.OnEnter, Under(at, DialogueNodeEntry.OnEnterKey));
 
                 for (int line = 0; line < node.Lines.Count; line++) Line(node.Lines[line], at, line);
                 for (int option = 0; option < node.Options.Count; option++) Option(node.Options[option], at, option, nodes);
@@ -298,11 +279,14 @@ namespace Core.Narrative.Validation
 
             private void Line(DialogueLineEntry line, string where, int index)
             {
-                string at = At(Under(where, LinesKey), index);
+                string at = At(Under(where, DialogueNodeEntry.LinesKey), index);
 
-                if (line.Key.Length == 0)
+                _vocabulary.Member(
+                    line.Speaker, s_speakers, Under(at, DialogueLineEntry.SpeakerKey), DialogueLineEntry.SpeakerKey);
+
+                if (line.Key is not { Length: > 0 })
                 {
-                    Add(NarrativeFindingKind.Incomplete, at, string.Format(NoTextKeyFormat, LineWord, TextKey));
+                    Add(NarrativeFindingKind.Incomplete, at, string.Format(NoTextKeyFormat, LineWord, DialogueLineEntry.TextKey));
                     return;
                 }
 
@@ -311,25 +295,26 @@ namespace Core.Narrative.Validation
 
             private void Option(DialogueOptionEntry option, string where, int index, HashSet<string> nodes)
             {
-                string at = Named(where, OptionsKey, option.Id, index);
+                string at = Named(where, DialogueNodeEntry.OptionsKey, option.Id, index);
 
-                if (option.Id.Length == 0) Add(NarrativeFindingKind.Incomplete, at, UnnamedOptionText);
+                if (option.Id is not { Length: > 0 }) Add(NarrativeFindingKind.Incomplete, at, UnnamedOptionText);
 
-                if (option.Key.Length == 0) Add(NarrativeFindingKind.Incomplete, at, string.Format(NoTextKeyFormat, OptionWord, TextKey));
+                if (option.Key is not { Length: > 0 })
+                    Add(NarrativeFindingKind.Incomplete, at, string.Format(NoTextKeyFormat, OptionWord, DialogueLineEntry.TextKey));
                 else Text(option.Key, at);
 
-                _vocabulary.Conditions(option.VisibleConditions, Under(at, VisibleConditionsKey));
-                _vocabulary.Conditions(option.EnabledConditions, Under(at, EnabledConditionsKey));
-                _vocabulary.Actions(option.Actions, Under(at, ActionsKey));
+                _vocabulary.Conditions(option.VisibleConditions, Under(at, DialogueOptionEntry.VisibleConditionsKey));
+                _vocabulary.Conditions(option.EnabledConditions, Under(at, DialogueOptionEntry.EnabledConditionsKey));
+                _vocabulary.Actions(option.Actions, Under(at, DialogueOptionEntry.ActionsKey));
 
-                Route(option.Next, nodes, at, NextKey, required: false);
+                Route(option.Next, nodes, at, DialogueOptionEntry.NextKey, required: false);
 
                 if (option.SpeechCheck is not { } check) return;
 
-                string speech = Under(at, SpeechCheckKey);
+                string speech = Under(at, DialogueOptionEntry.SpeechCheckKey);
 
-                _vocabulary.Actions(check.FailActions, Under(speech, FailActionsKey));
-                Route(check.FailNext, nodes, speech, FailNextKey, required: false);
+                _vocabulary.Actions(check.FailActions, Under(speech, DialogueSpeechCheckEntry.FailActionsKey));
+                Route(check.FailNext, nodes, speech, DialogueSpeechCheckEntry.FailNextKey, required: false);
             }
 
             /// <summary>The nodes no opening rule and no option can arrive at. Written out of the same
@@ -337,10 +322,13 @@ namespace Core.Narrative.Validation
             private void Unreachable(DialogueEntry entry, string where, HashSet<string> nodes)
             {
                 Dictionary<string, DialogueNodeEntry> byId = new(StringComparer.Ordinal);
-                foreach (DialogueNodeEntry node in entry.Nodes) byId.TryAdd(node.Id, node);
+                foreach (DialogueNodeEntry node in entry.Nodes)
+                    if (node.Id is { Length: > 0 } id) byId.TryAdd(id, node);
 
                 HashSet<string> reached = new(StringComparer.Ordinal);
-                Queue<string> pending = new(entry.EntryRules.Select(rule => rule.Node).Where(nodes.Contains));
+                Queue<string> pending = new(entry.EntryRules
+                    .Select(rule => rule.Node)
+                    .Where(node => node is { Length: > 0 } && nodes.Contains(node)));
 
                 while (pending.Count > 0)
                 {
@@ -351,8 +339,8 @@ namespace Core.Narrative.Validation
                         pending.Enqueue(next);
                 }
 
-                foreach (DialogueNodeEntry node in entry.Nodes.Where(node => node.Id.Length > 0 && !reached.Contains(node.Id)))
-                    Add(NarrativeFindingKind.UnreachableNode, Under(Under(where, NodesKey), node.Id),
+                foreach (DialogueNodeEntry node in entry.Nodes.Where(node => node.Id is { Length: > 0 } && !reached.Contains(node.Id)))
+                    Add(NarrativeFindingKind.UnreachableNode, Under(Under(where, DialogueEntry.NodesKey), node.Id),
                         string.Format(UnreachableNodeFormat, node.Id));
             }
 
@@ -369,41 +357,63 @@ namespace Core.Narrative.Validation
 
             private void Quest(QuestEntry entry, int index)
             {
-                string where = entry.Id.Length > 0 ? Under(DataCatalog.Quests, entry.Id) : At(DataCatalog.Quests, index);
+                string where = entry.Id is { Length: > 0 } id ? Under(DataCatalog.Quests, id) : At(DataCatalog.Quests, index);
 
-                if (entry.Id.Length == 0) Add(NarrativeFindingKind.Incomplete, where, UnnamedQuestText);
-                else if (!input.LoadedQuests.Contains(entry.Id))
-                    Add(NarrativeFindingKind.Dropped, where, string.Format(DroppedQuestFormat, entry.Id));
+                if (entry.Id is not { Length: > 0 }) Add(NarrativeFindingKind.Incomplete, where, UnnamedQuestText);
+                else
+                {
+                    if (!_questIds.Add(entry.Id))
+                        Add(NarrativeFindingKind.DuplicateId, where, string.Format(DuplicateQuestFormat, entry.Id));
+
+                    if (!_input.LoadedQuests.Contains(entry.Id))
+                        Add(NarrativeFindingKind.Dropped, where, string.Format(DroppedQuestFormat, entry.Id));
+                }
 
                 Giver(entry, where);
+                Members(entry, where);
 
-                _vocabulary.Conditions(entry.AcceptConditions, Under(where, AcceptConditionsKey));
-                _vocabulary.Actions(entry.OnAccept, Under(where, OnAcceptKey));
-                _vocabulary.Actions(entry.OnDecline, Under(where, OnDeclineKey));
-                _vocabulary.Actions(entry.OnFail, Under(where, OnFailKey));
-                Rewards(entry.Rewards, Under(where, RewardsKey));
+                _vocabulary.Conditions(entry.AcceptConditions, Under(where, QuestEntry.AcceptConditionsKey));
+                _vocabulary.Actions(entry.OnAccept, Under(where, QuestEntry.OnAcceptKey));
+                _vocabulary.Actions(entry.OnDecline, Under(where, QuestEntry.OnDeclineKey));
+                _vocabulary.Actions(entry.OnFail, Under(where, QuestEntry.OnFailKey));
+                Rewards(entry.Rewards, Under(where, QuestEntry.RewardsKey));
 
                 if (entry.Stages.Count == 0) Add(NarrativeFindingKind.Incomplete, where, NoStagesText);
 
                 HashSet<string> stages = Stages(entry, where);
 
-                for (int stage = 0; stage < entry.Stages.Count; stage++) Stage(entry.Stages[stage], where, stage, stages);
+                for (int stage = 0; stage < entry.Stages.Count; stage++)
+                    Stage(entry.Stages[stage], where, stage, stages, entry.CanFail);
+
+                Cycles(entry, where);
+            }
+
+            /// <summary>The two words of a quest the game reads into an enum. A faction is optional and a
+            /// decline policy has a fallback, but a word written and misspelt is refused by the parser
+            /// rather than passed over, which takes the quest out of the game.</summary>
+            private void Members(QuestEntry entry, string where)
+            {
+                if (entry.Faction is not null)
+                    _vocabulary.Member(entry.Faction, s_factions, Under(where, QuestEntry.FactionKey), QuestEntry.FactionKey);
+
+                _vocabulary.Member(
+                    entry.DeclinePolicy, s_declinePolicies, Under(where, QuestEntry.DeclinePolicyKey), QuestEntry.DeclinePolicyKey);
             }
 
             /// <summary>Who the quest is taken from and handed in to. Both have to be somebody the player
             /// can talk to: a quest offered by an npc with no dialogue is one nobody can ever start.</summary>
             private void Giver(QuestEntry entry, string where)
             {
-                if (entry.GiverNpcId.Length == 0) Add(NarrativeFindingKind.Incomplete, where, NoGiverText);
-                else Speaker(entry.GiverNpcId, Under(where, GiverKey), GiverKey, TakenWord);
+                if (entry.GiverNpcId is not { Length: > 0 }) Add(NarrativeFindingKind.Incomplete, where, NoGiverText);
+                else Speaker(entry.GiverNpcId, Under(where, QuestEntry.GiverKey), QuestEntry.GiverKey, TakenWord);
 
                 for (int index = 0; index < entry.TurnInNpcIds.Count; index++)
                 {
-                    string at = At(Under(where, TurnInKey), index);
-                    string npc = entry.TurnInNpcIds[index];
+                    string at = At(Under(where, QuestEntry.TurnInKey), index);
+                    string? npc = entry.TurnInNpcIds[index];
 
-                    if (npc.Length == 0) Add(NarrativeFindingKind.Incomplete, at, string.Format(EmptyIdFormat, TurnInKey));
-                    else Speaker(npc, at, TurnInKey, HandedInWord);
+                    if (npc is not { Length: > 0 }) Add(NarrativeFindingKind.Incomplete, at, string.Format(EmptyIdFormat, QuestEntry.TurnInKey));
+                    else Speaker(npc, at, QuestEntry.TurnInKey, HandedInWord);
                 }
             }
 
@@ -422,29 +432,31 @@ namespace Core.Narrative.Validation
                 HashSet<string> stages = new(StringComparer.Ordinal);
                 HashSet<string> outcomes = new(StringComparer.Ordinal);
 
-                foreach (QuestStageEntry stage in entry.Stages)
+                for (int index = 0; index < entry.Stages.Count; index++)
                 {
-                    if (stage.Id.Length > 0 && !stages.Add(stage.Id))
-                        Add(NarrativeFindingKind.DuplicateId, Under(Under(where, StagesKey), stage.Id),
-                            string.Format(DuplicateStageFormat, stage.Id));
+                    QuestStageEntry stage = entry.Stages[index];
+                    string at = Named(where, QuestEntry.StagesKey, stage.Id, index);
 
-                    if (stage.Outcome is { Id.Length: > 0 } outcome && !outcomes.Add(outcome.Id))
-                        Add(NarrativeFindingKind.DuplicateId, Under(Under(Under(where, StagesKey), stage.Id), OutcomeKey),
-                            string.Format(DuplicateOutcomeFormat, outcome.Id));
+                    if (stage.Id is { Length: > 0 } id && !stages.Add(id))
+                        Add(NarrativeFindingKind.DuplicateId, at, string.Format(DuplicateStageFormat, id));
+
+                    if (stage.Outcome is { Id: { Length: > 0 } outcome } && !outcomes.Add(outcome))
+                        Add(NarrativeFindingKind.DuplicateId, Under(at, QuestStageEntry.OutcomeKey),
+                            string.Format(DuplicateOutcomeFormat, outcome));
                 }
 
                 return stages;
             }
 
-            private void Stage(QuestStageEntry stage, string where, int index, HashSet<string> stages)
+            private void Stage(QuestStageEntry stage, string where, int index, HashSet<string> stages, bool canFail)
             {
-                string at = Named(where, StagesKey, stage.Id, index);
+                string at = Named(where, QuestEntry.StagesKey, stage.Id, index);
 
-                if (stage.Id.Length == 0) Add(NarrativeFindingKind.Incomplete, at, UnnamedStageText);
+                if (stage.Id is not { Length: > 0 }) Add(NarrativeFindingKind.Incomplete, at, UnnamedStageText);
                 if (stage.Objectives.Count == 0) Add(NarrativeFindingKind.Incomplete, at, NoObjectivesText);
 
-                _vocabulary.Actions(stage.OnEnter, Under(at, OnEnterKey));
-                _vocabulary.Actions(stage.OnComplete, Under(at, OnCompleteKey));
+                _vocabulary.Actions(stage.OnEnter, Under(at, QuestStageEntry.OnEnterKey));
+                _vocabulary.Actions(stage.OnComplete, Under(at, QuestStageEntry.OnCompleteKey));
 
                 for (int objective = 0; objective < stage.Objectives.Count; objective++)
                     Objective(stage.Objectives[objective], at, objective);
@@ -452,51 +464,118 @@ namespace Core.Narrative.Validation
                 for (int transition = 0; transition < stage.Transitions.Count; transition++)
                     Transition(stage.Transitions[transition], at, transition, stages);
 
-                if (stage.Outcome is { } outcome) Outcome(outcome, Under(at, OutcomeKey));
+                if (stage.Outcome is { } outcome) Outcome(outcome, stage, at, canFail);
             }
 
             private void Objective(QuestObjectiveEntry objective, string where, int index)
             {
-                string at = Named(where, ObjectivesKey, objective.Id, index);
+                string at = Named(where, QuestStageEntry.ObjectivesKey, objective.Id, index);
 
                 bool condition = objective.Condition is not null;
-                bool counter = objective.Counter is { Key.Length: > 0 };
+                bool counter = objective.Counter is { Key: { Length: > 0 } };
 
                 if (condition == counter)
                     Add(NarrativeFindingKind.Incomplete, at, string.Format(ObjectiveShapeFormat, condition ? BothWord : NeitherWord));
 
-                _vocabulary.Condition(objective.Condition, Under(at, ConditionKey));
+                _vocabulary.Condition(objective.Condition, Under(at, QuestObjectiveEntry.ConditionKey));
             }
 
             private void Transition(QuestTransitionEntry transition, string where, int index, HashSet<string> stages)
             {
-                string at = At(Under(where, TransitionsKey), index);
+                string at = At(Under(where, QuestStageEntry.TransitionsKey), index);
 
-                _vocabulary.Conditions(transition.Conditions, Under(at, ConditionsKey));
+                _vocabulary.Conditions(transition.Conditions, Under(at, QuestTransitionEntry.ConditionsKey));
 
-                if (transition.To.Length == 0)
-                    Add(NarrativeFindingKind.Incomplete, at, string.Format(EmptyRouteFormat, ToKey, StageWord));
+                if (transition.To is not { Length: > 0 })
+                    Add(NarrativeFindingKind.Incomplete, at, string.Format(EmptyRouteFormat, QuestTransitionEntry.ToKey, StageWord));
                 else if (!stages.Contains(transition.To))
-                    Add(NarrativeFindingKind.DanglingStage, at, string.Format(DanglingStageFormat, ToKey, transition.To));
+                    Add(NarrativeFindingKind.DanglingStage, at, string.Format(DanglingStageFormat, QuestTransitionEntry.ToKey, transition.To));
             }
 
-            private void Outcome(QuestOutcomeEntry outcome, string where)
+            /// <summary>An ending of the quest, and the two ways of writing one the loader refuses the
+            /// whole quest over: an ending that also declares routes leads both nowhere and somewhere, and
+            /// one that buries a quest written unable to fail asks for a state that cannot be reached.</summary>
+            private void Outcome(QuestOutcomeEntry outcome, QuestStageEntry stage, string where, bool canFail)
             {
-                if (outcome.Id.Length == 0) Add(NarrativeFindingKind.Incomplete, where, UnnamedOutcomeText);
+                string at = Under(where, QuestStageEntry.OutcomeKey);
 
-                if (outcome.Rewards is { } rewards) Rewards(rewards, Under(where, RewardsKey));
+                if (outcome.Id is not { Length: > 0 }) Add(NarrativeFindingKind.Incomplete, at, UnnamedOutcomeText);
+
+                if (stage.Transitions.Count > 0)
+                    Add(NarrativeFindingKind.Incomplete, where,
+                        string.Format(OutcomeAndRoutesFormat, QuestStageEntry.OutcomeKey, QuestStageEntry.TransitionsKey));
+
+                if (outcome.Fails && !canFail)
+                    Add(NarrativeFindingKind.Incomplete, Under(at, QuestOutcomeEntry.FailsKey), FailingOutcomeText);
+
+                if (outcome.Rewards is { } rewards) Rewards(rewards, Under(at, QuestEntry.RewardsKey));
+            }
+
+            /// <summary>The stages whose routes lead back into themselves. Read off the same successors the
+            /// loader walks — a stage's own routes, or the next stage of the list where it declares none —
+            /// because a ring in them is what the loader refuses the whole quest over.</summary>
+            private void Cycles(QuestEntry entry, string where)
+            {
+                Dictionary<string, int> byId = new(StringComparer.Ordinal);
+                for (int index = 0; index < entry.Stages.Count; index++)
+                    if (entry.Stages[index].Id is { Length: > 0 } id) byId.TryAdd(id, index);
+
+                HashSet<string> said = new(StringComparer.Ordinal);
+
+                foreach (QuestStageEntry stage in entry.Stages)
+                {
+                    if (stage.Id is not { Length: > 0 } id || !said.Add(id)) continue;
+                    if (!Loops(entry, byId, id)) continue;
+
+                    Add(NarrativeFindingKind.LoopingStage, Under(Under(where, QuestEntry.StagesKey), id),
+                        string.Format(LoopingStageFormat, id));
+                }
+            }
+
+            /// <summary>Whether one stage is reachable from itself. Routes naming no stage of the quest are
+            /// walked past: they are dangling and already said so, and following them would be this rule
+            /// answering for another one's finding.</summary>
+            private static bool Loops(QuestEntry entry, Dictionary<string, int> byId, string from)
+            {
+                HashSet<string> seen = new(StringComparer.Ordinal);
+                Queue<string> pending = new(Successors(entry, byId[from]));
+
+                while (pending.Count > 0)
+                {
+                    string id = pending.Dequeue();
+                    if (string.Equals(id, from, StringComparison.Ordinal)) return true;
+                    if (!seen.Add(id) || !byId.TryGetValue(id, out int index)) continue;
+
+                    foreach (string next in Successors(entry, index)) pending.Enqueue(next);
+                }
+
+                return false;
+            }
+
+            /// <summary>Stages a finished stage can lead to: its own routes, or the next of the list when it
+            /// declares none. An ending leads nowhere.</summary>
+            private static IEnumerable<string> Successors(QuestEntry entry, int index)
+            {
+                QuestStageEntry stage = entry.Stages[index];
+
+                if (stage.Outcome is not null) return [];
+
+                if (stage.Transitions.Count > 0)
+                    return [.. stage.Transitions.Select(transition => transition.To).Where(to => to is { Length: > 0 })];
+
+                return index + 1 < entry.Stages.Count && entry.Stages[index + 1].Id is { Length: > 0 } next ? [next] : [];
             }
 
             private void Rewards(QuestRewardsEntry rewards, string where)
             {
-                _vocabulary.Actions(rewards.Actions, Under(where, ActionsKey));
+                _vocabulary.Actions(rewards.Actions, Under(where, QuestRewardsEntry.ActionsKey));
 
                 for (int index = 0; index < rewards.Items.Count; index++)
                 {
                     QuestRewardItemEntry item = rewards.Items[index];
-                    string at = At(Under(where, ItemsKey), index);
+                    string at = At(Under(where, QuestRewardsEntry.ItemsKey), index);
 
-                    if (item.ItemId.Length == 0) Add(NarrativeFindingKind.Incomplete, at, string.Format(EmptyIdFormat, ItemReference.Key));
+                    if (item.ItemId is not { Length: > 0 }) Add(NarrativeFindingKind.Incomplete, at, string.Format(EmptyIdFormat, ItemReference.Key));
                     else _vocabulary.Reference(item.ItemId, ItemReference.Targets, at, ItemReference.Key);
                 }
             }
@@ -505,16 +584,16 @@ namespace Core.Narrative.Validation
             /// and every other locale that has not got it is a translation owed.</summary>
             private void Text(string key, string where)
             {
-                if (input.Texts.Locales.Count == 0) return;
+                if (_input.Texts.Locales.Count == 0) return;
 
-                if (!input.Texts.Has(input.Texts.ReferenceLocale, key))
+                if (!_input.Texts.Has(_input.Texts.ReferenceLocale, key))
                 {
                     Add(NarrativeFindingKind.MissingText, where, string.Format(MissingTextFormat, key));
                     return;
                 }
 
-                foreach (string locale in input.Texts.Locales.Where(locale => !string.Equals(locale, input.Texts.ReferenceLocale, StringComparison.Ordinal)))
-                    if (!input.Texts.Has(locale, key))
+                foreach (string locale in _input.Texts.Locales.Where(locale => !string.Equals(locale, _input.Texts.ReferenceLocale, StringComparison.Ordinal)))
+                    if (!_input.Texts.Has(locale, key))
                         Add(NarrativeFindingKind.UntranslatedText, where, string.Format(UntranslatedFormat, key, locale));
             }
         }

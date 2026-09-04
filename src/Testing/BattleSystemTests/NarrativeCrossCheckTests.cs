@@ -284,5 +284,335 @@ namespace LastBreathTest.BattleSystemTests
             """
             { "quests": [ { "id": "Quest_Empty", "giverNpcId": "Npc_Empty", "stages": [] } ] }
             """;
+
+        /// <summary>A key written as null is a key the loader takes and the reader cannot: the rules read
+        /// the record's strings straight, and a run that dies on one leaves the author with a tool that
+        /// stopped rather than a line to fix.</summary>
+        [TestMethod]
+        public void ALineWrittenWithANullKey_IsSaidRatherThanThrown()
+        {
+            IReadOnlyList<NarrativeFinding> findings = Read(NullKeyDialogueJson, NoQuestsJson);
+
+            Assert.IsTrue(findings.Any(finding => finding.Kind == NarrativeFindingKind.Incomplete
+                                                  && finding.Message.Contains("'key'", StringComparison.Ordinal)),
+                Lines(findings));
+        }
+
+        /// <summary>Every word the game parses into a member of a named set, held to that set: the parsers
+        /// throw on anything else, which takes the whole record out of the game without naming the word.</summary>
+        [TestMethod]
+        public void AWordOutsideTheMembersOffered_IsFound()
+        {
+            IReadOnlyList<NarrativeFinding> findings = Read(BadMemberDialogueJson, BadMemberQuestJson);
+
+            string[] said =
+            [
+                .. findings.Where(finding => finding.Kind == NarrativeFindingKind.UnknownChoice).Select(finding => finding.Where)
+            ];
+
+            Assert.AreEqual(4, said.Length, Lines(findings));
+
+            foreach (string key in new[] { "speaker", "faction", "declinePolicy", "status" })
+                Assert.IsTrue(said.Any(where => where.EndsWith(key, StringComparison.Ordinal)),
+                    $"'{key}' was passed over:{Environment.NewLine}  {Lines(findings)}");
+        }
+
+        /// <summary>A list of conditions written as one object gates nothing: the parsers read no entry out
+        /// of it, so the clause the author believes he wrote is not there at all.</summary>
+        [TestMethod]
+        public void ConditionsWrittenAsAnObject_AreNotPassedOver()
+        {
+            IReadOnlyList<NarrativeFinding> findings = Read(ObjectConditionsDialogueJson, NoQuestsJson);
+
+            Assert.IsTrue(findings.Any(finding => finding.Kind == NarrativeFindingKind.UnknownEntry
+                                                  && finding.Message.Contains("rather than as an array", StringComparison.Ordinal)),
+                Lines(findings));
+        }
+
+        /// <summary>The word inside a composite is read by the same rule as the word outside it — a run
+        /// that walked only the top of an AnyOf would pass a clause no factory reads.</summary>
+        [TestMethod]
+        public void AConditionNestedInACompositeUnderAnUnknownWord_IsFound()
+        {
+            IReadOnlyList<NarrativeFinding> findings = Read(NoDialoguesJson, NestedConditionQuestJson);
+
+            Assert.IsTrue(findings.Any(finding => finding.Kind == NarrativeFindingKind.UnknownEntry
+                                                  && finding.Where.Contains("acceptConditions[0]/conditions[0]", StringComparison.Ordinal)),
+                Lines(findings));
+        }
+
+        /// <summary>Two records written under one id leave the loader holding one of them, and everything
+        /// the other says out of the game with nothing said about it.</summary>
+        [TestMethod]
+        public void TwoRecordsWrittenUnderOneId_AreFound()
+        {
+            IReadOnlyList<NarrativeFinding> findings = Read(TwinDialogueJson, TwinQuestJson);
+
+            string[] duplicates =
+            [
+                .. findings.Where(finding => finding.Kind == NarrativeFindingKind.DuplicateId).Select(finding => finding.Where)
+            ];
+
+            CollectionAssert.AreEquivalent(new[] { "Dialogues/Npc_Twin", "Quests/Quest_Twin" }, duplicates, Lines(findings));
+        }
+
+        /// <summary>The three shapes the quest loader refuses a whole quest over. Each of them used to
+        /// arrive as a bare drop, which says a quest is gone and not one word about why.</summary>
+        [TestMethod]
+        public void TheQuestShapesTheLoaderRefuses_AreFoundOneAtATime()
+        {
+            IReadOnlyList<NarrativeFinding> findings = Read(NoDialoguesJson, RefusedQuestJson);
+
+            Assert.IsTrue(findings.Any(finding => finding.Kind == NarrativeFindingKind.Incomplete
+                                                  && finding.Where == "Quests/Quest_Ending_With_Routes/stages/Only"
+                                                  && finding.Message.Contains("an ending leads nowhere", StringComparison.Ordinal)),
+                Lines(findings));
+
+            Assert.IsTrue(findings.Any(finding => finding.Kind == NarrativeFindingKind.Incomplete
+                                                  && finding.Where == "Quests/Quest_Unloseable/stages/Only/outcome/fails"),
+                Lines(findings));
+
+            string[] looping =
+            [
+                .. findings.Where(finding => finding.Kind == NarrativeFindingKind.LoopingStage).Select(finding => finding.Where)
+            ];
+
+            CollectionAssert.AreEquivalent(
+                new[] { "Quests/Quest_Ring/stages/First", "Quests/Quest_Ring/stages/Second" }, looping, Lines(findings));
+        }
+
+        /// <summary>One forged pair of documents run through the rules with every id and every key
+        /// answered: what is found is the documents' own doing and not the bench's.</summary>
+        private static IReadOnlyList<NarrativeFinding> Read(string dialogues, string quests)
+        {
+            var dialogue = Records<DialoguesData>(dialogues);
+            var quest = Records<QuestsData>(quests);
+
+            return NarrativeChecks.Run(new NarrativeCheckInput
+            {
+                Dialogues = dialogue.Dialogues,
+                Quests = quest.Quests,
+                LoadedDialogues = [.. dialogue.Dialogues.Select(entry => entry.NpcId)],
+                LoadedQuests = [.. quest.Quests.Select(entry => entry.Id)],
+                Ids = new NarrativeIdSource(_ => true, (_, _) => true),
+                Texts = new NarrativeTextSource(
+                    LocalizedTexts.ReferenceLocale, [LocalizedTexts.ReferenceLocale], (_, _) => true)
+            });
+        }
+
+        private static string Lines(IReadOnlyList<NarrativeFinding> findings) =>
+            string.Join($"{Environment.NewLine}  ", findings.Select(Line));
+
+        private const string NoDialoguesJson = """{ "dialogues": [] }""";
+
+        private const string NoQuestsJson = """{ "quests": [] }""";
+
+        private const string NullKeyDialogueJson =
+            """
+            {
+              "dialogues": [
+                {
+                  "npcId": "Npc_Forged",
+                  "entryRules": [ { "priority": 0, "node": "Greeting" } ],
+                  "nodes": [
+                    {
+                      "id": "Greeting",
+                      "lines": [ { "speaker": "Npc", "key": null } ],
+                      "options": [ { "id": "Leave", "key": "Dialogue_Forged_Leave" } ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        private const string BadMemberDialogueJson =
+            """
+            {
+              "dialogues": [
+                {
+                  "npcId": "Npc_Forged",
+                  "entryRules": [ { "priority": 0, "node": "Greeting" } ],
+                  "nodes": [
+                    {
+                      "id": "Greeting",
+                      "lines": [ { "speaker": "Shouter", "key": "Dialogue_Forged_Greeting" } ],
+                      "options": [ { "id": "Leave", "key": "Dialogue_Forged_Leave" } ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        private const string BadMemberQuestJson =
+            """
+            {
+              "quests": [
+                {
+                  "id": "Quest_Forged",
+                  "giverNpcId": "Npc_Forged",
+                  "faction": "Halfling",
+                  "declinePolicy": "Whenever",
+                  "acceptConditions": [ { "type": "QuestStatus", "questId": "Quest_Forged", "status": "Elsewhere" } ],
+                  "stages": [
+                    {
+                      "id": "Only",
+                      "objectives": [ { "id": "Talk", "counter": { "key": "Fact_Forged", "amount": 1 } } ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        private const string ObjectConditionsDialogueJson =
+            """
+            {
+              "dialogues": [
+                {
+                  "npcId": "Npc_Forged",
+                  "entryRules": [ { "priority": 0, "node": "Greeting" } ],
+                  "nodes": [
+                    {
+                      "id": "Greeting",
+                      "lines": [ { "speaker": "Npc", "key": "Dialogue_Forged_Greeting" } ],
+                      "options": [
+                        {
+                          "id": "Leave",
+                          "key": "Dialogue_Forged_Leave",
+                          "visibleConditions": { "type": "Fact", "key": "Fact_Forged" }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        private const string NestedConditionQuestJson =
+            """
+            {
+              "quests": [
+                {
+                  "id": "Quest_Forged",
+                  "giverNpcId": "Npc_Forged",
+                  "acceptConditions": [
+                    { "type": "AnyOf", "conditions": [ { "type": "NoSuchInnerCondition" } ] }
+                  ],
+                  "stages": [
+                    {
+                      "id": "Only",
+                      "objectives": [ { "id": "Talk", "counter": { "key": "Fact_Forged", "amount": 1 } } ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        private const string TwinDialogueJson =
+            """
+            {
+              "dialogues": [
+                {
+                  "npcId": "Npc_Twin",
+                  "entryRules": [ { "priority": 0, "node": "Greeting" } ],
+                  "nodes": [
+                    {
+                      "id": "Greeting",
+                      "lines": [],
+                      "options": [ { "id": "Leave", "key": "Dialogue_Twin_Leave" } ]
+                    }
+                  ]
+                },
+                {
+                  "npcId": "Npc_Twin",
+                  "entryRules": [ { "priority": 0, "node": "Greeting" } ],
+                  "nodes": [
+                    {
+                      "id": "Greeting",
+                      "lines": [],
+                      "options": [ { "id": "Leave", "key": "Dialogue_Twin_Leave" } ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        private const string TwinQuestJson =
+            """
+            {
+              "quests": [
+                {
+                  "id": "Quest_Twin",
+                  "giverNpcId": "Npc_Twin",
+                  "stages": [
+                    { "id": "Only", "objectives": [ { "id": "Talk", "counter": { "key": "Fact_Twin", "amount": 1 } } ] }
+                  ]
+                },
+                {
+                  "id": "Quest_Twin",
+                  "giverNpcId": "Npc_Twin",
+                  "stages": [
+                    { "id": "Only", "objectives": [ { "id": "Talk", "counter": { "key": "Fact_Twin", "amount": 1 } } ] }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        /// <summary>One quest per way of writing a stage graph the loader refuses: an ending that also
+        /// declares routes, an ending that buries a quest written unable to fail, and two stages routing
+        /// into each other.</summary>
+        private const string RefusedQuestJson =
+            """
+            {
+              "quests": [
+                {
+                  "id": "Quest_Ending_With_Routes",
+                  "giverNpcId": "Npc_Forged",
+                  "stages": [
+                    {
+                      "id": "Only",
+                      "objectives": [ { "id": "Talk", "counter": { "key": "Fact_Forged", "amount": 1 } } ],
+                      "transitions": [ { "to": "Only" } ],
+                      "outcome": { "id": "Done" }
+                    }
+                  ]
+                },
+                {
+                  "id": "Quest_Unloseable",
+                  "giverNpcId": "Npc_Forged",
+                  "canFail": false,
+                  "stages": [
+                    {
+                      "id": "Only",
+                      "objectives": [ { "id": "Talk", "counter": { "key": "Fact_Forged", "amount": 1 } } ],
+                      "outcome": { "id": "Lost", "fails": true }
+                    }
+                  ]
+                },
+                {
+                  "id": "Quest_Ring",
+                  "giverNpcId": "Npc_Forged",
+                  "stages": [
+                    {
+                      "id": "First",
+                      "objectives": [ { "id": "Talk", "counter": { "key": "Fact_Forged", "amount": 1 } } ],
+                      "transitions": [ { "to": "Second" } ]
+                    },
+                    {
+                      "id": "Second",
+                      "objectives": [ { "id": "Talk", "counter": { "key": "Fact_Forged", "amount": 1 } } ],
+                      "transitions": [ { "to": "First" } ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
     }
 }

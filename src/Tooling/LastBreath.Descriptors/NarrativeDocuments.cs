@@ -32,7 +32,9 @@ namespace LastBreath.Descriptors
             if (view is not null)
                 return [.. view.Files.Select(file => new GameDataFile(file.Name, file.Document.Root.ToString(Formatting.None)))];
 
-            notes.Add(Text(NoCatalogFormat, catalog));
+            // Said once however many readers ask for the same catalog: the fact is about the run, and a
+            // second reading of one folder is not a second thing missing.
+            Said(notes, Text(NoCatalogFormat, catalog));
             return [];
         }
 
@@ -60,17 +62,28 @@ namespace LastBreath.Descriptors
         }
 
         /// <summary>One document read, or one note saying why it was not. The providers already drop a
-        /// broken record on their own; this catches the file that is not the shape they expect at all.</summary>
+        /// broken record on their own; this catches the file that is not the shape they expect at all —
+        /// including the key written as null, which reaches a loader as a reference that is not there.</summary>
         private static void Guarded(string name, Action read, ICollection<string> notes)
         {
             try
             {
                 read();
             }
-            catch (Exception failure) when (failure is IOException or JsonException or InvalidOperationException or ArgumentException)
+            catch (Exception failure) when (failure is IOException or JsonException or InvalidOperationException
+                                               or ArgumentException or NullReferenceException)
             {
                 notes.Add(Text(ReadFailedFormat, name, failure.Message));
             }
+        }
+
+        /// <summary>Adds a note the run has not already made. A tool reads one catalog for several
+        /// questions, and the same missing folder said once per question is noise about the run.</summary>
+        private static void Said(ICollection<string> notes, string note)
+        {
+            if (notes.Contains(note)) return;
+
+            notes.Add(note);
         }
     }
 }

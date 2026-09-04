@@ -1,5 +1,12 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из чистки бэклога нарратива, волна B (2026-09-04; accept with minors) — закрыты пункты раздела «перекрёстные проверки #249» (NRE на null-ключе, `Choice`/`[EnumOf]`/не-массив, `Notes` vs `Caveats`, подписки `ChecksPanel`, `DuplicateId` записей каталога, константы json-имён в DTO, три ронятельные причины квеста, дока `Nodes()`, нит-пакет) и «сухого прогона» (`SeededQuestNote` условно); открытыми остались: общая ветка `catch` в `DialogueDryRun.Guarded` (непокрываема — все пути бросания перекрыты), шум `UnreachableNode` у диалога без `entryRules`, секционная цель в `ChecksPanel.Record()`
+
+- (minor) `INarrativeTextSource.cs:19-22` — новая дока `Has` говорит «игра падает на референсную локаль», CLAUDE.md:164 — «`msgstr ""` → показывается ключ». Стало: вернуть прежнюю причину либо поправить CLAUDE.md, если фолбэк реально настроен.
+- (minor) `NarrativeFinding.cs:14, :33-34` — доки `UnknownEntry` (теперь и «не массив») и `Incomplete` (теперь и два противоречия формы квеста) не догнали применения.
+- (minor) `NarrativeDocuments.cs:64-66, 73-74` — ловля `NullReferenceException` в `Guarded` глушит программную ошибку с бесполезным текстом; живой источник теперь один: `{"dialogues": null}` → NRE в `DialogueProvider.Apply:31` (и `QuestProvider.Apply:32`). Стало: гуард на null-список в `Apply`, NRE из фильтра убрать.
+- (nit) `QuestsData.cs:44` `DefaultDeclinePolicy = "CanReturn"` → `nameof(DeclinePolicy.CanReturn)`; `:182` `= 1` при существующем `ItemReference.DefaultAmount`; порядок `internal`/`private` в `NarrativeVocabularyWalk`; двойная проверка `NpcId` + `else` вместо инверсии в `NarrativeChecks:192-197`; `DuplicateNodeFormat` не называет последствие; `said` в `Cycles` — «рассмотренные», не «названные», кольцо из N стадий даёт N находок; заголовок `Report(...)` в `NarrativeCrossCheckTests:82` не догнал разделение `Caveats`; `DialogueDryRunTests:79,81` — кусок текста заметки от руки.
+
 ## Из гейта переименования id, карточка #253 (2026-09-04; accept with minors)
 
 - (minor) `CatalogEditingTests.cs:750-806` — тесты не воспроизводят производственную форму: хост зовёт `CatalogView.Reread()` на каждое нажатие, панель держит старый инстанс записи; реализация `Itself` через `ReferenceEquals` прошла бы зелёной, а в инструменте отказывала бы записи в её же имени. Стало: в `RenameRefusal_TakesTheRecordsOwnNameWhateverItsCase` дёрнуть `view.Reread()` после `Put`.

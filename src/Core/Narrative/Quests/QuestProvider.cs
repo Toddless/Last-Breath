@@ -45,7 +45,7 @@ namespace Core.Narrative.Quests
 
         private QuestDefinition? ParseQuest(QuestEntry entry)
         {
-            if (entry.Id.Length == 0 || entry.Stages.Count == 0)
+            if (entry.Id is not { Length: > 0 } || entry.Stages.Count == 0)
             {
                 Tracker.TrackError($"Quest '{entry.Id}' is broken: id and at least one stage are required");
                 return null;

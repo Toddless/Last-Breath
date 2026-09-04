@@ -20,11 +20,17 @@ namespace Core.Narrative.Validation
 
         private const string NotAnObjectFormat = "a {0} is written as {1} rather than as an object";
 
+        private const string NotAnArrayFormat = "the {0}s are written as {1} rather than as an array, so none of them is read";
+
         private const string RequiredFormat = "'{0}' is required by the '{1}' {2} and is not written";
 
         private const string EmptyFormat = "'{0}' of the '{1}' {2} is written empty, where a record id is meant";
 
         private const string UnknownFormat = "'{0}' names '{1}', which is in none of {2}";
+
+        private const string ChoiceFormat = "'{0}' is written '{1}', which is none of {2}";
+
+        private const string NoChoiceFormat = "'{0}' is written empty, where one of {1} is meant";
 
         private const string UndescribedFormat = "the {0} is not among the catalogs this run read, so every id pointing into it is unanswered";
 
@@ -32,14 +38,17 @@ namespace Core.Narrative.Validation
 
         private const string ActionWord = "action";
 
-        private const string TargetSeparator = ", ";
+        /// <summary>How the members of a set — the targets a reference may point into, the words a choice
+        /// offers — are listed for a reader.</summary>
+        private const string ListSeparator = ", ";
 
         /// <summary>How the place of one entry inside a list is written.</summary>
         private const string IndexFormat = "{0}[{1}]";
 
+        /// <summary>How one step of a place is written under the one before it. A key under a record and a
+        /// section under a catalog are the same step, and one word for both is what keeps a place written
+        /// one way wherever it is made.</summary>
         private const string KeyFormat = "{0}/{1}";
-
-        private const string SectionFormat = "{0}/{1}";
 
         private static readonly IReadOnlyDictionary<string, NarrativeRecordSpec> s_conditions =
             NarrativeVocabulary.Conditions.ToDictionary(record => record.TypeName, StringComparer.Ordinal);
@@ -98,16 +107,55 @@ namespace Core.Narrative.Validation
                 NarrativeFindingKind.UnknownReference, where, string.Format(UnknownFormat, named, id, Named(targets))));
         }
 
+        /// <summary>The word a token is written as: a value reads as itself, and anything else as the shape
+        /// it was written in — the parser reads no member out of either, and naming the shape is what tells
+        /// a typo apart from a key written as a whole object.</summary>
+        private static string Word(JToken value) => value is JValue { Value: { } raw } ? raw.ToString() ?? string.Empty : value.Type.ToString();
+
+        /// <summary>One word written where a member of a named set is meant — a vocabulary parameter
+        /// offering choices, a record field the game parses into an enum. Both are read strictly: a word
+        /// that is none of them throws in the parser and takes the whole record out of the game, so it is
+        /// named here rather than left to a bare drop.</summary>
+        internal void Member(string? value, IReadOnlyList<string> members, string where, string named)
+        {
+            if (members.Count == 0) return;
+
+            if (value is not { Length: > 0 })
+            {
+                _findings.Add(new NarrativeFinding(
+                    NarrativeFindingKind.UnknownChoice, where, string.Format(NoChoiceFormat, named, Listed(members))));
+                return;
+            }
+
+            if (members.Contains(value, StringComparer.Ordinal)) return;
+
+            _findings.Add(new NarrativeFinding(
+                NarrativeFindingKind.UnknownChoice, where, string.Format(ChoiceFormat, named, value, Listed(members))));
+        }
+
+        /// <summary>The members of a set, as one reader-facing phrase.</summary>
+        private static string Listed(IReadOnlyList<string> members) => string.Join(ListSeparator, members);
+
         /// <summary>Where a set of targets points, as one reader-facing phrase.</summary>
         private static string Named(IReadOnlyList<NarrativeReferenceTarget> targets) =>
-            string.Join(TargetSeparator, targets.Select(Named));
+            Listed([.. targets.Select(Named)]);
 
         private static string Named(NarrativeReferenceTarget target) =>
-            target.Section is { } section ? string.Format(SectionFormat, target.Catalog, section) : target.Catalog;
+            target.Section is { } section ? Under(target.Catalog, section) : target.Catalog;
 
+        /// <summary>Every entry of a list. A key written as anything but a list is said out loud: the
+        /// parsers read nothing out of it, so a condition written as a bare object gates nothing and a
+        /// silent walk would leave the author reading a clause the game never asks.</summary>
         private void List(JToken? array, string where, IReadOnlyDictionary<string, NarrativeRecordSpec> vocabulary, string word)
         {
-            if (array is not JArray entries) return;
+            if (array is null or { Type: JTokenType.Null }) return;
+
+            if (array is not JArray entries)
+            {
+                _findings.Add(new NarrativeFinding(
+                    NarrativeFindingKind.UnknownEntry, where, string.Format(NotAnArrayFormat, word, array.Type)));
+                return;
+            }
 
             for (int index = 0; index < entries.Count; index++)
                 Entry(entries[index], At(where, index), vocabulary, word);
@@ -171,6 +219,9 @@ namespace Core.Narrative.Validation
                     break;
                 case NarrativeParameterKind.NestedConditions:
                     List(value, at, s_conditions, ConditionWord);
+                    break;
+                case NarrativeParameterKind.Choice:
+                    Member(Word(value), parameter.Choices, at, parameter.JsonName);
                     break;
                 default:
                     break;

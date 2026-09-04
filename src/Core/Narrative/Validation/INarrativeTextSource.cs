@@ -16,9 +16,10 @@ namespace Core.Narrative.Validation
         /// wording at all, which the checks say once rather than pass over.</summary>
         IReadOnlyList<string> Locales { get; }
 
-        /// <summary>Whether the locale writes anything under the key. A key written with no text is still
-        /// a key: an untranslated entry shows the key in the game, and that is a translation owed rather
-        /// than a line missing.</summary>
+        /// <summary>Whether the locale HOLDS the key at all, which is not the same question as whether it
+        /// says anything under it. A key laid down with an empty translation counts as held and is passed
+        /// over: the game falls back to the reference locale for it, so it is text owed to a translator and
+        /// not a line the checks can tell from one already written.</summary>
         bool Has(string locale, string key);
     }
 

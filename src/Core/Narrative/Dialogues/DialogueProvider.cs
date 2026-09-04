@@ -39,7 +39,7 @@ namespace Core.Narrative.Dialogues
 
         private DialogueDefinition? ParseDialogue(DialogueEntry entry)
         {
-            if (entry.NpcId.Length == 0 || entry.Nodes.Count == 0 || entry.EntryRules.Count == 0)
+            if (entry.NpcId is not { Length: > 0 } || entry.Nodes.Count == 0 || entry.EntryRules.Count == 0)
             {
                 Tracker.TrackError($"Dialogue '{entry.NpcId}' is broken: npcId, nodes and entryRules are required");
                 return null;

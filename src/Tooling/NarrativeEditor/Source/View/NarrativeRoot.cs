@@ -148,6 +148,7 @@ namespace NarrativeEditor.Source.View
 
             _inspector.References = references;
             _checks.References = references;
+            _checks.History = History;
             _checks.Workspace = _workspace;
 
             // The conditions and the actions: the schema can only call them free json, and this is what

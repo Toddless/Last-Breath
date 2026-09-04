@@ -13,7 +13,9 @@ namespace Core.Narrative.Validation
         /// <summary>A record, a node or a stage is missing a part the game requires of it.</summary>
         Incomplete,
 
-        /// <summary>Two nodes, stages or endings of one record answer to the same name.</summary>
+        /// <summary>Two records of a catalog, or two nodes, stages or endings of one record, answer to the
+        /// same name. The loader keeps one of them and everything written under the other is out of the
+        /// game without a word.</summary>
         DuplicateId,
 
         /// <summary>A route out of a dialogue leads to a node nobody wrote.</summary>
@@ -36,6 +38,15 @@ namespace Core.Narrative.Validation
 
         /// <summary>An id is written where a record is meant, and no catalog it may point into holds one.</summary>
         UnknownReference,
+
+        /// <summary>A word is written where one of a named set of members is meant, and it is none of
+        /// them. Its own kind and not an unknown entry: the entry is one the vocabulary reads, and the
+        /// author picked a member that does not exist rather than a factory that does not.</summary>
+        UnknownChoice,
+
+        /// <summary>A stage of a quest is reachable from itself: the routes close a ring and the quest
+        /// would never end.</summary>
+        LoopingStage,
 
         /// <summary>A catalog a reference points into is one this run cannot read at all. A fact about the
         /// run and not about the data: every id pointing there is left unanswered rather than called broken.</summary>
