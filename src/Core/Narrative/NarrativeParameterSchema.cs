@@ -18,6 +18,9 @@ namespace Core.Narrative
 
         private const string NestedConditionNote = "A narrative condition entry; its own \"type\" names the factory that reads it.";
 
+        private const string FactKeyNote =
+            "A key of the world's facts. The facts registry lists every key the code and the data write, and who reads each one back.";
+
         public static NarrativeRecordSpec Of(string type, params NarrativeParameterSpec[] parameters) =>
             new() { TypeName = type, Parameters = parameters };
 
@@ -47,6 +50,21 @@ namespace Core.Narrative
         /// nowhere reads as a decision.</summary>
         public static NarrativeParameterSpec FreeText(string jsonName, bool required) =>
             new() { JsonName = jsonName, Kind = NarrativeParameterKind.Text, Required = required, RefusedAsReference = true };
+
+        /// <summary>A key of the world's facts: free-form text pointing into no catalog, and the one thing
+        /// the narrative writes that another entry — or the game's own code — reads back under the very
+        /// same word. Marked rather than left as plain text so that a registry can say who writes each key
+        /// and who reads it, and so that an author is offered the keys that already exist.</summary>
+        public static NarrativeParameterSpec FactKey(string jsonName, bool written) =>
+            new()
+            {
+                JsonName = jsonName,
+                Kind = NarrativeParameterKind.Text,
+                Required = true,
+                RefusedAsReference = true,
+                Role = written ? NarrativeParameterRole.FactWritten : NarrativeParameterRole.FactRead,
+                Documentation = FactKeyNote
+            };
 
         /// <summary>A number the parser reads with a fallback, which is what makes writing it optional.</summary>
         public static NarrativeParameterSpec Integer(string jsonName, int fallback) =>

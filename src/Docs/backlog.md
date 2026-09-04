@@ -1,5 +1,15 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из реестра ключей фактов, карточка #248 (2026-09-04; accept with minors)
+
+Владельцу по данным: `Kill_Count_Faction:<faction>` и `Npc_Talked:<npcId>` пишутся кодом, но никто не читает (пины `FactNeverRead`); в поставляемых данных нет ни одного `SetFact` — все ключи пишет код.
+
+- (minor) `Place.cs:19` + `ChecksPanel.cs:151` — строка находки `facts/<ключ>` в панели Checks кликабельна (разбор даёт («facts», ключ)), клик уходит в `OpenRecord` и молчит; дока `Place.Record` обещает обратное. Стало: отвергать шаг `facts` (константа рядом с `NarrativeChecks.FactsWhere`).
+- (minor) `FactKeyRegistryTests.cs:35` — grep-тест обходит только `Core`/`Main`, а `Battle/Source/NpcReactionsDriver.cs:127` читает факты. Стало: добавить `Battle` (и `Crafting`).
+- (nit) grep-тест построчный (не поймает вызов через локальную с другим именем — lint, не инвариант); `FactKeyRegistry.cs:44` окольный `IndexOf`, ветка «семья из одного» недостижима; предикат `Counter is { Key: { Length: > 0 } }` дважды в `NarrativeChecks:528,537`; порядок членов `FactKeyRegistry.cs:207`.
+- (знать) семья отвечает за всех членов — опечатка в хвосте ключа (`Old_Battlefeild`) числится и написанной, и прочитанной; читатели вне Core (`LocationMarker`, `NpcReactionsDriver`, `BossSpawnPoint`) — голые строки, переименование сделает реестр молча лживым.
+- (знать) пикер ключа у `SetFact`/`Fact` в инспекторе не подключён: у `FieldSchema` нет слота подсказок для строкового поля — нужна правка `Tooling.Core` (`FieldSchema.Suggestions`?) + `InspectorPanel`; пока — вкладка facts с фильтром и `Documentation` у поля.
+
 ## Из чистки бэклога по описателям + PlayerStats и нарезки нарратива на файлы (2026-09-04; accept with minors) — закрыты: двойник Recovery, константы CombatRules, `Keys`/`Under`, `Words`→`ValuesAt`, слияние standing/settings тестов, пин `reordered` LootTables, доки, «Single = один json», DTO NpcSpawnRolls в `Core/Data`, аудит `Traders`, дока гранта NpcBuffs, `PerksField`, пропуск `Modifier`, PlayerStats описан; нарезка (решение 25): один файл на диалог/квест
 
 - (владельцу, данные) **`Trader_Ronald` без ключа .po** — `ReportMissingKeys` теперь постоянно Inconclusive из-за этой дыры; одна строка `msgid "Trader_Ronald"` в `en.po` (+ пустая в `ru.po`) вернёт аудиту различие «полно/не полно». Окно торговли Роналда показывает сырой id.

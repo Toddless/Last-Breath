@@ -33,6 +33,8 @@ namespace NarrativeEditor.Source.View
 
         private const string ChecksTabName = "checks";
 
+        private const string FactsTabName = "facts";
+
         private const string SectionRowFormat = "{0}   ({1})";
         private const string RecordRowFormat = "{0}{1}";
         private const string ReadoutFormat = "{0}   —   {1} record(s), {2} file(s), {3} note(s)";
@@ -51,6 +53,7 @@ namespace NarrativeEditor.Source.View
         private InspectorPanel _inspector = null!;
         private DryRunPanel _dryRun = null!;
         private ChecksPanel _checks = null!;
+        private FactsPanel _facts = null!;
 
         private CatalogWorkspace? _workspace;
 
@@ -87,6 +90,7 @@ namespace NarrativeEditor.Source.View
             _inspector = new InspectorPanel { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             _dryRun = new DryRunPanel();
             _checks = new ChecksPanel { Name = ChecksTabName };
+            _facts = new FactsPanel { Name = FactsTabName };
 
             // Two divides rather than one container holding all three panes: nested, each divider
             // starts at the minimum width of the pane before it and moves without touching the other.
@@ -101,9 +105,10 @@ namespace NarrativeEditor.Source.View
                 SizeFlagsVertical = SizeFlags.ExpandFill
             };
 
-            // Two readings of one record, side by side under the same divide: walking the conversation,
-            // and holding it against everything outside it. Tabs and not a third pane — an author does
-            // one or the other, and both at once would leave neither enough of the window to be read in.
+            // Three readings of the narrative under the same divide: walking the conversation, holding it
+            // against everything outside it, and the facts it keeps for itself. Tabs and not panes of
+            // their own — an author does one at a time, and all at once would leave none of them enough
+            // of the window to be read in.
             var read = new TabContainer
             {
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
@@ -121,6 +126,7 @@ namespace NarrativeEditor.Source.View
             edited.AddChild(read);
             read.AddChild(walked);
             read.AddChild(_checks);
+            read.AddChild(_facts);
 
             _recordList.ItemSelected += index => ShowRecord((int)index);
             tree.ItemSelected += ShowElement;
@@ -128,6 +134,8 @@ namespace NarrativeEditor.Source.View
             _dryRun.Said += Report;
             _checks.Said += Report;
             _checks.Chose += OpenRecord;
+            _facts.Said += Report;
+            _facts.Chose += OpenRecord;
 
             return body;
         }
@@ -150,6 +158,10 @@ namespace NarrativeEditor.Source.View
             _checks.References = references;
             _checks.History = History;
             _checks.Workspace = _workspace;
+
+            _facts.References = references;
+            _facts.History = History;
+            _facts.Workspace = _workspace;
 
             // The conditions and the actions: the schema can only call them free json, and this is what
             // tells the inspector which key is written from which of the two vocabularies.
@@ -188,6 +200,7 @@ namespace NarrativeEditor.Source.View
                 _outline.Texts = texts;
                 _dryRun.Texts = texts;
                 _checks.Texts = texts;
+                _facts.Texts = texts;
             }
             catch (Exception failure) when (failure is IOException or UnauthorizedAccessException
                                                or FormatException or ArgumentException)

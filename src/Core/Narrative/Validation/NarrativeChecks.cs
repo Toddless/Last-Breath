@@ -8,7 +8,13 @@ namespace Core.Narrative.Validation
     using Data.QuestData;
     using Dialogues;
     using Enums;
+    using Facts;
     using Quests;
+
+    /// <summary>What one run of the rules read: what it found, and the fact keys it met on the way. Both
+    /// come out of the one walk — a second pass over the same documents for the keys alone would be a
+    /// second answer to what a dialogue currently writes.</summary>
+    public sealed record NarrativeReading(IReadOnlyList<NarrativeFinding> Findings, FactKeyRegistry Facts);
 
     /// <summary>
     /// Everything one narrative catalog can only be held to against the others: the ids it names, the
@@ -112,6 +118,14 @@ namespace Core.Narrative.Validation
 
         private const string MissingTextFormat = "'{0}' is in no locale this run read";
 
+        /// <summary>Where the run says what it found about the facts themselves, which belong to no one
+        /// record: the key is the second step, the way a record's id is under its catalog.</summary>
+        private const string FactsWhere = "facts";
+
+        private const string NeverWrittenFormat = "'{0}' is asked about and nothing ever writes it, so the clause gated on it can never be met";
+
+        private const string NeverReadFormat = "'{0}' is written and nothing ever reads it back";
+
         private const string UntranslatedFormat = "'{0}' is missing from the '{1}' locale";
 
         /// <summary>Everywhere an npc is named by the narrative: the whole of the one catalog holding them.</summary>
@@ -128,11 +142,16 @@ namespace Core.Narrative.Validation
         /// <summary>Runs every rule over one reading of the narrative, in the order the records are
         /// written. The findings come back as they were made — sorting them is the reader's business, and
         /// a run whose order changes with the phase of the moon cannot be pinned.</summary>
-        public static IReadOnlyList<NarrativeFinding> Run(NarrativeCheckInput input)
+        public static IReadOnlyList<NarrativeFinding> Run(NarrativeCheckInput input) => Read(input).Findings;
+
+        /// <summary>One run of the rules, with the fact keys the walk met handed back beside what it
+        /// found: whoever wants the map of who writes and who reads asks for the reading rather than
+        /// walking the documents a second time.</summary>
+        public static NarrativeReading Read(NarrativeCheckInput input)
         {
             ArgumentNullException.ThrowIfNull(input);
 
-            return new Pass(input).Walk();
+            return new Pass(input).Read();
         }
 
         /// <summary>One run of the rules. A class rather than a pile of arguments: every rule writes into
@@ -141,6 +160,11 @@ namespace Core.Narrative.Validation
         {
             private readonly List<NarrativeFinding> _findings = [];
             private readonly HashSet<NarrativeReferenceTarget> _undescribed = [];
+
+            /// <summary>Every fact key the walk met, with the place that wrote or read it. Gathered as the
+            /// records are walked and answered for at the end: whether a key is ever written is a question
+            /// about the whole narrative, and no single record can answer it.</summary>
+            private readonly List<FactKeyUse> _facts = [];
 
             /// <summary>The ids each catalog has already written a record under. Two records sharing one
             /// leaves the loader keeping one of them, and everything written under the other silently
@@ -163,18 +187,36 @@ namespace Core.Narrative.Validation
             internal Pass(NarrativeCheckInput input)
             {
                 _input = input;
-                _vocabulary = new NarrativeVocabularyWalk(input.Ids, _findings, _undescribed);
+                _vocabulary = new NarrativeVocabularyWalk(input.Ids, _findings, _undescribed, _facts);
                 _speaking = [.. input.Dialogues.Select(dialogue => dialogue.NpcId).Where(npcId => npcId is { Length: > 0 })];
             }
 
-            internal IReadOnlyList<NarrativeFinding> Walk()
+            /// <summary>Every record walked, and then the one question no record can answer on its own:
+            /// which of the keys met is written by nobody and which is read by nobody.</summary>
+            internal NarrativeReading Read()
             {
                 if (_input.Texts.Locales.Count == 0) Add(NarrativeFindingKind.Incomplete, TextsWhere, NoLocalesText);
 
                 for (int index = 0; index < _input.Dialogues.Count; index++) Dialogue(_input.Dialogues[index], index);
                 for (int index = 0; index < _input.Quests.Count; index++) Quest(_input.Quests[index], index);
 
-                return _findings;
+                FactKeyRegistry facts = FactKeyRegistry.Over(_facts);
+                Facts(facts);
+
+                return new NarrativeReading(_findings, facts);
+            }
+
+            /// <summary>The two ends a fact key can be loose at. Said of the registry rather than of the
+            /// places: one key read in five quests and written nowhere is one thing wrong, not five.</summary>
+            private void Facts(FactKeyRegistry facts)
+            {
+                foreach (FactKeyEntry key in facts.Keys)
+                {
+                    if (key.NeverWritten)
+                        Add(NarrativeFindingKind.FactNeverWritten, Under(FactsWhere, key.Key), string.Format(NeverWrittenFormat, key.Key));
+                    else if (key.NeverRead)
+                        Add(NarrativeFindingKind.FactNeverRead, Under(FactsWhere, key.Key), string.Format(NeverReadFormat, key.Key));
+                }
             }
 
             private static string At(string where, int index) => NarrativeVocabularyWalk.At(where, index);
@@ -489,6 +531,14 @@ namespace Core.Narrative.Validation
                     Add(NarrativeFindingKind.Incomplete, at, string.Format(ObjectiveShapeFormat, condition ? BothWord : NeitherWord));
 
                 _vocabulary.Condition(objective.Condition, Under(at, QuestObjectiveEntry.ConditionKey));
+
+                // The one fact key of the narrative written outside the vocabulary: a counter is a field of
+                // the record, so the walk over the conditions and the actions never sees it.
+                if (objective.Counter is { Key: { Length: > 0 } key })
+                    _facts.Add(new FactKeyUse(
+                        key,
+                        FactKeyUseKind.Read,
+                        Under(Under(at, QuestObjectiveEntry.CounterKey), QuestCounterEntry.KeyKey)));
             }
 
             private void Transition(QuestTransitionEntry transition, string where, int index, HashSet<string> stages)

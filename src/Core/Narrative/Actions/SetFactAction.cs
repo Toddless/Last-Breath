@@ -21,7 +21,7 @@ namespace Core.Narrative.Actions
         private const int DefaultCount = 1;
 
         public static readonly NarrativeRecordSpec Spec = NarrativeParameterSchema.Of(TypeName,
-            NarrativeParameterSchema.Text(FactKey, required: true),
+            NarrativeParameterSchema.FactKey(FactKey, written: true),
             NarrativeParameterSchema.Integer(CountKey, DefaultCount));
 
         public string Type => TypeName;

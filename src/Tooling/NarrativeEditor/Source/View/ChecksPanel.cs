@@ -8,7 +8,6 @@ namespace NarrativeEditor.Source.View
     using LastBreath.Descriptors;
     using Tooling.Catalogs;
     using Tooling.Editing.History;
-    using Tooling.Json;
     using Tooling.Localization;
     using static Tooling.Text.Format;
 
@@ -44,24 +43,13 @@ namespace NarrativeEditor.Source.View
 
         private const string RefusedFormat = "the checks could not be run over the documents as they stand: {0}";
 
-        /// <summary>What separates the steps of the place a finding is in. The first two of them name the
-        /// catalog and the record, which is as far as a list of records can be opened to.</summary>
-        private const char PlaceSeparator = '/';
-
-        /// <summary>What the place of a record with no id of its own starts the step with. Such a row can
-        /// only be read, not opened: the list on the left names records by their ids.</summary>
-        private const char PlaceIndex = '[';
-
-        private const int RecordSteps = 2;
-
         /// <summary>How tall the list asks to be before the divider above it is dragged.</summary>
         private const int PaneHeight = 240;
 
         private readonly List<Row> _rows = [];
 
-        private readonly List<JsonTreeDocument> _watched = [];
-
-        private readonly List<CatalogView> _catalogs = [];
+        /// <summary>Everything the rows stop answering for the moment it is typed into.</summary>
+        private readonly DocumentWatch _watch = new();
 
         /// <summary>How many rows of the list are findings rather than notes about the run itself.</summary>
         private int _findings;
@@ -78,14 +66,8 @@ namespace NarrativeEditor.Source.View
         /// narrative alone: an id is only answered against a catalog somebody opened.</summary>
         public CatalogWorkspace? Workspace
         {
-            get;
-            set
-            {
-                Unwatch();
-                field = value;
-                Watch();
-                Invalidate();
-            }
+            get => _watch.Workspace;
+            set => _watch.Workspace = value;
         }
 
         /// <summary>The stack the tool files every step on. Watched because the .po files are edited onto
@@ -95,13 +77,8 @@ namespace NarrativeEditor.Source.View
         /// and one redraw of a summary line costs nothing.</remarks>
         public EditHistory? History
         {
-            get;
-            set
-            {
-                if (field is { } watched) watched.Changed -= Stepped;
-                field = value;
-                if (field is { } history) history.Changed += Stepped;
-            }
+            get => _watch.History;
+            set => _watch.History = value;
         }
 
         /// <summary>The ids of the run, as the shell already reads them for the inspector's pickers.</summary>
@@ -118,6 +95,8 @@ namespace NarrativeEditor.Source.View
 
         public override void _Ready()
         {
+            _watch.Changed += Invalidate;
+
             SizeFlagsHorizontal = SizeFlags.ExpandFill;
             SizeFlagsVertical = SizeFlags.ExpandFill;
 
@@ -146,11 +125,7 @@ namespace NarrativeEditor.Source.View
             Redraw();
         }
 
-        public override void _ExitTree()
-        {
-            Unwatch();
-            History = null;
-        }
+        public override void _ExitTree() => _watch.Stop();
 
         /// <summary>Reads the whole narrative through the game's own rules and lists what it found.</summary>
         /// <remarks>A run that throws is said in the status line and nothing else: the documents are being
@@ -173,7 +148,7 @@ namespace NarrativeEditor.Source.View
 
             _rows.Clear();
             _rows.AddRange(report.Findings.Select(finding =>
-                new Row(Text(RowFormat, finding.Kind, finding.Where), finding.Message, Record(finding.Where))));
+                new Row(Text(RowFormat, finding.Kind, finding.Where), finding.Message, Place.Record(finding.Where))));
             _rows.AddRange(report.Notes.Select(note => new Row(Text(NoteRowFormat, note), note, null)));
 
             _findings = report.Findings.Count;
@@ -231,67 +206,5 @@ namespace NarrativeEditor.Source.View
         /// <summary>One line of the list: what it says, what it says in full, and the record it can be
         /// opened to — nothing at all for a row that is about the run rather than about a record.</summary>
         private sealed record Row(string Text, string Tooltip, (string Catalog, string Id)? Record);
-
-        /// <summary>The catalog and the record a place names, or nothing when it names neither. A record
-        /// listed by its place in the file is named by neither step — the list on the left answers to ids —
-        /// and so is a row about a catalog the run could not read.</summary>
-        private static (string Catalog, string Id)? Record(string where)
-        {
-            string[] steps = where.Split(PlaceSeparator);
-
-            if (steps.Length < RecordSteps) return null;
-            if (steps[0].Length == 0 || steps[0].Contains(PlaceIndex)) return null;
-            if (steps[1].Length == 0 || steps[1][0] == PlaceIndex) return null;
-
-            return (steps[0], steps[1]);
-        }
-
-        /// <summary>Listens to every document of the run: an id the narrative points at is written in
-        /// another catalog, so a check is out of date as soon as ANY of them is typed into. A file the run
-        /// lays down joins them, and the stack the whole tool files its steps on covers the rest — the .po
-        /// files among them, whose wording is the very thing a missing-text finding is about.</summary>
-        private void Watch()
-        {
-            if (Workspace is not { } workspace) return;
-
-            foreach (CatalogView view in workspace.Catalogs)
-            {
-                view.FileAdded += Added;
-                _catalogs.Add(view);
-
-                foreach (CatalogFile file in view.Files) Watch(file);
-            }
-        }
-
-        private void Watch(CatalogFile file)
-        {
-            file.Document.Changed += Stale;
-            _watched.Add(file.Document);
-        }
-
-        private void Unwatch()
-        {
-            foreach (JsonTreeDocument document in _watched) document.Changed -= Stale;
-            foreach (CatalogView view in _catalogs) view.FileAdded -= Added;
-
-            _watched.Clear();
-            _catalogs.Clear();
-        }
-
-        /// <summary>Takes a freshly laid file under the same watch and marks what is on screen out of
-        /// date: a record written into a file that did not exist when the last run read is a record the
-        /// rows on screen never saw.</summary>
-        private void Added(CatalogFile file)
-        {
-            Watch(file);
-            Invalidate();
-        }
-
-        private void Stale(JsonPointer pointer) => Invalidate();
-
-        /// <summary>Any step the tool files, whatever it was typed into. The locales are edited onto this
-        /// same stack and announce nothing of their own, so a translation written a second ago reaches the
-        /// panel this way and no other.</summary>
-        private void Stepped() => Invalidate();
     }
 }

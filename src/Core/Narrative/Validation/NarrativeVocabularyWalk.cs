@@ -3,6 +3,7 @@ namespace Core.Narrative.Validation
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Facts;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -25,6 +26,8 @@ namespace Core.Narrative.Validation
         private const string RequiredFormat = "'{0}' is required by the '{1}' {2} and is not written";
 
         private const string EmptyFormat = "'{0}' of the '{1}' {2} is written empty, where a record id is meant";
+
+        private const string EmptyFactFormat = "'{0}' of the '{1}' {2} is written empty, where a fact key is meant";
 
         private const string UnknownFormat = "'{0}' names '{1}', which is in none of {2}";
 
@@ -59,13 +62,18 @@ namespace Core.Narrative.Validation
         private readonly INarrativeIdSource _ids;
         private readonly ICollection<NarrativeFinding> _findings;
         private readonly ISet<NarrativeReferenceTarget> _undescribed;
+        private readonly ICollection<FactKeyUse> _facts;
 
         internal NarrativeVocabularyWalk(
-            INarrativeIdSource ids, ICollection<NarrativeFinding> findings, ISet<NarrativeReferenceTarget> undescribed)
+            INarrativeIdSource ids,
+            ICollection<NarrativeFinding> findings,
+            ISet<NarrativeReferenceTarget> undescribed,
+            ICollection<FactKeyUse> facts)
         {
             _ids = ids;
             _findings = findings;
             _undescribed = undescribed;
+            _facts = facts;
         }
 
         /// <summary>The place one element of a list is written at.</summary>
@@ -206,6 +214,8 @@ namespace Core.Narrative.Validation
 
             string at = Under(where, parameter.JsonName);
 
+            if (parameter.Role != NarrativeParameterRole.None) Fact(value, parameter, type, at, where, word);
+
             switch (parameter.Kind)
             {
                 case NarrativeParameterKind.Reference:
@@ -243,6 +253,32 @@ namespace Core.Narrative.Validation
 
             Reference(id, parameter.Targets, at, parameter.JsonName);
         }
+
+        /// <summary>One written fact key of an entry: the word is taken down with its place, so that a
+        /// registry can say who else writes it and who reads it back. A key left empty is named on the
+        /// spot — the factory refuses such an entry, which takes the clause out of the game silently.</summary>
+        private void Fact(JToken value, NarrativeParameterSpec parameter, string type, string at, string where, string word)
+        {
+            string key = value.Value<string>() ?? string.Empty;
+
+            if (key.Length == 0)
+            {
+                _findings.Add(new NarrativeFinding(
+                    NarrativeFindingKind.MissingParameter, where, string.Format(EmptyFactFormat, parameter.JsonName, type, word)));
+                return;
+            }
+
+            _facts.Add(new FactKeyUse(key, Used(parameter.Role), at));
+        }
+
+        /// <summary>What a role does with the key it names. A role with no arm here does not compile away
+        /// quietly: it throws on the first entry carrying it.</summary>
+        private static FactKeyUseKind Used(NarrativeParameterRole role) => role switch
+        {
+            NarrativeParameterRole.FactWritten => FactKeyUseKind.Write,
+            NarrativeParameterRole.FactRead => FactKeyUseKind.Read,
+            _ => throw new ArgumentOutOfRangeException(nameof(role), role, "The narrative parameter role does nothing with a fact key."),
+        };
 
         /// <summary>A catalog this run cannot read, said once however many ids point into it: the fact is
         /// about the run, and repeating it per reference would bury what the data owes.</summary>

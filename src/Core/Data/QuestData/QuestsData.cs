@@ -135,19 +135,25 @@ namespace Core.Data.QuestData
     {
         public const string ConditionKey = "condition";
 
+        public const string CounterKey = "counter";
+
         /// <summary>Names the objective within its stage; its journal line is worded under it. Points
         /// into no catalog.</summary>
         [JsonProperty("id")][NotARef] public string Id { get; init; } = string.Empty;
 
         [JsonProperty(ConditionKey)] public JToken? Condition { get; init; }
-        [JsonProperty("counter")] public QuestCounterEntry? Counter { get; init; }
+        [JsonProperty(CounterKey)] public QuestCounterEntry? Counter { get; init; }
         [JsonProperty("optional")] public bool Optional { get; init; }
         [JsonProperty("hidden")] public bool Hidden { get; init; }
     }
 
     public record QuestCounterEntry
     {
-        [JsonProperty("key")] public string Key { get; init; } = string.Empty;
+        public const string KeyKey = "key";
+
+        /// <summary>The fact whose count the objective watches — the same free-form key a dialogue writes
+        /// and a Fact condition asks about. Points into no catalog.</summary>
+        [JsonProperty(KeyKey)][NotARef] public string Key { get; init; } = string.Empty;
         [JsonProperty("amount")] public int Amount { get; init; } = 1;
 
         /// <summary>True: kills from before the quest count. False: the counter starts at the

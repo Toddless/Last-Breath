@@ -61,6 +61,15 @@ namespace Core.Narrative.Validation
 
         /// <summary>The key is written in the reference locale and missing from another one.</summary>
         UntranslatedText,
+
+        /// <summary>Somebody asks about a fact key and nothing — no document, no code — ever raises it.
+        /// The clause gated on it can never be met, and the data gives no sign of it until played.</summary>
+        FactNeverWritten,
+
+        /// <summary>A fact key is raised and nobody ever asks about it: the write is a step nothing hangs
+        /// on. Its own kind because it is not necessarily wrong — a fact may be written today for a quest
+        /// written next week — which is why the run reports it rather than refusing it.</summary>
+        FactNeverRead,
     }
 
     /// <summary>One thing the checks found: what sort it is, the place in the data it belongs to, and what

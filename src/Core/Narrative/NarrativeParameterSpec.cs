@@ -28,6 +28,21 @@ namespace Core.Narrative
         References
     }
 
+    /// <summary>What a narrative parameter's value MEANS, where its shape does not say it. A fact key is
+    /// text like any other text, and nothing about the shape tells a registry of the world's facts apart
+    /// from a word the author invented — which of the two it is decides whether a key can be offered, and
+    /// whether the entry writing it answers a key somebody else reads.</summary>
+    public enum NarrativeParameterRole
+    {
+        None,
+
+        /// <summary>A fact key the entry asks about.</summary>
+        FactRead,
+
+        /// <summary>A fact key the entry writes.</summary>
+        FactWritten
+    }
+
     /// <summary>Where a narrative reference may point: a catalog, and at most one section of it. A catalog
     /// whose sections answer to nothing each other — the material categories beside the materials — offers
     /// a parameter naming the whole of it far more ids than the game will resolve.</summary>
@@ -63,6 +78,10 @@ namespace Core.Narrative
         /// <summary>The parameter was declared not to be a reference, whatever its name suggests: a
         /// decision told apart from a silence.</summary>
         public bool RefusedAsReference { get; init; }
+
+        /// <summary>What the value means beyond its shape; <see cref="NarrativeParameterRole.None"/> for
+        /// the parameters that are only what they are written as.</summary>
+        public NarrativeParameterRole Role { get; init; }
 
         /// <summary>What the parameter means, for whoever draws it.</summary>
         public string? Documentation { get; init; }
