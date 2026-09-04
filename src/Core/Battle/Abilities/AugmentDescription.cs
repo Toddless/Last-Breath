@@ -20,13 +20,14 @@ namespace Core.Battle.Abilities
     {
         /// <param name="record">The augment as it is being shown: the bare record, or the record with a
         /// copy's own numbers and drawn effect already folded in (<see cref="AugmentInstance.Applied"/>).</param>
-        /// <param name="effects">Where the canon is read. Null in a composition that has no effect
-        /// registry, where a line keeps the placeholders it has rather than failing.</param>
+        /// <param name="effects">Where the canon is read — the balance rows themselves, so a composition
+        /// holding the catalog alone prints the numbers one holding the whole registry prints. Null where
+        /// neither is at hand, and a line then keeps the placeholders it has rather than failing.</param>
         /// <param name="declared">Who answers for a record that lays an effect without naming it in data;
         /// see <see cref="LaidEffect"/>. Null where nobody does, which reads as "lays none".</param>
         public static Dictionary<string, object?> Values(
             AbilityAugmentData record,
-            IEffectProvider? effects,
+            IEffectCanonCatalog? effects,
             IAugmentLaidEffects? declared = null) =>
             Values(record.UpgradeProperties, LaidEffect(record.Id, record.LaidEffectId, declared), effects);
 
@@ -36,7 +37,7 @@ namespace Core.Battle.Abilities
         public static Dictionary<string, object?> Values(
             IReadOnlyDictionary<string, float> own,
             string laidEffectId,
-            IEffectProvider? effects)
+            IEffectCanonCatalog? effects)
         {
             Dictionary<string, object?> printed = new(StringComparer.Ordinal);
             bool lays = !string.IsNullOrWhiteSpace(laidEffectId);

@@ -20,7 +20,7 @@ namespace Core.Views.UI
         /// <paramref name="count"/> (pool tables) appends a rule and the block's entry count on the right.</summary>
         public static Control? AffixHeader(AffixKind affix, int? count = null)
         {
-            string? key = HeaderKey(affix);
+            string? key = ItemTooltipText.AffixHeaderKey(affix);
             if (key == null) return null;
 
             var label = new Label { Text = Localization.Localize(key).ToUpper(), ThemeTypeVariation = "DimLabel" };
@@ -44,13 +44,5 @@ namespace Core.Views.UI
             spaced.AddChild(row);
             return spaced;
         }
-
-        private static string? HeaderKey(AffixKind affix) => affix switch
-        {
-            AffixKind.Prefix => "UI_Item_Prefixes",
-            AffixKind.Suffix => "UI_Item_Suffixes",
-            AffixKind.Mythic => "UI_Item_Mythic",
-            _ => null,
-        };
     }
 }

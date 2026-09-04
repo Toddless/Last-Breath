@@ -189,6 +189,10 @@ namespace Battle.Source
             }
         }
 
+        /// <summary>The ids the canon carries a row for, whole and unfiltered — the question is about the
+        /// balance file and not about what this registry can build out of it.</summary>
+        public IReadOnlyCollection<string> Ids => canon.Ids;
+
         public int? StackCeilingOf(string effectId) => Taken(effectId) ? canon.StackCeilingOf(effectId) : null;
 
         public EffectPower PowerOf(string effectId) => Taken(effectId) ? canon.PowerOf(effectId) : EffectPower.Weak;

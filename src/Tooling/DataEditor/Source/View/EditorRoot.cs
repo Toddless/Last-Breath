@@ -5,8 +5,11 @@ namespace DataEditor.Source.View
     using System.IO;
     using System.Linq;
     using App;
+    using Core.Data.GameData;
+    using Core.Enums;
     using Godot;
     using LastBreath.Descriptors;
+    using LastBreath.Descriptors.Preview;
     using Tooling.Catalogs;
     using Tooling.Localization;
     using Tooling.Schema.Model;
@@ -85,6 +88,15 @@ namespace DataEditor.Source.View
 
         private const string NoTextsFormat = "the locales under {0} could not be read: {1}";
 
+        /// <summary>The rarities a template may be read at, the fullest first: a preview opening on a
+        /// piece with no lines rolled onto it is a preview of nothing. The authored rarities are not
+        /// offered — a unique and a mythic ARE their lines, and the roll never touches them.</summary>
+        private static readonly Rarity[] s_previewRarities =
+            [Rarity.Legendary, Rarity.Epic, Rarity.Rare, Rarity.Uncommon, Rarity.Common];
+
+        /// <summary>Those rarities as the panel offers them, which is also how they are read back.</summary>
+        private static readonly string[] s_rarityNames = [.. s_previewRarities.Select(rarity => rarity.ToString())];
+
         private const string RemoveQuestionFormat = "Take “{0}” out of {1}?";
         private const string AddedFormat = "added {0}";
         private const string CopiedFormat = "duplicated as {0}";
@@ -93,6 +105,7 @@ namespace DataEditor.Source.View
         private ItemList _catalogList = null!;
         private ItemList _recordList = null!;
         private InspectorPanel _inspector = null!;
+        private PreviewPanel _preview = null!;
 
         private Button _addButton = null!;
         private Button _copyButton = null!;
@@ -110,6 +123,11 @@ namespace DataEditor.Source.View
         private CatalogWorkspace? _workspace;
         private CatalogView? _catalog;
         private CatalogRecord? _record;
+
+        /// <summary>The game's readers over the documents as they stand, or null while nothing has asked
+        /// for a reading since the last change. Dropped rather than updated on every edit: a reading is
+        /// of the whole data root, and the panel asks for one only once the typing has stopped.</summary>
+        private TooltipPreview? _tooltips;
 
         /// <summary>Whether the dialog on screen is asking for a record to copy rather than for a fresh
         /// one. The two ask for the same thing — a name nobody has used — and differ only in what is
@@ -175,16 +193,27 @@ namespace DataEditor.Source.View
             };
 
             _inspector = new InspectorPanel { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            _preview = new PreviewPanel { SizeFlagsHorizontal = SizeFlags.ExpandFill };
 
             // Two divides rather than one container holding all three panes: nested, each divider
             // starts at the minimum width of the pane before it and moves without touching the other.
             HSplitContainer body = Split();
             HSplitContainer right = Split();
 
+            // The reading stands under the panel that edits, on a divide of its own: an author changes a
+            // number and reads what the change did, and the two are one gesture.
+            var edited = new VSplitContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                SizeFlagsVertical = SizeFlags.ExpandFill
+            };
+
             body.AddChild(_catalogList);
             body.AddChild(right);
             right.AddChild(RecordPane());
-            right.AddChild(Scrolled(_inspector));
+            right.AddChild(edited);
+            edited.AddChild(Scrolled(_inspector));
+            edited.AddChild(Scrolled(_preview));
 
             BuildRecordDialog();
             BuildRemoveDialog();
@@ -192,9 +221,41 @@ namespace DataEditor.Source.View
             _catalogList.ItemSelected += index => ShowCatalog((int)index);
             _recordList.ItemSelected += index => ShowRecord((int)index);
             _inspector.Said += Report;
+            _preview.Source = Previewed;
 
             return body;
         }
+
+        /// <summary>
+        /// What one record reads as in the game, built by the game's own readers over the documents this
+        /// run has open and the locales it has open beside them. Null for a catalog nothing previews,
+        /// which is how the panel says so instead of the host hiding it.
+        /// <para>The locale and the variant are the panel's own switches, read here while the question is
+        /// answered — the panel owns which reading is asked for and this owns what the answer is.</para>
+        /// </summary>
+        private PreviewText? Previewed(CatalogRecord record)
+        {
+            if (_workspace is not { } workspace || _catalog is not { } view) return null;
+            if (!TooltipPreview.Reads(view.Catalog)) return null;
+
+            TooltipPreview tooltips = _tooltips ??= TooltipPreview.Load(workspace, Texts);
+
+            tooltips.Wording.Locale = _preview.Locale;
+
+            return tooltips.Describe(view.Catalog, record.CurrentId, Read(_preview.Variant));
+        }
+
+        /// <summary>The rarity a template is read at, or the fullest one there is where the switch says
+        /// nothing — a preview opening on a piece with no lines on it is a preview of nothing.</summary>
+        private static Rarity Read(string variant) =>
+            Enum.TryParse(variant, out Rarity rarity) ? rarity : s_previewRarities[0];
+
+        /// <summary>What the preview's two switches may be set to now: the locales this run read, and the
+        /// rarities — for the one catalog whose records are templates that read differently at each.</summary>
+        private void OfferPreview() =>
+            _preview.Offer(
+                Texts?.Locales ?? [],
+                _catalog is { Catalog: DataCatalog.EquipItems } ? s_rarityNames : []);
 
         protected override void Opened() => LoadCatalogs();
 
@@ -393,6 +454,7 @@ namespace DataEditor.Source.View
 
             if (_catalog is not null) Show(_catalogList, index);
 
+            OfferPreview();
             FillRecords();
 
             ShowRecord(_catalog is { Records.Count: > 0 } ? 0 : NoSelection);
@@ -717,6 +779,12 @@ namespace DataEditor.Source.View
             MarkCatalogs();
             SyncRecords();
             EnableActions();
+
+            // The readers are dropped and the panel is told to ask again: an edit can have moved a number
+            // of the record, a word of a locale or a record of another catalog this one points at, and a
+            // reading of the data is a reading of all of it.
+            _tooltips = null;
+            _preview.Standing(_record);
         }
 
         /// <summary>A step through the history may have moved a text of a locale: the inspector copied it

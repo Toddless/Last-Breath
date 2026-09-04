@@ -14,7 +14,10 @@ namespace Core.Views.UI
         /// <summary>Prefix of the localization key wording a grip.</summary>
         public const string HandednessKeyPrefix = "Handedness_";
 
-        private const string Separator = " · ";
+        /// <summary>What two readings sharing one line of an item's header are separated by. Public
+        /// because the subtitle is written in two halves — a weapon's here, everything else's beside it —
+        /// and two spellings of one separator is two subtitles that do not line up.</summary>
+        public const string Separator = " · ";
 
         /// <summary>The weapon subtitle: the already-worded rarity, then the weapon's type and grip.</summary>
         public static string WeaponSubtitle(string rarityText, WeaponType type, Handedness handedness) =>

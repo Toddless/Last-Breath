@@ -1,5 +1,16 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из предпросмотра тултипов в DataEditor (2026-09-04; accept with minors)
+
+- (карточка #254) `Core/Views/UI/ItemTooltipText.cs` — третий строитель карточки предмета: дословно повторяет `Main/UI/ItemTooltipPopup.cs` и `Crafting/ItemPreviewPane.cs` (порядок секций совпадает; расхождение — мифик с заголовком у `Flatten`); читает пока только превью. Туда же: 4-я копия ролла редкости в `TooltipPreview.cs:194-210` (сверена с `LootGeneration/ItemCreationService.cs:41-62`; отличия — множитель 1, `PowerMultiplier` дефолт, без `TryRollGrant`) — шов `ItemRoll.ForRarity(template, rarity, rnd)` в Core.
+- (minor, первым в чистку) `TooltipPreview.cs:142` — глобальный `Localization.Override` не восстанавливается: после `TheSameTemplate_ReadsInWhicheverLocaleIsAskedFor` статик остаётся на превью-сервисе с локалью `ru` (`[assembly: DoNotParallelize]`; классы без своего `Override` в `[TestInitialize]` получат русский текст). Стало: `[TestCleanup]` возвращает `Wording.Locale = PreviewWording.Fallback`.
+- (minor) `ItemTooltipText.cs:109-111` + `EquipItemText.Separator` public — не-оружейная половина сабтайтла снаружи `EquipItemText`; `PieceSubtitle(...)` вернул бы `Separator` в private; `public` шире минимума (`internal` хватило бы).
+- (minor) `TooltipPreview.cs:214-227` — аугмент показан одной строкой описания; игровая карточка (`AugmentText.cs`) несёт тир и `FitLine(tags, abilityId, fitsAnyAbility)` — переиспользовать как есть.
+- (nit) дока `AffixHeaderKey` про мифик без заголовка расходится с кодом; `ToUpperInvariant` vs `ToUpper` соседей; параметр `format` без не-Plain вызывающих; `Lines` аллоцирует список на каждое чтение; `Values(augment, _canon)` без `IAugmentLaidEffects` — аугмент с безымянным эффектом недосчитается чисел; `s_previewRarities` посреди блока `const`; `IEffectProvider.Ids` отдаёт канон целиком, а `CanonOf` того же объекта — null для отвергнутых; тестов 9, не 8; у локальной мутации нет «до»-проверки.
+- (знать) фолбэк превью `локаль → en → ключ` = поведение Godot-рантайма (`locale/fallback` дефолт `en`, PO-загрузчик пустые `msgstr` не регистрирует); CLAUDE.md:164 верен лишь когда ключа нет и в en — правка доки за владельцем (см. также противоречие в разделе волны C).
+- (знать) `NarrativeDocuments.Read` теперь читает и предметные каталоги для превью — имя шире содержимого, переименовать в нейтральное; тексты грантов на карточке недоступны вне Battle (реестр эффектов).
+- (Godot-прогон владельца) DataEditor → EquipItems `Helmet_Steel`: карточка, переключить редкость/локаль; правка описания в «Текст» → превью через ~0.25 с; Abilities → `Augment_Attacks_Reduce_Armor` числа из Effects; Effects → `Effect_Charge`.
+
 ## Из реестра ключей фактов, карточка #248 (2026-09-04; accept with minors)
 
 Владельцу по данным: `Kill_Count_Faction:<faction>` и `Npc_Talked:<npcId>` пишутся кодом, но никто не читает (пины `FactNeverRead`); в поставляемых данных нет ни одного `SetFact` — все ключи пишет код.
