@@ -1,10 +1,12 @@
 namespace Tooling.Tests.DataEditor
 {
     using System.IO;
+    using System.Linq;
     using Newtonsoft.Json.Linq;
     using Tooling.Catalogs;
     using Tooling.Editing.History;
     using Tooling.Json;
+    using Tooling.Localization;
     using Tooling.Schema;
     using Tooling.Schema.Model;
 
@@ -164,6 +166,116 @@ namespace Tooling.Tests.DataEditor
             [
                 { "id": "Row_First" }
             ]
+            """;
+
+        // ── renaming a record everywhere the run writes it ──────────────────────────────────────
+
+        /// <summary>A second catalog, so that a rename has somewhere to reach that is not the record's
+        /// own file.</summary>
+        private const string QuestCatalog = "Quests";
+
+        private const string QuestFile = "Quests.json";
+        private const string QuestsKey = "quests";
+        private const string AllyField = "ally";
+        private const string NpcField = "npcId";
+        private const string GuardsField = "guards";
+        private const string DropsField = "drops";
+
+        /// <summary>A field standing INSIDE a map keyed by the name being renamed: it has to be written
+        /// before the key moves, or its address goes with the key and the word is left standing.</summary>
+        private const string ByField = "by";
+
+        /// <summary>Where the .po files sit: among the catalogs, and read like one.</summary>
+        private const string LocalizationFolder = "Localization";
+
+        private const string DescriptionSuffix = "_Description";
+
+        /// <summary>The address of the map a record is keyed into, for the tests that read it back.</summary>
+        private const string DropsAt = "/quests/0/drops";
+
+        /// <summary>The field of the OTHER npc pointing at the one being renamed: what makes the rename
+        /// reach a second record of the record's own file.</summary>
+        private const string AllyAt = "/npcs/1/ally";
+
+        private const string QuestNpcAt = "/quests/0/npcId";
+
+        /// <summary>The list writing the name twice. Both places are rewritten and both are counted: a
+        /// walk that stopped at the first would leave a guard pointing at a record nobody has.</summary>
+        private const string GuardsAt = "/quests/0/guards";
+
+        /// <summary>A word no record answers, already keying the same map: a rename to it would have one
+        /// key swallow the other.</summary>
+        private const string FreeId = "Npc_Free";
+
+        /// <summary>A word no record answers and every locale already writes: the records move and the
+        /// wording cannot follow.</summary>
+        private const string WordedId = "Npc_Worded";
+
+        /// <summary>A word the record's own catalog never wrote: renaming from it moves nothing and
+        /// refuses nothing — there is no place to carry.</summary>
+        private const string UnwrittenId = "Npc_Nobody";
+
+        /// <summary>What the host names the gesture, and so what one press of undo takes back.</summary>
+        private const string RenameStep = "rename " + RonaldId + " → " + NewId;
+
+        /// <summary>The suffixes the npc catalog words its records under: a name and a description.</summary>
+        private static readonly string[] s_npcSuffixes = ["", DescriptionSuffix];
+
+        private const string TwoAlliedNpcs = """
+            {
+                "npcs": [
+                    { "id": "Npc_Ronald", "name": "Ronald", "ally": "Npc_Skeleton" },
+                    { "id": "Npc_Skeleton", "name": "Skeleton", "ally": "Npc_Ronald" }
+                ]
+            }
+            """;
+
+        private const string OneQuest = """
+            {
+                "quests": [
+                    {
+                        "id": "Quest_One",
+                        "npcId": "Npc_Ronald",
+                        "guards": [ "Npc_Ronald", "Npc_Ronald" ],
+                        "drops": {
+                            "Npc_Ronald": { "by": "Npc_Ronald" },
+                            "Npc_Free": { "by": "Npc_Skeleton" }
+                        }
+                    }
+                ]
+            }
+            """;
+
+        private const string EnglishTexts = """
+            msgid ""
+            msgstr ""
+            "Content-Type: text/plain; charset=UTF-8\n"
+            "Language: en\n"
+
+            msgid "Npc_Ronald"
+            msgstr "Ronald"
+
+            msgid "Npc_Ronald_Description"
+            msgstr "A trader."
+
+            msgid "Npc_Worded"
+            msgstr "Somebody else."
+            """;
+
+        private const string RussianTexts = """
+            msgid ""
+            msgstr ""
+            "Content-Type: text/plain; charset=UTF-8\n"
+            "Language: ru\n"
+
+            msgid "Npc_Ronald"
+            msgstr "Роналд"
+
+            msgid "Npc_Ronald_Description"
+            msgstr "Торговец."
+
+            msgid "Npc_Worded"
+            msgstr "Кто-то ещё."
             """;
 
         private string _root = string.Empty;
@@ -821,6 +933,181 @@ namespace Tooling.Tests.DataEditor
             Assert.IsNull(CatalogEditing.RenameRefusal(view, view.Records[0], "   "));
         }
 
+        /// <summary>Every place the run wrote the old word is written again: a field of the record's own
+        /// catalog, a field of another one, both elements of a list writing it twice, and the key a map
+        /// stands under — which keeps the place it held among its neighbours.</summary>
+        [TestMethod]
+        public void RenameEverywhere_WritesTheNewNameEverywhereTheRunHeldTheOldOne()
+        {
+            Renaming run = ARun();
+            CatalogRenameResult result = Rename(run, NewId);
+
+            Assert.IsTrue(result.Done, result.Refused);
+            Assert.AreEqual(6, result.Uses);
+            Assert.AreEqual(2, result.Files, "the record's own catalog and the one pointing into it");
+
+            Assert.AreEqual(NewId, Written(run.Npcs, AllyAt));
+            Assert.AreEqual(NewId, Written(run.Quests, QuestNpcAt));
+
+            CollectionAssert.AreEqual(new[] { NewId, NewId }, Words(run.Quests, GuardsAt));
+
+            // The key is renamed and not written over, so the map is still read in the order the author
+            // wrote it — and what stood under the old key is written before the key moves, or its address
+            // would have gone with it.
+            CollectionAssert.AreEqual(new[] { NewId, FreeId }, Keys(run.Quests, DropsAt));
+            Assert.AreEqual(NewId, Under(run.Quests, DropsAt, NewId));
+        }
+
+        /// <summary>The wording the catalog builds out of the id travels with it: every suffix, in every
+        /// locale, and nothing else.</summary>
+        [TestMethod]
+        public void RenameEverywhere_CarriesTheWordingOfTheRecordWithIt()
+        {
+            Renaming run = ARun();
+            CatalogRenameResult result = Rename(run, NewId);
+
+            Assert.AreEqual(new LocalizedRename(2, null), result.Keys);
+            Assert.AreEqual(RonaldName, run.Texts.Read(LocalizedTexts.ReferenceLocale, NewId));
+            Assert.IsNotNull(run.Texts.Read(LocalizedTexts.AuthoringLocale, NewId + DescriptionSuffix));
+            Assert.IsNull(run.Texts.Read(LocalizedTexts.ReferenceLocale, RonaldId));
+            Assert.IsNull(run.Texts.Read(LocalizedTexts.AuthoringLocale, RonaldId + DescriptionSuffix));
+        }
+
+        /// <summary>The id, the references and the wording are one thing the author did. Taken back half
+        /// way, a record is read under one word by its own file and under another by everything naming
+        /// it — the state nothing on screen would show him.</summary>
+        [TestMethod]
+        public void RenameEverywhere_IsOneStepUndoTakesBackWhole()
+        {
+            Renaming run = ARun();
+
+            Assert.IsTrue(Rename(run, NewId).Done);
+            Assert.AreEqual(1, run.History.Depth, "the id typed and everything it carried are one step");
+            Assert.AreEqual(RenameStep, run.History.NextUndo);
+
+            run.History.Undo();
+
+            Assert.AreEqual(RonaldId, run.Npcs.Records[0].CurrentId);
+            Assert.AreEqual(RonaldId, Written(run.Npcs, AllyAt));
+            Assert.AreEqual(RonaldId, Written(run.Quests, QuestNpcAt));
+            CollectionAssert.AreEqual(new[] { RonaldId, RonaldId }, Words(run.Quests, GuardsAt));
+            CollectionAssert.AreEqual(new[] { RonaldId, FreeId }, Keys(run.Quests, DropsAt));
+            Assert.AreEqual(RonaldId, Under(run.Quests, DropsAt, RonaldId));
+            Assert.IsNotNull(run.Texts.Read(LocalizedTexts.ReferenceLocale, RonaldId));
+            Assert.IsFalse(run.Texts.IsDirty, "the locales are back where they were opened");
+        }
+
+        /// <summary>A name the section already writes is the one the game drops, so the rename is refused
+        /// whole: nothing else in the run is touched, and the author is left with one word to fix rather
+        /// than a run half rewritten.</summary>
+        [TestMethod]
+        public void RenameEverywhere_RefusesANameTheSectionAlreadyWrites_AndCarriesNothing()
+        {
+            Renaming run = ARun();
+            CatalogRenameResult result = Rename(run, SkeletonId);
+
+            Assert.IsFalse(result.Done);
+            StringAssert.Contains(result.Refused, SkeletonId);
+            Assert.AreEqual(0, result.Uses);
+            AssertNothingWasCarried(run);
+        }
+
+        /// <summary>A word the same map is already keyed by would have one key swallow the other, and what
+        /// stood under the one that went is a value no undo can name.</summary>
+        [TestMethod]
+        public void RenameEverywhere_RefusesAWordTheSameMapIsAlreadyKeyedBy()
+        {
+            Renaming run = ARun();
+            CatalogRenameResult result = Rename(run, FreeId);
+
+            Assert.IsFalse(result.Done);
+            StringAssert.Contains(result.Refused, FreeId);
+            StringAssert.Contains(result.Refused, QuestFile);
+            AssertNothingWasCarried(run);
+        }
+
+        /// <summary>The wording refusing to follow is a sentence to read and not a rename to take back:
+        /// the records have moved by then, and the two answers are told apart.</summary>
+        [TestMethod]
+        public void RenameEverywhere_MovesTheRecordsWhenTheWordingWillNotFollow()
+        {
+            Renaming run = ARun();
+            CatalogRenameResult result = Rename(run, WordedId);
+
+            Assert.IsTrue(result.Done, result.Refused);
+            Assert.AreEqual(6, result.Uses);
+            Assert.AreEqual(new LocalizedRename(0, WordedId), result.Keys);
+            Assert.AreEqual(WordedId, Written(run.Quests, QuestNpcAt));
+            Assert.IsNotNull(run.Texts.Read(LocalizedTexts.ReferenceLocale, RonaldId), "the old keys stand where they were");
+        }
+
+        /// <summary>A word nobody typed and a word the run never wrote are both nothing to carry: no
+        /// refusal, and no file touched on the way to finding that out.</summary>
+        [TestMethod]
+        public void RenameEverywhere_MovesNothingForAWordNobodyTypedOrNobodyWrote()
+        {
+            Renaming run = ARun();
+            CatalogRecord record = run.Ronald;
+
+            foreach (string to in new[] { string.Empty, RonaldId })
+            {
+                CatalogRenameResult nothing = CatalogEditing.RenameEverywhere(
+                    run.Uses, run.Npcs, record, RonaldId, to, run.Texts);
+
+                Assert.IsTrue(nothing.Done, to);
+                Assert.AreEqual(0, nothing.Uses, to);
+            }
+
+            CatalogRenameResult unwritten = CatalogEditing.RenameEverywhere(
+                run.Uses, run.Npcs, record, UnwrittenId, NewId, run.Texts);
+
+            Assert.IsTrue(unwritten.Done);
+            Assert.AreEqual(0, unwritten.Uses);
+            Assert.AreEqual(0, unwritten.Files);
+            AssertNothingWasCarried(run);
+            Assert.IsTrue(run.Npcs.Files[0].Document.IsClean);
+        }
+
+        /// <summary>Nothing left the record's own id behind: the references and the wording are where the
+        /// run opened with them.</summary>
+        private static void AssertNothingWasCarried(Renaming run)
+        {
+            Assert.AreEqual(RonaldId, Written(run.Npcs, AllyAt));
+            Assert.AreEqual(RonaldId, Written(run.Quests, QuestNpcAt));
+            CollectionAssert.AreEqual(new[] { RonaldId, FreeId }, Keys(run.Quests, DropsAt));
+            Assert.AreEqual(RonaldId, Under(run.Quests, DropsAt, RonaldId));
+            Assert.IsTrue(run.Quests.Files[0].Document.IsClean);
+            Assert.IsFalse(run.Texts.IsDirty);
+        }
+
+        /// <summary>The word standing at an address of a catalog's only file.</summary>
+        private static string? Written(CatalogView view, string at) =>
+            view.Files[0].Document.Resolve(JsonPointer.Parse(at))?.ToString();
+
+        private static string[] Words(CatalogView view, string at) =>
+            [.. ((JArray)view.Files[0].Document.Resolve(JsonPointer.Parse(at))!).Select(word => word.ToString())];
+
+        private static JObject Map(CatalogView view, string at) =>
+            (JObject)view.Files[0].Document.Resolve(JsonPointer.Parse(at))!;
+
+        private static string[] Keys(CatalogView view, string at) =>
+            [.. Map(view, at).Properties().Select(pair => pair.Name)];
+
+        /// <summary>The word the entry under one key of a map points at.</summary>
+        private static string? Under(CatalogView view, string at, string key) =>
+            Map(view, at)[key]?[ByField]?.ToString();
+
+        /// <summary>The gesture as a host makes it: the id is written into the record as the author types
+        /// it, and the rename is asked to carry everything else into the same step.</summary>
+        private static CatalogRenameResult Rename(Renaming run, string to)
+        {
+            CatalogRecord record = run.Ronald;
+
+            Assert.IsTrue(record.File.Document.Put(record.Pointer.Append(IdField), new JValue(to)));
+
+            return CatalogEditing.RenameEverywhere(run.Uses, run.Npcs, record, RonaldId, to, run.Texts);
+        }
+
         /// <summary>The array one section of a file holds.</summary>
         private static JArray Section(CatalogFile file, string key) =>
             (JArray)file.Document.Resolve(JsonPointer.Root.Append(key))!;
@@ -886,5 +1173,82 @@ namespace Tooling.Tests.DataEditor
             Catalog(CatalogFixture.Descriptor(RowsCatalog, RootShape.ArrayUnderKey,
                 [CatalogFixture.Section(RootKey, CatalogFixture.Record(IdField, CatalogFixture.Required(IdField, FieldKind.String)))],
                 new FreeFilePlacement()));
+
+        /// <summary>A field pointing at any record of the npc catalog.</summary>
+        private static FieldSchema PointsAtAnNpc(string jsonName) =>
+            new() { JsonName = jsonName, Kind = FieldKind.Reference, RefTargets = [ReferenceTarget.Whole(NpcCatalog)] };
+
+        /// <summary>The npcs, worded from their ids and pointing at one another: a rename has to reach a
+        /// second record of the very file the id was typed in.</summary>
+        private static ICatalogDescriptor NpcsThatAlly() =>
+            CatalogFixture.Descriptor(NpcCatalog, RootShape.ArrayUnderKey,
+                [
+                    CatalogFixture.Section(NpcsKey, CatalogFixture.Record(IdField,
+                        CatalogFixture.Required(IdField, FieldKind.String),
+                        CatalogFixture.Field(NameField, FieldKind.String),
+                        PointsAtAnNpc(AllyField)))
+                ],
+                placement: null,
+                localizedSuffixes: s_npcSuffixes);
+
+        /// <summary>A second catalog writing the npc's name in every way a word can be written: a field, an
+        /// element of a list, and the key of a map.</summary>
+        private static ICatalogDescriptor QuestsThatName() =>
+            CatalogFixture.Descriptor(QuestCatalog, RootShape.ArrayUnderKey,
+            [
+                CatalogFixture.Section(QuestsKey, CatalogFixture.Record(IdField,
+                    CatalogFixture.Required(IdField, FieldKind.String),
+                    PointsAtAnNpc(NpcField),
+                    new FieldSchema
+                    {
+                        JsonName = GuardsField,
+                        Kind = FieldKind.Array,
+                        Item = PointsAtAnNpc(FieldSchema.Unnamed)
+                    },
+                    new FieldSchema
+                    {
+                        JsonName = DropsField,
+                        Kind = FieldKind.Dictionary,
+                        Key = PointsAtAnNpc(FieldSchema.Unnamed),
+                        Item = new FieldSchema
+                        {
+                            JsonName = FieldSchema.Unnamed,
+                            Kind = FieldKind.Object,
+                            Record = CatalogFixture.Record(null, PointsAtAnNpc(ByField))
+                        }
+                    }))
+            ]);
+
+        /// <summary>The run a rename is made inside: two catalogs writing one npc's name, both locales
+        /// wording it, and one stack under all of them — the way a host holds them.</summary>
+        private Renaming ARun()
+        {
+            Write(NpcCatalog, NpcFile, TwoAlliedNpcs);
+            Write(QuestCatalog, QuestFile, OneQuest);
+            Write(LocalizationFolder, LocalizedTexts.ReferenceLocale + PoCatalogSet.FileExtension, EnglishTexts);
+            Write(LocalizationFolder, LocalizedTexts.AuthoringLocale + PoCatalogSet.FileExtension, RussianTexts);
+
+            EditHistory history = new();
+            CatalogWorkspace workspace = CatalogWorkspace.Load(_root, [NpcsThatAlly(), QuestsThatName()], history);
+
+            return new Renaming(
+                workspace,
+                new ReferenceUses(workspace),
+                LocalizedTexts.Load(Path.Combine(_root, LocalizationFolder), history),
+                history);
+        }
+
+        /// <summary>What one run of the tool has open while a record is renamed.</summary>
+        private sealed record Renaming(
+            CatalogWorkspace Workspace, ReferenceUses Uses, LocalizedTexts Texts, EditHistory History)
+        {
+            public CatalogView Npcs => Workspace.Catalogs[0];
+
+            public CatalogView Quests => Workspace.Catalogs[1];
+
+            /// <summary>The record being renamed, read again so that its address is the one the run holds
+            /// now.</summary>
+            public CatalogRecord Ronald => Npcs.Records[0];
+        }
     }
 }

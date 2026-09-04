@@ -5,6 +5,7 @@ namespace Tooling.Catalogs
     using System.Linq;
     using Newtonsoft.Json.Linq;
     using Tooling.Json;
+    using Tooling.Localization;
     using Tooling.Schema.Model;
     using static Tooling.Text.Format;
 
@@ -15,6 +16,21 @@ namespace Tooling.Catalogs
     public sealed record CatalogEditResult(CatalogRecord? Record, string? Note)
     {
         public bool Done => Note is null;
+    }
+
+    /// <summary>
+    /// What a rename carried with it: how many places were rewritten, across how many files, and what the
+    /// wording came to. <see cref="Refused"/> is the reason nothing at all was done — the two answers are
+    /// held apart because they are two different things to tell the author, and only one of them means
+    /// the record is still called what it was.
+    /// </summary>
+    /// <remarks>The keys are the wording's own answer (<see cref="LocalizedRename"/>), which says both how
+    /// many moved and the name that stopped them when none did. That refusal is not this one: the id and
+    /// its references have moved by then, and a locale that would not follow is a sentence to read rather
+    /// than a rename to take back.</remarks>
+    public sealed record CatalogRenameResult(int Uses, int Files, LocalizedRename Keys, string? Refused)
+    {
+        public bool Done => Refused is null;
     }
 
     /// <summary>
@@ -159,7 +175,99 @@ namespace Tooling.Catalogs
             return Taken(view, record.Section, wanted, record) ? TakenNote(record.Section, wanted) : null;
         }
 
+        /// <summary>
+        /// Carries a record's new name everywhere else the run writes the old one: every reference
+        /// pointing at it, in every catalog and every file, and the localization keys its own catalog
+        /// words from the id. One step of the history for all of it — a rename half taken back leaves a
+        /// record read under one word by the files and under another by everything naming it, which is
+        /// exactly what the author cannot see and cannot repair.
+        /// <para>The id in the record's OWN file is not written here. It is written by whoever renamed the
+        /// record — a box the author is typing in, a caller that set the field — and taken into this step
+        /// by <see cref="Editing.History.EditHistory.GroupWithNewest"/>, so the word and everything that
+        /// followed it are one thing to take back.</para>
+        /// <para>Refused whole and doing nothing when the new name is already written in the section, and
+        /// when a map already carries a key under it. A rename that stopped halfway through the files
+        /// would be the tool making a state nobody asked for.</para>
+        /// <para>A word nobody typed is no rename: an empty name either side, and a record renamed to what
+        /// it is already called, move nothing and refuse nothing.</para>
+        /// </summary>
+        public static CatalogRenameResult RenameEverywhere(
+            ReferenceUses uses,
+            CatalogView view,
+            CatalogRecord record,
+            string oldId,
+            string newId,
+            LocalizedTexts? texts = null)
+        {
+            ArgumentNullException.ThrowIfNull(uses);
+            ArgumentNullException.ThrowIfNull(view);
+            ArgumentNullException.ThrowIfNull(record);
+
+            string from = (oldId ?? string.Empty).Trim();
+            string to = (newId ?? string.Empty).Trim();
+
+            if (RenameRefusal(view, record, to) is { } refusal) return Nothing(refusal);
+            if (from.Length == 0 || to.Length == 0 || string.Equals(from, to, StringComparison.Ordinal)) return Nothing(null);
+
+            IReadOnlyList<ReferenceUse> written = uses.UsesOf(ReferenceUses.Naming(view, record), from);
+
+            if (Blocked(written, to) is { } blocked) return Nothing(blocked);
+
+            JsonTreeDocument owner = record.File.Document;
+            HashSet<CatalogFile> files = [];
+            int rewritten = 0;
+            LocalizedRename keys = default;
+
+            using (owner.History.GroupWithNewest(Text(Notes.RenameStep, from, to), owner))
+            {
+                foreach (ReferenceUse use in Writable(written))
+                {
+                    if (!Rewritten(use, to)) continue;
+
+                    rewritten++;
+                    files.Add(use.File);
+                }
+
+                if (texts is { } wording) keys = wording.RenameRecord(from, to, view.Schema.LocalizedSuffixes);
+            }
+
+            return new CatalogRenameResult(rewritten, files.Count, keys, null);
+        }
+
         private static CatalogEditResult Refused(string note) => new(null, note);
+
+        private static CatalogRenameResult Nothing(string? refused) => new(0, 0, default, refused);
+
+        /// <summary>The uses in an order they can all be written in: the deepest first, so that whatever
+        /// stands INSIDE a map keyed by the old word is written before the key itself moves and carries
+        /// the addresses of everything under it away. A value written over keeps its address, so nothing
+        /// else here depends on the order.</summary>
+        private static IEnumerable<ReferenceUse> Writable(IReadOnlyList<ReferenceUse> uses) =>
+            uses.OrderByDescending(use => use.At.Segments.Count);
+
+        /// <summary>Writes the new word where one use of the old one stands. A key of a map is given
+        /// another key rather than another value: the word IS the address there, and writing over it
+        /// would leave the map keyed by the id nobody has any more.</summary>
+        private static bool Rewritten(ReferenceUse use, string to) =>
+            use.Kind == ReferenceUseKind.MapKey
+                ? use.File.Document.RenameKey(use.At, to)
+                : use.File.Document.SetValue(use.At, new JValue(to));
+
+        /// <summary>The map that cannot take the new word, or null when every one of them can. A map
+        /// already keyed by it would have one key swallow the other, and what stood under the one that
+        /// went is a value no undo can name — so the whole rename is refused rather than made in part.</summary>
+        private static string? Blocked(IReadOnlyList<ReferenceUse> uses, string to)
+        {
+            foreach (ReferenceUse use in uses)
+            {
+                if (use.Kind != ReferenceUseKind.MapKey || use.At.Parent is not { } map) continue;
+
+                if (use.File.Document.Resolve(map) is JObject holder && holder.ContainsKey(to))
+                    return Text(Notes.KeyTaken, to, use.File.Name);
+            }
+
+            return null;
+        }
 
         /// <summary>Whether two records are the same one, asked by where it stands and not by what it
         /// holds: the id a record was listed under is exactly what a rename changes.</summary>
@@ -346,6 +454,11 @@ namespace Tooling.Catalogs
             public const string NoRoom = "{0} does not hold the records where the catalog says they are.";
             public const string NotWritten = "{0} refused the record.";
             public const string NotListed = "{0} was written and the catalog does not list the record.";
+
+            /// <summary>What one press of undo takes back, named the way the panels name a rename.</summary>
+            public const string RenameStep = "rename {0} → {1}";
+
+            public const string KeyTaken = "'{0}' already keys the same map in {1}.";
         }
     }
 }

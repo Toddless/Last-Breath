@@ -20,8 +20,13 @@ namespace Tooling.Tests.DataEditor
         /// the test is about placement itself — which file a record goes to is a rule of its own, and a
         /// test of the records has no business restating it.</summary>
         public static ICatalogDescriptor Descriptor(
-            string catalog, RootShape shape, SchemaList<SectionSchema> sections, FilePlacement? placement = null) =>
-            new HandWritten(catalog, shape, sections, placement ?? new SingleFilePlacement { FileName = catalog });
+            string catalog,
+            RootShape shape,
+            SchemaList<SectionSchema> sections,
+            FilePlacement? placement = null,
+            SchemaList<string> localizedSuffixes = default) =>
+            new HandWritten(
+                catalog, shape, sections, placement ?? new SingleFilePlacement { FileName = catalog }, localizedSuffixes);
 
         public static SectionSchema Section(string key, RecordSchema record) => new() { Key = key, Record = record };
 
@@ -55,12 +60,17 @@ namespace Tooling.Tests.DataEditor
         /// <summary>A catalog described in full by hand: the builder is offered and not used, which is
         /// what keeps the shapes under test out of the reflector's reach.</summary>
         private sealed class HandWritten(
-            string catalog, RootShape shape, SchemaList<SectionSchema> sections, FilePlacement placement)
+            string catalog,
+            RootShape shape,
+            SchemaList<SectionSchema> sections,
+            FilePlacement placement,
+            SchemaList<string> localizedSuffixes)
             : ICatalogDescriptor
         {
             public string Catalog => catalog;
 
-            public CatalogSchema Describe(ISchemaBuilder builder) => new(shape, sections, [], placement);
+            public CatalogSchema Describe(ISchemaBuilder builder) =>
+                new(shape, sections, localizedSuffixes, placement);
         }
     }
 }
