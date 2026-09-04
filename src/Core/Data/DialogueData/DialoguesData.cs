@@ -48,6 +48,11 @@ namespace Core.Data.DialogueData
 
     public record DialogueNodeEntry
     {
+        /// <summary>Json name a node and an option are both named under. Shared with the option because
+        /// the keys their text is read under are worded from the pair, and a reader walking one walks
+        /// the other by the same word.</summary>
+        public const string IdKey = "id";
+
         public const string OnEnterKey = "onEnter";
 
         public const string LinesKey = "lines";
@@ -56,7 +61,7 @@ namespace Core.Data.DialogueData
 
         /// <summary>Names the node within its own dialogue; the routes out of the other nodes are
         /// written with it. Points into no catalog.</summary>
-        [JsonProperty("id")][NotARef] public string Id { get; init; } = string.Empty;
+        [JsonProperty(IdKey)][NotARef] public string Id { get; init; } = string.Empty;
 
         [JsonProperty(OnEnterKey)] public JToken? OnEnter { get; init; }
         [JsonProperty(LinesKey)] public List<DialogueLineEntry> Lines { get; init; } = [];
@@ -73,7 +78,8 @@ namespace Core.Data.DialogueData
 
         [JsonProperty(SpeakerKey)][EnumOf(typeof(DialogueSpeaker))] public string Speaker { get; init; } = "Npc";
 
-        /// <summary>Localization key of the line, written out in full rather than derived from an id.</summary>
+        /// <summary>Localization key of the line, written out in full and worded from the place the line
+        /// stands in — see <see cref="DialogueKeys"/>, which is what the authoring tool writes it by.</summary>
         [JsonProperty(TextKey)][LocalizedKey] public string Key { get; init; } = string.Empty;
     }
 
@@ -90,10 +96,12 @@ namespace Core.Data.DialogueData
         public const string SpeechCheckKey = "speechCheck";
 
         /// <summary>Names the option within its node — the "once per game" bookkeeping is kept under
-        /// it. Points into no catalog.</summary>
-        [JsonProperty("id")][NotARef] public string Id { get; init; } = string.Empty;
+        /// it, and the key its text is read under is worded from it. Points into no catalog.</summary>
+        [JsonProperty(DialogueNodeEntry.IdKey)][NotARef] public string Id { get; init; } = string.Empty;
 
-        /// <summary>Localization key of the option, written out in full rather than derived from an id.</summary>
+        /// <summary>Localization key of the option, written out in full and worded from the place the
+        /// option stands in — or one of <see cref="DialogueKeys.SharedOptions"/>, which several nodes and
+        /// several conversations offer under one sentence.</summary>
         [JsonProperty(DialogueLineEntry.TextKey)][LocalizedKey] public string Key { get; init; } = string.Empty;
 
         /// <summary>Fails → the option is hidden entirely.</summary>

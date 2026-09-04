@@ -15,13 +15,13 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Merchant_Greeting_1"
+                            "key": "Dlg_Human_Merchant_Greeting_1"
                         }
                     ],
                     "options": [
                         {
                             "id": "Trade",
-                            "key": "Dlg_Merchant_Opt_Trade",
+                            "key": "Dlg_Human_Merchant_Greeting_Trade",
                             "actions": [
                                 {
                                     "type": "StartTrade",

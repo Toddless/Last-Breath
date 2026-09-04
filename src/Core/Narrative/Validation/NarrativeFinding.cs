@@ -16,8 +16,9 @@ namespace Core.Narrative.Validation
         Incomplete,
 
         /// <summary>Two records of a catalog, or two nodes, stages or endings of one record, answer to the
-        /// same name. The loader keeps one of them and everything written under the other is out of the
-        /// game without a word.</summary>
+        /// same name — or two lines of one conversation are worded into one localization key, which is the
+        /// same collision one step further on. The loader keeps one of them and everything written under
+        /// the other is out of the game without a word.</summary>
         DuplicateId,
 
         /// <summary>A route out of a dialogue leads to a node nobody wrote.</summary>
@@ -61,6 +62,12 @@ namespace Core.Narrative.Validation
 
         /// <summary>The key is written in the reference locale and missing from another one.</summary>
         UntranslatedText,
+
+        /// <summary>A line or an option is read under a key its own place does not word, and which is
+        /// none of the options every conversation shares. Reported and not refused: the game reads the
+        /// key as written, so the text is there — but the authoring tool words the key from the
+        /// structure, so a key off the pattern is one that stopped following its node.</summary>
+        KeyOffPattern,
 
         /// <summary>Somebody asks about a fact key and nothing — no document, no code — ever raises it.
         /// The clause gated on it can never be met, and the data gives no sign of it until played.</summary>

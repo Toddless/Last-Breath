@@ -118,6 +118,10 @@ namespace Core.Narrative.Validation
 
         private const string MissingTextFormat = "'{0}' is in no locale this run read";
 
+        private const string KeyOffPatternFormat = "the {0} is read under '{1}', where its place words '{2}'";
+
+        private const string KeyTwiceFormat = "'{0}' is worded by two places of this dialogue at once";
+
         private const string NeverWrittenFormat = "'{0}' is asked about and nothing ever writes it, so the clause gated on it can never be met";
 
         private const string NeverReadFormat = "'{0}' is written and nothing ever reads it back";
@@ -245,7 +249,13 @@ namespace Core.Narrative.Validation
                 HashSet<string> nodes = Nodes(entry, where);
 
                 Openings(entry, where, nodes);
-                for (int node = 0; node < entry.Nodes.Count; node++) Node(entry.Nodes[node], where, node, nodes);
+
+                // The keys this dialogue's own places word, so that two places wording one key are named
+                // rather than left to overwrite each other's text in the .po files.
+                HashSet<string> worded = new(StringComparer.Ordinal);
+
+                for (int node = 0; node < entry.Nodes.Count; node++)
+                    Node(entry.Nodes[node], where, node, nodes, entry.NpcId, worded);
 
                 Unreachable(entry, where, nodes);
             }
@@ -319,7 +329,8 @@ namespace Core.Narrative.Validation
                     Add(NarrativeFindingKind.DanglingNode, where, string.Format(DanglingNodeFormat, key, target));
             }
 
-            private void Node(DialogueNodeEntry node, string where, int index, HashSet<string> nodes)
+            private void Node(DialogueNodeEntry node, string where, int index, HashSet<string> nodes, string npcId,
+                HashSet<string> worded)
             {
                 string at = Named(where, DialogueEntry.NodesKey, node.Id, index);
 
@@ -328,16 +339,21 @@ namespace Core.Narrative.Validation
 
                 _vocabulary.Actions(node.OnEnter, Under(at, DialogueNodeEntry.OnEnterKey));
 
-                for (int line = 0; line < node.Lines.Count; line++) Line(node.Lines[line], at, line);
-                for (int option = 0; option < node.Options.Count; option++) Option(node.Options[option], at, option, nodes);
+                for (int line = 0; line < node.Lines.Count; line++)
+                    Line(node.Lines[line], at, line, DialogueKeys.Expected(npcId, node.Id, line), worded);
+
+                for (int option = 0; option < node.Options.Count; option++)
+                    Option(node.Options[option], at, option, nodes, npcId, node.Id, worded);
             }
 
-            private void Line(DialogueLineEntry line, string where, int index)
+            private void Line(DialogueLineEntry line, string where, int index, string expected, HashSet<string> worded)
             {
                 string at = At(Under(where, DialogueNodeEntry.LinesKey), index);
 
                 _vocabulary.Member(
                     line.Speaker, s_speakers, Under(at, DialogueLineEntry.SpeakerKey), DialogueLineEntry.SpeakerKey);
+
+                Worded(expected, at, worded);
 
                 if (line.Key is not { Length: > 0 })
                 {
@@ -345,18 +361,27 @@ namespace Core.Narrative.Validation
                     return;
                 }
 
+                // A line is read under the key its own place words and under no other: what an option may
+                // share with the rest of the game, a line said by one npc in one node never can.
+                if (expected.Length > 0 && !string.Equals(line.Key, expected, StringComparison.Ordinal))
+                    Add(NarrativeFindingKind.KeyOffPattern, at, string.Format(KeyOffPatternFormat, LineWord, line.Key, expected));
+
                 Text(line.Key, at);
             }
 
-            private void Option(DialogueOptionEntry option, string where, int index, HashSet<string> nodes)
+            private void Option(DialogueOptionEntry option, string where, int index, HashSet<string> nodes, string npcId,
+                string nodeId, HashSet<string> worded)
             {
                 string at = Named(where, DialogueNodeEntry.OptionsKey, option.Id, index);
+                string expected = DialogueKeys.Expected(npcId, nodeId, option.Id);
 
                 if (option.Id is not { Length: > 0 }) Add(NarrativeFindingKind.Incomplete, at, UnnamedOptionText);
 
                 if (option.Key is not { Length: > 0 })
                     Add(NarrativeFindingKind.Incomplete, at, string.Format(NoTextKeyFormat, OptionWord, DialogueLineEntry.TextKey));
                 else Text(option.Key, at);
+
+                OptionKey(option, at, expected, worded);
 
                 _vocabulary.Conditions(option.VisibleConditions, Under(at, DialogueOptionEntry.VisibleConditionsKey));
                 _vocabulary.Conditions(option.EnabledConditions, Under(at, DialogueOptionEntry.EnabledConditionsKey));
@@ -370,6 +395,31 @@ namespace Core.Narrative.Validation
 
                 _vocabulary.Actions(check.FailActions, Under(speech, DialogueSpeechCheckEntry.FailActionsKey));
                 Route(check.FailNext, nodes, speech, DialogueSpeechCheckEntry.FailNextKey, required: false);
+            }
+
+            /// <summary>The key an option is read under: the one its place words, or one of the options
+            /// every conversation shares. A shared key words no place of its own, so it takes none — two
+            /// nodes both offering "Leave." are not two places fighting over one word.</summary>
+            private void OptionKey(DialogueOptionEntry option, string where, string expected, HashSet<string> worded)
+            {
+                if (option.Key is { Length: > 0 } key && DialogueKeys.IsShared(key, offered: true)) return;
+
+                Worded(expected, where, worded);
+
+                if (option.Key is not { Length: > 0 } written || expected.Length == 0) return;
+                if (string.Equals(written, expected, StringComparison.Ordinal)) return;
+
+                Add(NarrativeFindingKind.KeyOffPattern, where, string.Format(KeyOffPatternFormat, OptionWord, written, expected));
+            }
+
+            /// <summary>Claims the key one place of a dialogue words. Two places wording one — a node
+            /// written twice, an option named after the number of a line — leave the second one's text
+            /// standing over the first's in every locale, with nothing in either file to show it.</summary>
+            private void Worded(string expected, string where, HashSet<string> worded)
+            {
+                if (expected.Length == 0 || worded.Add(expected)) return;
+
+                Add(NarrativeFindingKind.DuplicateId, where, string.Format(KeyTwiceFormat, expected));
             }
 
             /// <summary>The nodes no opening rule and no option can arrive at. Written out of the same

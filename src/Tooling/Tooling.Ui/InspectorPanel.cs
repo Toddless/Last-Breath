@@ -245,6 +245,21 @@ namespace Tooling.Ui
         /// </summary>
         public Func<CatalogRecord, Control?>? Forms { get; set; }
 
+        /// <summary>
+        /// What the host does about the record's wording once a gesture of this panel is over — a change
+        /// of its shape, or a run of keystrokes just sealed. Called after the panel has done its own,
+        /// so the two never write over each other.
+        /// <para>The block of text above draws the keys a catalog words from a record's id, and the
+        /// rename beside it moves those. A catalog wording its keys from the STRUCTURE a record stands in
+        /// — the node a line belongs to, the option's own name — cannot say so as a suffix of one id, and
+        /// this is where it says it instead. Null leaves a record's wording exactly what its own keys
+        /// say, which is what it always was.</para>
+        /// <para>Answers whether it wrote anything, and the panel is drawn again only where it did: every
+        /// box left, every box ticked and every id picked ends a gesture, and a panel torn down and built
+        /// again on each of them is one the author cannot keep his place in.</para>
+        /// </summary>
+        public Func<bool>? Settled { get; set; }
+
         /// <summary>How anything drawn inside this panel changes the document under it: one gesture, one
         /// step of the history, and the panel drawn again once the gesture is over rather than under the
         /// hand that made it.</summary>
@@ -1325,15 +1340,18 @@ namespace Tooling.Ui
         /// <para>Only the id does this. A record taken out leaves its keys standing — whether a key is
         /// still read is a question about every catalog at once, and it is asked by an audit over the
         /// whole data root, not by the panel showing one record.</para>
+        /// <para>Answers whether the record was renamed at all. Whether a key of it moved or not, the
+        /// boxes on screen are written under the keys the OLD id worded and have to be drawn again — but
+        /// the drawing is one decision taken once the gesture is over, not one per thing that wrote.</para>
         /// </summary>
-        private void RenameKeys(JsonPointer at)
+        private bool RenameKeys(JsonPointer at)
         {
-            if (Texts is not { } texts || _record is not { } record) return;
-            if (record.Schema.IdField is not { } id || at != record.Pointer.Append(id)) return;
+            if (Texts is not { } texts || _record is not { } record) return false;
+            if (record.Schema.IdField is not { } id || at != record.Pointer.Append(id)) return false;
 
             string now = record.CurrentId;
 
-            if (string.Equals(now, _idBefore, StringComparison.Ordinal)) return;
+            if (string.Equals(now, _idBefore, StringComparison.Ordinal)) return false;
 
             // The id was written into the record a moment ago and the keys move because of it: one step of
             // the history, so a record stepped back to its old name is read under that name in every locale
@@ -1351,10 +1369,27 @@ namespace Tooling.Ui
 
             _idBefore = now;
 
-            // Whether a key moved or not: the boxes on screen are written under the keys the OLD id worded,
-            // and a record that has just been given another id would go on writing its wording into them —
-            // into nothing at all where the new id is fresh, and over somebody else's text where it is not.
-            RebuildLater();
+            return true;
+        }
+
+        /// <summary>Lets the host word the record again now that the gesture is over, and answers whether
+        /// it wrote anything. Guarded the way every write of this panel is: what the host writes goes into
+        /// the very document the panel follows, and hearing about it from inside a box being left would
+        /// tear that box down under the hand leaving it.</summary>
+        private bool Settle()
+        {
+            if (Settled is not { } settled) return false;
+
+            _writing = true;
+
+            try
+            {
+                return settled();
+            }
+            finally
+            {
+                _writing = false;
+            }
         }
 
         /// <summary>What a gesture came to when the record itself cannot show it, on the line that says
@@ -1595,6 +1630,12 @@ namespace Tooling.Ui
             {
                 document.History.Seal();
                 changed = change(document);
+
+                // Before the seal, so that what the host writes about the wording is part of the gesture
+                // the author made and not a step of its own standing after it. What it answers is not
+                // asked here: the shape of the record changed, so the panel is drawn again either way.
+                if (changed) _ = Settled?.Invoke();
+
                 document.History.Seal();
             }
             finally
@@ -1695,7 +1736,12 @@ namespace Tooling.Ui
 
             /// <summary>Ends the run of keystrokes this field was taking, so the next field edited is a
             /// step of its own — and, where the run was over the record's id, names the localization keys
-            /// worded from it again.</summary>
+            /// worded from it again.
+            /// <para>Both the record's own keys and the host's are asked, and the panel is drawn once for
+            /// whichever of them wrote: the boxes are written under keys that may have moved, and drawing
+            /// them twice is a panel the author cannot keep his place in. Not drawn at all where nothing
+            /// moved — a gesture ends every time a box is left, and most of them leave the wording where
+            /// it was.</para></summary>
             public void Seal()
             {
                 panel._document?.History.Seal();
@@ -1708,7 +1754,10 @@ namespace Tooling.Ui
                 // keys stand where they are: the record is called what it was called a moment ago.
                 if (panel.Refused(at)) return;
 
-                panel.RenameKeys(at);
+                bool renamed = panel.RenameKeys(at);
+                bool worded = panel.Settle();
+
+                if (renamed || worded) Redraw();
             }
 
             public void Redraw() => panel.RebuildLater();

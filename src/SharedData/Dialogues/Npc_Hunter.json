@@ -21,7 +21,7 @@
                     "options": [
                         {
                             "id": "AskPrey",
-                            "key": "Dlg_Hunter_Opt_AskPrey",
+                            "key": "Dlg_Hunter_Greeting_AskPrey",
                             "oncePerConversation": true,
                             "next": "AboutPrey"
                         },

@@ -21,7 +21,7 @@
                     "options": [
                         {
                             "id": "AskVillage",
-                            "key": "Dlg_Villager_Opt_AskVillage",
+                            "key": "Dlg_Villager_Greeting_AskVillage",
                             "oncePerConversation": true,
                             "next": "AboutVillage"
                         },

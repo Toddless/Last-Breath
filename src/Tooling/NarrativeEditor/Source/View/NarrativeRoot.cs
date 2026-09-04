@@ -3,10 +3,12 @@ namespace NarrativeEditor.Source.View
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using App;
     using Godot;
     using LastBreath.Descriptors;
     using Tooling.Catalogs;
+    using Tooling.Json;
     using Tooling.Localization;
     using Tooling.Narrative;
     using Tooling.Ui;
@@ -40,6 +42,26 @@ namespace NarrativeEditor.Source.View
         private const string ReadoutFormat = "{0}   —   {1} record(s), {2} file(s), {3} note(s)";
 
         private const string NoTextsFormat = "the locales under {0} could not be read: {1}";
+
+        /// <summary>What the keys following the structure is called where the stack has nothing to name
+        /// the step by: the pass is one gesture with the edit that moved them, and that edit's own name is
+        /// what an author looks for.</summary>
+        private const string KeysStepText = "the wording follows the conversation";
+
+        private const string KeysWrittenFormat = "worded {0} key(s), moved {1}";
+
+        /// <summary>What a pass that left places standing says: what it did get done, and every name that
+        /// stopped one — a refusal naming the first of them reads as the only one.</summary>
+        private const string KeysNotMovedFormat = "{0}; {1} place(s) left as they stand — {2} already written";
+
+        /// <summary>What a pass that could not put a wording back says. Loud on purpose and never left to
+        /// the count above: the text is under a name nothing reads, and only the author knows which of the
+        /// two texts fighting over the key is which.</summary>
+        private const string KeysParkedFormat = "{0}; {1} wording(s) left parked and read by nothing — {2}";
+
+        private const string KeyNameFormat = "“{0}”";
+
+        private const string KeyNamesSeparator = ", ";
 
         private readonly List<Row> _rows = [];
 
@@ -131,6 +153,7 @@ namespace NarrativeEditor.Source.View
             _recordList.ItemSelected += index => ShowRecord((int)index);
             tree.ItemSelected += ShowElement;
             _inspector.Said += Report;
+            _inspector.Settled = FollowKeys;
             _dryRun.Said += Report;
             _checks.Said += Report;
             _checks.Chose += OpenRecord;
@@ -230,6 +253,81 @@ namespace NarrativeEditor.Source.View
         /// <summary>Whether the record on screen is a conversation. Only those can be walked: a quest is
         /// read through the dialogue that offers it.</summary>
         private bool IsDialogue() => _view is { } view && GameNarrative.IsDialogue(view);
+
+        /// <summary>
+        /// Brings the conversation's localization keys back to what its structure words them: a line just
+        /// added is given the key it will be read under, and a node or an option renamed carries its
+        /// wording in every locale along with the name.
+        /// <para>Asked once a gesture of the inspector is over rather than as the letters arrive: every
+        /// half-typed node id would otherwise move the keys of its lines, and the .po files would follow
+        /// the author's hesitation. One step of the history with the edit that caused it — a key read
+        /// under one word while the node answers to another is exactly what nobody can see.</para>
+        /// <para>Only a conversation: a quest words no key from its shape, and the dialogue is asked as a
+        /// whole because a node renamed moves the keys of every line and option under it.</para>
+        /// <para>Answers whether a key actually moved, which is when the panel showing the record has to
+        /// be drawn again: the boxes on screen are written under the keys the file held a moment ago, and
+        /// the panel has no document of its own to hear about it from. The row it stands on is the row it
+        /// already stood on, so its own redraw is the whole of it.</para>
+        /// </summary>
+        private bool FollowKeys()
+        {
+            if (!IsDialogue() || _record is not { } record) return false;
+
+            // Nothing is done without the locales: the keys would be written into the file alone and every
+            // line of the conversation would be left pointing at a text no locale holds, which is the one
+            // state this whole gesture exists to prevent.
+            if (Texts is not { } texts) return false;
+
+            JsonTreeDocument document = record.File.Document;
+            IReadOnlyList<DialogueTextPlace> off = DialogueKeyPlan.OffPattern(document, record.Pointer);
+
+            if (off.Count == 0) return false;
+
+            // Settled before a step is opened: a pass may refuse every place it was asked about, and a
+            // step opened for one would take the author's own edit into a group of the tool's making and
+            // leave the file called changed by a gesture that wrote nothing into it.
+            DialogueKeyPass pass = DialogueKeyPlan.Plan(off, texts);
+
+            // Named after the edit that caused it, which is the one this step takes in: the keys move
+            // because a node was renamed or a line added, and an author reading back what he can undo is
+            // looking for the gesture he made and not for what the tool did about it.
+            IDisposable? step = pass.Writes
+                ? History.GroupWithNewest(History.NextUndo ?? KeysStepText, document)
+                : null;
+
+            DialogueKeyResult result;
+
+            try
+            {
+                result = DialogueKeyPlan.Apply(document, pass, texts);
+            }
+            finally
+            {
+                step?.Dispose();
+            }
+
+            Report(Said(result));
+
+            return result.Written + result.Moved > 0;
+        }
+
+        /// <summary>What a pass over the wording is told as: what it wrote and moved, then the places it
+        /// left standing and the names that stopped them, then any wording it could not put back. Every
+        /// half and not one — a pass that moved four keys and refused a fifth did something, and a line
+        /// saying only the refusal reads as if the gesture had done nothing at all.</summary>
+        private static string Said(DialogueKeyResult result)
+        {
+            string done = Text(KeysWrittenFormat, result.Written, result.Moved);
+
+            if (result.Taken.Count > 0) done = Text(KeysNotMovedFormat, done, result.Taken.Count, Names(result.Taken));
+
+            if (result.Parked.Count == 0) return done;
+
+            return Text(KeysParkedFormat, done, result.Parked.Count, Names(result.Parked));
+        }
+
+        private static string Names(IReadOnlyList<string> names) =>
+            string.Join(KeyNamesSeparator, names.Select(name => Text(KeyNameFormat, name)));
 
         /// <summary>Writes a row for every record of every narrative catalog, under a heading naming the
         /// catalog and counting them. The headings are rows of the same list rather than a second list:
@@ -360,9 +458,10 @@ namespace NarrativeEditor.Source.View
 
         /// <summary>What the row on screen words its own text from: the suffixes the catalog declares while
         /// the inspector stands on the record itself, and none while it stands on something inside it. A
-        /// node, a line, an option or a stage is not worded from an id — every one of them writes out the
-        /// key it is read under — and offering boxes under keys nothing reads would be inviting the author
-        /// to write into the void.</summary>
+        /// node, a line, an option or a stage is worded from no suffix of a record's id — a line and an
+        /// option write out the key they are read under, and it follows their own place through
+        /// <see cref="FollowKeys"/> — and offering boxes under keys nothing reads would be inviting the
+        /// author to write into the void.</summary>
         private IReadOnlyList<string> Suffixes(CatalogRecord? shown) =>
             _view is { } view && shown is { } row && _record is { } record && row.Pointer == record.Pointer
                 ? view.Schema.LocalizedSuffixes

@@ -37,13 +37,13 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Veteran_Greeting_1"
+                            "key": "Dlg_Bandit_Veteran_Greeting_1"
                         }
                     ],
                     "options": [
                         {
                             "id": "AskWork",
-                            "key": "Dlg_Veteran_Opt_AskWork",
+                            "key": "Dlg_Bandit_Veteran_Greeting_AskWork",
                             "visibleConditions": [
                                 {
                                     "type": "CanAcceptQuest",
@@ -59,7 +59,7 @@
                         },
                         {
                             "id": "Flatter",
-                            "key": "Dlg_Veteran_Opt_Flatter",
+                            "key": "Dlg_Bandit_Veteran_Greeting_Flatter",
                             "oncePerGame": true,
                             "speechCheck": {
                                 "difficulty": 2,
@@ -84,17 +84,17 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Veteran_Offer_1"
+                            "key": "Dlg_Bandit_Veteran_Offer_1"
                         },
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Veteran_Offer_2"
+                            "key": "Dlg_Bandit_Veteran_Offer_2"
                         }
                     ],
                     "options": [
                         {
                             "id": "Accept",
-                            "key": "Dlg_Veteran_Opt_Accept",
+                            "key": "Dlg_Bandit_Veteran_Offer_Accept",
                             "actions": [
                                 {
                                     "type": "AcceptQuest",
@@ -105,7 +105,7 @@
                         },
                         {
                             "id": "Refuse",
-                            "key": "Dlg_Veteran_Opt_Refuse",
+                            "key": "Dlg_Bandit_Veteran_Offer_Refuse",
                             "actions": [
                                 {
                                     "type": "DeclineQuest",
@@ -120,7 +120,7 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Veteran_Accepted_1"
+                            "key": "Dlg_Bandit_Veteran_Accepted_1"
                         }
                     ],
                     "options": [
@@ -135,13 +135,13 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Veteran_Working_1"
+                            "key": "Dlg_Bandit_Veteran_Working_1"
                         }
                     ],
                     "options": [
                         {
                             "id": "GiveUp",
-                            "key": "Dlg_Veteran_Opt_GiveUp",
+                            "key": "Dlg_Bandit_Veteran_Working_GiveUp",
                             "actions": [
                                 {
                                     "type": "AbandonQuest",
@@ -160,13 +160,13 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Veteran_HaveIt_1"
+                            "key": "Dlg_Bandit_Veteran_HaveIt_1"
                         }
                     ],
                     "options": [
                         {
                             "id": "TurnIn",
-                            "key": "Dlg_Veteran_Opt_TurnIn",
+                            "key": "Dlg_Bandit_Veteran_HaveIt_TurnIn",
                             "enabledConditions": [
                                 {
                                     "type": "CanTurnInQuest",
@@ -192,7 +192,7 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Veteran_Thanks_1"
+                            "key": "Dlg_Bandit_Veteran_Thanks_1"
                         }
                     ],
                     "options": [
@@ -207,7 +207,7 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Veteran_FlatterGood_1"
+                            "key": "Dlg_Bandit_Veteran_FlatterGood_1"
                         }
                     ],
                     "options": [
@@ -223,7 +223,7 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Veteran_FlatterBad_1"
+                            "key": "Dlg_Bandit_Veteran_FlatterBad_1"
                         }
                     ],
                     "options": [

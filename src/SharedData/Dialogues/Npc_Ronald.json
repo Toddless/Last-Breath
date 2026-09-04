@@ -83,7 +83,7 @@
                     "options": [
                         {
                             "id": "Trade",
-                            "key": "Dlg_Ronald_Opt_Trade",
+                            "key": "Dlg_Ronald_Greeting_Trade",
                             "actions": [
                                 {
                                     "type": "StartTrade",
@@ -93,13 +93,13 @@
                         },
                         {
                             "id": "AskForge",
-                            "key": "Dlg_Ronald_Opt_AskForge",
+                            "key": "Dlg_Ronald_Greeting_AskForge",
                             "oncePerConversation": true,
                             "next": "AboutForge"
                         },
                         {
                             "id": "AskTrials",
-                            "key": "Dlg_Ronald_Opt_Trials",
+                            "key": "Dlg_Ronald_Greeting_AskTrials",
                             "visibleConditions": [
                                 {
                                     "type": "AnyOf",
@@ -174,7 +174,7 @@
                     "options": [
                         {
                             "id": "TakeFang",
-                            "key": "Dlg_Ronald_Opt_Trial_Fang",
+                            "key": "Dlg_Ronald_Trials_TakeFang",
                             "visibleConditions": [
                                 {
                                     "type": "CanAcceptQuest",
@@ -191,7 +191,7 @@
                         },
                         {
                             "id": "TakePack",
-                            "key": "Dlg_Ronald_Opt_Trial_Pack",
+                            "key": "Dlg_Ronald_Trials_TakePack",
                             "visibleConditions": [
                                 {
                                     "type": "CanAcceptQuest",
@@ -208,7 +208,7 @@
                         },
                         {
                             "id": "TakeMountain",
-                            "key": "Dlg_Ronald_Opt_Trial_Mountain",
+                            "key": "Dlg_Ronald_Trials_TakeMountain",
                             "visibleConditions": [
                                 {
                                     "type": "CanAcceptQuest",
@@ -225,7 +225,7 @@
                         },
                         {
                             "id": "TakeGrave",
-                            "key": "Dlg_Ronald_Opt_Trial_Grave",
+                            "key": "Dlg_Ronald_Trials_TakeGrave",
                             "visibleConditions": [
                                 {
                                     "type": "CanAcceptQuest",
@@ -273,7 +273,7 @@
                     "options": [
                         {
                             "id": "HintFang",
-                            "key": "Dlg_Ronald_Opt_TrialHint",
+                            "key": "Dlg_Opt_TrialHint",
                             "visibleConditions": [
                                 {
                                     "type": "QuestStatus",
@@ -285,7 +285,7 @@
                         },
                         {
                             "id": "HintPack",
-                            "key": "Dlg_Ronald_Opt_TrialHint",
+                            "key": "Dlg_Opt_TrialHint",
                             "visibleConditions": [
                                 {
                                     "type": "QuestStatus",
@@ -297,7 +297,7 @@
                         },
                         {
                             "id": "HintMountain",
-                            "key": "Dlg_Ronald_Opt_TrialHint",
+                            "key": "Dlg_Opt_TrialHint",
                             "visibleConditions": [
                                 {
                                     "type": "QuestStatus",
@@ -309,7 +309,7 @@
                         },
                         {
                             "id": "HintGrave",
-                            "key": "Dlg_Ronald_Opt_TrialHint",
+                            "key": "Dlg_Opt_TrialHint",
                             "visibleConditions": [
                                 {
                                     "type": "QuestStatus",
@@ -335,7 +335,7 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Ronald_TrialHint_Fang_1"
+                            "key": "Dlg_Ronald_TrialHintFang_1"
                         }
                     ],
                     "options": [
@@ -351,7 +351,7 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Ronald_TrialHint_Pack_1"
+                            "key": "Dlg_Ronald_TrialHintPack_1"
                         }
                     ],
                     "options": [
@@ -367,7 +367,7 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Ronald_TrialHint_Mountain_1"
+                            "key": "Dlg_Ronald_TrialHintMountain_1"
                         }
                     ],
                     "options": [
@@ -383,7 +383,7 @@
                     "lines": [
                         {
                             "speaker": "Npc",
-                            "key": "Dlg_Ronald_TrialHint_Grave_1"
+                            "key": "Dlg_Ronald_TrialHintGrave_1"
                         }
                     ],
                     "options": [
@@ -405,7 +405,7 @@
                     "options": [
                         {
                             "id": "TurnInFang",
-                            "key": "Dlg_Ronald_Opt_TrialTurnIn",
+                            "key": "Dlg_Opt_TrialTurnIn",
                             "visibleConditions": [
                                 {
                                     "type": "QuestStatus",
@@ -429,7 +429,7 @@
                         },
                         {
                             "id": "TurnInPack",
-                            "key": "Dlg_Ronald_Opt_TrialTurnIn",
+                            "key": "Dlg_Opt_TrialTurnIn",
                             "visibleConditions": [
                                 {
                                     "type": "QuestStatus",
@@ -453,7 +453,7 @@
                         },
                         {
                             "id": "TurnInMountain",
-                            "key": "Dlg_Ronald_Opt_TrialTurnIn",
+                            "key": "Dlg_Opt_TrialTurnIn",
                             "visibleConditions": [
                                 {
                                     "type": "QuestStatus",
@@ -477,7 +477,7 @@
                         },
                         {
                             "id": "TurnInGrave",
-                            "key": "Dlg_Ronald_Opt_TrialTurnIn",
+                            "key": "Dlg_Opt_TrialTurnIn",
                             "visibleConditions": [
                                 {
                                     "type": "QuestStatus",

@@ -38,8 +38,9 @@ namespace LastBreath.Descriptors
             return new CatalogSchema(
                 RootShape.ArrayUnderKey,
                 [new SectionSchema { Key = RecordsKey, Record = dialogue }],
-                // Nothing is worded from a dialogue's id: every line and option carries the key it is
-                // read under, written out in full.
+                // No suffix of the record's id words anything here: a line and an option carry the key
+                // they are read under, worded from the place they stand in rather than from the record
+                // — see DialogueKeyPlan, which is what writes and moves them.
                 [],
                 // The catalog ships one file today and is meant to be split by npc or by story line, so
                 // a new dialogue may go to a file of its own.

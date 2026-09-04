@@ -1044,52 +1044,58 @@ msgstr ""
 msgid "Dlg_Opt_Back"
 msgstr ""
 
+msgid "Dlg_Opt_TrialHint"
+msgstr ""
+
+msgid "Dlg_Opt_TrialTurnIn"
+msgstr ""
+
 msgid "Npc_Bandit_Veteran"
 msgstr ""
 
-msgid "Dlg_Veteran_Greeting_1"
+msgid "Dlg_Bandit_Veteran_Greeting_1"
 msgstr "Чего ты хочешь? Говори быстрее."
 
-msgid "Dlg_Veteran_Opt_AskWork"
+msgid "Dlg_Bandit_Veteran_Greeting_AskWork"
 msgstr ""
 
-msgid "Dlg_Veteran_Opt_Flatter"
+msgid "Dlg_Bandit_Veteran_Greeting_Flatter"
 msgstr ""
 
-msgid "Dlg_Veteran_FlatterGood_1"
+msgid "Dlg_Bandit_Veteran_FlatterGood_1"
 msgstr ""
 
-msgid "Dlg_Veteran_FlatterBad_1"
+msgid "Dlg_Bandit_Veteran_FlatterBad_1"
 msgstr ""
 
-msgid "Dlg_Veteran_Offer_1"
+msgid "Dlg_Bandit_Veteran_Offer_1"
 msgstr ""
 
-msgid "Dlg_Veteran_Offer_2"
+msgid "Dlg_Bandit_Veteran_Offer_2"
 msgstr ""
 
-msgid "Dlg_Veteran_Opt_Accept"
+msgid "Dlg_Bandit_Veteran_Offer_Accept"
 msgstr ""
 
-msgid "Dlg_Veteran_Opt_Refuse"
+msgid "Dlg_Bandit_Veteran_Offer_Refuse"
 msgstr ""
 
-msgid "Dlg_Veteran_Accepted_1"
+msgid "Dlg_Bandit_Veteran_Accepted_1"
 msgstr ""
 
-msgid "Dlg_Veteran_Working_1"
+msgid "Dlg_Bandit_Veteran_Working_1"
 msgstr ""
 
-msgid "Dlg_Veteran_Opt_GiveUp"
+msgid "Dlg_Bandit_Veteran_Working_GiveUp"
 msgstr ""
 
-msgid "Dlg_Veteran_HaveIt_1"
+msgid "Dlg_Bandit_Veteran_HaveIt_1"
 msgstr ""
 
-msgid "Dlg_Veteran_Opt_TurnIn"
+msgid "Dlg_Bandit_Veteran_HaveIt_TurnIn"
 msgstr ""
 
-msgid "Dlg_Veteran_Thanks_1"
+msgid "Dlg_Bandit_Veteran_Thanks_1"
 msgstr ""
 
 msgid "Belt_Life_Flow"
@@ -3090,7 +3096,7 @@ msgstr ""
 msgid "Dlg_Villager_Greeting_1"
 msgstr ""
 
-msgid "Dlg_Villager_Opt_AskVillage"
+msgid "Dlg_Villager_Greeting_AskVillage"
 msgstr ""
 
 msgid "Dlg_Villager_AboutVillage_1"
@@ -3099,7 +3105,7 @@ msgstr ""
 msgid "Dlg_Hunter_Greeting_1"
 msgstr ""
 
-msgid "Dlg_Hunter_Opt_AskPrey"
+msgid "Dlg_Hunter_Greeting_AskPrey"
 msgstr ""
 
 msgid "Dlg_Hunter_AboutPrey_1"
@@ -4085,10 +4091,10 @@ msgstr ""
 msgid "Npc_Human_Merchant"
 msgstr "Странствующий торговец"
 
-msgid "Dlg_Merchant_Greeting_1"
+msgid "Dlg_Human_Merchant_Greeting_1"
 msgstr "О, живой покупатель! Редкость на этой дороге. Взгляни — цены честные, ну... почти."
 
-msgid "Dlg_Merchant_Opt_Trade"
+msgid "Dlg_Human_Merchant_Greeting_Trade"
 msgstr "Показывай товар."
 
 msgid "UI_Inspect_Modifiers"
@@ -4377,10 +4383,10 @@ msgstr ""
 msgid "Dlg_Ronald_Greeting_1"
 msgstr ""
 
-msgid "Dlg_Ronald_Opt_Trade"
+msgid "Dlg_Ronald_Greeting_Trade"
 msgstr ""
 
-msgid "Dlg_Ronald_Opt_AskForge"
+msgid "Dlg_Ronald_Greeting_AskForge"
 msgstr ""
 
 msgid "Dlg_Ronald_AboutForge_1"
@@ -4459,22 +4465,22 @@ msgstr ""
 msgid "Ornament_Tier_3_Description"
 msgstr ""
 
-msgid "Dlg_Ronald_Opt_Trials"
+msgid "Dlg_Ronald_Greeting_AskTrials"
 msgstr ""
 
 msgid "Dlg_Ronald_Trials_1"
 msgstr ""
 
-msgid "Dlg_Ronald_Opt_Trial_Fang"
+msgid "Dlg_Ronald_Trials_TakeFang"
 msgstr ""
 
-msgid "Dlg_Ronald_Opt_Trial_Pack"
+msgid "Dlg_Ronald_Trials_TakePack"
 msgstr ""
 
-msgid "Dlg_Ronald_Opt_Trial_Mountain"
+msgid "Dlg_Ronald_Trials_TakeMountain"
 msgstr ""
 
-msgid "Dlg_Ronald_Opt_Trial_Grave"
+msgid "Dlg_Ronald_Trials_TakeGrave"
 msgstr ""
 
 msgid "Dlg_Ronald_TrialAccepted_1"
@@ -4483,25 +4489,19 @@ msgstr ""
 msgid "Dlg_Ronald_TrialWatch_1"
 msgstr ""
 
-msgid "Dlg_Ronald_Opt_TrialHint"
+msgid "Dlg_Ronald_TrialHintFang_1"
 msgstr ""
 
-msgid "Dlg_Ronald_TrialHint_Fang_1"
+msgid "Dlg_Ronald_TrialHintPack_1"
 msgstr ""
 
-msgid "Dlg_Ronald_TrialHint_Pack_1"
+msgid "Dlg_Ronald_TrialHintMountain_1"
 msgstr ""
 
-msgid "Dlg_Ronald_TrialHint_Mountain_1"
-msgstr ""
-
-msgid "Dlg_Ronald_TrialHint_Grave_1"
+msgid "Dlg_Ronald_TrialHintGrave_1"
 msgstr ""
 
 msgid "Dlg_Ronald_TrialReport_1"
-msgstr ""
-
-msgid "Dlg_Ronald_Opt_TrialTurnIn"
 msgstr ""
 
 msgid "Dlg_Ronald_TrialPraise_1"
