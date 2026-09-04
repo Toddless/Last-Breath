@@ -28,6 +28,14 @@ namespace Core.Narrative.Dialogues
             var data = JsonConvert.DeserializeObject<DialoguesData>(file.Json)
                        ?? throw new InvalidOperationException($"Failed to deserialize dialogues file '{file.FileName}'");
 
+            // The list written as null arrives as no list at all: the file is read, it simply holds no
+            // dialogue, and that is a report the loader makes rather than an exception out of the loop.
+            if (data.Dialogues is null)
+            {
+                Tracker.TrackError($"Dialogues file '{file.FileName}' writes no list of dialogues: nothing is read from it");
+                return;
+            }
+
             foreach (var entry in data.Dialogues)
             {
                 var dialogue = ParseDialogue(entry);

@@ -79,7 +79,7 @@ namespace LastBreathTest.BattleSystemTests
                 [.. s_report.Findings.Select(finding => (finding.Kind, finding.Where)).Distinct().Order()];
 
             Report("What the checks found in the shipped narrative", [.. s_report.Findings.Select(Line)]);
-            Report("What the run could not read or cannot answer for", [.. s_report.Notes]);
+            Report("What the run could not read", [.. s_report.Notes]);
 
             CollectionAssert.AreEquivalent(
                 s_known,

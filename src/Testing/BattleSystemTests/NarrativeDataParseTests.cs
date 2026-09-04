@@ -28,6 +28,15 @@ namespace LastBreathTest.BattleSystemTests
         private const string TrialQuestId = "Quest_Trial_Of_The_Fang";
         private const string SecondStageId = "GatherProof";
 
+        /// <summary>A file whose list is written as null. Newtonsoft hands the loader nothing there in
+        /// spite of the property's own default, so the shape is one an author can actually leave behind
+        /// and one the loader has to read rather than fall over inside.</summary>
+        private const string EmptiedFile = "emptied.json";
+
+        private const string NullDialoguesJson = """{"dialogues": null}""";
+
+        private const string NullQuestsJson = """{"quests": null}""";
+
         private WorldFactsService _facts = null!;
         private InfluenceMastery _influence = null!;
         private QuestProvider _quests = null!;
@@ -113,6 +122,19 @@ namespace LastBreathTest.BattleSystemTests
         {
             Assert.IsNotNull(_dialogues.Get(TraderNpcId), $"dialogue for '{TraderNpcId}' was dropped at parse — check the test log for the Tracker report");
             Assert.IsNotNull(_quests.Get(TrialQuestId), $"'{TrialQuestId}' was dropped at parse — check the test log for the Tracker report");
+        }
+
+        /// <summary>A file that writes its list as null is a file holding no record, and the loader says
+        /// so and reads on: an exception out of the loop would take down the whole catalog load and leave
+        /// the records of every other file unread.</summary>
+        [TestMethod]
+        public void ACatalogFileWritingItsListAsNull_IsReportedAndNotThrownOver()
+        {
+            _dialogues.Apply(DataCatalog.Dialogues, new GameDataFile(EmptiedFile, NullDialoguesJson));
+            _quests.Apply(DataCatalog.Quests, new GameDataFile(EmptiedFile, NullQuestsJson));
+
+            Assert.IsNotNull(_dialogues.Get(VeteranNpcId), "a file holding no dialogue took the read ones with it");
+            Assert.IsNotNull(_quests.Get(QuestId), "a file holding no quest took the read ones with it");
         }
 
         [TestMethod]

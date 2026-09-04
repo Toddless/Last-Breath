@@ -73,7 +73,8 @@ namespace Core.Narrative.Validation
 
         private const string UnreachableNodeFormat = "no route of the dialogue reaches '{0}'";
 
-        private const string DuplicateNodeFormat = "two nodes answer to '{0}'";
+        private const string DuplicateNodeFormat =
+            "two nodes answer to '{0}': the loader refuses the second one and drops the dialogue whole";
 
         private const string DuplicateStageFormat = "two stages answer to '{0}'";
 
@@ -192,17 +193,7 @@ namespace Core.Narrative.Validation
             {
                 string where = entry.NpcId is { Length: > 0 } npcId ? Under(DataCatalog.Dialogues, npcId) : At(DataCatalog.Dialogues, index);
 
-                if (entry.NpcId is not { Length: > 0 }) Add(NarrativeFindingKind.Incomplete, where, UnnamedDialogueText);
-                else
-                {
-                    Npc(entry.NpcId, Under(where, DialogueEntry.NpcIdKey), DialogueEntry.NpcIdKey);
-
-                    if (!_dialogueIds.Add(entry.NpcId))
-                        Add(NarrativeFindingKind.DuplicateId, where, string.Format(DuplicateDialogueFormat, entry.NpcId));
-
-                    if (!_input.LoadedDialogues.Contains(entry.NpcId))
-                        Add(NarrativeFindingKind.Dropped, where, string.Format(DroppedDialogueFormat, entry.NpcId));
-                }
+                DialogueNpc(entry, where);
 
                 if (entry.EntryRules.Count == 0) Add(NarrativeFindingKind.Incomplete, where, NoEntryRulesText);
                 if (entry.Nodes.Count == 0) Add(NarrativeFindingKind.Incomplete, where, NoNodesText);
@@ -213,6 +204,26 @@ namespace Core.Narrative.Validation
                 for (int node = 0; node < entry.Nodes.Count; node++) Node(entry.Nodes[node], where, node, nodes);
 
                 Unreachable(entry, where, nodes);
+            }
+
+            /// <summary>The npc a dialogue belongs to, which is also the name the catalog keeps it under.
+            /// Everything else here is asked of a written id: a dialogue with none is already out of the
+            /// game, and holding an empty word against the npc catalog would answer for the wrong fact.</summary>
+            private void DialogueNpc(DialogueEntry entry, string where)
+            {
+                if (entry.NpcId is not { Length: > 0 } npcId)
+                {
+                    Add(NarrativeFindingKind.Incomplete, where, UnnamedDialogueText);
+                    return;
+                }
+
+                Npc(npcId, Under(where, DialogueEntry.NpcIdKey), DialogueEntry.NpcIdKey);
+
+                if (!_dialogueIds.Add(npcId))
+                    Add(NarrativeFindingKind.DuplicateId, where, string.Format(DuplicateDialogueFormat, npcId));
+
+                if (!_input.LoadedDialogues.Contains(npcId))
+                    Add(NarrativeFindingKind.Dropped, where, string.Format(DroppedDialogueFormat, npcId));
             }
 
             /// <summary>The nodes one dialogue writes, and what it costs to write two of them alike: the
@@ -520,11 +531,11 @@ namespace Core.Narrative.Validation
                 for (int index = 0; index < entry.Stages.Count; index++)
                     if (entry.Stages[index].Id is { Length: > 0 } id) byId.TryAdd(id, index);
 
-                HashSet<string> said = new(StringComparer.Ordinal);
+                HashSet<string> considered = new(StringComparer.Ordinal);
 
                 foreach (QuestStageEntry stage in entry.Stages)
                 {
-                    if (stage.Id is not { Length: > 0 } id || !said.Add(id)) continue;
+                    if (stage.Id is not { Length: > 0 } id || !considered.Add(id)) continue;
                     if (!Loops(entry, byId, id)) continue;
 
                     Add(NarrativeFindingKind.LoopingStage, Under(Under(where, QuestEntry.StagesKey), id),

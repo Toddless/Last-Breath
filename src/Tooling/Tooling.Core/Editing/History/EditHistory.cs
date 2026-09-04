@@ -45,6 +45,10 @@ namespace Tooling.Editing.History
 
         private string _groupLabel = string.Empty;
 
+        /// <summary>The stack is in the middle of a change made of several: the news is held until it is
+        /// whole, or a reader would redraw a status line once per step of one thing that happened.</summary>
+        private bool _silent;
+
         /// <summary>The stack changed shape. What can be undone right now is the only thing outside
         /// that needs to hear about it.</summary>
         public event Action? Changed;
@@ -104,13 +108,13 @@ namespace Tooling.Editing.History
             if (_groupDepth > 0)
             {
                 _grouped.Add(command);
-                Changed?.Invoke();
+                Notify();
                 return;
             }
 
             if (_open && _done.Count > 0 && _done[^1] is IMergeableEdit top && top.TryAbsorb(command))
             {
-                Changed?.Invoke();
+                Notify();
                 return;
             }
 
@@ -135,7 +139,7 @@ namespace Tooling.Editing.History
 
             _open = false;
             _savedFor[owner] = NewestFor(owner);
-            Changed?.Invoke();
+            Notify();
         }
 
         /// <summary>
@@ -159,21 +163,35 @@ namespace Tooling.Editing.History
         /// run lays down is written into before it joins the tool, and the step that wrote it has to
         /// arrive with it or the one gesture that cannot be taken back is the one that created a file;
         /// the same goes for a step the author had already taken back, and for a document that reaches
-        /// the tool already written, which would otherwise be offered for saving forever.</summary>
+        /// the tool already written, which would otherwise be offered for saving forever.
+        /// <para>Taken into an open gesture the save points arrive naming the commands inside it rather
+        /// than the step it is filed as, so a document written before it joined reads as changed.</para></summary>
         public void Take(EditHistory other)
         {
             ArgumentNullException.ThrowIfNull(other);
 
             if (ReferenceEquals(other, this)) return;
 
-            foreach (IOwnedEdit command in other._done) Adopt(command);
+            _silent = true;
 
+            try
+            {
+                foreach (IOwnedEdit command in other._done) Adopt(command);
+            }
+            finally
+            {
+                _silent = false;
+            }
+
+            // A file joining the tool is a new edit like any other: what THIS stack had been stepped back
+            // out of is behind the author now, and the only branch ahead is the one arriving with it.
+            _undone.Clear();
             _undone.AddRange(other._undone);
 
             foreach (KeyValuePair<object, IOwnedEdit?> saved in other._savedFor) _savedFor[saved.Key] = saved.Value;
 
             other.Clear();
-            Changed?.Invoke();
+            Notify();
         }
 
         public IEditCommand? Undo() => Step(_done, _undone, undoing: true);
@@ -188,6 +206,15 @@ namespace Tooling.Editing.History
             _savedFor.Clear();
             _groupDepth = 0;
             _open = false;
+            Notify();
+        }
+
+        /// <summary>Tells whoever is listening that the stack has changed shape, unless a change made of
+        /// several is still being made.</summary>
+        private void Notify()
+        {
+            if (_silent) return;
+
             Changed?.Invoke();
         }
 
@@ -256,7 +283,7 @@ namespace Tooling.Editing.History
             // author has already stopped thinking about.
             if (_done.Count > MaxDepth) _done.RemoveAt(0);
 
-            Changed?.Invoke();
+            Notify();
         }
 
         /// <summary>Moves the newest command from one side to the other and applies it in that
@@ -273,7 +300,7 @@ namespace Tooling.Editing.History
 
             to.Add(command);
             _open = false;
-            Changed?.Invoke();
+            Notify();
             return command;
         }
 

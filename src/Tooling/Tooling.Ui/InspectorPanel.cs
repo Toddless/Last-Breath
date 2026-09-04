@@ -1297,7 +1297,10 @@ namespace Tooling.Ui
         /// <summary>Takes back the run of keystrokes just sealed, which is the newest step of the tool:
         /// a refused rename costs the author nothing to undo and leaves nothing on the stack. Guarded and
         /// redrawn the way every write of this panel is — a redraw from inside the box being left would
-        /// tear it down under the hand that left it.</summary>
+        /// tear it down under the hand that left it.
+        /// <para>The run is on top because nothing can have been filed over it: keystrokes into the id
+        /// merge into that one command and nothing else, the seal that asks this arrives with the box
+        /// being left, and the gesture that renames the keys is opened only after the answer.</para></summary>
         private void TakeBack(CatalogRecord record)
         {
             _writing = true;

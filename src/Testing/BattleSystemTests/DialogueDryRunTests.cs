@@ -76,10 +76,8 @@ namespace LastBreathTest.BattleSystemTests
             NarrativeSandbox seeded = Shipped(state);
             NarrativeSandbox empty = Shipped(new SandboxWorldState());
 
-            Assert.IsTrue(seeded.Caveats.Any(note => note.Contains("seeded quest", StringComparison.Ordinal)),
-                string.Join("; ", seeded.Caveats));
-            Assert.IsFalse(empty.Caveats.Any(note => note.Contains("seeded quest", StringComparison.Ordinal)),
-                string.Join("; ", empty.Caveats));
+            Assert.IsTrue(seeded.Caveats.Contains(NarrativeSandbox.SeededQuestNote), string.Join("; ", seeded.Caveats));
+            Assert.IsFalse(empty.Caveats.Contains(NarrativeSandbox.SeededQuestNote), string.Join("; ", empty.Caveats));
         }
 
         /// <summary>A root without the influence catalog falls back to built-in curves, and a chance

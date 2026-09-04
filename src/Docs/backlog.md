@@ -1,5 +1,22 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из чистки бэклога по описателям + PlayerStats и нарезки нарратива на файлы (2026-09-04; accept with minors) — закрыты: двойник Recovery, константы CombatRules, `Keys`/`Under`, `Words`→`ValuesAt`, слияние standing/settings тестов, пин `reordered` LootTables, доки, «Single = один json», DTO NpcSpawnRolls в `Core/Data`, аудит `Traders`, дока гранта NpcBuffs, `PerksField`, пропуск `Modifier`, PlayerStats описан; нарезка (решение 25): один файл на диалог/квест
+
+- (владельцу, данные) **`Trader_Ronald` без ключа .po** — `ReportMissingKeys` теперь постоянно Inconclusive из-за этой дыры; одна строка `msgid "Trader_Ronald"` в `en.po` (+ пустая в `ru.po`) вернёт аудиту различие «полно/не полно». Окно торговли Роналда показывает сырой id.
+- (владельцу, знать) порядок `QuestProvider.All`/диалогов стал алфавитным по имени файла (был авторский); игроку нигде не показывается, читают только `DebugConsole` и `NarrativeCheckRun`.
+- (владельцу, знать) `PlayerStatsProvider` перезаписывает профиль целиком на каждый файл каталога; второй json в папке без `unarmed` затрёт базу — держится только тестом «Single = один json». Явный `"unarmed": {}` теперь даёт ошибку, как отсутствующий.
+- (minor) `SharedDataRoot.SharedData.Files(catalog)` — копия `CatalogDescriptorTests.ShippedFiles` (20 вызовов). Стало: `ShippedFiles => [.. SharedData.Files(catalog)]`.
+- (nit) `NamesNoRecord` — `Ordinal` при регистронезависимом `ParseEnum` (`"modifier"`/`"masterylevel"` пройдут мимо пропуска); кованого случая «id ≠ имя файла» нет; `Report("Narrative files walked")` печатает пины, не обход; `HANDOFF.md:297`, `backlog.md` (ниже) всё ещё называют `Dialogues.json`/`Quests.json`; `QuestFailureGuardTests` `!.Quests` — NRE при `"quests": null`.
+- (знать) NarrativeEditor записей не создаёт — новая запись только через DataEditor (`FreeFilePlacement`, файл `<id>.json`).
+
+## Из чистки бэклога нарратива и гейта, волна C (2026-09-04; accept with minors) — закрыты: дока `Has`, доки родов, гуард null-списка в `Apply`, нит-пакет нарратива, `Take` чистит `_undone`, тесты `Reread`/пустой секции, дока `TakeBack`, Ctrl+S сеалит (без правки — `CommitTyping` → `ReleaseFocus` → `Seal`), `Notify()` один раз, `_rebuilding` в `finally`, usings
+
+- (владельцу, противоречие) CLAUDE.md:164 «`msgstr ""` → показывается ключ» против дефолта Godot `internationalization/locale/fallback = en` (в 7 `project.godot` не задан; `TranslationServer.Translate` уходит на фолбэк сам): при ru + пустом `msgstr` игрок увидит английскую строку. Либо `locale/fallback=""` в project.godot, либо поправить правило; дока `INarrativeTextSource.Has` сейчас повторяет CLAUDE.md.
+- (minor) `NarrativeCheckRun.cs:88-97` — `Written<>` при `{"dialogues": null}` бросает `ArgumentNullException` (catch только `JsonException`) → весь прогон проверок отваливается общим `catch` панели. Стало: `records(data) ?? []` + заметка.
+- (minor) `EditHistoryTests` — «`Take` поднимает `Changed` один раз» не закреплено (мутация «убрать `_silent`» зелёная). Стало: `Take_TellsTheOutsideOnce`.
+- (nit) `SeededQuestNote` public const между private (порядок §18), `NoPlayerNote` остался private; имя `ACatalogFileWritingItsListAsNull_IsReportedAndNotThrownOver` обещает репорт, ассертится только «записи не потеряны»; правило «новая правка = новая ветка» записано в `Record` и `Take` двумя комментариями; `Apply` называет каталог литералом при параметре `catalog`; `EditHistory.Open()` забирает верхний шаг без `Notify` (окно до `Close`).
+- (знать, открыто) Ctrl+Y сразу после отказа переименования возвращает занятое имя без проверки.
+
 ## Из волны описателей Effects/Conditions/PassiveSkills и починки инспектора для полиморфных записей (2026-09-04; rework → accept)
 
 Находки владельцу по данным:

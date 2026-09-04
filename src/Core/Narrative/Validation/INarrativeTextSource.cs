@@ -18,8 +18,8 @@ namespace Core.Narrative.Validation
 
         /// <summary>Whether the locale HOLDS the key at all, which is not the same question as whether it
         /// says anything under it. A key laid down with an empty translation counts as held and is passed
-        /// over: the game falls back to the reference locale for it, so it is text owed to a translator and
-        /// not a line the checks can tell from one already written.</summary>
+        /// over: what shows in its place is the key itself, which is a translation owed and not a line
+        /// nobody wrote.</summary>
         bool Has(string locale, string key);
     }
 

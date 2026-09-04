@@ -459,10 +459,18 @@ namespace DataEditor.Source.View
 
             _rebuilding = true;
 
+            // Held until the draw is over: a request the draw itself makes is the draw's own doing and
+            // not a new gesture, and letting it through would put a second frame's rebuild behind this one.
             Callable.From(() =>
             {
-                _rebuilding = false;
-                _inspector.Rebuild(_record, Suffixes(), Neighbour(_recordIndex));
+                try
+                {
+                    _inspector.Rebuild(_record, Suffixes(), Neighbour(_recordIndex));
+                }
+                finally
+                {
+                    _rebuilding = false;
+                }
             }).CallDeferred();
         }
 

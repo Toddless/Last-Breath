@@ -107,11 +107,6 @@ namespace Core.Narrative.Validation
                 NarrativeFindingKind.UnknownReference, where, string.Format(UnknownFormat, named, id, Named(targets))));
         }
 
-        /// <summary>The word a token is written as: a value reads as itself, and anything else as the shape
-        /// it was written in — the parser reads no member out of either, and naming the shape is what tells
-        /// a typo apart from a key written as a whole object.</summary>
-        private static string Word(JToken value) => value is JValue { Value: { } raw } ? raw.ToString() ?? string.Empty : value.Type.ToString();
-
         /// <summary>One word written where a member of a named set is meant — a vocabulary parameter
         /// offering choices, a record field the game parses into an enum. Both are read strictly: a word
         /// that is none of them throws in the parser and takes the whole record out of the game, so it is
@@ -132,6 +127,11 @@ namespace Core.Narrative.Validation
             _findings.Add(new NarrativeFinding(
                 NarrativeFindingKind.UnknownChoice, where, string.Format(ChoiceFormat, named, value, Listed(members))));
         }
+
+        /// <summary>The word a token is written as: a value reads as itself, and anything else as the shape
+        /// it was written in — the parser reads no member out of either, and naming the shape is what tells
+        /// a typo apart from a key written as a whole object.</summary>
+        private static string Word(JToken value) => value is JValue { Value: { } raw } ? raw.ToString() ?? string.Empty : value.Type.ToString();
 
         /// <summary>The members of a set, as one reader-facing phrase.</summary>
         private static string Listed(IReadOnlyList<string> members) => string.Join(ListSeparator, members);

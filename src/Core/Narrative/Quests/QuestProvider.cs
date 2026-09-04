@@ -29,6 +29,14 @@ namespace Core.Narrative.Quests
             var data = JsonConvert.DeserializeObject<QuestsData>(file.Json)
                        ?? throw new InvalidOperationException($"Failed to deserialize quests file '{file.FileName}'");
 
+            // The list written as null arrives as no list at all: the file is read, it simply holds no
+            // quest, and that is a report the loader makes rather than an exception out of the loop.
+            if (data.Quests is null)
+            {
+                Tracker.TrackError($"Quests file '{file.FileName}' writes no list of quests: nothing is read from it");
+                return;
+            }
+
             foreach (var entry in data.Quests)
             {
                 var quest = ParseQuest(entry);

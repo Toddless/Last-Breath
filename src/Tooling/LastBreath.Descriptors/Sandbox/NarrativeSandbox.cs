@@ -32,7 +32,9 @@ namespace LastBreath.Descriptors.Sandbox
         private const string NoPlayerNote =
             "the Attribute condition is never met here: a sandbox holds no character sheet to ask";
 
-        private const string SeededQuestNote =
+        /// <summary>What a world holding a quest is silent about. Public because a reader holding the run
+        /// has to be able to tell this caveat from the rest without matching on its wording.</summary>
+        public const string SeededQuestNote =
             "a seeded quest stands on the first stage of its record and its journal is not re-evaluated: "
             + "stages are entered and left when a choice moves the world, not when the world is typed";
 

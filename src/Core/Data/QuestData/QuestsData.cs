@@ -41,7 +41,7 @@ namespace Core.Data.QuestData
         public const string OnFailKey = "onFail";
 
         /// <summary>What the decline policy is read as when the key is not written.</summary>
-        public const string DefaultDeclinePolicy = "CanReturn";
+        public const string DefaultDeclinePolicy = nameof(Narrative.Quests.DeclinePolicy.CanReturn);
 
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
         [JsonProperty(GiverKey)][CatalogRef(DataCatalog.Npc)] public string GiverNpcId { get; init; } = string.Empty;
@@ -179,6 +179,6 @@ namespace Core.Data.QuestData
         [CatalogRef(ItemReference.Resources, Section = ItemReference.CraftingResources)]
         public string ItemId { get; init; } = string.Empty;
 
-        [JsonProperty(ItemReference.AmountKey)] public int Amount { get; init; } = 1;
+        [JsonProperty(ItemReference.AmountKey)] public int Amount { get; init; } = ItemReference.DefaultAmount;
     }
 }

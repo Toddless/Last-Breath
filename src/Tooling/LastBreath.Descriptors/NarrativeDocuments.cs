@@ -62,8 +62,7 @@ namespace LastBreath.Descriptors
         }
 
         /// <summary>One document read, or one note saying why it was not. The providers already drop a
-        /// broken record on their own; this catches the file that is not the shape they expect at all —
-        /// including the key written as null, which reaches a loader as a reference that is not there.</summary>
+        /// broken record on their own; this catches the file that is not the shape they expect at all.</summary>
         private static void Guarded(string name, Action read, ICollection<string> notes)
         {
             try
@@ -71,7 +70,7 @@ namespace LastBreath.Descriptors
                 read();
             }
             catch (Exception failure) when (failure is IOException or JsonException or InvalidOperationException
-                                               or ArgumentException or NullReferenceException)
+                                               or ArgumentException)
             {
                 notes.Add(Text(ReadFailedFormat, name, failure.Message));
             }

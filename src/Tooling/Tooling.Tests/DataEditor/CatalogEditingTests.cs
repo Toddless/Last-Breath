@@ -85,6 +85,10 @@ namespace Tooling.Tests.DataEditor
         private const string HealthKey = "Health";
         private const string RowId = "Row_First";
 
+        /// <summary>How a section with no word for itself would read if a refusal named it anyway: the
+        /// quotes of the wording with nothing between them.</summary>
+        private const string NamelessSection = "''";
+
         private const string TwoNpcs = """
             {
                 "npcs": [
@@ -744,6 +748,10 @@ namespace Tooling.Tests.DataEditor
 
             Assert.IsFalse(refused.Done);
             StringAssert.Contains(refused.Note, HealthKey);
+
+            // Named in the refusal is the id and nothing standing for a section: an author sent to look
+            // in a section written as an empty word is sent nowhere.
+            Assert.IsFalse(refused.Note!.Contains(NamelessSection, StringComparison.Ordinal), refused.Note);
             Assert.AreEqual(2, units.Records.Count);
         }
 
@@ -780,7 +788,10 @@ namespace Tooling.Tests.DataEditor
         }
 
         /// <summary>A record is never in its own way: the name is already written into it, and retyping it
-        /// — or the same word in another case — has taken nothing from anybody.</summary>
+        /// — or the same word in another case — has taken nothing from anybody. Asked the way the tool
+        /// asks it: the catalog is read again on every keystroke, so the record the panel holds is not the
+        /// instance the catalog now lists, and a record answered for by reference would be refused its own
+        /// name.</summary>
         [TestMethod]
         public void RenameRefusal_TakesTheRecordsOwnNameWhateverItsCase()
         {
@@ -788,6 +799,9 @@ namespace Tooling.Tests.DataEditor
 
             CatalogView view = Npcs();
             CatalogRecord record = view.Records[0];
+
+            Assert.IsTrue(record.File.Document.Put(record.Pointer.Append(IdField), new JValue(RonaldId)));
+            view.Reread();
 
             Assert.IsNull(CatalogEditing.RenameRefusal(view, record, RonaldId));
             Assert.IsNull(CatalogEditing.RenameRefusal(view, record, "npc_ronald"));

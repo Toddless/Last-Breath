@@ -10,7 +10,9 @@ namespace Core.Narrative.Validation
         /// something these rules do not read, and the run's own report names that.</summary>
         Dropped,
 
-        /// <summary>A record, a node or a stage is missing a part the game requires of it.</summary>
+        /// <summary>A record, a node or a stage is missing a part the game requires of it, or is written in
+        /// a shape that contradicts itself: an objective that is both a predicate and a counter or neither,
+        /// a stage that both ends and routes on, an ending that buries a quest written unable to fail.</summary>
         Incomplete,
 
         /// <summary>Two records of a catalog, or two nodes, stages or endings of one record, answer to the
@@ -30,7 +32,9 @@ namespace Core.Narrative.Validation
         /// <summary>A quest names an npc to take it from or hand it in to who has no dialogue to do it in.</summary>
         MissingDialogue,
 
-        /// <summary>A condition or an action is written under a word no factory of the vocabulary reads.</summary>
+        /// <summary>A condition or an action is written under a word no factory of the vocabulary reads,
+        /// or is not written as an entry at all — a list put down as an object, an entry as a bare value —
+        /// so the parsers read nothing out of it and the clause gates nothing.</summary>
         UnknownEntry,
 
         /// <summary>A key the vocabulary requires is not written, or is written empty.</summary>

@@ -1,5 +1,7 @@
 namespace Tooling.Tests.Editing
 {
+    using System;
+    using System.Collections.Generic;
     using Tooling.Editing.History;
 
     /// <summary>
@@ -623,6 +625,29 @@ namespace Tooling.Tests.Editing
 
             Assert.AreEqual(Second, cell.Value);
             Assert.IsFalse(tool.IsCleanFor(cell));
+        }
+
+        /// <summary>A file joining the tool is a new edit like any other, so the branch the author had
+        /// stepped back out of is behind him: a redo after it would otherwise repeat a step taken back
+        /// before the file existed, on top of the one that created it.</summary>
+        [TestMethod]
+        public void Take_DropsTheBranchTheToolHadSteppedOutOf()
+        {
+            EditHistory tool = new();
+            EditHistory own = new();
+            Cell typed = new(Initial);
+            Cell laid = new(Initial);
+
+            tool.Record(Write(typed, TitleField, First, LabelFirst));
+            tool.Undo();
+
+            own.Record(Write(laid, TitleField, Second, LabelSecond));
+            tool.Take(own);
+
+            Assert.IsFalse(tool.CanRedo, "the step stepped out of is behind the file that has just joined the tool");
+            Assert.IsNull(tool.NextRedo);
+            Assert.IsNull(tool.Redo());
+            Assert.AreEqual(Initial, typed.Value);
         }
 
         /// <summary>A file adopted in the middle of a gesture was laid down by it: its step joins the
