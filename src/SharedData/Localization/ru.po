@@ -1048,7 +1048,7 @@ msgid "Npc_Bandit_Veteran"
 msgstr ""
 
 msgid "Dlg_Veteran_Greeting_1"
-msgstr ""
+msgstr "Чего ты хочешь? Говори быстрее."
 
 msgid "Dlg_Veteran_Opt_AskWork"
 msgstr ""
