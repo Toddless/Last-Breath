@@ -37,10 +37,11 @@ namespace Core.Data.NpcBuffsData
     /// factory declares — a missing key is a refusal at mint, not a silent no-op.</summary>
     public record NpcBuffGrantData
     {
-        [JsonProperty("kind")][EnumOf(typeof(GrantKind))] public string Kind { get; init; } = "Passive";
+        [JsonProperty("kind")][EnumOf(typeof(GrantKind))] public string Kind { get; init; } = nameof(GrantKind.Passive);
 
         /// <summary>The behaviour handed over, answered from whichever catalog declares it — the kind
-        /// beside it says which.</summary>
+        /// beside it says which. A <see cref="GrantKind.Modifier"/> grant names no record at all: its id
+        /// is the label its own lines are minted under.</summary>
         [CatalogRef(DataCatalog.PassiveSkills)]
         [CatalogRef(DataCatalog.Effects)]
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;

@@ -9,6 +9,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Data.GameData;
     using Core.Data.LootTable;
     using Core.Data.NpcData;
+    using Core.Data.PlayerStatsData;
     using Core.Data.Schema;
     using Core.Enums;
     using Core.Inventory;
@@ -1389,31 +1390,11 @@ namespace LastBreathTest.BattleSystemTests
             CollectionAssert.Contains(field.RefTargets.ToArray(), target, $"'{path}' does not point into {target}");
         }
 
-        /// <summary>The keys one map is written with, wherever in a document it stands.</summary>
-        private static IEnumerable<string> Keys(JToken token, string map)
-        {
-            switch (token)
-            {
-                case JObject holder:
-                    foreach (JProperty property in holder.Properties())
-                    {
-                        if (property.Name == map && property.Value is JObject keyed)
-                            foreach (JProperty key in keyed.Properties())
-                                yield return key.Name;
-
-                        foreach (string nested in Keys(property.Value, map)) yield return nested;
-                    }
-
-                    break;
-
-                case JArray array:
-                    foreach (JToken item in array)
-                        foreach (string nested in Keys(item, map))
-                            yield return nested;
-
-                    break;
-            }
-        }
+        /// <summary>The keys one map is written with, wherever in a document it stands. The finding of it
+        /// is <see cref="Under"/>'s, which is the same walk: what is written under a name and what that
+        /// something is KEYED by are one question asked twice.</summary>
+        private static IEnumerable<string> Keys(JToken token, string map) =>
+            Under(token, map).OfType<JObject>().SelectMany(keyed => keyed.Properties()).Select(key => key.Name);
 
         /// <summary>How many times a key is written anywhere in a document — how many composites a catalog
         /// ships, how many of its lines hand out behaviour instead of a number.</summary>
@@ -1726,12 +1707,13 @@ namespace LastBreathTest.BattleSystemTests
                 ? $"{what}: none."
                 : $"{what} ({lines.Count}):{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", lines)}");
 
-        /// <summary>The one file each of the two narrative catalogs ships today. Neither placement rule
-        /// names it — both leave the file to the tool, so that a story line may be written into a file of
-        /// its own — and the names are held here to say what the walks were run over.</summary>
-        private const string DialoguesFileName = "Dialogues";
+        /// <summary>How many files each of the two narrative catalogs ships. Neither placement rule names
+        /// a file — both leave it to the tool — and the catalogs are written one record apiece, so a file
+        /// is a dialogue and a file is a quest. The counts are held here to say what the walks were run
+        /// over; <see cref="EveryNarrativeFileHoldsTheOneRecordItIsNamedAfter"/> holds the rest of it.</summary>
+        private const int ShippedDialogueCount = 9;
 
-        private const string QuestsFileName = "Quests";
+        private const int ShippedQuestCount = 5;
 
         /// <summary>What a dialogue writes its opening rules, its nodes and the parts of a node under. No
         /// descriptor names them — they are the DTOs' own fields, the way a table's tiers are — so the
@@ -1906,6 +1888,25 @@ namespace LastBreathTest.BattleSystemTests
         }
         """;
 
+        /// <summary>Two dialogues written into one file, which is what the walk over the shipped files
+        /// exists to find: the catalog is split one record to a file named after it.</summary>
+        private const string ForgedSharedFileJson = """
+        {
+          "dialogues": [
+            {
+              "npcId": "Npc_Forged",
+              "entryRules": [ { "priority": 0, "conditions": [], "node": "Greeting" } ],
+              "nodes": [ { "id": "Greeting", "lines": [], "options": [ { "id": "Leave", "key": "Dlg_Opt_Leave" } ] } ]
+            },
+            {
+              "npcId": "Npc_Forged_Second",
+              "entryRules": [ { "priority": 0, "conditions": [], "node": "Greeting" } ],
+              "nodes": [ { "id": "Greeting", "lines": [], "options": [ { "id": "Leave", "key": "Dlg_Opt_Leave" } ] } ]
+            }
+          ]
+        }
+        """;
+
         /// <summary>A quest whose route leads to a stage nobody wrote.</summary>
         private const string ForgedQuestRouteJson = """
         {
@@ -1942,10 +1943,10 @@ namespace LastBreathTest.BattleSystemTests
                 "a dialogue words nothing from its own id: every line and option carries the key it is read under");
 
             Assert.IsInstanceOfType<FreeFilePlacement>(schema.Placement, "the dialogues name a file of their own");
-            CollectionAssert.AreEqual(
-                new[] { DialoguesFileName },
-                ShippedFiles(DataCatalog.Dialogues).Select(Path.GetFileNameWithoutExtension).ToArray(),
-                "the catalog ships other files than the one known today");
+            Assert.AreEqual(
+                ShippedDialogueCount,
+                ShippedFiles(DataCatalog.Dialogues).Count,
+                "the catalog ships another number of files than the dialogues known today");
 
             CollectionAssert.AreEquivalent(
                 s_dialogueFreeFormFields,
@@ -2014,10 +2015,10 @@ namespace LastBreathTest.BattleSystemTests
                 "a quest is named and described in the journal by its own id");
 
             Assert.IsInstanceOfType<FreeFilePlacement>(schema.Placement, "the quests name a file of their own");
-            CollectionAssert.AreEqual(
-                new[] { QuestsFileName },
-                ShippedFiles(DataCatalog.Quests).Select(Path.GetFileNameWithoutExtension).ToArray(),
-                "the catalog ships other files than the one known today");
+            Assert.AreEqual(
+                ShippedQuestCount,
+                ShippedFiles(DataCatalog.Quests).Count,
+                "the catalog ships another number of files than the quests known today");
 
             CollectionAssert.AreEquivalent(
                 s_questFreeFormFields,
@@ -2103,6 +2104,59 @@ namespace LastBreathTest.BattleSystemTests
         public void TheQuestsSchemaRanksEveryKeyTheShippedFilesWriteOutsideAConditionOrAnAction()
         {
             InsideFreeFormOnly(Schema(DataCatalog.Quests), DataCatalog.Quests);
+        }
+
+        /// <summary>
+        /// Both narrative catalogs are written one record to a file, named by the id the record is found
+        /// under: a dialogue under the npc that speaks it, a quest under its own id. The loader takes the
+        /// whole folder and never reads a file name, so the rule is the author's alone — and it is the
+        /// reason he opens the conversation he means instead of scrolling one file holding all of them.
+        /// </summary>
+        [TestMethod]
+        public void EveryNarrativeFileHoldsTheOneRecordItIsNamedAfter()
+        {
+            List<string> misplaced =
+            [
+                .. ShippedFiles(DataCatalog.Dialogues)
+                    .SelectMany(file => RecordsOutOfPlace(file, DialoguesCatalogDescriptor.RecordsKey, DialoguesCatalogDescriptor.IdField)),
+                .. ShippedFiles(DataCatalog.Quests)
+                    .SelectMany(file => RecordsOutOfPlace(file, QuestsCatalogDescriptor.RecordsKey, QuestsCatalogDescriptor.IdField))
+            ];
+
+            Report("Narrative files walked", [$"{ShippedDialogueCount} dialogue(s)", $"{ShippedQuestCount} quest(s)"]);
+
+            Assert.AreEqual(0, misplaced.Count,
+                $"narrative files holding other than the one record they are named after: {string.Join(", ", misplaced)}");
+        }
+
+        /// <summary>The mutation the walk exists for: two dialogues written into one file is the catalog
+        /// growing a second monolith back, which the loader would read without a word.</summary>
+        [TestMethod]
+        public void ANarrativeFileHoldingTwoRecords_IsCaught()
+        {
+            List<string> misplaced = RecordsOutOfPlace(
+                JsonTreeDocument.Parse(ForgedSharedFileJson).Root,
+                "Npc_Forged",
+                DialoguesCatalogDescriptor.RecordsKey,
+                DialoguesCatalogDescriptor.IdField);
+
+            Assert.AreEqual(1, misplaced.Count, "a file holding two dialogues went unnoticed");
+        }
+
+        /// <summary>What a narrative file has to say about itself: another number of records than the one
+        /// it is named after, or a record whose id is not the name of the file it was written into.</summary>
+        private static List<string> RecordsOutOfPlace(string file, string section, string idField) =>
+            RecordsOutOfPlace(JsonTreeDocument.Load(file).Root, Path.GetFileNameWithoutExtension(file), section, idField);
+
+        private static List<string> RecordsOutOfPlace(JToken root, string name, string section, string idField)
+        {
+            List<JObject> records = SectionRecords(root, section);
+
+            if (records.Count != 1) return [$"{name} holds {records.Count} record(s)"];
+
+            string id = Id(records[0], idField);
+
+            return string.Equals(id, name, StringComparison.Ordinal) ? [] : [$"{name} holds '{id}'"];
         }
 
         /// <summary>
@@ -2299,17 +2353,22 @@ namespace LastBreathTest.BattleSystemTests
         /// any word and fail at load instead.</summary>
         private static readonly (string Catalog, string Path, Type Members)[] s_settingsChoices =
         [
-            (DataCatalog.CombatRules, "controlResistance.hardControlStatuses", typeof(StatusEffects)),
-            (DataCatalog.CombatRules, "controlResistance.appliesTo", typeof(EntityType)),
+            (DataCatalog.CombatRules,
+                $"{CombatRulesCatalogDescriptor.ControlResistanceField}{PathSeparator}{CombatRulesCatalogDescriptor.HardControlStatusesField}",
+                typeof(StatusEffects)),
+            (DataCatalog.CombatRules,
+                $"{CombatRulesCatalogDescriptor.ControlResistanceField}{PathSeparator}{CombatRulesCatalogDescriptor.AppliesToField}",
+                typeof(EntityType)),
             (DataCatalog.Formatting, FormattingCatalogDescriptor.IdField, typeof(EntityParameter)),
             (DataCatalog.Formatting, FormattingCatalogDescriptor.UnitField, typeof(ParameterUnit)),
         ];
 
         /// <summary>Every map of a settings document whose KEYS are members of an enum rather than words
         /// the author picks. None of the readers takes a word it does not know: the budgets and the price
-        /// multipliers throw at load, the mastery's maps drop the entry with a report — a rarity paying
-        /// nothing and a channel worth zero. Either way the tool has to offer the members rather than a
-        /// text box.</summary>
+        /// multipliers throw at load, the mastery's rarity weights and the player's baseline drop the
+        /// entry with a report — a rarity paying nothing and a stat worth zero — and a mode the exp
+        /// rewards do not name pays the FULL rate rather than none. Either way the tool has to offer the
+        /// members rather than a text box.</summary>
         private static readonly (string Catalog, string Path, Type Members)[] s_settingsMapKeys =
         [
             (DataCatalog.LootConfiguration, LootConfigurationCatalogDescriptor.BaseBudgetField, typeof(EntityType)),
@@ -2322,6 +2381,7 @@ namespace LastBreathTest.BattleSystemTests
             (DataCatalog.CraftingMastery,
                 $"{CraftingMasteryCatalogDescriptor.ExpRewardsField}{PathSeparator}{CraftingMasteryCatalogDescriptor.ExpModeFactorsField}",
                 typeof(CraftingMode)),
+            (DataCatalog.PlayerStats, PlayerStatsData.UnarmedField, typeof(EntityParameter)),
         ];
 
         /// <summary>Every number of a settings document whose ends the game enforces: a multicast row
@@ -2329,8 +2389,14 @@ namespace LastBreathTest.BattleSystemTests
         /// instead of letting the author write a stage that silently never rolls.</summary>
         private static readonly (string Catalog, string Path, double Min, double Max)[] s_settingsRanges =
         [
-            (DataCatalog.CombatRules, "multicast.stages.chance", 0, 1),
-            (DataCatalog.CombatRules, "multicast.stages.cap", 0, 1),
+            (DataCatalog.CombatRules,
+                $"{CombatRulesCatalogDescriptor.MulticastField}{PathSeparator}{CombatRulesCatalogDescriptor.StagesField}" +
+                $"{PathSeparator}{CombatRulesCatalogDescriptor.ChanceField}",
+                0, 1),
+            (DataCatalog.CombatRules,
+                $"{CombatRulesCatalogDescriptor.MulticastField}{PathSeparator}{CombatRulesCatalogDescriptor.StagesField}" +
+                $"{PathSeparator}{CombatRulesCatalogDescriptor.CapField}",
+                0, 1),
         ];
 
         /// <summary>
@@ -2354,6 +2420,7 @@ namespace LastBreathTest.BattleSystemTests
         [DataRow(DataCatalog.CraftingMastery, "CraftingMastery")]
         [DataRow(DataCatalog.Factions, "FactionRelations")]
         [DataRow(DataCatalog.NpcSpawnRolls, "NpcSpawnRolls")]
+        [DataRow(DataCatalog.PlayerStats, "PlayerStats")]
         public void ASettingsCatalogIsOneRecordAtTheRootOfItsOneFile(string catalog, string fileName)
         {
             CatalogSchemaBuilder builder = new(new SchemaReflector());
@@ -2368,6 +2435,12 @@ namespace LastBreathTest.BattleSystemTests
                 $"{catalog} is tuning: nothing in it is keyed off an id it does not have");
             Assert.AreEqual(fileName, schema.Placement.FileFor(_ => null), $"the {catalog} catalog names another file");
             Assert.AreNotEqual(0, schema.Sections[0].Record.Fields.Count, $"the {catalog} record was read with no fields at all");
+
+            // The placement names ONE file, so a folder holding a second one holds a document the tool
+            // never opens: the author edits it and the game reads it, and the two say different things.
+            Assert.AreEqual(1, ShippedFiles(catalog).Count,
+                $"the {catalog} folder ships more than the one file its placement names: "
+                + string.Join(", ", ShippedFiles(catalog).Select(Path.GetFileName)));
 
             Unexpected(builder.Reflection.Notes, s_settingsNotes, builder.Reflection);
             CollectionAssert.AreEqual(
@@ -2392,6 +2465,7 @@ namespace LastBreathTest.BattleSystemTests
         [DataRow(DataCatalog.MartialArtMastery)]
         [DataRow(DataCatalog.CraftingMastery)]
         [DataRow(DataCatalog.Formatting)]
+        [DataRow(DataCatalog.PlayerStats)]
         public void ASettingsCatalogRanksEveryKeyItsShippedFileWrites(string catalog)
         {
             List<string> unknown = UnknownKeys(Schema(catalog), catalog);
@@ -2429,34 +2503,40 @@ namespace LastBreathTest.BattleSystemTests
                 $"the assembled Formatting catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
         }
 
-        /// <summary>Every word a settings parser turns into an enum member, said so in the schema and
-        /// held against what the shipped file writes. An unmarked one reads to the tool as free text: the
-        /// author types a name nothing answers, and the miss surfaces as a throw at load.</summary>
+        /// <summary>
+        /// Every word a parser turns into an enum member, said so in the schema and held against what the
+        /// shipped file writes. An unmarked one reads to the tool as free text: the author types a name
+        /// nothing answers, and the miss surfaces as a throw or a dropped record at load.
+        /// <para>One walk for the settings documents and for the standing wave alike: the two tables are
+        /// the same three facts about the same kind of field, and a second copy of the check would be a
+        /// second place for the rule to drift.</para>
+        /// </summary>
         [TestMethod]
-        public void EverySettingsChoiceOffersItsMembersAndTheShippedFilesStayInThem()
+        public void EveryChoiceOffersItsMembersAndTheShippedFilesStayInThem()
         {
-            foreach ((string catalog, string path, Type members) in s_settingsChoices)
+            foreach ((string catalog, string path, Type members) in s_settingsChoices.Concat(s_standingChoices))
             {
                 CatalogSchema schema = Schema(catalog);
                 Choice(Leaf(Locate(schema.Sections[0].Record, path)), members);
 
-                List<string> written = [.. Words(Root(schema, catalog), LastSegment(path)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+                List<string> written = [.. ValuesAt(Root(schema, catalog), DocumentPath(schema, path))];
 
                 Assert.AreNotEqual(0, written.Count, $"the shipped {catalog} file writes no '{path}' — the check is checking nothing");
-                CollectionAssert.IsSubsetOf(
-                    written,
-                    Enum.GetNames(members),
-                    $"the shipped {catalog} file writes something other than a {members.Name} at '{path}': {string.Join(", ", written)}");
+                CollectionAssert.AreEqual(
+                    Array.Empty<string>(),
+                    Strangers(written, members).ToArray(),
+                    $"the shipped {catalog} file writes something other than a {members.Name} at '{path}'");
             }
         }
 
-        /// <summary>Every map of a settings document whose keys are enum members, said so in the schema
-        /// and held against what the shipped file writes. The keys are parsed strictly, so a key naming
-        /// no member takes the whole catalog down at load rather than losing its own line.</summary>
+        /// <summary>Every map whose keys are enum members, said so in the schema and held against what the
+        /// shipped file keys it by. A key naming no member is dropped with a report where the weights are
+        /// read and takes the whole file down where the ladders are — either way it is a rule that never
+        /// fires, which is what a picker instead of a text box prevents.</summary>
         [TestMethod]
-        public void EverySettingsMapOffersItsKeysAndTheShippedFilesStayInThem()
+        public void EveryMapOffersItsKeysAndTheShippedFilesStayInThem()
         {
-            foreach ((string catalog, string path, Type members) in s_settingsMapKeys)
+            foreach ((string catalog, string path, Type members) in s_settingsMapKeys.Concat(s_standingMapKeys))
             {
                 CatalogSchema schema = Schema(catalog);
                 FieldSchema map = Locate(schema.Sections[0].Record, path);
@@ -2466,15 +2546,23 @@ namespace LastBreathTest.BattleSystemTests
                     map.Key ?? throw new AssertFailedException($"'{catalog}.{path}' lets the author write its keys freely"),
                     members);
 
-                List<string> written = [.. Keys(Root(schema, catalog), LastSegment(path)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+                List<string> written = [.. Keys(Root(schema, catalog), LastSegment(path))];
 
                 Assert.AreNotEqual(0, written.Count, $"the shipped {catalog} file keys nothing under '{path}' — the check is checking nothing");
-                CollectionAssert.IsSubsetOf(
-                    written,
-                    Enum.GetNames(members),
-                    $"the shipped {catalog} file keys '{path}' by something other than a {members.Name}: {string.Join(", ", written)}");
+                CollectionAssert.AreEqual(
+                    Array.Empty<string>(),
+                    Strangers(written, members).ToArray(),
+                    $"the shipped {catalog} file keys '{path}' by something other than a {members.Name}");
             }
         }
+
+        /// <summary>Where a document writes what a path down a RECORD addresses: under the key the one
+        /// section stands at, which a settings document has none of because its record IS the root.</summary>
+        private static string[] DocumentPath(CatalogSchema schema, string path) =>
+        [
+            .. schema.Sections[0].Key.Split(PathSeparator, StringSplitOptions.RemoveEmptyEntries),
+            .. path.Split(PathSeparator)
+        ];
 
         /// <summary>Every number whose ends the game enforces, said so in the schema and held against
         /// what the shipped file writes. The ends are the point: a row outside them is dropped at load,
@@ -3159,7 +3247,7 @@ namespace LastBreathTest.BattleSystemTests
             if (answering.Count != field.RefTargets.Count) return (unanswered, walked);
 
             foreach (JObject record in SectionRecords(root, section.Key))
-                foreach (string id in ValuesAt(record, path))
+                foreach (string id in ValuesAt(record, path, NamesNoRecord))
                 {
                     if (id.Length == 0) continue;
 
@@ -3174,14 +3262,16 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>
-        /// Records whose id the walk must not read as a reference. One case, and it is the price of a
+        /// Records whose id the walk must not read as a reference. Two cases, and both are the price of a
         /// markup that cannot see the field beside it: a requirement demanding a level of mastery writes a
-        /// LOCALIZATION KEY where its siblings write a resource, and the markup states the catalogs
-        /// without regard to the type — the shipped word answering nothing there is the limit of the
-        /// contract and not broken data.
+        /// LOCALIZATION KEY where its siblings write a resource, and a grant handing over a MODIFIER names
+        /// no record anywhere — its id is the label its own lines are minted under. The markup states the
+        /// catalogs without regard to the field that says which, so the shipped word answering nothing
+        /// there is the limit of the contract and not broken data.
         /// </summary>
         private static bool NamesNoRecord(JObject holder) =>
-            string.Equals(holder.Value<string>(RequirementTypeField), nameof(RequirementType.MasteryLevel), StringComparison.Ordinal);
+            string.Equals(holder.Value<string>(RequirementTypeField), nameof(RequirementType.MasteryLevel), StringComparison.Ordinal)
+            || string.Equals(holder.Value<string>(GrantKindField), nameof(GrantKind.Modifier), StringComparison.Ordinal);
 
         /// <summary>Every id one target answers with, read out of the shipped files of the catalog it names
         /// and off that catalog's own schema. Null for a catalog no descriptor covers: what that one is
@@ -3220,15 +3310,21 @@ namespace LastBreathTest.BattleSystemTests
             return ids;
         }
 
-        /// <summary>Every string one address reaches inside a record: through the lists standing on the
-        /// way, and through the keys of a map wherever the address writes a <see cref="AnyKey"/>. A record
-        /// that <see cref="NamesNoRecord"/> answers for is stepped over with everything under it.</summary>
-        private static IEnumerable<string> ValuesAt(JToken token, string[] path, int step = 0)
+        /// <summary>
+        /// Every value one address reaches inside a record, as the text it is written as: through the
+        /// lists standing on the way, and through the keys of a map wherever the address writes a
+        /// <see cref="AnyKey"/>. A number met where a word was expected is read as its digits rather than
+        /// passed over — that is the miss the walk exists to name.
+        /// </summary>
+        /// <param name="stepOver">Records the walk must not read, with everything under them. Named by the
+        /// caller and not by the walk: what a REFERENCE may skip is the reference walk's own rule, and a
+        /// walk reading what is simply written skips nothing.</param>
+        private static IEnumerable<string> ValuesAt(JToken token, string[] path, Func<JObject, bool>? stepOver = null, int step = 0)
         {
             if (token is JArray array)
             {
                 foreach (JToken item in array)
-                    foreach (string found in ValuesAt(item, path, step))
+                    foreach (string found in ValuesAt(item, path, stepOver, step))
                         yield return found;
 
                 yield break;
@@ -3241,12 +3337,12 @@ namespace LastBreathTest.BattleSystemTests
                 yield break;
             }
 
-            if (token is not JObject holder || NamesNoRecord(holder)) yield break;
+            if (token is not JObject holder || stepOver?.Invoke(holder) == true) yield break;
 
             if (path[step] == AnyKey)
             {
                 foreach (JProperty property in holder.Properties())
-                    foreach (string found in ValuesAt(property.Value, path, step + 1))
+                    foreach (string found in ValuesAt(property.Value, path, stepOver, step + 1))
                         yield return found;
 
                 yield break;
@@ -3254,7 +3350,7 @@ namespace LastBreathTest.BattleSystemTests
 
             if (holder[path[step]] is not { } child) yield break;
 
-            foreach (string nested in ValuesAt(child, path, step + 1)) yield return nested;
+            foreach (string nested in ValuesAt(child, path, stepOver, step + 1)) yield return nested;
         }
 
         /// <summary>What the reflector may still have to say about the DTOs of the standing wave — one
@@ -3429,52 +3525,6 @@ namespace LastBreathTest.BattleSystemTests
                 + string.Join($"{Environment.NewLine}  ", named));
         }
 
-        /// <summary>Every word a parser of the wave turns into an enum member, said so in the schema and
-        /// held against what the shipped file writes. An unmarked one reads to the tool as free text: the
-        /// author types a name nothing answers, and the miss surfaces as a dropped record at load.</summary>
-        [TestMethod]
-        public void EveryStandingChoiceOffersItsMembersAndTheShippedFilesStayInThem()
-        {
-            foreach ((string catalog, string path, Type members) in s_standingChoices)
-            {
-                CatalogSchema schema = Schema(catalog);
-                Choice(Leaf(Locate(schema.Sections[0].Record, path)), members);
-
-                List<string> written = [.. Words(Root(schema, catalog), LastSegment(path))];
-
-                Assert.AreNotEqual(0, written.Count, $"the shipped {catalog} file writes no '{path}' — the check is checking nothing");
-                CollectionAssert.AreEqual(
-                    Array.Empty<string>(),
-                    Strangers(written, members).ToArray(),
-                    $"the shipped {catalog} file writes something other than a {members.Name} at '{path}'");
-            }
-        }
-
-        /// <summary>Every map of the wave whose keys are enum members, said so in the schema and held
-        /// against what the shipped file keys it by.</summary>
-        [TestMethod]
-        public void EveryStandingMapOffersItsKeysAndTheShippedFilesStayInThem()
-        {
-            foreach ((string catalog, string path, Type members) in s_standingMapKeys)
-            {
-                CatalogSchema schema = Schema(catalog);
-                FieldSchema map = Locate(schema.Sections[0].Record, path);
-
-                Assert.AreEqual(FieldKind.Dictionary, map.Kind, $"'{catalog}.{path}' is not a map");
-                Choice(
-                    map.Key ?? throw new AssertFailedException($"'{catalog}.{path}' lets the author write its keys freely"),
-                    members);
-
-                List<string> written = [.. Keys(Root(schema, catalog), LastSegment(path))];
-
-                Assert.AreNotEqual(0, written.Count, $"the shipped {catalog} file keys nothing under '{path}' — the check is checking nothing");
-                CollectionAssert.AreEqual(
-                    Array.Empty<string>(),
-                    Strangers(written, members).ToArray(),
-                    $"the shipped {catalog} file keys '{path}' by something other than a {members.Name}");
-            }
-        }
-
         /// <summary>
         /// What a shelf sells and what a buff hands over: the two references of the wave, said so in the
         /// schema. The shelf answers from exactly where a kill's drop does — a shop resolves an equipment
@@ -3573,6 +3623,10 @@ namespace LastBreathTest.BattleSystemTests
 
         private const string GrantIdField = "id";
 
+        /// <summary>What a grant writes the KIND of behaviour it hands over under — the field that says
+        /// whether its id names a record at all.</summary>
+        private const string GrantKindField = "kind";
+
         /// <summary>What the reflector may still have to say about the DTOs of the grant-target wave — one
         /// list for all three catalogs, because it is empty for all three: an effect row, a passive entry
         /// and the forms of a condition are plain properties the walk reads whole. A note appearing here is
@@ -3591,10 +3645,11 @@ namespace LastBreathTest.BattleSystemTests
         ];
 
         /// <summary>
-        /// Every field of the wave a parser turns into an enum member, addressed the way the file writes
-        /// it. All of them are read strictly and every miss costs a whole record: an unreadable strength
-        /// refuses the effect row, and an unreadable word of a condition refuses the entry — which leaves
-        /// every line naming that condition dropped rather than left unconditional.
+        /// Every field of the wave a parser turns into an enum member on the RECORD itself, addressed the
+        /// way the file writes it. It is read strictly and the miss costs a whole record: an unreadable
+        /// strength refuses the effect row, and the effect keeps whatever balance its factory was built
+        /// with. The words a condition is narrowed by are held per form as well as per field, so they are
+        /// stated in <see cref="s_conditionChoices"/> instead.
         /// </summary>
         private static readonly (string Catalog, string Path, Type Members)[] s_grantTargetChoices =
         [
@@ -3680,7 +3735,9 @@ namespace LastBreathTest.BattleSystemTests
         ];
 
         /// <summary>The grants the shipped data writes that nothing declares. Empty, and held as the whole
-        /// list rather than as a count: one arriving fails, and one going away fails just as loudly.</summary>
+        /// list rather than as a count: one arriving fails, and one going away fails just as loudly. Grants
+        /// of kind Modifier are not among them at all — they name no record anywhere, and the walk steps
+        /// over them the way it steps over a requirement asking for a level of mastery.</summary>
         private static readonly string[] s_unansweredGrants = [];
 
         /// <summary>A grant naming a passive nobody wrote, beside one naming a passive the catalog does
@@ -3690,6 +3747,18 @@ namespace LastBreathTest.BattleSystemTests
           "effects": [
             { "id": "Passive_Skill_Nobody_Wrote", "kind": "Passive", "weight": 100 },
             { "id": "Passive_Skill_Execute", "kind": "Passive", "weight": 100 }
+          ]
+        }
+        """;
+
+        /// <summary>A grant handing over a MODIFIER, whose id names no record and never could, beside a
+        /// passive grant naming nothing: the walk has to pass the first over entirely and still say the
+        /// second.</summary>
+        private const string ForgedModifierGrantJson = """
+        {
+          "effects": [
+            { "id": "Item_Effect_Of_Its_Own_Lines", "kind": "Modifier", "weight": 100 },
+            { "id": "Passive_Skill_Nobody_Wrote", "kind": "Passive", "weight": 100 }
           ]
         }
         """;
@@ -3911,20 +3980,22 @@ namespace LastBreathTest.BattleSystemTests
                     $"'{counting}' demands a count, and a record writing none counts one rather than nothing");
         }
 
-        /// <summary>The shipped conditions written back out through the schema, key for key. The catalog is
-        /// the one whose records take nine shapes, so its key order is assembled from the forms and the
+        /// <summary>A shipped file of a catalog whose records take several shapes, written back out through
+        /// the schema key for key. The key order of such a catalog is assembled from the forms and the
         /// record together — and an order that disagrees with the file has the tool silently rewrite every
         /// record the first time an author saves one of them.</summary>
-        [TestMethod]
-        public void TheCanonicalWriteOfTheShippedConditionsMovesNothing()
+        [DataTestMethod]
+        [DataRow(DataCatalog.Conditions)]
+        [DataRow(DataCatalog.LootTables)]
+        public void TheCanonicalWriteOfAShippedPolymorphicCatalogMovesNothing(string catalog)
         {
-            CatalogSchema schema = Schema(DataCatalog.Conditions);
-            JToken root = JsonTreeDocument.Load(CatalogFile(schema, DataCatalog.Conditions)).Root;
+            CatalogSchema schema = Schema(catalog);
+            JToken root = JsonTreeDocument.Load(CatalogFile(schema, catalog)).Root;
 
             (List<string> unknown, List<string> reordered) = Written(root, schema, new SchemaKeyOrder(schema));
 
             Assert.AreEqual(0, unknown.Count,
-                $"keys of the shipped conditions no field of the schema is written under: {string.Join(", ", unknown)}");
+                $"keys of the shipped {catalog} file no field of the schema is written under: {string.Join(", ", unknown)}");
             Assert.AreEqual(0, reordered.Count,
                 $"the canonical write would move the keys of records the author never touched:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", reordered)}");
         }
@@ -4039,6 +4110,24 @@ namespace LastBreathTest.BattleSystemTests
                 new[] { $"{DataCatalog.ItemEffects} {ItemEffectsCatalogDescriptor.IdField} → 'Passive_Skill_Nobody_Wrote'" },
                 missing.ToArray(),
                 $"a grant naming a passive nobody wrote went unnoticed: {string.Join(", ", missing)}");
+        }
+
+        /// <summary>The other half of that rule: a grant of kind Modifier is not a reference at all. Its id
+        /// is the label its own minted lines carry, so reading it as a reference would report every such
+        /// grant broken — while the passive grant beside it, naming nothing, still has to be said.</summary>
+        [TestMethod]
+        public void AGrantHandingOverAModifier_IsNotReadAsAReference()
+        {
+            SectionSchema section = Part(Schema(DataCatalog.ItemEffects), ItemEffectsCatalogDescriptor.RecordsKey);
+
+            (List<string> missing, int read) = Unanswered(
+                JsonTreeDocument.Parse(ForgedModifierGrantJson).Root, section, DataCatalog.ItemEffects, [ItemEffectsCatalogDescriptor.IdField]);
+
+            Assert.AreEqual(1, read, "the walk read the modifier grant's own label as an id it could answer");
+            CollectionAssert.AreEqual(
+                new[] { $"{DataCatalog.ItemEffects} {ItemEffectsCatalogDescriptor.IdField} → 'Passive_Skill_Nobody_Wrote'" },
+                missing.ToArray(),
+                $"the walk said other grants than the passive one naming nothing: {string.Join(", ", missing)}");
         }
 
         /// <summary>The second mutation, on the other half of the wave and on the other kind of miss: an

@@ -1,0 +1,41 @@
+{
+    "dialogues": [
+        {
+            "npcId": "Npc_Human_Merchant",
+            "entryRules": [
+                {
+                    "priority": 0,
+                    "conditions": [],
+                    "node": "Greeting"
+                }
+            ],
+            "nodes": [
+                {
+                    "id": "Greeting",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Merchant_Greeting_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Trade",
+                            "key": "Dlg_Merchant_Opt_Trade",
+                            "actions": [
+                                {
+                                    "type": "StartTrade",
+                                    "traderId": "Trader_Human_Merchant"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "Leave",
+                            "key": "Dlg_Opt_Leave"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

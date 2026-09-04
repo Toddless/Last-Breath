@@ -5,8 +5,8 @@ namespace Core.Entity
 
     /// <summary>
     /// Source of the player's base parameter values; the data side loads them from the PlayerStats
-    /// catalog. Named profiles are a detail of the file format, so a second baseline is a JSON edit
-    /// rather than a second reader.
+    /// catalog. One baseline is asked for and one is written down: a second would need a reader that
+    /// knows when to prefer it.
     /// </summary>
     public interface IPlayerStatsProvider
     {

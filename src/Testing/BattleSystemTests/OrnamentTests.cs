@@ -16,6 +16,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Save;
     using Core.Save.Participants;
     using Core.Session;
+    using LastBreath.Descriptors;
     using Microsoft.Extensions.DependencyInjection;
     using Moq;
     using Newtonsoft.Json.Linq;
@@ -571,7 +572,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             // Quests are the only road: ornaments drop from nobody. A tier handed out twice, or not at
             // all, is a playthrough that cannot reach the fourth socket it was promised.
-            JArray quests = (JArray?)ShippedQuests()["quests"] ?? [];
+            IReadOnlyList<JToken> quests = ShippedQuests();
             IOrnamentCatalog catalog = ShippedOrnaments();
 
             foreach (OrnamentData ornament in catalog.All)
@@ -701,10 +702,14 @@ namespace LastBreathTest.BattleSystemTests
             return catalog;
         }
 
-        /// <summary>The shipped quest file as written, read as markup rather than through the provider:
-        /// what is being asked is which quest NAMES the reward, which is a question about the data.</summary>
-        private static JObject ShippedQuests() =>
-            JObject.Parse(File.ReadAllText(Path.Combine(SharedData.Catalog(DataCatalog.Quests), "Quests.json")));
+        /// <summary>The shipped quests as written, read as markup rather than through the provider: what
+        /// is being asked is which quest NAMES the reward, which is a question about the data. The catalog
+        /// is written one quest to a file, so the walk gathers the records of every file of the folder.</summary>
+        private static IReadOnlyList<JToken> ShippedQuests() =>
+        [
+            .. SharedData.Files(DataCatalog.Quests)
+                .SelectMany(path => (JArray?)JObject.Parse(File.ReadAllText(path))[QuestsCatalogDescriptor.RecordsKey] ?? [])
+        ];
 
         /// <summary>The shipped tree document as written — the walk is about the node IDS, which is a
         /// question about the markup and not about an allocation.</summary>

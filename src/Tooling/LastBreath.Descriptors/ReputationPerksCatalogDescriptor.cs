@@ -21,14 +21,6 @@ namespace LastBreath.Descriptors
         /// <see cref="ReputationPerkLevelEntry.Level"/> is written as.</summary>
         public const string IdField = "level";
 
-        /// <summary>Json name of the field holding what the level hands out — what
-        /// <see cref="ReputationPerkLevelEntry.Perks"/> is written as.</summary>
-        public const string PerksField = "perks";
-
-        /// <summary>Json name of the word a perk is keyed off by whoever spends it — what
-        /// <see cref="ReputationPerkEntry.Id"/> is written as.</summary>
-        public const string PerkField = "id";
-
         /// <summary>The one file of the catalog. Written out rather than taken from the catalog's name:
         /// the two agree today and are two different facts.</summary>
         public const string FileName = "ReputationPerks";

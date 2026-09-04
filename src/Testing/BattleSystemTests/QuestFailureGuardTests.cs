@@ -186,8 +186,9 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void ShippedTrainerQuest_DeclaresItselfUnloseable()
         {
-            string json = File.ReadAllText(Path.Combine(SharedData.Catalog(DataCatalog.Quests), "Quests.json"));
-            var quest = JsonConvert.DeserializeObject<QuestsData>(json)!.Quests.Single(entry => entry.Id == TrainerQuestId);
+            var quest = SharedData.Files(DataCatalog.Quests)
+                .SelectMany(path => JsonConvert.DeserializeObject<QuestsData>(File.ReadAllText(path))!.Quests)
+                .Single(entry => entry.Id == TrainerQuestId);
 
             Assert.IsFalse(quest.CanFail, $"'{TrainerQuestId}' is a teaching chain — it must not be loseable");
         }

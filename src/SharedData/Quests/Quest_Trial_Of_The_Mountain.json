@@ -1,0 +1,49 @@
+{
+    "quests": [
+        {
+            "id": "Quest_Trial_Of_The_Mountain",
+            "giverNpcId": "Npc_Ronald",
+            "faction": "Human",
+            "tier": 3,
+            "turnInNpcIds": [ "Npc_Ronald" ],
+            "declinePolicy": "Cooldown",
+            "declineCooldownHours": 24,
+            "canFail": false,
+            "timeLimitHours": 0,
+            "acceptConditions": [
+                { "type": "QuestStatus", "questId": "Quest_Trial_Of_The_Pack", "status": "Completed" }
+            ],
+            "stages": [
+                {
+                    "id": "Hunt",
+                    "onEnter": [
+                        {
+                            "type": "SpawnNpc",
+                            "npcId": "Npc_Bear",
+                            "pointId": "Trial_Grounds",
+                            "modifiers": [
+                                "Npc_Modifier_Scale_Double_Defence",
+                                "Npc_Modifier_Item_Effect_Burning"
+                            ]
+                        }
+                    ],
+                    "objectives": [
+                        {
+                            "id": "Kill",
+                            "counter": { "key": "Kill_Count:Npc_Bear", "amount": 1, "retroactive": false }
+                        }
+                    ]
+                }
+            ],
+            "rewards": {
+                "influenceExp": 0,
+                "items": [
+                    { "itemId": "Ornament_Tier_2", "amount": 1 }
+                ],
+                "actions": [
+                    { "type": "GrantTreePoints", "amount": 4 }
+                ]
+            }
+        }
+    ]
+}

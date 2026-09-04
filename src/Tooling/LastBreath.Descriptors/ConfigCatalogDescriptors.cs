@@ -9,9 +9,10 @@ namespace LastBreath.Descriptors
     using Core.Data.GameData;
     using Core.Data.InfluenceData;
     using Core.Data.LootTable;
+    using Core.Data.NpcSpawnRollsData;
+    using Core.Data.PlayerStatsData;
     using Core.Data.WorldData;
     using Core.PassiveTree.Rules;
-    using Core.Services;
     using Core.Trade;
 
     // The catalogs whose file is one settings document. Each states only what cannot be read off a
@@ -22,7 +23,36 @@ namespace LastBreath.Descriptors
     /// <summary>The rules a battle is fought under: control resistance, the arena's slots, exhaustion,
     /// the ceiling on effect extensions and the multicast ladder.</summary>
     public sealed class CombatRulesCatalogDescriptor()
-        : SingleObjectDescriptor(DataCatalog.CombatRules, typeof(CombatRulesData), "CombatRules");
+        : SingleObjectDescriptor(DataCatalog.CombatRules, typeof(CombatRulesData), "CombatRules")
+    {
+        /// <summary>Json name of the control-resistance block — what
+        /// <see cref="CombatRulesData.ControlResistance"/> is written as.</summary>
+        public const string ControlResistanceField = "controlResistance";
+
+        /// <summary>Json name of the statuses that block counts as hard control — what
+        /// <see cref="ControlResistanceData.HardControlStatuses"/> is written as.</summary>
+        public const string HardControlStatusesField = "hardControlStatuses";
+
+        /// <summary>Json name of the kinds of foe it applies to — what
+        /// <see cref="ControlResistanceData.AppliesTo"/> is written as.</summary>
+        public const string AppliesToField = "appliesTo";
+
+        /// <summary>Json name of the multicast block — what <see cref="CombatRulesData.Multicast"/> is
+        /// written as.</summary>
+        public const string MulticastField = "multicast";
+
+        /// <summary>Json name of its ladder of stages — what <see cref="MulticastData.Stages"/> is
+        /// written as.</summary>
+        public const string StagesField = "stages";
+
+        /// <summary>Json name of the share a stage rolls at — what
+        /// <see cref="MulticastStageData.Chance"/> is written as.</summary>
+        public const string ChanceField = "chance";
+
+        /// <summary>Json name of the ceiling that share is held to — what
+        /// <see cref="MulticastStageData.Cap"/> is written as.</summary>
+        public const string CapField = "cap";
+    }
 
     /// <summary>What a kill is worth and what its budget buys: tier prices and chances, the per-entity
     /// base budget and the rarity multipliers scaling it.</summary>
@@ -56,9 +86,9 @@ namespace LastBreath.Descriptors
 
     /// <summary>Resting: what a recovery zone gives back per game minute, and when an npc walks away
     /// from its routine to go and rest.</summary>
-    /// <remarks>Read off <see cref="RecoveryConfig"/> — the shape the provider hands the game — because
-    /// the record the file is deserialized into is private to that provider. The two are written field
-    /// for field, and the shipped file is held against this schema by a test.</remarks>
+    /// <remarks>Read off <see cref="RecoveryConfig"/>, which is both the record the file is parsed into
+    /// and the shape the provider hands the game: one type, so a field cannot reach the tool without
+    /// reaching the reader.</remarks>
     public sealed class RecoveryCatalogDescriptor()
         : SingleObjectDescriptor(DataCatalog.Recovery, typeof(RecoveryConfig), "Recovery");
 
@@ -129,20 +159,26 @@ namespace LastBreath.Descriptors
     /// <remarks>Read off the document the provider parses the file into, which is the only shape of it
     /// there is: nothing downstream sees the file, only the chances worked out from it.</remarks>
     public sealed class NpcSpawnRollsCatalogDescriptor()
-        : SingleObjectDescriptor(DataCatalog.NpcSpawnRolls, typeof(NpcSpawnRollsProvider.SpawnRollsData), "NpcSpawnRolls")
+        : SingleObjectDescriptor(DataCatalog.NpcSpawnRolls, typeof(SpawnRollsData), "NpcSpawnRolls")
     {
         /// <summary>Json name of the map of foe kind to the ladder its modifier slots are rolled on — what
-        /// <see cref="NpcSpawnRollsProvider.SpawnRollsData.Modifiers"/> is written as.</summary>
+        /// <see cref="SpawnRollsData.Modifiers"/> is written as.</summary>
         public const string ModifiersField = "modifiers";
 
         /// <summary>Json name of the same map for the ability slots — what
-        /// <see cref="NpcSpawnRollsProvider.SpawnRollsData.Abilities"/> is written as.</summary>
+        /// <see cref="SpawnRollsData.Abilities"/> is written as.</summary>
         public const string AbilitiesField = "abilities";
 
         /// <summary>Json name of the map of rarity to what it multiplies every chance by — what
-        /// <see cref="NpcSpawnRollsProvider.SpawnRollsData.RarityMultipliers"/> is written as.</summary>
+        /// <see cref="SpawnRollsData.RarityMultipliers"/> is written as.</summary>
         public const string RarityMultipliersField = "rarityMultipliers";
     }
+
+    /// <summary>The player's own baseline: what the character is worth with no weapon and no gear. One
+    /// profile and not a catalog of them — the game reads the unarmed one and nothing reaches a second —
+    /// so the document names it as a field of its own.</summary>
+    public sealed class PlayerStatsCatalogDescriptor()
+        : SingleObjectDescriptor(DataCatalog.PlayerStats, typeof(PlayerStatsData), "PlayerStats");
 
     /// <summary>The influence curve: what a level costs and the two chances it moves.</summary>
     public sealed class InfluenceCatalogDescriptor()

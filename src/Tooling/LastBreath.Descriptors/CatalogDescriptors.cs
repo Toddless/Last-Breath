@@ -56,7 +56,8 @@ namespace LastBreath.Descriptors
             new MartialArtMasteryCatalogDescriptor(),
             new CraftingMasteryCatalogDescriptor(),
             new FactionsCatalogDescriptor(),
-            new NpcSpawnRollsCatalogDescriptor()
+            new NpcSpawnRollsCatalogDescriptor(),
+            new PlayerStatsCatalogDescriptor()
         ];
 
         /// <summary>Catalogs with no descriptor yet, named one by one rather than counted: a name added
@@ -70,10 +71,6 @@ namespace LastBreath.Descriptors
             // hand the tool the seven groups as its records and answer every id naming a modifier with
             // "nothing is called that". Either the file grows sections of its own or the shape does.
             DataCatalog.NpcModifiers,
-
-            // A map of named stat profiles, each a map of parameter to number: the game reads it
-            // without a DTO at all, so there is no type to read a record off.
-            DataCatalog.PlayerStats,
 
             // The tree itself, which is authored by a tool of its own outside this solution: a document of
             // nodes laid out on a canvas, whose records are read by that tool and by the game and by

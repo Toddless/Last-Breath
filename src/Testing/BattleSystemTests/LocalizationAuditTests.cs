@@ -560,6 +560,8 @@ namespace LastBreathTest.BattleSystemTests
             // Augments are records of their own in the same catalog, not a nested list under an ability
             ("Augments", CatalogIds("Abilities", "augments"), true),
             ("Npc", CatalogIds("Npc", "npcs"), false),
+            // The trade window titles itself by the trader's id, so an unworded shop shows the raw key
+            ("Traders", CatalogIds("Traders", "traders"), false),
             ("NpcModifiers", NestedIds("NpcModifiers", "mods", "modifiers"), true),
             // A condition is worded under a key derived from its id, not under the id itself
             ("Conditions", CatalogIds("Conditions", "conditions").Select(Core.Localization.ConditionalLineText.ClauseKey).ToList(), false),

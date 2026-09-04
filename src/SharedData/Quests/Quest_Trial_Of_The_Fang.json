@@ -1,0 +1,44 @@
+{
+    "quests": [
+        {
+            "id": "Quest_Trial_Of_The_Fang",
+            "giverNpcId": "Npc_Ronald",
+            "faction": "Human",
+            "tier": 1,
+            "turnInNpcIds": [ "Npc_Ronald" ],
+            "declinePolicy": "Cooldown",
+            "declineCooldownHours": 24,
+            "canFail": false,
+            "timeLimitHours": 0,
+            "acceptConditions": [],
+            "stages": [
+                {
+                    "id": "Hunt",
+                    "onEnter": [
+                        {
+                            "type": "SpawnNpc",
+                            "npcId": "Npc_Wolf",
+                            "pointId": "Trial_Grounds",
+                            "modifiers": []
+                        }
+                    ],
+                    "objectives": [
+                        {
+                            "id": "Kill",
+                            "counter": { "key": "Kill_Count:Npc_Wolf", "amount": 1, "retroactive": false }
+                        }
+                    ]
+                }
+            ],
+            "rewards": {
+                "influenceExp": 0,
+                "items": [
+                    { "itemId": "Ornament_Tier_1", "amount": 1 }
+                ],
+                "actions": [
+                    { "type": "GrantTreePoints", "amount": 2 }
+                ]
+            }
+        }
+    ]
+}

@@ -6,6 +6,7 @@ namespace LastBreathTest
     using System.Linq;
     using System.Reflection;
     using Core.Data.GameData;
+    using Tooling.Catalogs;
 
     /// <summary>The shipped data as a test reaches it. Every project links the common catalogs as a
     /// <c>Data/Shared</c> symlink next to its build output, so a test that reads what the game ships walks
@@ -30,6 +31,12 @@ namespace LastBreathTest
 
         /// <summary>The folder one shipped catalog is read from.</summary>
         public static string Catalog(string catalog) => Path.Combine(Root(), catalog);
+
+        /// <summary>The files one shipped catalog is written across, in the order the game reads them. A
+        /// catalog holds as many files as its author cared to split it into, so a test asking what the game
+        /// ships asks the folder and never a file name.</summary>
+        public static IReadOnlyList<string> Files(string catalog) =>
+            CatalogWorkspace.FilePaths(Catalog(catalog));
     }
 
     /// <summary>Every catalog the game names, read off the constants themselves so that a name added to

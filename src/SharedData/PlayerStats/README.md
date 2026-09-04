@@ -1,9 +1,9 @@
 # PlayerStats
 
 The player's base parameter values — the single source both the game (`Main/Player/Player.cs` through
-`Core.Entity.PlayerStatsProvider`) and the passive-tree tool measure against. The file is a map of
-named profiles; today there is one, `unarmed`: the character with no weapon and no gear. A parameter
-the profile does not name has a base of zero.
+`Core.Entity.PlayerStatsProvider`) and the passive-tree tool measure against. The file holds one
+profile, `unarmed`: the character with no weapon and no gear. A parameter the profile does not name
+has a base of zero.
 
 Data files carry no comments, so the design notes behind individual values live here.
 

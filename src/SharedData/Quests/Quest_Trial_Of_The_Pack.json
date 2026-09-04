@@ -1,0 +1,44 @@
+{
+    "quests": [
+        {
+            "id": "Quest_Trial_Of_The_Pack",
+            "giverNpcId": "Npc_Ronald",
+            "faction": "Human",
+            "tier": 2,
+            "turnInNpcIds": [ "Npc_Ronald" ],
+            "declinePolicy": "Cooldown",
+            "declineCooldownHours": 24,
+            "canFail": false,
+            "timeLimitHours": 0,
+            "acceptConditions": [
+                { "type": "QuestStatus", "questId": "Quest_Trial_Of_The_Fang", "status": "Completed" }
+            ],
+            "stages": [
+                {
+                    "id": "Hunt",
+                    "onEnter": [
+                        {
+                            "type": "SpawnNpc",
+                            "npcId": "Npc_Direwolf",
+                            "pointId": "Trial_Grounds",
+                            "modifiers": [ "Npc_Modifier_Scale_Double_Health_Recovery" ]
+                        }
+                    ],
+                    "objectives": [
+                        {
+                            "id": "Kill",
+                            "counter": { "key": "Kill_Count:Npc_Direwolf", "amount": 1, "retroactive": false }
+                        }
+                    ]
+                }
+            ],
+            "rewards": {
+                "influenceExp": 0,
+                "items": [],
+                "actions": [
+                    { "type": "GrantTreePoints", "amount": 3 }
+                ]
+            }
+        }
+    ]
+}
