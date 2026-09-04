@@ -2,6 +2,7 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Core.Ai;
     using Core.Ai.World;
+    using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Data.CraftingData;
     using Core.Data.EquipData;
@@ -13,6 +14,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Inventory;
     using Core.Items;
     using Core.Localization;
+    using Core.Modifiers.Conditions;
     using Core.Narrative;
     using Core.Narrative.Actions;
     using Core.Narrative.Conditions;
@@ -3551,11 +3553,524 @@ namespace LastBreathTest.BattleSystemTests
         /// them once and in one order. One walk for the shipped files and for the forged ones: a check
         /// whose mutation is caught by other code than the one holding the data proves nothing about
         /// it.</summary>
-        private static List<string> Strangers(IEnumerable<string> written, Type members)
+        private static List<string> Strangers(IEnumerable<string> written, Type members) =>
+            Strangers(written, Enum.GetNames(members));
+
+        /// <summary>The same walk against the words a SCHEMA offers rather than against a type's members:
+        /// what the author is given to pick from is the schema's list, and holding a document against the
+        /// enum instead would pass a field whose markup was never applied.</summary>
+        private static List<string> Strangers(IEnumerable<string> written, IEnumerable<string> offered)
         {
-            HashSet<string> named = [.. Enum.GetNames(members)];
+            HashSet<string> named = [.. offered];
 
             return [.. written.Where(word => !named.Contains(word)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+        }
+
+        /// <summary>What a record holding several grants writes them under, and what one grant names the
+        /// behaviour it hands over by. Both are the DTOs' own fields — the equipment template's and the npc
+        /// buff's alike — so the walks spell them out.</summary>
+        private const string GrantsField = "grants";
+
+        private const string GrantIdField = "id";
+
+        /// <summary>What the reflector may still have to say about the DTOs of the grant-target wave — one
+        /// list for all three catalogs, because it is empty for all three: an effect row, a passive entry
+        /// and the forms of a condition are plain properties the walk reads whole. A note appearing here is
+        /// either a DTO to fix or a fact to write down — never something to silence by widening the
+        /// check.</summary>
+        private static readonly (string About, string Word)[] s_allowedGrantTargetNotes = [];
+
+        /// <summary>The catalogs of the wave: what an effect is worth, which passive a node or a grant may
+        /// name, and the predicates a line is held up by. Nothing hands these out — they are where the
+        /// behaviour is declared, and every grant in the game points into two of them.</summary>
+        private static readonly string[] s_grantTargetCatalogs =
+        [
+            DataCatalog.Effects,
+            DataCatalog.PassiveSkills,
+            DataCatalog.Conditions
+        ];
+
+        /// <summary>
+        /// Every field of the wave a parser turns into an enum member, addressed the way the file writes
+        /// it. All of them are read strictly and every miss costs a whole record: an unreadable strength
+        /// refuses the effect row, and an unreadable word of a condition refuses the entry — which leaves
+        /// every line naming that condition dropped rather than left unconditional.
+        /// </summary>
+        private static readonly (string Catalog, string Path, Type Members)[] s_grantTargetChoices =
+        [
+            (DataCatalog.Effects, EffectsCatalogDescriptor.PowerField, typeof(EffectPower)),
+        ];
+
+        /// <summary>Every word of a condition a factory parses into an enum member, by the predicate that
+        /// reads it. Held per FORM as well as per field: the form is what the inspector draws, so a
+        /// narrowing left on the record alone never reaches the author — he types the miss himself, and the
+        /// entry is refused whole at load, which drops every line naming it.</summary>
+        private static readonly (string Type, string Path, Type Members)[] s_conditionChoices =
+        [
+            (ConditionTypes.ResourceThreshold, ConditionsCatalogDescriptor.ResourceField, typeof(Costs)),
+            (ConditionTypes.TargetResourceThreshold, ConditionsCatalogDescriptor.ResourceField, typeof(Costs)),
+            (ConditionTypes.ResourceState, ConditionsCatalogDescriptor.ResourceField, typeof(Costs)),
+            (ConditionTypes.ResourceState, ConditionsCatalogDescriptor.StateField, typeof(ResourceState)),
+            (ConditionTypes.Effect, ConditionsCatalogDescriptor.ScopeField, typeof(EffectScope)),
+            (ConditionTypes.Stance, ConditionsCatalogDescriptor.StanceField, typeof(Stance)),
+            (ConditionTypes.TurnAction, ConditionsCatalogDescriptor.ActionField, typeof(TurnAction)),
+        ];
+
+        /// <summary>What each form REQUIRES, which is what its factory refuses the record without. A form
+        /// asking for less hands the author a blank entry the reader drops; a form asking for more locks
+        /// him out of a record the game reads perfectly well.</summary>
+        private static readonly (string Type, string[] Demanded)[] s_conditionDemands =
+        [
+            (ConditionTypes.ResourceThreshold,
+                [ConditionsCatalogDescriptor.IdField, ConditionsCatalogDescriptor.TypeField,
+                    ConditionsCatalogDescriptor.ResourceField, ConditionsCatalogDescriptor.ValueField]),
+            (ConditionTypes.TargetResourceThreshold,
+                [ConditionsCatalogDescriptor.IdField, ConditionsCatalogDescriptor.TypeField,
+                    ConditionsCatalogDescriptor.ResourceField, ConditionsCatalogDescriptor.ValueField]),
+            (ConditionTypes.ResourceState,
+                [ConditionsCatalogDescriptor.IdField, ConditionsCatalogDescriptor.TypeField,
+                    ConditionsCatalogDescriptor.ResourceField, ConditionsCatalogDescriptor.StateField]),
+            (ConditionTypes.Status,
+                [ConditionsCatalogDescriptor.IdField, ConditionsCatalogDescriptor.TypeField,
+                    ConditionsCatalogDescriptor.StatusesField]),
+            (ConditionTypes.TargetStatus,
+                [ConditionsCatalogDescriptor.IdField, ConditionsCatalogDescriptor.TypeField,
+                    ConditionsCatalogDescriptor.StatusesField]),
+            (ConditionTypes.Effect,
+                [ConditionsCatalogDescriptor.IdField, ConditionsCatalogDescriptor.TypeField,
+                    ConditionsCatalogDescriptor.ScopeField]),
+            (ConditionTypes.Stance,
+                [ConditionsCatalogDescriptor.IdField, ConditionsCatalogDescriptor.TypeField,
+                    ConditionsCatalogDescriptor.StanceField]),
+            (ConditionTypes.TurnAction,
+                [ConditionsCatalogDescriptor.IdField, ConditionsCatalogDescriptor.TypeField,
+                    ConditionsCatalogDescriptor.ActionField]),
+            (ConditionTypes.BattleTurn,
+                [ConditionsCatalogDescriptor.IdField, ConditionsCatalogDescriptor.TypeField,
+                    ConditionsCatalogDescriptor.TurnField]),
+        ];
+
+        /// <summary>Which form the inspector draws for which predicate. Held as the whole mapping rather
+        /// than as a count: a type drawn by the wrong form offers the author keys its factory never reads,
+        /// and the two families asked about the fighter being hit share the owner-side form on purpose —
+        /// one shape is written the same way whichever fighter it asks about.</summary>
+        private static readonly (string Type, string Form)[] s_conditionShapes =
+        [
+            (ConditionTypes.ResourceThreshold, nameof(ConditionOverAResourceShare)),
+            (ConditionTypes.TargetResourceThreshold, nameof(ConditionOverAResourceShare)),
+            (ConditionTypes.ResourceState, nameof(ConditionOverAResourceBoundary)),
+            (ConditionTypes.Status, nameof(ConditionOverStatuses)),
+            (ConditionTypes.TargetStatus, nameof(ConditionOverStatuses)),
+            (ConditionTypes.Effect, nameof(ConditionOverCarriedEffects)),
+            (ConditionTypes.Stance, nameof(ConditionOverTheStance)),
+            (ConditionTypes.TurnAction, nameof(ConditionOverTurnActions)),
+            (ConditionTypes.BattleTurn, nameof(ConditionOverTheBattleTurn)),
+        ];
+
+        /// <summary>The three places the shipped data hands a behaviour over, addressed the way each file
+        /// writes it: the roll an item effect IS, the grants an npc buff carries, and the grants written on
+        /// an equipment template. Until the two catalogs behind them were described, every one of these ids
+        /// was passed over whole — the walk could not tell a renamed passive from one it simply could not
+        /// read.</summary>
+        private static readonly (string Catalog, string Section, string[] Path)[] s_grantSites =
+        [
+            (DataCatalog.ItemEffects, ItemEffectsCatalogDescriptor.RecordsKey, [ItemEffectsCatalogDescriptor.IdField]),
+            (DataCatalog.NpcBuffs, NpcBuffsCatalogDescriptor.RecordsKey, [NpcBuffsCatalogDescriptor.GrantsField, NpcBuffsCatalogDescriptor.IdField]),
+            (DataCatalog.EquipItems, EquipItemsCatalogDescriptor.RecordsKey, [GrantsField, GrantIdField]),
+        ];
+
+        /// <summary>The grants the shipped data writes that nothing declares. Empty, and held as the whole
+        /// list rather than as a count: one arriving fails, and one going away fails just as loudly.</summary>
+        private static readonly string[] s_unansweredGrants = [];
+
+        /// <summary>A grant naming a passive nobody wrote, beside one naming a passive the catalog does
+        /// carry: the walk has to say the first and stay quiet about the second.</summary>
+        private const string ForgedItemEffectsJson = """
+        {
+          "effects": [
+            { "id": "Passive_Skill_Nobody_Wrote", "kind": "Passive", "weight": 100 },
+            { "id": "Passive_Skill_Execute", "kind": "Passive", "weight": 100 }
+          ]
+        }
+        """;
+
+        /// <summary>An effect standing at a strength nobody named, beside one spelling its own right. The
+        /// reader refuses the whole row over that word — the balance of the effect silently becomes
+        /// whatever its factory was built with — so the picker is what has to prevent it being typed.</summary>
+        private const string ForgedEffectJson = """
+        {
+          "effects": [
+            { "id": "Effect_Forged", "power": "Unbreakable", "properties": { "duration": 3 } },
+            { "id": "Effect_Sound", "power": "Absolute", "properties": { "duration": 3 } }
+          ]
+        }
+        """;
+
+        /// <summary>The catalogs a grant and a gated line point INTO, each held to the same five facts —
+        /// the shape, the key, the field a record is found by, what of it is worded for the player, and the
+        /// one file it lives in.</summary>
+        [DataTestMethod]
+        [DataRow(DataCatalog.Effects, EffectsCatalogDescriptor.RecordsKey, EffectsCatalogDescriptor.IdField,
+            EffectsCatalogDescriptor.FileName,
+            new[] { LocalizedKeyAttribute.NoSuffix, LocalizationService.DescriptionSuffix, LocalizationService.TooltipSuffix })]
+        [DataRow(DataCatalog.PassiveSkills, PassiveSkillsCatalogDescriptor.RecordsKey, PassiveSkillsCatalogDescriptor.IdField,
+            PassiveSkillsCatalogDescriptor.FileName,
+            new[] { LocalizedKeyAttribute.NoSuffix, LocalizationService.DescriptionSuffix })]
+        [DataRow(DataCatalog.Conditions, ConditionsCatalogDescriptor.RecordsKey, ConditionsCatalogDescriptor.IdField,
+            ConditionsCatalogDescriptor.FileName, new string[0])]
+        public void AGrantTargetCatalogIsOneArrayUnderAKeyOfItsOneFile(
+            string catalog, string recordsKey, string idField, string fileName, string[] worded)
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(catalog));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape, $"the {catalog} file is not read as one array under a key");
+            Assert.AreEqual(1, schema.Sections.Count, $"{catalog} states several sections where its file holds one");
+            Assert.AreEqual(recordsKey, schema.Sections[0].Key, $"the records of {catalog} are read from another key");
+            Assert.AreEqual(idField, schema.Sections[0].Record.IdField, $"a record of {catalog} is found by another field");
+            Assert.AreNotEqual(0, schema.Sections[0].Record.Fields.Count, $"the {catalog} record was read with no fields at all");
+            CollectionAssert.AreEqual(
+                worded,
+                schema.LocalizedSuffixes.ToArray(),
+                $"{catalog} words another part of itself for the player than it is read for");
+            Assert.AreEqual(fileName, schema.Placement.FileFor(_ => null), $"the {catalog} catalog names another file");
+            CollectionAssert.AreEqual(
+                new[] { fileName },
+                ShippedFiles(catalog).Select(Path.GetFileNameWithoutExtension).ToArray(),
+                $"the {catalog} catalog ships other files than the one its placement names");
+
+            Unexpected(builder.Reflection.Notes, s_allowedGrantTargetNotes, builder.Reflection);
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled {catalog} catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>The shipped files of the wave read back through their schemas: every key they write is
+        /// one the schema ranks, and the canonical write loses nothing. A key the tool cannot place is a
+        /// field the author is quietly locked out of.</summary>
+        [DataTestMethod]
+        [DataRow(DataCatalog.Effects)]
+        [DataRow(DataCatalog.PassiveSkills)]
+        [DataRow(DataCatalog.Conditions)]
+        public void AGrantTargetCatalogRanksEveryKeyItsShippedFileWrites(string catalog)
+        {
+            List<string> unknown = UnknownKeys(Schema(catalog), catalog);
+
+            Assert.AreEqual(0, unknown.Count,
+                $"keys of the {catalog} file no field of the schema is written under:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", unknown)}");
+        }
+
+        /// <summary>Every word a parser of the wave turns into an enum member, said so in the schema and
+        /// held against what the shipped file writes. An unmarked one reads to the tool as free text: the
+        /// author types a name nothing answers, and the miss surfaces as a dropped record at load.</summary>
+        [TestMethod]
+        public void EveryGrantTargetChoiceOffersItsMembersAndTheShippedFilesStayInThem()
+        {
+            foreach ((string catalog, string path, Type members) in s_grantTargetChoices)
+            {
+                CatalogSchema schema = Schema(catalog);
+                Choice(Leaf(Locate(schema.Sections[0].Record, path)), members);
+
+                List<string> written = [.. Words(Root(schema, catalog), LastSegment(path))];
+
+                Assert.AreNotEqual(0, written.Count, $"the shipped {catalog} file writes no '{path}' — the check is checking nothing");
+                CollectionAssert.AreEqual(
+                    Array.Empty<string>(),
+                    Strangers(written, members).ToArray(),
+                    $"the shipped {catalog} file writes something other than a {members.Name} at '{path}'");
+            }
+        }
+
+        /// <summary>
+        /// The numbers of an effect and the fields of a passive are maps and lists the author fills
+        /// himself: the keys belong to the factory that builds the thing, which lives battle-side where the
+        /// tool cannot reach it, so the schema offers a map and no picker for what goes in it.
+        /// </summary>
+        [TestMethod]
+        public void TheEffectNumbersAndThePassiveFieldsAreTheFactorysOwnWords()
+        {
+            FieldSchema properties = Locate(Schema(DataCatalog.Effects).Sections[0].Record, EffectsCatalogDescriptor.PropertiesField);
+
+            Assert.AreEqual(FieldKind.Dictionary, properties.Kind, $"'{EffectsCatalogDescriptor.PropertiesField}' is not a map");
+            Assert.IsNull(properties.Key, "the canonical numbers are keyed by the building factory's own names, and the schema offers a list of them");
+            Assert.AreEqual(FieldKind.Number, Leaf(properties).Kind, "a canonical number is not a number");
+
+            FieldSchema fields = Locate(Schema(DataCatalog.PassiveSkills).Sections[0].Record, PassiveSkillsCatalogDescriptor.FieldsField);
+
+            Assert.AreEqual(FieldKind.Array, fields.Kind, $"'{PassiveSkillsCatalogDescriptor.FieldsField}' is not a list");
+            Assert.AreEqual(FieldKind.String, Leaf(fields).Kind, "the fields a passive's factory reads are not words");
+        }
+
+        /// <summary>
+        /// The forms of a condition against the predicates the parser actually registers. The catalog is
+        /// the one described file the game parses without a DTO — a record goes to whichever factory its
+        /// type names — so the forms are the only statement of its shapes there is, and a type the game
+        /// grows without one is drawn as the whole record's worth of optional keys.
+        /// <para>Every form is a narrowing of the record and never more: a key on a form that the record
+        /// does not carry is a field the reader would never look for. And every form begins with the two
+        /// keys of a condition — the form is what the inspector draws and what it offers keys out of, so a
+        /// form without them draws an entry no line can name and no factory can pick.</para>
+        /// </summary>
+        [TestMethod]
+        public void TheConditionsSchemaDrawsAFormForEveryPredicateTheParserRegisters()
+        {
+            RecordSchema record = Schema(DataCatalog.Conditions).Sections[0].Record;
+            VariantSet shapes = record.Variants
+                                ?? throw new AssertFailedException("the conditions catalog states one shape for nine predicates");
+
+            Assert.AreEqual(ConditionsCatalogDescriptor.TypeField, shapes.Discriminator,
+                "the shapes of a condition are told apart by another field than the one the parser reads");
+            CollectionAssert.AreEquivalent(
+                ConditionParser.BuiltInFactories().Select(factory => factory.Type).ToArray(),
+                shapes.Variants.Select(shape => shape.DiscriminatorValue).ToArray(),
+                "the forms and the registered predicates are not the same set");
+            CollectionAssert.AreEqual(
+                s_conditionShapes,
+                shapes.Variants.Select(shape => (shape.DiscriminatorValue, shape.Record.TypeName)).ToArray(),
+                "a predicate is drawn by another form than the one it is written in");
+
+            HashSet<string> carried = [.. record.Fields.Select(field => field.JsonName)];
+            List<string> stray =
+            [
+                .. shapes.Variants
+                    .SelectMany(shape => shape.Record.Fields.Select(field => $"{shape.Record.TypeName}.{field.JsonName}"))
+                    .Where(named => !carried.Contains(named.Split(PathSeparator)[^1]))
+                    .Distinct(StringComparer.Ordinal)
+                    .Order(StringComparer.Ordinal)
+            ];
+
+            Assert.AreEqual(0, stray.Count, $"forms writing keys the record does not carry: {string.Join(", ", stray)}");
+
+            foreach (RecordSchema shape in shapes.Variants.Select(variant => variant.Record).Distinct())
+                CollectionAssert.AreEqual(
+                    new[] { ConditionsCatalogDescriptor.IdField, ConditionsCatalogDescriptor.TypeField },
+                    shape.Fields.Take(2).Select(field => field.JsonName).ToArray(),
+                    $"'{shape.TypeName}' does not begin with the two keys every condition on disk begins with");
+
+            Assert.AreEqual(
+                ConditionsCatalogDescriptor.NegateField,
+                record.Fields[^1].JsonName,
+                "the inversion is written after whatever the type asked for, and the record has to keep it there");
+        }
+
+        /// <summary>Every word a condition's factory parses into an enum member, offered on the record AND
+        /// on the form the author is actually handed, and held against what the shipped file writes.</summary>
+        [TestMethod]
+        public void EveryConditionChoiceIsOfferedOnTheRecordAndOnItsFormAndTheShippedFileStaysInIt()
+        {
+            CatalogSchema schema = Schema(DataCatalog.Conditions);
+            RecordSchema record = schema.Sections[0].Record;
+            VariantSet shapes = record.Variants
+                                ?? throw new AssertFailedException("the conditions catalog states one shape for nine predicates");
+
+            foreach ((string type, string path, Type members) in s_conditionChoices)
+            {
+                Choice(Leaf(Locate(record, path)), members);
+                Choice(Leaf(Locate(Shape(shapes, type), path)), members);
+            }
+
+            foreach (string path in s_conditionChoices.Select(choice => choice.Path).Distinct(StringComparer.Ordinal))
+            {
+                Type members = s_conditionChoices.First(choice => choice.Path == path).Members;
+                List<string> written = [.. Words(Root(schema, DataCatalog.Conditions), path)];
+
+                Assert.AreNotEqual(0, written.Count, $"the shipped conditions write no '{path}' — the check is checking nothing");
+                CollectionAssert.AreEqual(
+                    Array.Empty<string>(),
+                    Strangers(written, members).ToArray(),
+                    $"the shipped conditions write something other than a {members.Name} at '{path}'");
+            }
+        }
+
+        /// <summary>
+        /// What each form asks for against what its factory refuses the record without. The forms are what
+        /// a freshly made entry is built from — a blank record carries the keys a form REQUIRES and nothing
+        /// else — so a key demanded here and left optional there is an entry the tool hands the author and
+        /// the reader drops without reading.
+        /// </summary>
+        [TestMethod]
+        public void EveryFormAsksForExactlyWhatItsFactoryRefusesTheRecordWithout()
+        {
+            VariantSet shapes = Schema(DataCatalog.Conditions).Sections[0].Record.Variants
+                                ?? throw new AssertFailedException("the conditions catalog states one shape for nine predicates");
+
+            foreach ((string type, string[] demanded) in s_conditionDemands)
+            {
+                RecordSchema form = Shape(shapes, type);
+
+                CollectionAssert.AreEquivalent(
+                    demanded,
+                    form.Fields.Where(field => field.Required).Select(field => field.JsonName).ToArray(),
+                    $"'{type}' asks the author for other keys than the ones its factory refuses the record without");
+            }
+
+            foreach (string counting in new[] { ConditionTypes.Effect, ConditionTypes.TurnAction })
+                Assert.IsFalse(
+                    Field(Shape(shapes, counting), ConditionsCatalogDescriptor.CountField).Required,
+                    $"'{counting}' demands a count, and a record writing none counts one rather than nothing");
+        }
+
+        /// <summary>The shipped conditions written back out through the schema, key for key. The catalog is
+        /// the one whose records take nine shapes, so its key order is assembled from the forms and the
+        /// record together — and an order that disagrees with the file has the tool silently rewrite every
+        /// record the first time an author saves one of them.</summary>
+        [TestMethod]
+        public void TheCanonicalWriteOfTheShippedConditionsMovesNothing()
+        {
+            CatalogSchema schema = Schema(DataCatalog.Conditions);
+            JToken root = JsonTreeDocument.Load(CatalogFile(schema, DataCatalog.Conditions)).Root;
+
+            (List<string> unknown, List<string> reordered) = Written(root, schema, new SchemaKeyOrder(schema));
+
+            Assert.AreEqual(0, unknown.Count,
+                $"keys of the shipped conditions no field of the schema is written under: {string.Join(", ", unknown)}");
+            Assert.AreEqual(0, reordered.Count,
+                $"the canonical write would move the keys of records the author never touched:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", reordered)}");
+        }
+
+        /// <summary>The one word of a condition the schema cannot narrow: a status name is a member of the
+        /// enum OR one of the groups the design talks in, and the markup states one vocabulary or none. The
+        /// words are left free there, so the check the picker would have made is made here instead.</summary>
+        [TestMethod]
+        public void EveryStatusAConditionNamesIsOneTheMaskReaderResolves()
+        {
+            CatalogSchema schema = Schema(DataCatalog.Conditions);
+            FieldSchema statuses = Locate(schema.Sections[0].Record, ConditionsCatalogDescriptor.StatusesField);
+
+            Assert.AreEqual(FieldKind.String, Leaf(statuses).Kind, "a status is written as a word");
+
+            List<string> written = [.. Words(Root(schema, DataCatalog.Conditions), ConditionsCatalogDescriptor.StatusesField)];
+            List<string> strangers = [.. written.Where(word => !Resolves(word)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+
+            Assert.AreNotEqual(0, written.Count, "the shipped conditions name no status at all — the check is checking nothing");
+            CollectionAssert.AreEqual(Array.Empty<string>(), strangers.ToArray(),
+                $"the shipped conditions name statuses no mask resolves: {string.Join(", ", strangers)}");
+        }
+
+        /// <summary>Whether the one reader of a status name makes anything of it. Asked of that reader
+        /// rather than of a vocabulary assembled here: it matches names its own way, and a second spelling
+        /// of the same list would be free to disagree with it about a letter's case.</summary>
+        private static bool Resolves(string word)
+        {
+            try
+            {
+                StatusMasks.Resolve(word);
+
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>The one id a condition writes: the effect whose stacks it counts. Said on the record
+        /// every reader parses into and on the form the author is offered, which is what makes the picker
+        /// reach him at all.</summary>
+        [TestMethod]
+        public void TheConditionCountingStacksNamesTheEffectItCounts()
+        {
+            RecordSchema record = Schema(DataCatalog.Conditions).Sections[0].Record;
+            VariantSet shapes = record.Variants
+                                ?? throw new AssertFailedException("the conditions catalog states one shape for nine predicates");
+
+            foreach (RecordSchema shape in new[] { record, Shape(shapes, ConditionTypes.Effect) })
+            {
+                FieldSchema counted = Leaf(Locate(shape, ConditionsCatalogDescriptor.EffectIdField));
+
+                Points(counted, ConditionsCatalogDescriptor.EffectIdField, DataCatalog.Effects, WholeCatalog);
+                Assert.IsTrue(counted.AllowEmpty,
+                    "every scope but the stack-counting one counts a family and names no effect, and has to be able to say so");
+            }
+        }
+
+        /// <summary>
+        /// Every behaviour the shipped data hands over is one the catalog declaring it actually writes.
+        /// Nothing else can see this: the ids answering a grant live in another catalog than the record
+        /// carrying it, so a renamed passive leaves an item granting nothing — and says so only when the
+        /// player equips it.
+        /// <para>What the data owes is named rather than failed on, so that one arriving fails and one
+        /// going away fails just as loudly.</para>
+        /// </summary>
+        [TestMethod]
+        public void EveryGrantTheShippedDataWritesNamesABehaviourItsCatalogDeclares()
+        {
+            List<string> unanswered = [];
+            int walked = 0;
+
+            foreach ((string catalog, string section, string[] path) in s_grantSites)
+            {
+                SectionSchema handing = Part(Schema(catalog), section);
+
+                foreach (string file in ShippedFiles(catalog))
+                {
+                    (List<string> missing, int read) = Unanswered(JsonTreeDocument.Load(file).Root, handing, catalog, path);
+                    unanswered.AddRange(missing);
+                    walked += read;
+                }
+            }
+
+            Assert.AreNotEqual(0, walked, "the shipped data hands nothing over at all — the walk proves nothing");
+
+            List<string> named = [.. unanswered.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+            Report("Grants the shipped data writes that no catalog declares", named);
+
+            CollectionAssert.AreEquivalent(
+                s_unansweredGrants,
+                named.ToArray(),
+                $"the shipped data hands over other behaviours than the known ones nothing declares:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", named)}");
+        }
+
+        /// <summary>The first mutation, and the one the whole wave exists for: a grant naming a passive
+        /// nobody wrote. The roll picks it, the factory is handed an id it does not know, and the item
+        /// comes out of the mint carrying a promise it cannot keep — while the grant beside it, naming a
+        /// passive the catalog does carry, has to stay unremarked.</summary>
+        [TestMethod]
+        public void AGrantNamingAPassiveNobodyWrote_IsCaught()
+        {
+            SectionSchema section = Part(Schema(DataCatalog.ItemEffects), ItemEffectsCatalogDescriptor.RecordsKey);
+
+            (List<string> missing, int read) = Unanswered(
+                JsonTreeDocument.Parse(ForgedItemEffectsJson).Root, section, DataCatalog.ItemEffects, [ItemEffectsCatalogDescriptor.IdField]);
+
+            Assert.AreEqual(2, read, "the forged catalog hands over another number of behaviours than the walk read");
+            CollectionAssert.AreEqual(
+                new[] { $"{DataCatalog.ItemEffects} {ItemEffectsCatalogDescriptor.IdField} → 'Passive_Skill_Nobody_Wrote'" },
+                missing.ToArray(),
+                $"a grant naming a passive nobody wrote went unnoticed: {string.Join(", ", missing)}");
+        }
+
+        /// <summary>The second mutation, on the other half of the wave and on the other kind of miss: an
+        /// effect standing at a strength that names no rung of the ladder. The reader refuses that row
+        /// whole, so the effect keeps whatever balance its factory was built with and nothing in the game
+        /// says which one — while the row spelling its own strength right stays unremarked.</summary>
+        [TestMethod]
+        public void AnEffectAtAStrengthNobodyNamed_IsCaught()
+        {
+            FieldSchema power = Leaf(Locate(Schema(DataCatalog.Effects).Sections[0].Record, EffectsCatalogDescriptor.PowerField));
+            List<string> written = [.. Words(JsonTreeDocument.Parse(ForgedEffectJson).Root, EffectsCatalogDescriptor.PowerField)];
+            List<string> strangers = Strangers(written, power.EnumValues);
+
+            Assert.AreEqual(2, written.Count, "the forged catalog writes another number of strengths than the walk read");
+            Assert.AreNotEqual(0, power.EnumValues.Count, "the schema offers no strengths at all, so nothing could be a stranger to them");
+            CollectionAssert.AreEqual(new[] { "Unbreakable" }, strangers.ToArray(),
+                $"an effect standing at a strength nobody named went unnoticed: {string.Join(", ", strangers)}");
+        }
+
+        /// <summary>Every catalog of the wave answers with ids at all. A described catalog whose shipped
+        /// file the walk reads as empty would call every grant into it broken, and the pin above would go
+        /// on excusing the lot.</summary>
+        [TestMethod]
+        public void EveryGrantTargetCatalogAnswersWithTheIdsItsShippedFileWrites()
+        {
+            foreach (string catalog in s_grantTargetCatalogs)
+            {
+                HashSet<string>? ids = Answers(ReferenceTarget.Whole(catalog));
+
+                Assert.IsNotNull(ids, $"the {catalog} catalog is described and still answers nothing");
+                Assert.AreNotEqual(0, ids.Count, $"the shipped {catalog} file writes no id at all — every reference into it would read as broken");
+            }
         }
     }
 }

@@ -115,6 +115,24 @@ namespace Tooling.Tests.DataEditor
             Assert.AreEqual(0d, (double)blank[PriceField]!);
         }
 
+        /// <summary>And the keys the record itself cannot be written without arrive with it. What stays on
+        /// the record outside every shape — the inversion a predicate is read backwards by, the tier an
+        /// augment has — is asked of it whichever shape it wears, so a blank wearing one shape and lacking
+        /// them is a record the game refuses the moment it is laid down.</summary>
+        [TestMethod]
+        public void Blank_WritesTheKeysTheRecordItselfRequiresBesideTheShapesOwn()
+        {
+            JObject blank = RecordTemplates.Blank(CatalogFixture.Record(
+                IdField,
+                Field(IdField, FieldKind.Reference),
+                Field(NoteField, FieldKind.String) with { Required = true }) with { Variants = Forms() });
+
+            Assert.AreEqual(string.Empty, (string?)blank[IdField], "the shape it wears names the thing that drops");
+            Assert.AreEqual(0d, (double)blank[PriceField]!);
+            Assert.AreEqual(string.Empty, (string?)blank[NoteField], "and the record itself asks for a note");
+            Assert.IsFalse(blank.ContainsKey(AugmentsField));
+        }
+
         [TestMethod]
         public void Worn_AnswersByThePresenceOfAKeyAndByTheValueOfADiscriminator()
         {

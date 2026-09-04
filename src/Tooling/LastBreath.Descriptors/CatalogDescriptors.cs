@@ -37,6 +37,12 @@ namespace LastBreath.Descriptors
             new ReputationPerksCatalogDescriptor(),
             new NpcBuffsCatalogDescriptor(),
 
+            // What a grant hands over and what a line is held up by: the three catalogs every other one
+            // points INTO. Nothing here is granted by anything — they are where the behaviour is declared.
+            new EffectsCatalogDescriptor(),
+            new PassiveSkillsCatalogDescriptor(),
+            new ConditionsCatalogDescriptor(),
+
             // The settings documents: one object each, and one shape between them.
             new CombatRulesCatalogDescriptor(),
             new LootConfigurationCatalogDescriptor(),
@@ -68,8 +74,11 @@ namespace LastBreath.Descriptors
             // A map of named stat profiles, each a map of parameter to number: the game reads it
             // without a DTO at all, so there is no type to read a record off.
             DataCatalog.PlayerStats,
+
+            // The tree itself, which is authored by a tool of its own outside this solution: a document of
+            // nodes laid out on a canvas, whose records are read by that tool and by the game and by
+            // nothing in between. A second editor built from a schema would be a second author of it.
             DataCatalog.PassiveTree,
-            DataCatalog.PassiveSkills,
 
             // The legacy plain items. A DTO reads the file — one array under "items" — and the shipped
             // file is written in another shape entirely, two sections of its own, so the parser finds no
@@ -78,8 +87,6 @@ namespace LastBreath.Descriptors
             // that quest cannot be finished. Describing the catalog would mean choosing between the shape
             // the game reads and the shape the file is in.
             DataCatalog.Items,
-            DataCatalog.Effects,
-            DataCatalog.Conditions,
         ];
     }
 }

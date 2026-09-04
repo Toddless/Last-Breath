@@ -1,7 +1,9 @@
 namespace Core.Data.EffectsData
 {
     using System.Collections.Generic;
+    using Battle.Abilities;
     using Newtonsoft.Json;
+    using Schema;
 
     /// <summary>The SharedData/Effects catalog: the canonical numbers of every temporary effect.</summary>
     public record EffectCatalogData
@@ -17,7 +19,7 @@ namespace Core.Data.EffectsData
 
         /// <summary>Optional strength against dispelling (<c>EffectPower</c>); absent means Weak.
         /// A string beside the numbers rather than among them: the properties are figures a factory reads.</summary>
-        [JsonProperty("power")] public string? Power { get; init; }
+        [JsonProperty("power")][EnumOf(typeof(EffectPower))] public string? Power { get; init; }
 
         [JsonProperty("properties")] public IReadOnlyDictionary<string, float> Properties { get; init; } =
             new Dictionary<string, float>();

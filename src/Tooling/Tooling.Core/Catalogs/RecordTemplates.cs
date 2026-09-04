@@ -54,9 +54,16 @@ namespace Tooling.Catalogs
             return blank is JValue && Chosen(field.Default) is { } chosen ? chosen : blank;
         }
 
-        /// <summary>A record with the keys it cannot be written without and no others. What the schema
-        /// leaves optional is left out on purpose: the author adds it when he means it, and a record laid
-        /// down with every key of its type would say things about itself that nobody decided.</summary>
+        /// <summary>
+        /// A record with the keys it cannot be written without and no others. What the schema leaves
+        /// optional is left out on purpose: the author adds it when he means it, and a record laid down
+        /// with every key of its type would say things about itself that nobody decided.
+        /// <para>A record taking several shapes is required to hold its OWN keys as much as the shape's:
+        /// what stays on the record — the inversion every predicate shares, the tier every augment has —
+        /// is asked of it whichever shape it wears. An id among them arrives empty like any other required
+        /// key: WHICH word a record is listed under is its catalog's answer, written onto the blank by
+        /// whoever adds the record to a section.</para>
+        /// </summary>
         public static JObject Blank(RecordSchema record)
         {
             ArgumentNullException.ThrowIfNull(record);
@@ -64,7 +71,7 @@ namespace Tooling.Catalogs
             // A record with shapes is written in one of them, and the first is the one the schema lists
             // first: a record wearing no shape at all is not a record the game can read.
             return record.Variants is { } variants
-                ? Wear(new JObject(), variants, variants.Variants[0])
+                ? Filled(Wear(new JObject(), variants, variants.Variants[0]), record, variants.Discriminator)
                 : Filled(new JObject(), record, skip: null);
         }
 

@@ -15,11 +15,12 @@ namespace Tooling.Schema.Reflection
     /// file had it. That is the point of the whole thing: an editor built against one version of the game
     /// carries a newer file's keys through a save untouched.</para>
     /// <para>A record taking several shapes is ranked by all of them at once: the writer asks about a key,
-    /// not about a value, so which shape stands there cannot be told at that moment. The shapes contribute
-    /// their fields in turn, each new name after the ones already placed, and the record's own fields last;
-    /// the first shape to write a name is also the one the walk goes on through. Where two shapes write one
-    /// name over different things, the name keeps its place and the walk stops there — ranking the inside of
-    /// one shape by the fields of another would move lines the author never touched.</para>
+    /// not about a value, so which shape stands there cannot be told at that moment. The order is the
+    /// record's own — see <see cref="RecordFieldOrder"/> — with what only a shape brings placed where the
+    /// shape is decided; the first shape to write a name is also the one the walk goes on through. Where
+    /// two shapes write one name over different things, the name keeps its place and the walk stops there —
+    /// ranking the inside of one shape by the fields of another would move lines the author never
+    /// touched.</para>
     /// </summary>
     public sealed class SchemaKeyOrder : IKeyOrder
     {
@@ -104,33 +105,21 @@ namespace Tooling.Schema.Reflection
         {
             if (_layouts.TryGetValue(record, out KeyLayout? cached)) return cached;
 
-            List<FieldSchema> merged = [];
-
-            if (record.Variants is { } variants)
-                foreach (VariantSchema variant in variants.Variants)
-                    Merge(merged, variant.Record.Fields);
-
-            Merge(merged, record.Fields);
-
-            KeyLayout layout = new(merged);
+            KeyLayout layout = new(RecordFieldOrder.Merged(record, Shapes(record), Walked));
             _layouts[record] = layout;
 
             return layout;
         }
 
-        /// <summary>Adds the fields a shape brings that no earlier shape has placed. The first shape to
-        /// write a name owns its place, so the order is the same however many times it is built; a name two
-        /// shapes write different things under keeps the place and loses what is under it.</summary>
-        private static void Merge(List<FieldSchema> merged, SchemaList<FieldSchema> fields)
-        {
-            foreach (FieldSchema field in fields)
-            {
-                int at = merged.FindIndex(placed => string.Equals(placed.JsonName, field.JsonName, StringComparison.Ordinal));
+        /// <summary>The shapes the record may be written in, and none where it has only the one.</summary>
+        private static IEnumerable<RecordSchema> Shapes(RecordSchema record) =>
+            record.Variants is { } variants ? variants.Variants.Select(variant => variant.Record) : [];
 
-                if (at < 0) merged.Add(field);
-                else if (!Alike(merged[at], field)) merged[at] = Anything(field.JsonName);
-            }
-        }
+        /// <summary>What the walk goes on through where a shape writes a name already placed: the field
+        /// standing there while both say the same thing about it, and a name whose contents nothing can
+        /// vouch for while they disagree.</summary>
+        private static FieldSchema Walked(FieldSchema placed, FieldSchema brought) =>
+            Alike(placed, brought) ? placed : Anything(placed.JsonName);
 
         /// <summary>Whether two shapes write the same thing under a name, as far as the walk is concerned:
         /// what stands there and what is inside it. Whether one of them requires the key, or starts it at

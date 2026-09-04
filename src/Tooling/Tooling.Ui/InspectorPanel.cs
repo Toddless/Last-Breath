@@ -844,11 +844,27 @@ namespace Tooling.Ui
 
         private void AddRecord(Node parent, RecordSchema schema, JToken token, JsonPointer at, int depth)
         {
-            RecordSchema written = Wearing(parent, schema, token, at);
+            VariantSchema? worn = Wearing(schema, token);
+            IReadOnlyList<FieldSchema> written = Drawn(schema, worn);
 
-            foreach (FieldSchema field in written.Fields)
+            // Said before anything is drawn: what follows is everything the record declares and not the
+            // shape it claims to be, and the author has to see that the file names something the game will
+            // not recognise.
+            if (schema.Variants is not null && worn is null) parent.AddChild(new Label { Text = UnknownShapeText });
+
+            // With no field naming the shapes the presence of a key is what names them, and the picker has
+            // no row of the record's own to stand in: it heads the record instead.
+            if (schema.Variants is { Discriminator: null } nameless) AddForm(parent, nameless, worn, token, at);
+
+            foreach (FieldSchema field in written)
             {
-                if (field.Hidden || NamesTheForm(schema, field)) continue;
+                if (field.Hidden) continue;
+
+                if (NamesTheForm(schema, field) && schema.Variants is { } named)
+                {
+                    AddForm(parent, named, worn, token, at);
+                    continue;
+                }
 
                 JsonPointer key = at.Append(field.JsonName);
                 JToken? value = Value(token, field.JsonName);
@@ -859,24 +875,59 @@ namespace Tooling.Ui
             if (token is JObject holder && NewField(written, schema, holder, at) is { } add) parent.AddChild(add);
         }
 
+        /// <summary>The shape a polymorphic record is written in, or null where it wears none the schema
+        /// lists and where it takes only the one shape it was declared with.</summary>
+        private static VariantSchema? Wearing(RecordSchema schema, JToken token) =>
+            schema.Variants is { } variants ? RecordTemplates.Worn(variants, token) : null;
+
         /// <summary>
-        /// The shape a polymorphic record is written in, together with the picker that changes it. A
-        /// record whose shape the schema does not list is said out loud and then drawn by the shape it
-        /// was declared with: the author has to see that the file names something the game will not
-        /// recognise, and the picker is how he answers it.
+        /// The fields a record is drawn by. A record of one shape is drawn by its own; a record of several
+        /// by the fields the shape it wears brings AND by those of the record itself that no shape claims
+        /// — the id its catalog lists it under, the inversion every predicate shares — in the order the
+        /// file is written in. A key another shape is known by is that shape's alone: written here it
+        /// would answer the question the picker asks, and twice over.
+        /// <para>A record wearing no shape the schema lists is drawn by everything it declares: what the
+        /// file holds has to be readable, and a key hidden on the strength of a shape nobody wears would
+        /// be a key the author cannot see and cannot correct.</para>
         /// </summary>
-        private RecordSchema Wearing(Node parent, RecordSchema schema, JToken token, JsonPointer at)
+        private static IReadOnlyList<FieldSchema> Drawn(RecordSchema schema, VariantSchema? worn)
         {
-            if (schema.Variants is not { } variants) return schema;
+            if (schema.Variants is not { } variants || worn is null) return schema.Fields;
 
-            VariantSchema? worn = RecordTemplates.Worn(variants, token);
+            HashSet<string> elsewhere = Elsewhere(variants, worn);
 
-            if (_document is not null && token is JObject)
-                parent.AddChild(Row(FormName, FormPicker(variants, worn, at), FormHint, actions: null));
+            return [.. RecordFieldOrder.Merged(schema, [worn.Record], Brought).Where(field => !elsewhere.Contains(field.JsonName))];
+        }
 
-            if (worn is null) parent.AddChild(new Label { Text = UnknownShapeText });
+        /// <summary>The names the shapes this record is NOT written in are known by, less everything the
+        /// shape it wears writes too: a key two shapes share belongs to the one standing here.</summary>
+        private static HashSet<string> Elsewhere(VariantSet variants, VariantSchema worn)
+        {
+            HashSet<string> names = new(StringComparer.Ordinal);
 
-            return worn?.Record ?? schema;
+            foreach (VariantSchema variant in variants.Variants)
+                if (!ReferenceEquals(variant, worn))
+                    foreach (FieldSchema field in variant.Record.Fields)
+                        names.Add(field.JsonName);
+
+            foreach (FieldSchema field in worn.Record.Fields) names.Remove(field.JsonName);
+
+            return names;
+        }
+
+        /// <summary>What is drawn where the record and the shape it wears both name a key: the shape's,
+        /// which is the narrower answer — what the record leaves optional for every shape at once is what
+        /// one shape requires.</summary>
+        private static FieldSchema Brought(FieldSchema placed, FieldSchema brought) => brought;
+
+        /// <summary>The row the shape of a polymorphic record is picked in, standing where the field
+        /// naming the shape would have. Nothing at all while the panel has no document to write to, or
+        /// where what stands here is not a record: a picker over neither writes nowhere.</summary>
+        private void AddForm(Node parent, VariantSet variants, VariantSchema? worn, JToken token, JsonPointer at)
+        {
+            if (_document is null || token is not JObject) return;
+
+            parent.AddChild(Row(FormName, FormPicker(variants, worn, at), FormHint, actions: null));
         }
 
         /// <summary>
@@ -1461,12 +1512,13 @@ namespace Tooling.Ui
             return document.Insert(at, wanted, Blank(item));
         }
 
-        /// <summary>The row that writes one of the record's own keys into it, offering the keys the schema
-        /// names and the file does not hold. Null when it holds all of them — a picker with nothing in it
-        /// is a row that only takes up space.</summary>
-        private Control? NewField(RecordSchema written, RecordSchema declared, JObject holder, JsonPointer at)
+        /// <summary>The row that writes one of a record's keys into it, offering those the record is drawn
+        /// by and the file does not hold — the shape's keys and the record's own alike, so that a key
+        /// living outside the shape is one the author can still lay down. Null when the file holds all of
+        /// them: a picker with nothing in it is a row that only takes up space.</summary>
+        private Control? NewField(IReadOnlyList<FieldSchema> written, RecordSchema declared, JObject holder, JsonPointer at)
         {
-            List<FieldSchema> absent = [.. written.Fields.Where(field =>
+            List<FieldSchema> absent = [.. written.Where(field =>
                 !field.Hidden && !NamesTheForm(declared, field) && !holder.ContainsKey(field.JsonName))];
 
             if (absent.Count == 0) return null;

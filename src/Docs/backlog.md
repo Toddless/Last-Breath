@@ -1,5 +1,22 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из волны описателей Effects/Conditions/PassiveSkills и починки инспектора для полиморфных записей (2026-09-04; rework → accept)
+
+Находки владельцу по данным:
+- `Conditions.json`: `PassiveTree.json` называет 2 условия в 4 местах (`Health_Below_30` ×3, `Stance_Strength`); остальные 37 из 39 записей не адресуются ничем в поставляемых данных (поля `condition` экипировки, пулов, ресурсов пусты) — каталог на 95% мёртвый.
+- Семейство `Passive_Skill_Stats_*` (`PassiveSkillCatalog.Knows` по префиксу) каталогом не описывается принципиально — грант с таким id обход прочтёт как битый (сегодня их пишет только `PassiveTree.json`, 6 штук).
+- Грант вида `Modifier` записи не называет; в данных таких нет (все 44 — `Passive`); первый появившийся уронит пин `s_unansweredGrants` — нужен пропуск как `NamesNoRecord` у `MasteryLevel`.
+- `ModifierPools` не пишет ни одного `grant` — канал описан и не используется.
+- `reordered` канонической записи по каталогам (расхождение файлов с объявлением DTO, не менялось): Npc 4, EquipItems 117, ModifierPools 8, Resources 152, Abilities 122 (augments в дизайнерском порядке `id, minRarity, maxRarity, grantsTags, tier, tags`), Dialogues 4, Quests 4, CraftingMastery 1, Standing 1; Conditions и LootTables — 0. Первый Ctrl+S в туле переставит ключи этих файлов.
+
+Код:
+- (minor) `CatalogDescriptorTests.cs:3910` — пин `reordered == 0` стоит только на Conditions; `SchemaKeyOrder` сменил семантику для всех полиморфных каталогов. Стало: `[DataRow(DataCatalog.LootTables)]` рядом; Abilities — только строка отчёта.
+- (nit) устаревшая дока `s_grantTargetChoices` (:3593) после переезда условий в `s_conditionChoices`; шапка `ConditionForms.cs` 16 строк, ремарки описателя 10 (стиль Tooling).
+- (знать) `negate` только на `ConditionRecord` и последним — единственный вариант, при котором 39 записей не переставляются; в инспекторе виден благодаря `Drawn` (поля базы ∪ поля формы) — описатель и инспектор связаны.
+- (знать) инспектор не показывает ключ, который запись физически держит, но который заявляет чужая форма (`statuses` на записи `ResourceThreshold`); канонический сейв его не теряет.
+- (знать) `IdField` на формах условий нужен глобальному тесту «поле на -id — ссылка или отказ»; читатели `IdField` к вариантам не спускаются.
+- (Godot-прогон владельца) Conditions: видны `id`, пикер формы на месте `type`, `negate`, поля формы; смена формы сохраняет `id`/`negate`; Abilities → augments: `id` и общие поля видны, из трёх ключей привязки — только свой; Ctrl+S на нетронутых Conditions/LootTables — diff пуст.
+
 ## Из чистки бэклога нарратива, волна B (2026-09-04; accept with minors) — закрыты пункты раздела «перекрёстные проверки #249» (NRE на null-ключе, `Choice`/`[EnumOf]`/не-массив, `Notes` vs `Caveats`, подписки `ChecksPanel`, `DuplicateId` записей каталога, константы json-имён в DTO, три ронятельные причины квеста, дока `Nodes()`, нит-пакет) и «сухого прогона» (`SeededQuestNote` условно); открытыми остались: общая ветка `catch` в `DialogueDryRun.Guarded` (непокрываема — все пути бросания перекрыты), шум `UnreachableNode` у диалога без `entryRules`, секционная цель в `ChecksPanel.Record()`
 
 - (minor) `INarrativeTextSource.cs:19-22` — новая дока `Has` говорит «игра падает на референсную локаль», CLAUDE.md:164 — «`msgstr ""` → показывается ключ». Стало: вернуть прежнюю причину либо поправить CLAUDE.md, если фолбэк реально настроен.

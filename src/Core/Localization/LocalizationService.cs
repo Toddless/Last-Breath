@@ -19,6 +19,11 @@ namespace Core.Localization
         /// authoring tool — asks for the same key this service would.</summary>
         public const string DescriptionSuffix = "_Description";
 
+        /// <summary>What the keyword CARD of a thing is filed under: its id with this after it. Separate
+        /// from the rule text because the two are read in different places — the card is the standing
+        /// wording a keyword link opens, and it falls back to the description when nothing is written.</summary>
+        public const string TooltipSuffix = "_Tooltip";
+
         public ILocalizationProvider Provider => provider;
 
         public string Localize(string key) => provider.Translate(key);

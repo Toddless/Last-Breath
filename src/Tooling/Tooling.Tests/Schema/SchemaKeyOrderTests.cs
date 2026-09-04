@@ -36,6 +36,7 @@ namespace Tooling.Tests.Schema
         private const string UnheardOf = "unheardOf";
 
         private const string KindField = "kind";
+        private const string NegateField = "negate";
         private const string AlphaField = "alpha";
         private const string BetaField = "beta";
 
@@ -44,6 +45,7 @@ namespace Tooling.Tests.Schema
 
         private const string AuthoredType = "Authored";
         private const string ShapedType = "Shaped";
+        private const string PredicateType = "Predicate";
 
         private const string NpcPointer = "/npcs/0";
         private const string AuthoredPointer = "/npcs/0/authored";
@@ -69,6 +71,21 @@ namespace Tooling.Tests.Schema
                             "name": "Ronald",
                             "level": 3
                         }
+                    }
+                ]
+            }
+            """;
+
+        /// <summary>A record wearing one of its shapes, with the key the shape brought and the keys it
+        /// carries whichever shape it wears written in every order but the right one.</summary>
+        private const string ScrambledPredicate = """
+            {
+                "npcs": [
+                    {
+                        "alpha": "under a third",
+                        "negate": true,
+                        "id": "Health_Below_30",
+                        "kind": "left"
                     }
                 ]
             }
@@ -127,8 +144,9 @@ namespace Tooling.Tests.Schema
         }
 
         /// <summary>A position sits two arrays below its section and takes two shapes. The writer is asked
-        /// about a key and not about a value, so every shape's fields are placed at once — the first shape
-        /// to write a name owns its place, and the record's own fields come after them.</summary>
+        /// about a key and not about a value, so every shape's fields are placed at once. Nothing but the
+        /// price is asked of a position whichever shape it is, and the keys the shapes are KNOWN by head
+        /// the record: what a position is stands before what every position holds alike.</summary>
         [TestMethod]
         public void ARecordTakingSeveralShapes_IsRankedByAllOfThem()
         {
@@ -136,9 +154,51 @@ namespace Tooling.Tests.Schema
             JsonPointer position = JsonPointer.Parse(PositionPointer);
 
             Assert.AreEqual(0, order.Rank(position, IdField));
-            Assert.AreEqual(1, order.Rank(position, PriceField));
-            Assert.AreEqual(2, order.Rank(position, AugmentsField));
+            Assert.AreEqual(1, order.Rank(position, AugmentsField));
+            Assert.AreEqual(2, order.Rank(position, PriceField));
             Assert.AreEqual(IKeyOrder.Unknown, order.Rank(position, UnheardOf));
+        }
+
+        /// <summary>A record carrying keys of its own outside every shape — the id its catalog lists it
+        /// under, the inversion each of its shapes may be read backwards by. Those are the record's own
+        /// answer and stand where the record declares them: ranking them behind the shapes would move the
+        /// id of every predicate in the file to the end of its line.</summary>
+        [TestMethod]
+        public void TheRecordsOwnKeys_StandWhereItDeclaresThemAndNotBehindItsShapes()
+        {
+            SchemaKeyOrder order = new(Predicates());
+            JsonPointer record = JsonPointer.Parse(NpcPointer);
+
+            Assert.AreEqual(0, order.Rank(record, IdField));
+            Assert.AreEqual(1, order.Rank(record, KindField));
+            Assert.IsTrue(order.Rank(record, NegateField) < order.Rank(record, AlphaField),
+                "a key no shape brings does not slide behind the keys they do");
+        }
+
+        /// <summary>And a key only one shape brings stands right after the field naming the shapes: it is
+        /// read as part of what that shape is. A key the record declares as well keeps the record's
+        /// place.</summary>
+        [TestMethod]
+        public void AKeyOnlyAShapeBrings_StandsAfterTheFieldNamingTheShape()
+        {
+            SchemaKeyOrder order = new(Predicates());
+            JsonPointer record = JsonPointer.Parse(NpcPointer);
+
+            Assert.AreEqual(2, order.Rank(record, BetaField));
+            Assert.AreEqual(3, order.Rank(record, NegateField));
+            Assert.AreEqual(4, order.Rank(record, AlphaField));
+        }
+
+        /// <summary>The whole of it over a file: a record wearing a shape comes back written in the order
+        /// its own declaration names, with what the shape brought among it.</summary>
+        [TestMethod]
+        public void TheWriter_PutsAShapedRecordsKeysInTheOrderItsRecordDeclaresThem()
+        {
+            string written = JsonTreeDocument.Parse(ScrambledPredicate).Write(new SchemaKeyOrder(Predicates()));
+            var root = (JObject)JToken.Parse(written);
+            var record = (JObject)((JArray)root[NpcsKey]!)[0];
+
+            CollectionAssert.AreEqual(new[] { IdField, KindField, NegateField, AlphaField }, Keys(record));
         }
 
         /// <summary>And the walk goes on through a field only one of the shapes has.</summary>
@@ -265,6 +325,33 @@ namespace Tooling.Tests.Schema
                 KindField);
 
             RecordSchema record = new() { TypeName = ShapedType, Fields = [Text(KindField)], Variants = shapes };
+
+            return new CatalogSchema(RootShape.ArrayUnderKey, [Section(NpcsKey, record)], [], new FreeFilePlacement());
+        }
+
+        /// <summary>A catalog whose records take shapes told apart by the value of a field and carry keys
+        /// of their own outside every shape — the id they are listed under and the inversion they may be
+        /// read backwards by. One shape brings a key the record declares as well, the other a key nobody
+        /// but it has: what the game's conditions are written like.</summary>
+        private static CatalogSchema Predicates()
+        {
+            RecordSchema Shape(string kind, string brought) =>
+                new() { TypeName = kind, Fields = [Text(KindField), Text(brought)] };
+
+            VariantSet shapes = new(
+                [
+                    SchemaReflectorTests.Variant(LeftKind, Shape(LeftKind, AlphaField)),
+                    SchemaReflectorTests.Variant(RightKind, Shape(RightKind, BetaField))
+                ],
+                KindField);
+
+            RecordSchema record = new()
+            {
+                TypeName = PredicateType,
+                Fields = [Text(IdField), Text(KindField), Text(NegateField), Text(AlphaField)],
+                IdField = IdField,
+                Variants = shapes
+            };
 
             return new CatalogSchema(RootShape.ArrayUnderKey, [Section(NpcsKey, record)], [], new FreeFilePlacement());
         }
