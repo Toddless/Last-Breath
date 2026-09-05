@@ -134,6 +134,16 @@ namespace Tooling.Ui
         private const string RequiredFieldHint = "the schema requires this key: it can be emptied, not removed";
         private const string AbsentFieldHint = "the record does not hold this key";
 
+        /// <summary>What a structural press says it did. A key written into a record and a key taken out
+        /// of one change what the game reads there, and the press answers with nothing an author reading
+        /// the row can see: the row is redrawn among a hundred others, and the file says nothing until it
+        /// is saved. These are the line that says it out loud.</summary>
+        private const string WroteKeyFormat = "wrote “{0}” into the record";
+
+        private const string TookKeyFormat = "took “{0}” out of the record";
+
+        private const string TookElementFormat = "took element [{0}] out of the list";
+
         // ── suggested words ────────────────────────────────────────────────────────────────────
 
         private const string SuggestHint = "pick one of the words this field is usually answered with";
@@ -1115,7 +1125,8 @@ namespace Tooling.Ui
 
                     foreach (JProperty pair in map.Properties())
                         AddField(pairs, item, pair.Value, pair.Name, at.Append(pair.Name), named: false, depth + 1,
-                            Gesture(RemoveText, RemoveKeyHint, enabled: true, document => document.Remove(at.Append(pair.Name))));
+                            Gesture(RemoveText, RemoveKeyHint, enabled: true,
+                                document => Took(document, at.Append(pair.Name), Text(TookKeyFormat, pair.Name))));
 
                     pairs.AddChild(NewKey(field, item, map, at));
                     break;
@@ -1613,7 +1624,8 @@ namespace Tooling.Ui
             row.AddChild(Gesture(DownText, index < count - 1 ? MoveDownHint : LastElementHint, index < count - 1,
                 document => document.Move(element, index + 1)));
 
-            row.AddChild(Gesture(RemoveText, RemoveElementHint, enabled: true, document => document.Remove(element)));
+            row.AddChild(Gesture(RemoveText, RemoveElementHint, enabled: true,
+                document => Took(document, element, Text(TookElementFormat, index))));
 
             return row;
         }
@@ -1626,7 +1638,32 @@ namespace Tooling.Ui
             if (field.Required) return new Button { Text = RemoveText, Disabled = true, TooltipText = RequiredFieldHint };
             if (value is null) return new Button { Text = RemoveText, Disabled = true, TooltipText = AbsentFieldHint };
 
-            return Gesture(RemoveText, RemoveFieldHint, enabled: true, document => document.Remove(at));
+            return Gesture(RemoveText, RemoveFieldHint, enabled: true,
+                document => Took(document, at, Text(TookKeyFormat, field.JsonName)));
+        }
+
+        /// <summary>Takes a value out and says what went. The press has no answer of its own an author
+        /// can read — the row is redrawn among a hundred others and the file says nothing until it is
+        /// saved — so what a structural gesture removed is named on the line that says what the run last
+        /// did. Silent where nothing was there to take: a press that changed nothing says nothing.</summary>
+        private bool Took(JsonTreeDocument document, JsonPointer at, string what)
+        {
+            if (!document.Remove(at)) return false;
+
+            Say(what);
+
+            return true;
+        }
+
+        /// <summary>Writes a key into a record and says which one, for the reason a removal says what it
+        /// took: a key nobody reads as having arrived is one the game reads all the same.</summary>
+        private bool Wrote(JsonTreeDocument document, JsonPointer at, FieldSchema field)
+        {
+            if (!document.Insert(at, field.JsonName, Blank(field))) return false;
+
+            Say(Text(WroteKeyFormat, field.JsonName));
+
+            return true;
         }
 
         /// <summary>The value a key of this panel is written with the moment the author asks for it. One
@@ -1755,7 +1792,7 @@ namespace Tooling.Ui
             row.AddChild(Gesture(AddFieldText, AddFieldHint, enabled: true, document =>
                 picker.Selected >= 0
                 && picker.Selected < absent.Count
-                && document.Insert(at, absent[picker.Selected].JsonName, Blank(absent[picker.Selected]))));
+                && Wrote(document, at, absent[picker.Selected])));
 
             return row;
         }

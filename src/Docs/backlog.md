@@ -1,5 +1,13 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из диагностики потери `counter.key` при прогоне владельца (2026-09-05) — отрисовка не пишет (доказано гардами); ключ снят кнопкой `×` у строки `key` (лог DataEditor 08:32:56), `transitions: []`/`onComplete: []` — «+ field»; жесты `×`/`+ field` теперь называют себя в статусе
+
+- (в работе) `SchemaReflector.IsRequired` — инициализатор в DTO ≠ «ключ необязателен»: `×` на несущих ключах, `Blank(QuestRewardItemEntry) == {}`. Решение ведущего: обязательность по nullability (ссылочный без `?` — обязателен).
+- (в работе) `FactKeySuggestions.Read()` глотает `Findings` игрового прогона — редактор знал про уронённый квест 2,5 минуты и молчал; `SpinBox`/`OptionButton` перехватывают колесо мыши — тихие правки при прокрутке.
+- (знать) `ValueEdit.Undo` резолвит указатель заново — undo правки значения после удаления соседнего элемента списка попадёт не в тот узел или бросит.
+- (владельцу) восстановить `Quest_Field_Of_Bones.json` из HEAD (`git checkout HEAD -- src/SharedData/Quests/Quest_Field_Of_Bones.json`) либо вернуть строку `"counter": { "key": "Kill_Count:Npc_Grave_Revenant", "amount": 2, "retroactive": true }`; `Quest_Trial_Of_The_Fang.json`, `Conditions.json`, `Npc_Bandit_Veteran.json`, `BaseAbilityData.json` — только канон-формат и осознанный `repeatable: false`, можно коммитить.
+- (знать) 5 предсуществующих красных тестов на HEAD от незакоммиченных данных владельца: `LootTables.json` (`npc_id` плейсхолдер в `individual/1/key`, `reordered`), `PassiveTree.json` (`small_barrier_suppress_5`).
+
 ## Из переписывания `NpcModifiers` в секции корня и описателя (2026-09-05; accept with minors) — решение владельца: 7 секций, записи побайтно те же (сверено машинно), `uniqueScope` → `NpcSpawnRolls.json`; каталог описан, `UndescribedTarget NpcModifiers` снят, 6 id из квестов резолвятся; `isUnique` переехал в 7 DTO секций ради `reordered == 0` (рефлектор читает базу первой)
 
 - (minor) `NpcModifierProvider.cs:36` — битый/пропавший `NpcSpawnRolls.json` → `LoadFailed` в Tracker, но модификаторы грузятся все с `Group`: два разных скейлера тихо схлопываются в один (раньше `uniqueScope` нельзя было потерять без потери файла). Стало: «не прочитано» ≠ «пусто» — отказ строить модификаторы.
