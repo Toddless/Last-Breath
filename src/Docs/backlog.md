@@ -1,5 +1,16 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из починок после потери `counter.key` (2026-09-05; accept with minors) — контракт обязательности по nullability (ссылочный без `?` = обязателен, инициализатор — защита парсера, не «можно не писать»; 201 член стал обязательным, `×` на несущих ключах исчез, `Blank` кладёт `""`/`[]`); статус говорит вердикт нарратива при смене («narrative: N finding(s), M dropped — see checks», «narrative: no findings»), DataEditor на старте гоняет каталожные проверки и отдаёт отчёт панели, после Ctrl+S — «checks stale»; `SpinBox` не реагирует на колесо (`PanelParts.Unwheeled`)
+
+- (карточка) `ItemModifier` — неописанный союз форм (строка/композит/грант/операция в одном DTO): `+ field` требует у атома `parts`, у композита `parameter` — разложить на `Variants` по наличию ключа (как `TableRecord`).
+- (владельцу, DTO) кандидаты в `string?` по смыслу: `AbilityAugmentData.abilityId/effectId/exclusionGroup/attackModifier/behaviour`, `EquipItemData.weaponType/handedness` (свежая броня получит `"weaponType": ""` — мёртвый ключ, парсер не ломает); без правки они стоят первыми в `+ field` как «required, missing».
+- (minor) `NarrativeCheckRun.FoundFormat` «— see checks» врёт в DataEditor (там панель каталожная, нарративных находок нет). Стало: адрес называет хост.
+- (minor) `NarrativeRoot.cs:216` — стартовый нарративный прогон выброшен (только строка), `ChecksPanel`/`FactsPanel` гоняют заново — тот же двойной пасс, что убран в DataEditor (#256).
+- (minor) `SchemaContractTests.Absence()` — таблица конвенции без `required`-члена и без неаннотированного (оба только в `SchemaReflectorTests`).
+- (nit) `SchemaReflector.IsRequired` решает и репортит (`NullabilityUnknown`) — предикат с побочкой; `new At(...)` дважды в `Field`; `NewField` — два списка вместо одного `OrderBy(!Required)`; `ToolShell.SaveEverything` — строка сейва пишется дважды (`Action = Written(n)` затем `Wrote` → `Report`); `_verdict = _verdict` на кэш-пути; имя `CatalogChecksPanel.Show` рядом с `CanvasItem.Show()`; прокрутка на целых пикселях (`(int)` каждый щелчок, `factor < 1` → 0).
+- (знать) `Report.Note` не дедуплицирует, схемы не кэшируются — первая `NullabilityUnknown` размножится по каталогам; `EditorRoot._sectionPicker`/`_filePicker` вне `ScrollContainer`; открытие DataEditor подорожало на два полных прогона (нарратив + каталоги).
+- (Godot-прогон владельца) Quests → objective → у `key` нет `×`, тултип «can be emptied, not removed»; `+ element` в `rewards.items` → `{ "itemId": "", "amount": 1 }`; `+ field` квеста — `transitions — required, missing` первым; при открытии на битом квесте — статус «narrative: 1 finding(s), 1 record(s) dropped»; после Ctrl+S — «wrote N file(s); checks stale — press Check»; колесо над `SpinBox` не меняет число.
+
 ## Из диагностики потери `counter.key` при прогоне владельца (2026-09-05) — отрисовка не пишет (доказано гардами); ключ снят кнопкой `×` у строки `key` (лог DataEditor 08:32:56), `transitions: []`/`onComplete: []` — «+ field»; жесты `×`/`+ field` теперь называют себя в статусе
 
 - (в работе) `SchemaReflector.IsRequired` — инициализатор в DTO ≠ «ключ необязателен»: `×` на несущих ключах, `Blank(QuestRewardItemEntry) == {}`. Решение ведущего: обязательность по nullability (ссылочный без `?` — обязателен).

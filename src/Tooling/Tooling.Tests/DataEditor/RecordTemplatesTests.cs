@@ -4,6 +4,7 @@ namespace Tooling.Tests.DataEditor
     using Tooling.Catalogs;
     using Tooling.Json;
     using Tooling.Schema.Model;
+    using Tooling.Schema.Reflection;
 
     /// <summary>
     /// What the editor writes when the author asks for something that is not there yet: an element of a
@@ -15,6 +16,7 @@ namespace Tooling.Tests.DataEditor
     public class RecordTemplatesTests
     {
         private const string IdField = "id";
+        private const string KeyField = "key";
         private const string PriceField = "price";
         private const string AugmentsField = "augments";
         private const string TierField = "tier";
@@ -101,6 +103,20 @@ namespace Tooling.Tests.DataEditor
             Assert.AreEqual(string.Empty, (string?)blank[IdField]);
             Assert.AreEqual(0d, (double)blank[PriceField]!);
             Assert.IsFalse(blank.ContainsKey(NoteField));
+        }
+
+        /// <summary>The same rule against a record read off a real DTO rather than written out here: what
+        /// the type does not allow to be absent is laid down empty, and what the game already reads
+        /// something for is left out. The empty word is the point — a counter watching "" is caught by the
+        /// checks the moment it is saved, while a counter with no key at all is a quest the game drops
+        /// without a word.</summary>
+        [TestMethod]
+        public void Blank_OfARecordReadFromItsType_WritesWhatTheTypeDoesNotAllowToBeAbsent()
+        {
+            JObject blank = RecordTemplates.Blank(new SchemaReflector().Record(typeof(CounterDto)));
+
+            Assert.AreEqual(1, blank.Count);
+            Assert.AreEqual(string.Empty, (string?)blank[KeyField]);
         }
 
         /// <summary>A record with shapes is written in one of them from the start: a position carrying
@@ -297,5 +313,16 @@ namespace Tooling.Tests.DataEditor
 
         private static VariantSchema Shape(string value, RecordSchema record) =>
             new() { DiscriminatorValue = value, Record = record };
+
+        /// <summary>The shape a quest's counter takes: a fact key the reader is owed, and two numbers
+        /// whose absence the game already reads as something.</summary>
+        private sealed record CounterDto
+        {
+            public string Key { get; init; } = string.Empty;
+
+            public int Amount { get; init; } = 1;
+
+            public bool Retroactive { get; init; } = true;
+        }
     }
 }

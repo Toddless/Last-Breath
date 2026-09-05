@@ -271,13 +271,31 @@ namespace Tooling.Ui
             CatalogSaveResult texts = Texts?.SaveAll() ?? Nothing;
             CatalogSaveResult result = new([.. catalogs.Saved, .. texts.Saved], [.. catalogs.Notes, .. texts.Notes]);
 
-            Action = Text(WroteFormat, result.Saved.Count);
+            Action = Written(result.Saved.Count);
             Refresh();
+
+            Wrote(result);
 
             if (result.Notes.Count > 0) ShowMessage(SaveIssuesTitle, result.Notes);
 
             return result;
         }
+
+        /// <summary>The run has just been written to disk. Whatever a host reads over the WHOLE run — the
+        /// checks, the readings held from before — answers about the documents as they were, and this is
+        /// where it says so.
+        /// <para>Overridden by the tool that leaves a whole-run reading standing on screen and by no
+        /// other: the data editor lists the checks it made while opening, so the line a save writes is
+        /// where it says they answer about documents the author has since moved. The narrative editor
+        /// presses for its readings by hand and its panels word their own staleness.</para></summary>
+        protected virtual void Wrote(CatalogSaveResult result)
+        {
+        }
+
+        /// <summary>What a save came to, worded once. A host adding to the line reads it from the result
+        /// rather than from the line standing: what stands there is whatever the last gesture said, and
+        /// the next one has already replaced it.</summary>
+        protected static string Written(int files) => Text(WroteFormat, files);
 
         /// <summary>Says what the run could not read: the catalogs' own notes, and whatever else the host
         /// has to add — the locales it could not open. A root that is not there at all is said on its

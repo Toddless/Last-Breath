@@ -130,6 +130,9 @@ namespace Tooling.Ui
         private const string RemoveKeyHint = "take this key out of the map";
         private const string EveryKeyHint = "every key the schema names is already written";
         private const string AddFieldHint = "write this key into the record";
+
+        /// <summary>How a key the record cannot be read without is named while the file lacks it.</summary>
+        private const string OwedFieldFormat = "{0} — required, missing";
         private const string RemoveFieldHint = "take this key out; the game reads the default in its place";
         private const string RequiredFieldHint = "the schema requires this key: it can be emptied, not removed";
         private const string AbsentFieldHint = "the record does not hold this key";
@@ -723,7 +726,7 @@ namespace Tooling.Ui
             box.ValueChanged += number => edit.Write(JsonScalars.Number(edit.Value, number, whole: true));
             box.GetLineEdit().FocusExited += edit.Seal;
 
-            return box;
+            return box.Unwheeled();
         }
 
         /// <summary>
@@ -1772,19 +1775,23 @@ namespace Tooling.Ui
 
         /// <summary>The row that writes one of a record's keys into it, offering those the record is drawn
         /// by and the file does not hold — the shape's keys and the record's own alike, so that a key
-        /// living outside the shape is one the author can still lay down. Null when the file holds all of
-        /// them: a picker with nothing in it is a row that only takes up space.</summary>
+        /// living outside the shape is one the author can still lay down. A key the record cannot be read
+        /// without stands first and is named as owed: everything else on the list is a choice, and that
+        /// one is a repair. Null when the file holds all of them: a picker with nothing in it is a row
+        /// that only takes up space.</summary>
         private Control? NewField(IReadOnlyList<FieldSchema> written, RecordSchema declared, JObject holder, JsonPointer at)
         {
-            List<FieldSchema> absent = [.. written.Where(field =>
+            List<FieldSchema> offered = [.. written.Where(field =>
                 !field.Hidden && !NamesTheForm(declared, field) && !holder.ContainsKey(field.JsonName))];
 
-            if (absent.Count == 0) return null;
+            if (offered.Count == 0) return null;
 
+            List<FieldSchema> absent = [.. offered.Where(field => field.Required), .. offered.Where(field => !field.Required)];
             var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             var picker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = AddFieldHint };
 
-            foreach (FieldSchema field in absent) picker.AddItem(field.JsonName);
+            foreach (FieldSchema field in absent)
+                picker.AddItem(field.Required ? Text(OwedFieldFormat, field.JsonName) : field.JsonName);
 
             picker.Selected = 0;
 

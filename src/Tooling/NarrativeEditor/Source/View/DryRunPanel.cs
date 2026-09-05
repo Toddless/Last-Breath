@@ -211,13 +211,13 @@ namespace NarrativeEditor.Source.View
             SizeFlagsHorizontal = SizeFlags.ExpandFill
         };
 
-        private static SpinBox Counter(int value) => new()
+        private static SpinBox Counter(int value) => new SpinBox
         {
             MinValue = 0,
             MaxValue = MaxCount,
             Step = 1,
             Value = value
-        };
+        }.Unwheeled();
 
         /// <summary>An option button over every member of an enum, in the enum's own order.</summary>
         private static OptionButton Choices<T>(T selected) where T : struct, Enum

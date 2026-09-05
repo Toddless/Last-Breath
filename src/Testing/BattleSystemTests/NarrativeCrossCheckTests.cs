@@ -113,6 +113,104 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         /// <summary>
+        /// What a run says on the status line of a tool nobody pressed a button on. Three answers and no
+        /// more: silence for a narrative that owes nothing, a count for one that owes something, and the
+        /// records the loader refused counted apart — those are not a warning about the game, they are the
+        /// quest being out of it this second.
+        /// </summary>
+        [TestMethod]
+        public void TheStatusLine_CountsTheFindingsAndNamesTheDroppedApart()
+        {
+            Assert.IsNull(NarrativeCheckRun.Said([]), "a clean run wrote a line the author only learns to read past");
+
+            Assert.AreEqual(
+                "narrative: 2 finding(s) — see checks",
+                NarrativeCheckRun.Said(
+                [
+                    new NarrativeFinding(NarrativeFindingKind.MissingText, "Dialogues/Npc_Forged/Greeting", "no locale words it"),
+                    new NarrativeFinding(NarrativeFindingKind.FactNeverRead, "facts/Fact_Forged", "nobody asks about it")
+                ]));
+
+            Assert.AreEqual(
+                "narrative: 3 finding(s), 2 record(s) dropped — see checks",
+                NarrativeCheckRun.Said(
+                [
+                    new NarrativeFinding(NarrativeFindingKind.Dropped, "Quests/Quest_Forged", "the loader kept nothing"),
+                    new NarrativeFinding(NarrativeFindingKind.UnknownReference, "Quests/Quest_Forged/rewards", "no catalog holds it"),
+                    new NarrativeFinding(NarrativeFindingKind.Dropped, "Dialogues/Npc_Forged", "the loader kept nothing")
+                ]));
+        }
+
+        /// <summary>The verdict rides with the fact keys, which is the reading a tool makes without being
+        /// asked for one: what the checks found reaches the status line through that same run rather than
+        /// through a second walk of every document.</summary>
+        [TestMethod]
+        public void TheFactKeyReading_CarriesWhatTheChecksFound()
+        {
+            var workspace = CatalogWorkspace.Load(NullListRoot(), CatalogDescriptors.All);
+            var references = new ReferenceIndex(workspace);
+
+            FactKeyReading reading = NarrativeFactKeys.Over(workspace, references, texts: null);
+            NarrativeCheckReport report = NarrativeCheckRun.Over(workspace, references, texts: null);
+
+            Assert.IsNotNull(reading.Said, "a run over a narrative that owes something handed the tool nothing to say");
+            Assert.AreEqual(NarrativeCheckRun.Said(report.Findings), reading.Said);
+        }
+
+        /// <summary>
+        /// What a second reading has to say once the first has spoken. The readings are made behind every
+        /// redraw of the tool, so a verdict repeated is a verdict written over the line the author's own
+        /// gesture put there — and a narrative that has just stopped owing anything is said exactly once,
+        /// or the author who fixed the last quest is never told that he did.
+        /// </summary>
+        [TestMethod]
+        public void TheVerdict_IsSaidOnlyWhenItHasMoved()
+        {
+            string found = Verdict(NarrativeFindingKind.FactNeverRead);
+            string dropped = Verdict(NarrativeFindingKind.Dropped);
+
+            Assert.IsNull(NarrativeCheckRun.Changed(found, found), "the same verdict was said twice");
+            Assert.IsNull(NarrativeCheckRun.Changed(null, null), "a narrative that owed nothing and owes nothing wrote a line");
+
+            Assert.AreEqual(found, NarrativeCheckRun.Changed(null, found), "the first verdict of a run went unsaid");
+            Assert.AreEqual(dropped, NarrativeCheckRun.Changed(found, dropped), "a verdict that moved went unsaid");
+            Assert.AreEqual("narrative: no findings", NarrativeCheckRun.Changed(found, null),
+                "the author fixed the last finding and was told nothing");
+        }
+
+        /// <summary>The same rule where it is actually read: the list of fact keys is walked again after
+        /// every step the tool files, and the verdict rides on those readings. Said at the reading nobody
+        /// asked for, and not again while the documents say the same thing.</summary>
+        [TestMethod]
+        public void TheVerdictOfTheFactKeys_IsSaidOnceUntilTheNarrativeMoves()
+        {
+            var workspace = CatalogWorkspace.Load(NullListRoot(), CatalogDescriptors.All);
+            var references = new ReferenceIndex(workspace);
+            var suggestions = new FactKeySuggestions(workspace, references, texts: null);
+            List<string> said = [];
+
+            suggestions.Said += said.Add;
+            suggestions.ReadNow();
+
+            // Two steps of the tool, each dropping the reading the way one edit of a document does.
+            for (int step = 0; step < 2; step++)
+            {
+                suggestions.Invalidate();
+                suggestions.Matching(string.Empty);
+            }
+
+            string verdict = NarrativeCheckRun.Said(NarrativeCheckRun.Over(workspace, references, texts: null).Findings)!;
+
+            Assert.AreEqual(1, said.Count(line => line == verdict),
+                $"the verdict was not said exactly once:{Environment.NewLine}  {string.Join($"{Environment.NewLine}  ", said)}");
+        }
+
+        /// <summary>What one finding of a kind is said as, so a test names the verdict the way the tool
+        /// words it rather than spelling the line out twice.</summary>
+        private static string Verdict(NarrativeFindingKind kind) =>
+            NarrativeCheckRun.Said([new NarrativeFinding(kind, "Quests/Quest_Forged", "forged")])!;
+
+        /// <summary>
         /// The records the vocabulary's own gaps used to swallow. The parse is the game's, run over the
         /// shipped documents: a registry short of one action drops the whole record naming it, and the
         /// trader and his four trials are where every such word is written.

@@ -153,6 +153,24 @@ namespace Tooling.Tests.Schema
             CollectionAssert.AreEquivalent(SpelledOut(), Named(), "MarkupNames spells a name nothing in the markup wears.");
         }
 
+        /// <summary>
+        /// The game's half of the contract about absence: whether the author may leave a key out is said
+        /// by the DTO's nullability and by nothing else. A member written without a "?" is a key the file
+        /// has to hold — the <c>= string.Empty</c> and the <c>= []</c> beside it keep the parser off null
+        /// and say nothing about the file. A value type says the same by having neither a "?" nor a value
+        /// of its own, because a number that starts at one already means the absent key.
+        /// <para>Written down here because it is what the inspector draws by: the key it refuses to
+        /// remove, the blank it lays a fresh record down with, the keys it offers to write.</para>
+        /// </summary>
+        [TestMethod]
+        public void WhetherAKeyMayBeLeftOut_IsSaidByNullabilityAlone()
+        {
+            RecordSchema record = new SchemaReflector().Record(typeof(AbsenceDto));
+
+            foreach ((string field, bool required) in Absence())
+                Assert.AreEqual(required, Field(record, field).Required, $"'{field}' is read the other way round");
+        }
+
         /// <summary>A schema is handed around, held for comparison against the file on disk and kept
         /// while the author edits: anything settable on it is a way for one holder to change what
         /// another is looking at.</summary>
@@ -471,6 +489,20 @@ namespace Tooling.Tests.Schema
             Field(record, name).Item?.Record
             ?? throw new AssertFailedException($"{record.TypeName}.{name} holds no records.");
 
+        /// <summary>Every way a DTO says whether the file may go without the key, and what each of them
+        /// means. Written out as a table for the reason the markup is: the rule is read off the types by
+        /// reflection, and a rule nobody spelled out is one that changes without anybody noticing.</summary>
+        private static IEnumerable<(string Field, bool Required)> Absence() =>
+        [
+            (IdField, true),
+            (ItemsField, true),
+            (AugmentsField, true),
+            (WeightField, true),
+            (FractionField, false),
+            (TierField, false),
+            (PriceField, false)
+        ];
+
         private static IReadOnlyList<Type> ModelTypes() =>
             [.. typeof(CatalogSchema).Assembly.GetTypes().Where(type => type.IsPublic && type.Namespace == ModelNamespace)];
 
@@ -608,6 +640,26 @@ namespace Tooling.Tests.Schema
             [Range(MinTier, MaxTier)] public int Tier { get; init; }
 
             [EnumOf(typeof(TestRarity))] public string Rarity { get; init; } = string.Empty;
+        }
+
+        /// <summary>One member for every way a DTO can say whether the key may be absent: text and a list
+        /// and a record kept off null by an initializer, a number with nothing written for it — and,
+        /// against them, the "?" and the number that starts at something.</summary>
+        private sealed record AbsenceDto
+        {
+            public string Id { get; init; } = string.Empty;
+
+            public List<string> Items { get; init; } = [];
+
+            public AugmentGroupDto Augments { get; init; } = new();
+
+            public float Weight { get; init; }
+
+            [EnumOf(typeof(TestFraction))] public string? Fraction { get; init; }
+
+            public int Tier { get; init; } = 1;
+
+            public float? Price { get; init; }
         }
 
         private sealed record NpcModifiersDocumentDto

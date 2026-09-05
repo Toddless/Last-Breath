@@ -393,7 +393,7 @@ namespace Tooling.Schema.Reflection
 
             return field with
             {
-                Required = IsRequired(member, type, value),
+                Required = IsRequired(member, type, value, new At(walk.Owner, jsonName)),
                 Default = Written(field.Kind, value),
                 Hidden = markup.Hidden
             };
@@ -722,12 +722,29 @@ namespace Tooling.Schema.Reflection
             Note(Notes.Converted, walk.Owner, jsonName, converter.Name);
         }
 
-        private bool IsRequired(PropertyInfo member, Type type, object? value)
+        /// <summary>
+        /// Whether the file has to write the key, read from what the member says it may hold rather than
+        /// from what it starts out holding. A reference the DTO does not mark nullable is a value the
+        /// reader is owed: the <c>= string.Empty</c> and the <c>= []</c> beside it guard the parser
+        /// against null and say nothing about the key being the author's to leave out.
+        /// <para>A value type has no such guard to tell apart, so it answers as it always has: required
+        /// while it is neither written <c>T?</c> nor given a value of its own — a tier that starts at one
+        /// and a flag that starts true mean the absent key already.</para>
+        /// </summary>
+        private bool IsRequired(PropertyInfo member, Type type, object? value, At at)
         {
             if (member.GetCustomAttribute<RequiredMemberAttribute>() != null) return true;
             if (Nullable.GetUnderlyingType(type) != null) return false;
+            if (type.IsValueType) return !HasInitializer(type, value);
 
-            return _nullability.Create(member).ReadState != NullabilityState.Nullable && !HasInitializer(type, value);
+            NullabilityState read = _nullability.Create(member).ReadState;
+
+            // A type compiled without the annotations says nothing either way, and the strict reading is
+            // the safe one: a key the author cannot remove is corrected in a moment, a key that vanished
+            // from a record is a game that stops reading it without a word.
+            if (read == NullabilityState.Unknown) Note(Notes.NullabilityUnknown, at.Owner, at.Field);
+
+            return read != NullabilityState.Nullable;
         }
 
         private void Note(string format, params object?[] parts) => Report.Note(Text(format, parts));
@@ -804,6 +821,7 @@ namespace Tooling.Schema.Reflection
             public const string MarkupUnreadable = "'{0}.{1}' carries a '{2}' with no '{3}' the tool can read: that part of the markup was not applied.";
             public const string NamelessSection = "'{0}.{1}' narrows its reference into '{2}' to a section with no name: it points into the whole catalog.";
             public const string NamelessCatalog = "'{0}.{1}' points into a catalog with no name, which is no catalog: the reference was not read.";
+            public const string NullabilityUnknown = "'{0}.{1}' is declared where nullability is not stated, so nothing says whether the key may be left out: it was read as one the file has to write.";
         }
     }
 }

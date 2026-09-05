@@ -54,6 +54,7 @@ namespace Tooling.Tests.Schema
         private const string TiersField = "tiers";
         private const string ItemsField = "items";
         private const string PriceField = "price";
+        private const string AmountField = "amount";
         private const string TierField = "tier";
         private const string AugmentsField = "augments";
         private const string ChildrenField = "children";
@@ -416,19 +417,52 @@ namespace Tooling.Tests.Schema
             CollectionAssert.AreEqual(new[] { AuthoredLevelField, NameField }, Names(authored));
         }
 
-        /// <summary>Required is what the file has to state: neither nullable, nor given a value where it is
-        /// declared, nor optional by any other means.</summary>
+        /// <summary>Required is what the file has to state, and the type says it by what it allows to be
+        /// absent: a reference not written "?" is a value the reader is owed, a value type says the same
+        /// by having neither a "?" nor a value of its own.</summary>
         [TestMethod]
-        public void WhatIsRequired_IsWhatIsNeitherNullableNorGivenAValueOfItsOwn()
+        public void WhatIsRequired_IsWhatTheTypeDoesNotAllowToBeAbsent()
         {
             RecordSchema record = _reflector.Record(typeof(NpcDto));
+            RecordSchema authored = _reflector.Record(typeof(AuthoredDto));
 
             Assert.IsTrue(Field(record, ScalingField).Required, "a number with nothing written for it");
-            Assert.IsFalse(Field(record, IdField).Required, "a string that starts empty");
+            Assert.IsTrue(Field(record, IdField).Required, "a string nothing allows to be absent");
+            Assert.IsTrue(Field(record, AbilitiesField).Required, "a list is a key like any other");
+            Assert.IsTrue(Field(record, BaseParametersField).Required, "and so is a map");
             Assert.IsFalse(Field(record, LevelField).Required, "a number that starts at one");
+            Assert.IsFalse(Field(record, AggressiveField).Required, "a flag that starts true");
             Assert.IsFalse(Field(record, AuthoredField).Required, "a section that may be absent");
-            Assert.IsFalse(Field(record, ConditionsField).Required);
+            Assert.IsFalse(Field(record, ConditionsField).Required, "and a free structure that may be");
+            Assert.IsFalse(Field(authored, AuthoredLevelField).Required, "a number written '?'");
+            Assert.IsFalse(Field(authored, NameField).Required, "and text written '?'");
             Assert.IsTrue(Field(_reflector.Record(typeof(StrictDto)), IdField).Required, "and what the type demands");
+        }
+
+        /// <summary>The value a reference starts out holding is the parser's guard against null and not the
+        /// author's leave to leave the key out: the same string with an initializer and without one makes
+        /// the same demand of the file. A key the game reads a default for is a key the game DECIDED could
+        /// be absent, and only a value type and a "?" say that.</summary>
+        [TestMethod]
+        public void AnInitializerOnAReference_DoesNotMakeTheKeyTheAuthorsToLeaveOut()
+        {
+            RecordSchema record = _reflector.Record(typeof(GuardedDto));
+
+            Assert.IsTrue(Field(record, IdField).Required, "text that starts empty is text the file writes");
+            Assert.IsTrue(Field(record, TagsField).Required, "a list that starts empty is a list the file writes");
+            Assert.IsTrue(Field(record, AuthoredField).Required, "and a record that stands whole from the start");
+            Assert.IsFalse(Field(record, NameField).Required);
+            Assert.IsFalse(Field(record, AmountField).Required);
+        }
+
+        /// <summary>A type compiled where nullability is not stated answers neither way, and the key is
+        /// read as one the file has to write. Said out loud: a record whose keys cannot be removed for a
+        /// reason nobody can see is a contract the author has no way of reading back.</summary>
+        [TestMethod]
+        public void ATypeThatStatesNoNullability_IsReadAsRequired_AndSaidOutLoud()
+        {
+            Assert.IsTrue(Field(_reflector.Record(typeof(UnannotatedDto)), IdField).Required);
+            Said(nameof(UnannotatedDto), IdField);
         }
 
         /// <summary>The default is what the game reads when the key is absent, which is the value a fresh
@@ -994,6 +1028,21 @@ namespace Tooling.Tests.Schema
             public required string Id { get; init; }
         }
 
+        /// <summary>The shape the game's own records take: text, a list and a record that start out empty
+        /// rather than null, beside the two ways a key really is the author's to leave out.</summary>
+        internal sealed record GuardedDto
+        {
+            public string Id { get; init; } = string.Empty;
+
+            public List<string> Tags { get; init; } = [];
+
+            public AuthoredDto Authored { get; init; } = new();
+
+            public string? Name { get; init; }
+
+            public int Amount { get; init; } = 1;
+        }
+
         internal sealed record LootTableDto
         {
             [NotARef] public string Key { get; init; } = string.Empty;
@@ -1159,6 +1208,17 @@ namespace Tooling.Tests.Schema
 
             public AuthoredDto? Fallback { get; init; }
         }
+
+#nullable disable
+
+        /// <summary>A type compiled where nullability is not stated: its text answers neither "may be
+        /// absent" nor "may not", which is the one case the walk has to decide for itself.</summary>
+        internal sealed record UnannotatedDto
+        {
+            public string Id { get; init; } = string.Empty;
+        }
+
+#nullable restore
 
         internal sealed record FieldedDto
         {

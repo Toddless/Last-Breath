@@ -11,6 +11,7 @@ namespace DataEditor.Source.View
     using LastBreath.Descriptors;
     using LastBreath.Descriptors.Preview;
     using Tooling.Catalogs;
+    using Tooling.Catalogs.Checks;
     using Tooling.Localization;
     using Tooling.Schema.Model;
     using Tooling.Ui;
@@ -92,6 +93,15 @@ namespace DataEditor.Source.View
         private const string CopySuffix = "_Copy";
 
         private const string NoTextsFormat = "the locales under {0} could not be read: {1}";
+
+        /// <summary>What the pass over every catalog came to, on the line that says what the run last did.</summary>
+        private const string CatalogsFoundFormat = "catalogs: {0} finding(s) — see checks";
+
+        private const string CatalogsRefusedFormat = "the catalogs could not be checked as they stand: {0}";
+
+        /// <summary>What a save leaves behind it: what was written, and the reading of the whole run that
+        /// the writing has just made out of date.</summary>
+        private const string CatalogsStaleFormat = "{0}; checks stale — press Check";
 
         /// <summary>What the conversations following an npc's name is told as, beside what the pass over
         /// their keys itself came to: the author renamed an npc here and the lines that moved are in
@@ -484,7 +494,53 @@ namespace DataEditor.Source.View
 
             ShowCatalog(_workspace.Catalogs.Count > 0 ? 0 : NoSelection);
 
+            // What the data owes, read once the panes are up and said before the author touches anything:
+            // a record the game's own rules refuse is the one thing he cannot see by opening it. The
+            // narrative goes last of the two because the status line holds one answer and that is the
+            // graver one: a catalog finding is a record the game reads wrongly, a dropped narrative record
+            // is a quest the game does not hold at all.
+            CheckCatalogs(references);
+            facts.ReadNow();
+
             ReportIssues(_workspace, _notes);
+        }
+
+        /// <summary>
+        /// Reads every catalog through the game's own rules, says how much they found and hands the pass
+        /// itself to the panel that lists it. Made when the run is opened and not again: the pass parses
+        /// the whole data root through the game's readers, and an author saves a file every few seconds.
+        /// <para>The panel is given the reading rather than told to make one. It is the same pass over the
+        /// same documents either way, and an author pressing Check on a tool that has just opened would be
+        /// waiting out a second walk of every catalog to be shown the answer already in hand.</para>
+        /// </summary>
+        /// <remarks>A run that throws is said and nothing else: this is a reading the author did not ask
+        /// for, and a half-written record must not stop the tool from opening on it.</remarks>
+        private void CheckCatalogs(ReferenceIndex references)
+        {
+            if (_workspace is not { } workspace) return;
+
+            try
+            {
+                IReadOnlyList<CatalogFinding> found = CatalogCheckRun.Over(workspace, references, Texts);
+
+                _checks.Show(found);
+
+                if (found.Count > 0) Report(Text(CatalogsFoundFormat, found.Count));
+            }
+            catch (Exception failure)
+            {
+                Report(Text(CatalogsRefusedFormat, failure.Message));
+            }
+        }
+
+        /// <summary>The checks answered about the documents as they were read, and a save is the author
+        /// having moved them: what stands in the panel is out of date and the press that reads them again
+        /// is named, because the pass is too long to be made for him behind every Ctrl+S.
+        /// <para>What was written is read from the result and not from the line standing: the line is
+        /// whatever the last gesture said, and this is what the save itself came to.</para></summary>
+        protected override void Wrote(CatalogSaveResult result)
+        {
+            if (result.Saved.Count > 0) Report(Text(CatalogsStaleFormat, Written(result.Saved.Count)));
         }
 
         /// <summary>

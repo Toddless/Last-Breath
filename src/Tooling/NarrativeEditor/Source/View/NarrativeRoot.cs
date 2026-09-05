@@ -210,6 +210,11 @@ namespace NarrativeEditor.Source.View
                 ReadoutFormat, root, _rows.Count - Sections(), FileCount(), report.Count + _notes.Count);
 
             ShowRecord(First());
+
+            // What the narrative owes, read once the panes are up and said before the author touches
+            // anything: a quest the loader is already refusing is the one thing he cannot see by opening it.
+            facts.ReadNow();
+
             ReportIssues(_workspace, _notes, report);
         }
 

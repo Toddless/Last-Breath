@@ -168,13 +168,25 @@ namespace Tooling.Ui
                 return;
             }
 
+            Show(reading);
+
+            Said?.Invoke(reading.Said);
+        }
+
+        /// <summary>Lists a reading and stands by it until the documents move. Reached by the button and
+        /// by a host that has already made the very same pass while opening the run: the pass reads every
+        /// document there is, and one made twice a second apart is a tool that opens slowly for nothing.
+        /// <para>Says nothing of itself — whoever hands a reading over is where the author was told about
+        /// it, and one answer said twice reads as two.</para></summary>
+        protected void Show(Reading reading)
+        {
+            ArgumentNullException.ThrowIfNull(reading);
+
             _rows.Clear();
             _rows.AddRange(reading.Rows);
 
             _counted = reading.Summary;
             _stale = false;
-
-            Said?.Invoke(reading.Said);
 
             Refresh();
             Relist();

@@ -1,5 +1,6 @@
 namespace Tooling.Ui
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using LastBreath.Descriptors;
@@ -36,10 +37,20 @@ namespace Tooling.Ui
 
         protected override string NotRunText => NotRun;
 
+        /// <summary>Lists a pass somebody else has already made over these very documents — the one the
+        /// host makes while it opens the run. The rows stand as if the button had been pressed, because
+        /// the reading is the same reading: pressing it again would walk every catalog a second time to
+        /// come back with what is already on screen.</summary>
+        public void Show(IReadOnlyList<CatalogFinding> found) => Show(Listed(found));
+
         /// <summary>Reads every catalog through the same rules the game's own tests run.</summary>
-        protected override Reading Read(CatalogWorkspace workspace, ReferenceIndex references, LocalizedTexts? texts)
+        protected override Reading Read(CatalogWorkspace workspace, ReferenceIndex references, LocalizedTexts? texts) =>
+            Listed(CatalogCheckRun.Over(workspace, references, texts));
+
+        /// <summary>What one pass comes to on screen: a row per finding, and how they are counted.</summary>
+        private static Reading Listed(IReadOnlyList<CatalogFinding> found)
         {
-            IReadOnlyList<CatalogFinding> found = CatalogCheckRun.Over(workspace, references, texts);
+            ArgumentNullException.ThrowIfNull(found);
 
             return new Reading(
                 [.. found.Select(Written)],
