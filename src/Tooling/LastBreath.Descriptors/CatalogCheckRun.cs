@@ -8,6 +8,7 @@ namespace LastBreath.Descriptors
     using Core.Data;
     using Core.Data.AbilityData;
     using Core.Data.GameData;
+    using Core.Data.NpcData;
     using Core.Data.QuestData;
     using Core.Data.Validation;
     using Core.Enums;
@@ -103,6 +104,7 @@ namespace LastBreath.Descriptors
             [
                 .. Guarded(() => ContextKnobRules.Check(Pools(workspace, parser))),
                 .. Guarded(() => LootBandRules.Check(Tables(workspace), Augments(workspace))),
+                .. Guarded(() => NpcRules.Check(Npcs(workspace))),
                 .. Guarded(() => Judged(workspace, parser)),
             ];
         }
@@ -181,6 +183,19 @@ namespace LastBreath.Descriptors
             Read(workspace, DataCatalog.Abilities, catalog);
 
             return [.. catalog.All];
+        }
+
+        /// <summary>Every npc the documents WRITE, whether or not the provider could build a definition out
+        /// of one: what a record says about itself is written down in the record.</summary>
+        private static IReadOnlyList<NpcData> Npcs(CatalogWorkspace workspace)
+        {
+            List<NpcData> npcs = [];
+
+            foreach (GameDataFile file in Documents(workspace, DataCatalog.Npc))
+                if (JsonConvert.DeserializeObject<NpcsData>(file.Json) is { Npcs: { } written })
+                    npcs.AddRange(written);
+
+            return npcs;
         }
 
         /// <summary>Every quest the documents WRITE, whether or not a loader would keep it: a hand-out is

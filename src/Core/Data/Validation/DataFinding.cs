@@ -28,6 +28,11 @@ namespace Core.Data.Validation
         /// of an artefact the world was written to hold one of.</summary>
         RepeatedUniqueReward,
 
+        /// <summary>A list the record is read by is written empty, and nothing else in the record answers
+        /// for what it was to say. The reader takes such a record all the same and falls back to a default
+        /// nobody chose, so the record ships meaning something other than what it says.</summary>
+        EmptyRequiredList,
+
         /// <summary>A quest hands out an id no item catalog declares. The mint has nothing to build, and
         /// the uniqueness rule cannot judge an id it does not know — an unrecognised reward must not pass
         /// by being unrecognised.</summary>

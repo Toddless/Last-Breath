@@ -280,6 +280,7 @@ namespace LastBreathTest.BattleSystemTests
             {
                 Dialogues = dialogue.Dialogues,
                 Quests = quest.Quests,
+                Npcs = [],
                 LoadedDialogues = [.. dialogue.Dialogues.Select(entry => entry.NpcId)],
                 LoadedQuests = [.. quest.Quests.Select(entry => entry.Id)],
                 Ids = new NarrativeIdSource(_ => true, (_, _) => true),

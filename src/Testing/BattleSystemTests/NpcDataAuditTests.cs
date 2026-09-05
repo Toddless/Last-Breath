@@ -1,88 +1,75 @@
 namespace LastBreathTest.BattleSystemTests
 {
-    using Core.Data;
-    using Core.Data.DialogueData;
-    using Core.Data.NpcData;
-    using Core.Enums;
-    using Newtonsoft.Json;
+    using Core.Data.GameData;
+    using Core.Narrative.Validation;
+    using Tooling.Catalogs.Checks;
 
     /// <summary>
-    /// Audits the REAL Npc.json: enum names must parse (a typo is a silent drop at runtime),
-    /// ids must be unique, and every canTalk species should have a dialogue in the catalog —
-    /// that one is a warning (Inconclusive), the dialogue may simply not be written yet.
+    /// The gates over the shipped npc catalog. Both are held on the rules the authoring tool reports with
+    /// and nowhere else: a word outside the members its field offers, a name written twice and a record
+    /// naming no stance are the catalog checks' answer, and a species written able to talk with nothing to
+    /// say is the narrative's. What an author sees in a Checks panel and what fails here is one answer.
     /// </summary>
+    /// <remarks>The talking species used to be Inconclusive — a dialogue that may simply not be written
+    /// yet. It is a gate now: the claim is made in the npc catalog, so a species declaring it and no
+    /// dialogue behind it is data that contradicts itself, and the player clicking such an npc opens
+    /// nothing.</remarks>
     [TestClass]
     public class NpcDataAuditTests
     {
-        [TestMethod]
-        public void NpcCatalog_EnumsParseAndIdsAreUnique()
-        {
-            var npcs = LoadNpcs();
-            Assert.IsTrue(npcs.Count > 0, "Npc.json produced no entries");
+        /// <summary>Where the narrative addresses what an npc record claims about itself.</summary>
+        private const string NpcPlace = DataCatalog.Npc + "/";
 
-            var ids = new HashSet<string>();
-            foreach (var npc in npcs)
-            {
-                Assert.IsTrue(ids.Add(npc.Id), $"duplicate npc id '{npc.Id}'");
-                EnumParser.ParseEnum<Fractions>(npc.Fraction);
-                EnumParser.ParseEnum<EntityType>(npc.EntityType);
-                EnumParser.ParseEnum<Core.Ai.AiIntellect>(npc.AiIntellect);
-                Assert.IsTrue(npc.Stances.Count > 0, $"'{npc.Id}' has no stances");
-                foreach (string stance in npc.Stances)
-                    EnumParser.ParseEnum<Stance>(stance);
-                foreach (string parameter in npc.BaseParameters.Keys)
-                    EnumParser.ParseEnum<EntityParameter>(parameter);
-                if (!string.IsNullOrEmpty(npc.Rarity))
-                    EnumParser.ParseEnum<Rarity>(npc.Rarity);
-                foreach (var reaction in npc.Reactions)
-                    EnumParser.ParseEnum<ReactionTrigger>(reaction.Trigger);
-            }
+        /// <summary>A record naming no stance at all: the provider falls back to a default nobody chose,
+        /// and the behaviour archetype follows the stance.</summary>
+        private const string StancelessNpcJson =
+            """
+            { "npcs": [ { "id": "Npc_Forged_Stanceless", "stances": [] } ] }
+            """;
+
+        /// <summary>Every rule over the npc catalog itself: the words its fields are drawn from, the names
+        /// its records are found by, and what a record has to say about itself beyond its shape.</summary>
+        [TestMethod]
+        public void TheNpcCatalog_OwesNothingToTheChecks()
+        {
+            CatalogFinding[] owed =
+            [
+                .. CatalogCrossCheckTests.Shipped.Findings.Where(finding => finding.Catalog == DataCatalog.Npc)
+            ];
+
+            Assert.AreEqual(0, owed.Length,
+                $"the npc catalog owes the checks:{Environment.NewLine}  {CatalogCrossCheckTests.Lines(owed)}");
         }
 
+        /// <summary>Every species written able to talk has something to say. A gate and not a report: the
+        /// claim is written in the npc catalog and the dialogue is written beside it, so the two are either
+        /// one decision or a click into silence.</summary>
         [TestMethod]
         public void TalkingSpecies_HaveADialogueInTheCatalog()
         {
-            var talkers = LoadNpcs()
-                .Where(npc => npc.Interaction is { CanTalk: true })
-                .Select(npc => npc.Id)
-                .ToList();
-            var dialogues = LoadDialogueIds();
+            string[] silent =
+            [
+                .. NarrativeCrossCheckTests.Shipped.Findings
+                    .Where(finding => finding.Kind == NarrativeFindingKind.MissingDialogue
+                                      && finding.Where.StartsWith(NpcPlace, StringComparison.Ordinal))
+                    .Select(finding => finding.Where)
+            ];
 
-            var silent = talkers.Where(id => !dialogues.Contains(id)).ToList();
-            if (silent.Count > 0)
-                Assert.Inconclusive($"canTalk species without a dialogue yet (clicks will be silent): {string.Join(", ", silent)}");
+            Assert.AreEqual(0, silent.Length,
+                $"a species is written able to talk with no dialogue behind it:{Environment.NewLine}  "
+                + string.Join($"{Environment.NewLine}  ", silent));
         }
 
-        private static List<NpcData> LoadNpcs()
+        /// <summary>The mutation the stance rule exists for, put to the same entry point the gate reads: a
+        /// record with no stance to roll and none named passes every rule about its SHAPE, and ships an npc
+        /// fighting a style nobody chose for it.</summary>
+        [TestMethod]
+        public void ARecordNamingNoStance_IsFound()
         {
-            string json = File.ReadAllText(Path.Combine(FindSharedData(), "Npc", "Npc.json"));
-            return JsonConvert.DeserializeObject<NpcsData>(json)!.Npcs;
-        }
+            IReadOnlyList<CatalogFinding> added = CatalogCrossCheckTests.Added(DataCatalog.Npc, StancelessNpcJson);
 
-        private static HashSet<string> LoadDialogueIds()
-        {
-            var ids = new HashSet<string>();
-            foreach (string file in Directory.GetFiles(Path.Combine(FindSharedData(), "Dialogues"), "*.json"))
-            {
-                var data = JsonConvert.DeserializeObject<DialoguesData>(File.ReadAllText(file));
-                foreach (var dialogue in data!.Dialogues)
-                    ids.Add(dialogue.NpcId);
-            }
-
-            return ids;
-        }
-
-        private static string FindSharedData()
-        {
-            var directory = new DirectoryInfo(AppContext.BaseDirectory);
-            while (directory != null)
-            {
-                string candidate = Path.Combine(directory.FullName, "SharedData");
-                if (Directory.Exists(candidate)) return candidate;
-                directory = directory.Parent;
-            }
-
-            throw new DirectoryNotFoundException("SharedData was not found above the test host directory");
+            Assert.AreEqual(1, added.Count(finding => finding.Kind == CatalogFindingKind.Rule),
+                $"a record naming no stance was passed over:{Environment.NewLine}  {CatalogCrossCheckTests.Lines(added)}");
         }
     }
 }

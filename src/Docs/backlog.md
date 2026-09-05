@@ -1,5 +1,22 @@
 # Бэклог: minor / nit / «замечено, не исправлено»
 
+## Из переписывания `NpcModifiers` в секции корня и описателя (2026-09-05; accept with minors) — решение владельца: 7 секций, записи побайтно те же (сверено машинно), `uniqueScope` → `NpcSpawnRolls.json`; каталог описан, `UndescribedTarget NpcModifiers` снят, 6 id из квестов резолвятся; `isUnique` переехал в 7 DTO секций ради `reordered == 0` (рефлектор читает базу первой)
+
+- (minor) `NpcModifierProvider.cs:36` — битый/пропавший `NpcSpawnRolls.json` → `LoadFailed` в Tracker, но модификаторы грузятся все с `Group`: два разных скейлера тихо схлопываются в один (раньше `uniqueScope` нельзя было потерять без потери файла). Стало: «не прочитано» ≠ «пусто» — отказ строить модификаторы.
+- (minor) уникальность id по всему каталогу `NpcModifiers` держит только тест; `CatalogChecks.DuplicateId` считает по секции — межсекционный дубль в DataEditor без находки, игра молча выкинет второй (`TryAdd`). Стало: род «id уникален по каталогу» для каталогов, которые игра ключует одним словарём (описатель объявляет).
+- (nit) значение `uniqueScope` парсит Newtonsoft (`"scale": 3` пройдёт); дважды написанная секция — Newtonsoft берёт последнюю (раньше падал `Dictionary.Add`).
+- (знать) `_uniqueScopeNote` в `NpcSpawnRolls.json` запинен в `s_standingUnknownKeys`; `AdditionalItemsModifier` без секции и описателя (отложено ранее); правка абзаца про NPC-модификаторы в `CLAUDE.md` лежит в незакоммиченном файле владельца.
+- (Godot-прогон владельца) игра: спавн NPC с модификаторами и испытания; DataEditor: каталог NpcModifiers семью секциями, `npcBuffId`/`effectId`/`items` пикерами, `uniqueScope` в NpcSpawnRolls; NarrativeEditor: `SpawnNpc` модификаторы пикером; checks: остался только `UndescribedTarget Items`.
+
+## Из правил NPC в общих валидаторах (2026-09-05; accept with minors) — решение владельца: `canTalk` без диалога = ошибка данных (`MissingDialogue` на стороне NPC, `NpcDataAuditTests.TalkingSpecies…` — ворота); enum-слова вне членов — новый род `UnknownChoice` над схемой для всех каталогов; `stances` — `NpcRules` (род `Rule`); закрыт пункт «правила NPC остаются тестами»
+
+- (minor) `NarrativeCrossCheckTests.cs:107-112` — «прогон прочитал Npc» не запинен (`Npcs.Count`), ворота `TalkingSpecies` могут зазеленеть вакуумно. Стало: `AreNotEqual(0, Shipped.Read.Npcs.Count)`.
+- (minor) `NarrativeChecks.FactsWhere` остался public ради читателя, которого нет (`Place` перешёл на `GameNarrative.Catalogs`); док описывает несуществующий контракт.
+- (minor) `NpcRules.cs:22` — `StancesKey = "stances"` литералом при заведённых `NpcData.InteractionKey`/`CanTalkKey`. Стало: константа на `NpcData` + `[JsonProperty]`.
+- (minor) `CatalogChecks.Offers:325-334` — строже читателя на `[Flags]`: `EnumParser.NamesOneMember` принимает список через запятую и маску, `Offers` — нет; латентно (единственный `[Flags]` в разметке — `StatusEffects` у `hardControlStatuses`, данные пишут по имени на элемент). Стало: док + маркер `[Flags]` в схеме либо резать по `,`.
+- (nit) `Place.cs` полный `using NarrativeEditor.Source.App` против локального `using App;`; `CanTalkKey` без дока; `CatalogCheckRun.Npcs` — третья копия чтения (`Quests`, `NarrativeCheckRun.Written<>`).
+- (Godot-прогон владельца) NarrativeEditor → переименовать `npcId` у ветерана → Check → строка `MissingDialogue Npc/Npc_Bandit_Veteran/interaction/canTalk` серая.
+
 ## Из проверок каталогов, половина B (2026-09-04; rework → accept) — карточка #247: правила с семантикой игры в `Core/Data/Validation` (`ContextKnobRules`, `LootBandRules`, `QuestRewardRules`), общие для аудит-тестов (ворота через `Check`) и вкладки «checks» (через `CatalogCheckRun.Over`, род `Rule`); находок по поставляемым данным — ноль, каждое правило закрыто кованым прогоном
 
 - (остаток, карточка) `NpcRules` (`canTalk` без диалога → `NarrativeChecks` c записями Npc во входе; enum-разбор Npc DTO) и `AugmentRules` (запись ↔ фабрика ↔ один раз в секции; теги озвучены — реестр фабрик живёт в Battle, Core не видит: нужен шов) — не перенесены; остаются тестами-воротами.

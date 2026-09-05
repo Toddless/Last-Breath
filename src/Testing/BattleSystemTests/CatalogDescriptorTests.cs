@@ -3272,6 +3272,7 @@ namespace LastBreathTest.BattleSystemTests
             (DataCatalog.NpcSpawnRolls, "_modifiersNote"),
             (DataCatalog.NpcSpawnRolls, "_abilitiesNote"),
             (DataCatalog.NpcSpawnRolls, "_rarityNote"),
+            (DataCatalog.NpcSpawnRolls, "_uniqueScopeNote"),
         ];
 
         /// <summary>A deed whose no-penalty floor names a rung of the ladder nobody wrote, beside two
@@ -4007,5 +4008,220 @@ namespace LastBreathTest.BattleSystemTests
                     $"the shipped {catalog} file writes no id at all — every reference into it would read as broken");
             }
         }
+
+        /// <summary>What the reflector may still have to say about the npc modifier DTOs. Empty: every one
+        /// of them is plain properties the walk reads whole. A note appearing here is either a DTO to fix
+        /// or a fact to write down — never something to silence by widening the check.</summary>
+        private static readonly (string About, string Word)[] s_allowedNpcModifierNotes = [];
+
+        /// <summary>The seven sections of the modifier catalog, in the order the file writes them. The key
+        /// of a section is the KIND of modifier under it — it picks the shape the entries are read in and
+        /// becomes the group uniqueness is weighed within — so a section is not a place records happen to
+        /// sit but the answer to what they are.</summary>
+        private static readonly string[] s_npcModifierSections =
+        [
+            NpcModifiersCatalogDescriptor.ScaleKey,
+            NpcModifiersCatalogDescriptor.TierUpgradeKey,
+            NpcModifiersCatalogDescriptor.GuaranteedItemsKey,
+            NpcModifiersCatalogDescriptor.TierMultiplierKey,
+            NpcModifiersCatalogDescriptor.ItemEffectsKey,
+            NpcModifiersCatalogDescriptor.RarityUpgradeKey,
+            NpcModifiersCatalogDescriptor.MinRarityKey,
+        ];
+
+        /// <summary>A file whose sections are one word off. The reader parses the document into a type
+        /// whose properties ARE the sections, so a misspelt one is simply not there: the modifiers under it
+        /// are never built, nothing in the game carries them, and the file loads without a word. The walk
+        /// has to name the key and stay quiet about the section spelled right beside it.</summary>
+        private const string ForgedNpcModifierJson = """
+        {
+          "scaling": [
+            { "id": "Npc_Modifier_Forged", "npcBuffId": "Npc_Buff_Double_Health", "weight": 1, "difficulty": 1, "scale": 1.5, "isUnique": true }
+          ],
+          "minRarity": [
+            { "id": "Npc_Modifier_Sound", "npcBuffId": "Npc_Buff_Min_Rarity_Rare", "weight": 1, "difficulty": 1, "rarity": "Rare", "isUnique": true }
+          ]
+        }
+        """;
+
+        /// <summary>The shape of the npc modifier catalog: seven sections of one file, each found by the
+        /// same field, and both halves of what a modifier is worded under. The kinds are sections and not
+        /// shapes of one record because the game reads them that way — the key picks the type the entries
+        /// are parsed into, and a record of the wrong kind under a key is not read at all.</summary>
+        [TestMethod]
+        public void TheNpcModifierCatalogIsSevenSectionsOfItsOneFile()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.NpcModifiers));
+
+            Assert.AreEqual(RootShape.SectionsOfArrays, schema.Shape, "the modifier file is not read as sections of arrays");
+            CollectionAssert.AreEqual(
+                s_npcModifierSections,
+                schema.Sections.Select(section => section.Key).ToArray(),
+                "the modifier catalog names other sections, or names them in another order than the file writes them");
+
+            foreach (SectionSchema section in schema.Sections)
+            {
+                Assert.AreEqual(NpcModifiersCatalogDescriptor.IdField, section.Record.IdField,
+                    $"a record of '{section.Key}' is found by another field");
+                Assert.AreNotEqual(0, section.Record.Fields.Count, $"the '{section.Key}' record was read with no fields at all");
+            }
+
+            Assert.AreEqual(
+                s_npcModifierSections.Length,
+                schema.Sections.Select(section => section.Record.TypeName).Distinct(StringComparer.Ordinal).Count(),
+                "two sections are read into one type, so the kind a key names would not decide the shape");
+
+            CollectionAssert.AreEqual(
+                new[] { LocalizedKeyAttribute.NoSuffix, LocalizationService.DescriptionSuffix },
+                schema.LocalizedSuffixes.ToArray(),
+                "a modifier is worded for the player in other places than its name and its line");
+            CollectionAssert.AreEqual(
+                schema.LocalizedSuffixes.ToArray(),
+                schema.RequiredSuffixes.ToArray(),
+                "a modifier is allowed to go without one of the two, and the catalog ships both for every record");
+
+            Assert.AreEqual(NpcModifiersCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null),
+                "the modifier catalog names another file");
+            CollectionAssert.AreEqual(
+                new[] { NpcModifiersCatalogDescriptor.FileName },
+                ShippedFiles(DataCatalog.NpcModifiers).Select(Path.GetFileNameWithoutExtension).ToArray(),
+                "the modifier catalog ships other files than the one its placement names");
+
+            Unexpected(builder.Reflection.Notes, s_allowedNpcModifierNotes, builder.Reflection);
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled modifier catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>The shipped file read back through its schema: every key it writes is one the schema
+        /// ranks, and the canonical write would move nothing at all. The second half is not a nicety — the
+        /// tool rewrites the WHOLE file on the first edit of any record in it, so a file the schema would
+        /// reorder is a diff the author never asked for waiting to happen.</summary>
+        [TestMethod]
+        public void TheShippedNpcModifierFileIsWrittenTheWayItsSchemaRanksIt()
+        {
+            CatalogSchema schema = Schema(DataCatalog.NpcModifiers);
+            SchemaKeyOrder order = new(schema);
+            List<string> unknown = [];
+            List<string> reordered = [];
+
+            foreach (string file in ShippedFiles(DataCatalog.NpcModifiers))
+            {
+                (List<string> unplaced, List<string> moved) = Written(JsonTreeDocument.Load(file).Root, schema, order);
+
+                unknown.AddRange(unplaced.Select(key => $"{Path.GetFileName(file)}{key}"));
+                reordered.AddRange(moved.Select(record => $"{Path.GetFileName(file)} {record}"));
+            }
+
+            Report("Keys of the shipped modifier file the schema does not know", unknown);
+            Report("Records the canonical write would reorder", reordered);
+
+            Assert.AreEqual(0, unknown.Count,
+                $"keys of the modifier file no field of the schema is written under: {string.Join(", ", unknown)}");
+            Assert.AreEqual(0, reordered.Count,
+                $"the modifier file is not written in the order its schema ranks:{Environment.NewLine}  "
+                + string.Join($"{Environment.NewLine}  ", reordered));
+        }
+
+        /// <summary>What a modifier points at: the buff carrying its numbers, the grant an item-effect one
+        /// lays on every drop, and the things a guaranteed-items one hands over. The last answers from
+        /// exactly where a rolled drop does — the promise and the roll name the same things.</summary>
+        [TestMethod]
+        public void TheModifierNamesItsBuffAndWhatItHandsOver()
+        {
+            foreach (SectionSchema section in Schema(DataCatalog.NpcModifiers).Sections)
+                Points(
+                    Leaf(Locate(section.Record, NpcModifiersCatalogDescriptor.NpcBuffIdField)),
+                    $"{section.Key}.{NpcModifiersCatalogDescriptor.NpcBuffIdField}",
+                    DataCatalog.NpcBuffs,
+                    WholeCatalog);
+
+            RecordSchema effects = Section(NpcModifiersCatalogDescriptor.ItemEffectsKey);
+            string laid = NpcModifiersCatalogDescriptor.EffectIdField;
+            Points(Leaf(Locate(effects, laid)), laid, DataCatalog.ItemEffects, WholeCatalog);
+
+            FieldSchema promised = Leaf(Locate(
+                Section(NpcModifiersCatalogDescriptor.GuaranteedItemsKey), NpcModifiersCatalogDescriptor.ItemsField));
+
+            Assert.AreEqual(FieldKind.Reference, promised.Kind,
+                $"'{NpcModifiersCatalogDescriptor.ItemsField}' names nothing");
+            Assert.IsFalse(promised.AllowEmpty,
+                $"'{NpcModifiersCatalogDescriptor.ItemsField}' may hold an empty word, which is a promise of nothing");
+            CollectionAssert.AreEquivalent(
+                s_dropTargets,
+                promised.RefTargets.ToArray(),
+                $"'{NpcModifiersCatalogDescriptor.ItemsField}' points somewhere other than where droppable things are written: "
+                + string.Join(", ", promised.RefTargets));
+        }
+
+        /// <summary>The one field of the catalog written as a member of an enum. The reader parses it
+        /// strictly, so a word nobody wrote takes the whole file down at load: the author has to be offered
+        /// the rarities rather than a text box.</summary>
+        [TestMethod]
+        public void TheRarityFloorOffersTheRarities() =>
+            Choice(
+                Leaf(Locate(Section(NpcModifiersCatalogDescriptor.MinRarityKey), NpcModifiersCatalogDescriptor.RarityField)),
+                typeof(Rarity));
+
+        /// <summary>
+        /// An id is unique across the WHOLE catalog and not merely within its section. The checks weigh a
+        /// repeated name section by section, which is right for a catalog whose sections answer to nothing
+        /// each other — but this one is keyed by the game in ONE dictionary, and the second record under a
+        /// name is dropped there without a word. A quest naming a modifier names it out of any section too.
+        /// </summary>
+        [TestMethod]
+        public void TheNpcModifierIdsAreUniqueAcrossTheWholeCatalog()
+        {
+            List<string> written = [];
+
+            foreach (string file in ShippedFiles(DataCatalog.NpcModifiers))
+            {
+                JToken root = JsonTreeDocument.Load(file).Root;
+
+                foreach (string section in s_npcModifierSections)
+                    written.AddRange(SectionRecords(root, section)
+                        .Select(record => Id(record, NpcModifiersCatalogDescriptor.IdField)));
+            }
+
+            List<string> twice =
+            [
+                .. written.GroupBy(id => id, StringComparer.Ordinal)
+                    .Where(named => named.Count() > 1)
+                    .Select(named => named.Key)
+                    .Order(StringComparer.Ordinal)
+            ];
+
+            Assert.AreNotEqual(0, written.Count, "the shipped modifier file writes no record at all");
+            Assert.AreEqual(0, twice.Count,
+                $"the modifier catalog answers to one name in two places, and the game keeps one of them: {string.Join(", ", twice)}");
+        }
+
+        /// <summary>The mutation of the shape: a section one word off. The game parses the file into a type
+        /// whose properties are the sections, so the misspelt one is read by nothing and the modifiers under
+        /// it never exist — while the file loads and says nothing. The walk names the key and everything
+        /// standing under it, since a section the schema cannot place is a section it cannot look inside;
+        /// the section spelled right beside it has to stay unremarked.</summary>
+        [TestMethod]
+        public void ASectionOneWordOff_IsCaught()
+        {
+            const string forged = "/scaling";
+
+            CatalogSchema schema = Schema(DataCatalog.NpcModifiers);
+            (List<string> unknown, _) = Written(JsonTreeDocument.Parse(ForgedNpcModifierJson).Root, schema, new SchemaKeyOrder(schema));
+
+            CollectionAssert.Contains(unknown, forged, $"the misspelt section went unremarked: {string.Join(", ", unknown)}");
+            Assert.AreEqual(
+                0,
+                unknown.Count(address => !address.StartsWith(forged, StringComparison.Ordinal)),
+                $"the walk named keys outside the misspelt section: {string.Join(", ", unknown)}");
+        }
+
+        /// <summary>The record of one section of the modifier catalog, by the key the file writes it
+        /// under.</summary>
+        private static RecordSchema Section(string key) =>
+            Schema(DataCatalog.NpcModifiers).Sections.FirstOrDefault(section => section.Key == key)?.Record
+            ?? throw new AssertFailedException($"the modifier catalog holds no '{key}' section.");
     }
 }

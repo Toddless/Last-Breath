@@ -28,6 +28,10 @@ namespace LastBreathTest.BattleSystemTests
         private const string BuffsFile = "NpcBuffs.json";
         private const string ModifiersFile = "NpcModifiers.json";
 
+        /// <summary>The document the reach of a section's uniqueness is authored in, beside the ladders
+        /// saying how many modifiers a spawn gets at all.</summary>
+        private const string SpawnRollsFile = "NpcSpawnRolls.json";
+
         /// <summary>
         /// The convention, checked over the SHIPPED catalogs rather than a list written here: every modifier
         /// that names a buff gets exactly the lines that buff declares, on the parameter it declares, in the
@@ -458,6 +462,64 @@ namespace LastBreathTest.BattleSystemTests
         private static float Crit(BuffTarget owner) =>
             owner.Modifiers.EntityModifiers.TryGetValue(EntityParameter.CriticalChance, out var lines) ? lines.Sum(line => line.Value) : 0f;
 
+        /// <summary>Where the reach of a section's uniqueness is authored, now that the modifier file holds
+        /// modifiers and nothing else: the spawn-rolls document names it per section, and every section it
+        /// leaves out reaches the whole group.</summary>
+        [TestMethod]
+        public void TheScalingSectionTakesItsReachFromTheSpawnDocument()
+        {
+            IReadOnlyDictionary<string, NpcUniqueScope> scopes = ShippedScopes();
+
+            CollectionAssert.AreEqual(
+                new[] { ModifiersData.ScaleSection },
+                scopes.Keys.Order(StringComparer.Ordinal).ToArray(),
+                "the spawn document narrows other sections than the scaling one");
+            Assert.AreEqual(NpcUniqueScope.Id, scopes[ModifiersData.ScaleSection],
+                "the scaling section is no longer narrowed to the id");
+
+            List<INpcModifier> shipped = new NpcModifiersFactory().CreateNpcModifiers(ShippedSections(scopes));
+
+            Assert.IsTrue(
+                shipped.Where(modifier => modifier.Group == ModifiersData.ScaleSection)
+                    .All(modifier => modifier.UniqueScope == NpcUniqueScope.Id),
+                "a scaling modifier came out reaching its whole section");
+            Assert.IsTrue(
+                shipped.Where(modifier => modifier.Group != ModifiersData.ScaleSection)
+                    .All(modifier => modifier.UniqueScope == NpcUniqueScope.Group),
+                "a modifier outside the scaling section came out narrowed to its own id");
+        }
+
+        /// <summary>The mutation over the move: the map unread — the spawn document lost, or its key
+        /// misspelt into a section nobody answers to. Every modifier falls back to reaching its whole
+        /// section, and two different scalers stop living together, which is exactly the rule the vault
+        /// gives that section. Nothing else in the file says so, so nothing else would notice.</summary>
+        [TestMethod]
+        public void WithoutTheMapTheScalersCollapseToOneSlot()
+        {
+            List<INpcModifier> unscoped = new NpcModifiersFactory()
+                .CreateNpcModifiers(ShippedSections(new Dictionary<string, NpcUniqueScope>()));
+            var owner = new BuffTarget();
+
+            owner.NpcModifiers.AddModifiers(
+            [
+                unscoped.First(modifier => modifier.Id == "Npc_Modifier_Scale_Double_Health"),
+                unscoped.First(modifier => modifier.Id == "Npc_Modifier_Scale_Double_Damage"),
+            ]);
+
+            Assert.AreEqual(1, owner.NpcModifiers.AllModifiers.Count,
+                "the scalers stacked without the map, so the map is not what decides their reach");
+        }
+
+        /// <summary>A section the map names that no modifier file holds: a rule written for a word nobody
+        /// answers to, which would fire on nothing and say nothing. Refused where it is read.</summary>
+        [TestMethod]
+        public void AReachWrittenForASectionNobodyHas_IsRefused()
+        {
+            Assert.ThrowsException<FormatException>(
+                () => NpcModifiersParser.Scopes("""{ "uniqueScope": { "scaling": "id" } }"""),
+                "a reach authored for a section nobody has went through unremarked");
+        }
+
         private static INpcModifier Floor(string id, float difficulty) =>
             new MinRarityModifier(id, 1f, difficulty, true, string.Empty, Rarity.Rare) { Group = "minRarity" };
 
@@ -471,12 +533,26 @@ namespace LastBreathTest.BattleSystemTests
             return JsonConvert.DeserializeObject<NpcBuffsData>(File.ReadAllText(path))!;
         }
 
-        private static List<INpcModifier> ShippedModifiers()
+        private static List<INpcModifier> ShippedModifiers() =>
+            new NpcModifiersFactory().CreateNpcModifiers(ShippedSections(ShippedScopes()));
+
+        /// <summary>The shipped modifier file read the way the provider reads it: the sections of the
+        /// catalog, each stamped with the reach the spawn-rolls document gives it.</summary>
+        private static Dictionary<string, List<NpcModifierData>> ShippedSections(
+            IReadOnlyDictionary<string, NpcUniqueScope> scopes)
         {
             string path = Path.Combine(SharedData.Catalog(DataCatalog.NpcModifiers), ModifiersFile);
             Assert.IsTrue(File.Exists(path), $"the NPC modifier catalog ships at {path}");
 
-            return new NpcModifiersFactory().CreateNpcModifiers(NpcModifiersParser.Parse(File.ReadAllText(path)));
+            return NpcModifiersParser.Parse(File.ReadAllText(path), scopes);
+        }
+
+        private static IReadOnlyDictionary<string, NpcUniqueScope> ShippedScopes()
+        {
+            string path = Path.Combine(SharedData.Catalog(DataCatalog.NpcSpawnRolls), SpawnRollsFile);
+            Assert.IsTrue(File.Exists(path), $"the spawn-rolls document ships at {path}");
+
+            return NpcModifiersParser.Scopes(File.ReadAllText(path));
         }
 
         /// <summary>A body a buff can land on: a real parameters/modifiers pair, a real passive list and a

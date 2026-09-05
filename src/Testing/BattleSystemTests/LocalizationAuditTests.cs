@@ -554,34 +554,21 @@ namespace LastBreathTest.BattleSystemTests
         /// templates fill themselves in with, which come from an ENUM and not from a file, and the clause a
         /// gated line is joined to, which is worded under a key DERIVED from a condition's id rather than
         /// under the id itself.</para>
-        /// <para>The last two are catalogs no describer covers yet
-        /// (<c>CatalogDescriptors.NotYetDescribed</c>): a workspace never opens them, so the checks say
-        /// nothing about their wording and this list is the only thing holding it. They go the day their
-        /// describers are written and not before.</para>
+        /// <para>The last is a catalog no describer covers yet
+        /// (<c>CatalogDescriptors.NotYetDescribed</c>): a workspace never opens it, so the checks say
+        /// nothing about its wording and this list is the only thing holding it. It goes the day its
+        /// describer is written and not before.</para>
         /// </summary>
         private static List<(string Domain, List<string> Ids, bool NeedsDescription)> CollectDataIds() =>
         [
             ("EntityParameter", [.. Enum.GetNames<Core.Enums.EntityParameter>()], false),
             ("Conditions", CatalogIds("Conditions", "conditions").Select(Core.Localization.ConditionalLineText.ClauseKey).ToList(), false),
             ("Items", CatalogIds("Items", "items"), true),
-            ("NpcModifiers", NestedIds("NpcModifiers", "mods", "modifiers"), true),
         ];
 
         private static List<string> CatalogIds(string catalog, string arrayProperty) =>
             CatalogRoots(catalog)
                 .SelectMany(root => root[arrayProperty] as JArray ?? [])
-                .Select(token => (string?)token["id"])
-                .Where(id => !string.IsNullOrEmpty(id))
-                .Select(id => id!)
-                .Distinct()
-                .ToList();
-
-        /// <summary>The ids of records written one list inside another — an npc modifier stands under the
-        /// pool it belongs to, and the pool answers to no name of its own.</summary>
-        private static List<string> NestedIds(string catalog, string outerProperty, string innerProperty) =>
-            CatalogRoots(catalog)
-                .SelectMany(root => root[outerProperty] as JArray ?? [])
-                .SelectMany(outer => outer[innerProperty] as JArray ?? [])
                 .Select(token => (string?)token["id"])
                 .Where(id => !string.IsNullOrEmpty(id))
                 .Select(id => id!)

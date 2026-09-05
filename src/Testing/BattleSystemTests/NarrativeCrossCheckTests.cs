@@ -1,11 +1,14 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Core.Data.DialogueData;
+    using Core.Data.GameData;
+    using Core.Data.NpcData;
     using Core.Data.QuestData;
     using Core.Narrative.Validation;
     using LastBreath.Descriptors;
     using Newtonsoft.Json;
     using Tooling.Catalogs;
+    using Tooling.Json;
     using Tooling.Localization;
 
     /// <summary>
@@ -44,12 +47,13 @@ namespace LastBreathTest.BattleSystemTests
         /// nothing else: the wording of a message is the tool's to improve, while the sort of thing and
         /// the place it is in are the fact.
         /// </summary>
-        /// <remarks>A row is taken out when the data is fixed, never to quiet a run. The first two are the
-        /// tool's own gap and not the author's: no descriptor is written for those catalogs
-        /// (<c>CatalogDescriptors.NotYetDescribed</c>), so every item and npc-modifier id the narrative
-        /// names is left unanswered rather than called broken. Describing them turns these two rows into
-        /// real answers with nothing else to change — as describing the traders and the deeds already
-        /// has: the shop a dialogue opens and the deed it publishes are now answered, not passed over.
+        /// <remarks>A row is taken out when the data is fixed, never to quiet a run. The first is the
+        /// tool's own gap and not the author's: no descriptor is written for that catalog
+        /// (<c>CatalogDescriptors.NotYetDescribed</c>), so every item id the narrative names is left
+        /// unanswered rather than called broken. Describing it turns the row into a real answer with
+        /// nothing else to change — as describing the traders, the deeds and the npc modifiers already
+        /// has: the shop a dialogue opens, the deed it publishes and the modifiers a quest hangs on a
+        /// spawned foe are now answered, not passed over.
         /// <para>The last four are the author's, and owed rather than broken: the game counts kills per
         /// faction, remembers who has been spoken to and remembers the gear the player has ever put on,
         /// and no quest and no dialogue asks about any of it yet. All are families a narrative would read
@@ -57,21 +61,23 @@ namespace LastBreathTest.BattleSystemTests
         private static readonly (NarrativeFindingKind Kind, string Where)[] s_known =
         [
             (NarrativeFindingKind.UndescribedTarget, "Items"),
-            (NarrativeFindingKind.UndescribedTarget, "NpcModifiers"),
             (NarrativeFindingKind.FactNeverRead, "facts/Kill_Count_Faction:<faction>"),
             (NarrativeFindingKind.FactNeverRead, "facts/Npc_Talked:<npcId>"),
             (NarrativeFindingKind.FactNeverRead, "facts/Item_Equipped:<piece>"),
             (NarrativeFindingKind.FactNeverRead, "facts/Item_Equipped_Any"),
         ];
 
-        private static NarrativeCheckReport s_report = null!;
+        /// <summary>Read once for the whole assembly: every audit that owns a gate over one of these rules
+        /// is asking the same question of the same run.</summary>
+        private static readonly Lazy<NarrativeCheckReport> s_shipped = new(Run);
 
-        [ClassInitialize]
-        public static void Check(TestContext context) => s_report = Run();
+        /// <summary>One run of the checks over the shipped narrative, shared with the audits that gate on
+        /// one of its rules — so the tool, the audits and this pin are one answer.</summary>
+        internal static NarrativeCheckReport Shipped => s_shipped.Value;
 
         /// <summary>One run of the checks over the shipped data, through the same entry point the
         /// authoring tool presses its button on.</summary>
-        internal static NarrativeCheckReport Run()
+        private static NarrativeCheckReport Run()
         {
             string root = SharedData.Root();
             var workspace = CatalogWorkspace.Load(root, CatalogDescriptors.All);
@@ -84,16 +90,16 @@ namespace LastBreathTest.BattleSystemTests
         public void TheShippedNarrativeHoldsOnlyTheKnownFindings()
         {
             (NarrativeFindingKind Kind, string Where)[] found =
-                [.. s_report.Findings.Select(finding => (finding.Kind, finding.Where)).Distinct().Order()];
+                [.. Shipped.Findings.Select(finding => (finding.Kind, finding.Where)).Distinct().Order()];
 
-            Report("What the checks found in the shipped narrative", [.. s_report.Findings.Select(Line)]);
-            Report("What the run could not read", [.. s_report.Notes]);
+            Report("What the checks found in the shipped narrative", [.. Shipped.Findings.Select(Line)]);
+            Report("What the run could not read", [.. Shipped.Notes]);
 
             CollectionAssert.AreEquivalent(
                 s_known,
                 found,
                 $"the shipped narrative holds other findings than the known ones:{Environment.NewLine}  "
-                + string.Join($"{Environment.NewLine}  ", s_report.Findings.Select(Line)));
+                + string.Join($"{Environment.NewLine}  ", Shipped.Findings.Select(Line)));
         }
 
         /// <summary>The run has to be reading something: a workspace that opened no narrative would find
@@ -101,9 +107,9 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void TheRunReadsTheNarrativeCatalogsAtAll()
         {
-            Assert.AreNotEqual(0, s_report.Read.Dialogues.Count, "the run opened no dialogue at all");
-            Assert.AreNotEqual(0, s_report.Read.Quests.Count, "the run opened no quest at all");
-            Assert.AreNotEqual(0, s_report.Read.Texts.Locales.Count, "the run read no locale, so no line was held to the wording");
+            Assert.AreNotEqual(0, Shipped.Read.Dialogues.Count, "the run opened no dialogue at all");
+            Assert.AreNotEqual(0, Shipped.Read.Quests.Count, "the run opened no quest at all");
+            Assert.AreNotEqual(0, Shipped.Read.Texts.Locales.Count, "the run read no locale, so no line was held to the wording");
         }
 
         /// <summary>
@@ -116,14 +122,14 @@ namespace LastBreathTest.BattleSystemTests
         {
             string[] dropped =
             [
-                .. s_report.Findings
+                .. Shipped.Findings
                     .Where(finding => finding.Kind == NarrativeFindingKind.Dropped)
                     .Select(finding => finding.Where)
             ];
 
             Assert.AreEqual(0, dropped.Length, $"the loader kept none of: {string.Join(", ", dropped)}");
 
-            NarrativeCheckInput input = s_report.Read;
+            NarrativeCheckInput input = Shipped.Read;
 
             CollectionAssert.Contains(input.LoadedDialogues.ToArray(), TraderNpcId,
                 $"the dialogue of '{TraderNpcId}' was dropped at parse");
@@ -183,6 +189,7 @@ namespace LastBreathTest.BattleSystemTests
             {
                 Dialogues = Records<DialoguesData>(EmptyDialogueJson).Dialogues,
                 Quests = Records<QuestsData>(EmptyQuestJson).Quests,
+                Npcs = [],
                 LoadedDialogues = [],
                 LoadedQuests = [],
                 Ids = new NarrativeIdSource(_ => true, (_, _) => true),
@@ -212,6 +219,7 @@ namespace LastBreathTest.BattleSystemTests
             {
                 Dialogues = dialogue.Dialogues,
                 Quests = quest.Quests,
+                Npcs = [],
                 LoadedDialogues = [.. dialogue.Dialogues.Select(entry => entry.NpcId)],
                 LoadedQuests = [.. quest.Quests.Select(entry => entry.Id)],
                 Ids = new NarrativeIdSource(_ => true, (_, id) => id.StartsWith("Npc_", StringComparison.Ordinal)),
@@ -389,9 +397,9 @@ namespace LastBreathTest.BattleSystemTests
                 new[] { "Quests/Quest_Ring/stages/First", "Quests/Quest_Ring/stages/Second" }, looping, Lines(findings));
         }
 
-        /// <summary>One forged pair of documents run through the rules with every id and every key
+        /// <summary>One forged set of documents run through the rules with every id and every key
         /// answered: what is found is the documents' own doing and not the bench's.</summary>
-        private static IReadOnlyList<NarrativeFinding> Read(string dialogues, string quests)
+        private static IReadOnlyList<NarrativeFinding> Read(string dialogues, string quests, string npcs = NoNpcsJson)
         {
             var dialogue = Records<DialoguesData>(dialogues);
             var quest = Records<QuestsData>(quests);
@@ -400,6 +408,7 @@ namespace LastBreathTest.BattleSystemTests
             {
                 Dialogues = dialogue.Dialogues,
                 Quests = quest.Quests,
+                Npcs = Records<NpcsData>(npcs).Npcs,
                 LoadedDialogues = [.. dialogue.Dialogues.Select(entry => entry.NpcId)],
                 LoadedQuests = [.. quest.Quests.Select(entry => entry.Id)],
                 Ids = new NarrativeIdSource(_ => true, (_, _) => true),
@@ -414,6 +423,68 @@ namespace LastBreathTest.BattleSystemTests
         private const string NoDialoguesJson = """{ "dialogues": [] }""";
 
         private const string NoQuestsJson = """{ "quests": [] }""";
+
+        private const string NoNpcsJson = """{ "npcs": [] }""";
+
+        /// <summary>Three species: one able to talk with a dialogue written for it, one able to talk with
+        /// none, and one that cannot talk and has none either — which is a wolf and not a finding.</summary>
+        private const string TalkingNpcJson =
+            """
+            {
+              "npcs": [
+                { "id": "Npc_Forged", "interaction": { "canTalk": true } },
+                { "id": "Npc_Silent", "interaction": { "canTalk": true } },
+                { "id": "Npc_Wolf" }
+              ]
+            }
+            """;
+
+        /// <summary>A species written able to talk with no dialogue behind it: the player clicks it and the
+        /// game opens nothing. The two beside it — one with a dialogue, one that never talks — have to stay
+        /// unremarked, or the rule would be reporting that an npc exists.</summary>
+        [TestMethod]
+        public void ASpeciesWrittenAbleToTalkWithNoDialogue_IsFound()
+        {
+            IReadOnlyList<NarrativeFinding> findings = Read(NullKeyDialogueJson, NoQuestsJson, TalkingNpcJson);
+
+            string[] silent =
+            [
+                .. findings.Where(finding => finding.Kind == NarrativeFindingKind.MissingDialogue).Select(finding => finding.Where)
+            ];
+
+            CollectionAssert.AreEqual(new[] { "Npc/Npc_Silent/interaction/canTalk" }, silent, Lines(findings));
+        }
+
+        /// <summary>What the file a forged record is laid into is called. Named after nothing the catalogs
+        /// hold, so it stands beside the shipped npcs rather than over one of them.</summary>
+        private const string ForgedNpcFile = "Forged.json";
+
+        private const string MuteNpcId = "Npc_Forged_Mute";
+
+        private const string MuteNpcJson =
+            """
+            { "npcs": [ { "id": "Npc_Forged_Mute", "stances": [ "Dexterity" ], "interaction": { "canTalk": true } } ] }
+            """;
+
+        /// <summary>The same mutation put to the RUN instead of to the rules: a talking species laid into
+        /// the shipped npc catalog and no dialogue written for it. What the run reads out of a workspace is
+        /// what the tool's panel reads, so this is what says the rule reaches the documents at all.</summary>
+        [TestMethod]
+        public void ASpeciesLaidIntoTheShippedCatalog_IsFoundByTheRunOverTheDocuments()
+        {
+            var workspace = CatalogWorkspace.Load(SharedData.Root(), CatalogDescriptors.All);
+            CatalogView view = workspace.Catalogs.Single(open => open.Catalog == DataCatalog.Npc);
+
+            view.AddFile(new CatalogFile(Path.Combine(view.Folder, ForgedNpcFile), JsonTreeDocument.Parse(MuteNpcJson)));
+
+            NarrativeCheckReport report = NarrativeCheckRun.Over(workspace, new ReferenceIndex(workspace), texts: null);
+
+            Assert.IsTrue(
+                report.Findings.Any(finding => finding.Kind == NarrativeFindingKind.MissingDialogue
+                                               && finding.Where == $"{DataCatalog.Npc}/{MuteNpcId}/interaction/canTalk"),
+                $"a talking species with no dialogue went unnoticed by the run itself:{Environment.NewLine}  "
+                + string.Join($"{Environment.NewLine}  ", report.Findings.Select(Line)));
+        }
 
         private const string NullKeyDialogueJson =
             """

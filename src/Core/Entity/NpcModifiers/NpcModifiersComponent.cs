@@ -60,7 +60,7 @@ namespace Core.Entity.NpcModifiers
 
         /// <summary>
         /// "Уникальные модификаторы не складываются (более сильные заменяют более слабые)". HOW WIDE that
-        /// reads is the designer's call, authored per catalog section as uniqueScope, because the vault
+        /// reads is the designer's call, authored per catalog section in the spawn-rolls document, because the vault
         /// answers it differently section by section: the rarity floors are one at a time (three floors is
         /// three difficulties for one floor's worth of effect), while the scaling section says outright
         /// "Нпс может иметь несколько разных модификаторов данного типа" — ×2 health beside ×2 damage, and

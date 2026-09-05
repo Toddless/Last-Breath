@@ -8,23 +8,36 @@ namespace Core.Services
     using Data.NpcModifiersData;
     using Entity;
     using Entity.NpcModifiers;
+    using Enums;
 
     /// <summary>
     /// Shared NPC modifier provider (used by LootGeneration and Battle): consumes the
     /// NpcModifiers catalog and serves copies. Parsing and factories live in Core.
+    /// <para>Two catalogs and not one: how far "unique" reaches in a section is a rule about composing a
+    /// spawn and stands with the other such rules in the spawn-rolls document, while the modifier catalog
+    /// holds only the modifiers. The order the two are named in is the order they are read in, so the
+    /// reach is known before the first modifier is built out of it.</para>
     /// </summary>
     public class NpcModifierProvider : INpcModifierProvider, IGameDataParticipant
     {
         private readonly Dictionary<string, INpcModifier> _npcModifiers = [];
         private readonly INpcModifiersFactory _modifiersFactory = new NpcModifiersFactory();
 
-        public IReadOnlyList<string> Catalogs => [DataCatalog.NpcModifiers];
+        private IReadOnlyDictionary<string, NpcUniqueScope> _scopes = new Dictionary<string, NpcUniqueScope>();
+
+        public IReadOnlyList<string> Catalogs => [DataCatalog.NpcSpawnRolls, DataCatalog.NpcModifiers];
 
         public void Apply(string catalog, GameDataFile file)
         {
-            var data = NpcModifiersParser.Parse(file.Json);
-            var modifiers = _modifiersFactory.CreateNpcModifiers(data);
-            modifiers.ForEach(modifier => _npcModifiers.TryAdd(modifier.Id, modifier));
+            ArgumentNullException.ThrowIfNull(file);
+
+            if (string.Equals(catalog, DataCatalog.NpcSpawnRolls, StringComparison.Ordinal))
+            {
+                _scopes = NpcModifiersParser.Scopes(file.Json);
+                return;
+            }
+
+            ReadModifiers(file);
         }
 
         public INpcModifier GetModifier(string id) => !_npcModifiers.TryGetValue(id, out var modifier)
@@ -41,5 +54,14 @@ namespace Core.Services
         /// it the entry sat — so moving an entry between files would silently re-aim every seeded draw.</summary>
         public IReadOnlyList<INpcModifier> GetAllModifiers() =>
             [.. _npcModifiers.Values.OrderBy(modifier => modifier.Id, StringComparer.Ordinal)];
+
+        /// <summary>One file of the modifier catalog, section by section, added to what the folder has
+        /// given so far: a catalog is a folder, and an id already served is kept.</summary>
+        private void ReadModifiers(GameDataFile file)
+        {
+            var data = NpcModifiersParser.Parse(file.Json, _scopes);
+            var modifiers = _modifiersFactory.CreateNpcModifiers(data);
+            modifiers.ForEach(modifier => _npcModifiers.TryAdd(modifier.Id, modifier));
+        }
     }
 }

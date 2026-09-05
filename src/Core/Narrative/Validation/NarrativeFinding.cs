@@ -30,7 +30,9 @@ namespace Core.Narrative.Validation
         /// <summary>A route out of a stage leads to a stage nobody wrote.</summary>
         DanglingStage,
 
-        /// <summary>A quest names an npc to take it from or hand it in to who has no dialogue to do it in.</summary>
+        /// <summary>Somebody is meant to be spoken to and there is no conversation to do it in: a quest
+        /// names an npc to be taken from or handed in to, or an npc declares itself able to talk. One kind
+        /// for both, because the fix is one — write the dialogue, or take the claim back.</summary>
         MissingDialogue,
 
         /// <summary>A condition or an action is written under a word no factory of the vocabulary reads,

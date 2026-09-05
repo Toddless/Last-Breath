@@ -17,33 +17,33 @@ namespace Core.Entity.NpcModifiers
         {
             _factories = new Dictionary<string, Func<string, List<NpcModifierData>, List<INpcModifier>>>
             {
-                ["scale"] = (group, data) =>
+                [ModifiersData.ScaleSection] = (group, data) =>
                     data.OfType<ScaleModifierData>()
                         .Select(scale => new ScaleModifier(scale.Id, scale.Weight, scale.Difficulty, scale.Scale, scale.IsUnique, scale.NpcBuffId) { Group = group, UniqueScope = scale.UniqueScope })
                         .Cast<INpcModifier>().ToList(),
-                ["tierUpgrade"] = (group, data) =>
+                [ModifiersData.TierUpgradeSection] = (group, data) =>
                     data.OfType<TierUpgradeData>()
                         .Select(upgrade => new TierUpgradeModifier(upgrade.Id, upgrade.Weight, upgrade.Difficulty, upgrade.IsUnique, upgrade.NpcBuffId, upgrade.TierUpgradeChance,
                             upgrade.UpgradeBy) { Group = group, UniqueScope = upgrade.UniqueScope })
                         .Cast<INpcModifier>().ToList(),
-                ["guaranteedItems"] = (group, data) =>
+                [ModifiersData.GuaranteedItemsSection] = (group, data) =>
                     data.OfType<GuaranteedItemsData>()
                         .Select(guaranteed =>
                             new GuaranteedItemsModifier(guaranteed.Id, guaranteed.Weight, guaranteed.Difficulty, guaranteed.IsUnique, guaranteed.NpcBuffId, guaranteed.Items) { Group = group, UniqueScope = guaranteed.UniqueScope })
                         .Cast<INpcModifier>().ToList(),
-                ["tierMultiplier"] = (group, data) =>
+                [ModifiersData.TierMultiplierSection] = (group, data) =>
                     data.OfType<TierMultiplierData>()
                         .Select(tier => new TierMultiplierModifier(tier.Id, tier.Weight, tier.Difficulty, tier.IsUnique, tier.NpcBuffId, tier.Multiplier, tier.AffectedTiers) { Group = group, UniqueScope = tier.UniqueScope })
                         .Cast<INpcModifier>().ToList(),
-                ["itemEffects"] = (group, data) =>
+                [ModifiersData.ItemEffectsSection] = (group, data) =>
                     data.OfType<ItemEffectData>()
                         .Select(item => new ItemEffectsModifier(item.Id, item.Weight, item.Difficulty, item.IsUnique, item.NpcBuffId, item.EffectId) { Group = group, UniqueScope = item.UniqueScope })
                         .Cast<INpcModifier>().ToList(),
-                ["minRarity"] = (group, data) =>
+                [ModifiersData.MinRaritySection] = (group, data) =>
                     data.OfType<MinRarityModifierData>()
                         .Select(rarity => new MinRarityModifier(rarity.Id, rarity.Weight, rarity.Difficulty, rarity.IsUnique, rarity.NpcBuffId, rarity.Rarity) { Group = group, UniqueScope = rarity.UniqueScope })
                         .Cast<INpcModifier>().ToList(),
-                ["rarityUpgrade"] = (group, data) =>
+                [ModifiersData.RarityUpgradeSection] = (group, data) =>
                     data.OfType<RarityUpgradeModifierData>()
                         .Select(rarity => new RarityUpgradeModifier(rarity.Id, rarity.Weight, rarity.Difficulty, rarity.IsUnique, rarity.NpcBuffId, rarity.AffectedRarity,
                             rarity.Multiplier) { Group = group, UniqueScope = rarity.UniqueScope })

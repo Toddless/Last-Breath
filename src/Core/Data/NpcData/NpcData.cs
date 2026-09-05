@@ -13,8 +13,13 @@ namespace Core.Data.NpcData
     /// and are parsed by the provider; base parameters are keyed by EntityParameter name and
     /// replace the hardcoded random roll of BaseNpc.
     /// </summary>
+    /// <remarks>The json names of the section the narrative rules address are constants: a finding is
+    /// written the way the file is, so the reader that names a place and the attribute that reads it are
+    /// one word.</remarks>
     public record NpcData
     {
+        public const string InteractionKey = "interaction";
+
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
         [JsonProperty("fraction")][EnumOf(typeof(Fractions))] public string Fraction { get; init; } = string.Empty;
         [JsonProperty("entityType")][EnumOf(typeof(EntityType))] public string EntityType { get; init; } = string.Empty;
@@ -77,7 +82,7 @@ namespace Core.Data.NpcData
         [JsonProperty("lifecycle")] public NpcLifecycleData? Lifecycle { get; init; }
 
         /// <summary>Species capabilities (talking, later trading). Null = can do none of it.</summary>
-        [JsonProperty("interaction")] public NpcInteractionData? Interaction { get; init; }
+        [JsonProperty(InteractionKey)] public NpcInteractionData? Interaction { get; init; }
 
         /// <summary>Authored identity (named villagers, trial targets): the facts this section names
         /// stop being rolled, so two spawns of the id are the same fighter. Null = everything rolls.</summary>
@@ -130,7 +135,9 @@ namespace Core.Data.NpcData
     /// (reputation), never declared here — a hostile veteran may talk, a friendly wolf never will.</summary>
     public record NpcInteractionData
     {
-        [JsonProperty("canTalk")] public bool CanTalk { get; init; }
+        public const string CanTalkKey = "canTalk";
+
+        [JsonProperty(CanTalkKey)] public bool CanTalk { get; init; }
     }
 
     /// <summary>The "lifecycle" section: WHICH post-defeat cycle the NPC lives by plus its numbers. Each

@@ -42,6 +42,13 @@ namespace Tooling.Catalogs.Checks
         /// nothing, so the reader refuses the record either way.</summary>
         AmbiguousShape,
 
+        /// <summary>A word is written where one of a named set of members is meant, and it is none of
+        /// them. Its own sort and not an id nothing answers: the members are written down in the schema
+        /// rather than in another catalog, and what an author does about it is pick from a list. The
+        /// readers of such a field are strict wherever they are — the word is refused, and the record
+        /// carrying it goes out of the game without either being named.</summary>
+        UnknownChoice,
+
         /// <summary>A rule of the GAME over the meaning of its own data, run beside these and reported in
         /// one list. The shape of a record says nothing about such a fact — a knob written two ways, a
         /// filter nothing answers, an artefact handed out again on every turn-in — so the rules live with

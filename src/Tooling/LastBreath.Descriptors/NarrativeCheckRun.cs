@@ -5,6 +5,7 @@ namespace LastBreath.Descriptors
     using System.Linq;
     using Core.Data.DialogueData;
     using Core.Data.GameData;
+    using Core.Data.NpcData;
     using Core.Data.QuestData;
     using Core.Narrative;
     using Core.Narrative.Dialogues;
@@ -44,6 +45,8 @@ namespace LastBreath.Descriptors
 
         private const string QuestWord = "quests";
 
+        private const string NpcWord = "npcs";
+
         /// <summary>Runs every rule over the documents as they are written this second. The records are
         /// read twice on purpose: once raw, because a route that dangles is only nameable before the
         /// loader drops the record it is in, and once through the game's own loader, which is the only
@@ -57,8 +60,9 @@ namespace LastBreath.Descriptors
             return new NarrativeCheckReport(input, reading.Findings, notes, reading.Facts);
         }
 
-        /// <summary>The narrative as the rules are asked about it: the records as written, the records the
-        /// loader kept, and the two sources answering for everything outside.</summary>
+        /// <summary>The narrative as the rules are asked about it: the records as written — the npcs among
+        /// them, since what a species claims it can do is half of a conversation — the records the loader
+        /// kept, and the two sources answering for everything outside.</summary>
         private static NarrativeCheckInput Narrative(
             CatalogWorkspace workspace, ReferenceIndex references, LocalizedTexts? texts, ICollection<string> notes)
         {
@@ -73,6 +77,7 @@ namespace LastBreath.Descriptors
             {
                 Dialogues = Written<DialoguesData, DialogueEntry>(workspace, DataCatalog.Dialogues, DialogueWord, data => data.Dialogues, notes),
                 Quests = Written<QuestsData, QuestEntry>(workspace, DataCatalog.Quests, QuestWord, data => data.Quests, notes),
+                Npcs = Written<NpcsData, NpcData>(workspace, DataCatalog.Npc, NpcWord, data => data.Npcs, notes),
                 LoadedDialogues = Loaded(sandbox.Dialogues.All.Select(dialogue => dialogue.NpcId)),
                 LoadedQuests = Loaded(sandbox.QuestCatalog.All.Select(quest => quest.Id)),
                 Ids = new IndexedIds(references),

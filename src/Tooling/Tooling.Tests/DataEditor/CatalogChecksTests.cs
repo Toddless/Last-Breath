@@ -41,6 +41,9 @@ namespace Tooling.Tests.DataEditor
         private const string IdField = "id";
         private const string AllyField = "ally";
         private const string HomeField = "home";
+        private const string StanceField = "stance";
+        private const string StancesField = "stances";
+        private const string ParametersField = "parameters";
         private const string PriceField = "price";
         private const string ItemsField = "items";
         private const string GroupField = "group";
@@ -69,13 +72,30 @@ namespace Tooling.Tests.DataEditor
         private const string GhostId = "Npc_Ghost";
 
         /// <summary>Two npcs answering to one name, one naming an ally nobody wrote, one naming a home in a
-        /// catalog nobody described, and one writing its band as a plain number instead of a pair of
-        /// bounds. Beside each of them stands the same thing written right.</summary>
+        /// catalog nobody described, one writing its band as a plain number instead of a pair of bounds,
+        /// and one writing a word outside the members offered in each of the three places a word can stand
+        /// — a field of its own, an element of a list and the key of a map. Beside each of them stands the
+        /// same thing written right, the first of them in the wrong case: the readers match members
+        /// without regard to it and a rule stricter than the reader would report a word the game takes.</summary>
         private const string Npcs = """
             {
                 "npcs": [
-                    { "id": "Npc_Ronald", "ally": "Npc_Twin", "band": { "min": 1, "max": 3 } },
-                    { "id": "Npc_Twin", "ally": "Npc_Ghost", "home": "Place_Forge" },
+                    {
+                        "id": "Npc_Ronald",
+                        "ally": "Npc_Twin",
+                        "band": { "min": 1, "max": 3 },
+                        "stance": "strength",
+                        "stances": [ "Dexterity" ],
+                        "parameters": { "Health": 1 }
+                    },
+                    {
+                        "id": "Npc_Twin",
+                        "ally": "Npc_Ghost",
+                        "home": "Place_Forge",
+                        "stance": "Shouter",
+                        "stances": [ "Whisper" ],
+                        "parameters": { "Mood": 1 }
+                    },
                     { "id": "Npc_Twin", "band": 4 }
                 ]
             }
@@ -326,6 +346,30 @@ namespace Tooling.Tests.DataEditor
             StringAssert.StartsWith(twice.Where, LocalizedTexts.ReferenceLocale, StringComparison.Ordinal);
         }
 
+        /// <summary>A word outside the members offered, in each of the three places a word can stand: a
+        /// field of its own, an element of a list and the key of a map. The three written right beside
+        /// them stay unremarked — one of them in the wrong case, which the readers take.</summary>
+        [TestMethod]
+        public void AWordOutsideTheMembersOffered_IsFoundWhereverItStands()
+        {
+            IReadOnlyList<CatalogFinding> found = Checked();
+
+            string[] places =
+            [
+                .. found.Where(finding => finding.Kind == CatalogFindingKind.UnknownChoice).Select(finding => finding.Where)
+            ];
+
+            CollectionAssert.AreEqual(
+                new[]
+                {
+                    $"{NpcFile}/{NpcsKey}/1/{StanceField}",
+                    $"{NpcFile}/{NpcsKey}/1/{StancesField}/0",
+                    $"{NpcFile}/{NpcsKey}/1/{ParametersField}/Mood"
+                },
+                places,
+                Lines(found));
+        }
+
         /// <summary>A pair of bounds written as a plain number. The one beside it, written as an object with
         /// both ends, has to stay unremarked.</summary>
         [TestMethod]
@@ -505,7 +549,16 @@ namespace Tooling.Tests.DataEditor
                         CatalogFixture.Field(IdField, FieldKind.String),
                         Reference(AllyField, NpcCatalog),
                         Reference(HomeField, PlaceCatalog),
-                        Range("band")))
+                        Range("band"),
+                        Choice(StanceField),
+                        new FieldSchema { JsonName = StancesField, Kind = FieldKind.Array, Item = Choice(FieldSchema.Unnamed) },
+                        new FieldSchema
+                        {
+                            JsonName = ParametersField,
+                            Kind = FieldKind.Dictionary,
+                            Key = new FieldSchema { JsonName = FieldSchema.Unnamed, Kind = FieldKind.Enum, EnumValues = s_parameters },
+                            Item = CatalogFixture.Field(FieldSchema.Unnamed, FieldKind.Number)
+                        }))
                 ],
                 localizedSuffixes: [string.Empty, DescriptionSuffix, TooltipSuffix],
                 requiredSuffixes: saysWhatItOwes ? required ?? [string.Empty, DescriptionSuffix] : null),
@@ -525,6 +578,16 @@ namespace Tooling.Tests.DataEditor
                 RootShape.Single,
                 [CatalogFixture.Section(string.Empty, CatalogFixture.Record(null, CatalogFixture.Field("hoursPerDay", FieldKind.Integer)))])
         ];
+
+        /// <summary>The members a stance is written from, and the ones a parameter map is keyed by.</summary>
+        private static readonly string[] s_stances = ["Dexterity", "Strength"];
+
+        private static readonly string[] s_parameters = ["Health", "Mana"];
+
+        /// <summary>A field drawn from a named set of members — the one shape a word outside them is
+        /// judged by, wherever it stands.</summary>
+        private static FieldSchema Choice(string jsonName) =>
+            new() { JsonName = jsonName, Kind = FieldKind.Enum, EnumValues = s_stances };
 
         private static FieldSchema Reference(string jsonName, string catalog) => new()
         {

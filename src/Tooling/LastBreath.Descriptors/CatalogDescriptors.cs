@@ -36,6 +36,7 @@ namespace LastBreath.Descriptors
             new ReputationDeedsCatalogDescriptor(),
             new ReputationPerksCatalogDescriptor(),
             new NpcBuffsCatalogDescriptor(),
+            new NpcModifiersCatalogDescriptor(),
 
             // What a grant hands over and what a line is held up by: the three catalogs every other one
             // points INTO. Nothing here is granted by anything — they are where the behaviour is declared.
@@ -64,14 +65,6 @@ namespace LastBreath.Descriptors
         /// to <see cref="DataCatalog"/> has to be put on one of the two lists by hand.</summary>
         public static IReadOnlyList<string> NotYetDescribed { get; } =
         [
-            // The npc modifiers. The file writes its groups as ELEMENTS of one array — a group carrying
-            // the kind of modifier under it, the reach of its uniqueness, and the modifiers themselves —
-            // so the ids anything points at stand two levels below the root. A section of a catalog is one
-            // key of the root here, and records are found directly under it: describing this file would
-            // hand the tool the seven groups as its records and answer every id naming a modifier with
-            // "nothing is called that". Either the file grows sections of its own or the shape does.
-            DataCatalog.NpcModifiers,
-
             // The tree itself, which is authored by a tool of its own outside this solution: a document of
             // nodes laid out on a canvas, whose records are read by that tool and by the game and by
             // nothing in between. A second editor built from a schema would be a second author of it.

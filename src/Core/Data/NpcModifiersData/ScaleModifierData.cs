@@ -5,5 +5,6 @@ namespace Core.Data.NpcModifiersData
     public record ScaleModifierData : NpcModifierData
     {
         [JsonProperty("scale")] public float Scale { get; init; }
+        [JsonProperty("isUnique")] public bool IsUnique { get; init; }
     }
 }

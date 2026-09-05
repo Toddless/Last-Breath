@@ -19,7 +19,7 @@ namespace Core.Entity
         string Group { get; }
 
         /// <summary>How far this modifier's uniqueness reaches — the whole <see cref="Group"/> or just its
-        /// own <see cref="IIdentifiable.Id"/>. Authored per section in NpcModifiers.json.</summary>
+        /// own <see cref="IIdentifiable.Id"/>. Authored per section in the spawn-rolls document.</summary>
         Enums.NpcUniqueScope UniqueScope { get; }
 
         void Attach(IFightable to);

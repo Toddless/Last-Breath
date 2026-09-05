@@ -5,6 +5,7 @@ namespace Core.Narrative.Validation
     using System.Linq;
     using Data.DialogueData;
     using Data.GameData;
+    using Data.NpcData;
     using Data.QuestData;
     using Dialogues;
     using Enums;
@@ -87,6 +88,9 @@ namespace Core.Narrative.Validation
         private const string DuplicateOutcomeFormat = "two endings answer to '{0}', so the reward paid would be ambiguous";
 
         private const string NoDialogueFormat = "'{0}' has no dialogue, so the quest cannot be {1} in one";
+
+        private const string SilentTalkerFormat =
+            "'{0}' is written able to talk and no dialogue is written for it: the player clicks the npc and nothing opens";
 
         private const string ObjectiveShapeFormat =
             "the objective writes {0} of a condition and a counter, where the quest log reads exactly one";
@@ -208,6 +212,7 @@ namespace Core.Narrative.Validation
 
                 for (int index = 0; index < _input.Dialogues.Count; index++) Dialogue(_input.Dialogues[index], index);
                 for (int index = 0; index < _input.Quests.Count; index++) Quest(_input.Quests[index], index);
+                foreach (NpcData npc in _input.Npcs) Talker(npc);
 
                 FactKeyRegistry facts = FactKeyRegistry.Over(_facts);
 
@@ -546,6 +551,23 @@ namespace Core.Narrative.Validation
             }
 
             private void Npc(string npcId, string where, string key) => _vocabulary.Reference(npcId, s_npcTargets, where, key);
+
+            /// <summary>A species written able to talk, held to having something to say. The claim is made
+            /// in the npc catalog and answered in the dialogues, so it belongs to neither on its own — the
+            /// player clicks an npc that declares it and the game opens a conversation nobody wrote.
+            /// <para>Said at the claim itself and not at the record: that key is what an author either
+            /// takes back or writes a dialogue for. A record with no id at all is passed over — nothing
+            /// can be matched to a dialogue by a name that is not there, and an unnamed record is the npc
+            /// catalog's own business.</para></summary>
+            private void Talker(NpcData npc)
+            {
+                if (npc.Interaction is not { CanTalk: true }) return;
+                if (npc.Id is not { Length: > 0 } id || _speaking.Contains(id)) return;
+
+                Add(NarrativeFindingKind.MissingDialogue,
+                    Under(Under(Under(DataCatalog.Npc, id), NpcData.InteractionKey), NpcInteractionData.CanTalkKey),
+                    string.Format(SilentTalkerFormat, id));
+            }
 
             private HashSet<string> Stages(QuestEntry entry, string where)
             {

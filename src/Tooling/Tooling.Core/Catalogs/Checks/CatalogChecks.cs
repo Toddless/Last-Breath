@@ -10,9 +10,10 @@ namespace Tooling.Catalogs.Checks
 
     /// <summary>
     /// The catalogs of a run held against each other and against the wording beside them: the ids they
-    /// name, the names they are found by, the shapes their records are written in and the keys their
-    /// text is read under. Everything here is answered from a schema and a document and from nothing
-    /// else, so the authoring tool and the game's own tests run the very same rules.
+    /// name, the names they are found by, the shapes their records are written in, the words their fields
+    /// are drawn from and the keys their text is read under. Everything here is answered from a schema and
+    /// a document and from nothing else, so the authoring tool and the game's own tests run the very same
+    /// rules.
     /// <para>A REPORT and not a gate. Nothing is refused, nothing is repaired: a finding says where an
     /// author has to look, and whether it is owed or broken is his to decide.</para>
     /// <para>The findings arrive in one order every run — catalog, then file, then the address inside it
@@ -57,6 +58,10 @@ namespace Tooling.Catalogs.Checks
             "a range is written as {0}: one field has one shape wherever it stands, and the second spelling is one every reader has to know about.";
 
         private const string UnboundedRangeFormat = "a range writes no number under '{0}', which the converter reads as a bound that is not there.";
+
+        private const string UnknownChoiceFormat =
+            "'{0}' is written where one of {1} is meant and is none of them: the reader refuses the word, "
+            + "and the record carrying it goes out of the game with it.";
 
         private const string NoShapeFormat = "the record names none of {0}, so it describes nothing the reader can act on.";
 
@@ -129,6 +134,7 @@ namespace Tooling.Catalogs.Checks
                     foreach (SchemaNode node in nodes)
                     {
                         Ranged(catalog, record, node, found);
+                        Chosen(catalog, record, node, found);
                         Shaped(catalog, record, node.File, node.At, node.Field.Record, node.Token, readsInOrder, found);
                     }
 
@@ -267,6 +273,69 @@ namespace Tooling.Catalogs.Checks
         private static bool IsNumber(JObject written, string jsonName) =>
             written.GetValue(jsonName, StringComparison.OrdinalIgnoreCase)
                 is { Type: JTokenType.Integer or JTokenType.Float };
+
+        // ── the words a field is drawn from ────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// A field drawn from a named set of members, held to those members. WHICH fields those are is
+        /// read off the schema, so a DTO that grows an enum joins the rule without anyone remembering it.
+        /// <para>The keys of a map are asked the same question as a value: a map keyed by members is a
+        /// list of them written as names, and a key outside the set fails the record just as loudly.</para>
+        /// </summary>
+        private static void Chosen(
+            CatalogView catalog, CatalogRecord record, SchemaNode node, ICollection<CatalogFinding> found)
+        {
+            if (node.Field is { Kind: FieldKind.Dictionary, Key.Kind: FieldKind.Enum } keyed && node.Token is JObject map)
+            {
+                foreach (JProperty pair in map.Properties())
+                    Word(catalog, record, node.File, node.At.Append(pair.Name), keyed.Key!, pair.Name, found);
+
+                return;
+            }
+
+            if (node.Field is not { Kind: FieldKind.Enum } field) return;
+            if (node.Token is not JValue { Type: JTokenType.String } written) return;
+
+            Word(catalog, record, node.File, node.At, field, JsonScalars.Written(written), found);
+        }
+
+        /// <summary>One written word held against the members offered. A set with no members judges
+        /// nothing — the schema knows of no list to pick from — and neither does a word of no length:
+        /// what an absent word means is the reader's own default and no business of this rule.</summary>
+        private static void Word(
+            CatalogView catalog,
+            CatalogRecord record,
+            CatalogFile file,
+            JsonPointer at,
+            FieldSchema field,
+            string written,
+            ICollection<CatalogFinding> found)
+        {
+            if (field.EnumValues.Count == 0 || written.Length == 0) return;
+            if (Offers(field.EnumValues, written)) return;
+
+            found.Add(new CatalogFinding(
+                CatalogFindingKind.UnknownChoice,
+                catalog.Catalog,
+                record.CurrentId,
+                written,
+                Place(file, at),
+                Text(UnknownChoiceFormat, written, Members(field.EnumValues))));
+        }
+
+        /// <summary>Whether the members hold the word. Matched without regard to case, the way the
+        /// readers of such a field match them: a rule stricter than the reader would report a word the
+        /// game takes.</summary>
+        private static bool Offers(SchemaList<string> members, string written)
+        {
+            foreach (string member in members)
+                if (string.Equals(member, written, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+            return false;
+        }
+
+        private static string Members(SchemaList<string> members) => string.Join(ShapeSeparator, members);
 
         /// <summary>
         /// A record whose shapes are told apart by the PRESENCE of a key, held to wearing exactly one of

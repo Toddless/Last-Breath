@@ -6,6 +6,7 @@
   "_modifiersNote": "Calibration point agreed with the owner: Elit x Epic (4 slots) = 90% at least one, 54% exactly one, 24% two, 9% three, 3% all four.",
   "_abilitiesNote": "Own numbers, same shape: on a Regular or a Special an ability is an event, on an Elit one or two is the norm. Boss and Archon are absent on purpose - their slot count is 'every ability of the pool' (NpcTypeDefaults.AllAbilities), an authored promise and not a thing to roll against.",
   "_rarityNote": "One ladder for both tables: rarity is the same promise wherever it is read. A type or a rarity this file does not name rolls no dice at all - the slot is simply filled, which is the behaviour that predates this catalog.",
+  "_uniqueScopeNote": "How far 'unique' reaches inside one section of the NpcModifiers catalog, keyed by that section. 'group' (the answer for a section left out) means one unique modifier of the whole section at a time and the stronger one takes the slot; 'id' means only the same modifier twice is refused and different ones of the section stack. It stands here rather than in NpcModifiers.json because that file is sections of modifiers and nothing else - the same reason the slot ladders are not in it. A section this map names that the modifier catalog does not hold is refused rather than passed over.",
 
   "rarityMultipliers": {
     "Common": 0.45,
@@ -31,5 +32,9 @@
     "Special": { "firstSlotChance": 0.35, "nextSlotChance": 0.15, "decay": 0.7 },
     "Elit": { "firstSlotChance": 0.95, "nextSlotChance": 0.55, "decay": 0.75 },
     "Unique": { "firstSlotChance": 1.0, "nextSlotChance": 0.7, "decay": 0.8 }
+  },
+
+  "uniqueScope": {
+    "scale": "id"
   }
 }
