@@ -36,6 +36,8 @@ namespace LastBreath.World
         /// <summary>Tile source of the 4x4 transition atlas the display layer draws from.</summary>
         [Export] private int _displaySourceId;
 
+        [Export] public TransitionAtlasLayout AtlasLayout { get; set; }
+
         private readonly DualGridProjection _projection = new();
 
         private bool _repaintQueued;
@@ -166,7 +168,7 @@ namespace LastBreath.World
                 return;
             }
 
-            _display!.SetCell(coords, _displaySourceId, DualGridAtlas.CoordinateOf(mask).ToVector2I());
+            _display!.SetCell(coords, _displaySourceId, DualGridAtlas.CoordinateOf(mask, AtlasLayout).ToVector2I());
         }
 
         /// <summary>Writes one world cell and repaints only the four display tiles that cover it.</summary>

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="TerrainRootConfig" format=3 uid="uid://b2eys61tsxc43"]
+
+[ext_resource type="Script" uid="uid://bl6rh3e3m0370" path="res://World/TerrainEntry.cs" id="1_2ibnj"]
+[ext_resource type="Texture2D" uid="uid://ce4ogekincvq4" path="res://Data/Shared/Assets/Tiles/Dirt_Transitions.png" id="2_2hfeq"]
+[ext_resource type="Script" uid="uid://de2g0a07260y5" path="res://World/TerrainRootConfig.cs" id="2_dr406"]
+[ext_resource type="Texture2D" uid="uid://bfofb3n2gkiex" path="res://Data/Shared/Assets/Tiles/Square_Tiles_Transitions.png" id="3_nobv2"]
+
+[sub_resource type="Resource" id="Resource_2hfeq"]
+script = ExtResource("1_2ibnj")
+Layer = "Dirt"
+Transitions = ExtResource("2_2hfeq")
+AtlasLayout = 1
+metadata/_custom_type_script = "uid://bl6rh3e3m0370"
+
+[sub_resource type="Resource" id="Resource_bty6m"]
+script = ExtResource("1_2ibnj")
+Layer = "Square"
+Transitions = ExtResource("3_nobv2")
+AtlasLayout = 1
+metadata/_custom_type_script = "uid://bl6rh3e3m0370"
+
+[resource]
+script = ExtResource("2_dr406")
+Entries = Array[ExtResource("1_2ibnj")]([SubResource("Resource_2hfeq"), SubResource("Resource_bty6m")])
+metadata/_custom_type_script = "uid://de2g0a07260y5"

@@ -9,7 +9,7 @@ namespace LastBreath.World
     /// Holds every dual-grid terrain of a location and builds their machinery from data. Its children are the
     /// invisible data layers the owner paints on, one per terrain, each named after an entry of the config; on
     /// <see cref="_Ready"/> each named layer gets a display layer (its tileset assembled from the entry's
-    /// transition sheet), a <see cref="DualGridTerrainLayer"/> wiring the pair, and a
+    /// transition sheet and surface material), a <see cref="DualGridTerrainLayer"/> wiring the pair, and a
     /// <see cref="PropScatterLayer"/> where the entry carries a prop. A new terrain is therefore an empty layer
     /// and a row of data — no scene, no hand-wired exports, nothing to lose on the next edit.
     /// </summary>
@@ -164,15 +164,17 @@ namespace LastBreath.World
         private readonly record struct TerrainEntryData(
             string Layer,
             Texture2D? Transitions,
+            Material? SurfaceMaterial,
             Texture2D? Prop,
             float PropHeight,
-            PropScatterSettings ScatterSettings)
+            PropScatterSettings ScatterSettings,
+            TransitionAtlasLayout AtlasLayout = TransitionAtlasLayout.RowMajor)
         {
             public bool Scatters => Prop is not null;
         }
 
         /// <summary>Blank slot: an empty array element, same as a null <see cref="TerrainEntry"/> reference.</summary>
-        private static readonly TerrainEntryData BlankEntry = new("", null, null, 96f, new PropScatterSettings());
+        private static readonly TerrainEntryData BlankEntry = new("", null, null, null, 96f, new PropScatterSettings());
 
         /// <summary>
         /// Reads the table behind <paramref name="config"/>. Null means the resource is assigned but unreadable
@@ -208,7 +210,7 @@ namespace LastBreath.World
         {
             if (entry is null) return BlankEntry;
 
-            return new TerrainEntryData(entry.Layer, entry.Transitions, entry.Prop, entry.PropHeight, entry.ScatterSettings());
+            return new TerrainEntryData(entry.Layer, entry.Transitions, entry.SurfaceMaterial, entry.Prop, entry.PropHeight, entry.ScatterSettings(), entry.AtlasLayout);
         }
 
         /// <summary>
@@ -224,6 +226,7 @@ namespace LastBreath.World
 
             string layer = VariantString(obj, "Layer", "");
             Texture2D? transitions = VariantTexture(obj, "Transitions");
+            Material? surfaceMaterial = VariantMaterial(obj, "SurfaceMaterial");
             Texture2D? prop = VariantTexture(obj, "Prop");
             float propHeight = VariantFloat(obj, "PropHeight", 96f);
 
@@ -238,7 +241,8 @@ namespace LastBreath.World
                 TintJitter = VariantFloat(obj, "TintJitter", 0.08f)
             };
 
-            return new TerrainEntryData(layer, transitions, prop, propHeight, settings);
+            return new TerrainEntryData(layer, transitions, surfaceMaterial, prop, propHeight, settings,
+                (TransitionAtlasLayout)VariantInt(obj, nameof(TerrainEntry.AtlasLayout), (int)TransitionAtlasLayout.RowMajor));
         }
 
         private static string VariantString(GodotObject obj, string property, string fallback)
@@ -263,6 +267,12 @@ namespace LastBreath.World
         {
             Variant value = obj.Get(property);
             return value.VariantType == Variant.Type.Object ? value.As<Texture2D>() : null;
+        }
+
+        private static Material? VariantMaterial(GodotObject obj, string property)
+        {
+            Variant value = obj.Get(property);
+            return value.VariantType == Variant.Type.Object ? value.As<Material>() : null;
         }
 
         /// <summary>Children painted on by the owner: scene layers only, never a display built by a past pass.</summary>
@@ -319,7 +329,8 @@ namespace LastBreath.World
             TileMapLayer display = new()
             {
                 Name = $"{data.Name}Display",
-                TileSet = tileSet
+                TileSet = tileSet,
+                Material = entry.SurfaceMaterial
             };
 
             // Marked and left without an Owner: the editor neither saves it into the scene nor mistakes it for
@@ -329,7 +340,7 @@ namespace LastBreath.World
             // display built before it: the draw order of the terrains is the order of the entries.
             AddChild(display);
 
-            DualGridTerrainLayer painter = new() { Name = $"{data.Name}Painter" };
+            DualGridTerrainLayer painter = new() { Name = $"{data.Name}Painter", AtlasLayout = entry.AtlasLayout };
             // Bound before it enters the tree: its _Ready aligns the pair and paints what is already drawn.
             painter.Bind(data, display, DisplaySourceId);
             GeneratedTerrainNodes.Mark(painter);

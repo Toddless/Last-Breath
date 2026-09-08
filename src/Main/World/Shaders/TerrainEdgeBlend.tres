@@ -1,0 +1,23 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dhdn3w56edxi1"]
+
+[ext_resource type="Shader" uid="uid://b0l81rtu808av" path="res://World/Shaders/TerrainEdgeBlend.gdshader" id="1_shader"]
+
+[sub_resource type="FastNoiseLite" id="Noise_Edge"]
+noise_type = 3
+frequency = 0.0047
+
+[sub_resource type="NoiseTexture2D" id="Texture_Edge"]
+noise = SubResource("Noise_Edge")
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/edge_noise = SubResource("Texture_Edge")
+shader_parameter/blend_width = 19.16400091029
+shader_parameter/blend_low = 0.04
+shader_parameter/blend_high = 0.174000008265
+shader_parameter/outward_bias = 0.01200001244499998
+shader_parameter/edge_roughen = 0.06000000285
+shader_parameter/edge_noise_size = 310.44801322628
+shader_parameter/scatter_size = 47.1490020495775
+shader_parameter/scatter_strength = 1.0
+shader_parameter/scatter_softness = 0.00999999977648

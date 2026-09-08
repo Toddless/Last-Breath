@@ -5,9 +5,9 @@ namespace LastBreath.World
 
     /// <summary>
     /// One terrain of a <see cref="TerrainRoot"/>: the name of the invisible data layer it reads, the 4x4
-    /// transition sheet its ground is painted from, and — when a prop texture is given — the scatter that grows
-    /// over the same cells. Everything a new terrain needs is here, so adding one is a data edit plus an empty
-    /// layer, never a new scene.
+    /// transition sheet its ground is painted from, the optional material of that generated surface, and — when
+    /// a prop texture is given — the scatter that grows over the same cells. Everything a new terrain needs is
+    /// here, so adding one is a data edit plus an empty layer, never a new scene.
     /// </summary>
     [GlobalClass]
     public partial class TerrainEntry : Resource
@@ -15,8 +15,14 @@ namespace LastBreath.World
         /// <summary>Name of the child layer holding the painted cells. The match is exact, case included.</summary>
         [Export] public string Layer { get; set; } = "";
 
-        /// <summary>4x4 transition sheet, mask value indexing it row-major — the layout every sheet shares.</summary>
+        /// <summary>4x4 transition sheet using the selected atlas layout.</summary>
         [Export] public Texture2D? Transitions { get; set; }
+
+        /// <summary>RowMajor: masks 0–15; Grouped: corners, edges and remaining shapes in the authored sheet.</summary>
+        [Export] public TransitionAtlasLayout AtlasLayout { get; set; }
+
+        /// <summary>Material applied to the generated display layer, never to the painted data layer.</summary>
+        [Export] public Material? SurfaceMaterial { get; set; }
 
         /// <summary>Prop grown on every painted cell. Leave empty for a terrain that grows nothing.</summary>
         [ExportGroup("Scatter")]

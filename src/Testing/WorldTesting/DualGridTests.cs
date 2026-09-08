@@ -35,6 +35,47 @@ namespace LastBreathTest.WorldTesting
             (TerrainCorner.All, new GridCoordinate(3, 3))
         ];
 
+        [TestMethod]
+        public void GroupedAtlasMatchesAuthoredCornersForEveryWorldNeighbourhood()
+        {
+            int[,] authoredMasks =
+            {
+                { 1, 2, 8, 4 },
+                { 3, 10, 9, 6 },
+                { 12, 5, 7, 11 },
+                { 13, 14, 0, 15 }
+            };
+
+            var display = new GridCoordinate(-2, 3);
+            for (int row = 0; row < 4; row++)
+            {
+                for (int column = 0; column < 4; column++)
+                {
+                    var expected = (TerrainCorner)authoredMasks[row, column];
+                    var projection = new DualGridProjection();
+                    foreach (TerrainCorner corner in DualGridLayout.Corners)
+                    {
+                        if ((expected & corner) != 0)
+                            projection.SetCell(DualGridLayout.WorldCellOf(display, corner), true);
+                    }
+
+                    Assert.AreEqual(new GridCoordinate(column, row),
+                        DualGridAtlas.CoordinateOf(projection.MaskAt(display), TransitionAtlasLayout.Grouped),
+                        $"Authored tile ({column}, {row}) must represent mask {(int)expected}");
+                }
+            }
+        }
+
+        [TestMethod]
+        public void GroupedAtlasRejectsInvalidMasksAndUnknownLayouts()
+        {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(
+                () => DualGridAtlas.CoordinateOf((TerrainCorner)(-1), TransitionAtlasLayout.Grouped));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(
+                () => DualGridAtlas.CoordinateOf((TerrainCorner)16, TransitionAtlasLayout.Grouped));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(
+                () => DualGridAtlas.CoordinateOf(TerrainCorner.All, (TransitionAtlasLayout)99));
+        }
         private static IEnumerable<TerrainCorner> AllMasks() =>
             Enumerable.Range(0, DualGridAtlas.MaskCount).Select(index => (TerrainCorner)index);
 
