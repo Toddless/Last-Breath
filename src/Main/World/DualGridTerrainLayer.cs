@@ -18,8 +18,8 @@ namespace LastBreath.World
     /// is left untouched — cells written into it would be serialised on the next save.
     /// <para>
     /// Editor preview is disabled (2026-09-01): a live [Tool] instance keeps the editor from unloading the C#
-    /// assembly on rebuild (godotengine/godot#78513). Layout is verified by running the scene; restore the
-    /// preview by putting the [Tool] attribute back once the upstream fix lands.
+    /// assembly on rebuild (godotengine/godot#78513). Terrain textures are previewed by the GDScript editor
+    /// plugin; these C# components remain runtime-only.
     /// </para>
     /// </remarks>
     [GlobalClass]
