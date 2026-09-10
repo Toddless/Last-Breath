@@ -8,6 +8,7 @@ namespace LastBreath.Npc
     using Core.Enums;
     using Core.Events;
     using Core.Session;
+    using Core.World.Spaces;
     using Godot;
 
     /// <summary>
@@ -24,6 +25,7 @@ namespace LastBreath.Npc
 
         public bool TryStart(ISkirmishParticipant initiator, ISkirmishParticipant target)
         {
+            if (!NativeSpatialQuery.Instance.SharesSpace(initiator, target)) return false;
             if (!CanFight(initiator) || !CanFight(target)) return false;
             // группы сущности сравниваются по InstanceId вместо референса?
             // TODO: Проверить как сохраняются/загружаются группы нпс
@@ -75,7 +77,9 @@ namespace LastBreath.Npc
         {
             if (member.Group == null) return [member];
 
-            var squad = member.Group.GetEntitiesInGroup<ISkirmishParticipant>().Where(CanFight).ToList();
+            var squad = member.Group.GetEntitiesInGroup<ISkirmishParticipant>()
+                .Where(candidate => CanFight(candidate) && NativeSpatialQuery.Instance.SharesSpace(member, candidate))
+                .ToList();
             if (!squad.Contains(member)) squad.Add(member);
             return squad;
         }
@@ -103,7 +107,6 @@ namespace LastBreath.Npc
                 loser.IsFighting = false;
                 loser.DefeatInWorld();
                 // TODO: Анимация сожжения тела. Победители поджигают, пораженные горят
-
                 // The living burn undead bodies after a victory — deliberately not always.
                 if (winnersAreLiving && loser.Fraction == Fractions.Undead && _rnd.RandFloat() < _config.UndeadBurnChance)
                     loser.TryBurnBody();

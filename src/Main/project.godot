@@ -56,10 +56,6 @@ folder_colors={
 
 settings/test/flaky_check_enable=true
 
-[global_group]
-
-MovingObstacles=""
-
 [gui]
 
 timers/tooltip_delay_sec=0.1
@@ -161,4 +157,4 @@ locale/translations=PackedStringArray("res://Data/Shared/Localization/en.po", "r
 
 [rendering]
 
-environment/defaults/default_clear_color=Color(0.268665, 0.371091, 0.22191, 1)
+environment/defaults/default_clear_color=Color(0.29401833, 0.23795551, 0.16863683, 1)

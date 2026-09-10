@@ -80,7 +80,7 @@ namespace Battle.Source
             if (Entity == null) return;
             Entity.Effects.EffectAdded -= OnEffectAdded;
             var node = Entity as Node;
-            RemoveChild(node);
+            if (node?.GetParent() == this) RemoveChild(node);
             Entity = null;
         }
 
@@ -91,12 +91,15 @@ namespace Battle.Source
             Entity = entity;
             ClearToIdle(); // a spot freed by a death stays Unavailable otherwise — the newcomer would be untargetable
             if (body == null) return;
-            // Reparent, THEN zero the LOCAL position — both deferred, in that order. Setting the
-            // position now would be relative to the body's CURRENT parent (the world, origin 0,0),
-            // so a lagging reparent left a fighter attacking from (0,0) and dying there. After the
-            // deferred AddChild the local zero means the spot.
-            CallDeferred(Node.MethodName.AddChild, body);
-            body.SetDeferred(Node2D.PropertyName.Position, Vector2.Zero);
+            // Transfer outside physics callbacks. A released slot cancels its pending transfer.
+            Callable.From(() =>
+            {
+                if (Entity != entity || !IsInsideTree() || !IsInstanceValid(body) || body.IsQueuedForDeletion()) return;
+                body.GetParent()?.RemoveChild(body);
+                AddChild(body);
+                body.Position = Vector2.Zero;
+                body.Velocity = Vector2.Zero;
+            }).CallDeferred();
         }
 
         public bool HasEntityInit() => Entity != null;

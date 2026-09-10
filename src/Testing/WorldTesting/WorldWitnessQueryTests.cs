@@ -24,7 +24,7 @@ namespace LastBreathTest.WorldTesting
         {
             _bus = new GameEventBus();
             _registry = new NpcWorldRegistry();
-            _query = new WorldWitnessQuery(_registry, new FactionRelationService(FactionTestData.Create()), _bus);
+            _query = new WorldWitnessQuery(_registry, new FactionRelationService(FactionTestData.Create()), _bus, spatial: new TestSpatialQuery());
         }
 
         [TestMethod]
@@ -75,7 +75,9 @@ namespace LastBreathTest.WorldTesting
         [TestMethod]
         public void FledNpcIsAGuaranteedWitnessUntilTheBattleEnds()
         {
-            _bus.Publish(new EntityFledBattleEvent(FightableNpc(Fractions.Elf, Vector2.Zero)));
+            var fighter = FightableNpc(Fractions.Elf, Vector2.Zero);
+            _bus.Publish(new BattleInitializedEvent(new Mock<IPlayer>().Object, [fighter]));
+            _bus.Publish(new EntityFledBattleEvent(fighter));
 
             Assert.IsTrue(_query.HasWitness(new Vector2(99999, 99999), Radius));
 

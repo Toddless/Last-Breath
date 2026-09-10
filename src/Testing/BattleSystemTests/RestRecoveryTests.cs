@@ -116,7 +116,7 @@ namespace LastBreathTest.BattleSystemTests
             var clock = new SettableClock();
             var config = new Mock<IRecoveryConfigProvider>();
             config.SetupGet(c => c.Config).Returns(new RecoveryConfig());
-            return (new RestRecoveryService(config.Object, clock), clock);
+            return (new RestRecoveryService(config.Object, clock, new LastBreathTest.WorldTesting.TestSpatialQuery()), clock);
         }
 
         private static Mock<IFightable> CreateEntity(float health, float mana = 0f, float barrier = 0f)

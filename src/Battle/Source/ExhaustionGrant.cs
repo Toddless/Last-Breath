@@ -33,7 +33,6 @@ namespace Battle.Source
         public static void Attach(IFightable owner)
         {
             var provider = GameServiceProvider.Instance.GetService<ICombatRulesProvider>();
-            if (provider == null) return;
 
             Attach(owner, provider.Exhaustion);
         }

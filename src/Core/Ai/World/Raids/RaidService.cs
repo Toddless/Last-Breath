@@ -39,6 +39,8 @@ namespace Core.Ai.World.Raids
         private readonly IGameEventBus _gameEventBus;
         private readonly IGameMessageBus _messageBus;
         private readonly IRandomNumberGenerator _rnd;
+        private readonly Core.World.Spaces.ISpatialQuery _spatial;
+        private readonly Core.World.Spaces.BattleSiteRegistry? _battleSites;
         private RaidsData _config = new();
         private Fractions _raidFraction;
         private float _timeLeft;
@@ -53,7 +55,9 @@ namespace Core.Ai.World.Raids
             IPlayerAccessor playerAccessor,
             IGameEventBus gameEventBus,
             IGameMessageBus messageBus,
-            IRandomNumberGenerator? rnd = null)
+            IRandomNumberGenerator? rnd = null,
+            Core.World.Spaces.BattleSiteRegistry? battleSites = null,
+            Core.World.Spaces.ISpatialQuery? spatial = null)
         {
             _relations = relations;
             _sites = sites;
@@ -63,6 +67,8 @@ namespace Core.Ai.World.Raids
             _playerAccessor = playerAccessor;
             _gameEventBus = gameEventBus;
             _messageBus = messageBus;
+            _spatial = spatial ?? Core.World.Spaces.NativeSpatialQuery.Instance;
+            _battleSites = battleSites;
             _rnd = rnd ?? new DefaultRandomNumberGenerator();
         }
 
@@ -146,6 +152,7 @@ namespace Core.Ai.World.Raids
             float bestDistance = float.MaxValue;
             foreach (var site in _sites.All)
             {
+                if (!_spatial.SharesSpace(_playerAccessor.Player, site)) continue;
                 if (site.Fraction is not { } faction || site.NpcIds.Count == 0) continue;
                 if (!_relations.CanRaid(faction)) continue;
                 if (_relations.GetPlayerRelation(faction) != RelationLevel.Hatred) continue;
@@ -170,7 +177,7 @@ namespace Core.Ai.World.Raids
                 var jitter = new Vector2(
                     _rnd.RandFloatRange(-_config.SpawnJitter, _config.SpawnJitter),
                     _rnd.RandFloatRange(-_config.SpawnJitter, _config.SpawnJitter));
-                if (_spawner.Spawn(definition, site.Position + jitter) is not { } raider) continue;
+                if (_spawner.SpawnAt(definition, site.Position + jitter, site) is not { } raider) continue;
 
                 _population.ReserveOutsideLimit();
                 _raiders.Add(new ActiveRaider(raider, definition.NpcId));
@@ -191,7 +198,6 @@ namespace Core.Ai.World.Raids
 
             bool anyAlive = false;
             bool anyFighting = false;
-            var playerPosition = GetPlayerPosition();
             foreach (var raider in _raiders)
             {
                 if (!raider.Npc.IsAlive) continue;
@@ -202,14 +208,27 @@ namespace Core.Ai.World.Raids
                     continue;
                 }
 
-                if (_timeLeft > 0 && playerPosition is { } target && raider.Npc is IWorldAgent agent)
+                if (raider.Npc is not IWorldAgent agent) continue;
+                if (_timeLeft > 0 && GetPursuitTarget(raider.Npc) is { } target)
                     agent.MoveTo(target, _config.MoveSpeed);
+                else agent.StopMoving();
             }
 
             if (_timeLeft > 0 && anyAlive) return;
             if (anyFighting) return; // the last battle plays out before the raid wraps up
 
             EndRaid();
+        }
+
+        private Vector2? GetPursuitTarget(IFightableNpc raider)
+        {
+            if (_playerAccessor.Player is { IsFighting: true })
+            {
+                var site = _battleSites?.Current;
+                return site != null && site.SpaceId == _spatial.GetSpace(raider) ? site.Position : null;
+            }
+            return _playerAccessor.Player is { IsAlive: true }
+                && _spatial.SharesSpace(raider, _playerAccessor.Player) ? GetPlayerPosition() : null;
         }
 
         private void EndRaid()

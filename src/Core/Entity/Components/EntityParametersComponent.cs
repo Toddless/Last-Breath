@@ -106,7 +106,6 @@
         }
 
         public float GetValueForParameter(EntityParameter parameter) => this[parameter];
-
         public void Initialize(Func<EntityParameter, IReadOnlyList<IModifier>> getModifiers)
         {
             _getModifiersForParameter = getModifiers;
@@ -115,19 +114,12 @@
 
         public void AddModuleDecorator(EntityParameterModuleDecorator decorator) => _moduleManager.AddDecorator(decorator);
         public void RemoveModuleDecorator(string id, EntityParameter param) => _moduleManager.RemoveDecorator(id, param);
-
         public void AddChanceLuck(EntityParameter parameter, ChanceLuck luck) => ShiftChanceLuck(parameter, (int)luck);
-
         public void RemoveChanceLuck(EntityParameter parameter, ChanceLuck luck) => ShiftChanceLuck(parameter, -(int)luck);
-
         public ChanceLuck GetChanceLuck(EntityParameter parameter) => (ChanceLuck)Math.Sign(_chanceLuck.GetValueOrDefault(parameter));
-
         public void AddChanceDenial(EntityParameter parameter) => ShiftChanceDenial(parameter, 1);
-
         public void RemoveChanceDenial(EntityParameter parameter) => ShiftChanceDenial(parameter, -1);
-
         public bool IsChanceDenied(EntityParameter parameter) => _chanceDenials.GetValueOrDefault(parameter) > 0;
-
         /// <summary>The pool as it stands before any conversion touched it — deliberately blind to the mark
         /// that empties it, since this is the very measure a conversion takes of what it is taking over.</summary>
         public float GetUnconvertedValueForParameter(EntityParameter parameter) =>
@@ -148,12 +140,9 @@
         }
 
         private void ShiftChanceLuck(EntityParameter parameter, int delta) => _chanceLuck[parameter] = _chanceLuck.GetValueOrDefault(parameter) + delta;
-
         private void ShiftChanceDenial(EntityParameter parameter, int delta) =>
             _chanceDenials[parameter] = Math.Max(0, _chanceDenials.GetValueOrDefault(parameter) + delta);
-
         private IReadOnlyList<IModifier> ModifiersFor(EntityParameter parameter) => _getModifiersForParameter?.Invoke(parameter) ?? [];
-
         private float BaseFor(EntityParameter parameter) =>
             _parameterValues.TryGetValue(parameter, out (float Base, float Current) value) ? value.Base : DefaultBase(parameter);
 

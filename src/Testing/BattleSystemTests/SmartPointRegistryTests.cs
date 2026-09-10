@@ -9,7 +9,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void ClaimsTheNearestFreePointOfTheTag()
         {
-            var registry = new SmartPointRegistry();
+            var registry = new SmartPointRegistry(new LastBreathTest.WorldTesting.TestSpatialQuery());
             var far = new FakePoint(SmartPointTags.Campfire, new Vector2(500, 0));
             var near = new FakePoint(SmartPointTags.Campfire, new Vector2(100, 0));
             var otherTag = new FakePoint(SmartPointTags.Tent, new Vector2(10, 0));
@@ -25,7 +25,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void CapacityIsRespectedAndReleaseFreesTheSeat()
         {
-            var registry = new SmartPointRegistry();
+            var registry = new SmartPointRegistry(new LastBreathTest.WorldTesting.TestSpatialQuery());
             var point = new FakePoint(SmartPointTags.Campfire, Vector2.Zero);
             registry.Register(point);
 
@@ -39,7 +39,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void ReclaimIsIdempotentForTheHolder()
         {
-            var registry = new SmartPointRegistry();
+            var registry = new SmartPointRegistry(new LastBreathTest.WorldTesting.TestSpatialQuery());
             var point = new FakePoint(SmartPointTags.Campfire, Vector2.Zero);
             registry.Register(point);
 
@@ -52,7 +52,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void UnregisterDropsTheDanglingClaims()
         {
-            var registry = new SmartPointRegistry();
+            var registry = new SmartPointRegistry(new LastBreathTest.WorldTesting.TestSpatialQuery());
             var point = new FakePoint(SmartPointTags.OreVein, Vector2.Zero);
             var replacement = new FakePoint(SmartPointTags.OreVein, new Vector2(50, 0));
             registry.Register(point);
@@ -67,7 +67,7 @@ namespace LastBreathTest.BattleSystemTests
         [TestMethod]
         public void DeathInsuranceReleasesByClaimantId()
         {
-            var registry = new SmartPointRegistry();
+            var registry = new SmartPointRegistry(new LastBreathTest.WorldTesting.TestSpatialQuery());
             var point = new FakePoint(SmartPointTags.Tent, Vector2.Zero);
             registry.Register(point);
             registry.TryClaim(SmartPointTags.Tent, "npc-1", Vector2.Zero);

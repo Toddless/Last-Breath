@@ -1,11 +1,14 @@
 namespace LastBreath.Npc
 {
+    using System;
+    using Core;
     using Core.Ai.World.Skirmish;
     using Core.Entity;
     using Core.Enums;
     using Core.MessageBus;
     using Core.MessageBus.Messages;
     using Core.Services;
+    using Core.World.Spaces;
     using Godot;
 
     /// <summary>
@@ -25,8 +28,8 @@ namespace LastBreath.Npc
 
         public override void _Ready()
         {
-            _messages = Services.GameServiceProvider.Instance.GetService<IGameMessageBus>();
-            _playerAccessor = Services.GameServiceProvider.Instance.GetService<IPlayerAccessor>();
+            _messages = GameServiceProvider.Instance.GetService<IGameMessageBus>();
+            _playerAccessor = GameServiceProvider.Instance.GetService<IPlayerAccessor>();
             InputEvent += OnInputEvent;
         }
 
@@ -48,7 +51,7 @@ namespace LastBreath.Npc
             var message = new OpenDialogueMessage(npcId, parent?.InstanceId, parent?.Fraction ?? _faction);
             if (message.NpcId.Length == 0)
             {
-                Core.Tracker.TrackError("DialogueActor has no npc id: neither the parent INpc nor the _npcId export provides one");
+                Tracker.TrackError("DialogueActor has no npc id: neither the parent INpc nor the _npcId export provides one");
                 return;
             }
 
@@ -62,14 +65,16 @@ namespace LastBreath.Npc
             {
                 if (_messages != null) await _messages.PublishMessageAsync(message);
             }
-            catch (System.Exception exception)
+            catch (Exception exception)
             {
-                Core.Tracker.TrackError($"Opening dialogue for '{message.NpcId}' failed: {exception}");
+                Tracker.TrackError($"Opening dialogue for '{message.NpcId}' failed: {exception}");
             }
         }
 
         private bool PlayerInReach() =>
             _playerAccessor?.Player is Node2D player
+            && SpatialAccess.SharesSpace(this, player)
+            && SpatialAccess.CanReceiveInput(this)
             && player.GlobalPosition.DistanceTo(GlobalPosition) <= InteractDistance;
     }
 }

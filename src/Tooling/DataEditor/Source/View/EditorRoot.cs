@@ -49,6 +49,7 @@ namespace DataEditor.Source.View
 
         private const string CatalogRowFormat = "{0}{1}   ({2})";
         private const string RecordRowFormat = "{0}   ·  {1}";
+
         private const string ReadoutFormat =
             "{0}   —   {1} catalog(s) of {2} described, {3} file(s), {4} record(s), {5} note(s)";
 
@@ -177,11 +178,7 @@ namespace DataEditor.Source.View
         /// them findable.</summary>
         private Control RecordPane()
         {
-            var pane = new VBoxContainer
-            {
-                CustomMinimumSize = new Vector2(RecordPaneWidth, 0),
-                SizeFlagsVertical = SizeFlags.ExpandFill
-            };
+            var pane = new VBoxContainer { CustomMinimumSize = new Vector2(RecordPaneWidth, 0), SizeFlagsVertical = SizeFlags.ExpandFill };
 
             var actions = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
 
@@ -195,23 +192,16 @@ namespace DataEditor.Source.View
 
             pane.AddChild(actions);
             pane.AddChild(_recordList);
+            pane.SetStretchRatio(0.3f);
 
             return pane;
         }
 
         protected override Control BuildBody()
         {
-            _catalogList = new ItemList
-            {
-                CustomMinimumSize = new Vector2(CatalogPaneWidth, 0),
-                SizeFlagsVertical = SizeFlags.ExpandFill
-            };
+            _catalogList = new ItemList { CustomMinimumSize = new Vector2(CatalogPaneWidth, 0), SizeFlagsVertical = SizeFlags.ExpandFill };
 
-            _recordList = new ItemList
-            {
-                CustomMinimumSize = new Vector2(RecordPaneWidth, 0),
-                SizeFlagsVertical = SizeFlags.ExpandFill
-            };
+            _recordList = new ItemList { CustomMinimumSize = new Vector2(RecordPaneWidth, 0), SizeFlagsVertical = SizeFlags.ExpandFill };
 
             _inspector = new InspectorPanel { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             _preview = new PreviewPanel { SizeFlagsHorizontal = SizeFlags.ExpandFill };
@@ -224,11 +214,7 @@ namespace DataEditor.Source.View
 
             // The reading stands under the panel that edits, on a divide of its own: an author changes a
             // number and reads what the change did, and the two are one gesture.
-            var edited = new VSplitContainer
-            {
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                SizeFlagsVertical = SizeFlags.ExpandFill
-            };
+            var edited = new VSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
 
             body.AddChild(_catalogList);
             body.AddChild(right);
@@ -238,11 +224,7 @@ namespace DataEditor.Source.View
             // Two readings of the data under the same divide: what one record comes out as, and what the
             // whole run owes. Tabs and not panes of their own — an author does one at a time, and both at
             // once would leave neither enough of the window to be read in.
-            var read = new TabContainer
-            {
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                SizeFlagsVertical = SizeFlags.ExpandFill
-            };
+            var read = new TabContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
 
             ScrollContainer previewed = Scrolled(_preview);
             previewed.Name = PreviewTabName;
@@ -349,16 +331,10 @@ namespace DataEditor.Source.View
         {
             var row = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
 
-            row.AddChild(new Label
-            {
-                Text = name,
-                TooltipText = hint,
-                MouseFilter = MouseFilterEnum.Pass,
-                CustomMinimumSize = new Vector2(DialogNameWidth, 0)
-            });
+            row.AddChild(new Label { Text = name, TooltipText = hint, MouseFilter = MouseFilterEnum.Pass, CustomMinimumSize = new Vector2(DialogNameWidth, 0) });
 
             row.AddChild(value);
-
+            row.SetStretchRatio(0.7f);
             return row;
         }
 
@@ -381,16 +357,10 @@ namespace DataEditor.Source.View
 
             _idBox = new LineEdit { SizeFlagsHorizontal = SizeFlags.ExpandFill, PlaceholderText = IdName };
 
-            _fileBox = new LineEdit
-            {
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                PlaceholderText = FileName,
-                TooltipText = NewFileHint
-            };
+            _fileBox = new LineEdit { SizeFlagsHorizontal = SizeFlags.ExpandFill, PlaceholderText = FileName, TooltipText = NewFileHint };
 
             _sectionPicker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
             _filePicker = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-
             var file = new HBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
 
             file.AddChild(_fileBox);
@@ -557,10 +527,7 @@ namespace DataEditor.Source.View
 
             var panel = new LootTablePanel
             {
-                Layout = LootTableFormKeys.Layout,
-                References = _inspector.References,
-                Gestures = _inspector.Gestures,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill
+                Layout = LootTableFormKeys.Layout, References = _inspector.References, Gestures = _inspector.Gestures, SizeFlagsHorizontal = SizeFlags.ExpandFill
             };
 
             panel.Said += Report;
@@ -585,7 +552,7 @@ namespace DataEditor.Source.View
                 _checks.Texts = texts;
             }
             catch (Exception failure) when (failure is IOException or UnauthorizedAccessException
-                                               or FormatException or ArgumentException)
+                                                or FormatException or ArgumentException)
             {
                 _notes.Add(Text(NoTextsFormat, folder, failure.Message));
             }

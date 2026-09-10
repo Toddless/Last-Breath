@@ -19,14 +19,14 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_1mud6")
-_header = NodePath("Center/Panel/Margin/Layout/Header")
-_recipeTree = NodePath("Center/Panel/Margin/Layout/Body/RecipeTreePanel")
-_masteryRail = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail")
-_modeTabs = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ModeTabs")
-_preview = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/ItemPreviewPane")
-_requirements = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/RequirementsPanel")
-_pool = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn")
-_actionBar = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar")
+_header = NodePath("Center/MarginContainer/Panel/Margin/Layout/Header")
+_recipeTree = NodePath("Center/MarginContainer/Panel/Margin/Layout/Body/RecipeTreePanel")
+_masteryRail = NodePath("Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail")
+_modeTabs = NodePath("Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ModeTabs")
+_preview = NodePath("Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/ItemPreviewPane")
+_requirements = NodePath("Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/RequirementsPanel")
+_pool = NodePath("Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn")
+_actionBar = NodePath("Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar")
 
 [node name="Center" type="HBoxContainer" parent="." unique_id=145418391]
 layout_mode = 1
@@ -39,77 +39,84 @@ grow_vertical = 2
 mouse_filter = 2
 alignment = 2
 
-[node name="Panel" type="PanelContainer" parent="Center" unique_id=170032292]
+[node name="MarginContainer" type="MarginContainer" parent="Center" unique_id=489410335]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 0
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+
+[node name="Panel" type="PanelContainer" parent="Center/MarginContainer" unique_id=170032292]
 custom_minimum_size = Vector2(1460, 860)
 layout_mode = 2
 size_flags_vertical = 4
 theme_type_variation = &"UmbralWindowPanel"
 
-[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=402062292]
+[node name="Margin" type="MarginContainer" parent="Center/MarginContainer/Panel" unique_id=402062292]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="Layout" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=1834006548]
+[node name="Layout" type="VBoxContainer" parent="Center/MarginContainer/Panel/Margin" unique_id=1834006548]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Header" parent="Center/Panel/Margin/Layout" instance=ExtResource("2_whead")]
+[node name="Header" parent="Center/MarginContainer/Panel/Margin/Layout" unique_id=852876389 instance=ExtResource("2_whead")]
 layout_mode = 2
 
-[node name="Body" type="HBoxContainer" parent="Center/Panel/Margin/Layout" unique_id=438175333]
+[node name="Body" type="HBoxContainer" parent="Center/MarginContainer/Panel/Margin/Layout" unique_id=438175333]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 14
 
-[node name="RecipeTreePanel" parent="Center/Panel/Margin/Layout/Body" instance=ExtResource("3_rtree")]
+[node name="RecipeTreePanel" parent="Center/MarginContainer/Panel/Margin/Layout/Body" unique_id=864292342 instance=ExtResource("3_rtree")]
 layout_mode = 2
 
-[node name="RightPane" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body" unique_id=1099318909]
+[node name="RightPane" type="PanelContainer" parent="Center/MarginContainer/Panel/Margin/Layout/Body" unique_id=1099318909]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RightMargin" type="MarginContainer" parent="Center/Panel/Margin/Layout/Body/RightPane" unique_id=1839435543]
+[node name="RightMargin" type="MarginContainer" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane" unique_id=1839435543]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="RightLayout" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin" unique_id=411326286]
+[node name="RightLayout" type="VBoxContainer" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin" unique_id=411326286]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="MasteryRail" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" instance=ExtResource("4_mrail")]
+[node name="MasteryRail" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=1414477494 instance=ExtResource("4_mrail")]
 layout_mode = 2
 
-[node name="RailSeparator" type="HSeparator" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=1166940477]
+[node name="RailSeparator" type="HSeparator" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=1166940477]
 layout_mode = 2
 
-[node name="ModeTabs" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" instance=ExtResource("5_mtabs")]
+[node name="ModeTabs" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=1640544089 instance=ExtResource("5_mtabs")]
 layout_mode = 2
 
-[node name="TabsSeparator" type="HSeparator" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=2017367836]
+[node name="TabsSeparator" type="HSeparator" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=2017367836]
 layout_mode = 2
 
-[node name="Bench" type="HBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=12349981]
+[node name="Bench" type="HBoxContainer" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=12349981]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 22
 
-[node name="ItemPreviewPane" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench" instance=ExtResource("6_iprev")]
+[node name="ItemPreviewPane" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench" unique_id=1234157619 instance=ExtResource("6_iprev")]
 layout_mode = 2
 
-[node name="RequirementsPanel" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench" instance=ExtResource("7_reqsp")]
+[node name="RequirementsPanel" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench" unique_id=1943662828 instance=ExtResource("7_reqsp")]
 layout_mode = 2
 
-[node name="PoolColumn" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench" instance=ExtResource("8_poolc")]
+[node name="PoolColumn" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench" unique_id=1897596046 instance=ExtResource("8_poolc")]
 layout_mode = 2
 
-[node name="ActionSeparator" type="HSeparator" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=1565296213]
+[node name="ActionSeparator" type="HSeparator" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=1565296213]
 layout_mode = 2
 
-[node name="ActionBar" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" instance=ExtResource("9_abar")]
+[node name="ActionBar" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=885573634 instance=ExtResource("9_abar")]
 layout_mode = 2

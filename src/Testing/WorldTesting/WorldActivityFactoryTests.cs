@@ -126,7 +126,7 @@ namespace LastBreathTest.WorldTesting
 
             public void Unregister(ISmartPoint point) => _points.Remove(point);
 
-            public ISmartPoint? TryClaim(string tag, string claimantId, Vector2 from)
+            public ISmartPoint? TryClaim(string tag, string claimantId, Vector2 from, object? source = null)
             {
                 LastRequestedTag = tag;
                 return _points.Find(point => point.Tag == tag);

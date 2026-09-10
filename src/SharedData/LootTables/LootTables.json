@@ -119,12 +119,18 @@
                             "price": 640
                         },
                         {
-                            "augments": { "tier": 3, "rarity": "Legendary" },
-                            "price": 600
+                            "price": 600,
+                            "augments": {
+                                "tier": 3,
+                                "rarity": "Legendary"
+                            }
                         },
                         {
-                            "augments": { "tier": 2, "rarity": "Legendary" },
-                            "price": 430
+                            "price": 430,
+                            "augments": {
+                                "tier": 2,
+                                "rarity": "Legendary"
+                            }
                         }
                     ]
                 },
@@ -152,11 +158,11 @@
                             "price": 175
                         },
                         {
-                            "id": "Boots_Steel_Greaves",
+                            "id": "Boots_Steel",
                             "price": 150
                         },
                         {
-                            "id": "Body_Steel_Bastion",
+                            "id": "Body_Steel",
                             "price": 145
                         },
                         {
@@ -212,12 +218,18 @@
                             "price": 275
                         },
                         {
-                            "augments": { "tier": 2, "rarity": "Epic" },
-                            "price": 220
+                            "price": 220,
+                            "augments": {
+                                "tier": 2,
+                                "rarity": "Epic"
+                            }
                         },
                         {
-                            "augments": { "tier": 1, "rarity": "Legendary" },
-                            "price": 200
+                            "price": 200,
+                            "augments": {
+                                "tier": 1,
+                                "rarity": "Legendary"
+                            }
                         }
                     ]
                 },
@@ -269,24 +281,39 @@
                             "price": 105
                         },
                         {
-                            "augments": { "tier": 2, "rarity": "Rare" },
-                            "price": 105
+                            "price": 105,
+                            "augments": {
+                                "tier": 2,
+                                "rarity": "Rare"
+                            }
                         },
                         {
-                            "augments": { "tier": 1, "rarity": "Epic" },
-                            "price": 95
+                            "price": 95,
+                            "augments": {
+                                "tier": 1,
+                                "rarity": "Epic"
+                            }
                         },
                         {
-                            "augments": { "tier": 2, "rarity": "Uncommon" },
-                            "price": 75
+                            "price": 75,
+                            "augments": {
+                                "tier": 2,
+                                "rarity": "Uncommon"
+                            }
                         },
                         {
-                            "augments": { "tier": 1, "rarity": "Rare" },
-                            "price": 65
+                            "price": 65,
+                            "augments": {
+                                "tier": 1,
+                                "rarity": "Rare"
+                            }
                         },
                         {
-                            "augments": { "tier": 1, "rarity": "Uncommon" },
-                            "price": 50
+                            "price": 50,
+                            "augments": {
+                                "tier": 1,
+                                "rarity": "Uncommon"
+                            }
                         }
                     ]
                 },
@@ -1005,31 +1032,13 @@
                     "tier": 0,
                     "items": [
                         {
-                            "augments": { "tier": 3, "rarity": "Mythic" },
-                            "price": 650
+                            "price": 650,
+                            "augments": {
+                                "tier": 3,
+                                "rarity": "Mythic"
+                            }
                         }
                     ]
-                }
-            ]
-        },
-        {
-            "key": "npc_id",
-            "tiers": [
-                {
-                    "tier": 0,
-                    "items": []
-                },
-                {
-                    "tier": 1,
-                    "items": []
-                },
-                {
-                    "tier": 2,
-                    "items": []
-                },
-                {
-                    "tier": 3,
-                    "items": []
                 }
             ]
         }

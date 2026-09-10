@@ -17,7 +17,7 @@ namespace Core.Ai.World.SmartPoints
         /// point of this tag keeps it (idempotent re-claim). Null = everything is taken or no
         /// such points exist — callers degrade to resting at home.
         /// </summary>
-        ISmartPoint? TryClaim(string tag, string claimantId, Vector2 from);
+        ISmartPoint? TryClaim(string tag, string claimantId, Vector2 from, object? source = null);
 
         /// <summary>Drops every claim held by the claimant (activity exit, death insurance).</summary>
         void Release(string claimantId);

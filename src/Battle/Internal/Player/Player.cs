@@ -57,7 +57,6 @@ namespace Battle.Internal.Player
         private readonly Dictionary<Stance, IStance> _stances = [];
         private readonly RandomNumberGenerator _rnd = new();
         private readonly Core.Battle.DamageResolution.DamageResolutionChain _damageChain = Core.Battle.DamageResolution.DamageResolutionChain.CreateDefault();
-        private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
         private float _baseSpeed = 500;
         [Export] private AnimationsComponentBase? _animationsComponent;
@@ -183,7 +182,7 @@ namespace Battle.Internal.Player
                     _passiveTree.ContextSource.Detach(this);
                 }
 
-                Battle.Source.ExhaustionGrant.Detach(this);
+                ExhaustionGrant.Detach(this);
             }
 
             base.Dispose(disposing);
@@ -238,13 +237,11 @@ namespace Battle.Internal.Player
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
             CombatEvents = new CombatEventBus();
-            Battle.Source.ExhaustionGrant.Attach(this);
+            ExhaustionGrant.Attach(this);
             SetBaseValuesForParameters();
             ConfigureStateMachine();
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
-            // The barrier pool starts full like the other vitals: a Barrier stat that never
-            // filled itself read as "barrier does not work" (damage went straight to health).
             CurrentBarrier = Parameters.MaxBarrier;
             _stances.Add(Stance.Intelligence, new IntelligenceStance(this));
             _stances.Add(Stance.Strength, new StrengthStance(this));
@@ -265,10 +262,10 @@ namespace Battle.Internal.Player
                 return;
             }
 
-            if (!CanMove) return;
+            if (!CanMove || !Core.World.Spaces.SpatialAccess.CanReceiveInput(this)) return;
             // Typing is not walking: WASD is polled, so a focused text field (debug console,
             // future chat) would otherwise drive the character while the user types.
-            if (GetViewport().GuiGetFocusOwner() is LineEdit or TextEdit)
+            if (Core.World.Spaces.SpatialAccess.HasTextFocus(this))
             {
                 Velocity = Vector2.Zero;
                 return;
@@ -480,12 +477,12 @@ namespace Battle.Internal.Player
                 {
                     Animations.PlayAnimation($"Idle_{_direction}");
                     CanMove = false;
-                    _lastPosition = Position;
+
                 })
                 .OnExit(() =>
                 {
                     CanMove = true;
-                    Position = _lastPosition;
+
                 })
                 .Permit(Trigger.Idle, State.Idle)
                 .Permit(Trigger.Die, State.Dead)

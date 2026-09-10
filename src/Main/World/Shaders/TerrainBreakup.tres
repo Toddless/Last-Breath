@@ -2,35 +2,26 @@
 
 [ext_resource type="Shader" uid="uid://baai8ltcgc55h" path="res://World/Shaders/TerrainBreakup.gdshader" id="1_shader"]
 
-[sub_resource type="FastNoiseLite" id="Noise_Grain"]
-frequency = 0.0027
-
-[sub_resource type="NoiseTexture2D" id="Tex_Grain"]
-width = 1000
-height = 1000
-noise = SubResource("Noise_Grain")
-seamless = true
-
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_5f5v3"]
-frequency = 0.0035
+frequency = 0.0013
+offset = Vector3(556.39, 165.41, 0)
 fractal_lacunarity = 1.765
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_fx85w"]
-width = 1000
-height = 1000
+width = 1024
+height = 1024
 noise = SubResource("FastNoiseLite_5f5v3")
 seamless = true
-seamless_blend_skirt = 0.748
+seamless_blend_skirt = 0.425
 
 [resource]
 shader = ExtResource("1_shader")
 shader_parameter/macro_noise = SubResource("NoiseTexture2D_fx85w")
-shader_parameter/grain_noise = SubResource("Tex_Grain")
 shader_parameter/show_noise = false
-shader_parameter/macro_size = 1462.6270633947825
-shader_parameter/macro_strength = 0.5
-shader_parameter/tint_strength = 0.5
-shader_parameter/warm_tint = Color(0.98962396, 0.6379221, 0.47772384, 1)
-shader_parameter/cool_tint = Color(0.6201009, 0.72513396, 1, 1)
+shader_parameter/macro_size = 1300.00005567
+shader_parameter/macro_strength = 0.190000009025
+shader_parameter/tint_strength = 0.314000014915
+shader_parameter/warm_tint = Color(0.99385124, 0.7633583, 0.65990067, 1)
+shader_parameter/cool_tint = Color(0.03455961, 0.00016345203, 0.42244583, 1)
 shader_parameter/grain_size = 96.0
 shader_parameter/grain_strength = 0.07

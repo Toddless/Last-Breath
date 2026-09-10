@@ -16,11 +16,15 @@ namespace Battle.Internal
         private const float ContactRadius = 120f;
 
         private IGameEventBus? _gameEventBus;
+        private Core.World.Spaces.BattleSiteRegistry? _sites;
+        public System.Guid BattleId { get; } = System.Guid.NewGuid();
         private float _pulseCooldown = NoisePulseSeconds;
 
-        public void Setup(IGameEventBus gameEventBus)
+        public void Setup(IGameEventBus gameEventBus, Core.World.Spaces.BattleSiteRegistry sites)
         {
             _gameEventBus = gameEventBus;
+            _sites = sites;
+            sites.Register(new Core.World.Spaces.BattleSite(BattleId, Core.World.Spaces.NativeSpatialQuery.Instance.GetSpace(this), GlobalPosition));
             var area = new Area2D { CollisionMask = uint.MaxValue };
             var shape = new CollisionShape2D { Shape = new CircleShape2D { Radius = ContactRadius } };
             area.AddChild(shape);
@@ -30,6 +34,14 @@ namespace Battle.Internal
             CallDeferred(Node.MethodName.AddChild, area);
         }
 
+        public void Close()
+        {
+            _sites?.Remove(BattleId);
+            _gameEventBus = null;
+        }
+
+        public override void _ExitTree() => Close();
+
         public override void _Process(double delta)
         {
             if (_gameEventBus == null) return;
@@ -38,7 +50,7 @@ namespace Battle.Internal
 
             _pulseCooldown = NoisePulseSeconds;
             // The clash stays audible for its whole duration: latecomers in hearing range keep coming.
-            _gameEventBus.Publish(new WorldStimulusEvent(new Stimulus(StimulusType.Noise, GlobalPosition)));
+            _gameEventBus.Publish(new WorldStimulusEvent(new Stimulus(StimulusType.Noise, GlobalPosition, Core.World.Spaces.NativeSpatialQuery.Instance.GetSpace(this))));
         }
 
         private void OnBodyEntered(Node2D body)
@@ -47,8 +59,8 @@ namespace Battle.Internal
             if (body is not BaseNpc npc || !npc.IsAlive || npc.IsFighting) return;
             if (!npc.ConsidersPlayerAnEnemy()) return;
 
-            npc.StopMoving(); // records the world position the fighter returns to after the battle
-            _gameEventBus.Publish(new BattleJoinRequestEvent(npc, AlliedWithPlayer: false));
+            npc.StopMoving(); // BattleContext captures placement when admission succeeds.
+            _gameEventBus.Publish(new BattleJoinRequestEvent(npc, AlliedWithPlayer: false, BattleId: BattleId));
         }
     }
 }

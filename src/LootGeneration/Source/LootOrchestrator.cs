@@ -33,6 +33,7 @@ namespace LootGeneration.Source
         private Vector2 _startPosition = new(850f, 450f);
         private float _animationDurationScale = 1f;
         private Node2D? _floor;
+        private Node2D? _battleFloor;
         private bool _battleActive;
 
         public LootOrchestrator(ILootGenerationService lootGenerationService, IGameEventBus gameEventBus, RandomNumberGenerator rnd, IGameServiceProvider provider)
@@ -108,6 +109,7 @@ namespace LootGeneration.Source
             // threw mid-loop, skipping Clear() — the poisoned cache (nodes already in the tree,
             // later freed) then failed every subsequent drop and loot stopped falling entirely.
             var pending = new List<ItemOnGround>(_itemOnGroundsCache);
+            var floor = _battleFloor ?? _floor;
             _itemOnGroundsCache.Clear();
             try
             {
@@ -120,7 +122,7 @@ namespace LootGeneration.Source
                 foreach (var item in pending)
                 {
                     if (!GodotObject.IsInstanceValid(item)) continue;
-                    AddToFloor(item);
+                    AddToFloor(item, floor);
                     _gameEventBus.Publish(new ItemDroppedEvent(item));
                     await item.AnimateAsync();
                 }
@@ -135,7 +137,10 @@ namespace LootGeneration.Source
         {
             _battleActive = true;
             if (obj.Player is CharacterBody2D player)
+            {
+                _battleFloor = player.GetParent() as Node2D;
                 _startPosition = player.Position;
+            }
             _animationDurationScale = 1f;
         }
 
@@ -187,9 +192,9 @@ namespace LootGeneration.Source
             return onGround;
         }
 
-        private void AddToFloor(ItemOnGround item)
+        private void AddToFloor(ItemOnGround item, Node2D? floor = null)
         {
-            _floor?.AddChild(item);
+            (floor ?? _floor)?.AddChild(item);
             _itemsOnGround.Add(item);
             // A drop can leave the tree without going through TryPickup (scene change,
             // debug frees) — TreeExited keeps the pickable list honest either way.
@@ -242,12 +247,13 @@ namespace LootGeneration.Source
             if (clicked.Category is not (LootCategory.Resource or LootCategory.Recipe)) return [clicked];
 
             var batch = new List<ItemOnGround> { clicked };
-            batch.AddRange(_itemsOnGround.Where(item => item != clicked && item.Category == clicked.Category));
+            batch.AddRange(_itemsOnGround.Where(item => item != clicked && item.Category == clicked.Category && Core.World.Spaces.SpatialAccess.SharesSpace(clicked, item)));
             return batch;
         }
 
         private bool PlayerInReach(Node2D item) =>
             _provider.GetServices<IPlayerAccessor>().FirstOrDefault()?.Player is Node2D player
+            && Core.World.Spaces.SpatialAccess.SharesSpace(player, item)
             && player.GlobalPosition.DistanceTo(item.GlobalPosition) <= PickupRange;
 
         /// <summary>Takes drops out of the game for good: a lost/fled battle leaves nothing behind, a load

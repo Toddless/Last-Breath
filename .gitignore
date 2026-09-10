@@ -3,6 +3,7 @@
 /android/
 ./temp
 .claude/
+.codex/
 
 # User-specific files
 *.rsuser

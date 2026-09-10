@@ -56,7 +56,7 @@ namespace Core.Ai.World.Activities
         private Vector2? ResolveSpot(WorldBrain brain)
         {
             if (context.Points == null || context.Self == null) return null;
-            return context.Points.TryClaim(tag, context.Self.InstanceId, brain.Agent.Position)?.Position;
+            return context.Points.TryClaim(tag, context.Self.InstanceId, brain.Agent.Position, context.Self)?.Position;
         }
     }
 }

@@ -38,6 +38,7 @@ namespace Core.Ai.World.Activities
             float best = float.MaxValue;
             foreach (var candidate in context.Npcs.All)
             {
+                if (!context.Spatial.SharesSpace(context.Self, candidate)) continue;
                 if (ReferenceEquals(candidate, context.Self) || !candidate.IsAlive || candidate.IsFighting) continue;
                 if (!context.Relations.IsHostile(context.Self.Fraction, candidate.Fraction)) continue;
                 // The leash anchors hunting to home: prey beyond it would only ping-pong the chase.

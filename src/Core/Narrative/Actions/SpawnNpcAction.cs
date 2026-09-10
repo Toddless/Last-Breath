@@ -59,9 +59,9 @@ namespace Core.Narrative.Actions
                 return;
             }
 
-            if (ResolvePosition() is not { } position) return;
+            if (ResolvePosition() is not { } site) return;
 
-            Spawn(position);
+            Spawn(site);
         }
 
         /// <summary>Guarded like every other spawn site in the project: rolling a definition and
@@ -69,7 +69,7 @@ namespace Core.Narrative.Actions
         /// a scene that fails to load). Neither the quest log nor the dialogue service catches, so
         /// an escaping exception would abandon the remaining actions of the same entry and leave
         /// the stage half applied.</summary>
-        private void Spawn(Vector2 position)
+        private void Spawn(IRaidSpawnSite site)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace Core.Narrative.Actions
                 if (modifierIds != null)
                     definition = definition with { Modifiers = modifierIds.Select(modifierProvider.GetModifier).ToList() };
 
-                if (spawner.Spawn(definition, position) is not { } spawned)
+                if (spawner.SpawnAt(definition, site.Position, site) is not { } spawned)
                 {
                     Tracker.TrackError($"SpawnNpc action '{npcId}': no world to spawn into", this);
                     return;
@@ -111,7 +111,7 @@ namespace Core.Narrative.Actions
         /// sites; one that does not (a point outside that contract) cannot be addressed by data.
         /// A miss names every point the scene did register: the id is authored by hand in two places
         /// at once, and a singular against a plural is the whole of the mistake.</summary>
-        private Vector2? ResolvePosition()
+        private IRaidSpawnSite? ResolvePosition()
         {
             var point = points.All.FirstOrDefault(entry => entry.PointId == pointId);
             if (point == null)
@@ -126,7 +126,7 @@ namespace Core.Narrative.Actions
                 return null;
             }
 
-            return site.Position;
+            return site;
         }
 
         /// <summary>The ids the scene registered, for the refusal above — parenthesised there, because

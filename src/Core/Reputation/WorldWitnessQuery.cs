@@ -20,10 +20,15 @@ namespace Core.Reputation
         private readonly IFactionRelationService _relations;
         private readonly HashSet<string> _fled = [];
         private Vector2? _battleSite;
+        private ulong _battleSpace;
+        private readonly Core.World.Spaces.ISpatialQuery _spatial;
+        private readonly Core.Services.IPlayerAccessor? _player;
 
-        public WorldWitnessQuery(INpcWorldRegistry registry, IFactionRelationService relations, IGameEventBus gameEventBus)
+        public WorldWitnessQuery(INpcWorldRegistry registry, IFactionRelationService relations, IGameEventBus gameEventBus, Core.Services.IPlayerAccessor? player = null, Core.World.Spaces.ISpatialQuery? spatial = null)
         {
             _registry = registry;
+            _spatial = spatial ?? Core.World.Spaces.NativeSpatialQuery.Instance;
+            _player = player;
             _relations = relations;
             gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleInitialized);
             gameEventBus.Subscribe<EntityFledBattleEvent>(OnEntityFled);
@@ -35,8 +40,11 @@ namespace Core.Reputation
             if (_fled.Count > 0) return true;
 
             var anchor = _battleSite ?? position;
+            ulong space = _battleSite != null ? _battleSpace : _spatial.GetSpace(_player?.Player);
+            if (space == 0) return false;
             foreach (var npc in _registry.All)
             {
+                if (_spatial.GetSpace(npc) != space) continue;
                 if (npc is not { IsAlive: true, IsFighting: false }) continue;
                 if (npc.InstanceId == excludeInstanceId) continue;
                 if (!_relations.HasReputation(npc.Fraction)) continue;
@@ -49,11 +57,13 @@ namespace Core.Reputation
         private void OnBattleInitialized(BattleInitializedEvent evnt)
         {
             _fled.Clear();
-            _battleSite = evnt.Entities.OfType<INpc>().FirstOrDefault()?.Position;
+            _battleSite = evnt.Player is Node2D playerNode ? playerNode.GlobalPosition : evnt.Entities.OfType<INpc>().FirstOrDefault()?.Position;
+            _battleSpace = _spatial.GetSpace(evnt.Player);
         }
 
         private void OnEntityFled(EntityFledBattleEvent evnt)
         {
+            if (_battleSite == null || !_spatial.SharesSpace(evnt.Entity, _player?.Player)) return;
             if (evnt.Entity is INpc npc && _relations.HasReputation(npc.Fraction))
                 _fled.Add(npc.InstanceId);
         }
@@ -62,6 +72,7 @@ namespace Core.Reputation
         {
             _fled.Clear();
             _battleSite = null;
+            _battleSpace = 0;
         }
     }
 }

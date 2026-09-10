@@ -4,6 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://ce4ogekincvq4" path="res://Data/Shared/Assets/Tiles/Dirt_Transitions.png" id="2_2hfeq"]
 [ext_resource type="Script" uid="uid://de2g0a07260y5" path="res://World/TerrainRootConfig.cs" id="2_dr406"]
 [ext_resource type="Texture2D" uid="uid://bfofb3n2gkiex" path="res://Data/Shared/Assets/Tiles/Square_Tiles_Transitions.png" id="3_nobv2"]
+[ext_resource type="Shader" uid="uid://b0l81rtu808av" path="res://World/Shaders/TerrainEdgeBlend.gdshader" id="3_xlgj0"]
+[ext_resource type="Texture2D" uid="uid://drpoyp7xeuyeu" path="res://Data/Shared/Assets/Tiles/Stone_Road_Transitions.png" id="5_s8gpg"]
 
 [sub_resource type="Resource" id="Resource_2hfeq"]
 script = ExtResource("1_2ibnj")
@@ -12,14 +14,42 @@ Transitions = ExtResource("2_2hfeq")
 AtlasLayout = 1
 metadata/_custom_type_script = "uid://bl6rh3e3m0370"
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_iqrg2"]
+noise_type = 3
+frequency = 0.004
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_a3v5j"]
+noise = SubResource("FastNoiseLite_iqrg2")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xcdpj"]
+shader = ExtResource("3_xlgj0")
+shader_parameter/edge_noise = SubResource("NoiseTexture2D_a3v5j")
+shader_parameter/blend_width = 24.0
+shader_parameter/blend_low = 0.04
+shader_parameter/blend_high = 0.82
+shader_parameter/outward_bias = 0.04
+shader_parameter/edge_roughen = 0.05
+shader_parameter/edge_noise_size = 824.9050376629875
+shader_parameter/scatter_size = 18.0
+shader_parameter/scatter_strength = 0.1600000076
+shader_parameter/scatter_softness = 0.12
+
 [sub_resource type="Resource" id="Resource_bty6m"]
 script = ExtResource("1_2ibnj")
 Layer = "Square"
 Transitions = ExtResource("3_nobv2")
 AtlasLayout = 1
+SurfaceMaterial = SubResource("ShaderMaterial_xcdpj")
+metadata/_custom_type_script = "uid://bl6rh3e3m0370"
+
+[sub_resource type="Resource" id="Resource_a3v5j"]
+script = ExtResource("1_2ibnj")
+Layer = "Stone"
+Transitions = ExtResource("5_s8gpg")
+AtlasLayout = 1
 metadata/_custom_type_script = "uid://bl6rh3e3m0370"
 
 [resource]
 script = ExtResource("2_dr406")
-Entries = Array[ExtResource("1_2ibnj")]([SubResource("Resource_2hfeq"), SubResource("Resource_bty6m")])
+Entries = Array[ExtResource("1_2ibnj")]([SubResource("Resource_2hfeq"), SubResource("Resource_bty6m"), SubResource("Resource_a3v5j")])
 metadata/_custom_type_script = "uid://de2g0a07260y5"

@@ -60,18 +60,18 @@
                         {
                             "id": "Flatter",
                             "key": "Dlg_Bandit_Veteran_Greeting_Flatter",
-                            "oncePerGame": true,
-                            "speechCheck": {
-                                "difficulty": 2,
-                                "failNext": "FlatterBad"
-                            },
                             "actions": [
                                 {
                                     "type": "Deed",
                                     "deedId": "Deed_Flattery"
                                 }
                             ],
-                            "next": "FlatterGood"
+                            "next": "FlatterGood",
+                            "oncePerGame": true,
+                            "speechCheck": {
+                                "difficulty": 2,
+                                "failNext": "FlatterBad"
+                            }
                         },
                         {
                             "id": "Leave",

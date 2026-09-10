@@ -58,7 +58,6 @@ namespace LastBreath.Player
         private readonly Dictionary<Stance, IStance> _stances = [];
         private readonly RandomNumberGenerator _rnd = new();
         private readonly DamageResolutionChain _damageChain = DamageResolutionChain.CreateDefault();
-        private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
         [Export] private AnimationsComponentBase? _animationsComponent;
         [Export] private Area2D? _interactionArea;
@@ -220,7 +219,7 @@ namespace LastBreath.Player
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
             CombatEvents = new CombatEventBus();
-            Battle.Source.ExhaustionGrant.Attach(this);
+            ExhaustionGrant.Attach(this);
             SetBaseValuesForParameters();
             ConfigureStateMachine();
             CurrentHealth = Parameters.MaxHealth;
@@ -273,7 +272,7 @@ namespace LastBreath.Player
                 return;
             }
 
-            if (!CanMove) return;
+            if (!CanMove || !Core.World.Spaces.SpatialAccess.CanReceiveInput(this)) return;
             // Blocking windows (dialogue, trade) freeze walking: movement is polled here, so
             // without this gate the player strolls away mid-conversation. The windows declare
             // IWindow.BlocksMovement; the player only asks the manager. Fail-open — a project
@@ -286,7 +285,7 @@ namespace LastBreath.Player
 
             // Typing is not walking: WASD is polled, so a focused text field (debug console,
             // future chat) would otherwise drive the character while the user types.
-            if (GetViewport().GuiGetFocusOwner() is LineEdit or TextEdit)
+            if (Core.World.Spaces.SpatialAccess.HasTextFocus(this))
             {
                 Velocity = Vector2.Zero;
                 return;
@@ -503,12 +502,12 @@ namespace LastBreath.Player
                 {
                     Animations.PlayAnimation($"Idle_{_direction}");
                     CanMove = false;
-                    _lastPosition = Position;
+
                 })
                 .OnExit(() =>
                 {
                     CanMove = true;
-                    Position = _lastPosition;
+
                 })
                 .Permit(Trigger.Idle, State.Idle)
                 .Permit(Trigger.Die, State.Dead)

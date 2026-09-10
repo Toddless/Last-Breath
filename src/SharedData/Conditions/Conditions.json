@@ -10,7 +10,8 @@
             "id": "Health_Below_50",
             "type": "ResourceThreshold",
             "resource": "Health",
-            "value": 0.5
+            "value": 0.5,
+            "negate": false
         },
         {
             "id": "Health_Above_70",
@@ -66,22 +67,31 @@
         {
             "id": "Under_Control",
             "type": "Status",
-            "statuses": [ "Control" ]
+            "statuses": [
+                "Control"
+            ]
         },
         {
             "id": "Stunned_Or_Frozen",
             "type": "Status",
-            "statuses": [ "Stun", "Freeze" ]
+            "statuses": [
+                "Stun",
+                "Freeze"
+            ]
         },
         {
             "id": "Damaged_Over_Turns",
             "type": "Status",
-            "statuses": [ "DamageOverTime" ]
+            "statuses": [
+                "DamageOverTime"
+            ]
         },
         {
             "id": "Clean_Of_Debuffs",
             "type": "Status",
-            "statuses": [ "Debuff" ],
+            "statuses": [
+                "Debuff"
+            ],
             "negate": true
         },
         {
@@ -155,32 +165,44 @@
         {
             "id": "Target_Under_Control",
             "type": "TargetStatus",
-            "statuses": [ "Control" ]
+            "statuses": [
+                "Control"
+            ]
         },
         {
             "id": "Target_Bleeding",
             "type": "TargetStatus",
-            "statuses": [ "Bleed" ]
+            "statuses": [
+                "Bleed"
+            ]
         },
         {
             "id": "Target_Poisoned",
             "type": "TargetStatus",
-            "statuses": [ "Poison" ]
+            "statuses": [
+                "Poison"
+            ]
         },
         {
             "id": "Target_Burning",
             "type": "TargetStatus",
-            "statuses": [ "Burning" ]
+            "statuses": [
+                "Burning"
+            ]
         },
         {
             "id": "Target_Damaged_Over_Turns",
             "type": "TargetStatus",
-            "statuses": [ "DamageOverTime" ]
+            "statuses": [
+                "DamageOverTime"
+            ]
         },
         {
             "id": "Target_Clean_Of_Debuffs",
             "type": "TargetStatus",
-            "statuses": [ "Debuff" ],
+            "statuses": [
+                "Debuff"
+            ],
             "negate": true
         },
         {

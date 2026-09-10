@@ -9,16 +9,13 @@ namespace Core.Constants
     /// </summary>
     public static class AssetPaths
     {
-        public const string Icons = "res://Data/Shared/Assets/Icons/";
-        public const string Items = "res://Data/Shared/Assets/Items/";
-        public const string Resources = "res://Data/Shared/Assets/Resources/";
-        public const string UI = "res://Data/Shared/Assets/UI/";
+        private const string Icons = "res://Data/Shared/Assets/Icons/";
+        private const string Items = "res://Data/Shared/Assets/Items/";
+        private const string Resources = "res://Data/Shared/Assets/Resources/";
+        private const string UI = "res://Data/Shared/Assets/UI/";
 
         // Recipes share one icon (a scroll) regardless of the crafted result.
         public const string RecipeIcon = $"{Icons}Recipe_Scroll.png";
-
-        // Inventory-slot chrome: one background per rarity plus a single neutral frame overlay.
-        public const string SlotFrame = $"{UI}Slot_Frame.png";
 
         public static string AbilityIcon(string abilityId) => $"{Icons}{abilityId}.png";
 

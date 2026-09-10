@@ -250,7 +250,7 @@ namespace LastBreathTest.ReputationSimulation
         private sealed class SimRaidService(
             IFactionRelationService relations, IRaidSpawnRegistry sites, INpcProvider provider, INpcWorldSpawner spawner,
             INpcPopulationService population, IPlayerAccessor accessor, GameEventBus bus, Core.MessageBus.IGameMessageBus messages, IRandomNumberGenerator rnd)
-            : RaidService(relations, sites, provider, spawner, population, accessor, bus, messages, rnd)
+            : RaidService(relations, sites, provider, spawner, population, accessor, bus, messages, rnd, spatial: new LastBreathTest.WorldTesting.TestSpatialQuery())
         {
             protected override Vector2? GetPlayerPosition() => Vector2.Zero;
         }

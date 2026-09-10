@@ -6,8 +6,9 @@ namespace Core.Ai.World.Recovery
     using Godot;
     using Time;
 
-    public class RestRecoveryService(IRecoveryConfigProvider configProvider, IWorldClock? clock = null) : IRestRecoveryService
+    public class RestRecoveryService(IRecoveryConfigProvider configProvider, IWorldClock? clock = null, Core.World.Spaces.ISpatialQuery? spatial = null) : IRestRecoveryService
     {
+        private readonly Core.World.Spaces.ISpatialQuery _spatial = spatial ?? Core.World.Spaces.NativeSpatialQuery.Instance;
         private readonly record struct Zone(object Owner, Func<Vector2> Position, float Radius, Func<IFightable, bool>? CanRest);
 
         private readonly record struct Participant(IFightable Entity, Func<Vector2> Position);
@@ -59,7 +60,7 @@ namespace Core.Ai.World.Recovery
         private bool InsideAnyZone(IFightable entity, Vector2 position)
         {
             foreach (var zone in _zones)
-                if (position.DistanceTo(zone.Position()) <= zone.Radius && zone.CanRest?.Invoke(entity) != false)
+                if (_spatial.SharesSpace(entity, zone.Owner) && position.DistanceTo(zone.Position()) <= zone.Radius && zone.CanRest?.Invoke(entity) != false)
                     return true;
             return false;
         }

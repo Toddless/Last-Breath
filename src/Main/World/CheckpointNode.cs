@@ -2,6 +2,7 @@ namespace LastBreath.World
 {
     using Core.Services;
     using Core.Views.UI;
+    using Core.World.Spaces;
     using Godot;
     using SaveLoadWindow = UI.SaveLoadWindow;
 
@@ -34,6 +35,6 @@ namespace LastBreath.World
         }
 
         private bool IsPlayerWithin(float distance) =>
-            _playerAccessor?.Player is Node2D playerNode && GlobalPosition.DistanceTo(playerNode.GlobalPosition) <= distance;
+            _playerAccessor?.Player is Node2D playerNode && SpatialAccess.SharesSpace(this, playerNode) && GlobalPosition.DistanceTo(playerNode.GlobalPosition) <= distance;
     }
 }

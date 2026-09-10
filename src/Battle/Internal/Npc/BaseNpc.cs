@@ -14,6 +14,8 @@ namespace Battle.Internal.Npc
     using Core.Ai.World.SmartPoints;
     using Core.Ai.World.Time;
     using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Battle.Skills;
     using Core.Context;
     using Core.Data;
     using Core.Data.NpcData;
@@ -24,10 +26,12 @@ namespace Battle.Internal.Npc
     using Core.Enums;
     using Core.Events;
     using Core.Items;
+    using Core.Items.Grants;
     using Core.Modifiers;
     using Core.Modifiers.Context;
     using Core.Narrative.Facts;
     using Core.Services;
+    using Core.World.Spaces;
     using Godot;
     using Source;
     using Source.Presentation;
@@ -280,6 +284,7 @@ namespace Battle.Internal.Npc
 
             if (Fraction is not (Fractions.Human or Fractions.Dwarf or Fractions.Elf)) return;
             if (_playerAccessor?.Player is not Player.Player { IsAlive: false, Lifecycle: { } lifecycle } corpse) return;
+            if (!SpatialAccess.SharesSpace(this, corpse)) return;
             if (GlobalPosition.DistanceTo(corpse.GlobalPosition) > lifecycle.Config.BurnRadius) return;
 
             lifecycle.TryBurnRoll(InstanceId); // the player reacts to the Burned event itself
@@ -348,7 +353,7 @@ namespace Battle.Internal.Npc
         {
             var catalog = provider.TryGet<INpcBuffProvider>();
             if (catalog == null) return;
-            NpcModifiers.UseBuffs(new NpcBuffBinder(catalog, provider.TryGet<Core.Items.Grants.IGrantFactory>()));
+            NpcModifiers.UseBuffs(new NpcBuffBinder(catalog, provider.TryGet<IGrantFactory>()));
         }
 
         /// <summary>Per-NPC art from the shared visual library; no entry — the scene's placeholder frames
@@ -379,7 +384,7 @@ namespace Battle.Internal.Npc
         private void AttachAuthoredPassives(IReadOnlyList<NpcPassiveData> passives, IGameServiceProvider provider)
         {
             if (passives.Count == 0) return;
-            var skills = provider.GetService<Core.Battle.Skills.ISkillProvider>();
+            var skills = provider.GetService<ISkillProvider>();
 
             foreach (var entry in passives)
             {
@@ -415,7 +420,7 @@ namespace Battle.Internal.Npc
             foreach (var learned in AbilityBook.AllAbilities)
                 AbilityBook.Forget(learned.InstanceId);
 
-            var abilities = provider.GetService<Core.Battle.Abilities.IAbilityProvider>();
+            var abilities = provider.GetService<IAbilityProvider>();
             foreach (string abilityId in stage.Abilities)
             {
                 if (!abilities.KnownAbilityIds.Contains(abilityId))
@@ -493,7 +498,7 @@ namespace Battle.Internal.Npc
             Vector2? nearest = null;
             float nearestDistance = visionRadius;
 
-            if (ConsidersPlayerAnEnemy() && _playerAccessor?.Player is { IsAlive: true } and Node2D playerNode)
+            if (ConsidersPlayerAnEnemy() && _playerAccessor?.Player is { IsAlive: true } and Node2D playerNode && SpatialAccess.SharesSpace(this, playerNode))
                 Consider(playerNode.GlobalPosition, ref nearest, ref nearestDistance);
 
             if (_npcRegistry == null || _factionRelations == null)
@@ -526,6 +531,7 @@ namespace Battle.Internal.Npc
         /// <summary>An NPC worth chasing/fighting: alive, free and hostile in either direction.</summary>
         private bool IsSkirmishableEnemy(ISkirmishParticipant other)
         {
+            if (!NativeSpatialQuery.Instance.SharesSpace(this, other)) return false;
             if (other.InstanceId == InstanceId || !other.IsAlive || other.IsFighting) return false;
             return _factionRelations!.IsHostile(Fraction, other.Fraction) ||
                    _factionRelations.IsHostile(other.Fraction, Fraction);
@@ -583,7 +589,11 @@ namespace Battle.Internal.Npc
             Animations.PlayAnimation(clip);
         }
 
-        private void OnWorldStimulus(WorldStimulusEvent evnt) => _brain?.OnStimulus(evnt.Stimulus);
+        private void OnWorldStimulus(WorldStimulusEvent evnt)
+        {
+            if (evnt.Stimulus.SpaceId == 0 || evnt.Stimulus.SpaceId != NativeSpatialQuery.Instance.GetSpace(this)) return;
+            _brain?.OnStimulus(evnt.Stimulus);
+        }
 
         public void AddItemToInventory(IItem item)
         {
@@ -760,7 +770,7 @@ namespace Battle.Internal.Npc
         /// its own hit); only a debug/tool death frames nobody.</summary>
         public void Kill(bool isDebug = false)
         {
-            bool guarded = IsAlive && Effects.GetBy(e => e is Core.Battle.Abilities.IStageGuardEffect).Any();
+            bool guarded = IsAlive && Effects.GetBy(e => e is IStageGuardEffect).Any();
             if (!guarded)
             {
                 if (isDebug) _lastDamageSource = null;
@@ -800,7 +810,7 @@ namespace Battle.Internal.Npc
                     // fight in two battles at once (tracker #62). Filter BEFORE the Attacked
                     // notification — it raises IsFighting on the whole group.
                     fighters.AddRange(Group.GetEntitiesInGroup<IFightable>()
-                        .Where(member => member.IsAlive && !member.IsFighting));
+                        .Where(member => member.IsAlive && !member.IsFighting && NativeSpatialQuery.Instance.SharesSpace(this, member)));
                     Group.NotifyAllInGroup(GroupNotification.Attacked);
                 }
                 else
@@ -809,7 +819,7 @@ namespace Battle.Internal.Npc
                 StopMoving();
                 _gameEventBus?.Publish(new BattleInitializedEvent(player, fighters));
                 // A fight breaking out is audible: nearby brains investigate (they filter by hearing radius).
-                _gameEventBus?.Publish(new WorldStimulusEvent(new Stimulus(StimulusType.Noise, GlobalPosition)));
+                _gameEventBus?.Publish(new WorldStimulusEvent(new Stimulus(StimulusType.Noise, GlobalPosition, NativeSpatialQuery.Instance.GetSpace(this))));
             }
             catch (Exception e)
             {
@@ -838,7 +848,7 @@ namespace Battle.Internal.Npc
             CombatEvents.Publish(obj);
             Effects.RemoveAllEffects();
             CanMove = true;
-            Position = _lastPosition;
+
 
             if (IsAlive)
             {
@@ -902,7 +912,7 @@ namespace Battle.Internal.Npc
         }
 
         private bool IsPlayerWithin(float distance) =>
-            _playerAccessor?.Player is Node2D playerNode && GlobalPosition.DistanceTo(playerNode.GlobalPosition) <= distance;
+            _playerAccessor?.Player is Node2D playerNode && SpatialAccess.SharesSpace(this, playerNode) && GlobalPosition.DistanceTo(playerNode.GlobalPosition) <= distance;
 
         private void OnResurrectionReady(float parameterBonus)
         {

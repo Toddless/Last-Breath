@@ -1,554 +1,448 @@
 {
-	"craftingRecipes": [
-		{
-			"id": "Recipe_Creators_Ring",
-			"resultItemId": "Ring_of_Creators",
-			"tags": [
-				"Ring",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Rare",
-			"basePrice": 90,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Crafting_Resource_Gold_Ore",
-					"amount": 3
-				},
-				{
-					"type": "Resource",
-					"id": "Crafting_Resource_Emerald_Gem",
-					"amount": 2
-				},
-				{
-					"type": "Resource",
-					"id": "Crafting_Resource_Ruby_Gem",
-					"amount": 2
-				},
-				{
-					"type": "MasteryLevel",
-					"id": "Crafting_Mastery",
-					"amount": 5
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Ring_Of_Fire_Demon",
-			"resultItemId": "Ring_Of_Fire_Demon",
-			"tags": [
-				"Boots",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Rare",
-			"basePrice": 90,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "ResourceCategory",
-					"id": "Category_Leather",
-					"amount": 4
-				},
-				{
-					"type": "ResourceCategory",
-					"id": "Category_Metal",
-					"amount": 4
-				},
-				{
-					"type": "ResourceCategory",
-					"id": "Category_Fabric",
-					"amount": 3
-				},
-				{
-					"type": "MasteryLevel",
-					"id": "Crafting_Mastery",
-					"amount": 10
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Body_Steel_Bastion",
-			"resultItemId": "Body_Steel_Bastion",
-			"tags": [
-				"Gloves",
-				"Recipe",
-				"Crafting",
-				"Equipment",
-				"Generic"
-			],
-			"rarity": "Rare",
-			"unlockAtMastery": 8,
-			"basePrice": 45,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Crafting_Resource_Silk_Fabric",
-					"amount": 2
-				},
-				{
-					"type": "Resource",
-					"id": "Crafting_Resource_Wild_Boar_Leather",
-					"amount": 2
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Body_Aegis",
-			"resultItemId": "Body_Aegis",
-			"tags": [
-				"Helmet",
-				"Recipe",
-				"Crafting",
-				"Equipment",
-				"Generic"
-			],
-			"rarity": "Rare",
-			"basePrice": 90,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Crafting_Resource_Deer_Leather",
-					"amount": 2
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Weapon_Simple_Sword",
-			"resultItemId": "Weapon_Simple_Sword",
-			"tags": [
-				"Weapon",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Uncommon",
-			"unlockAtMastery": 0,
-			"basePrice": 30,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Crafting_Resource_Iron_Ore",
-					"amount": 2
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Weapon_Simple_Dagger",
-			"resultItemId": "Weapon_Simple_Dagger",
-			"tags": [
-				"Weapon",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Uncommon",
-			"unlockAtMastery": 0,
-			"basePrice": 30,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Crafting_Resource_Iron_Ore",
-					"amount": 1
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Weapon_Simple_Axe",
-			"resultItemId": "Weapon_Simple_Axe",
-			"tags": [
-				"Weapon",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Uncommon",
-			"unlockAtMastery": 0,
-			"basePrice": 30,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Crafting_Resource_Iron_Ore",
-					"amount": 3
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Body_Iron_Bastion",
-			"resultItemId": "Body_Iron_Bastion",
-			"tags": [
-				"Body",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 2,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Metal",
-					"amount": 5
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Leather",
-					"amount": 3
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Body_Hunter_Chestplate",
-			"resultItemId": "Body_Hunter_Chestplate",
-			"tags": [
-				"Body",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 4,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Bone",
-					"amount": 3
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Leather",
-					"amount": 5
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Body_Archmage_Mantle",
-			"resultItemId": "Body_Archmage_Mantle",
-			"tags": [
-				"Body",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 6,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Gem",
-					"amount": 3
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Fabric",
-					"amount": 5
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Helmet_Iron_Bastion",
-			"resultItemId": "Helmet_Iron_Bastion",
-			"tags": [
-				"Helmet",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 2,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Metal",
-					"amount": 3
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Leather",
-					"amount": 1
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Helmet_Hunter",
-			"resultItemId": "Helmet_Hunter",
-			"tags": [
-				"Helmet",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 4,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Bone",
-					"amount": 1
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Leather",
-					"amount": 3
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Helmet_Archmage_Cap",
-			"resultItemId": "Helmet_Archmage_Cap",
-			"tags": [
-				"Helmet",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 6,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Gem",
-					"amount": 1
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Fabric",
-					"amount": 3
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Boots_Iron_Bastion",
-			"resultItemId": "Boots_Iron_Bastion",
-			"tags": [
-				"Boots",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 2,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Metal",
-					"amount": 3
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Leather",
-					"amount": 1
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Boots_Hunter",
-			"resultItemId": "Boots_Hunter",
-			"tags": [
-				"Boots",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 4,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Bone",
-					"amount": 1
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Leather",
-					"amount": 3
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Boots_Archmage_Sandals",
-			"resultItemId": "Boots_Archmage_Sandals",
-			"tags": [
-				"Boots",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 6,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Gem",
-					"amount": 1
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Fabric",
-					"amount": 3
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Gloves_Iron_Bastion",
-			"resultItemId": "Gloves_Iron_Bastion",
-			"tags": [
-				"Gloves",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 2,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Metal",
-					"amount": 3
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Leather",
-					"amount": 1
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Gloves_Hunter",
-			"resultItemId": "Gloves_Hunter",
-			"tags": [
-				"Gloves",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 4,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Bone",
-					"amount": 1
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Leather",
-					"amount": 3
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		},
-		{
-			"id": "Recipe_Gloves_Archmage",
-			"resultItemId": "Gloves_Archmage",
-			"tags": [
-				"Gloves",
-				"Recipe",
-				"Crafting",
-				"Equipment"
-			],
-			"rarity": "Epic",
-			"unlockAtMastery": 6,
-			"basePrice": 60,
-			"itemType": "Equipment",
-			"requirements": [
-				{
-					"type": "Resource",
-					"id": "Category_Gem",
-					"amount": 1
-				},
-				{
-					"type": "Resource",
-					"id": "Category_Fabric",
-					"amount": 3
-				}
-			],
-			"optionalResourceCategories": [
-				"Essence"
-			]
-		}
-	]
+    "craftingRecipes": [
+        {
+            "id": "Recipe_Body_Steel",
+            "resultItemId": "Body_Steel",
+            "tags": [
+                "Body",
+                "Crafting",
+                "Recipe",
+                "Equipment"
+            ],
+            "rarity": "Rare",
+            "unlockAtMastery": 8,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "ResourceCategory",
+                    "id": "Category_Metal",
+                    "amount": 5
+                },
+                {
+                    "type": "ResourceCategory",
+                    "id": "Category_Leather",
+                    "amount": 3
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Body_Aegis",
+            "resultItemId": "Body_Aegis",
+            "tags": [
+                "Helmet",
+                "Recipe",
+                "Crafting",
+                "Equipment",
+                "Generic"
+            ],
+            "rarity": "Rare",
+            "basePrice": 90,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Crafting_Resource_Deer_Leather",
+                    "amount": 2
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Weapon_Simple_Sword",
+            "resultItemId": "Weapon_Simple_Sword",
+            "tags": [
+                "Weapon",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Uncommon",
+            "unlockAtMastery": 0,
+            "basePrice": 30,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Crafting_Resource_Iron_Ore",
+                    "amount": 2
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Weapon_Simple_Dagger",
+            "resultItemId": "Weapon_Simple_Dagger",
+            "tags": [
+                "Weapon",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Uncommon",
+            "unlockAtMastery": 0,
+            "basePrice": 30,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Crafting_Resource_Iron_Ore",
+                    "amount": 1
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Weapon_Simple_Axe",
+            "resultItemId": "Weapon_Simple_Axe",
+            "tags": [
+                "Weapon",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Uncommon",
+            "unlockAtMastery": 0,
+            "basePrice": 30,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Crafting_Resource_Iron_Ore",
+                    "amount": 3
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Body_Hunter_Chestplate",
+            "resultItemId": "Body_Hunter_Chestplate",
+            "tags": [
+                "Body",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Epic",
+            "unlockAtMastery": 4,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Category_Bone",
+                    "amount": 3
+                },
+                {
+                    "type": "Resource",
+                    "id": "Category_Leather",
+                    "amount": 5
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Body_Archmage_Mantle",
+            "resultItemId": "Body_Archmage_Mantle",
+            "tags": [
+                "Body",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Epic",
+            "unlockAtMastery": 6,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Category_Gem",
+                    "amount": 3
+                },
+                {
+                    "type": "Resource",
+                    "id": "Category_Fabric",
+                    "amount": 5
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Helmet_Steel",
+            "resultItemId": "Helmet_Steel",
+            "tags": [
+                "Helmet",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Rare",
+            "unlockAtMastery": 8,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Category_Metal",
+                    "amount": 3
+                },
+                {
+                    "type": "Resource",
+                    "id": "Category_Leather",
+                    "amount": 1
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Helmet_Hunter",
+            "resultItemId": "Helmet_Hunter",
+            "tags": [
+                "Helmet",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Epic",
+            "unlockAtMastery": 4,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Category_Bone",
+                    "amount": 1
+                },
+                {
+                    "type": "Resource",
+                    "id": "Category_Leather",
+                    "amount": 3
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Helmet_Archmage_Cap",
+            "resultItemId": "Helmet_Archmage_Cap",
+            "tags": [
+                "Helmet",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Epic",
+            "unlockAtMastery": 6,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Category_Gem",
+                    "amount": 1
+                },
+                {
+                    "type": "Resource",
+                    "id": "Category_Fabric",
+                    "amount": 3
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Boots_Steel",
+            "resultItemId": "Boots_Steel",
+            "tags": [
+                "Boots",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Rare",
+            "unlockAtMastery": 8,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Category_Metal",
+                    "amount": 3
+                },
+                {
+                    "type": "Resource",
+                    "id": "Category_Leather",
+                    "amount": 1
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Boots_Hunter",
+            "resultItemId": "Boots_Hunter",
+            "tags": [
+                "Boots",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Epic",
+            "unlockAtMastery": 4,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Category_Bone",
+                    "amount": 1
+                },
+                {
+                    "type": "Resource",
+                    "id": "Category_Leather",
+                    "amount": 3
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Boots_Archmage_Sandals",
+            "resultItemId": "Boots_Archmage_Sandals",
+            "tags": [
+                "Boots",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Epic",
+            "unlockAtMastery": 6,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Category_Gem",
+                    "amount": 1
+                },
+                {
+                    "type": "Resource",
+                    "id": "Category_Fabric",
+                    "amount": 3
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Gloves_Steel",
+            "resultItemId": "Gloves_Steel",
+            "tags": [
+                "Gloves",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Rare",
+            "unlockAtMastery": 8,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Category_Metal",
+                    "amount": 3
+                },
+                {
+                    "type": "Resource",
+                    "id": "Category_Leather",
+                    "amount": 1
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Gloves_Hunter",
+            "resultItemId": "Gloves_Hunter",
+            "tags": [
+                "Gloves",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Epic",
+            "unlockAtMastery": 4,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Category_Bone",
+                    "amount": 1
+                },
+                {
+                    "type": "Resource",
+                    "id": "Category_Leather",
+                    "amount": 3
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        },
+        {
+            "id": "Recipe_Gloves_Archmage",
+            "resultItemId": "Gloves_Archmage",
+            "tags": [
+                "Gloves",
+                "Recipe",
+                "Crafting",
+                "Equipment"
+            ],
+            "rarity": "Epic",
+            "unlockAtMastery": 6,
+            "basePrice": 60,
+            "itemType": "Equipment",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Category_Gem",
+                    "amount": 1
+                },
+                {
+                    "type": "Resource",
+                    "id": "Category_Fabric",
+                    "amount": 3
+                }
+            ],
+            "optionalResourceCategories": [
+                "Essence"
+            ]
+        }
+    ]
 }

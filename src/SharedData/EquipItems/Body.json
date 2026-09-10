@@ -3,6 +3,7 @@
         {
             "id": "Body_Stoneheart",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Common",
             "tags": [
                 "Body",
@@ -30,12 +31,12 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 80
+            "grants": []
         },
         {
-            "id": "Body_Steel_Bastion",
+            "id": "Body_Steel",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Common",
             "tags": [
                 "Body",
@@ -56,12 +57,12 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 80
+            "grants": []
         },
         {
             "id": "Body_Vital_Core",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Common",
             "tags": [
                 "Body",
@@ -82,12 +83,12 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 80
+            "grants": []
         },
         {
             "id": "Body_Hunter_Chestplate",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Common",
             "tags": [
                 "Body",
@@ -108,12 +109,12 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 80
+            "grants": []
         },
         {
             "id": "Body_Hunters_Dream",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Common",
             "tags": [
                 "Body",
@@ -141,12 +142,12 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 80
+            "grants": []
         },
         {
             "id": "Body_Feral_Instinct",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Common",
             "tags": [
                 "Body",
@@ -174,12 +175,12 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 80
+            "grants": []
         },
         {
             "id": "Body_Archmage_Mantle",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Common",
             "tags": [
                 "Body",
@@ -200,12 +201,12 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 80
+            "grants": []
         },
         {
             "id": "Body_Mysterious_Bastion",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Common",
             "tags": [
                 "Body",
@@ -233,12 +234,12 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 80
+            "grants": []
         },
         {
             "id": "Body_Aegis",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Common",
             "tags": [
                 "Body",
@@ -266,18 +267,17 @@
                 }
             ],
             "modifiers": [],
-            "grants": [],
-            "basePrice": 80
+            "grants": []
         },
         {
             "id": "Body_Porcupine",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Unique",
             "tags": [
                 "Body",
                 "Equipment"
             ],
-            "effectId": "",
             "updateLevel": {
                 "min": 0,
                 "max": 0
@@ -295,35 +295,35 @@
                 {
                     "parameter": "Armor",
                     "modifierType": "inc",
+                    "scope": "Local",
                     "value": {
                         "min": 0.25,
                         "max": 0.8
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
             "grants": [
                 {
-                    "id": "Passive_Skill_Porcupine",
                     "kind": "Passive",
+                    "id": "Passive_Skill_Porcupine",
                     "properties": {
                         "damagePercent": 0.15,
                         "armorPercent": 0.25
                     }
                 }
             ],
-            "basePrice": 80
+            "effectId": ""
         },
         {
             "id": "Body_Carapace",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Unique",
             "tags": [
                 "Body",
                 "Equipment"
             ],
-            "effectId": "",
             "updateLevel": {
                 "min": 0,
                 "max": 0
@@ -341,26 +341,26 @@
                 {
                     "parameter": "Evade",
                     "modifierType": "inc",
+                    "scope": "Local",
                     "value": {
                         "min": 0.25,
                         "max": 0.8
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
             "grants": [],
-            "basePrice": 80
+            "effectId": ""
         },
         {
             "id": "Body_Strong_Spirit",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Unique",
             "tags": [
                 "Body",
                 "Equipment"
             ],
-            "effectId": "",
             "updateLevel": {
                 "min": 0,
                 "max": 0
@@ -378,20 +378,21 @@
                 {
                     "parameter": "Evade",
                     "modifierType": "inc",
+                    "scope": "Local",
                     "value": {
                         "min": 0.25,
                         "max": 0.8
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
             "grants": [],
-            "basePrice": 80
+            "effectId": ""
         },
         {
             "id": "Body_Ice_Mage",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Unique",
             "tags": [
                 "Body",
@@ -414,28 +415,28 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "inc",
+                    "scope": "Local",
                     "value": {
                         "min": 0.25,
                         "max": 0.5
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
             "grants": [
                 {
-                    "id": "Passive_Skill_Ice_Meteor",
                     "kind": "Passive",
+                    "id": "Passive_Skill_Ice_Meteor",
                     "properties": {
                         "damage": 300
                     }
                 }
-            ],
-            "basePrice": 80
+            ]
         },
         {
             "id": "Body_Disaster_Herald",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Unique",
             "tags": [
                 "Body",
@@ -467,18 +468,18 @@
             "modifiers": [],
             "grants": [
                 {
-                    "id": "Passive_Skill_Meteor",
                     "kind": "Passive",
+                    "id": "Passive_Skill_Meteor",
                     "properties": {
                         "damage": 300
                     }
                 }
-            ],
-            "basePrice": 80
+            ]
         },
         {
             "id": "Body_Creators_Vestment",
             "equipmentPart": "Body",
+            "basePrice": 80,
             "rarity": "Mythic",
             "tags": [
                 "Body",
@@ -533,8 +534,7 @@
                     }
                 }
             ],
-            "grants": [],
-            "basePrice": 80
+            "grants": []
         }
     ]
 }

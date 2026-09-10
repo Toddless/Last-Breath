@@ -32,6 +32,7 @@ namespace LastBreath.Npc
     using Core.Narrative.Facts;
     using Core.Reputation;
     using Core.Services;
+    using Core.World.Spaces;
     using Godot;
     using Player;
 
@@ -281,6 +282,7 @@ namespace LastBreath.Npc
 
             if (Fraction is not (Fractions.Human or Fractions.Dwarf or Fractions.Elf)) return;
             if (_playerAccessor?.Player is not Player { IsAlive: false, Lifecycle: { } lifecycle } corpse) return;
+            if (!SpatialAccess.SharesSpace(this, corpse)) return;
             if (GlobalPosition.DistanceTo(corpse.GlobalPosition) > lifecycle.Config.BurnRadius) return;
 
             lifecycle.TryBurnRoll(InstanceId); // the player reacts to the Burned event itself
@@ -497,16 +499,17 @@ namespace LastBreath.Npc
             // A fighting player is not in the world (his node stands on the arena): chasing that
             // model parks NPCs under it for the whole battle. The battle-site marker's noise is
             // the intended lure to an ongoing fight.
-            if (ConsidersPlayerAnEnemy() && _playerAccessor?.Player is { IsAlive: true, IsFighting: false } and Node2D playerNode)
+            if (ConsidersPlayerAnEnemy() && _playerAccessor?.Player is { IsAlive: true, IsFighting: false } and Node2D playerNode &&
+                SpatialAccess.SharesSpace(this, playerNode))
                 Consider(playerNode.GlobalPosition, ref nearest, ref nearestDistance);
 
-            if (_npcRegistry != null && _factionRelations != null)
+            if (_npcRegistry == null || _factionRelations == null)
+                return nearest == null ? null : new TargetSighting(nearest.Value);
+
+            foreach (var other in _npcRegistry.All)
             {
-                foreach (var other in _npcRegistry.All)
-                {
-                    if (!IsSkirmishableEnemy(other)) continue;
-                    Consider(other.Position, ref nearest, ref nearestDistance);
-                }
+                if (!IsSkirmishableEnemy(other)) continue;
+                Consider(other.Position, ref nearest, ref nearestDistance);
             }
 
             return nearest == null ? null : new TargetSighting(nearest.Value);
@@ -532,6 +535,7 @@ namespace LastBreath.Npc
         /// <summary>An NPC worth chasing/fighting: alive, free and hostile in either direction.</summary>
         private bool IsSkirmishableEnemy(ISkirmishParticipant other)
         {
+            if (!NativeSpatialQuery.Instance.SharesSpace(this, other)) return false;
             if (other.InstanceId == InstanceId || !other.IsAlive || other.IsFighting) return false;
             return _factionRelations!.IsHostile(Fraction, other.Fraction) ||
                    _factionRelations.IsHostile(other.Fraction, Fraction);
@@ -589,7 +593,11 @@ namespace LastBreath.Npc
             Animations.PlayAnimation(clip);
         }
 
-        private void OnWorldStimulus(WorldStimulusEvent evnt) => _brain?.OnStimulus(evnt.Stimulus);
+        private void OnWorldStimulus(WorldStimulusEvent evnt)
+        {
+            if (evnt.Stimulus.SpaceId == 0 || evnt.Stimulus.SpaceId != NativeSpatialQuery.Instance.GetSpace(this)) return;
+            _brain?.OnStimulus(evnt.Stimulus);
+        }
 
         public void AddItemToInventory(IItem item)
         {
@@ -808,7 +816,7 @@ namespace LastBreath.Npc
                     // fight in two battles at once (tracker #62). Filter BEFORE the Attacked
                     // notification — it raises IsFighting on the whole group.
                     fighters.AddRange(Group.GetEntitiesInGroup<IFightable>()
-                        .Where(member => member.IsAlive && !member.IsFighting));
+                        .Where(member => member.IsAlive && !member.IsFighting && NativeSpatialQuery.Instance.SharesSpace(this, member)));
                     Group.NotifyAllInGroup(GroupNotification.Attacked);
                 }
                 else
@@ -820,7 +828,7 @@ namespace LastBreath.Npc
                 Tracker.TrackInfo($"Battle started by {Id} ({InstanceId}) at {GlobalPosition}, player at {(player as Node2D)?.GlobalPosition}", this);
                 _gameEventBus?.Publish(new BattleInitializedEvent(player, fighters));
                 // A fight breaking out is audible: nearby brains investigate (they filter by hearing radius).
-                _gameEventBus?.Publish(new WorldStimulusEvent(new Stimulus(StimulusType.Noise, GlobalPosition)));
+                _gameEventBus?.Publish(new WorldStimulusEvent(new Stimulus(StimulusType.Noise, GlobalPosition, NativeSpatialQuery.Instance.GetSpace(this))));
             }
             catch (Exception e)
             {
@@ -849,7 +857,7 @@ namespace LastBreath.Npc
             CombatEvents.Publish(obj);
             Effects.RemoveAllEffects();
             CanMove = true;
-            Position = _lastPosition;
+
 
             if (IsAlive)
             {
@@ -913,7 +921,8 @@ namespace LastBreath.Npc
         }
 
         private bool IsPlayerWithin(float distance) =>
-            _playerAccessor?.Player is Node2D playerNode && GlobalPosition.DistanceTo(playerNode.GlobalPosition) <= distance;
+            _playerAccessor?.Player is Node2D playerNode && SpatialAccess.SharesSpace(this, playerNode) &&
+            GlobalPosition.DistanceTo(playerNode.GlobalPosition) <= distance;
 
         private void OnResurrectionReady(float parameterBonus)
         {

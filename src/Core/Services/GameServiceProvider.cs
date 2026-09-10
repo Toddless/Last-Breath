@@ -101,6 +101,7 @@ namespace Core.Services
             // time it opens, so where the player left it has to be kept somewhere that outlives it.
             services.AddSingleton<PassiveWheelViewMemory>();
             services.AddSingleton<IPlayerAccessor, PlayerAccessor>();
+            services.AddSingleton<Core.World.Spaces.BattleSiteRegistry>();
             services.AddSingleton<IRestRecoveryService, RestRecoveryService>();
             services.AddSingleton<ISmartPointRegistry, SmartPointRegistry>();
             services.AddGameDataParticipant<IRecoveryConfigProvider, RecoveryConfigProvider>();

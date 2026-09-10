@@ -5,7 +5,10 @@
             "giverNpcId": "Npc_Ronald",
             "faction": "Human",
             "tier": 1,
-            "turnInNpcIds": [ "Npc_Ronald" ],
+            "repeatable": false,
+            "turnInNpcIds": [
+                "Npc_Ronald"
+            ],
             "declinePolicy": "Cooldown",
             "declineCooldownHours": 24,
             "canFail": false,
@@ -14,6 +17,16 @@
             "stages": [
                 {
                     "id": "Hunt",
+                    "objectives": [
+                        {
+                            "id": "Kill",
+                            "counter": {
+                                "key": "Kill_Count:Npc_Wolf",
+                                "amount": 1,
+                                "retroactive": false
+                            }
+                        }
+                    ],
                     "onEnter": [
                         {
                             "type": "SpawnNpc",
@@ -21,22 +34,22 @@
                             "pointId": "Trial_Grounds",
                             "modifiers": []
                         }
-                    ],
-                    "objectives": [
-                        {
-                            "id": "Kill",
-                            "counter": { "key": "Kill_Count:Npc_Wolf", "amount": 1, "retroactive": false }
-                        }
                     ]
                 }
             ],
             "rewards": {
                 "influenceExp": 0,
                 "items": [
-                    { "itemId": "Ornament_Tier_1", "amount": 1 }
+                    {
+                        "itemId": "Ornament_Tier_1",
+                        "amount": 1
+                    }
                 ],
                 "actions": [
-                    { "type": "GrantTreePoints", "amount": 2 }
+                    {
+                        "type": "GrantTreePoints",
+                        "amount": 2
+                    }
                 ]
             }
         }

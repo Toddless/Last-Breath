@@ -16,6 +16,7 @@ namespace Core.Ai.World.Activities
     /// </summary>
     public record WorldActivityContext
     {
+        public Core.World.Spaces.ISpatialQuery Spatial { get; init; } = Core.World.Spaces.NativeSpatialQuery.Instance;
         public IReadOnlyList<Vector2>? PatrolRoute { get; init; }
         public IWorldClock? Clock { get; init; }
         public INpcWorldRegistry? Npcs { get; init; }

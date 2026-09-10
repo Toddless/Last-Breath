@@ -24,6 +24,7 @@ namespace Battle.Internal.Npc
 
         public bool TryStart(ISkirmishParticipant initiator, ISkirmishParticipant target)
         {
+            if (!Core.World.Spaces.NativeSpatialQuery.Instance.SharesSpace(initiator, target)) return false;
             if (!CanFight(initiator) || !CanFight(target)) return false;
             // группы сущности сравниваются по InstanceId вместо референса?
             // TODO: Проверить как сохраняются/загружаются группы нпс
@@ -75,7 +76,7 @@ namespace Battle.Internal.Npc
         {
             if (member.Group == null) return [member];
 
-            var squad = member.Group.GetEntitiesInGroup<ISkirmishParticipant>().Where(CanFight).ToList();
+            var squad = member.Group.GetEntitiesInGroup<ISkirmishParticipant>().Where(candidate => CanFight(candidate) && Core.World.Spaces.NativeSpatialQuery.Instance.SharesSpace(member, candidate)).ToList();
             if (!squad.Contains(member)) squad.Add(member);
             return squad;
         }

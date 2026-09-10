@@ -20,6 +20,9 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class RaidServiceTests
     {
+        private Mock<IPlayer> _player = null!;
+        private LastBreathTest.WorldTesting.TestSpatialQuery _spatial = null!;
+        private Core.World.Spaces.BattleSiteRegistry _battleSites = null!;
         private GameEventBus _bus = null!;
         private FactionRelationService _relations = null!;
         private NpcPopulationService _population = null!;
@@ -53,7 +56,9 @@ namespace LastBreathTest.BattleSystemTests
             _bus.Subscribe<RaidEndedEvent>(_ended.Add);
             _bus.Subscribe<NpcFinalDeathEvent>(_finalDeaths.Add);
 
-            var player = new Mock<IPlayer>();
+            var player = _player = new Mock<IPlayer>();
+            _spatial = new LastBreathTest.WorldTesting.TestSpatialQuery();
+            _battleSites = new Core.World.Spaces.BattleSiteRegistry();
             player.SetupGet(p => p.IsAlive).Returns(true);
             player.SetupGet(p => p.IsFighting).Returns(false);
             var accessor = new Mock<IPlayerAccessor>();
@@ -65,7 +70,7 @@ namespace LastBreathTest.BattleSystemTests
             var messages = new Mock<IGameMessageBus>();
             messages.Setup(m => m.PublishMessageAsync(It.IsAny<SendNotificationMessageMessage>())).Returns(Task.CompletedTask);
 
-            _raids = new TestRaidService(_relations, _sites, provider.Object, _spawner, _population, accessor.Object, _bus, messages.Object, new FixedRaidRandom());
+            _raids = new TestRaidService(_relations, _sites, provider.Object, _spawner, _population, accessor.Object, _bus, messages.Object, new FixedRaidRandom(), _battleSites, _spatial);
             _raids.Apply(DataCatalog.Raids, ConfigFile(initialDelay: 0));
         }
 
@@ -176,6 +181,67 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsTrue(_raids.IsRaidActive);
         }
 
+        [TestMethod]
+        public void FightingPlayerIsReplacedByTheOriginMarker()
+        {
+            StartRaid();
+            _player.SetupGet(p => p.IsFighting).Returns(true);
+            _spatial.Set(_player.Object, 2);
+            _raids.PlayerPoint = new Vector2(9000, 9000);
+            var site = new Core.World.Spaces.BattleSite(Guid.NewGuid(), 1, new Vector2(120, 80));
+            _battleSites.Register(site);
+            _raids.Tick(1);
+            foreach (var raider in _raiderMocks)
+            {
+                raider.As<IWorldAgent>().Verify(a => a.MoveTo(site.Position, It.IsAny<float>()), Times.Once);
+                raider.As<IWorldAgent>().Verify(a => a.MoveTo(_raids.PlayerPoint, It.IsAny<float>()), Times.Never);
+            }
+            _battleSites.Remove(site.BattleId);
+            _raids.Tick(1);
+            foreach (var raider in _raiderMocks)
+                raider.As<IWorldAgent>().Verify(a => a.StopMoving(), Times.Once);
+        }
+
+        [TestMethod]
+        public void LeavingTheRaidSpaceStopsPursuitButPreservesExpiry()
+        {
+            StartRaid();
+            _spatial.Set(_player.Object, 2);
+            _raids.Tick(1);
+            foreach (var raider in _raiderMocks)
+            {
+                raider.As<IWorldAgent>().Verify(a => a.StopMoving(), Times.Once);
+                raider.As<IWorldAgent>().Verify(a => a.MoveTo(It.IsAny<Vector2>(), It.IsAny<float>()), Times.Never);
+            }
+            Assert.IsTrue(_raids.IsRaidActive);
+            _raids.Tick(11);
+            Assert.IsFalse(_raids.IsRaidActive);
+            Assert.AreEqual(2, _spawner.Despawned.Count);
+        }
+
+        [TestMethod]
+        public void MarkerInAnotherSpaceCannotAttractRaiders()
+        {
+            StartRaid();
+            _player.SetupGet(p => p.IsFighting).Returns(true);
+            _battleSites.Register(new Core.World.Spaces.BattleSite(Guid.NewGuid(), 2, Vector2.Zero));
+            _raids.Tick(1);
+            foreach (var raider in _raiderMocks)
+                raider.As<IWorldAgent>().Verify(a => a.MoveTo(It.IsAny<Vector2>(), It.IsAny<float>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void ClosestSpawnSiteMustBelongToPlayerSpace()
+        {
+            _relations.SetPlayerRelation(Fractions.Elf, RelationLevel.Hatred);
+            var foreign = new FakeSite(Fractions.Elf, Vector2.Zero, "elf_warrior");
+            _spatial.Set(foreign, 2);
+            _sites.Register(foreign);
+            _sites.Register(new FakeSite(Fractions.Elf, new Vector2(500, 0), "elf_warrior"));
+            Assert.IsTrue(_raids.ForceRaid());
+            Assert.AreEqual(new Vector2(500, 0), _started.Single().Origin);
+        }
+
         private IFightableNpc CreateRaiderMock()
         {
             var npc = new Mock<IFightableNpc>();
@@ -213,10 +279,10 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>Exposes a deterministic player position — the real one needs a Godot node in a tree.</summary>
         private sealed class TestRaidService(
             IFactionRelationService relations, IRaidSpawnRegistry sites, INpcProvider provider, INpcWorldSpawner spawner,
-            INpcPopulationService population, IPlayerAccessor accessor, GameEventBus bus, IGameMessageBus messages, IRandomNumberGenerator rnd)
-            : RaidService(relations, sites, provider, spawner, population, accessor, bus, messages, rnd)
+            INpcPopulationService population, IPlayerAccessor accessor, GameEventBus bus, IGameMessageBus messages, IRandomNumberGenerator rnd, Core.World.Spaces.BattleSiteRegistry battleSites, LastBreathTest.WorldTesting.TestSpatialQuery spatial)
+            : RaidService(relations, sites, provider, spawner, population, accessor, bus, messages, rnd, battleSites, spatial)
         {
-            public Vector2 PlayerPoint { get; } = new(0, 0);
+            public Vector2 PlayerPoint { get; set; } = new(0, 0);
 
             protected override Vector2? GetPlayerPosition() => PlayerPoint;
         }

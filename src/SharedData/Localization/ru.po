@@ -1320,8 +1320,8 @@ msgstr ""
 msgid "Recipe_Weapon_Simple_Axe"
 msgstr ""
 
-msgid "Recipe_Body_Steel_Bastion"
-msgstr ""
+msgid "Recipe_Body_Steel"
+msgstr "Стальной бастион"
 
 msgid "Recipe_Body_Aegis"
 msgstr ""
@@ -1330,37 +1330,37 @@ msgid "Recipe_Body_Iron_Bastion"
 msgstr ""
 
 msgid "Recipe_Body_Hunter_Chestplate"
-msgstr ""
+msgstr "Охотничий Нагрудник"
 
 msgid "Recipe_Body_Archmage_Mantle"
-msgstr ""
+msgstr "Мантия Архимага"
 
-msgid "Recipe_Helmet_Iron_Bastion"
-msgstr ""
+msgid "Recipe_Helmet_Steel"
+msgstr "Стальной Шлем"
 
 msgid "Recipe_Helmet_Hunter"
-msgstr ""
+msgstr "Охотничий Шлем"
 
 msgid "Recipe_Helmet_Archmage_Cap"
 msgstr ""
 
-msgid "Recipe_Gloves_Iron_Bastion"
-msgstr ""
+msgid "Recipe_Gloves_Steel"
+msgstr "Стальные Перчатки"
 
 msgid "Recipe_Gloves_Hunter"
-msgstr ""
+msgstr "Охотничьи Перчатки"
 
 msgid "Recipe_Gloves_Archmage"
-msgstr ""
+msgstr "Перчатки Архимага"
 
-msgid "Recipe_Boots_Iron_Bastion"
-msgstr ""
+msgid "Recipe_Boots_Steel"
+msgstr "Стальные Сапоги"
 
 msgid "Recipe_Boots_Hunter"
-msgstr ""
+msgstr "Охотничьи Сапоги"
 
 msgid "Recipe_Boots_Archmage_Sandals"
-msgstr ""
+msgstr "Сандали Архимага"
 
 msgid "Recipe_Generic_Ring"
 msgstr ""
@@ -2191,10 +2191,10 @@ msgstr "Каменное сердце"
 msgid "Body_Stoneheart_Description"
 msgstr ""
 
-msgid "Body_Steel_Bastion"
+msgid "Body_Steel"
 msgstr "Стальной бастион"
 
-msgid "Body_Steel_Bastion_Description"
+msgid "Body_Steel_Description"
 msgstr ""
 
 msgid "Body_Vital_Core"
@@ -2365,10 +2365,10 @@ msgstr "Каменная поступь"
 msgid "Boots_Stone_Tread_Description"
 msgstr ""
 
-msgid "Boots_Steel_Greaves"
+msgid "Boots_Steel"
 msgstr "Стальные поножи"
 
-msgid "Boots_Steel_Greaves_Description"
+msgid "Boots_Steel_Description"
 msgstr ""
 
 msgid "Boots_Vital_Core"

@@ -66,7 +66,7 @@ namespace Core.Ai.World.Activities
         private ISmartPoint? Claim(WorldBrain brain)
         {
             if (context.Points == null || context.Self == null) return null;
-            return context.Points.TryClaim(tag, context.Self.InstanceId, brain.Agent.Position);
+            return context.Points.TryClaim(tag, context.Self.InstanceId, brain.Agent.Position, context.Self);
         }
     }
 }

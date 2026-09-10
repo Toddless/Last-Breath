@@ -58,7 +58,6 @@ namespace Core.Items
                 field = ResourceLoader.Load<Texture2D>(AssetPaths.ItemIcon(Id));
                 return field;
             }
-            private init;
         }
         public Rarity Rarity { get; set; } = Rarity.Common;
         // The item's caliber: loot stamps the kill's difficulty multiplier, crafting stamps the mastery
@@ -365,8 +364,6 @@ namespace Core.Items
             (float flat, float increase, float multiplier) = LocalBucket(parameter);
             return flat * (1f + increase) * (1f + multiplier);
         }
-
-
 
         /// <summary>The scaled value of one line — FLAT lines ONLY, by the multiplier of the channel the line
         /// belongs to. A percent line (increase/multiplicative) already multiplies a value the scales have

@@ -12,5 +12,5 @@ namespace Core.Ai.World
     }
 
     /// <summary>A world event an NPC can react to without direct line of sight.</summary>
-    public record Stimulus(StimulusType Type, Vector2 Position);
+    public record Stimulus(StimulusType Type, Vector2 Position, ulong SpaceId = 0);
 }

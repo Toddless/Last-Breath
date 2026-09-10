@@ -4,6 +4,7 @@ namespace Battle.Internal.Npc
     using Core.Data.NpcData;
     using Core.Entity;
     using Core.Services;
+    using Core.World.Spaces;
     using Godot;
 
     /// <summary>
@@ -15,7 +16,14 @@ namespace Battle.Internal.Npc
     {
         public IFightableNpc? Spawn(NpcDefinition definition, Vector2 position)
         {
-            if (playerAccessor.Player is not Node playerNode || playerNode.GetParent() is not Node2D world) return null;
+            if (playerAccessor.Player is not { IsFighting: false }) return null;
+            return playerAccessor.Player is not Node2D playerNode ? null : SpawnAt(definition, position, playerNode);
+        }
+
+        public IFightableNpc? SpawnAt(NpcDefinition definition, Vector2 position, object source)
+        {
+            if (source is not Node2D node || !GodotObject.IsInstanceValid(node) || !node.IsInsideTree() || node.IsQueuedForDeletion()) return null;
+            var world = SpatialAccess.GetSpaceRoot(node);
 
             var npc = BaseNpc.Initialize().Instantiate<BaseNpc>();
             npc.InjectServices(provider);

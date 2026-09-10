@@ -112,8 +112,8 @@
             "id": "abilityunlock_Discharge_1",
             "kind": "AbilityUnlock",
             "stance": "Intelligence",
-            "x": 321.0,
-            "y": 130.0,
+            "x": 326.0,
+            "y": 161.0,
             "title": "Discharge",
             "abilityId": "Ability_Discharge"
         },
@@ -193,8 +193,8 @@
             "id": "abilityunlock_Static_Armor_1",
             "kind": "AbilityUnlock",
             "stance": "Intelligence",
-            "x": 288.0,
-            "y": 193.0,
+            "x": 295.0,
+            "y": 194.0,
             "title": "Static Armor",
             "abilityId": "Ability_Static_Armor"
         },
@@ -337,8 +337,8 @@
             "kind": "Keystone",
             "stance": "Intelligence",
             "hybridStance": "Strength",
-            "x": 198.0,
-            "y": -169.0,
+            "x": 212.0,
+            "y": -155.0,
             "title": "Strength of Spirit",
             "passiveId": "Passive_Skill_Strength_Of_Spirit",
             "properties": {
@@ -1129,8 +1129,8 @@
             "kind": "Notable",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -367.0,
-            "y": -111.0,
+            "x": -357.0,
+            "y": -94.0,
             "title": "Critical Chance|Damage",
             "modifiers": [
                 {
@@ -1769,8 +1769,8 @@
             "kind": "Notable",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -304.0,
-            "y": -81.0,
+            "x": -310.0,
+            "y": -86.0,
             "title": "Physical|Bleed Damage",
             "modifiers": [
                 {
@@ -3519,8 +3519,8 @@
             "kind": "Small",
             "stance": "Dexterity",
             "hybridStance": "Intelligence",
-            "x": 57.0,
-            "y": 397.0,
+            "x": 51.0,
+            "y": 389.0,
             "title": "Suppress",
             "modifiers": [
                 {
@@ -3615,8 +3615,8 @@
             "kind": "Small",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -296.0,
-            "y": -97.0,
+            "x": -295.0,
+            "y": -93.0,
             "title": "Physical Damage|Bleed Damage",
             "modifiers": [
                 {
@@ -3647,8 +3647,8 @@
             "kind": "Small",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -257.0,
-            "y": -88.0,
+            "x": -258.0,
+            "y": -101.0,
             "title": "Physical Damage|Bleed Damage",
             "modifiers": [
                 {
@@ -4632,8 +4632,8 @@
             "kind": "Small",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -324.0,
-            "y": -91.0,
+            "x": -314.0,
+            "y": -103.0,
             "title": "Critical Chance",
             "modifiers": [
                 {
@@ -4653,8 +4653,8 @@
             "kind": "Small",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -323.0,
-            "y": -108.0,
+            "x": -310.0,
+            "y": -137.0,
             "title": "Critical Chance",
             "modifiers": [
                 {
@@ -4674,8 +4674,8 @@
             "kind": "Small",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -352.0,
-            "y": -86.0,
+            "x": -329.0,
+            "y": -106.0,
             "title": "Critical Chance",
             "modifiers": [
                 {
@@ -4695,8 +4695,8 @@
             "kind": "Small",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -387.0,
-            "y": -78.0,
+            "x": -345.0,
+            "y": -43.0,
             "title": "Critical Chance",
             "modifiers": [
                 {
@@ -4716,8 +4716,8 @@
             "kind": "Small",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -367.0,
-            "y": -72.0,
+            "x": -332.0,
+            "y": -53.0,
             "title": "Critical Chance",
             "modifiers": [
                 {
@@ -9367,8 +9367,8 @@
             "kind": "Small",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -305.0,
-            "y": -56.0,
+            "x": -298.0,
+            "y": -65.0,
             "title": "Physical Damage",
             "modifiers": [
                 {
@@ -9383,8 +9383,8 @@
             "kind": "Small",
             "stance": "Strength",
             "hybridStance": "Dexterity",
-            "x": -321.0,
-            "y": -61.0,
+            "x": -310.0,
+            "y": -58.0,
             "title": "Physical Damage",
             "modifiers": [
                 {
@@ -10787,8 +10787,8 @@
             "id": "sockettier2_Overload_1",
             "kind": "SocketTier2",
             "stance": "Intelligence",
-            "x": 350.0,
-            "y": 215.0,
+            "x": 338.0,
+            "y": 222.0,
             "title": "Augmentation Slot (T2)",
             "abilityId": "Ability_Overload"
         },
@@ -11651,6 +11651,10 @@
         },
         {
             "from": "notable_physical_bleed_damage_1",
+            "to": "small_bleed_damage_6"
+        },
+        {
+            "from": "notable_physical_bleed_damage_1",
             "to": "small_physical_damage_12"
         },
         {
@@ -12139,7 +12143,7 @@
         },
         {
             "from": "small_barrier_suppress_1",
-            "to": "small_dex_int_24"
+            "to": "small_barrier_suppress_5"
         },
         {
             "from": "small_barrier_suppress_2",
@@ -12148,6 +12152,10 @@
         {
             "from": "small_barrier_suppress_3",
             "to": "small_barrier_suppress_4"
+        },
+        {
+            "from": "small_barrier_suppress_5",
+            "to": "small_dex_int_24"
         },
         {
             "from": "small_bleed_damage_1",

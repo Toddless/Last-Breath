@@ -1,4 +1,4 @@
-﻿namespace Battle.Internal
+namespace Battle.Internal
 {
     using System;
     using Core;
@@ -93,10 +93,15 @@
         /// <summary>Refusal (no free spot / battle over) simply leaves the NPC in the world.
         /// Deferred: the request comes from a physics callback, and joining reparents a physics
         /// body (world → spot) — doing that mid-flush silently fails and strands the node in the world.</summary>
-        private void OnBattleJoinRequest(BattleJoinRequestEvent evnt) =>
-            // Statement lambda on purpose: an expression lambda would return bool? and Callable
-            // has no Variant conversion for Nullable — crashes at invoke time.
-            Callable.From(() => { _activeContext?.TryJoinBattle(evnt.Fighter, evnt.AlliedWithPlayer); }).CallDeferred();
+        private void OnBattleJoinRequest(BattleJoinRequestEvent evnt)
+        {
+            var context = _activeContext;
+            if (context == null || evnt.BattleId != context.BattleId) return;
+            Callable.From(() =>
+            {
+                if (_activeContext == context) context.TryJoinBattle(evnt.Fighter, evnt.AlliedWithPlayer);
+            }).CallDeferred();
+        }
 
 
         public override void _Input(InputEvent @event)
@@ -118,7 +123,7 @@
                 ArgumentNullException.ThrowIfNull(_uiElementProvider);
                 ArgumentNullException.ThrowIfNull(_mainWorld);
                 battleSite = CreateBattleSiteMarker(evnt.Player);
-                context = new BattleContext(evnt.Player, evnt.Entities, _mainWorld, _provider, this);
+                context = new BattleContext(evnt.Player, evnt.Entities, _mainWorld, _provider, this, battleSite?.BattleId ?? Guid.Empty);
                 _activeContext = context;
                 await ToSignal(GetTree(), "process_frame");
                 var result = await context.RunBattleAsync();
@@ -134,6 +139,7 @@
                 // Dispose must survive a crashed battle: it returns the fighters to the world
                 // and frees the arena — otherwise the NPCs vanish with the leaked arena node.
                 _activeContext = null;
+                battleSite?.Close();
                 battleSite?.QueueFree();
                 context?.Dispose();
             }
@@ -148,7 +154,7 @@
             var marker = new BattleSiteMarker();
             _mainWorld.AddChild(marker);
             marker.GlobalPosition = playerNode.GlobalPosition;
-            marker.Setup(_gameEventBus);
+            marker.Setup(_gameEventBus, _provider.GetService<Core.World.Spaces.BattleSiteRegistry>());
             return marker;
         }
     }

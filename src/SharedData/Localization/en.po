@@ -436,10 +436,10 @@ msgstr "Stoneheart"
 msgid "Body_Stoneheart_Description"
 msgstr ""
 
-msgid "Body_Steel_Bastion"
+msgid "Body_Steel"
 msgstr "Steel Bastion"
 
-msgid "Body_Steel_Bastion_Description"
+msgid "Body_Steel_Description"
 msgstr ""
 
 msgid "Body_Vital_Core"
@@ -610,10 +610,10 @@ msgstr "Stone Tread"
 msgid "Boots_Stone_Tread_Description"
 msgstr ""
 
-msgid "Boots_Steel_Greaves"
+msgid "Boots_Steel"
 msgstr "Steel Greaves"
 
-msgid "Boots_Steel_Greaves_Description"
+msgid "Boots_Steel_Description"
 msgstr ""
 
 msgid "Boots_Vital_Core"
@@ -951,7 +951,7 @@ msgstr "Simple Dagger"
 msgid "Recipe_Weapon_Simple_Axe"
 msgstr "Simple Axe"
 
-msgid "Recipe_Body_Steel_Bastion"
+msgid "Recipe_Body_Steel"
 msgstr "Steel Bastion"
 
 msgid "Recipe_Body_Aegis"
@@ -966,8 +966,8 @@ msgstr "Hunter's Chestplate"
 msgid "Recipe_Body_Archmage_Mantle"
 msgstr "Archmage's Mantle"
 
-msgid "Recipe_Helmet_Iron_Bastion"
-msgstr "Iron Bastion Helmet"
+msgid "Recipe_Helmet_Steel"
+msgstr "Steel Helmet"
 
 msgid "Recipe_Helmet_Hunter"
 msgstr "Hunter's Helmet"
@@ -975,8 +975,8 @@ msgstr "Hunter's Helmet"
 msgid "Recipe_Helmet_Archmage_Cap"
 msgstr "Archmage's Cap"
 
-msgid "Recipe_Gloves_Iron_Bastion"
-msgstr "Iron Bastion Gloves"
+msgid "Recipe_Gloves_Steel"
+msgstr "Steel Gloves"
 
 msgid "Recipe_Gloves_Hunter"
 msgstr "Hunter's Gloves"
@@ -984,8 +984,8 @@ msgstr "Hunter's Gloves"
 msgid "Recipe_Gloves_Archmage"
 msgstr "Archmage's Gloves"
 
-msgid "Recipe_Boots_Iron_Bastion"
-msgstr "Iron Bastion Boots"
+msgid "Recipe_Boots_Steel"
+msgstr "Steel Boots"
 
 msgid "Recipe_Boots_Hunter"
 msgstr "Hunter's Boots"

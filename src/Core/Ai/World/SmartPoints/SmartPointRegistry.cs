@@ -4,8 +4,9 @@ namespace Core.Ai.World.SmartPoints
     using System.Linq;
     using Godot;
 
-    public class SmartPointRegistry : ISmartPointRegistry
+    public class SmartPointRegistry(Core.World.Spaces.ISpatialQuery? spatial = null) : ISmartPointRegistry
     {
+        private readonly Core.World.Spaces.ISpatialQuery _spatial = spatial ?? Core.World.Spaces.NativeSpatialQuery.Instance;
         private readonly List<ISmartPoint> _points = [];
         private readonly Dictionary<string, ISmartPoint> _claims = [];
 
@@ -22,14 +23,16 @@ namespace Core.Ai.World.SmartPoints
                 _claims.Remove(claimant);
         }
 
-        public ISmartPoint? TryClaim(string tag, string claimantId, Vector2 from)
+        public ISmartPoint? TryClaim(string tag, string claimantId, Vector2 from, object? source = null)
         {
-            if (_claims.TryGetValue(claimantId, out var held) && held.Tag == tag) return held;
+            if (_claims.TryGetValue(claimantId, out var held) && held.Tag == tag && _spatial.SharesSpace(source, held)) return held;
 
+            _claims.Remove(claimantId);
             ISmartPoint? nearest = null;
             float best = float.MaxValue;
             foreach (var point in _points)
             {
+                if (!_spatial.SharesSpace(source, point)) continue;
                 if (point.Tag != tag || ClaimCount(point) >= point.Capacity) continue;
                 float distance = from.DistanceSquaredTo(point.Position);
                 if (distance >= best) continue;

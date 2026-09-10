@@ -50,6 +50,7 @@ namespace Core.Session
                 Add<IPersonalReputationService>();
                 Add<IReputationDeedProcessor>();
                 Add<IRaidService>();
+                Add<Core.World.Spaces.BattleSiteRegistry>();
                 Add<IWorldClock>();
                 Add<INpcPopulationService>();
                 Add<INpcSkirmishService>(); // ghost skirmishes must not outlive the scene's NPCs
