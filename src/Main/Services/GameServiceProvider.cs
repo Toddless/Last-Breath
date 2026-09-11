@@ -110,6 +110,12 @@ namespace LastBreath.Services
             services.AddSingleton<IBattleNpcSpawner, BattleSummonSpawner>();
             services.AddSingleton<IRaidSpawnRegistry, RaidSpawnRegistry>();
             services.AddGameDataParticipant<IRaidService, RaidService>();
+            services.AddSingleton<Core.World.Locations.LocationCatalog>();
+            services.AddSingleton<IGameDataParticipant>(sp => sp.GetRequiredService<Core.World.Locations.LocationCatalog>());
+            services.AddSingleton<World.Locations.LocationCoordinator>();
+            services.AddSingleton<Core.World.Locations.ILocationTravelService>(sp => sp.GetRequiredService<World.Locations.LocationCoordinator>());
+            services.AddSingleton<Core.World.Locations.ILocationSaveCoordinator>(sp => sp.GetRequiredService<World.Locations.LocationCoordinator>());
+            services.AddTransient<IRequestHandler<Core.World.Locations.TravelRequest, Core.World.Locations.TravelResult>, Core.World.Locations.TravelRequestHandler>();
             services.AddSingleton<ISaveGameService, SaveGameService>();
             // Project infrastructure (module discipline): the save stack and session reset are
             // composed by the PROJECT, not by the battle module.
@@ -229,11 +235,9 @@ namespace LastBreath.Services
                 provider.GetService<IAugmentItemMinter>()));
             // Loot lying in the world is the player's the moment it falls: this project owns the floor
             // the loot module spills it on, so the section that keeps it is registered here.
-            saveManager.Register(new GroundItemsSaveParticipant(
-                provider.GetService<IGroundItemStore>(),
-                provider.GetService<IItemDataProvider>(),
-                provider.GetService<EquipItemSaveConverter>(),
-                provider.GetService<IAugmentItemMinter>()));
+            saveManager.Unregister("npcWorld");
+            saveManager.Unregister("spawnPoints");
+            saveManager.Register(provider.GetService<World.Locations.LocationCoordinator>());
         }
 
         private static void RegisterUiFactories(IGameServiceProvider provider)

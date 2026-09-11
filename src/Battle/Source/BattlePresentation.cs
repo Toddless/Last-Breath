@@ -25,14 +25,17 @@ namespace Battle.Source
             _originVisible = _originView.Visible;
             _originInputDisabled = _originViewport.GuiDisableInput;
             _originListener = _originViewport.AudioListenerEnable2D;
-            _view = new SubViewportContainer { Name = "BattleView", Stretch = true, MouseFilter = Control.MouseFilterEnum.Stop };
+            _view = new SubViewportContainer { Name = "BattleView", Stretch = true, MouseFilter = Control.MouseFilterEnum.Pass };
             Viewport = new SubViewport
             {
-                Name = "BattleSpace", World2D = new World2D(),
-                PhysicsObjectPicking = true, AudioListenerEnable2D = true,
+                Name = "BattleSpace",
+                World2D = new World2D(),
+                PhysicsObjectPicking = true,
+                AudioListenerEnable2D = true,
                 RenderTargetUpdateMode = SubViewport.UpdateMode.Always,
                 CanvasItemDefaultTextureFilter = _originViewport.CanvasItemDefaultTextureFilter,
-                Msaa2D = _originViewport.Msaa2D, UseHdr2D = _originViewport.UseHdr2D
+                Msaa2D = _originViewport.Msaa2D,
+                UseHdr2D = _originViewport.UseHdr2D
             };
             _view.AddChild(Viewport);
             Resize();

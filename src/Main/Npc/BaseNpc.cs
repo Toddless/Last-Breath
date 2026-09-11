@@ -72,6 +72,7 @@ namespace LastBreath.Npc
         private IWorldClock? _worldClock;
         private IWorldBrain? _brain;
         private INpcLifecycle? _lifecycle;
+        private Core.World.Locations.ILocationTravelService? _locations;
         private ISmartPointRegistry? _smartPoints;
         private IWorldFactsService? _worldFacts;
         private IRecoveryConfigProvider? _recoveryConfig;
@@ -92,7 +93,7 @@ namespace LastBreath.Npc
         private IRandomNumberGenerator CombatRolls => field ??= new GodotRandomNumberGenerator(_rnd);
 
         [Export] public string Id { get; private set; } = "Npc_Bandit_Veteran";
-        public string InstanceId { get; } = Guid.NewGuid().ToString();
+        public string InstanceId { get; private set; } = Guid.NewGuid().ToString();
         [Export] public string[] Tags { get; private set; } = [];
         public Texture2D? Icon { get; } = null;
         public string Description => Localization.LocalizeDescription(Id);
@@ -240,6 +241,7 @@ namespace LastBreath.Npc
 
         public void InjectServices(IGameServiceProvider provider)
         {
+            _locations = provider.TryGet<Core.World.Locations.ILocationTravelService>();
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             _playerAccessor = GameServiceProvider.Instance.GetService<IPlayerAccessor>();
             _factionRelations = GameServiceProvider.Instance.GetService<IFactionRelationService>();
@@ -798,7 +800,7 @@ namespace LastBreath.Npc
 
         private void OnBodyEnter(Node2D body)
         {
-            if (IsFighting || !IsAlive) return; // a lying body must not start battles
+            if (IsFighting || !IsAlive || _locations?.IsTransitioning == true) return; // transfer and lying bodies cannot start battles
             if (_contactGraceSeconds > 0) return; // fresh out of a battle: let the loser leave
             // The player's flag guards the battle-start window: a second NPC touching in the same
             // frame must not publish a second BattleInitializedEvent. A dead player is a corpse,

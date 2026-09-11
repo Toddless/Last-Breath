@@ -1,7 +1,10 @@
 # LastBreath — правила работы (всегда в контексте)
 
 ## Language
-GitHub content (issues, project cards, pull requests, and comments) and project documentation must be written in English. Conversation with the user remains in Russian. Apply this rule to future work; do not translate existing cards unless explicitly requested.
+Предреализационная документация (проектирование, планы и обсуждение решений) пишется на русском. Документация и комментарии в коде — на английском. Сообщения коммитов — на английском. Прочий GitHub-контент (карточки, PR и комментарии) сохраняет английский язык. Общение с пользователем — на русском. Правило применяется к новым материалам: уже написанное не переводить.
+
+## Testing: native Godot objects
+Never construct native Godot classes or access engine-backed APIs outside a running Godot process: this can terminate tests with an access violation (0xC0000005), which try/catch cannot make safe. Test pure logic with managed fakes; run Node/Resource/physics/UI integration tests as Godot test scenes (headless where appropriate).
 
 Godot 4.7, C# (.NET 9, LangVersion preview: primary constructors, `field`). Пошаговая 2D RPG, соло-разработчик Todd, общение на русском. Подробный контекст архитектуры/способностей — `HANDOFF.md`.
 
@@ -186,9 +189,9 @@ AbilityActivationContext меняется активационными мута�
 
 ## Работа с файлами
 - НЕ изменять файлы без разрешения: сначала показать план; при нескольких вариантах — дать выбор.
-## Location architecture (implementation in progress)
+## Location architecture
 - MainWorld remains loaded and simulated. Side locations unload after exploration travel, preserving state and reconciling elapsed game time on return.
 - NPCs do not travel between exploration locations. One player arena is active at most; NPC skirmishes keep their own rules.
 - Entrances and exits have explicit directed connections. A dead-end entrance has a reverse connection; through-locations may have several endpoints.
 - The origin location stays loaded during battle. BattleSiteMarker remains there for noise and reinforcement admission.
-- LocationSpaces.md records the approved architecture and implementation status. MainWorld and the player arena now use separate World2D instances; BattleContext owns participant return placement. Spatial services use live World2D identity, and raids target the origin battle marker by BattleId. Side-location transitions and persistence remain planned for #278.
+- LocationSpaces.md records the approved architecture and implementation status. MainWorld and the player arena now use separate World2D instances; BattleContext owns participant return placement. Spatial services use live World2D identity, and raids target the origin battle marker by BattleId. LocationCoordinator now owns catalog-driven travel and per-location snapshots; SaveDirector prepares the saved location before restoring global state. See LocationSpaces.md for authoring and validation.

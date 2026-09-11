@@ -11,6 +11,7 @@ namespace Core.Save
     {
         /// <summary>Unique section key inside the save file (e.g. "mastery", "inventory").</summary>
         string SectionId { get; }
+        bool RequiredForLoad => false;
 
         /// <summary>Current section format version; stored with the data for per-section migrations.</summary>
         int Version { get; }

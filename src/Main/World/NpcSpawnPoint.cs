@@ -80,11 +80,11 @@ namespace LastBreath.World
 
         Vector2 IRaidSpawnSite.Position => GlobalPosition;
 
-        public string PointId => string.IsNullOrEmpty(_pointId) ? GetPath().ToString() : _pointId;
+        public string PointId => string.IsNullOrEmpty(_pointId) ? Locations.LocationRoot.Find(this)?.GetPathTo(this).ToString() ?? GetPath().ToString() : _pointId;
 
         /// <summary>Now in absolute game minutes; without a clock (sandbox scenes) approximates
         /// the default speed of one game minute per real second.</summary>
-        private double NowMinutes => _worldClock != null ? _worldClock.Day * 1440 + _worldClock.MinuteOfDay : _fallbackMinutes;
+        private double NowMinutes => Locations.LocationRoot.Find(this)?.ReconciliationMinutes ?? _worldClock?.TotalMinutes ?? _fallbackMinutes;
 
         public override void _Ready()
         {
@@ -108,7 +108,7 @@ namespace LastBreath.World
             // Filling here regardless was the save-scum exploit (save -> load = full camp again).
             bool loadPending = _gameServiceProvider.GetService<ISaveGameService>()?.HasPendingLoad == true;
             // Deferred so the providers finish loading their JSON before the first spawn.
-            if (_spawnOnReady && !loadPending) CallDeferred(nameof(FillToCapacity));
+            if (_spawnOnReady && !loadPending && Locations.LocationRoot.Find(this)?.IsPreparing != true) CallDeferred(nameof(FillToCapacity));
         }
 
         public override void _ExitTree()
@@ -122,6 +122,7 @@ namespace LastBreath.World
 
         public override void _Process(double delta)
         {
+            if (Locations.LocationRoot.Find(this)?.IsPreparing == true) return;
             if (_worldClock == null) _fallbackMinutes += delta;
             if (_pendingDueMinutes.Count == 0) return;
 
@@ -159,7 +160,17 @@ namespace LastBreath.World
             _pendingDueMinutes.AddRange(data.PendingDueMinutes);
         }
 
-        public void FillFresh() => FillToCapacity();
+        public void FillFresh() { if (_spawnOnReady) FillToCapacity(); }
+
+        public IReadOnlyCollection<string> OwnedIds => _ownedInstanceIds;
+        public void RestoreOwnership(IEnumerable<BaseNpc> residents, SpawnPointSaveData state)
+        {
+            _ownedInstanceIds.Clear();
+            _group = null;
+            foreach (var npc in residents) { _ownedInstanceIds.Add(npc.InstanceId); AddToGroupIfNeeded(npc); }
+            _pendingDueMinutes.Clear();
+            _pendingDueMinutes.AddRange(state.PendingDueMinutes);
+        }
 
         private void FillToCapacity()
         {
@@ -225,7 +236,7 @@ namespace LastBreath.World
             _pendingDueMinutes.Add(NowMinutes + delay);
         }
 
-        private float PhaseDelayMultiplier => _worldClock?.Phase switch
+        private float PhaseDelayMultiplier => _worldClock?.PhaseAt(NowMinutes) switch
         {
             DayPhase.Night => _nightDelayMultiplier,
             DayPhase.Morning => _morningDelayMultiplier,

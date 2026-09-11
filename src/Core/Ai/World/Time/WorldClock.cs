@@ -14,6 +14,7 @@ namespace Core.Ai.World.Time
         private WorldClockConfig _config;
         private double _secondsOfDay;
 
+        public double TotalMinutes => Day * 1440.0 + _secondsOfDay / 60.0;
         public int Day { get; private set; }
         public int Hour => (int)(_secondsOfDay / 3600);
         public int Minute => (int)(_secondsOfDay % 3600 / 60);
@@ -21,6 +22,7 @@ namespace Core.Ai.World.Time
         public float NormalizedTimeOfDay => (float)(_secondsOfDay / GameDaySeconds);
         public float RealSecondsPerGameMinute => _config.RealMinutesPerGameDay * 60f / (24f * 60f);
         public DayPhase Phase => PhaseOf(Hour);
+        public DayPhase PhaseAt(double totalMinutes) => PhaseOf((int)(totalMinutes % 1440 / 60));
 
         public event Action<int>? HourPassed;
         public event Action<DayPhase>? PhaseChanged;
@@ -48,13 +50,16 @@ namespace Core.Ai.World.Time
             if (Phase != previousPhase) PhaseChanged?.Invoke(Phase);
         }
 
-        public void RestoreState(int day, int minuteOfDay)
+        public void RestoreState(int day, int minuteOfDay) => RestoreTime(Math.Max(0, day) * 1440.0 + Math.Clamp(minuteOfDay, 0, 1439));
+
+        public void RestoreTime(double totalMinutes)
         {
+            if (!double.IsFinite(totalMinutes) || totalMinutes < 0) throw new ArgumentOutOfRangeException(nameof(totalMinutes));
             int previousHour = Hour;
             var previousPhase = Phase;
 
-            Day = Math.Max(0, day);
-            _secondsOfDay = Math.Clamp(minuteOfDay, 0, (24 * 60) - 1) * 60.0;
+            Day = (int)(totalMinutes / 1440);
+            _secondsOfDay = totalMinutes % 1440 * 60.0;
 
             if (Hour != previousHour) HourPassed?.Invoke(Hour);
             if (Phase != previousPhase) PhaseChanged?.Invoke(Phase);

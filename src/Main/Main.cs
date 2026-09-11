@@ -73,6 +73,7 @@ namespace LastBreath
             // thrown away — and toasts a full bag over the world the player is loading into.
             bool loadPending = _provider.GetService<ISaveGameService>().HasPendingLoad;
             if (_addTestItems && !loadPending) AddTestItems();
+            _provider.GetService<World.Locations.LocationCoordinator>().Attach(this, _mainWorld!, _provider);
         }
 
         private void ResizeWorldView()
@@ -122,6 +123,7 @@ namespace LastBreath
             _gameEventBus?.Unsubscribe<BattleInitializedEvent>(OnBattleInitialized);
             _gameEventBus?.Unsubscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
             _gameEventBus?.Unsubscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
+            _provider.GetService<World.Locations.LocationCoordinator>().Detach();
             _provider.GetService<ILootOrchestrator>().SetFloorToSpawnItems(null);
             GetTree().Root.SizeChanged -= ResizeWorldView;
             GetTree().AutoAcceptQuit = true; // menu scene has no battles — stock quit is fine there

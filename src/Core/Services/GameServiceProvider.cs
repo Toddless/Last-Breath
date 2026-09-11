@@ -17,6 +17,7 @@ namespace Core.Services
     using Microsoft.Extensions.DependencyInjection;
     using PassiveTree.View;
     using Views.UI;
+    using World.Spaces;
 
     /// <summary>
     /// The shared composition root. A project bootstraps it ONCE with its own registrations:
@@ -101,7 +102,7 @@ namespace Core.Services
             // time it opens, so where the player left it has to be kept somewhere that outlives it.
             services.AddSingleton<PassiveWheelViewMemory>();
             services.AddSingleton<IPlayerAccessor, PlayerAccessor>();
-            services.AddSingleton<Core.World.Spaces.BattleSiteRegistry>();
+            services.AddSingleton<BattleSiteRegistry>();
             services.AddSingleton<IRestRecoveryService, RestRecoveryService>();
             services.AddSingleton<ISmartPointRegistry, SmartPointRegistry>();
             services.AddGameDataParticipant<IRecoveryConfigProvider, RecoveryConfigProvider>();

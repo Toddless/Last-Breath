@@ -11,17 +11,24 @@ namespace Core.Save
 
     public class LoadScope : ILoadScope
     {
-        public bool IsLoading { get; private set; }
+        private int _depth;
+        public bool IsLoading => _depth > 0;
 
         public IDisposable Begin()
         {
-            IsLoading = true;
+            _depth++;
             return new Ender(this);
         }
 
         private sealed class Ender(LoadScope owner) : IDisposable
         {
-            public void Dispose() => owner.IsLoading = false;
+            private bool _disposed;
+            public void Dispose()
+            {
+                if (_disposed) return;
+                _disposed = true;
+                owner._depth--;
+            }
         }
     }
 }

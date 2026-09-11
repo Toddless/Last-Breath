@@ -1,4 +1,4 @@
-﻿namespace Core.Save
+namespace Core.Save
 {
     /// <summary>Checkpoint-facing orchestration over SaveManager + SaveStorage: slots, metadata
     /// peeking for the UI, and the two-step load (request → scene reload → apply).</summary>
@@ -29,5 +29,6 @@
         /// <summary>Applies the pending file. The SaveDirector in the fresh scene calls this
         /// once every node's _Ready (and the deferred spawn fills) have run.</summary>
         void ApplyPendingLoad();
+        System.Threading.Tasks.Task ApplyPendingLoadAsync() { ApplyPendingLoad(); return System.Threading.Tasks.Task.CompletedTask; }
     }
 }

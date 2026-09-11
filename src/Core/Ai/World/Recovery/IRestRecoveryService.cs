@@ -25,5 +25,6 @@ namespace Core.Ai.World.Recovery
         void UnregisterParticipant(IFightable entity);
 
         void Tick(float realDelta);
+        void Reconcile(IFightable entity, Vector2 position, float minutes) { }
     }
 }

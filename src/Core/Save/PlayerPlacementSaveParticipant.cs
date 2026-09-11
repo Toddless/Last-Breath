@@ -6,14 +6,16 @@ namespace Core.Save
     using Newtonsoft.Json.Linq;
 
     /// <summary>Godot-side participant: the position lives on the player node, not on IPlayer.</summary>
-    public class PlayerPlacementSaveParticipant(IPlayerAccessor playerAccessor) : ISaveParticipant
+    public class PlayerPlacementSaveParticipant(IPlayerAccessor playerAccessor, World.Locations.ILocationSaveCoordinator? locations = null) : ISaveParticipant
     {
         public string SectionId => "playerPlacement";
-        public int Version => 1;
+        public bool RequiredForLoad => locations != null;
+        public int Version => 2;
         public int RestoreOrder => Core.Save.RestoreOrder.PlayerPlacement;
 
         public JToken Capture()
         {
+            if (locations != null) return JToken.FromObject(locations.CapturePlacement());
             if (playerAccessor.Player is not Node2D node) return new JObject();
             return JToken.FromObject(new PlayerPlacementSaveData { X = node.GlobalPosition.X, Y = node.GlobalPosition.Y });
         }
@@ -21,7 +23,9 @@ namespace Core.Save
         public void Restore(JToken data, int savedVersion)
         {
             var saved = data.ToObject<PlayerPlacementSaveData>();
-            if (saved == null || playerAccessor.Player is not Node2D node) return;
+            if (saved == null) return;
+            if (locations != null) { locations.RestorePlacement(saved); return; }
+            if (playerAccessor.Player is not Node2D node) return;
             node.GlobalPosition = new Vector2(saved.X, saved.Y);
         }
     }

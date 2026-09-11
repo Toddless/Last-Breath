@@ -75,6 +75,38 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void UnloadedRaidExpiresWithoutDereferencingItsFormerNodes()
+        {
+            StartRaid();
+            _raids.SuspendSpace(new object());
+            foreach (var raider in _raiderMocks) raider.SetupGet(x => x.IsAlive).Throws(new InvalidOperationException("Freed node"));
+            Assert.AreEqual(0, _finalDeaths.Count);
+            _raids.Tick(20);
+            Assert.IsFalse(_raids.IsRaidActive);
+            Assert.AreEqual(2, _finalDeaths.Count);
+            Assert.AreEqual(0, _population.CurrentCount);
+        }
+
+        [TestMethod]
+        public void ResumedRaidUsesRestoredResidents()
+        {
+            StartRaid();
+            var originals = _raiderMocks.ToList();
+            _raids.SuspendSpace(new object());
+            var replacements = originals.Select(old =>
+            {
+                var next = new Mock<IFightableNpc>();
+                next.SetupGet(x => x.InstanceId).Returns(old.Object.InstanceId);
+                next.SetupGet(x => x.IsAlive).Returns(false);
+                return next.Object;
+            }).ToList();
+            _raids.ResumeResidents(replacements);
+            _raids.Tick(1);
+            Assert.IsFalse(_raids.IsRaidActive);
+            Assert.AreEqual(0, _finalDeaths.Count);
+        }
+
+        [TestMethod]
         public void RaidSpawnsFromTheNearestHatredSite()
         {
             _relations.SetPlayerRelation(Fractions.Elf, RelationLevel.Hatred);

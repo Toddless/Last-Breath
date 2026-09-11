@@ -31,7 +31,7 @@ namespace LastBreath.World
             {
                 // One frame: every node's _Ready and the deferred spawn fills have run by then.
                 await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-                _saveGame!.ApplyPendingLoad();
+                await _saveGame!.ApplyPendingLoadAsync();
                 // Until this line the scene ran on the state of the playthrough being left behind.
                 // No section announces the load itself, so whoever read that state in _Ready is told here.
                 _gameEventBus?.Publish(new GameLoadedEvent());

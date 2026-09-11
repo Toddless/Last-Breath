@@ -2,6 +2,7 @@ namespace Core.Ai.World.Skirmish
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Entity.Components;
 
     // TODO:
@@ -45,6 +46,19 @@ namespace Core.Ai.World.Skirmish
             _strengthA = SquadStrength.Calculate(sideA);
             _strengthB = SquadStrength.Calculate(sideB);
             ScheduleNextRoll();
+        }
+
+        public NpcSkirmishState CaptureState() => new()
+        {
+            SideA = SideA.Select(x => x.InstanceId).ToList(), SideB = SideB.Select(x => x.InstanceId).ToList(),
+            RoundsPlayed = _roundsPlayed, SideAWins = _sideAWins, NextRollIn = _nextRollIn
+        };
+
+        public void RestoreState(NpcSkirmishState state)
+        {
+            _roundsPlayed = state.RoundsPlayed;
+            _sideAWins = state.SideAWins;
+            _nextRollIn = state.NextRollIn;
         }
 
         public void Tick(float delta)

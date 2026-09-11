@@ -84,7 +84,7 @@ namespace Core.Save
                     sp.GetService<Items.IOrnamentMinter>(),
                     sp.GetService<IInventory>()));
                 manager.Register(new PlayerVitalsSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
-                manager.Register(new PlayerPlacementSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
+                manager.Register(new PlayerPlacementSaveParticipant(sp.GetRequiredService<IPlayerAccessor>(), sp.GetService<World.Locations.ILocationSaveCoordinator>()));
 
                 // The npcWorld section needs a project-side NPC factory; a project without one
                 // (no world NPCs) simply doesn't write the section.

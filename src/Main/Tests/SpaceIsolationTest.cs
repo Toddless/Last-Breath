@@ -193,12 +193,12 @@ namespace LastBreath.Tests
                 bus.Subscribe<Core.Events.AttackTargetSelectedEvent>(_ => picked = true);
                 spot.MarkSelectable("space-test", true);
                 var clickPosition = spot.GetGlobalTransformWithCanvas().Origin;
-                npc.GetViewport().NotifyMouseEntered();
+                GetTree().Root.NotifyMouseEntered();
                 Capture("arena");
-                npc.GetViewport().PushInput(new InputEventMouseMotion { Position = clickPosition, GlobalPosition = clickPosition }, true);
-                npc.GetViewport().PushInput(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = clickPosition, GlobalPosition = clickPosition }, true);
+                GetTree().Root.PushInput(new InputEventMouseMotion { Position = clickPosition, GlobalPosition = clickPosition }, true);
+                GetTree().Root.PushInput(new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = clickPosition, GlobalPosition = clickPosition }, true);
                 await Frames(3);
-                Check(picked, "Arena picking must resolve a rendered target.");
+                Check(picked, "Window input must pass through the HUD and container to select an arena target.");
                 Capture("arena");
                 context.Abort();
                 for (int i = 0; !task.IsCompleted && i < 300; i++) await Frames(1);

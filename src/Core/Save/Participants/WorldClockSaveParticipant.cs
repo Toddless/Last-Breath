@@ -7,11 +7,12 @@ namespace Core.Save.Participants
     public class WorldClockSaveParticipant(IWorldClock clock) : ISaveParticipant
     {
         public string SectionId => "worldClock";
-        public int Version => 1;
+        public int Version => 2;
         public int RestoreOrder => Save.RestoreOrder.World;
 
         public JToken Capture() => JToken.FromObject(new WorldClockSaveData
         {
+            TotalMinutes = clock.TotalMinutes,
             Day = clock.Day,
             MinuteOfDay = clock.MinuteOfDay
         });
@@ -20,7 +21,7 @@ namespace Core.Save.Participants
         {
             var saved = data.ToObject<WorldClockSaveData>();
             if (saved == null) return;
-            clock.RestoreState(saved.Day, saved.MinuteOfDay);
+            clock.RestoreTime(saved.TotalMinutes ?? saved.Day * 1440.0 + saved.MinuteOfDay);
         }
     }
 }

@@ -22,6 +22,7 @@ namespace Core.Save
         private readonly IGameMessageBus _messageBus;
         private readonly IRaidService? _raids;
         private SaveFile? _pendingLoad;
+        private readonly World.Locations.ILocationSaveCoordinator? _locations;
 
         public SaveGameService(
             ISaveManager manager,
@@ -30,7 +31,8 @@ namespace Core.Save
             IMartialArtMastery mastery,
             INpcPopulationService population,
             IGameMessageBus messageBus,
-            IRaidService? raids = null)
+            IRaidService? raids = null,
+            World.Locations.ILocationSaveCoordinator? locations = null)
         {
             _manager = manager;
             _storage = storage;
@@ -39,13 +41,14 @@ namespace Core.Save
             _population = population;
             _messageBus = messageBus;
             _raids = raids;
+            _locations = locations;
             _manager.SectionRestoreFailed += OnSectionRestoreFailed;
         }
 
         public int SlotCount => Slots;
 
         /// <summary>No saving in battle, while lying dead, or under an active raid (checkpoints are unreachable in all — this is the backstop).</summary>
-        public bool CanSave => _playerAccessor.Player is { IsFighting: false, IsAlive: true } && _raids?.IsRaidActive != true;
+        public bool CanSave => _playerAccessor.Player is { IsFighting: false, IsAlive: true } && _raids?.IsRaidActive != true && _locations?.IsTransitioning != true;
         public bool HasPendingLoad => _pendingLoad != null;
 
         public bool HasSave(int slot) => _storage.Exists(slot);
@@ -101,8 +104,23 @@ namespace Core.Save
             _manager.Restore(file);
         }
 
+        public async System.Threading.Tasks.Task ApplyPendingLoadAsync()
+        {
+            if (_pendingLoad == null) return;
+            var file = _pendingLoad;
+            bool success = false;
+            try
+            {
+                if (_locations != null) await _locations.PrepareLoadAsync(file);
+                ApplyPendingLoad();
+                success = true;
+            }
+            finally { _pendingLoad = null; _locations?.CompleteLoad(success); }
+        }
+
         private string CurrentSceneName() =>
-            _playerAccessor.Player is Node playerNode ? playerNode.GetTree().CurrentScene.Name : string.Empty;
+            _locations?.CapturePlacement().LocationId
+            ?? (_playerAccessor.Player is Node playerNode ? playerNode.GetTree().CurrentScene.Name : string.Empty);
 
         private static void OnSectionRestoreFailed(string sectionId, Exception e) =>
             Tracker.TrackException($"Save section '{sectionId}' failed to restore", e);

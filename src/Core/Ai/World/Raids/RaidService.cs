@@ -27,7 +27,7 @@ namespace Core.Ai.World.Raids
     {
         private const string RaidNotificationId = "UI_Raid_Started";
 
-        private record ActiveRaider(IFightableNpc Npc, string NpcId);
+        private record ActiveRaider(IFightableNpc? Npc, string NpcId, string InstanceId, Vector2 Position, bool Alive);
 
         private readonly List<ActiveRaider> _raiders = [];
         private readonly IFactionRelationService _relations;
@@ -180,7 +180,7 @@ namespace Core.Ai.World.Raids
                 if (_spawner.SpawnAt(definition, site.Position + jitter, site) is not { } raider) continue;
 
                 _population.ReserveOutsideLimit();
-                _raiders.Add(new ActiveRaider(raider, definition.NpcId));
+                _raiders.Add(new ActiveRaider(raider, definition.NpcId, raider.InstanceId, raider.Position, true));
             }
 
             if (_raiders.Count == 0) return;
@@ -200,6 +200,7 @@ namespace Core.Ai.World.Raids
             bool anyFighting = false;
             foreach (var raider in _raiders)
             {
+                if (raider.Npc == null) { anyAlive |= raider.Alive; continue; }
                 if (!raider.Npc.IsAlive) continue;
                 anyAlive = true;
                 if (raider.Npc.IsFighting)
@@ -220,6 +221,23 @@ namespace Core.Ai.World.Raids
             EndRaid();
         }
 
+        public void SuspendSpace(object root)
+        {
+            for (int i = 0; i < _raiders.Count; i++)
+            {
+                var raider = _raiders[i];
+                if (raider.Npc == null || !_spatial.SharesSpace(root, raider.Npc)) continue;
+                _raiders[i] = raider with { Npc = null, Position = raider.Npc.Position, Alive = raider.Npc.IsAlive };
+            }
+        }
+
+        public void ResumeResidents(IEnumerable<IFightableNpc> residents)
+        {
+            foreach (var npc in residents)
+            for (int i = 0; i < _raiders.Count; i++)
+                if (_raiders[i].InstanceId == npc.InstanceId) _raiders[i] = _raiders[i] with { Npc = npc };
+        }
+
         private Vector2? GetPursuitTarget(IFightableNpc raider)
         {
             if (_playerAccessor.Player is { IsFighting: true })
@@ -235,6 +253,11 @@ namespace Core.Ai.World.Raids
         {
             foreach (var raider in _raiders)
             {
+                if (raider.Npc == null)
+                {
+                    if (raider.Alive) _gameEventBus.Publish(new NpcFinalDeathEvent(raider.InstanceId, raider.NpcId, raider.Position));
+                    continue;
+                }
                 if (!raider.Npc.IsAlive) continue; // the dead stay as bodies with their normal lifecycles
 
                 // Final death is the single channel every interested system already listens to:

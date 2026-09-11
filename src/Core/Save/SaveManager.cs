@@ -65,8 +65,10 @@ namespace Core.Save
 
             if (section.Version > participant.Version)
             {
-                Report(participant, new InvalidOperationException(
-                    $"Section version {section.Version} is newer than the supported {participant.Version}."));
+                var error = new InvalidOperationException(
+                    $"Section version {section.Version} is newer than the supported {participant.Version}.");
+                Report(participant, error);
+                if (participant.RequiredForLoad) throw error;
                 RestoreWithoutSection(participant);
                 return;
             }
@@ -78,6 +80,7 @@ namespace Core.Save
             catch (Exception e)
             {
                 Report(participant, e);
+                if (participant.RequiredForLoad) throw;
                 RestoreWithoutSection(participant);
             }
         }
@@ -93,6 +96,7 @@ namespace Core.Save
             catch (Exception e)
             {
                 Report(participant, e);
+                if (participant.RequiredForLoad) throw;
             }
         }
 

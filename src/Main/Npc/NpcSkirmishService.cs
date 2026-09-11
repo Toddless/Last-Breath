@@ -41,11 +41,36 @@ namespace LastBreath.Npc
                 participant.IsFighting = true;
 
             var skirmish = new NpcSkirmish(sideA, sideB, _rnd, _config);
+            Track(skirmish);
+            return true;
+        }
+
+        private void Track(NpcSkirmish skirmish)
+        {
             skirmish.RoundResolved += round => OnRoundResolved(skirmish, round);
             skirmish.Completed += OnCompleted;
             skirmish.Aborted += OnAborted;
             _active.Add(skirmish);
-            return true;
+        }
+
+        public List<NpcSkirmishState> CaptureSpace(Node2D root) => _active
+            .Where(x => NativeSpatialQuery.Instance.SharesSpace(root, x.SideA[0]))
+            .Select(x => x.CaptureState()).ToList();
+
+        public void SuspendSpace(Node2D root) =>
+            _active.RemoveAll(x => NativeSpatialQuery.Instance.SharesSpace(root, x.SideA[0]));
+
+        public void RestoreSpace(IEnumerable<NpcSkirmishState> states, IReadOnlyDictionary<string, BaseNpc> npcs)
+        {
+            foreach (var state in states)
+            {
+                var a = state.SideA.Select(x => (ISkirmishParticipant)npcs[x]).ToList();
+                var b = state.SideB.Select(x => (ISkirmishParticipant)npcs[x]).ToList();
+                foreach (var npc in a.Concat(b)) npc.IsFighting = true;
+                var skirmish = new NpcSkirmish(a, b, _rnd, _config);
+                skirmish.RestoreState(state);
+                Track(skirmish);
+            }
         }
 
         public void Tick(float delta)

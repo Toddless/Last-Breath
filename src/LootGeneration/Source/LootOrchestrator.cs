@@ -204,11 +204,17 @@ namespace LootGeneration.Source
         /// <summary>A restored drop lands where it was left instead of being tossed there: the toss is the
         /// presentation of a kill, and nothing was just killed. The spot is written BEFORE the node enters
         /// the tree — a body placed after it joins teleports whatever it overlaps.</summary>
-        private void SpawnRestored(GroundItemPlacement placement)
+        public void RestoreLocationItems(Node2D floor, IReadOnlyList<GroundItemPlacement> items)
+        {
+            FreeItems(_itemsOnGround.Where(x => GodotObject.IsInstanceValid(x) && Core.World.Spaces.SpatialAccess.SharesSpace(floor, x)).ToList());
+            foreach (var placement in items) SpawnRestored(placement, floor);
+        }
+
+        private void SpawnRestored(GroundItemPlacement placement, Node2D? floor = null)
         {
             var onGround = BuildItemOnGround(placement.Item, placement.Quantity);
             onGround.Position = new Vector2(placement.X, placement.Y);
-            AddToFloor(onGround);
+            AddToFloor(onGround, floor);
         }
 
         /// <summary>Empties the floor, spilled drops and the ones a battle had ready alike: the orchestrator

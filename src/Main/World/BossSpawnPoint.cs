@@ -43,7 +43,7 @@ namespace LastBreath.World
         private bool _bossAlive;
         private bool _spawnPending;
 
-        public string PointId => string.IsNullOrEmpty(_pointId) ? GetPath().ToString() : _pointId;
+        public string PointId => string.IsNullOrEmpty(_pointId) ? Locations.LocationRoot.Find(this)?.GetPathTo(this).ToString() ?? GetPath().ToString() : _pointId;
 
         public override void _Ready()
         {
@@ -61,7 +61,7 @@ namespace LastBreath.World
             // A pending load owns the initial population (same policy as NpcSpawnPoint).
             bool loadPending = _gameServiceProvider.GetService<ISaveGameService>()?.HasPendingLoad == true;
             // Deferred so the providers finish loading their JSON before the first spawn.
-            if (!loadPending) CallDeferred(nameof(SpawnIfAllowed));
+            if (!loadPending && Locations.LocationRoot.Find(this)?.IsPreparing != true) CallDeferred(nameof(SpawnIfAllowed));
         }
 
         public override void _ExitTree()
@@ -76,7 +76,7 @@ namespace LastBreath.World
         /// deferred to _Process, the same "never touch the tree from a combat callback" rule.</summary>
         public override void _Process(double delta)
         {
-            if (!_spawnPending) return;
+            if (Locations.LocationRoot.Find(this)?.IsPreparing == true || !_spawnPending) return;
             _spawnPending = false;
             SpawnBoss();
         }
@@ -94,6 +94,14 @@ namespace LastBreath.World
         }
 
         public void FillFresh() => SpawnIfAllowed();
+        public string? OwnedId => _bossInstanceId;
+        public void RestoreOwnership(BaseNpc? npc)
+        {
+            _bossInstanceId = npc?.InstanceId;
+            EnsureTrackerFromDefinition();
+            SetBossAlive(npc?.IsAlive == true);
+            _spawnPending = !_bossAlive && _respawnMode == BossRespawnMode.FactionDeaths && _tracker?.IsRespawnDue == true;
+        }
 
         /// <summary>First appearance: both categories spawn on a fresh world; Single never returns
         /// after the final-death fact, FactionDeaths ignores it by design (Todd, 2026-07-17).</summary>

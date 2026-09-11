@@ -9,6 +9,9 @@ namespace Core.Ai.World.Time
     /// </summary>
     public interface IWorldClock
     {
+        double TotalMinutes => Day * 1440.0 + MinuteOfDay;
+        void RestoreTime(double totalMinutes) => RestoreState((int)(totalMinutes / 1440), (int)(totalMinutes % 1440));
+
         int Day { get; }
         int Hour { get; }
         int Minute { get; }
@@ -25,6 +28,7 @@ namespace Core.Ai.World.Time
         float RealSecondsPerGameMinute => 1f;
 
         DayPhase Phase { get; }
+        DayPhase PhaseAt(double totalMinutes) => Phase;
 
         event Action<int>? HourPassed;
         event Action<DayPhase>? PhaseChanged;

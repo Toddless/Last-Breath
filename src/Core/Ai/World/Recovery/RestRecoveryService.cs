@@ -57,6 +57,11 @@ namespace Core.Ai.World.Recovery
             }
         }
 
+        public void Reconcile(IFightable entity, Vector2 position, float minutes)
+        {
+            if (minutes > 0 && entity.IsAlive && !entity.IsFighting && InsideAnyZone(entity, position)) Restore(entity, minutes);
+        }
+
         private bool InsideAnyZone(IFightable entity, Vector2 position)
         {
             foreach (var zone in _zones)

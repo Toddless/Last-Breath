@@ -1,31 +1,49 @@
 # Location and Battle Spaces
 
-Status: architecture approved. Arena isolation, participant return, spatial services, and raid/marker targeting are implemented for #274–277. Location transitions and persistence remain planned for #278.
+Status: architecture approved. The initial runtime for #274–278 is implemented: arena isolation, participant return, spatial services, raid targeting, exploration travel, and location snapshots.
 
 ## Implementation Status
 
 Implemented:
-- MainWorld runs inside its own World2D/SubViewport; a transient battle presentation owns a distinct World2D and restores the origin view/input on disposal.
-- BattleContext records each participant's original parent and transform, including late arrivals, and returns them after battle end or cancelled preparation. Nested parents are supported.
-- EntitySpot owns the deferred transfer to its slot and cancels a pending transfer when the slot is released.
-- Battle drops retain their origin parent; pickup, dialogue, checkpoint, and corpse-distance guards reject other physical spaces.
-- ISpatialQuery resolves live World2D instance identity. Unknown or detached native objects do not share a space. Durable LocationId/SpaceId contracts remain part of #278.
-- NPC sightings, hunting, skirmish recruitment, noise, smart-point claims, recovery zones, and witnesses respect spatial membership. Battle witnesses retain the origin space after the player transfers.
-- BattleSiteRegistry holds the active marker's BattleId, origin space, and position without retaining scene nodes. Marker teardown and session reset remove this record.
-- Reinforcement requests carry BattleId and remain bound to the receiving BattleContext, rejecting stale requests and arrivals from another space.
-- Raids spawn in their source point's space and pursue the local player or the matching origin marker during battle. An inaccessible target clears movement while normal expiry and cleanup continue.
-- Narrative NPC spawning also uses the named source point's space, independent of the player's current parent.
+- MainWorld and each managed side location use distinct World2D/SubViewport instances. MainWorld keeps simulating while hidden.
+- BattleContext owns a transient arena and restores each participant's original parent and transform. A battle retains its exploration origin, including side locations.
+- Spatial services filter sightings, noise, hunting, witnesses, recovery, smart-point claims, skirmishes, and reinforcement admission. BattleId rejects stale joins.
+- LocationCatalog reads authored scene paths, a new-game start address, and directed endpoint connections from SharedData/Locations.
+- LocationCoordinator serializes travel, checks endpoint reach and player state, gates input/saving, prepares the destination, transfers the existing player, and unloads the abandoned side location.
+- Location snapshots retain NPC identities, rolled parameters, abilities/modifiers, vitals, homes/patrol routes, groups, spawn ownership, lifecycle state, and concrete ground items.
+- NPC skirmishes retain participants, round scores, and the pending round delay. They resume on activation; unloaded time does not invent historical fight outcomes.
+- Dormant residents retain population reservations. An unloaded raid releases native references while its normal expiry continues; expired raiders are removed from dormant state.
+- WorldClock and playerPlacement v2 preserve fractional game minutes and location-relative placement. The locations section replaces Main's legacy npcWorld/spawnPoints/groundItems sections; old files migrate to MainWorld.
+- SaveDirector prepares required scenes before global save restoration. Required location/placement failures stop loading instead of falling back to a partially restored playable session.
+- Authored object state uses ILocationStateParticipant. Null entries are permanent-removal records; recovery receives the elapsed game minutes once on activation.
 
 Validation:
-- Main and Testing projects build with zero errors; Testing also builds the Battle dependency. Existing nullable/analyzer warnings remain.
-- 73 focused logic tests pass, covering raids, spatial services, witnesses, claims, recovery, activities, reputation, world brains, narrative spawning, and session reset.
-- The Godot SpaceIsolationTest scene passes 31 checks, including native sighting/noise isolation and marker identity, battle abort/return, late admission, cancelled preparation, hidden-world physics, target picking, and view sizing.
-- The earlier rendered Compatibility run passed; world, arena, and return screenshots were inspected. Existing Effekseer path-case warnings remain.
-- Run: Godot --headless --path src/Main res://Tests/SpaceIsolationTest.tscn --quit-after 1800 (build Main first).
+- Main and Testing builds succeed; existing nullable/analyzer warnings remain.
+- LocationTravelTest passes 34 native checks: directed travel, concurrent/remote refusal, independent worlds, hidden-world time, unloaded NPC/loot persistence, corpse deadlines, invalid destinations, keyboard interaction, side-location battles, object removal, and the real SaveDirector path after recreating Main.
+- SpaceIsolationTest passes 31 native checks. Its target-selection check now sends input through the root window and HUD rather than directly into the arena viewport.
+- 99 focused logic tests pass, covering location graph validation, fractional clock saves, nested load scopes, dormant raids, save restoration, recovery, skirmishes, and spatial queries.
+- Run the scenes with Godot --headless --path src/Main res://Tests/LocationTravelTest.tscn --quit-after 1800 and res://Tests/SpaceIsolationTest.tscn (build Main first).
+- Existing Effekseer path-case warnings remain.
 
-Remaining:
-- Data-driven location connections, side-location snapshots, elapsed-time reconciliation, and save orchestration (#278).
-- Broader gameplay validation of death/flee/quit and spatial lighting/audio remains part of the integration work.
+## Authoring the Current Runtime
+
+- Give each location a LocationRoot and a stable LocationId. MainWorld already derives from LocationRoot.
+- Add a LocationEndpoint with a unique EndpointId and a child Marker2D named Arrival. Move the endpoint to the interaction position and Arrival to the spawn position/facing.
+- Register the scene and directed connections in SharedData/Locations/Locations.json. A two-way passage needs two records; multiple entrances need distinct endpoint IDs.
+- The initial connection is MainWorld.VillageSource ↔ SourceOfPowerNearVillage.Entrance. Interaction uses the interact action (E). Endpoint positions and labels are initial scene placements for further level design.
+- New games currently start at MainWorld.Start; change the catalog's start address to begin in another location.
+- Managed locations share the session player. A Player authored inside a side scene is retained in the file for standalone F6 testing and removed from the managed instance before it enters the tree.
+- Keep the global NpcWorldDirector and SaveDirector in MainWorld only. Side locations must not add another global heartbeat.
+- Empty fullscreen HUD roots use MouseFilter.Ignore so the viewport container underneath receives mouse events. Interactive HUD children retain their own filters.
+- For persistent authored objects, implement ILocationStateParticipant with an ID unique within the location. Capture concrete contents and deadlines; RestoreLocationState must not reroll them. ReconcileElapsed implements the object's own recovery and occupancy rules. Chest/resource gameplay adapters belong to the interactive-environment stages.
+- Give spawn points explicit stable IDs before renaming or moving them. Their default ID is the path relative to LocationRoot.
+- No C# Tool instance is required by these runtime components.
+
+Remaining integration work:
+- Author final entrance placement, hints, lighting, and environment content.
+- Connect future chest/resource components to the object-state contract.
+- Continue broader visual/audio and death/flee/quit gameplay checks.
+
 
 ## Overview
 
