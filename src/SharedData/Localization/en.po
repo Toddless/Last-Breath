@@ -4982,3 +4982,36 @@ msgstr "Trinity"
 
 msgid "Passive_Skill_Trinity_Description"
 msgstr "Attacks deal 100% of their {@Physical} Damage as {@Cold}, {@Fire} and {@Lightning}."
+
+msgid "UI_Close"
+msgstr "Close"
+
+msgid "UI_Interaction_Interact"
+msgstr "Interact"
+
+msgid "UI_Interaction_Open"
+msgstr "Open"
+
+msgid "UI_Interaction_Travel"
+msgstr "Travel"
+
+msgid "UI_Interaction_Unavailable"
+msgstr "Unavailable"
+
+msgid "UI_Container_TakeAll"
+msgstr "Take all"
+
+msgid "UI_Container_Full"
+msgstr "Inventory full. Remaining items stay in the chest."
+
+msgid "Chest_Starter"
+msgstr "Starting equipment"
+
+msgid "UI_Interaction_Talk"
+msgstr "Talk"
+
+msgid "UI_Interaction_Attack"
+msgstr "Attack"
+
+msgid "UI_Interaction_NoDialogue"
+msgstr "Nothing to say right now"

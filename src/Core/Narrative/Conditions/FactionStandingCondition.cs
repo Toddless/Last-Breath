@@ -7,6 +7,8 @@ namespace Core.Narrative.Conditions
 
     public class FactionStandingCondition(IFactionRelationService relations, Fractions faction, RelationLevel atLeast) : INarrativeCondition
     {
+        public bool IsPreviewSafe => true;
+
         public bool IsMet(NarrativeContext context) => relations.GetPlayerRelation(faction) >= atLeast;
     }
 

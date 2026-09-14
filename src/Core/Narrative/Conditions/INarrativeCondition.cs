@@ -7,6 +7,9 @@ namespace Core.Narrative.Conditions
     /// </summary>
     public interface INarrativeCondition
     {
+        /// <summary>Explicit opt-in for repeated admission checks without writes or random rolls.</summary>
+        bool IsPreviewSafe => false;
+
         bool IsMet(NarrativeContext context);
     }
 }

@@ -5049,3 +5049,36 @@ msgstr "Триединство"
 
 msgid "Passive_Skill_Trinity_Description"
 msgstr "Атаки наносят 100% физического урона как холод, огонь и молния."
+
+msgid "UI_Close"
+msgstr ""
+
+msgid "UI_Interaction_Interact"
+msgstr ""
+
+msgid "UI_Interaction_Open"
+msgstr ""
+
+msgid "UI_Interaction_Travel"
+msgstr ""
+
+msgid "UI_Interaction_Unavailable"
+msgstr ""
+
+msgid "UI_Container_TakeAll"
+msgstr ""
+
+msgid "UI_Container_Full"
+msgstr ""
+
+msgid "Chest_Starter"
+msgstr ""
+
+msgid "UI_Interaction_Talk"
+msgstr ""
+
+msgid "UI_Interaction_Attack"
+msgstr ""
+
+msgid "UI_Interaction_NoDialogue"
+msgstr ""

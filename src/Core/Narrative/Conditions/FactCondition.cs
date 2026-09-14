@@ -6,6 +6,8 @@ namespace Core.Narrative.Conditions
     /// <summary>One entry covers flags and counters: a flag is a count of at least 1.</summary>
     public class FactCondition(IWorldFactsService facts, string key, int count) : INarrativeCondition
     {
+        public bool IsPreviewSafe => true;
+
         public bool IsMet(NarrativeContext context) => facts.GetCount(key) >= count;
     }
 

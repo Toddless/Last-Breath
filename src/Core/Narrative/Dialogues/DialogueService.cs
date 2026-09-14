@@ -39,25 +39,29 @@ namespace Core.Narrative.Dialogues
 
         public event Action? Ended;
 
+        public bool CanStart(string npcId, string? npcInstanceId, Fractions faction) =>
+            ResolveEntry(npcId, new NarrativeContext(npcInstanceId, faction)) != null;
+
+        private (DialogueDefinition Dialogue, DialogueNode Node)? ResolveEntry(string npcId, NarrativeContext context)
+        {
+            var dialogue = _dialogues.Get(npcId);
+            if (dialogue == null || dialogue.EntryRules.Any(rule => rule.Conditions.Any(condition => !condition.IsPreviewSafe))) return null;
+            var rule = dialogue.EntryRules.FirstOrDefault(entry => entry.Conditions.All(condition => condition.IsMet(context)));
+            return rule != null && dialogue.Nodes.TryGetValue(rule.NodeId, out var node) ? (dialogue, node) : null;
+        }
+
         public bool Start(string npcId, string? npcInstanceId, Fractions faction)
         {
             if (IsActive) End();
 
-            var dialogue = _dialogues.Get(npcId);
-            if (dialogue == null) return false;
+            var context = new NarrativeContext(npcInstanceId, faction);
+            if (ResolveEntry(npcId, context) is not { } entry) return false;
 
-            _context = new NarrativeContext(npcInstanceId, faction);
-            var rule = dialogue.EntryRules.FirstOrDefault(entry => entry.Conditions.All(condition => condition.IsMet(_context)));
-            if (rule == null)
-            {
-                _context = NarrativeContext.Empty;
-                return false;
-            }
-
-            _dialogue = dialogue;
+            _context = context;
+            _dialogue = entry.Dialogue;
             _usedThisConversation.Clear();
             RewardFirstTalk(npcId);
-            EnterNode(dialogue.Nodes[rule.NodeId]);
+            EnterNode(entry.Node);
             return true;
         }
 

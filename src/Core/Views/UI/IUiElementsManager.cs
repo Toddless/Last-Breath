@@ -42,6 +42,8 @@ namespace Core.Views.UI
         /// Polled by the player's movement, so it must stay cheap.</summary>
         bool HasMovementBlockingWindow { get; }
 
+        bool HasMovementBlockingWindowExcept(IWindow? ownedWindow) => HasMovementBlockingWindow;
+
         bool RegisterHudFactory(Type hudType, Func<IHud> factory);
 
         /// <summary>The window is openable only in <paramref name="allowedIn"/> contexts; a context

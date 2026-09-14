@@ -16,8 +16,8 @@ namespace LastBreath.Npc
     ///
     /// Known limitations beyond that:
     /// - The fitter (and the calculator's authored numbers) assume the TestNpc.tscn layout. A scene
-    ///   built differently — Necro.tscn, say: circle interaction r100, capsule body r25/h90, no
-    ///   DialogueActor — would, should its NPC ever gain a visual config, get its body refitted
+    ///   built differently — Necro.tscn, say: circle interaction r100, capsule body r25/h90 —
+    ///   would, should its NPC ever gain a visual config, get its body refitted
     ///   with TestNpc's proportions while the unmatched nodes spam the Tracker. Today that path is
     ///   dead (Necro is never instantiated; spawns go through TestNpc), but reviving such a scene
     ///   needs its own calculator preset.
@@ -50,7 +50,6 @@ namespace LastBreath.Npc
                 silhouette, Mathf.Abs(sprite.Scale.X), Mathf.Abs(sprite.Scale.Y));
             FitBody(npc, profile);
             FitInteraction(npc, interactionArea, profile);
-            FitDialogue(npc, profile);
         }
 
         private static void FitBody(CharacterBody2D npc, in NpcCollisionProfile profile)
@@ -76,19 +75,6 @@ namespace LastBreath.Npc
 
             Place(node, npc, profile.Interaction.CenterX, profile.Interaction.CenterY);
             node.Shape = new CapsuleShape2D { Radius = profile.Interaction.Radius, Height = profile.Interaction.Height };
-        }
-
-        private static void FitDialogue(CharacterBody2D npc, in NpcCollisionProfile profile)
-        {
-            if (profile.Dialogue is not { } circle) return;
-            if (FindChildOfType<DialogueActor>(npc) is not { } actor || FindShapeNode<CircleShape2D>(actor) is not { } node)
-            {
-                ReportMissing("DialogueActor CollisionShape2D (circle) of npc", npc);
-                return;
-            }
-
-            Place(node, npc, circle.CenterX, circle.CenterY);
-            node.Shape = new CircleShape2D { Radius = circle.Radius };
         }
 
         /// <summary>The profile speaks NPC-local coordinates; a shape node one level down (inside

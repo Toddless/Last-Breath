@@ -800,41 +800,44 @@ namespace LastBreath.Npc
 
         private void OnBodyEnter(Node2D body)
         {
-            if (IsFighting || !IsAlive || _locations?.IsTransitioning == true) return; // transfer and lying bodies cannot start battles
-            if (_contactGraceSeconds > 0) return; // fresh out of a battle: let the loser leave
-            // The player's flag guards the battle-start window: a second NPC touching in the same
-            // frame must not publish a second BattleInitializedEvent. A dead player is a corpse,
-            // not a battle target.
-            if (body is not IPlayer player || player.IsFighting || !player.IsAlive) return;
-            // Contact is not a war declaration: a neutral local (merchant, future villagers) bumped
-            // into is no battle. Hostility comes from the standing/personal layers, not the touch.
-            if (!ConsidersPlayerAnEnemy()) return;
+            if (_contactGraceSeconds > 0 || body is not IPlayer player || !ConsidersPlayerAnEnemy()) return;
+            TryStartBattleWith(player);
+        }
+
+        /// <summary>Shared admission for contact and an explicit player attack.</summary>
+        public bool CanStartBattleWith(IPlayer player) =>
+            IsInsideTree() && !IsQueuedForDeletion() && IsAlive && !IsFighting
+            && player is Node2D body && GodotObject.IsInstanceValid(body) && body.IsInsideTree()
+            && player.IsAlive && !player.IsFighting && _gameEventBus != null
+            && _locations?.IsTransitioning != true && NativeSpatialQuery.Instance.SharesSpace(this, player);
+
+        /// <summary>Starts the existing world battle pipeline, including group admission and origin noise.</summary>
+        public bool TryStartBattleWith(IPlayer player)
+        {
+            if (!CanStartBattleWith(player)) return false;
             try
             {
-                List<IFightable> fighters = [];
+                List<IFightable> fighters = [this];
                 if (Group != null)
                 {
-                    // Only free, living squadmates join: a member frozen in an NPC skirmish must not
-                    // fight in two battles at once (tracker #62). Filter BEFORE the Attacked
-                    // notification — it raises IsFighting on the whole group.
                     fighters.AddRange(Group.GetEntitiesInGroup<IFightable>()
-                        .Where(member => member.IsAlive && !member.IsFighting && NativeSpatialQuery.Instance.SharesSpace(this, member)));
-                    Group.NotifyAllInGroup(GroupNotification.Attacked);
+                        .Where(member => member != this && member.IsAlive && !member.IsFighting
+                            && NativeSpatialQuery.Instance.SharesSpace(this, member)));
+                    // BattleContext claims only admitted participants; unrelated squadmates keep their state.
                 }
-                else
-                    fighters.Add(this);
 
                 StopMoving();
-                // Permanent forensics: one line per battle start names the initiator and the spot —
-                // it has already pinned down two "battles out of nowhere" bugs. Kept cheap on purpose.
-                Tracker.TrackInfo($"Battle started by {Id} ({InstanceId}) at {GlobalPosition}, player at {(player as Node2D)?.GlobalPosition}", this);
-                _gameEventBus?.Publish(new BattleInitializedEvent(player, fighters));
-                // A fight breaking out is audible: nearby brains investigate (they filter by hearing radius).
-                _gameEventBus?.Publish(new WorldStimulusEvent(new Stimulus(StimulusType.Noise, GlobalPosition, NativeSpatialQuery.Instance.GetSpace(this))));
+                var position = GlobalPosition;
+                var space = NativeSpatialQuery.Instance.GetSpace(this);
+                Tracker.TrackInfo($"Battle started with {Id} ({InstanceId}) at {position}, player at {(player as Node2D)?.GlobalPosition}", this);
+                _gameEventBus!.Publish(new BattleInitializedEvent(player, fighters));
+                _gameEventBus.Publish(new WorldStimulusEvent(new Stimulus(StimulusType.Noise, position, space)));
+                return true;
             }
-            catch (Exception e)
+            catch (Exception error)
             {
-                Tracker.TrackException("Failed to handle body enter", e, this);
+                Tracker.TrackException("Failed to start world battle", error, this);
+                return false;
             }
         }
 

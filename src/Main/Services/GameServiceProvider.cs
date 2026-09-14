@@ -124,7 +124,13 @@ namespace LastBreath.Services
             services.AddGameData("res://Data/", "res://Data/Shared/");
             // The bag registers once; its Core seams (contents, slot lending, click reports) all
             // resolve to the same instance, so windows never name the concrete service.
+            services.AddSingleton<World.Interactions.InteractionService>();
+            services.AddSingleton<Core.World.Containers.ChestCatalog>();
+            services.AddSingleton<IGameDataParticipant>(sp => sp.GetRequiredService<Core.World.Containers.ChestCatalog>());
+            services.AddTransient<IRequestHandler<Core.World.Interactions.ExecuteInteractionRequest, Core.World.Interactions.InteractionResult>, World.Interactions.ExecuteInteractionHandler>();
+            services.AddTransient<IRequestHandler<Core.World.Interactions.ContainerTransferRequest, Core.World.Interactions.InteractionResult>, World.Interactions.ContainerTransferHandler>();
             services.AddSingleton<Bag>();
+            services.AddSingleton<IInventoryTransfer>(sp => sp.GetRequiredService<Bag>());
             services.AddSingleton<IInventory>(sp => sp.GetRequiredService<Bag>());
             services.AddSingleton<ISlotLender>(sp => sp.GetRequiredService<Bag>());
             services.AddSingleton<IItemInteractionSource>(sp => sp.GetRequiredService<Bag>());
@@ -246,6 +252,8 @@ namespace LastBreath.Services
             uiElements.RegisterHudFactory(typeof(PlayerHud), () => PlayerHud.Initialize().Instantiate<PlayerHud>());
             // The availability map (design, Todd 2026-07-11): battle allows only the read-only
             // CharacterWindow; a dialogue allows nothing else; a forbidden open is a silent no-op.
+            uiElements.RegisterWindowFactory(typeof(World.Interactions.UI.InteractionMenuWindow), () => World.Interactions.UI.InteractionMenuWindow.Initialize().Instantiate<World.Interactions.UI.InteractionMenuWindow>(), UiContext.World);
+            uiElements.RegisterWindowFactory(typeof(World.Interactions.UI.ChestContentsWindow), () => World.Interactions.UI.ChestContentsWindow.Initialize().Instantiate<World.Interactions.UI.ChestContentsWindow>(), UiContext.World);
             uiElements.RegisterWindowFactory(typeof(InventoryWindow), () => InventoryWindow.Initialize().Instantiate<InventoryWindow>(), UiContext.World);
             uiElements.RegisterWindowFactory(typeof(DialogueWindow), () => DialogueWindow.Initialize().Instantiate<DialogueWindow>(), UiContext.World | UiContext.Dialogue);
             uiElements.RegisterWindowFactory(typeof(QuestJournalWindow), () => QuestJournalWindow.Initialize().Instantiate<QuestJournalWindow>(), UiContext.World);

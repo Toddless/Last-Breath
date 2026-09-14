@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://bk7b387n62dh" path="res://Npc/Left - Idle.png" id="4_n34kv"]
 [ext_resource type="Texture2D" uid="uid://rpt1oxcxaifq" path="res://Npc/Left - Hurt.png" id="4_og1c3"]
 [ext_resource type="Texture2D" uid="uid://dtcqxb7rqpu70" path="res://Npc/Right - Idle.png" id="5_lhems"]
-[ext_resource type="Script" uid="uid://bqc3et70qq3ua" path="res://Npc/DialogueActor.cs" id="10_r5eee"]
+[ext_resource type="PackedScene" path="res://Npc/NpcInteractionTarget.tscn" id="10_r5eee"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8osjy"]
 radius = 35.0
@@ -715,9 +715,6 @@ animations = [{
 radius = 37.4
 height = 136.39
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_5f5v3"]
-radius = 77.64
-
 [node name="TestNpc" type="CharacterBody2D" unique_id=283522954 node_paths=PackedStringArray("_interactionArea", "_animationsComponent")]
 script = ExtResource("1_xnmur")
 _interactionArea = NodePath("Area2D")
@@ -742,11 +739,4 @@ animation = &"Idle_Down"
 position = Vector2(0, 92)
 shape = SubResource("CapsuleShape2D_0trnf")
 
-[node name="DialogueActor" type="Area2D" parent="." unique_id=1792907842]
-position = Vector2(0, 70)
-script = ExtResource("10_r5eee")
-metadata/_custom_type_script = "uid://bqc3et70qq3ua"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DialogueActor" unique_id=92195266]
-position = Vector2(0, 15)
-shape = SubResource("CircleShape2D_5f5v3")
+[node name="InteractionTarget" parent="." instance=ExtResource("10_r5eee")]

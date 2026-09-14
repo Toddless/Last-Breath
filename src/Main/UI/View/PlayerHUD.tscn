@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://boqqyrt0sfpve"]
 
+[ext_resource type="PackedScene" path="res://World/Interactions/UI/InteractionHint.tscn" id="interaction_hint"]
+
 [ext_resource type="Script" uid="uid://dw5w7qvskr8b4" path="res://UI/PlayerHud.cs" id="1_22o70"]
 [ext_resource type="PackedScene" uid="uid://bqsttrk1hud4a" path="res://UI/View/QuestTracker.tscn" id="2_l0x06"]
 [ext_resource type="PackedScene" uid="uid://cv5svhrugien6" path="res://Addons/Battle/UIElements/CharacterHealthBar.tscn" id="3_20ugx"]
@@ -19,6 +21,9 @@ _questsBtn = NodePath("Margin/Buttons/Quests")
 _craftingBtn = NodePath("Margin/Buttons/Crafting")
 _clock = NodePath("Margin/VBoxContainer/Clock")
 _playerBar = NodePath("Margin/VBoxContainer/CharacterHealthBar")
+
+[node name="InteractionHint" parent="." instance=ExtResource("interaction_hint")]
+layout_mode = 0
 
 [node name="QuestTracker" parent="." unique_id=941207267 instance=ExtResource("2_l0x06")]
 layout_mode = 1

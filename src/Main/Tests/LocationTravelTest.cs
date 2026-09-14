@@ -130,7 +130,10 @@ namespace LastBreath.Tests
                 Check(side.Descendants().OfType<BaseNpc>().Count(x => x.InstanceId == npcId) == 1, "Loading cannot duplicate residents.");
                 Check(loot.ItemsOnGround.Count(x => Core.World.Spaces.SpatialAccess.SharesSpace(side, x)) == 1, "Loading cannot duplicate drops.");
                 player.GlobalPosition = side.Endpoint("Entrance").GlobalPosition;
+                for (int tick = 0; tick < 12; tick++) await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+                await Frames(2);
                 GetTree().Root.PushInput(new InputEventKey { PhysicalKeycode = Key.E, Pressed = true }, true);
+                for (int tick = 0; tick < 12; tick++) await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
                 await Frames(5);
                 GetTree().Root.PushInput(new InputEventKey { PhysicalKeycode = Key.E, Pressed = false }, true);
                 Check(travel.ActiveLocationId == "MainWorld", "The authored interaction action reaches the endpoint through the viewport.");

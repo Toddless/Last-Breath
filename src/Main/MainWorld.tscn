@@ -67,7 +67,7 @@ tile_map_data = PackedByteArray("AAACAAAAAAADAAMAAAADAAAAAAADAAMAAAAEAAAAAAADAAM
 tile_set = SubResource("TileSet_brush")
 
 [node name="NpcSpawnPoint" type="Node2D" parent="." unique_id=1770220157]
-position = Vector2(558, -57)
+position = Vector2(1112, -253)
 script = ExtResource("9_hv00y")
 _npcIds = PackedStringArray("Npc_Wolf")
 _maxCount = 1
@@ -78,6 +78,7 @@ _recoveryZone = false
 metadata/_custom_type_script = "uid://ctta8cas4isp7"
 
 [node name="Start" type="Node2D" parent="." unique_id=1285303473]
+position = Vector2(314, -332)
 script = ExtResource("loc_endpoint")
 EndpointId = "Start"
 
@@ -85,12 +86,11 @@ EndpointId = "Start"
 position = Vector2(1, 0)
 
 [node name="VillageSource" type="Node2D" parent="." unique_id=1114708774]
-position = Vector2(900, 0)
+position = Vector2(292, 601)
 script = ExtResource("loc_endpoint")
 EndpointId = "VillageSource"
 
 [node name="Arrival" type="Marker2D" parent="VillageSource" unique_id=1670240056]
-position = Vector2(0, 220)
 
 [node name="Label" type="Label" parent="VillageSource" unique_id=200626887]
 offset_left = -120.0

@@ -195,3 +195,15 @@ AbilityActivationContext меняется активационными мута�
 - Entrances and exits have explicit directed connections. A dead-end entrance has a reverse connection; through-locations may have several endpoints.
 - The origin location stays loaded during battle. BattleSiteMarker remains there for noise and reinforcement admission.
 - LocationSpaces.md records the approved architecture and implementation status. MainWorld and the player arena now use separate World2D instances; BattleContext owns participant return placement. Spatial services use live World2D identity, and raids target the origin battle marker by BattleId. LocationCoordinator now owns catalog-driven travel and per-location snapshots; SaveDirector prepares the saved location before restoring global state. See LocationSpaces.md for authoring and validation.
+
+## Общее взаимодействие и сундук (#265, 2026-09-11)
+- PlayerInteractionController — единый владелец E для выходов и сундуков; Area2D поддерживает кандидатов, точная проверка выполняется с интервалом 0,1 с и перед действием. Слой физики 16 — InteractionTargets; препятствия настраиваются через ObstacleMask цели.
+- InteractionService связывает окно с живой целью и пространством; команды идут через GameMessageBus, проверяются в физическом цикле и отменяются при закрытии/выгрузке. Действия компонует IInteractionSource. Перенос NPC на этот механизм — #266.
+- ChestCatalog читает SharedData/Chests. ChestComponent сохраняет конкретные предметы, остатки слотов и абсолютный срок удаления через ILocationStateParticipant. Частичный перенос использует IInventoryTransfer.ReceiveUpTo и отложенные уведомления: остатки источника фиксируются до событий инвентаря.
+- Первый сундук — StarterChest в SourceOfPowerNearVillage, без замка, пять Uncommon-предметов из JSON. Сапоги имеют ID Boots_Stone_Tread. E открывает, ПКМ переносит позицию, R забирает всё помещающееся. Пустой сундук исчезает через настраиваемые 5 игровых минут.
+
+## NPC в общем взаимодействии (#266)
+- TestNpc содержит NpcInteractionTarget с DialogueActor и NpcAttackActionSource. Разговор запускается через E/меню; старой кликовой области нет. Атака всегда требует явного выбора, включая случай единственного действия.
+- IDialogueService.CanStart и Start разрешают вход одним способом. INarrativeCondition.IsPreviewSafe — явное разрешение предварительной проверки; по умолчанию false, составные условия требуют безопасности каждого ребёнка. QuestOfferRoll и косвенный CanAcceptQuest запрещены во входах, но сохраняют работу в репликах.
+- BaseNpc.TryStartBattleWith объединяет контакт и явную атаку. BattleContext помечает только принятых участников; нельзя использовать уведомление Attacked всей группе для установки IsFighting. Позиция/пространство шума фиксируются до переноса в арену.
+- InteractionTarget регистрируется при каждом входе в дерево локации и получает новую привязку; NPC использует InstanceId. Смерть/бой/преграда закрывают меню, уход или удаление собеседника завершают принадлежащий ему диалог. Статические собеседники используют обычную цель и авторские параметры DialogueActor.

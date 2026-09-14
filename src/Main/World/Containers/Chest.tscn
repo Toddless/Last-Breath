@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://d4ke0my3shbsa"]
+
+[ext_resource type="Texture2D" uid="uid://bb84e38q7guai" path="res://World/Containers/Chest.png" id="2_p728w"]
+[ext_resource type="Script" uid="uid://tc13ki6wtb6f" path="res://World/Containers/ChestComponent.cs" id="script"]
+[ext_resource type="PackedScene" path="res://World/Interactions/InteractionTarget.tscn" id="target"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xjaui"]
+atlas = ExtResource("2_p728w")
+region = Rect2(1259.8744, 10.829041, 817.0294, 864.17096)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0el2h"]
+atlas = ExtResource("2_p728w")
+region = Rect2(12.283752, 10.829041, 1029.7161, 518.7487)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iywav"]
+atlas = ExtResource("2_p728w")
+region = Rect2(1239.1244, 5.6415405, 855.9352, 848.1541)
+
+[sub_resource type="RectangleShape2D" id="body"]
+size = Vector2(112, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fx85w"]
+size = Vector2(312, 147)
+
+[node name="Chest" type="Node2D" unique_id=2089530389 node_paths=PackedStringArray("Visual")]
+script = ExtResource("script")
+Visual = NodePath("Visual")
+Visuals = Array[Texture2D]([SubResource("AtlasTexture_xjaui"), SubResource("AtlasTexture_0el2h")])
+
+[node name="Visual" type="Sprite2D" parent="." unique_id=433653130]
+scale = Vector2(0.35, 0.35)
+texture = SubResource("AtlasTexture_iywav")
+
+[node name="SolidBody" type="StaticBody2D" parent="." unique_id=1638875469]
+
+[node name="Shape" type="CollisionShape2D" parent="SolidBody" unique_id=1194086988]
+shape = SubResource("body")
+
+[node name="InteractionTarget" parent="." unique_id=370911694 instance=ExtResource("target")]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionTarget" unique_id=1052523319]
+position = Vector2(2, 9.5)
+shape = SubResource("RectangleShape2D_fx85w")

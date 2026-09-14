@@ -11,6 +11,8 @@ namespace Core.Narrative.Conditions
     /// against Influence are the rolled kind).</summary>
     public class AttributeCondition(IPlayerAccessor playerAccessor, AttributeType attribute, int atLeast) : INarrativeCondition
     {
+        public bool IsPreviewSafe => true;
+
         public bool IsMet(NarrativeContext context) =>
             playerAccessor.Player is { } player && Resolve(player) is { } value && value.Total >= atLeast;
 

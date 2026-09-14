@@ -22,6 +22,9 @@ namespace Core.Narrative.Dialogues
         event Action? Ended;
 
         /// <summary>False when the NPC has no dialogue or no entry rule matches.</summary>
+        /// <summary>Resolves an entry without starting a conversation or evaluating its options.</summary>
+        bool CanStart(string npcId, string? npcInstanceId, Fractions faction);
+
         bool Start(string npcId, string? npcInstanceId, Fractions faction);
 
         void Choose(string optionId);

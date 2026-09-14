@@ -9,6 +9,8 @@ namespace Core.Narrative.Conditions
     /// opinion. Outside a conversation (empty context) the condition is never met.</summary>
     public class NpcRelationCondition(IPersonalReputationService personal, RelationLevel atLeast) : INarrativeCondition
     {
+        public bool IsPreviewSafe => true;
+
         public bool IsMet(NarrativeContext context) =>
             context is { NpcInstanceId: { } instanceId, NpcFaction: { } faction }
             && personal.GetEffectiveRelation(instanceId, faction) >= atLeast;

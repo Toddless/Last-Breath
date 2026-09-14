@@ -62,6 +62,9 @@ namespace Core.Narrative.Dialogues
                     .OrderByDescending(rule => rule.Priority)
                     .ToList();
 
+                if (rules.Any(rule => rule.Conditions.Any(condition => !condition.IsPreviewSafe)))
+                    throw new InvalidOperationException("entry conditions must support read-only preview; rolls and indirect quest acceptance belong in dialogue options");
+
                 var dialogue = new DialogueDefinition(entry.NpcId, rules, nodes);
                 ValidateReferences(dialogue);
                 return dialogue;

@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Inventory
+namespace LastBreath.Inventory
 {
     using System;
     using System.Collections.Generic;
@@ -14,13 +14,15 @@
     using Godot;
     using UI;
 
-    public class Inventory(IUiElementsManager uiElements, IGameMessageBus messageBus) : IInventory, ISlotLender, IItemInteractionSource, ISessionResettable
+    public class Inventory(IUiElementsManager uiElements, IGameMessageBus messageBus) : IInventory, ISlotLender, IItemInteractionSource, ISessionResettable, IInventoryTransfer
     {
         private const int BagSlots = 220;
         private const string BagIsFullKey = "UI_Inventory_Full";
         private const string MissingItemsKey = "UI_Inventory_Missing_Items";
 
         private readonly Dictionary<string, IItem> _itemInstances = [];
+        private int _notificationDepth;
+        private readonly HashSet<string> _pendingNotifications = [];
         protected List<IInventorySlot> Slots { get; } = [];
 
         public int InventoryCapacity => BagSlots;
@@ -148,10 +150,46 @@
         /// and the mutated item's own slot never sees an event of its own.</summary>
         private void AnnounceAmountChange(string itemId)
         {
+            if (_notificationDepth > 0) { _pendingNotifications.Add(itemId); return; }
             ItemAmountChanges?.Invoke(itemId, GetTotalItemAmount(itemId));
             foreach (var slot in Slots)
                 if (slot is Slot node)
                     node.RefreshView();
+        }
+
+        /// <summary>Accepts the quantity that fits without issuing capacity notifications.</summary>
+        public int ReceiveUpTo(IItem item, int amount)
+        {
+            if (amount <= 0) return 0;
+            EnsureSlots();
+            int room = Slots.Sum(slot => RoomInSlot(slot, item.Id, item.MaxStackSize));
+            int accepted = Math.Min(amount, room);
+            if (accepted <= 0) return 0;
+            _itemInstances.TryAdd(item.InstanceId, item);
+            FitItemsInSlots(item.Id, item.InstanceId, accepted, item.MaxStackSize);
+            if (!Slots.Any(x => x.CurrentItem?.InstanceId == item.InstanceId)) _itemInstances.Remove(item.InstanceId);
+            AnnounceAmountChange(item.Id);
+            return accepted;
+        }
+
+        public IDisposable DeferNotifications()
+        {
+            _notificationDepth++;
+            return new NotificationScope(this);
+        }
+
+        private sealed class NotificationScope(Inventory owner) : IDisposable
+        {
+            private bool _disposed;
+            public void Dispose()
+            {
+                if (_disposed) return;
+                _disposed = true;
+                if (--owner._notificationDepth != 0) return;
+                var pending = owner._pendingNotifications.ToArray();
+                owner._pendingNotifications.Clear();
+                foreach (string id in pending) owner.AnnounceAmountChange(id);
+            }
         }
 
         /// <summary>Whether the whole amount fits: what the stacks already held can still take, plus

@@ -5,6 +5,8 @@ namespace Core.Narrative.Conditions
 
     public class InfluenceCondition(IInfluenceMastery mastery, int atLeast) : INarrativeCondition
     {
+        public bool IsPreviewSafe => true;
+
         public bool IsMet(NarrativeContext context) => mastery.CurrentLevel >= atLeast;
     }
 

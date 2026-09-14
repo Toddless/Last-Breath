@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://World/Interactions/UI/InteractionHint.cs" id="script"]
+
+[node name="InteractionHint" type="PanelContainer"]
+mouse_filter = 2
+script = ExtResource("script")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 20

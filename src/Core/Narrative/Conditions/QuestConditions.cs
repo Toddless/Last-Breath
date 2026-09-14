@@ -13,6 +13,7 @@ namespace Core.Narrative.Conditions
     /// </summary>
     public class QuestStatusCondition(Func<IQuestLogService> log, string questId, QuestStatus? status) : INarrativeCondition
     {
+        public bool IsPreviewSafe => true;
         public bool IsMet(NarrativeContext context) => log().GetStatus(questId) == status;
     }
 
@@ -68,6 +69,7 @@ namespace Core.Narrative.Conditions
 
     public class CanTurnInQuestCondition(Func<IQuestLogService> log, string questId) : INarrativeCondition
     {
+        public bool IsPreviewSafe => true;
         public bool IsMet(NarrativeContext context) => log().CanTurnIn(questId);
     }
 

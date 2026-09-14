@@ -8,16 +8,19 @@ namespace Core.Narrative.Conditions
     /// factory). A silently dropped clause would soften a gate — fail closed instead.</summary>
     public class AllOfCondition(List<INarrativeCondition> conditions) : INarrativeCondition
     {
+        public bool IsPreviewSafe => conditions.All(condition => condition.IsPreviewSafe);
         public bool IsMet(NarrativeContext context) => conditions.All(condition => condition.IsMet(context));
     }
 
     public class AnyOfCondition(List<INarrativeCondition> conditions) : INarrativeCondition
     {
+        public bool IsPreviewSafe => conditions.All(condition => condition.IsPreviewSafe);
         public bool IsMet(NarrativeContext context) => conditions.Any(condition => condition.IsMet(context));
     }
 
     public class NotCondition(INarrativeCondition condition) : INarrativeCondition
     {
+        public bool IsPreviewSafe => condition.IsPreviewSafe;
         public bool IsMet(NarrativeContext context) => !condition.IsMet(context);
     }
 

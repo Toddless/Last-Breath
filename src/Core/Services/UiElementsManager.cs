@@ -65,6 +65,10 @@ namespace Core.Services
         public bool HasMovementBlockingWindow =>
             _openWindows.ToList().Any(pair => TryGetOpenWindow(pair.Key, out var window) && window.BlocksMovement);
 
+        public bool HasMovementBlockingWindowExcept(IWindow? ownedWindow) =>
+            _openWindows.ToList().Any(pair => TryGetOpenWindow(pair.Key, out var window)
+                && !ReferenceEquals(window, ownedWindow) && window.BlocksMovement);
+
         public bool HandleEscape()
         {
             if (CloseOverlayLayer()) return true;

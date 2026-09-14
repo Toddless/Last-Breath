@@ -7,6 +7,8 @@ namespace Core.Narrative.Conditions
     /// quest item found before the quest count, and a sold-off one stop counting.</summary>
     public class HasItemCondition(IInventory inventory, string itemId, int amount) : INarrativeCondition
     {
+        public bool IsPreviewSafe => true;
+
         public bool IsMet(NarrativeContext context) => inventory.GetTotalItemAmount(itemId) >= amount;
     }
 

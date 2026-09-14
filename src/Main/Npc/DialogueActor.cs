@@ -1,80 +1,82 @@
 namespace LastBreath.Npc
 {
-    using System;
-    using Core;
-    using Core.Ai.World.Skirmish;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
     using Core.Entity;
     using Core.Enums;
     using Core.MessageBus;
     using Core.MessageBus.Messages;
+    using Core.Narrative.Dialogues;
     using Core.Services;
-    using Core.World.Spaces;
+    using Core.World.Interactions;
     using Godot;
+    using World.Interactions;
 
-    /// <summary>
-    /// The talk interaction: an Area2D dropped into an NPC scene (or placed standalone for a
-    /// static talker). Left click with the player in reach opens the conversation. Under a
-    /// world NPC the identity comes from the parent; the exports are the standalone fallback.
-    /// </summary>
+    /// <summary>Supplies talk under a shared target; authored identity overrides preserve static talkers.</summary>
     [GlobalClass]
-    public partial class DialogueActor : Area2D
+    public partial class DialogueActor : Node, IInteractionSource
     {
-        private const float InteractDistance = 150f;
-
+        private const double ValidationIntervalSeconds = 0.1;
         [Export] private string _npcId = string.Empty;
         [Export] private Fractions _faction = Fractions.Human;
-        private IGameMessageBus? _messages;
-        private IPlayerAccessor? _playerAccessor;
+        private IDialogueService _dialogue = null!;
+        private IPlayerAccessor _players = null!;
+        private IGameMessageBus _messages = null!;
+        private bool _ownsConversation;
+        private double _elapsed;
+        private InteractionTarget Target => (InteractionTarget)GetParent();
+        private INpc? Npc => Target.GetParent() as INpc;
+        private string NpcId => _npcId.Length > 0 ? _npcId : Npc?.Id ?? string.Empty;
 
-        public override void _Ready()
+        public override void _EnterTree()
         {
-            _messages = GameServiceProvider.Instance.GetService<IGameMessageBus>();
-            _playerAccessor = GameServiceProvider.Instance.GetService<IPlayerAccessor>();
-            InputEvent += OnInputEvent;
+            var provider = Services.GameServiceProvider.Instance;
+            _dialogue = provider.GetService<IDialogueService>();
+            _players = provider.GetService<IPlayerAccessor>();
+            _messages = provider.GetService<IGameMessageBus>();
+            _dialogue.Ended += ConversationEnded;
         }
 
-        private void OnInputEvent(Node viewport, InputEvent @event, long shapeIdx)
+        public override void _ExitTree()
         {
-            if (@event is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left }) return;
-            if (!PlayerInReach()) return;
-
-            // A lying body or a fighter mid-battle doesn't talk.
-            if (GetParent() is ISkirmishParticipant { IsAlive: false } or ISkirmishParticipant { IsFighting: true }) return;
-            // Species capability (interaction.canTalk in Npc.json): a wolf never converses no matter
-            // the reputation. Checked at click time — the definition applies after _Ready.
-            // A standalone actor (no INpc parent) is an authored static talker and always may.
-            if (GetParent() is INpc { CanTalk: false }) return;
-            // A filled export is the author's override (a spawned parent may carry ANY definition);
-            // the parent identity is the fallback, but its instance/faction stay authoritative.
-            var parent = GetParent() as INpc;
-            string npcId = _npcId.Length > 0 ? _npcId : parent?.Id ?? string.Empty;
-            var message = new OpenDialogueMessage(npcId, parent?.InstanceId, parent?.Fraction ?? _faction);
-            if (message.NpcId.Length == 0)
-            {
-                Tracker.TrackError("DialogueActor has no npc id: neither the parent INpc nor the _npcId export provides one");
-                return;
-            }
-
-            Publish(message);
+            EndOwnedConversation();
+            _dialogue.Ended -= ConversationEnded;
         }
 
-        /// <summary>Awaited so a handler exception lands in the log instead of vanishing with the task.</summary>
-        private async void Publish(OpenDialogueMessage message)
+        public IEnumerable<InteractionAction> Actions()
         {
-            try
-            {
-                if (_messages != null) await _messages.PublishMessageAsync(message);
-            }
-            catch (Exception exception)
-            {
-                Tracker.TrackError($"Opening dialogue for '{message.NpcId}' failed: {exception}");
-            }
+            if (!Target.IsAvailable || Npc is { CanTalk: false }) return [];
+            bool available = NpcId.Length > 0 && _dialogue.CanStart(NpcId, Npc?.InstanceId, Npc?.Fraction ?? _faction);
+            return [new(InteractionActions.Talk, "UI_Interaction_Talk", available,
+                available ? null : "UI_Interaction_NoDialogue")];
         }
 
-        private bool PlayerInReach() =>
-            _playerAccessor?.Player is Node2D player
-            && SpatialAccess.SharesSpace(this, player)
-            && SpatialAccess.CanReceiveInput(this)
-            && player.GlobalPosition.DistanceTo(GlobalPosition) <= InteractDistance;
+        public async Task<InteractionResult> Execute(string actionId)
+        {
+            if (actionId != InteractionActions.Talk || !Actions().Any(action => action.Enabled))
+                return InteractionResult.Unavailable;
+            await _messages.PublishMessageAsync(new OpenDialogueMessage(NpcId, Npc?.InstanceId, Npc?.Fraction ?? _faction));
+            _ownsConversation = _dialogue.IsActive;
+            return _ownsConversation ? InteractionResult.Completed : InteractionResult.Unavailable;
+        }
+
+        public override void _PhysicsProcess(double delta)
+        {
+            if (!_ownsConversation) return;
+            _elapsed += delta;
+            if (_elapsed < ValidationIntervalSeconds) return;
+            _elapsed = 0;
+            if (_players.Player is not IPlayer { IsAlive: true, IsFighting: false } player
+                || player is not Node2D body || !float.IsFinite(InteractionReach.DistanceSquared(body, Target)))
+                EndOwnedConversation();
+        }
+
+        private void ConversationEnded() => _ownsConversation = false;
+        private void EndOwnedConversation()
+        {
+            if (_ownsConversation) _dialogue.End();
+            _ownsConversation = false;
+        }
     }
 }
