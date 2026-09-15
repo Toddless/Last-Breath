@@ -5082,3 +5082,6 @@ msgstr ""
 
 msgid "UI_Interaction_NoDialogue"
 msgstr ""
+
+msgid "UI_Interaction_Unbound"
+msgstr "Не назначено"

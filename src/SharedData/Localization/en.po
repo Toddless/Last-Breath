@@ -5015,3 +5015,6 @@ msgstr "Attack"
 
 msgid "UI_Interaction_NoDialogue"
 msgstr "Nothing to say right now"
+
+msgid "UI_Interaction_Unbound"
+msgstr "Unbound"

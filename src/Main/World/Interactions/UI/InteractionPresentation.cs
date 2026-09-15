@@ -1,11 +1,18 @@
 namespace LastBreath.World.Interactions.UI
 {
     using System.Linq;
+    using Core.Localization;
     using Core.World.Interactions;
     using Godot;
 
     internal static class InteractionPresentation
     {
+        /// <summary>Localization key shown in place of a key when an action has no usable input bound.</summary>
+        private const string UnboundKey = "UI_Interaction_Unbound";
+
+        /// <summary>Whether the display server exposes keyboard layouts; physical keys resolve to layout labels only where it does.</summary>
+        private static bool HasKeyboardLayouts => DisplayServer.KeyboardGetLayoutCount() > 0;
+
         public static Vector2 ScreenPoint(Node2D anchor)
         {
             var point = anchor.GetGlobalTransformWithCanvas().Origin;
@@ -15,10 +22,29 @@ namespace LastBreath.World.Interactions.UI
             return container.GetGlobalTransformWithCanvas() * (point * scale);
         }
 
+        /// <summary>The first input bound to the action as the player reads it; an action with nothing to show reads as unbound.</summary>
         public static string Binding(string action)
         {
-            var events = InputMap.ActionGetEvents(action);
-            return events.FirstOrDefault()?.AsText() ?? action;
+            string text = InputMap.ActionGetEvents(action).FirstOrDefault() switch
+            {
+                InputEventKey key => OS.GetKeycodeString(BoundKey(key)),
+                { } input => input.AsText(),
+                null => string.Empty,
+            };
+            return string.IsNullOrEmpty(text) ? Localization.Localize(UnboundKey) : text;
         }
+
+        /// <summary>The key an event matches by, read in the engine's matching order: Latin keycode, physical position, key label.</summary>
+        private static Key BoundKey(InputEventKey key)
+        {
+            if (key.Keycode != Key.None) return key.GetKeycodeWithModifiers();
+            if (key.PhysicalKeycode != Key.None) return PhysicalKeyLabel(key);
+            return key.GetKeyLabelWithModifiers();
+        }
+
+        /// <summary>The label printed on a physical key in the active layout, modifiers kept; the US QWERTY name where no layouts are exposed.</summary>
+        private static Key PhysicalKeyLabel(InputEventKey key) => HasKeyboardLayouts
+            ? DisplayServer.KeyboardGetLabelFromPhysical(key.PhysicalKeycode) | (Key)key.GetModifiersMask()
+            : key.GetPhysicalKeycodeWithModifiers();
     }
 }
