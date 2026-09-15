@@ -9,12 +9,16 @@ namespace LastBreath.World.Interactions.UI
 
     public abstract partial class InteractionWindow : Control, IWindow
     {
+        private static readonly Vector2 PanelOffset = new(24, 12);
+        private AudioStreamPlayer _refusal = null!;
         protected InteractionService? Service;
         protected InteractionTarget? Target;
         protected IGameMessageBus Messages = null!;
         protected VBoxContainer Rows = null!;
         protected PanelContainer Panel = null!;
-        private AudioStreamPlayer _refusal = null!;
+        protected Button CloseButton = null!;
+        /// <summary>The bound target while it is alive in the scene tree; null otherwise.</summary>
+        private InteractionTarget? LiveTarget => Target != null && GodotObject.IsInstanceValid(Target) && Target.IsInsideTree() ? Target : null;
         public bool BlocksMovement => true;
 
         public void InjectServices(IGameServiceProvider provider) => Messages = provider.GetService<IGameMessageBus>();
@@ -22,10 +26,14 @@ namespace LastBreath.World.Interactions.UI
         {
             Panel = GetNode<PanelContainer>("Frame");
             Rows = GetNode<VBoxContainer>("Frame/Content/Rows");
-            GetNode<Button>("Frame/Content/Close").Text = Localization.Localize("UI_Close");
-            GetNode<Button>("Frame/Content/Close").Pressed += Close;
+            CloseButton = GetNode<Button>("Frame/Content/Close");
+            CloseButton.Text = Localization.Localize("UI_Close");
+            CloseButton.Pressed += Close;
             _refusal = GetNode<AudioStreamPlayer>("Refusal");
-            if (Target != null) Refresh();
+            if (LiveTarget is not { } target) return;
+            // _Ready precedes the first drawn frame; placing before Refresh keeps the hide from dropping the rows' focus.
+            UiPlacement.PlaceClamped(Panel, InteractionPresentation.ScreenPoint(target.Anchor), PanelOffset);
+            Refresh();
         }
         public void Bind(InteractionService service, InteractionTarget target)
         {
@@ -35,8 +43,8 @@ namespace LastBreath.World.Interactions.UI
         }
         public override void _Process(double delta)
         {
-            if (Target == null || !GodotObject.IsInstanceValid(Target) || !Target.IsInsideTree()) { Close(); return; }
-            UiPlacement.PlaceClamped(Panel, InteractionPresentation.ScreenPoint(Target.Anchor), new Vector2(24, 12));
+            if (LiveTarget is not { } target) { Close(); return; }
+            UiPlacement.Follow(Panel, InteractionPresentation.ScreenPoint(target.Anchor), PanelOffset);
         }
         public virtual void Close()
         {

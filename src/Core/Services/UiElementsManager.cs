@@ -185,13 +185,14 @@ namespace Core.Services
                 node.QueueFree();
         }
 
-        /// <summary>Windows can close themselves (close button), leaving a stale tracking entry behind.</summary>
+        /// <summary>Windows can close themselves (close button), leaving a stale tracking entry behind. A window queued
+        /// for deletion is already closed: it no longer blocks movement, and its type opens a fresh instance.</summary>
         private bool TryGetOpenWindow(Type windowType, out IWindow window)
         {
             if (!_openWindows.TryGetValue(windowType, out window!)) return false;
             // The disposed-instance check only applies to nodes (non-node windows exist in tests).
             if (window is not Node node) return true;
-            if (GodotObject.IsInstanceValid(node)) return true;
+            if (GodotObject.IsInstanceValid(node) && !node.IsQueuedForDeletion()) return true;
 
             _openWindows.Remove(windowType);
             return false;

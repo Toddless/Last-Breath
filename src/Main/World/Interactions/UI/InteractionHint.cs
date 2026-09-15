@@ -28,7 +28,14 @@ namespace LastBreath.World.Interactions.UI
             _label.Text = enabled.Count > 0
                 ? $"{InteractionPresentation.Binding(InteractionActions.Interact)} · {Localization.Localize(key)}"
                 : Localization.Localize(actions.FirstOrDefault()?.ReasonKey ?? "UI_Interaction_Unavailable");
-            UiPlacement.PlaceClamped(this, InteractionPresentation.ScreenPoint(target.Anchor) - new Vector2(Size.X / 2, Size.Y));
+            Place(InteractionPresentation.ScreenPoint(target.Anchor) - new Vector2(Size.X / 2, Size.Y));
+        }
+
+        /// <summary>A hidden hint appears already standing at the point; a visible one follows it without toggling visibility.</summary>
+        private void Place(Vector2 point)
+        {
+            if (Visible) UiPlacement.Follow(this, point);
+            else UiPlacement.PlaceClamped(this, point);
         }
     }
 }
