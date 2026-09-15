@@ -14,7 +14,7 @@ monitoring = false
 script = ExtResource("target")
 
 [node name="InteractionPoint" type="Marker2D" parent="." unique_id=358546018]
-position = Vector2(0, 85)
+position = Vector2(0, 92)
 
 [node name="HintAnchor" type="Marker2D" parent="." unique_id=1553874808]
 position = Vector2(0, -70)

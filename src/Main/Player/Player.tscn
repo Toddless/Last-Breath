@@ -1300,11 +1300,12 @@ animations = [{
 "speed": 24.0
 }]
 
-[node name="Player" type="CharacterBody2D" unique_id=698931184 node_paths=PackedStringArray("_animationsComponent", "_interactionArea", "_camera")]
+[node name="Player" type="CharacterBody2D" unique_id=698931184 node_paths=PackedStringArray("_animationsComponent", "_interactionArea", "_camera", "_interactionController")]
 script = ExtResource("2_ko8e3")
 _animationsComponent = NodePath("AnimationsComponent")
 _interactionArea = NodePath("Area2D")
 _camera = NodePath("Camera2D")
+_interactionController = NodePath("PlayerInteractionController")
 
 [node name="AnimationsComponent" type="Node" parent="." unique_id=1274889767 node_paths=PackedStringArray("_animatedSprite2D")]
 script = ExtResource("2_p7tob")
@@ -1315,6 +1316,7 @@ position = Vector2(0, 73)
 shape = SubResource("CapsuleShape2D_7ir56")
 
 [node name="PlayerInteractionController" type="Area2D" parent="."]
+position = Vector2(0, 73)
 collision_layer = 0
 collision_mask = 32768
 monitorable = false

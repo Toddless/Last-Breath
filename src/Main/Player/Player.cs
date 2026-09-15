@@ -26,8 +26,9 @@ namespace LastBreath.Player
     using Core.Views.UI;
     using Godot;
     using Stateless;
+    using World.Interactions;
 
-    public partial class Player : CharacterBody2D, IPlayer
+    public partial class Player : CharacterBody2D, IPlayer, IInteractionActor
     {
         public enum State
         {
@@ -62,6 +63,7 @@ namespace LastBreath.Player
         [Export] private AnimationsComponentBase? _animationsComponent;
         [Export] private Area2D? _interactionArea;
         [Export] private Camera2D? _camera;
+        [Export] private PlayerInteractionController? _interactionController;
 
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
@@ -114,6 +116,9 @@ namespace LastBreath.Player
         public Fractions Fractions { get; } = Fractions.Human;
 
         public string PlayerName { get; private set; } = "Toddless";
+
+        /// <summary>The interaction controller sits at the body's collision center; without it the node origin is used.</summary>
+        public Vector2 InteractionOrigin => _interactionController?.GlobalPosition ?? GlobalPosition;
 
         // TakeDamage owns the event order (damage beat first, death after) — see its comment.
         private bool _suppressDeathNotify;

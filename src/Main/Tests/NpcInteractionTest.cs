@@ -21,12 +21,19 @@ namespace LastBreath.Tests
 
     public partial class NpcInteractionTest : Node
     {
+        // Player body center level with the NPC point on its left, within reach; the wall stands in the gap between the NPC body and the player's capsule.
+        private static readonly Vector2 s_playerBodyFromNpc = new(-140, 92);
+        private static readonly Vector2 s_wallFromNpc = new(-52, 92);
+        private static readonly Vector2 s_wallSize = new(12, 200);
+        private static readonly Vector2 s_playerBodyFromStaticTalker = new(0, 100);
         private int _checks;
         private void Check(bool condition, string message)
         {
             if (!condition) throw new InvalidOperationException(message);
             _checks++;
         }
+        private static void PlaceBody(Node2D player, Vector2 bodyCenter) =>
+            player.GlobalPosition += bodyCenter - ((IInteractionActor)player).InteractionOrigin;
         private async Task Ticks(int count = 14)
         {
             for (int i = 0; i < count; i++) await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
@@ -71,7 +78,7 @@ namespace LastBreath.Tests
                 npc.ApplyDefinition(definition with { World = null }, provider);
                 npc.CanMove = false;
                 var target = npc.GetNode<NpcInteractionTarget>("InteractionTarget");
-                player.GlobalPosition = npc.GlobalPosition + new Vector2(0, 205);
+                PlaceBody(player, npc.GlobalPosition + s_playerBodyFromNpc);
                 await Ticks();
                 Check(interaction.Selected == target, "A nearby NPC is selected through the shared detector.");
                 Check(target.Handle.ObjectId == "npc/" + npc.InstanceId, "The live instance owns target identity.");
@@ -98,8 +105,8 @@ namespace LastBreath.Tests
                 await Ticks();
                 Check(!dialogue.IsActive && !npc.IsFighting, "Mouse clicks no longer start NPC dialogue.");
                 await Press(Key.E);
-                var wall = new StaticBody2D { Position = npc.Position + new Vector2(0, 145) };
-                wall.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = new Vector2(200, 12) } });
+                var wall = new StaticBody2D { Position = npc.Position + s_wallFromNpc };
+                wall.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = s_wallSize } });
                 location.AddChild(wall);
                 await Ticks();
                 Check(interaction.Selected == null && interaction.SessionTarget == null, "An obstruction closes the NPC menu.");
@@ -214,7 +221,7 @@ namespace LastBreath.Tests
                 staticTarget.AddChild(staticTalk);
                 staticOwner.AddChild(staticTarget);
                 location.AddChild(staticOwner);
-                player.GlobalPosition = staticOwner.GlobalPosition + new Vector2(0, 100);
+                PlaceBody(player, staticOwner.GlobalPosition + s_playerBodyFromStaticTalker);
                 await Ticks();
                 Check(interaction.Selected == staticTarget && staticTarget.ReadActions().Count == 1, "An authored static talker needs no combat body.");
                 await Press(Key.E);

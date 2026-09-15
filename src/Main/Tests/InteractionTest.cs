@@ -24,12 +24,18 @@ namespace LastBreath.Tests
 
     public partial class InteractionTest : Node
     {
+        // Player body center below the chest point, within reach; walls stand in the gap between the chest body and the player's capsule.
+        private static readonly Vector2 s_playerBodyFromChest = new(0, 140);
+        private static readonly Vector2 s_wallFromChest = new(0, 45);
+        private static readonly Vector2 s_wallSize = new(200, 15);
         private int _checks;
         private void Check(bool passed, string message)
         {
             if (!passed) throw new InvalidOperationException(message);
             _checks++;
         }
+        private static void PlaceBody(Node2D player, Vector2 bodyCenter) =>
+            player.GlobalPosition += bodyCenter - ((IInteractionActor)player).InteractionOrigin;
         private async Task Ticks(int count = 12)
         {
             for (int i = 0; i < count; i++) await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
@@ -76,7 +82,7 @@ namespace LastBreath.Tests
                 Check(travel.ActiveLocationId == "SourceOfPowerNearVillage", "Shared E travels from the root window.");
                 var side = travel.Loaded("SourceOfPowerNearVillage")!;
                 var chest = side.GetNode<ChestComponent>("StarterChest");
-                player.GlobalPosition = chest.GlobalPosition + new Vector2(0, 120);
+                PlaceBody(player, chest.GlobalPosition + s_playerBodyFromChest);
                 await Ticks();
                 Check(interaction.Selected == chest.Target, "The chest is selected after entering its discovery area.");
                 Check(controller.CandidateCount < 5, "Discovery retains a local candidate set.");
@@ -85,8 +91,8 @@ namespace LastBreath.Tests
                 Check(controller.EvaluationCount - updates < 12, "Selection does not run on every physics tick.");
                 Check(!chest.Contents.Initialized, "Hint polling does not generate chest contents.");
 
-                var wall = new StaticBody2D { Position = chest.Position + new Vector2(0, 60) };
-                wall.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = new Vector2(200, 15) } });
+                var wall = new StaticBody2D { Position = chest.Position + s_wallFromChest };
+                wall.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = s_wallSize } });
                 side.AddChild(wall);
                 await Ticks();
                 Check(interaction.Selected != chest.Target, "A wall blocks the chest hint.");
@@ -178,8 +184,8 @@ namespace LastBreath.Tests
                 Check(!(await pending).Success, "Closing a session cancels its queued transfer.");
                 await Ticks();
                 await Press(Key.E);
-                var barrier = new StaticBody2D { Position = chest.Position + new Vector2(0, 60) };
-                barrier.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = new Vector2(200, 15) } });
+                var barrier = new StaticBody2D { Position = chest.Position + s_wallFromChest };
+                barrier.AddChild(new CollisionShape2D { Shape = new RectangleShape2D { Size = s_wallSize } });
                 side.AddChild(barrier);
                 await Ticks();
                 Check(interaction.SessionTarget == null, "A new obstruction closes an existing container session.");
@@ -217,7 +223,7 @@ namespace LastBreath.Tests
                 Check(JToken.DeepEquals(remaining, chest.CaptureLocationState()), "Unloading preserves exact slot contents.");
                 Check(!(await bus.SendRequest<ExecuteInteractionRequest, InteractionResult>(new(oldHandle, InteractionActions.Open))).Success,
                     "A command for an unloaded binding cannot target its replacement.");
-                player.GlobalPosition = chest.GlobalPosition + new Vector2(0, 120);
+                PlaceBody(player, chest.GlobalPosition + s_playerBodyFromChest);
                 await Ticks();
                 await Press(Key.E);
                 bag.Clear();
