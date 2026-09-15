@@ -1,9 +1,9 @@
 namespace LastBreath.World.Interactions
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
     using Core.Data;
     using Core.MessageBus;
     using Core.Save;
@@ -17,6 +17,8 @@ namespace LastBreath.World.Interactions
 
     public sealed class InteractionService(IGameServiceProvider provider)
     {
+        private const string DuplicateTargetFormat =
+            "Interaction target '{0}' is disabled: object ID '{1}' in location '{2}' is already registered by '{3}'";
         private readonly Dictionary<InteractionHandle, InteractionTarget> _targets = [];
         private InteractionTarget? _sessionTarget;
         private InteractionWindow? _window;
@@ -26,15 +28,18 @@ namespace LastBreath.World.Interactions
         public InteractionTarget? SessionTarget => _sessionTarget;
         private IUiElementsManager Ui => provider.GetService<IUiElementsManager>();
 
-        public void Register(InteractionTarget target)
+        /// <summary>Adds a live target; a second target with the same location and object ID is reported and stays unregistered.</summary>
+        public bool TryRegister(InteractionTarget target)
         {
-            if (_targets.Keys.Any(x => x.LocationId == target.Handle.LocationId && x.ObjectId == target.Handle.ObjectId))
-                throw new InvalidOperationException($"Duplicate interaction target '{target.Handle}'.");
-            _targets.Add(target.Handle, target);
+            if (FindRegistered(target.Handle) is not { } holder) return _targets.TryAdd(target.Handle, target);
+            Tracker.TrackError(string.Format(DuplicateTargetFormat, target.GetPath(), target.Handle.ObjectId,
+                target.Handle.LocationId, holder.GetPath()), this);
+            return false;
         }
+        /// <summary>Drops the target's own registration and its session/selection; a never-registered target leaves the registry intact.</summary>
         public void Unregister(InteractionTarget target)
         {
-            _targets.Remove(target.Handle);
+            if (_targets.TryGetValue(target.Handle, out var registered) && registered == target) _targets.Remove(target.Handle);
             if (_sessionTarget == target) CancelSession();
             if (Selected == target) Select(null);
         }
@@ -73,8 +78,7 @@ namespace LastBreath.World.Interactions
         {
             if (!TryResolve(handle, out var target) || !CanReach(target)
                 || _sessionTarget != null && _sessionTarget != target) return InteractionResult.Unavailable;
-            var source = target.Sources.SingleOrDefault(x => x.Actions().Any(a => a.Id == actionId && a.Enabled));
-            if (source == null) return InteractionResult.Unavailable;
+            if (target.FindEnabledSource(actionId) is not { } source) return InteractionResult.Unavailable;
             // Release a menu before travel/dialogue enters its own UI/transition gate.
             CancelSession();
             return await source.Execute(actionId);
@@ -136,6 +140,11 @@ namespace LastBreath.World.Interactions
             if (_targets.TryGetValue(handle, out target!) && GodotObject.IsInstanceValid(target) && !target.IsQueuedForDeletion()) return true;
             return false;
         }
+        /// <summary>Target registered under the same location and object ID, whatever its binding.</summary>
+        private InteractionTarget? FindRegistered(InteractionHandle identity) => _targets
+            .Where(x => x.Key.LocationId == identity.LocationId && x.Key.ObjectId == identity.ObjectId)
+            .Select(x => x.Value)
+            .FirstOrDefault();
     }
 
     public sealed class ExecuteInteractionHandler(InteractionService service) : IRequestHandler<ExecuteInteractionRequest, InteractionResult>

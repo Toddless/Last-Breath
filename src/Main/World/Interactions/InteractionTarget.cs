@@ -2,7 +2,9 @@ namespace LastBreath.World.Interactions
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
+    using Core;
     using Core.World.Interactions;
     using Godot;
     using Locations;
@@ -10,11 +12,17 @@ namespace LastBreath.World.Interactions
     [GlobalClass]
     public partial class InteractionTarget : Area2D
     {
+        private const string InvalidConfigurationFormat =
+            "Interaction target '{0}' is disabled: it needs a non-empty object ID and a positive finite reach, but has ID '{1}' and reach {2}";
+        private const string DuplicateActionsFormat = "Interaction target '{0}' ('{1}') disables the actions that share an ID: {2}";
+        private const string ActionIdSeparator = ", ";
         public const uint DetectionLayer = 1u << 15;
         [Export] public string ObjectId { get; set; } = "";
         [Export] public float Reach { get; set; } = 150;
         [Export(PropertyHint.Layers2DPhysics)] public uint ObstacleMask { get; set; } = InteractionReach.BlockerMask;
+        private readonly HashSet<string> _reportedDuplicateActionIds = [];
         private bool _registered;
+        private bool _configurationReported;
         protected virtual string StableObjectId => ObjectId;
         public virtual bool IsAvailable => true;
         public InteractionHandle Handle { get; private set; }
@@ -45,17 +53,14 @@ namespace LastBreath.World.Interactions
 
         public override void _EnterTree()
         {
-            var root = LocationRoot.Find(this);
-            if (root == null) return;
+            if (!CheckConfiguration() || LocationRoot.Find(this) is not { } root) return;
             Handle = new(root.LocationId, StableObjectId, Guid.NewGuid());
-            Services.GameServiceProvider.Instance.GetService<InteractionService>().Register(this);
-            _registered = true;
+            _registered = Services.GameServiceProvider.Instance.GetService<InteractionService>().TryRegister(this);
         }
 
         public override void _Ready()
         {
-            if (string.IsNullOrWhiteSpace(StableObjectId) || !float.IsFinite(Reach) || Reach <= 0)
-                throw new InvalidOperationException("Interaction target needs a stable ID and a positive reach.");
+            if (!CheckConfiguration()) return;
             CollisionLayer = DetectionLayer;
             CollisionMask = 0;
             Monitoring = false;
@@ -72,13 +77,46 @@ namespace LastBreath.World.Interactions
             _registered = false;
         }
 
-        public IReadOnlyList<InteractionAction> ReadActions()
+        /// <summary>Actions offered now: none while the target is unregistered or unavailable; actions that share an ID are left out.</summary>
+        public IReadOnlyList<InteractionAction> ReadActions() => ReadOffers().ConvertAll(x => x.Action);
+
+        /// <summary>Source of the enabled action with this ID among the offered actions; null when <see cref="ReadActions"/> does not offer it.</summary>
+        public IInteractionSource? FindEnabledSource(string actionId) =>
+            ReadOffers().Where(x => x.Action.Enabled && x.Action.Id == actionId).Select(x => x.Source).FirstOrDefault();
+
+        /// <summary>True for a non-empty stable ID and a positive finite reach; an invalid setup is reported once per node.</summary>
+        private bool CheckConfiguration()
         {
-            if (!IsAvailable) return [];
-            var actions = Sources.SelectMany(x => x.Actions()).ToList();
-            if (actions.Select(x => x.Id).Distinct().Count() != actions.Count)
-                throw new InvalidOperationException($"Duplicate action ID on '{ObjectId}'.");
-            return actions;
+            if (!string.IsNullOrWhiteSpace(StableObjectId) && float.IsFinite(Reach) && Reach > 0) return true;
+            if (_configurationReported) return false;
+            _configurationReported = true;
+            Tracker.TrackError(string.Format(CultureInfo.InvariantCulture, InvalidConfigurationFormat, GetPath(), StableObjectId, Reach), this);
+            return false;
         }
+
+        private List<ActionOffer> ReadOffers()
+        {
+            if (!_registered || !IsAvailable) return [];
+            var offers = Sources.SelectMany(source => source.Actions().Select(action => new ActionOffer(source, action))).ToList();
+            var duplicates = DuplicateActionIds(offers);
+            if (duplicates.Count == 0) return offers;
+            ReportDuplicateActions(duplicates);
+            offers.RemoveAll(x => duplicates.Contains(x.Action.Id));
+            return offers;
+        }
+
+        private static HashSet<string> DuplicateActionIds(IEnumerable<ActionOffer> offers) =>
+            offers.GroupBy(x => x.Action.Id).Where(x => x.Skip(1).Any()).Select(x => x.Key).ToHashSet();
+
+        /// <summary>Reports only IDs not reported before, so repeated reads of the same broken set stay silent.</summary>
+        private void ReportDuplicateActions(HashSet<string> duplicates)
+        {
+            if (duplicates.IsSubsetOf(_reportedDuplicateActionIds)) return;
+            _reportedDuplicateActionIds.UnionWith(duplicates);
+            Tracker.TrackError(string.Format(DuplicateActionsFormat, GetPath(), Handle.ObjectId,
+                string.Join(ActionIdSeparator, duplicates.Order(StringComparer.Ordinal))), this);
+        }
+
+        private readonly record struct ActionOffer(IInteractionSource Source, InteractionAction Action);
     }
 }
