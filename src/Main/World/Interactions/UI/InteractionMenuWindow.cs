@@ -22,6 +22,8 @@ namespace LastBreath.World.Interactions.UI
             _signature = signature;
             string? focusedActionId = FocusedActionId();
             bool closeFocused = CloseButton.HasFocus();
+            // The console, the bag filter and this menu share one root window: a rebuild must leave a typing player alone.
+            bool typing = Core.World.Spaces.SpatialAccess.HasTextFocus(this);
             ClearRows();
             GetNode<Label>("Frame/Content/Title").Text = Localization.Localize("UI_Interaction_Interact");
             var rows = new List<(InteractionAction Action, Button Row)>(actions.Count);
@@ -36,7 +38,7 @@ namespace LastBreath.World.Interactions.UI
                 Rows.AddChild(row);
                 rows.Add((action, row));
             }
-            FocusCandidate(rows, focusedActionId, closeFocused).GrabFocus();
+            if (!typing) FocusCandidate(rows, focusedActionId, closeFocused).GrabFocus();
         }
         public override void _Process(double delta)
         {

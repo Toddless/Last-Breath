@@ -49,12 +49,14 @@ namespace LastBreath.World.Interactions
             SelectedActions = target?.ReadActions() ?? [];
         }
 
-        public bool CanDiscover() => ActorAvailable() && _window == null && !Ui.HasMovementBlockingWindow;
+        /// <summary>Target selection and E input; text focus suppresses them without closing an open session.</summary>
+        public bool CanDiscover() => ActorAvailable() && !Core.World.Spaces.SpatialAccess.HasTextFocus(Controller!)
+            && _window == null && !Ui.HasMovementBlockingWindow;
+        /// <summary>Actor and space state shared by discovery and open sessions; discovery-only gates stay in <see cref="CanDiscover"/>.</summary>
         private bool ActorAvailable() => Controller is { } controller && GodotObject.IsInstanceValid(controller) && controller.IsInsideTree()
             && provider.GetService<IPlayerAccessor>().Player is { IsAlive: true, IsFighting: false } player
             && ReferenceEquals(player, controller.Player)
             && Core.World.Spaces.SpatialAccess.CanReceiveInput(controller)
-            && !Core.World.Spaces.SpatialAccess.HasTextFocus(controller)
             && !provider.GetService<ILocationTravelService>().IsTransitioning
             && !provider.GetService<ILoadScope>().IsLoading
             && provider.GetService<IUiContextService>().Current == UiContext.World;
