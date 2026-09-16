@@ -20,6 +20,8 @@ namespace LastBreath.World.Interactions
         [Export] public string ObjectId { get; set; } = "";
         [Export] public float Reach { get; set; } = 150;
         [Export(PropertyHint.Layers2DPhysics)] public uint ObstacleMask { get; set; } = InteractionReach.BlockerMask;
+        /// <summary>Bodies of this object that do not block access to its own interaction points.</summary>
+        [Export] public Godot.Collections.Array<CollisionObject2D> OwnBodies { get; set; } = [];
         private readonly HashSet<string> _reportedDuplicateActionIds = [];
         private bool _registered;
         private bool _configurationReported;

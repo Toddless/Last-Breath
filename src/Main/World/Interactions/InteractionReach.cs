@@ -20,16 +20,21 @@ namespace LastBreath.World.Interactions
             {
                 float distance = origin.DistanceSquaredTo(point);
                 if (distance > target.Reach * target.Reach || distance >= best) continue;
-                if (Clear(player, target.GetParent(), point, target.ObstacleMask)) best = distance;
+                if (Clear(player, target.OwnBodies, point, target.ObstacleMask)) best = distance;
             }
             return best;
         }
 
-        public static bool Clear(Node2D player, Node targetOwner, Vector2 point, uint blockerMask)
+        /// <summary>True when no blocker crosses the segment from the player to the point; the player's bodies and the live target bodies are ignored.</summary>
+        public static bool Clear(Node2D player, IReadOnlyList<CollisionObject2D> targetBodies, Vector2 point, uint blockerMask)
         {
             var excluded = new Godot.Collections.Array<Rid>();
             foreach (var body in Bodies(player)) excluded.Add(body.GetRid());
-            foreach (var body in Bodies(targetOwner)) excluded.Add(body.GetRid());
+            for (int i = 0; i < targetBodies.Count; i++)
+            {
+                var body = targetBodies[i];
+                if (GodotObject.IsInstanceValid(body)) excluded.Add(body.GetRid());
+            }
             using var query = PhysicsRayQueryParameters2D.Create(Origin(player), point, blockerMask, excluded);
             query.CollideWithAreas = false;
             query.HitFromInside = true;

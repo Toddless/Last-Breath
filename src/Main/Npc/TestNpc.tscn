@@ -739,4 +739,5 @@ animation = &"Idle_Down"
 position = Vector2(0, 92)
 shape = SubResource("CapsuleShape2D_0trnf")
 
-[node name="InteractionTarget" parent="." instance=ExtResource("10_r5eee")]
+[node name="InteractionTarget" parent="." node_paths=PackedStringArray("OwnBodies") instance=ExtResource("10_r5eee")]
+OwnBodies = [NodePath("..")]

@@ -36,7 +36,8 @@ texture = SubResource("AtlasTexture_iywav")
 [node name="Shape" type="CollisionShape2D" parent="SolidBody" unique_id=1194086988]
 shape = SubResource("body")
 
-[node name="InteractionTarget" parent="." unique_id=370911694 instance=ExtResource("target")]
+[node name="InteractionTarget" parent="." unique_id=370911694 node_paths=PackedStringArray("OwnBodies") instance=ExtResource("target")]
+OwnBodies = [NodePath("../SolidBody")]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionTarget" unique_id=1052523319]
 position = Vector2(2, 9.5)
