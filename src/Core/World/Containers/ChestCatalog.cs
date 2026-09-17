@@ -4,6 +4,7 @@ namespace Core.World.Containers
     using System.Collections.Generic;
     using System.Linq;
     using Data;
+    using Data.ChestData;
     using Data.GameData;
     using Enums;
     using Newtonsoft.Json;
@@ -60,17 +61,17 @@ namespace Core.World.Containers
             {
                 if (Read(record, file.FileName) is not { } definition) continue;
                 if (!_definitions.TryAdd(definition.Id, definition))
-                    Report(definition.Id, file.FileName, Field.Id, "is already taken by another chest");
+                    Report(definition.Id, file.FileName, ChestFields.Id, "is already taken by another chest");
             }
         }
 
         private static ChestDefinition? Read(ChestData? record, string file)
         {
-            if (ReadText(record?.Id, UnnamedChest, file, Field.Id) is not { } id) return null;
-            if (ReadText(record?.NameKey, id, file, Field.NameKey) is not { } nameKey) return null;
+            if (ReadText(record?.Id, UnnamedChest, file, ChestFields.Id) is not { } id) return null;
+            if (ReadText(record?.NameKey, id, file, ChestFields.NameKey) is not { } nameKey) return null;
             if (record?.EmptyRemovalDelayMinutes is not { } delay || !double.IsFinite(delay) || delay < 0)
             {
-                Report(id, file, Field.Delay, "must be a finite, non-negative number of game minutes");
+                Report(id, file, ChestFields.Delay, "must be a finite, non-negative number of game minutes");
                 return null;
             }
 
@@ -81,14 +82,14 @@ namespace Core.World.Containers
         }
 
         private static ChestAccess? ReadAccess(ChestAccessData? data, string id, string file) =>
-            ReadMode<ChestAccessMode>(data?.Mode, id, file, Field.AccessMode) is { } mode ? new ChestAccess(mode) : null;
+            ReadMode<ChestAccessMode>(data?.Mode, id, file, Address.AccessMode) is { } mode ? new ChestAccess(mode) : null;
 
         private static ChestContentsDefinition? ReadContents(ChestContentsData? data, string id, string file)
         {
-            if (ReadMode<ChestContentsMode>(data?.Mode, id, file, Field.ContentsMode) is not { } mode) return null;
+            if (ReadMode<ChestContentsMode>(data?.Mode, id, file, Address.ContentsMode) is not { } mode) return null;
             if (data?.Items is not { Count: > 0 } entries)
             {
-                Report(id, file, Field.ContentsItems, "lists no positions");
+                Report(id, file, Address.ContentsItems, "lists no positions");
                 return null;
             }
 
@@ -102,21 +103,21 @@ namespace Core.World.Containers
             if (items.Select(item => item.SlotId).Distinct().Count() == items.Count)
                 return new ChestContentsDefinition(mode, items);
 
-            Report(id, file, Field.ItemSlotId, "is repeated: every position needs its own slot");
+            Report(id, file, Address.ItemSlotId, "is repeated: every position needs its own slot");
             return null;
         }
 
         private static AuthoredChestItem? ReadItem(ChestItemData? entry, string id, string file)
         {
-            if (ReadText(entry?.SlotId, id, file, Field.ItemSlotId) is not { } slotId) return null;
-            if (ReadText(entry?.ItemId, id, file, Field.ItemItemId) is not { } itemId) return null;
+            if (ReadText(entry?.SlotId, id, file, Address.ItemSlotId) is not { } slotId) return null;
+            if (ReadText(entry?.ItemId, id, file, Address.ItemItemId) is not { } itemId) return null;
             if (entry?.Amount is not { } amount || amount <= 0)
             {
-                Report(id, file, Field.ItemAmount, "must be a positive count");
+                Report(id, file, Address.ItemAmount, "must be a positive count");
                 return null;
             }
 
-            return ReadMode<Rarity>(entry.Rarity, id, file, Field.ItemRarity) is { } rarity
+            return ReadMode<Rarity>(entry.Rarity, id, file, Address.ItemRarity) is { } rarity
                 ? new AuthoredChestItem(slotId, itemId, amount, rarity) : null;
         }
 
@@ -143,61 +144,19 @@ namespace Core.World.Containers
         private static void Report(string id, string file, string field, string reason) =>
             Tracker.TrackError($"Skipping chest '{id}' from '{file}': '{field}' {reason}.");
 
-        /// <summary>The json field names, shared by the DTOs that read them and the reports that name
-        /// them, so a renamed field cannot leave a report pointing at a field the file no longer has.</summary>
-        private static class Field
+        /// <summary>How a report addresses a field standing inside another: the file's own names, which
+        /// the records themselves are read by, joined the way an author reads his way down to one.</summary>
+        private static class Address
         {
-            public const string Id = "id";
-            public const string NameKey = "nameKey";
-            public const string Delay = "emptyRemovalDelayMinutes";
-            public const string Access = "access";
-            public const string Contents = "contents";
-            public const string Mode = "mode";
-            public const string Items = "items";
-            public const string SlotId = "slotId";
-            public const string ItemId = "itemId";
-            public const string Amount = "amount";
-            public const string Rarity = "rarity";
-
-            public const string AccessMode = Access + Separator + Mode;
-            public const string ContentsMode = Contents + Separator + Mode;
-            public const string ContentsItems = Contents + Separator + Items;
-            public const string ItemSlotId = ContentsItems + Separator + SlotId;
-            public const string ItemItemId = ContentsItems + Separator + ItemId;
-            public const string ItemAmount = ContentsItems + Separator + Amount;
-            public const string ItemRarity = ContentsItems + Separator + Rarity;
+            public const string AccessMode = ChestFields.Access + Separator + ChestFields.Mode;
+            public const string ContentsMode = ChestFields.Contents + Separator + ChestFields.Mode;
+            public const string ContentsItems = ChestFields.Contents + Separator + ChestFields.Items;
+            public const string ItemSlotId = ContentsItems + Separator + ChestFields.SlotId;
+            public const string ItemItemId = ContentsItems + Separator + ChestFields.ItemId;
+            public const string ItemAmount = ContentsItems + Separator + ChestFields.Amount;
+            public const string ItemRarity = ContentsItems + Separator + ChestFields.Rarity;
 
             private const string Separator = ".";
-        }
-
-        /// <summary>What the file says, before any of it is believed: every field is optional here so a
-        /// missing one is a rejected record rather than a silent default.</summary>
-        private sealed record ChestData
-        {
-            [JsonProperty(Field.Id)] public string? Id { get; init; }
-            [JsonProperty(Field.NameKey)] public string? NameKey { get; init; }
-            [JsonProperty(Field.Delay)] public double? EmptyRemovalDelayMinutes { get; init; }
-            [JsonProperty(Field.Access)] public ChestAccessData? Access { get; init; }
-            [JsonProperty(Field.Contents)] public ChestContentsData? Contents { get; init; }
-        }
-
-        private sealed record ChestAccessData
-        {
-            [JsonProperty(Field.Mode)] public string? Mode { get; init; }
-        }
-
-        private sealed record ChestContentsData
-        {
-            [JsonProperty(Field.Mode)] public string? Mode { get; init; }
-            [JsonProperty(Field.Items)] public List<ChestItemData?>? Items { get; init; }
-        }
-
-        private sealed record ChestItemData
-        {
-            [JsonProperty(Field.SlotId)] public string? SlotId { get; init; }
-            [JsonProperty(Field.ItemId)] public string? ItemId { get; init; }
-            [JsonProperty(Field.Amount)] public int? Amount { get; init; }
-            [JsonProperty(Field.Rarity)] public string? Rarity { get; init; }
         }
     }
 }

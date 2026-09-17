@@ -21,6 +21,7 @@ namespace LastBreath.Descriptors
             new DialoguesCatalogDescriptor(),
             new QuestsCatalogDescriptor(),
             new FormattingCatalogDescriptor(),
+            new ChestsCatalogDescriptor(),
 
             // The crafting bench: what is made, what it is made of, what an operation costs and what a
             // finished item may be given on top.
@@ -77,11 +78,6 @@ namespace LastBreath.Descriptors
             // that quest cannot be finished. Describing the catalog would mean choosing between the shape
             // the game reads and the shape the file is in.
             DataCatalog.Items,
-
-            // The authored containers. The catalog is read by the game already; its describer waits on the
-            // contents modes the design still owes, so an editor would draw the authored shape as the only
-            // one there is.
-            DataCatalog.Chests,
         ];
     }
 }
