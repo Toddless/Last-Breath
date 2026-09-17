@@ -3,37 +3,43 @@
         "id": "Chest_Starter",
         "nameKey": "Chest_Starter",
         "emptyRemovalDelayMinutes": 5,
-        "items": [
-            {
-                "slotId": "dagger",
-                "itemId": "Weapon_Simple_Dagger",
-                "amount": 1,
-                "rarity": "Uncommon"
-            },
-            {
-                "slotId": "helmet",
-                "itemId": "Helmet_Stoneheart",
-                "amount": 1,
-                "rarity": "Uncommon"
-            },
-            {
-                "slotId": "gloves",
-                "itemId": "Gloves_Stoneheart",
-                "amount": 1,
-                "rarity": "Uncommon"
-            },
-            {
-                "slotId": "boots",
-                "itemId": "Boots_Stone_Tread",
-                "amount": 1,
-                "rarity": "Uncommon"
-            },
-            {
-                "slotId": "body",
-                "itemId": "Body_Stoneheart",
-                "amount": 1,
-                "rarity": "Uncommon"
-            }
-        ]
+        "access": {
+            "mode": "Unlocked"
+        },
+        "contents": {
+            "mode": "Authored",
+            "items": [
+                {
+                    "slotId": "dagger",
+                    "itemId": "Weapon_Simple_Dagger",
+                    "amount": 1,
+                    "rarity": "Uncommon"
+                },
+                {
+                    "slotId": "helmet",
+                    "itemId": "Helmet_Stoneheart",
+                    "amount": 1,
+                    "rarity": "Uncommon"
+                },
+                {
+                    "slotId": "gloves",
+                    "itemId": "Gloves_Stoneheart",
+                    "amount": 1,
+                    "rarity": "Uncommon"
+                },
+                {
+                    "slotId": "boots",
+                    "itemId": "Boots_Stone_Tread",
+                    "amount": 1,
+                    "rarity": "Uncommon"
+                },
+                {
+                    "slotId": "body",
+                    "itemId": "Body_Stoneheart",
+                    "amount": 1,
+                    "rarity": "Uncommon"
+                }
+            ]
+        }
     }
 ]

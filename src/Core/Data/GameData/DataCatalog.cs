@@ -26,6 +26,10 @@ namespace Core.Data.GameData
         public const string Dialogues = "Dialogues";
         public const string Formatting = "Formatting";
         public const string World = "World";
+
+        /// <summary>The authored containers a location may place: what one is called, what it holds and
+        /// how long it lingers once emptied.</summary>
+        public const string Chests = "Chests";
         public const string Recovery = "Recovery";
         public const string Player = "Player";
         public const string PlayerStats = "PlayerStats";

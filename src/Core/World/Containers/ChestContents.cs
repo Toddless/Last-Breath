@@ -27,7 +27,7 @@ namespace Core.World.Containers
         public void Initialize(ChestDefinition definition, Func<AuthoredChestItem, IItem> create)
         {
             if (Initialized) return;
-            var slots = definition.Items.Select(x => new ChestSlot(x.SlotId, create(x), x.Amount)).ToList();
+            var slots = definition.Contents.Items.Select(x => new ChestSlot(x.SlotId, create(x), x.Amount)).ToList();
             Restore(true, slots, null);
         }
 
