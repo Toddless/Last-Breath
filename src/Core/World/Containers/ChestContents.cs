@@ -24,11 +24,11 @@ namespace Core.World.Containers
         public double? RemoveAtMinutes { get; private set; }
         public bool Empty => Initialized && Slots.All(x => x.Amount == 0);
 
-        public void Initialize(ChestDefinition definition, Func<AuthoredChestItem, IItem> create)
+        /// <summary>Takes the minted slots as the chest's first contents; an initialized chest keeps what it holds.</summary>
+        public void Initialize(IReadOnlyList<ChestSlot> slots)
         {
             if (Initialized) return;
-            var slots = definition.Contents.Items.Select(x => new ChestSlot(x.SlotId, create(x), x.Amount)).ToList();
-            Restore(true, slots, null);
+            Restore(true, [.. slots], null);
         }
 
         public void Restore(bool initialized, List<ChestSlot> slots, double? removeAt)

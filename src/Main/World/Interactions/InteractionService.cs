@@ -88,8 +88,7 @@ namespace LastBreath.World.Interactions
 
         public InteractionResult OpenChest(ChestComponent chest)
         {
-            if (!CanReach(chest.Target)) return InteractionResult.Unavailable;
-            chest.Open();
+            if (!CanReach(chest.Target) || !chest.TryOpen()) return InteractionResult.Unavailable;
             ShowWindow<ChestContentsWindow>(chest.Target);
             return InteractionResult.Completed;
         }

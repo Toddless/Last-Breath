@@ -27,6 +27,7 @@ namespace LastBreath.World.Containers
         private const string TargetIdPrefix = "chest/";
         private const string MissingObjectIdFormat = "Chest '{0}' is disabled: it needs a stable ObjectId";
         private const string UnknownDefinitionFormat = "Chest '{0}' ('{1}') is disabled: the chest catalog holds no definition '{2}'";
+        private const string MintRefusedFormat = "Chest '{0}' ('{1}') is disabled: definition '{2}' cannot mint item '{3}' into position '{4}': {5}";
         private static readonly ChestTransfer NothingTransferred = new(0, false);
 
         [Export] public string ObjectId { get; set; } = "";
@@ -57,16 +58,16 @@ namespace LastBreath.World.Containers
         public IEnumerable<InteractionAction> Actions() => _definition == null || Contents.Empty
             ? [] : [new(InteractionActions.Open, "UI_Interaction_Open")];
 
-        public Task<InteractionResult> Execute(string actionId) => Task.FromResult(actionId == InteractionActions.Open
+        /// <summary>Opens the chest only while <see cref="Actions"/> offers Open enabled.</summary>
+        public Task<InteractionResult> Execute(string actionId) => Task.FromResult(actionId == InteractionActions.Open && Offers(actionId)
             ? _provider.GetService<InteractionService>().OpenChest(this) : InteractionResult.Unavailable);
 
-        /// <summary>Mints the authored contents on the first open; a chest without a definition does nothing.</summary>
-        public void Open()
+        /// <summary>Mints the authored contents on the first open; false while the chest is disabled or empty, and when its contents refuse to mint.</summary>
+        public bool TryOpen()
         {
-            if (_definition == null) return;
-            var creation = _provider.GetService<IItemCreationService>();
-            Contents.Initialize(_definition, entry => creation.CreateItem(entry.ItemId, [], entry.Rarity, 0, 1, entry.Rarity));
+            if (_definition is not { } definition || Contents.Empty || !TryInitialize(definition)) return false;
             RefreshVisuals();
+            return true;
         }
 
         /// <summary>Moves one slot, or every slot, into the bag as far as it fits; a chest without a definition moves nothing.</summary>
@@ -94,6 +95,31 @@ namespace LastBreath.World.Containers
             Visual?.Texture = Contents.Empty ? Visuals?[0] : Visuals?[1];
         }
 
+        /// <summary>True when <see cref="Actions"/> offers the action with this ID enabled.</summary>
+        private bool Offers(string actionId) => Actions().Any(action => action.Enabled && action.Id == actionId);
+
+        /// <summary>Mints the authored contents once; a refused mint leaves the chest uninitialized and disables it.</summary>
+        private bool TryInitialize(ChestDefinition definition)
+        {
+            if (Contents.Initialized) return true;
+            if (!new AuthoredChestMinter(_provider.GetService<IItemCreationService>()).TryMint(definition, out var slots, out var refusal))
+            {
+                DisableAfterRefusal(refusal);
+                return false;
+            }
+
+            Contents.Initialize(slots);
+            return true;
+        }
+
+        /// <summary>Reports the refused mint and drops the definition: the chest stays shut, without actions, until its location loads again.</summary>
+        private void DisableAfterRefusal(ChestMintRefusal refusal)
+        {
+            _definition = null;
+            ReportConfiguration(string.Format(MintRefusedFormat, GetPath(), ObjectId, DefinitionId,
+                refusal.ItemId, refusal.SlotId, refusal.Problem));
+        }
+
         /// <summary>Gives the interaction target this chest's identity; without a stable ObjectId there is none to give.</summary>
         private bool BindTarget()
         {
@@ -115,7 +141,7 @@ namespace LastBreath.World.Containers
             return null;
         }
 
-        /// <summary>Writes a setup error to the log and the Godot console, once per node.</summary>
+        /// <summary>Writes an error that disables the chest to the log and the Godot console, once per node.</summary>
         private void ReportConfiguration(string message)
         {
             if (_configurationReported) return;

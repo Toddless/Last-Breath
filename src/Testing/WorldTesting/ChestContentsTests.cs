@@ -5,22 +5,33 @@ namespace LastBreathTest.WorldTesting
     using Core.Enums;
     using Core.Inventory;
     using Core.Items;
+    using Core.Modifiers;
+    using Core.Services;
     using Core.World.Containers;
     using Moq;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    [TestClass]
-    public class ChestContentsTests
+    /// <summary>Managed stand-ins for the items a chest holds: Moq proxies, no engine object behind them.</summary>
+    internal static class ChestItems
     {
-        private static IItem Item(string id)
+        /// <summary>The stack size of an item that does not stack.</summary>
+        public const int Unstackable = 1;
+
+        public static IItem Item(string id, int maxStackSize = Unstackable, Rarity rarity = Rarity.Common)
         {
             var item = new Mock<IItem>();
             item.SetupGet(x => x.Id).Returns(id);
+            item.SetupGet(x => x.MaxStackSize).Returns(maxStackSize);
+            item.SetupGet(x => x.Rarity).Returns(rarity);
             return item.Object;
         }
-        private static ChestDefinition Definition() => new("test", "test", 5, new(ChestAccessMode.Unlocked),
-            new(ChestContentsMode.Authored, [new("first", "sword", 1, Rarity.Common), new("second", "ore", 10, Rarity.Common)]));
+    }
+
+    [TestClass]
+    public class ChestContentsTests
+    {
+        private static List<ChestSlot> Slots() => [new("first", ChestItems.Item("sword"), 1), new("second", ChestItems.Item("ore"), 10)];
 
         private sealed class Receiver(Dictionary<string, int> capacity, Action? notify = null) : IInventoryTransfer
         {
@@ -40,7 +51,7 @@ namespace LastBreathTest.WorldTesting
         public void PartialStackAndLaterSlotsRemainAvailableAfterRefusal()
         {
             var chest = new ChestContents();
-            chest.Initialize(Definition(), x => Item(x.ItemId));
+            chest.Initialize(Slots());
             var result = chest.Transfer(new Receiver(new() { ["ore"] = 3 }), null, 100, 5, () => true);
             Assert.AreEqual(3, result.Accepted);
             Assert.IsTrue(result.CapacityLimited);
@@ -54,7 +65,7 @@ namespace LastBreathTest.WorldTesting
         public void NotificationSeesCommittedSourceAndCannotReenterTransfer()
         {
             var chest = new ChestContents();
-            chest.Initialize(Definition(), x => Item(x.ItemId));
+            chest.Initialize(Slots());
             int observed = -1;
             Receiver? receiver = null;
             receiver = new Receiver(new() { ["sword"] = 1, ["ore"] = 10 }, () =>
@@ -71,37 +82,29 @@ namespace LastBreathTest.WorldTesting
             Assert.AreEqual(105d, chest.RemoveAtMinutes);
         }
 
+        /// <summary>Contents are taken once: initializing again, or after a restore, keeps what the chest already holds.</summary>
         [TestMethod]
-        public void OpeningAndRestoringDoNotReroll()
+        public void InitializingAgainChangesNothing()
         {
             var chest = new ChestContents();
-            int calls = 0;
-            chest.Initialize(Definition(), x => { calls++; return Item(x.ItemId); });
-            var first = chest.Slots[0].Item;
-            chest.Initialize(Definition(), _ => throw new Exception("Must not mint twice"));
-            Assert.AreEqual(2, calls);
-            Assert.AreSame(first, chest.Slots[0].Item);
-            var restored = new ChestContents();
-            restored.Restore(true, [new("first", first, 1), new("second", chest.Slots[1].Item, 7)], null);
-            restored.Initialize(Definition(), _ => throw new Exception("Restore must not mint"));
-            Assert.AreEqual(7, restored.Slots[1].Amount);
-        }
+            var first = Slots();
+            chest.Initialize(first);
 
-        [TestMethod]
-        public void FailedCreationDoesNotCommitPartialContents()
-        {
-            var chest = new ChestContents();
-            Assert.ThrowsException<InvalidOperationException>(() => chest.Initialize(Definition(),
-                x => x.ItemId == "ore" ? throw new InvalidOperationException() : Item(x.ItemId)));
-            Assert.IsFalse(chest.Initialized);
-            Assert.AreEqual(0, chest.Slots.Count);
+            chest.Initialize([new("other", ChestItems.Item("other"), 3)]);
+
+            CollectionAssert.AreEqual(first, chest.Slots);
+            var restored = new ChestContents();
+            restored.Restore(true, [new("first", first[0].Item, 1), new("second", first[1].Item, 7)], null);
+            restored.Initialize(Slots());
+            Assert.AreEqual(7, restored.Slots[1].Amount);
+            Assert.AreSame(first[1].Item, restored.Slots[1].Item);
         }
 
         [TestMethod]
         public void LostAccessAndUnknownSlotDoNotTransfer()
         {
             var chest = new ChestContents();
-            chest.Initialize(Definition(), x => Item(x.ItemId));
+            chest.Initialize(Slots());
             var receiver = new Receiver(new() { ["sword"] = 1, ["ore"] = 10 });
             Assert.AreEqual(0, chest.Transfer(receiver, null, 10, 5, () => false).Accepted);
             Assert.AreEqual(0, chest.Transfer(receiver, "absent", 10, 5, () => true).Accepted);
@@ -116,11 +119,122 @@ namespace LastBreathTest.WorldTesting
         }
     }
 
+    /// <summary>Authored contents minted through a managed creation service: whole, or refused with no slot left behind.</summary>
+    [TestClass]
+    public class AuthoredChestMinterTests
+    {
+        private const string FailureMessage = "no item is written under this id";
+        private const int OreStack = 20;
+        private const int Pair = 2;
+        private const int StarterPieces = 5;
+        private const float NoBonusEffect = 0f;
+        private const float BaseMultiplier = 1f;
+
+        private static readonly AuthoredChestItem Sword = new("first", "sword", 1, Rarity.Common);
+        private static readonly AuthoredChestItem Ore = new("second", "ore", 10, Rarity.Common);
+        private static readonly AuthoredChestItem Gem = new("third", "gem", 1, Rarity.Rare);
+
+        private static ChestDefinition Definition(params AuthoredChestItem[] positions) =>
+            new("test", "test", 5, new(ChestAccessMode.Unlocked), new(ChestContentsMode.Authored, positions));
+
+        private sealed record Request(string Id, int SignatureEffects, Rarity Rarity, float EquipEffectChance,
+            float ModifierMultiplier, Rarity? FixedRarity);
+
+        /// <summary>Creates a managed item for every request and remembers the requests in order: the ore stacks,
+        /// everything else is a single piece, and the failing id throws instead.</summary>
+        private sealed class Creation(string? failingId = null) : IItemCreationService
+        {
+            public List<Request> Requests { get; } = [];
+
+            public string[] RequestedIds => Requests.Select(x => x.Id).ToArray();
+
+            public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance,
+                float modifierMultiplier, Rarity? fixedRarity = null)
+            {
+                Requests.Add(new(id, additionalItemEffects.Count, rarity, equipEffectChance, modifierMultiplier, fixedRarity));
+                if (id == failingId) throw new InvalidOperationException(FailureMessage);
+                return ChestItems.Item(id, id == Ore.ItemId ? OreStack : ChestItems.Unstackable, rarity);
+            }
+
+            public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifierDescriptor> descriptors, Rarity? minRarity = null) =>
+                throw new NotSupportedException("A chest mints by item id only.");
+        }
+
+        [TestMethod]
+        public void EveryPositionIsMintedIntoItsSlotInAuthoredOrder()
+        {
+            var creation = new Creation();
+
+            Assert.IsTrue(new AuthoredChestMinter(creation).TryMint(Definition(Sword, Ore, Gem), out var slots, out var refusal));
+
+            Assert.IsNull(refusal);
+            CollectionAssert.AreEqual(new[] { Sword.SlotId, Ore.SlotId, Gem.SlotId }, slots.Select(x => x.Id).ToArray());
+            CollectionAssert.AreEqual(new[] { Sword.ItemId, Ore.ItemId, Gem.ItemId }, slots.Select(x => x.Item?.Id).ToArray());
+            CollectionAssert.AreEqual(new[] { Sword.Amount, Ore.Amount, Gem.Amount }, slots.Select(x => x.Amount).ToArray());
+            Assert.AreEqual(Gem.Rarity, slots[2].Item?.Rarity);
+        }
+
+        /// <summary>The shipped starter chest, read through the real load path, mints its five authored pieces at
+        /// their authored rarity, with no bonus effect and at the base modifier scale.</summary>
+        [TestMethod]
+        public void ShippedStarterChestMintsItsFiveUncommonPieces()
+        {
+            ChestCatalog catalog = new();
+            new GameDataService(new FileSystemDataSource(SharedData.Root()), [catalog]).LoadAll();
+            var starter = catalog.Find(ChestCatalogTests.StarterChest);
+            Assert.IsNotNull(starter, "the shipped catalog no longer holds the starter chest");
+            var creation = new Creation();
+
+            Assert.IsTrue(new AuthoredChestMinter(creation).TryMint(starter, out var slots, out _));
+
+            Assert.AreEqual(StarterPieces, slots.Count);
+            CollectionAssert.AreEqual(starter.Contents.Items.Select(x => x.SlotId).ToArray(), slots.Select(x => x.Id).ToArray());
+            CollectionAssert.AreEqual(starter.Contents.Items.Select(x => x.ItemId).ToArray(), slots.Select(x => x.Item?.Id).ToArray());
+            Assert.IsTrue(slots.All(x => x.Amount == 1 && x.Item?.Rarity == Rarity.Uncommon));
+            Assert.IsTrue(creation.Requests.All(x => x.SignatureEffects == 0 && x.EquipEffectChance == NoBonusEffect
+                && x.ModifierMultiplier == BaseMultiplier && x.FixedRarity == x.Rarity));
+        }
+
+        /// <summary>A position whose item cannot be created refuses the whole chest: no slot comes back, the failure
+        /// is named, and the positions after it are never minted.</summary>
+        [TestMethod]
+        public void RefusalOnTheSecondPositionLeavesNoSlots()
+        {
+            var creation = new Creation(failingId: Ore.ItemId);
+
+            Assert.IsFalse(new AuthoredChestMinter(creation).TryMint(Definition(Sword, Ore, Gem), out var slots, out var refusal));
+
+            Assert.AreEqual(0, slots.Count);
+            Assert.IsNotNull(refusal);
+            Assert.AreEqual(Ore.SlotId, refusal.SlotId);
+            Assert.AreEqual(Ore.ItemId, refusal.ItemId);
+            StringAssert.Contains(refusal.Problem, FailureMessage);
+            CollectionAssert.AreEqual(new[] { Sword.ItemId, Ore.ItemId }, creation.RequestedIds);
+        }
+
+        /// <summary>More than one of an item that does not stack is refused: the bag would put one instance into two slots.</summary>
+        [TestMethod]
+        public void UnstackableItemAskedForMoreThanOneIsRefused()
+        {
+            var boots = new AuthoredChestItem("boots", "Boots_Stone_Tread", Pair, Rarity.Uncommon);
+            var creation = new Creation();
+
+            Assert.IsFalse(new AuthoredChestMinter(creation).TryMint(Definition(Sword, boots, Gem), out var slots, out var refusal));
+
+            Assert.AreEqual(0, slots.Count);
+            Assert.IsNotNull(refusal);
+            Assert.AreEqual(boots.SlotId, refusal.SlotId);
+            Assert.AreEqual(boots.ItemId, refusal.ItemId);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(refusal.Problem));
+            CollectionAssert.AreEqual(new[] { Sword.ItemId, boots.ItemId }, creation.RequestedIds);
+        }
+    }
+
     /// <summary>The catalog as the game reads it: the shipped file, and what a broken record costs.</summary>
     [TestClass]
     public class ChestCatalogTests
     {
-        private const string StarterChest = "Chest_Starter";
+        internal const string StarterChest = "Chest_Starter";
         private const string TestFile = "chests-under-test.json";
         private const string ItemsPath = ChestFields.Contents + "." + ChestFields.Items;
         private const string FirstAmountPath = ItemsPath + "[0]." + ChestFields.Amount;
