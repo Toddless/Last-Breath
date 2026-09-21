@@ -11,6 +11,9 @@ namespace Core.World.Containers
         public string Id { get; } = id;
         public IItem? Item { get; } = item;
         public int Amount { get; internal set; } = amount;
+
+        /// <summary>True when the slot counts a quantity with no item behind it.</summary>
+        internal bool LacksItem => Amount > 0 && Item == null;
     }
 
     public record ChestTransfer(int Accepted, bool CapacityLimited);
@@ -22,7 +25,19 @@ namespace Core.World.Containers
         public bool Initialized { get; private set; }
         public List<ChestSlot> Slots { get; private set; } = [];
         public double? RemoveAtMinutes { get; private set; }
-        public bool Empty => Initialized && Slots.All(x => x.Amount == 0);
+        public bool Empty => IsEmpty(Initialized, Slots);
+
+        /// <summary>True for an opened chest with nothing left in any slot.</summary>
+        internal static bool IsEmpty(bool initialized, IEnumerable<ChestSlot> slots) => initialized && slots.All(x => x.Amount == 0);
+
+        /// <summary>True when a chest can hold the state: distinct named slots without a negative or itemless quantity, nothing
+        /// in an unopened chest, and a finite, non-negative deadline exactly when an opened chest has nothing left.</summary>
+        internal static bool IsCoherent(bool initialized, IReadOnlyList<ChestSlot> slots, double? removeAt) =>
+            !(slots.Select(x => x.Id).Distinct().Count() != slots.Count
+              || slots.Any(x => string.IsNullOrWhiteSpace(x.Id) || x.Amount < 0 || x.LacksItem)
+              || !initialized && (slots.Count > 0 || removeAt != null)
+              || removeAt is { } deadline && (!double.IsFinite(deadline) || deadline < 0 || slots.Any(x => x.Amount > 0))
+              || IsEmpty(initialized, slots) && removeAt == null);
 
         /// <summary>Takes the minted slots as the chest's first contents; an initialized chest keeps what it holds.</summary>
         public void Initialize(IReadOnlyList<ChestSlot> slots)
@@ -33,12 +48,7 @@ namespace Core.World.Containers
 
         public void Restore(bool initialized, List<ChestSlot> slots, double? removeAt)
         {
-            if (slots.Select(x => x.Id).Distinct().Count() != slots.Count
-                || slots.Any(x => string.IsNullOrWhiteSpace(x.Id) || x.Amount < 0 || x.Amount > 0 && x.Item == null)
-                || !initialized && (slots.Count > 0 || removeAt != null)
-                || removeAt is { } deadline && (!double.IsFinite(deadline) || deadline < 0 || slots.Any(x => x.Amount > 0))
-                || initialized && slots.All(x => x.Amount == 0) && removeAt == null)
-                throw new InvalidOperationException("Invalid chest state.");
+            if (!IsCoherent(initialized, slots, removeAt)) throw new InvalidOperationException("Invalid chest state.");
             Initialized = initialized;
             Slots = slots;
             RemoveAtMinutes = removeAt;

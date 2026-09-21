@@ -1,5 +1,6 @@
 namespace LastBreathTest.WorldTesting
 {
+    using System.Globalization;
     using Core.Data.ChestData;
     using Core.Data.GameData;
     using Core.Enums;
@@ -116,6 +117,192 @@ namespace LastBreathTest.WorldTesting
         {
             Assert.ThrowsException<InvalidOperationException>(() => new ChestContents().Restore(true, [new("x", null, 1)], null));
             Assert.ThrowsException<InvalidOperationException>(() => new ChestContents().Restore(true, [], null));
+        }
+    }
+
+    /// <summary>A saved chest state made into one the chest can hold: content changed since the save is repaired and
+    /// reported, and a state that cannot be read is refused whole.</summary>
+    [TestClass]
+    public class ChestStateRepairTests
+    {
+        private const string Placed = "Chest_Placed";
+        private const string Renamed = "Chest_Renamed";
+        private const string First = "first";
+        private const string Second = "second";
+        private const string SwordId = "sword";
+        private const string OreId = "ore";
+        private const string ReadProblem = "the record is not an object";
+        private const int OreStack = 20;
+        private const int OneLeft = 1;
+        private const int OreLeft = 7;
+        private const int NoneLeft = 0;
+        private const double Now = 100d;
+        private const double Delay = 5d;
+        private const double SavedDeadline = 42d;
+
+        private static readonly IItem Sword = ChestItems.Item(SwordId);
+        private static readonly IItem Ore = ChestItems.Item(OreId, OreStack);
+
+        private static SavedChestState Saved(bool initialized, double? removeAt, params ChestSlot[] slots) =>
+            new(Placed, initialized, slots, removeAt);
+
+        private static SavedChestState Opened(params ChestSlot[] slots) => Saved(true, null, slots);
+
+        private static ChestStateRepairResult Repair(SavedChestState saved, double? delay = Delay) =>
+            ChestStateRepair.Repair(saved, Placed, Now, delay);
+
+        private static void AssertProblems(ChestStateRepairResult result, params ChestStateProblem[] expected) =>
+            CollectionAssert.AreEqual(expected, result.Findings.Select(x => x.Problem).ToArray(),
+                string.Join("; ", result.Findings.Select(x => x.Description)));
+
+        /// <summary>The repaired state taken by a fresh chest the way the component takes it: a state the repair hands
+        /// back never trips the invariants of ChestContents.</summary>
+        private static ChestContents Restored(ChestStateRepairResult result)
+        {
+            Assert.IsNotNull(result.State, "the repair refused a state it should restore");
+            ChestContents contents = new();
+            contents.Restore(result.State.Initialized, result.State.Slots, result.State.RemoveAtMinutes);
+            return contents;
+        }
+
+        /// <summary>A save under the same definition with every item read back comes back slot for slot, item for item.</summary>
+        [TestMethod]
+        public void SoundSaveComesBackAsSavedWithoutFindings()
+        {
+            var result = Repair(Opened(new(First, Sword, OneLeft), new(Second, Ore, OreLeft)));
+
+            AssertProblems(result);
+            var chest = Restored(result);
+            Assert.IsTrue(chest.Initialized);
+            Assert.IsNull(chest.RemoveAtMinutes);
+            CollectionAssert.AreEqual(new[] { First, Second }, chest.Slots.Select(x => x.Id).ToArray());
+            CollectionAssert.AreEqual(new[] { OneLeft, OreLeft }, chest.Slots.Select(x => x.Amount).ToArray());
+            Assert.AreSame(Sword, chest.Slots[0].Item);
+            Assert.AreSame(Ore, chest.Slots[1].Item);
+        }
+
+        /// <summary>An unopened chest stays unopened and an emptied one keeps the deadline it was saved with.</summary>
+        [TestMethod]
+        public void SoundUnopenedAndEmptiedChestsComeBackAsSaved()
+        {
+            var unopened = Repair(Saved(false, null));
+            var emptied = Repair(Saved(true, SavedDeadline, new ChestSlot(First, null, NoneLeft)));
+
+            AssertProblems(unopened);
+            AssertProblems(emptied);
+            Assert.IsFalse(Restored(unopened).Initialized);
+            Assert.AreEqual(SavedDeadline, Restored(emptied).RemoveAtMinutes);
+        }
+
+        /// <summary>The concrete items of the save are the truth: a chest placed with another definition keeps them.</summary>
+        [TestMethod]
+        public void ChangedDefinitionIsReportedAndTheSavedSlotsAreKept()
+        {
+            var result = Repair(Opened(new ChestSlot(First, Sword, OneLeft)) with { DefinitionId = Renamed });
+
+            AssertProblems(result, ChestStateProblem.DefinitionChanged);
+            StringAssert.Contains(result.Findings[0].Description, Renamed);
+            StringAssert.Contains(result.Findings[0].Description, Placed);
+            Assert.AreSame(Sword, Restored(result).Slots.Single().Item);
+        }
+
+        /// <summary>An unopened chest under a changed definition is still unopened: it mints from the definition it is placed with.</summary>
+        [TestMethod]
+        public void UnopenedChestUnderAChangedDefinitionStaysUnopened()
+        {
+            var result = Repair(Saved(false, null) with { DefinitionId = Renamed });
+
+            AssertProblems(result, ChestStateProblem.DefinitionChanged);
+            Assert.IsFalse(Restored(result).Initialized);
+        }
+
+        /// <summary>A slot whose item could not be read back is emptied in place; the slots around it keep their items.</summary>
+        [TestMethod]
+        public void SlotWhoseItemIsMissingIsEmptiedAndTheOthersAreKept()
+        {
+            ChestSlot missing = new(First, null, OneLeft);
+
+            var result = Repair(Opened(missing, new(Second, Ore, OreLeft)));
+
+            AssertProblems(result, ChestStateProblem.ItemMissing);
+            StringAssert.Contains(result.Findings[0].Description, First);
+            var chest = Restored(result);
+            CollectionAssert.AreEqual(new[] { First, Second }, chest.Slots.Select(x => x.Id).ToArray());
+            Assert.AreEqual(NoneLeft, chest.Slots[0].Amount);
+            Assert.AreEqual(OreLeft, chest.Slots[1].Amount);
+            Assert.AreSame(Ore, chest.Slots[1].Item);
+            Assert.IsNull(chest.RemoveAtMinutes, "a chest still holding ore started its removal");
+            Assert.AreEqual(OneLeft, missing.Amount, "the repair changed the slot it was handed");
+        }
+
+        /// <summary>A chest left with nothing once its missing items are emptied starts the placed definition's delay now.</summary>
+        [TestMethod]
+        public void ChestLeftWithNothingGetsTheDefinitionDelay()
+        {
+            var result = Repair(Opened(new(First, null, OneLeft), new(Second, null, OreLeft)));
+
+            AssertProblems(result, ChestStateProblem.ItemMissing, ChestStateProblem.ItemMissing, ChestStateProblem.DeadlineMissing);
+            var chest = Restored(result);
+            Assert.AreEqual(Now + Delay, chest.RemoveAtMinutes);
+            Assert.IsFalse(chest.RemovalDue(Now));
+            Assert.IsTrue(chest.RemovalDue(Now + Delay));
+        }
+
+        /// <summary>Without a definition there is no delay to wait out: the emptied chest is due for removal at once.</summary>
+        [TestMethod]
+        public void EmptiedChestWithoutDeadlineIsDueAtOnceWhenItsDefinitionIsUnknown()
+        {
+            var result = Repair(Opened(new ChestSlot(First, null, NoneLeft)), delay: null);
+
+            AssertProblems(result, ChestStateProblem.DeadlineMissing);
+            var chest = Restored(result);
+            Assert.AreEqual(Now, chest.RemoveAtMinutes);
+            Assert.IsTrue(chest.RemovalDue(Now));
+        }
+
+        /// <summary>A state from a newer build is refused with nothing to restore, so nothing is minted in its place.</summary>
+        [TestMethod]
+        public void VersionThisBuildDoesNotReadIsRefused()
+        {
+            int newer = ChestStateRepair.StateVersion + 1;
+
+            var result = ChestStateRepair.VersionNotRead(newer);
+
+            Assert.IsTrue(ChestStateRepair.Reads(ChestStateRepair.StateVersion));
+            Assert.IsFalse(ChestStateRepair.Reads(newer));
+            Assert.IsNull(result.State);
+            AssertProblems(result, ChestStateProblem.VersionNotRead);
+            StringAssert.Contains(result.Findings[0].Description, newer.ToString(CultureInfo.InvariantCulture));
+        }
+
+        [TestMethod]
+        public void UnreadableStateIsRefusedWithItsProblem()
+        {
+            var result = ChestStateRepair.Unreadable(ReadProblem);
+
+            Assert.IsNull(result.State);
+            AssertProblems(result, ChestStateProblem.Unreadable);
+            StringAssert.Contains(result.Findings[0].Description, ReadProblem);
+        }
+
+        /// <summary>A state the repairs cannot make coherent is refused whole with one finding: none of the repairs it
+        /// would have needed is reported, and nothing reaches ChestContents to throw.</summary>
+        [TestMethod]
+        public void IncoherentStateIsRefusedWholeRatherThanRepaired()
+        {
+            var repeatedSlot = Repair(Opened(new(First, Sword, OneLeft), new(First, null, OneLeft)) with { DefinitionId = Renamed });
+            var unopenedWithContents = Repair(Saved(false, null, new ChestSlot(First, Sword, OneLeft)));
+            var deadlineOverContents = Repair(Saved(true, SavedDeadline, new ChestSlot(First, Sword, OneLeft)));
+
+            foreach (var (name, result) in new[]
+                     {
+                         (nameof(repeatedSlot), repeatedSlot), (nameof(unopenedWithContents), unopenedWithContents),
+                         (nameof(deadlineOverContents), deadlineOverContents)
+                     })
+            {
+                Assert.IsNull(result.State, name);
+                AssertProblems(result, ChestStateProblem.Unreadable);
+            }
         }
     }
 
