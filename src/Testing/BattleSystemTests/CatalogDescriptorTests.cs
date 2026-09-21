@@ -4,6 +4,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Ai.World;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
+    using Core.Data.ChestData;
     using Core.Data.CraftingData;
     using Core.Data.EquipData;
     using Core.Data.GameData;
@@ -19,6 +20,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Narrative;
     using Core.Narrative.Actions;
     using Core.Narrative.Conditions;
+    using Core.World.Containers;
     using LastBreath.Descriptors;
     using Moq;
     using Newtonsoft.Json.Linq;
@@ -4223,5 +4225,111 @@ namespace LastBreathTest.BattleSystemTests
         private static RecordSchema Section(string key) =>
             Schema(DataCatalog.NpcModifiers).Sections.FirstOrDefault(section => section.Key == key)?.Record
             ?? throw new AssertFailedException($"the modifier catalog holds no '{key}' section.");
+
+        /// <summary>The schema of the chests: the file IS the array of records, each chest found by its own
+        /// id. Nothing is worded off the id — a chest writes the key it is named under as a field of its own
+        /// — so the catalog owes the localization nothing. Both reports gather what neither reflection nor
+        /// the assembled parts could vouch for.</summary>
+        [TestMethod]
+        public void TheChestsSchemaBuildsFromTheRealDtosWithoutAReport()
+        {
+            CatalogSchemaBuilder builder = new(new SchemaReflector());
+            CatalogSchema schema = builder.Build(Descriptor(DataCatalog.Chests));
+
+            Assert.AreEqual(RootShape.ArrayUnderKey, schema.Shape);
+            Assert.AreEqual(1, schema.Sections.Count);
+            Assert.AreEqual(ChestsCatalogDescriptor.RecordsKey, schema.Sections[0].Key);
+            Assert.AreEqual(ChestsCatalogDescriptor.IdField, schema.Sections[0].Record.IdField);
+            Assert.AreEqual(0, schema.LocalizedSuffixes.Count,
+                "a chest is named by the key it writes for itself, and nothing is worded off its id");
+            Assert.AreEqual(ChestsCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null));
+
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Reflection.Notes.ToArray(),
+                $"reflection has something to say about the chest DTOs:{Environment.NewLine}{builder.Reflection}");
+            CollectionAssert.AreEqual(
+                Array.Empty<string>(),
+                builder.Checks.Notes.ToArray(),
+                $"the assembled Chests catalog disagrees with itself:{Environment.NewLine}{builder.Checks}");
+        }
+
+        /// <summary>
+        /// Every id the chest parser resolves, every name it parses into an enum, the key a chest is named
+        /// under, and the one field that reads like a reference and is none, said so in the schema. What a
+        /// position mints answers from everywhere a thing placed in the world is written — the places a loot
+        /// seat names its drop from, with the ornaments standing outside both.
+        /// </summary>
+        [TestMethod]
+        public void TheChestsSchemaNamesTheReferenceChoicesKeyAndRefusalTheParserResolves()
+        {
+            RecordSchema record = Schema(DataCatalog.Chests).Sections[0].Record;
+
+            NamesADrop(Leaf(Locate(record, ChestItem(ChestFields.ItemId))), "what a chest position mints");
+
+            Choice(Leaf(Locate(record, $"{ChestFields.Access}{PathSeparator}{ChestFields.Mode}")), typeof(ChestAccessMode));
+            Choice(Leaf(Locate(record, $"{ChestFields.Contents}{PathSeparator}{ChestFields.Mode}")), typeof(ChestContentsMode));
+            Choice(Leaf(Locate(record, ChestItem(ChestFields.Rarity))), typeof(Rarity));
+
+            Assert.AreEqual(FieldKind.LocalizedKey, Field(record, ChestFields.NameKey).Kind,
+                $"'{ChestFields.NameKey}' is drawn as text to read instead of the key it holds");
+            Assert.IsTrue(Leaf(Locate(record, ChestItem(ChestFields.SlotId))).RefusedAsReference,
+                $"'{ChestFields.SlotId}' names a position inside its own chest and neither points anywhere nor says it does not");
+        }
+
+        /// <summary>The shipped file read back through the schema, the way the NPC one is: every key it
+        /// writes is one the schema ranks, and the canonical write loses nothing. The records stand at the
+        /// root of the file, so this is also where the root array is held to the descriptor.</summary>
+        [TestMethod]
+        public void TheChestsSchemaRanksEveryKeyTheShippedFileWrites()
+        {
+            CatalogSchema schema = Schema(DataCatalog.Chests);
+            JToken root = JsonTreeDocument.Load(CatalogFile(schema, DataCatalog.Chests)).Root;
+            SchemaKeyOrder order = new(schema);
+
+            (List<string> unknown, List<string> reordered) = Written(root, schema, order);
+
+            Report($"Keys of {ChestsCatalogDescriptor.FileName} the schema does not know", unknown);
+            Report("Records the canonical write would reorder", reordered);
+
+            Assert.AreEqual(0, unknown.Count,
+                $"keys of {ChestsCatalogDescriptor.FileName} no field of the schema is written under: {string.Join(", ", unknown)}");
+            Assert.IsTrue(
+                JToken.DeepEquals(root, JsonTreeDocument.Parse(CanonicalJsonWriter.Write(root, order, CanonicalJsonOptions.Default)).Root),
+                $"the canonical write of {ChestsCatalogDescriptor.FileName} says something other than the file it was given");
+        }
+
+        /// <summary>
+        /// What each record of a chest asks the author for against what the reader refuses it without —
+        /// which is every key: the reader defaults nothing, so a key left out is a chest that never exists.
+        /// A fresh record is laid down with the keys the schema REQUIRES and nothing else, so a key the reader
+        /// cannot do without and the schema leaves optional is a chest the tool lets the author save and the
+        /// game drops at load.
+        /// </summary>
+        [TestMethod]
+        public void TheChestsSchemaAsksForExactlyWhatTheReaderRefusesARecordWithout()
+        {
+            RecordSchema chest = Schema(DataCatalog.Chests).Sections[0].Record;
+            RecordSchema contents = Nested(chest, ChestFields.Contents);
+
+            (RecordSchema Record, string[] Demanded)[] demands =
+            [
+                (chest, [ChestFields.Id, ChestFields.NameKey, ChestFields.Delay, ChestFields.Access, ChestFields.Contents]),
+                (Nested(chest, ChestFields.Access), [ChestFields.Mode]),
+                (contents, [ChestFields.Mode, ChestFields.Items]),
+                (Nested(contents, ChestFields.Items), [ChestFields.SlotId, ChestFields.ItemId, ChestFields.Amount, ChestFields.Rarity])
+            ];
+
+            foreach ((RecordSchema record, string[] demanded) in demands)
+                CollectionAssert.AreEquivalent(
+                    demanded,
+                    record.Fields.Where(field => field.Required).Select(field => field.JsonName).ToArray(),
+                    $"'{record.TypeName}' asks the author for other keys than the ones the reader refuses it without");
+        }
+
+        /// <summary>The address of a field of one authored position: a position is written under the field
+        /// a chest's contents hold their positions in, and everything about it is addressed from there.</summary>
+        private static string ChestItem(string path) =>
+            $"{ChestFields.Contents}{PathSeparator}{ChestFields.Items}{PathSeparator}{path}";
     }
 }
