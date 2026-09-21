@@ -8,6 +8,7 @@ namespace Core.World.Containers
     using Data.GameData;
     using Enums;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>How a chest is entered. Locked modes wait on the lock design.</summary>
     public enum ChestAccessMode
@@ -36,34 +37,71 @@ namespace Core.World.Containers
         ChestContentsDefinition Contents);
 
     /// <summary>
-    /// The chest catalog. Json records are read into DTOs and converted one by one: a record that fails
-    /// a rule is reported with its id and the field at fault and skipped, so its neighbours in the file
-    /// still load. Only a file that cannot be read at all takes the whole file down with it.
+    /// The chest catalog. Each json record is read into its DTO and converted on its own: a record holding
+    /// a value its field cannot take, or failing a rule, is reported with its id and skipped, so its
+    /// neighbours in the file still load. Only a file that is not a readable list of records is refused whole.
     /// </summary>
     public sealed class ChestCatalog : IGameDataParticipant
     {
         /// <summary>Stands in for the chest id in a report about the id itself.</summary>
         private const string UnnamedChest = "<no id>";
 
+        private const string UnreadableFileFormat = "Failed to deserialize chests file '{0}'.";
+
+        private const string SkippedChestFormat = "Skipping chest '{0}' from '{1}': {2}";
+
+        private const string FieldProblemFormat = "'{0}' {1}.";
+
+        private const string UnreadableRecordFormat = "the record cannot be read as a chest: {0}";
+
+        /// <summary>Leaves every value as written until its own record is read: a date-shaped string stays a string.</summary>
+        private static readonly JsonSerializerSettings RecordListSettings = new() { DateParseHandling = DateParseHandling.None };
+
         private readonly Dictionary<string, ChestDefinition> _definitions = [];
 
         public IReadOnlyList<string> Catalogs => [DataCatalog.Chests];
 
-        public ChestDefinition Get(string id) => _definitions.TryGetValue(id, out var definition)
-            ? definition : throw new InvalidOperationException($"Unknown chest definition '{id}'.");
+        /// <summary>The definition under <paramref name="id"/>; null when the catalog holds none.</summary>
+        public ChestDefinition? Find(string id) => _definitions.GetValueOrDefault(id);
 
         public void Apply(string catalog, GameDataFile file)
         {
-            var records = JsonConvert.DeserializeObject<List<ChestData?>>(file.Json)
-                ?? throw new InvalidOperationException($"Failed to deserialize chests file '{file.FileName}'.");
-
-            foreach (var record in records)
+            foreach (var record in ReadRecords(file))
             {
-                if (Read(record, file.FileName) is not { } definition) continue;
+                if (!TryConvert(record, file.FileName, out var data)) continue;
+                if (Read(data, file.FileName) is not { } definition) continue;
                 if (!_definitions.TryAdd(definition.Id, definition))
                     Report(definition.Id, file.FileName, ChestFields.Id, "is already taken by another chest");
             }
         }
+
+        /// <summary>The file's records as json, none of them believed yet. A file that is not a list of
+        /// records at all is refused whole.</summary>
+        private static List<JToken> ReadRecords(GameDataFile file) =>
+            JsonConvert.DeserializeObject<List<JToken>>(file.Json, RecordListSettings)
+            ?? throw new InvalidOperationException(string.Format(UnreadableFileFormat, file.FileName));
+
+        /// <summary>Reads one record into its DTO; a value its field cannot hold is reported and costs this
+        /// record alone. Read back from text: a token reader rounds a fractional amount the text reader refuses.</summary>
+        private static bool TryConvert(JToken record, string file, out ChestData? data)
+        {
+            try
+            {
+                data = JsonConvert.DeserializeObject<ChestData>(record.ToString(Formatting.None));
+                return true;
+            }
+            catch (JsonException exception)
+            {
+                ReportSkipped(IdOf(record), file, string.Format(UnreadableRecordFormat, exception.Message));
+                data = null;
+                return false;
+            }
+        }
+
+        /// <summary>Names a record that did not convert: its id when written as text, the placeholder otherwise.</summary>
+        private static string IdOf(JToken record) =>
+            record is JObject fields && fields[ChestFields.Id] is JValue { Value: string id } && !string.IsNullOrWhiteSpace(id)
+                ? id : UnnamedChest;
 
         private static ChestDefinition? Read(ChestData? record, string file)
         {
@@ -142,7 +180,10 @@ namespace Core.World.Containers
         }
 
         private static void Report(string id, string file, string field, string reason) =>
-            Tracker.TrackError($"Skipping chest '{id}' from '{file}': '{field}' {reason}.");
+            ReportSkipped(id, file, string.Format(FieldProblemFormat, field, reason));
+
+        private static void ReportSkipped(string id, string file, string problem) =>
+            Tracker.TrackError(string.Format(SkippedChestFormat, id, file, problem));
 
         /// <summary>How a report addresses a field standing inside another: the file's own names, which
         /// the records themselves are read by, joined the way an author reads his way down to one.</summary>

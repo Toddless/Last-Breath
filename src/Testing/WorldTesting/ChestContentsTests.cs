@@ -1,5 +1,6 @@
 namespace LastBreathTest.WorldTesting
 {
+    using Core.Data.ChestData;
     using Core.Data.GameData;
     using Core.Enums;
     using Core.Inventory;
@@ -7,6 +8,7 @@ namespace LastBreathTest.WorldTesting
     using Core.World.Containers;
     using Moq;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     [TestClass]
     public class ChestContentsTests
@@ -120,6 +122,8 @@ namespace LastBreathTest.WorldTesting
     {
         private const string StarterChest = "Chest_Starter";
         private const string TestFile = "chests-under-test.json";
+        private const string ItemsPath = ChestFields.Contents + "." + ChestFields.Items;
+        private const string FirstAmountPath = ItemsPath + "[0]." + ChestFields.Amount;
 
         /// <summary>The shipped chest, read through the real load path so the file's shape is held to
         /// what the participant expects of it.</summary>
@@ -134,7 +138,8 @@ namespace LastBreathTest.WorldTesting
             service.LoadAll();
 
             Assert.AreEqual(0, failures.Count, string.Join(", ", failures));
-            var starter = catalog.Get(StarterChest);
+            var starter = catalog.Find(StarterChest);
+            Assert.IsNotNull(starter, "the shipped catalog no longer holds the starter chest");
             Assert.AreEqual(StarterChest, starter.NameKey);
             Assert.AreEqual(5d, starter.EmptyRemovalDelayMinutes);
             Assert.AreEqual(ChestAccessMode.Unlocked, starter.Access.Mode);
@@ -153,15 +158,47 @@ namespace LastBreathTest.WorldTesting
 
             catalog.Apply(DataCatalog.Chests, new GameDataFile(TestFile, BrokenCatalogJson));
 
-            Assert.AreEqual("Chest_Sound", catalog.Get("Chest_Sound").NameKey);
-            Assert.AreEqual(2, catalog.Get("Chest_Sound").Contents.Items.Count);
-            Assert.AreEqual("Chest_Last", catalog.Get("Chest_Last").NameKey);
+            Assert.AreEqual("Chest_Sound", catalog.Find("Chest_Sound")?.NameKey);
+            Assert.AreEqual(2, catalog.Find("Chest_Sound")?.Contents.Items.Count);
+            Assert.AreEqual("Chest_Last", catalog.Find("Chest_Last")?.NameKey);
             foreach (string skipped in (string[])
             [
                 "Chest_UnknownAccessMode", "Chest_UnknownContentsMode", "Chest_RarityAsFlags",
                 "Chest_NoDelay", "Chest_EmptyItemId", "Chest_RepeatedSlot", "Chest_NoPositions"
             ])
-                Assert.ThrowsException<InvalidOperationException>(() => catalog.Get(skipped), skipped);
+                Assert.IsNull(catalog.Find(skipped), skipped);
+        }
+
+        /// <summary>A value its field cannot hold — an object for text, text for a number or a section, a
+        /// fraction for a count — costs its own record only: the sound records around it still load.</summary>
+        [TestMethod]
+        public void ValueOfTheWrongTypeCostsOnlyItsRecord()
+        {
+            ChestCatalog catalog = new();
+
+            catalog.Apply(DataCatalog.Chests, new GameDataFile(TestFile, MistypedCatalogJson));
+
+            Assert.AreEqual(2, catalog.Find("Chest_First")?.Contents.Items.Count);
+            Assert.AreEqual(2, catalog.Find("Chest_Last")?.Contents.Items.Count);
+            foreach (string skipped in (string[])
+            [
+                "Chest_NameKeyAsObject", "Chest_AccessAsText", "Chest_ItemsAsObject",
+                "Chest_AmountAsText", "Chest_FractionalAmount", "Chest_DelayAsText"
+            ])
+                Assert.IsNull(catalog.Find(skipped), skipped);
+        }
+
+        /// <summary>An id the catalog does not hold is answered with nothing rather than a throw.</summary>
+        [TestMethod]
+        public void FindAnswersNothingForAnIdTheCatalogDoesNotHold()
+        {
+            ChestCatalog catalog = new();
+
+            catalog.Apply(DataCatalog.Chests, new GameDataFile(TestFile, JsonConvert.SerializeObject(new[] { Sound("Chest_Known") })));
+
+            Assert.AreEqual("Chest_Known", catalog.Find("Chest_Known")?.Id);
+            Assert.IsNull(catalog.Find("Chest_Unknown"));
+            Assert.IsNull(catalog.Find(string.Empty));
         }
 
         /// <summary>A second record under a taken id is refused, and the one already read is left alone.</summary>
@@ -172,8 +209,8 @@ namespace LastBreathTest.WorldTesting
 
             catalog.Apply(DataCatalog.Chests, new GameDataFile(TestFile, BrokenCatalogJson));
 
-            Assert.AreEqual("Chest_Sound", catalog.Get("Chest_Sound").NameKey);
-            Assert.AreEqual("first", catalog.Get("Chest_Sound").Contents.Items[0].SlotId);
+            Assert.AreEqual("Chest_Sound", catalog.Find("Chest_Sound")?.NameKey);
+            Assert.AreEqual("first", catalog.Find("Chest_Sound")?.Contents.Items[0].SlotId);
         }
 
         /// <summary>A file the reader cannot get records out of at all is refused whole, which is what
@@ -186,6 +223,7 @@ namespace LastBreathTest.WorldTesting
             Assert.ThrowsException<InvalidOperationException>(
                 () => catalog.Apply(DataCatalog.Chests, new GameDataFile(TestFile, "null")));
             Assert.IsTrue(Refused(() => catalog.Apply(DataCatalog.Chests, new GameDataFile(TestFile, "{ not json"))));
+            Assert.IsTrue(Refused(() => catalog.Apply(DataCatalog.Chests, new GameDataFile(TestFile, "{}"))));
         }
 
         private static bool Refused(Action apply)
@@ -205,6 +243,38 @@ namespace LastBreathTest.WorldTesting
             string rarity = "Uncommon") => new { slotId, itemId, amount, rarity };
 
         private static object Contents(string mode, params object[] items) => new { mode, items };
+
+        /// <summary>A record every rule accepts, with two positions.</summary>
+        private static JObject Sound(string id) => JObject.FromObject(new
+        {
+            id, nameKey = id, emptyRemovalDelayMinutes = 5,
+            access = new { mode = "Unlocked" },
+            contents = Contents("Authored", Position("first"), Position("second"))
+        });
+
+        /// <summary>A sound record whose one field at <paramref name="path"/> holds <paramref name="value"/> instead.</summary>
+        private static JObject Mistyped(string id, string path, JToken value)
+        {
+            var record = Sound(id);
+            (record.SelectToken(path) ?? throw new ArgumentException($"a sound record has no '{path}'", nameof(path))).Replace(value);
+            return record;
+        }
+
+        /// <summary>One file carrying every kind of value a field cannot hold between two sound records,
+        /// plus a record whose id is not text and one that is not a record at all.</summary>
+        private static string MistypedCatalogJson => JsonConvert.SerializeObject(new JToken[]
+        {
+            Sound("Chest_First"),
+            Mistyped("Chest_NameKeyAsObject", ChestFields.NameKey, new JObject()),
+            Mistyped("Chest_AccessAsText", ChestFields.Access, "Unlocked"),
+            Mistyped("Chest_ItemsAsObject", ItemsPath, new JObject()),
+            Mistyped("Chest_AmountAsText", FirstAmountPath, "many"),
+            Mistyped("Chest_FractionalAmount", FirstAmountPath, 2.5),
+            Mistyped("Chest_DelayAsText", ChestFields.Delay, "soon"),
+            Mistyped("Chest_IdAsObject", ChestFields.Id, new JObject()),
+            5,
+            Sound("Chest_Last")
+        });
 
         /// <summary>One file carrying every way a record is refused, sound records first, between and
         /// last. The records are composed rather than written out so that a broken one differs from a
