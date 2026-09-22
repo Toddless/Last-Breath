@@ -64,6 +64,9 @@ namespace LastBreath.World.Containers
         private bool _configurationReported;
         private bool _visualsReported;
 
+        /// <summary>The clock this chest listens to while its removal deadline is set; null while it does not listen.</summary>
+        private IWorldClock? _watchedClock;
+
         /// <summary>A saved state this build could not read; every capture writes it back unchanged.</summary>
         private JToken? _unreadState;
 
@@ -73,14 +76,19 @@ namespace LastBreath.World.Containers
         private InventoryItemSaveConverter Converter => new(_provider.GetService<EquipItemSaveConverter>(),
             _provider.GetService<IItemDataProvider>(), _provider.GetService<IAugmentItemMinter>());
 
-        /// <summary>Binds the interaction target to this chest's identity, then resolves its definition; a setup error disables the chest.</summary>
+        /// <summary>Binds the interaction target to this chest's identity, resolves its definition and resumes the removal watch
+        /// of a set deadline; a setup error disables the chest.</summary>
         public override void _EnterTree()
         {
             _provider = Services.GameServiceProvider.Instance;
             _definition = BindTarget() ? FindDefinition() : null;
+            RefreshRemovalWatch();
         }
 
         public override void _Ready() => RefreshVisuals();
+
+        /// <summary>Stops the removal watch: a chest outside the tree does not listen to the clock.</summary>
+        public override void _ExitTree() => StopRemovalWatch();
 
         /// <summary>Open while the chest has a definition and something left in it.</summary>
         public IEnumerable<InteractionAction> Actions() => _definition == null || Contents.Empty
@@ -94,7 +102,7 @@ namespace LastBreath.World.Containers
         public bool TryOpen()
         {
             if (_definition is not { } definition || Contents.Empty || !TryInitialize(definition)) return false;
-            RefreshVisuals();
+            RefreshFromContents();
             return true;
         }
 
@@ -104,18 +112,57 @@ namespace LastBreath.World.Containers
             if (_definition == null) return NothingTransferred;
             var result = Contents.Transfer(_provider.GetService<IInventoryTransfer>(), slotId, Clock.TotalMinutes,
                 _definition.EmptyRemovalDelayMinutes, accessible);
-            RefreshVisuals();
+            RefreshFromContents();
             return result;
         }
 
-        public override void _Process(double delta)
+        /// <summary>Removes the chest at once when its deadline passed while the location was away or loading.</summary>
+        public void ReconcileElapsed(double gameMinutes) => RemoveIfDue(Clock.TotalMinutes);
+
+        /// <summary>Brings the look and the removal watch in line with the contents after they change.</summary>
+        private void RefreshFromContents()
+        {
+            RefreshVisuals();
+            RefreshRemovalWatch();
+        }
+
+        /// <summary>Listens to the game minutes only while a removal deadline is set and the chest is in the tree and not queued
+        /// for deletion; repeated calls change nothing.</summary>
+        private void RefreshRemovalWatch()
+        {
+            if (Contents.RemoveAtMinutes == null || !IsInsideTree() || IsQueuedForDeletion()) StopRemovalWatch();
+            else StartRemovalWatch();
+        }
+
+        /// <summary>Subscribes to the current clock unless a watch is already running.</summary>
+        private void StartRemovalWatch()
+        {
+            if (_watchedClock != null) return;
+            _watchedClock = Clock;
+            _watchedClock.MinutePassed += OnMinutePassed;
+        }
+
+        /// <summary>Unsubscribes from the clock the watch subscribed to, if any.</summary>
+        private void StopRemovalWatch()
+        {
+            if (_watchedClock == null) return;
+            _watchedClock.MinutePassed -= OnMinutePassed;
+            _watchedClock = null;
+        }
+
+        /// <summary>Checks the deadline every game minute; a location still preparing waits for the next one.</summary>
+        private void OnMinutePassed(double totalMinutes)
         {
             if (LocationRoot.Find(this) is { IsPreparing: true }) return;
-            ReconcileElapsed(0);
+            RemoveIfDue(totalMinutes);
         }
-        public void ReconcileElapsed(double gameMinutes)
+
+        /// <summary>Queues the chest for removal once its deadline is due, which also ends the watch.</summary>
+        private void RemoveIfDue(double now)
         {
-            if (Contents.RemovalDue(Clock.TotalMinutes) && !IsQueuedForDeletion()) QueueFree();
+            if (!Contents.RemovalDue(now) || IsQueuedForDeletion()) return;
+            QueueFree();
+            RefreshRemovalWatch();
         }
 
         /// <summary>Shows the texture of the current look; without a sprite or that texture the sprite stays as it is and the
@@ -249,7 +296,7 @@ namespace LastBreath.World.Containers
 
             _unreadState = null;
             Contents.Restore(restored.Initialized, restored.Slots, restored.RemoveAtMinutes);
-            RefreshVisuals();
+            RefreshFromContents();
         }
 
         /// <summary>The saved state made into one this chest can hold, or refused when it cannot be read.</summary>
@@ -326,7 +373,7 @@ namespace LastBreath.World.Containers
             _unreadState = state.DeepClone();
             _definition = null;
             Contents.Restore(initialized: false, slots: [], removeAt: null);
-            RefreshVisuals();
+            RefreshFromContents();
         }
 
         /// <summary>What the chest looks like: shut until first opened, lid up while anything is left, then empty.</summary>

@@ -33,9 +33,12 @@ namespace Core.Ai.World.Time
         event Action<int>? HourPassed;
         event Action<DayPhase>? PhaseChanged;
 
+        /// <summary>Fires with the current <see cref="TotalMinutes"/> when the whole game minute changes; hosts without minute notifications never fire it.</summary>
+        event Action<double>? MinutePassed { add { } remove { } }
+
         void Tick(float realDelta);
 
-        /// <summary>Save-load path: jumps to the stored moment; fires HourPassed/PhaseChanged when they differ.</summary>
+        /// <summary>Save-load path: jumps to the stored moment; fires MinutePassed/HourPassed/PhaseChanged when they differ.</summary>
         void RestoreState(int day, int minuteOfDay);
     }
 }

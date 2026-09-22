@@ -78,11 +78,78 @@ namespace LastBreathTest.WorldTesting
             int announcements = 0;
             clock.HourPassed += _ => announcements++;
             clock.PhaseChanged += _ => announcements++;
+            clock.MinutePassed += _ => announcements++;
 
             ((ISessionResettable)clock).ResetSession();
 
             Assert.AreEqual(DayPhase.Morning, clock.Phase);
             Assert.AreEqual(0, announcements, "the session rewind is silent by design");
+        }
+
+        [TestMethod]
+        public void ATickCrossingAMinuteAnnouncesItOnceWithTheCurrentTime()
+        {
+            var clock = CreateClock(startHour: 8);
+            clock.Tick(0.5f); // 24 real min/day => one real second per game minute: 08:00:30
+            var announced = RecordMinutes(clock);
+
+            clock.Tick(0.75f); // 08:00:30 -> 08:01:15
+
+            CollectionAssert.AreEqual(new List<double> { clock.TotalMinutes }, announced);
+        }
+
+        [TestMethod]
+        public void ATickWithinTheSameMinuteStaysSilent()
+        {
+            var clock = CreateClock(startHour: 8);
+            var announced = RecordMinutes(clock);
+
+            clock.Tick(0.25f); // 08:00:15
+            clock.Tick(0.5f); // 08:00:45
+
+            Assert.AreEqual(0, announced.Count);
+        }
+
+        [TestMethod]
+        public void ATickSpanningSeveralMinutesAnnouncesOnlyTheFinalTime()
+        {
+            var clock = CreateClock(startHour: 8);
+            var announced = RecordMinutes(clock);
+
+            clock.Tick(5.5f); // 08:00 -> 08:05:30 in one tick
+
+            CollectionAssert.AreEqual(new List<double> { clock.TotalMinutes }, announced);
+        }
+
+        [TestMethod]
+        public void ARestoreJumpAnnouncesTheNewTime()
+        {
+            var clock = CreateClock(startHour: 8);
+            var announced = RecordMinutes(clock);
+
+            clock.RestoreTime(clock.TotalMinutes + 90.5); // 08:00 -> 09:30:30
+
+            CollectionAssert.AreEqual(new List<double> { clock.TotalMinutes }, announced);
+        }
+
+        [TestMethod]
+        public void RestoringWithinTheSameMinuteStaysSilent()
+        {
+            var clock = CreateClock(startHour: 8);
+            clock.Tick(0.25f); // 08:00:15
+            var announced = RecordMinutes(clock);
+
+            clock.RestoreTime(clock.TotalMinutes + 0.5); // 08:00:15 -> 08:00:45
+
+            Assert.AreEqual(0, announced.Count);
+        }
+
+        /// <summary>Collects every time the clock announces a passed minute from now on.</summary>
+        private static List<double> RecordMinutes(WorldClock clock)
+        {
+            var announced = new List<double>();
+            clock.MinutePassed += announced.Add;
+            return announced;
         }
 
         private static DayPhase PhaseAtHour(int hour) => CreateClock(startHour: hour).Phase;
