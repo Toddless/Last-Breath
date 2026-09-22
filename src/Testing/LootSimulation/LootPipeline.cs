@@ -28,6 +28,10 @@ namespace LastBreathTest.LootSimulation
         public required IRandomNumberGenerator Rnd { get; init; }
         public required Core.Items.IItemMinter Minter { get; init; }
 
+        /// <summary>The creation service the drop pipeline mints its rolled ids through, for audits that mint
+        /// shipped ids against the real item data.</summary>
+        public required IItemCreationService ItemCreation { get; init; }
+
         /// <summary>The data participants Core registers for every composition, resolved the way a
         /// project resolves them. The stand builds no battle module, so whatever the game keeps
         /// outside its modules has to arrive here through that same registration — otherwise the sim
@@ -92,6 +96,7 @@ namespace LastBreathTest.LootSimulation
                 Messages = messages,
                 Rnd = rnd,
                 Minter = itemMinter,
+                ItemCreation = itemCreation,
                 Shared = shared,
             };
         }

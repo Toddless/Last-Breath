@@ -9,9 +9,12 @@ namespace LastBreathTest.WorldTesting
     using Core.Modifiers;
     using Core.Services;
     using Core.World.Containers;
+    using LastBreath.Descriptors;
+    using LootSimulation;
     using Moq;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using Tooling.Catalogs;
 
     /// <summary>Managed stand-ins for the items a chest holds: Moq proxies, no engine object behind them.</summary>
     internal static class ChestItems
@@ -317,6 +320,19 @@ namespace LastBreathTest.WorldTesting
         private const float NoBonusEffect = 0f;
         private const float BaseMultiplier = 1f;
 
+        /// <summary>Seeds the real creation service: the rolls decide what a piece rolls, never whether its id mints.</summary>
+        private const int AuditSeed = 20260710;
+
+        private const string FaultFormat = "{0} / {1} / {2}: {3}";
+        private const string NoRecordsFault = "the shipped chest file writes no records";
+        private const string UnnamedRecordFormat = "record {0} of the shipped chest file writes no id the catalog could hold";
+        private const string NotHeldFormat = "{0}: the catalog holds no chest under this id, so the record was skipped as broken";
+        private const string SlotCountFormat = "{0}: {1} slots were minted for {2} authored positions";
+        private const string SlotIdFormat = "minted into slot '{0}'";
+        private const string ItemIdFormat = "minted item '{0}'";
+        private const string AmountFormat = "minted {0} of it";
+        private const string RarityFormat = "minted at {0}";
+
         private static readonly AuthoredChestItem Sword = new("first", "sword", 1, Rarity.Common);
         private static readonly AuthoredChestItem Ore = new("second", "ore", 10, Rarity.Common);
         private static readonly AuthoredChestItem Gem = new("third", "gem", 1, Rarity.Rare);
@@ -381,6 +397,74 @@ namespace LastBreathTest.WorldTesting
             Assert.IsTrue(creation.Requests.All(x => x.SignatureEffects == 0 && x.EquipEffectChance == NoBonusEffect
                 && x.ModifierMultiplier == BaseMultiplier && x.FixedRarity == x.Rarity));
         }
+
+        /// <summary>Every chest the shipped file writes, found by the id read straight off the json, is held by the catalog
+        /// and mints whole through the real creation service, each slot as authored: a mistyped item id, or a record the
+        /// catalog skips as broken, fails here rather than in the game.</summary>
+        [TestMethod]
+        public void EveryShippedChestMintsWholeFromTheRealItemData()
+        {
+            var faults = ChestFaults(SharedData.Root(), LootPipeline.Create(AuditSeed).ItemCreation);
+
+            Assert.AreEqual(0, faults.Count, string.Join(Environment.NewLine, faults));
+        }
+
+        /// <summary>Everything that keeps the chests written under <paramref name="dataRoot"/> from minting as authored,
+        /// one line per fault.</summary>
+        private static List<string> ChestFaults(string dataRoot, IItemCreationService creation)
+        {
+            ChestCatalog catalog = new();
+            new GameDataService(new FileSystemDataSource(dataRoot), [catalog]).LoadAll();
+            var minter = new AuthoredChestMinter(creation);
+            var ids = WrittenChestIds(dataRoot);
+
+            return ids.Count == 0 ? [NoRecordsFault] : [.. ids.SelectMany((id, index) => RecordFaults(id, index, catalog, minter))];
+        }
+
+        /// <summary>The id each record of the chest file writes, read off the json rather than the catalog; null where a
+        /// record writes none as text.</summary>
+        private static List<string?> WrittenChestIds(string dataRoot)
+        {
+            string file = Path.Combine(dataRoot, DataCatalog.Chests, ChestsCatalogDescriptor.FileName + CatalogWorkspace.FileExtension);
+            return [.. JArray.Parse(File.ReadAllText(file)).Select(IdOf)];
+        }
+
+        private static string? IdOf(JToken record) =>
+            record is JObject fields && fields[ChestFields.Id] is JValue { Value: string id } && !string.IsNullOrWhiteSpace(id) ? id : null;
+
+        /// <summary>The faults of one written record: no id, no chest in the catalog under it, or what its mint says.</summary>
+        private static IEnumerable<string> RecordFaults(string? id, int index, ChestCatalog catalog, AuthoredChestMinter minter)
+        {
+            if (id == null) return [string.Format(CultureInfo.InvariantCulture, UnnamedRecordFormat, index)];
+            return catalog.Find(id) is { } chest ? MintFaults(minter, chest) : [string.Format(CultureInfo.InvariantCulture, NotHeldFormat, id)];
+        }
+
+        /// <summary>The refusal of a chest that does not mint whole, or every slot minted other than its authored position.</summary>
+        private static IEnumerable<string> MintFaults(AuthoredChestMinter minter, ChestDefinition chest)
+        {
+            if (!minter.TryMint(chest, out var slots, out var refusal))
+                return [Fault(chest.Id, refusal.SlotId, refusal.ItemId, refusal.Problem)];
+            if (slots.Count != chest.Contents.Items.Count)
+                return [string.Format(CultureInfo.InvariantCulture, SlotCountFormat, chest.Id, slots.Count, chest.Contents.Items.Count)];
+
+            return chest.Contents.Items.Zip(slots).SelectMany(pair =>
+                SlotDifferences(pair.First, pair.Second).Select(problem => Fault(chest.Id, pair.First.SlotId, pair.First.ItemId, problem)));
+        }
+
+        /// <summary>What a minted slot says other than its position: the slot, the item, the amount, and the rarity equipment
+        /// is minted at.</summary>
+        private static IEnumerable<string> SlotDifferences(AuthoredChestItem position, ChestSlot slot)
+        {
+            if (slot.Id != position.SlotId) yield return string.Format(CultureInfo.InvariantCulture, SlotIdFormat, slot.Id);
+            if (slot.Item?.Id != position.ItemId) yield return string.Format(CultureInfo.InvariantCulture, ItemIdFormat, slot.Item?.Id);
+            if (slot.Amount != position.Amount) yield return string.Format(CultureInfo.InvariantCulture, AmountFormat, slot.Amount);
+            if (slot.Item is IEquipItem equip && equip.Rarity != position.Rarity)
+                yield return string.Format(CultureInfo.InvariantCulture, RarityFormat, equip.Rarity);
+        }
+
+        /// <summary>One fault line: the chest, the slot and the item it belongs to, and what went wrong.</summary>
+        private static string Fault(string chest, string slot, string item, string problem) =>
+            string.Format(CultureInfo.InvariantCulture, FaultFormat, chest, slot, item, problem);
 
         /// <summary>A position whose item cannot be created refuses the whole chest: no slot comes back, the failure
         /// is named, and the positions after it are never minted.</summary>
