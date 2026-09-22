@@ -20,7 +20,7 @@ namespace LastBreath.Npc
         {
             var player = Services.GameServiceProvider.Instance.GetService<IPlayerAccessor>().Player;
             bool started = actionId == InteractionActions.Attack && player != null && Npc?.TryStartBattleWith(player) == true;
-            return Task.FromResult(started ? InteractionResult.Completed : InteractionResult.Unavailable);
+            return Task.FromResult(started ? InteractionResult.Started : InteractionResult.Unavailable);
         }
     }
 }

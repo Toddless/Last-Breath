@@ -5,10 +5,34 @@ namespace Core.World.Interactions
 
     public readonly record struct InteractionHandle(string LocationId, string ObjectId, Guid Binding);
     public record InteractionAction(string Id, string LabelKey, bool Enabled = true, string? ReasonKey = null, bool ExplicitChoice = false);
-    public record InteractionResult(bool Success, string? ReasonKey = null)
+
+    /// <summary>How an interaction request ended.</summary>
+    public enum InteractionOutcome
     {
-        public static readonly InteractionResult Completed = new(true);
-        public static readonly InteractionResult Unavailable = new(false, "UI_Interaction_Unavailable");
+        /// <summary>The action's effect is done when the request returns.</summary>
+        Completed,
+
+        /// <summary>The action handed over to a session or its own process that keeps running after the request.</summary>
+        Started,
+
+        /// <summary>The action did not happen; a reason key, when set, says why.</summary>
+        Refused
+    }
+
+    public record InteractionResult(InteractionOutcome Outcome, string? ReasonKey = null)
+    {
+        public static readonly InteractionResult Completed = new(InteractionOutcome.Completed);
+        public static readonly InteractionResult Started = new(InteractionOutcome.Started);
+        public static readonly InteractionResult Unavailable = new(InteractionOutcome.Refused, "UI_Interaction_Unavailable");
+
+        /// <summary>True for Completed and Started.</summary>
+        public bool Success => Outcome != InteractionOutcome.Refused;
+
+        /// <summary>Completed when the operation succeeded, refused otherwise.</summary>
+        public InteractionResult(bool success, string? reasonKey = null)
+            : this(success ? InteractionOutcome.Completed : InteractionOutcome.Refused, reasonKey)
+        {
+        }
     }
     public record ExecuteInteractionRequest(InteractionHandle Target, string ActionId) : IRequest<InteractionResult>;
     public record ContainerTransferRequest(InteractionHandle Target, string? SlotId = null) : IRequest<InteractionResult>;

@@ -73,7 +73,7 @@ namespace LastBreath.World.Interactions
             if (enabled.Count == 0) return Task.FromResult(InteractionResult.Unavailable);
             if (enabled.Count == 1 && !enabled[0].ExplicitChoice) return Execute(handle, enabled[0].Id);
             ShowWindow<InteractionMenuWindow>(target);
-            return Task.FromResult(InteractionResult.Completed);
+            return Task.FromResult(InteractionResult.Started);
         }
 
         public async Task<InteractionResult> Execute(InteractionHandle handle, string actionId)
@@ -82,7 +82,7 @@ namespace LastBreath.World.Interactions
                 || _session != null && _session.Target != target) return InteractionResult.Unavailable;
             if (target.FindEnabledSource(actionId) is not { } source) return InteractionResult.Unavailable;
             // Release a menu before travel/dialogue enters its own UI/transition gate.
-            CancelSession(InteractionSessionEndCause.Replaced);
+            ReplaceCurrent();
             return await source.Execute(actionId);
         }
 
@@ -90,13 +90,13 @@ namespace LastBreath.World.Interactions
         {
             if (!CanReach(chest.Target) || !chest.TryOpen()) return InteractionResult.Unavailable;
             ShowWindow<ChestContentsWindow>(chest.Target);
-            return InteractionResult.Completed;
+            return InteractionResult.Started;
         }
 
-        /// <summary>Makes the session the open one: a different open session ends as replaced and the selection clears.</summary>
+        /// <summary>Makes the session the open one: a different current session ends as replaced and the selection clears.</summary>
         public void Begin(IInteractionSession session)
         {
-            if (_session != session) CancelSession(InteractionSessionEndCause.Replaced);
+            if (_session != session) ReplaceCurrent();
             _session = session;
             Select(null);
         }
@@ -104,7 +104,7 @@ namespace LastBreath.World.Interactions
         private void ShowWindow<T>(InteractionTarget target) where T : InteractionWindow
         {
             // Ended before opening: an open window of the same type would be handed back instead of a fresh one.
-            CancelSession(InteractionSessionEndCause.Replaced);
+            ReplaceCurrent();
             if (Ui.OpenWindow(typeof(T)) is not T window) return;
             window.Bind(this, target);
             Begin(window);
@@ -141,6 +141,11 @@ namespace LastBreath.World.Interactions
             var session = _session;
             Forget();
             session?.End(cause);
+        }
+        /// <summary>Ends the current session, if any, as replaced; with none, no pending command belongs to a session, so it stays queued.</summary>
+        private void ReplaceCurrent()
+        {
+            if (_session != null) CancelSession(InteractionSessionEndCause.Replaced);
         }
         /// <summary>Why a session bound to the target must end, checked as actor, target lifecycle, then reach; null while it may stay open.</summary>
         private InteractionSessionEndCause? FindEndCause(InteractionTarget target)

@@ -58,7 +58,7 @@ namespace LastBreath.Npc
                 return InteractionResult.Unavailable;
             await _messages.PublishMessageAsync(new OpenDialogueMessage(NpcId, Npc?.InstanceId, Npc?.Fraction ?? _faction));
             _ownsConversation = _dialogue.IsActive;
-            return _ownsConversation ? InteractionResult.Completed : InteractionResult.Unavailable;
+            return _ownsConversation ? InteractionResult.Started : InteractionResult.Unavailable;
         }
 
         public override void _PhysicsProcess(double delta)
