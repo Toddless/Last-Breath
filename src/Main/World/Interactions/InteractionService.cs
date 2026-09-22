@@ -20,12 +20,11 @@ namespace LastBreath.World.Interactions
         private const string DuplicateTargetFormat =
             "Interaction target '{0}' is disabled: object ID '{1}' in location '{2}' is already registered by '{3}'";
         private readonly Dictionary<InteractionHandle, InteractionTarget> _targets = [];
-        private InteractionTarget? _sessionTarget;
-        private InteractionWindow? _window;
+        private IInteractionSession? _session;
         public PlayerInteractionController? Controller { get; set; }
         public InteractionTarget? Selected { get; private set; }
         public IReadOnlyList<InteractionAction> SelectedActions { get; private set; } = [];
-        public InteractionTarget? SessionTarget => _sessionTarget;
+        public InteractionTarget? SessionTarget => _session?.Target;
         private IUiElementsManager Ui => provider.GetService<IUiElementsManager>();
 
         /// <summary>Adds a live target; a second target with the same location and object ID is reported and stays unregistered.</summary>
@@ -40,7 +39,7 @@ namespace LastBreath.World.Interactions
         public void Unregister(InteractionTarget target)
         {
             if (_targets.TryGetValue(target.Handle, out var registered) && registered == target) _targets.Remove(target.Handle);
-            if (_sessionTarget == target) CancelSession();
+            if (_session?.Target == target) CancelSession(InteractionSessionEndCause.TargetLost);
             if (Selected == target) Select(null);
         }
         public void Select(InteractionTarget? target)
@@ -51,7 +50,7 @@ namespace LastBreath.World.Interactions
 
         /// <summary>Target selection and E input; text focus suppresses them without closing an open session.</summary>
         public bool CanDiscover() => ActorAvailable() && !Core.World.Spaces.SpatialAccess.HasTextFocus(Controller!)
-            && _window == null && !Ui.HasMovementBlockingWindow;
+            && _session == null && !Ui.HasMovementBlockingWindow;
         /// <summary>Actor and space state shared by discovery and open sessions; discovery-only gates stay in <see cref="CanDiscover"/>.</summary>
         private bool ActorAvailable() => Controller is { } controller && GodotObject.IsInstanceValid(controller) && controller.IsInsideTree()
             && provider.GetService<IPlayerAccessor>().Player is { IsAlive: true, IsFighting: false } player
@@ -60,10 +59,11 @@ namespace LastBreath.World.Interactions
             && !provider.GetService<ILocationTravelService>().IsTransitioning
             && !provider.GetService<ILoadScope>().IsLoading
             && provider.GetService<IUiContextService>().Current == UiContext.World;
+        /// <summary>The actor is available and held by no blocking window other than the open session's own.</summary>
+        private bool ActorFree() => ActorAvailable() && !Ui.HasMovementBlockingWindowExcept(_session?.Window);
 
-        public bool CanReach(InteractionTarget target) => ActorAvailable()
-            && !Ui.HasMovementBlockingWindowExcept(_window)
-            && float.IsFinite(InteractionReach.DistanceSquared(Controller!.Player, target));
+        /// <summary>The actor is free to act and reaches the target.</summary>
+        public bool CanReach(InteractionTarget target) => ActorFree() && InReach(target);
 
         public Task<InteractionResult> Activate(InteractionHandle handle)
         {
@@ -79,10 +79,10 @@ namespace LastBreath.World.Interactions
         public async Task<InteractionResult> Execute(InteractionHandle handle, string actionId)
         {
             if (!TryResolve(handle, out var target) || !CanReach(target)
-                || _sessionTarget != null && _sessionTarget != target) return InteractionResult.Unavailable;
+                || _session != null && _session.Target != target) return InteractionResult.Unavailable;
             if (target.FindEnabledSource(actionId) is not { } source) return InteractionResult.Unavailable;
             // Release a menu before travel/dialogue enters its own UI/transition gate.
-            CancelSession();
+            CancelSession(InteractionSessionEndCause.Replaced);
             return await source.Execute(actionId);
         }
 
@@ -93,48 +93,72 @@ namespace LastBreath.World.Interactions
             return InteractionResult.Completed;
         }
 
+        /// <summary>Makes the session the open one: a different open session ends as replaced and the selection clears.</summary>
+        public void Begin(IInteractionSession session)
+        {
+            if (_session != session) CancelSession(InteractionSessionEndCause.Replaced);
+            _session = session;
+            Select(null);
+        }
+
         private void ShowWindow<T>(InteractionTarget target) where T : InteractionWindow
         {
-            CancelSession();
+            // Ended before opening: an open window of the same type would be handed back instead of a fresh one.
+            CancelSession(InteractionSessionEndCause.Replaced);
             if (Ui.OpenWindow(typeof(T)) is not T window) return;
-            _sessionTarget = target;
-            _window = window;
             window.Bind(this, target);
-            Select(null);
+            Begin(window);
         }
 
         public InteractionResult Transfer(InteractionHandle handle, string? slotId)
         {
-            if (_window is not ChestContentsWindow || _sessionTarget is not { } target
+            if (_session is not ChestContentsWindow window || window.Target is not { } target
                 || target.Handle != handle || !CanReach(target) || target.GetParent() is not ChestComponent chest)
                 return InteractionResult.Unavailable;
             if (slotId != null && !chest.Contents.Slots.Any(x => x.Id == slotId)) return InteractionResult.Unavailable;
-            var transfer = chest.Transfer(slotId, () => _sessionTarget == target && CanReach(target));
-            if (transfer.CapacityLimited) _window?.CapacityRefused();
-            _window?.Refresh();
+            var transfer = chest.Transfer(slotId, () => _session == window && CanReach(target));
+            var open = _session as InteractionWindow;
+            if (transfer.CapacityLimited) open?.CapacityRefused();
+            open?.Refresh();
             return new(transfer.Accepted > 0, transfer.CapacityLimited ? "UI_Inventory_Full" : null);
         }
 
+        /// <summary>Ends the open session with the cause of its first failed check; a session no longer open is forgotten.</summary>
         public void ValidateSession()
         {
-            if (_sessionTarget == null) return;
-            if (_window == null || !GodotObject.IsInstanceValid(_window) || _window.IsQueuedForDeletion() || !CanReach(_sessionTarget))
-                CancelSession();
+            if (_session is not { } session) return;
+            if (!session.IsOpen) { Forget(); return; }
+            if (FindEndCause(session.Target) is { } cause) CancelSession(cause);
         }
-        public void WindowClosed(InteractionWindow window)
+        /// <summary>Forgets the open session when it ended on its own terms, dropping the controller's pending command.</summary>
+        public void SessionClosed(IInteractionSession session)
         {
-            if (_window != window) return;
-            _window = null;
-            _sessionTarget = null;
-            Controller?.CancelPending();
+            if (_session == session) Forget();
         }
-        public void CancelSession()
+        /// <summary>Drops the controller's pending command and ends the open session, if any, for the cause.</summary>
+        public void CancelSession(InteractionSessionEndCause cause = InteractionSessionEndCause.Cancelled)
         {
-            var window = _window;
+            var session = _session;
+            Forget();
+            session?.End(cause);
+        }
+        /// <summary>Why a session bound to the target must end, checked as actor, target lifecycle, then reach; null while it may stay open.</summary>
+        private InteractionSessionEndCause? FindEndCause(InteractionTarget target)
+        {
+            if (!ActorFree()) return InteractionSessionEndCause.ActorUnavailable;
+            if (!IsLive(target)) return InteractionSessionEndCause.TargetLost;
+            return InReach(target) ? null : InteractionSessionEndCause.OutOfReach;
+        }
+        /// <summary>The target is valid, in the tree, registered under its current binding and available.</summary>
+        private bool IsLive(InteractionTarget target) => TryResolve(target.Handle, out var registered) && registered == target
+            && target.IsInsideTree() && target.IsAvailable;
+        /// <summary>The player reaches one of the target's points in its own space, without an obstacle in between.</summary>
+        private bool InReach(InteractionTarget target) => float.IsFinite(InteractionReach.DistanceSquared(Controller!.Player, target));
+        /// <summary>Drops the open session without ending it and cancels the controller's pending command.</summary>
+        private void Forget()
+        {
+            _session = null;
             Controller?.CancelPending();
-            _window = null;
-            _sessionTarget = null;
-            if (window != null && GodotObject.IsInstanceValid(window) && !window.IsQueuedForDeletion()) window.Close();
         }
         private bool TryResolve(InteractionHandle handle, out InteractionTarget target)
         {

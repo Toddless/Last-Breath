@@ -58,7 +58,7 @@ namespace LastBreath.World.Interactions
         {
             _candidates.Clear();
             CancelPending();
-            _service.CancelSession();
+            _service.CancelSession(InteractionSessionEndCause.ActorUnavailable);
             if (_service.Controller == this) _service.Controller = null;
             _service.Select(null);
             _dirty = true;

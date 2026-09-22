@@ -5,20 +5,27 @@ namespace LastBreath.World.Interactions.UI
     using Core.MessageBus;
     using Core.MessageBus.Messages;
     using Core.Views.UI;
+    using Core.World.Interactions;
     using Godot;
 
-    public abstract partial class InteractionWindow : Control, IWindow
+    public abstract partial class InteractionWindow : Control, IWindow, IInteractionSession
     {
         private static readonly Vector2 PanelOffset = new(24, 12);
         private AudioStreamPlayer _refusal = null!;
+        private bool _ended;
         protected InteractionService? Service;
-        protected InteractionTarget? Target;
         protected IGameMessageBus Messages = null!;
         protected VBoxContainer Rows = null!;
         protected PanelContainer Panel = null!;
         protected Button CloseButton = null!;
         /// <summary>The bound target while it is alive in the scene tree; null otherwise.</summary>
         private InteractionTarget? LiveTarget => Target != null && GodotObject.IsInstanceValid(Target) && Target.IsInsideTree() ? Target : null;
+        /// <summary>Target this window is bound to by <see cref="Bind"/>.</summary>
+        public InteractionTarget Target { get; private set; } = null!;
+        /// <summary>The window is the session's own UI.</summary>
+        IWindow? IInteractionSession.Window => this;
+        /// <summary>Open while the node is valid and not queued for deletion.</summary>
+        public bool IsOpen => GodotObject.IsInstanceValid(this) && !IsQueuedForDeletion();
         public bool BlocksMovement => true;
 
         public void InjectServices(IGameServiceProvider provider) => Messages = provider.GetService<IGameMessageBus>();
@@ -46,12 +53,20 @@ namespace LastBreath.World.Interactions.UI
             if (LiveTarget is not { } target) { Close(); return; }
             UiPlacement.Follow(Panel, InteractionPresentation.ScreenPoint(target.Anchor), PanelOffset);
         }
+        /// <summary>Closes the window whatever the cause, without reporting back to the service; later calls do nothing.</summary>
+        public void End(InteractionSessionEndCause cause)
+        {
+            if (_ended) return;
+            _ended = true;
+            if (IsOpen) Close();
+        }
+        /// <summary>Closes the window; closing on its own terms reports the ended session to the service.</summary>
         public virtual void Close()
         {
-            Service?.WindowClosed(this);
+            ReportClosed();
             QueueFree();
         }
-        public override void _ExitTree() => Service?.WindowClosed(this);
+        public override void _ExitTree() => ReportClosed();
         public abstract void Refresh();
         protected void ClearRows()
         {
@@ -66,6 +81,13 @@ namespace LastBreath.World.Interactions.UI
         {
             _refusal.Play();
             _ = Messages.PublishMessageAsync(new SendNotificationMessageMessage("UI_Container_Full"));
+        }
+        /// <summary>Tells the service once that the session ended on the window's own terms; silent after <see cref="End"/>.</summary>
+        private void ReportClosed()
+        {
+            if (_ended) return;
+            _ended = true;
+            Service?.SessionClosed(this);
         }
     }
 }

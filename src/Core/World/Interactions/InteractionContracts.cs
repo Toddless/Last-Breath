@@ -12,6 +12,26 @@ namespace Core.World.Interactions
     }
     public record ExecuteInteractionRequest(InteractionHandle Target, string ActionId) : IRequest<InteractionResult>;
     public record ContainerTransferRequest(InteractionHandle Target, string? SlotId = null) : IRequest<InteractionResult>;
+
+    /// <summary>Why the interaction service ended a session.</summary>
+    public enum InteractionSessionEndCause
+    {
+        /// <summary>Another session, or an action taking over from it, replaced the session.</summary>
+        Replaced,
+
+        /// <summary>The target was freed, left the tree, was queued for deletion or unregistered, or became unavailable.</summary>
+        TargetLost,
+
+        /// <summary>The actor is gone or cannot act: dead, fighting, travelling, loading, outside the world UI or held by another blocking window.</summary>
+        ActorUnavailable,
+
+        /// <summary>The actor no longer reaches the target: another space, the distance or an obstacle.</summary>
+        OutOfReach,
+
+        /// <summary>Code ended the session without a more specific cause.</summary>
+        Cancelled
+    }
+
     public static class InteractionActions
     {
         public const string Interact = "interact";
