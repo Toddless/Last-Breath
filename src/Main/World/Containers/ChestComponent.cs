@@ -17,7 +17,6 @@ namespace LastBreath.World.Containers
     using Core.World.Interactions;
     using Core.World.Locations;
     using Godot;
-    using Godot.Collections;
     using Interactions;
     using Locations;
     using Newtonsoft.Json.Linq;
@@ -27,8 +26,12 @@ namespace LastBreath.World.Containers
     {
         private const string TargetIdPrefix = "chest/";
         private const string MissingObjectIdFormat = "Chest '{0}' is disabled: it needs a stable ObjectId";
+        private const string MissingTargetFormat = "Chest '{0}' ('{1}') is disabled: it needs its interaction target set in the scene";
+        private const string ForeignTargetFormat = "Chest '{0}' ('{1}') is disabled: its interaction target '{2}' is not a direct child of the chest";
         private const string UnknownDefinitionFormat = "Chest '{0}' ('{1}') is disabled: the chest catalog holds no definition '{2}'";
         private const string MintRefusedFormat = "Chest '{0}' ('{1}') is disabled: definition '{2}' cannot mint item '{3}' into position '{4}': {5}";
+        private const string MissingSpriteFormat = "Chest '{0}' ('{1}') shows no state: it needs its sprite set in the scene";
+        private const string MissingTextureFormat = "Chest '{0}' ('{1}') leaves its sprite unchanged: no texture is set for the {2} state";
         private const string StateRepairedFormat = "Chest '{0}' ('{1}') repaired its saved state: {2}";
         private const string UnreadStateKeptFormat = "Chest '{0}' ('{1}') is disabled and keeps its saved state for the next save: {2}";
         private const string FailureFormat = "{0}: {1}";
@@ -38,18 +41,33 @@ namespace LastBreath.World.Containers
 
         [Export] public string ObjectId { get; set; } = "";
         [Export] public string DefinitionId { get; set; } = "";
+
+        /// <summary>Interaction target of this chest, set in the scene as its direct child; without it the chest reports the
+        /// setup error and stays disabled.</summary>
+        [Export] public InteractionTarget Target { get; private set; } = null!;
+
+        /// <summary>Sprite that shows the chest; the state textures share one canvas size with the chest standing on its bottom
+        /// edge, so a state change never moves the chest.</summary>
         [Export] private Sprite2D? Visual { get;  set; }
-        [Export] private Array<Texture2D>? Visuals { get; set; } = [];
+
+        /// <summary>Look of a chest never opened.</summary>
+        [Export] private Texture2D? ClosedTexture { get; set; }
+
+        /// <summary>Look of an opened chest with something left in it.</summary>
+        [Export] private Texture2D? OpenTexture { get; set; }
+
+        /// <summary>Look of an opened chest with nothing left; optional, the open look stands in when it is not set.</summary>
+        [Export] private Texture2D? EmptyTexture { get; set; }
 
         private ChestDefinition? _definition;
         private IGameServiceProvider _provider = null!;
         private bool _configurationReported;
+        private bool _visualsReported;
 
         /// <summary>A saved state this build could not read; every capture writes it back unchanged.</summary>
         private JToken? _unreadState;
 
         public ChestContents Contents { get; } = new();
-        public InteractionTarget Target => GetNode<InteractionTarget>("InteractionTarget");
         public string NameKey => _definition?.NameKey ?? string.Empty;
         private IWorldClock Clock => _provider.GetService<IWorldClock>();
         private InventoryItemSaveConverter Converter => new(_provider.GetService<EquipItemSaveConverter>(),
@@ -100,10 +118,27 @@ namespace LastBreath.World.Containers
             if (Contents.RemovalDue(Clock.TotalMinutes) && !IsQueuedForDeletion()) QueueFree();
         }
 
+        /// <summary>Shows the texture of the current look; without a sprite or that texture the sprite stays as it is and the
+        /// problem is reported once.</summary>
         private void RefreshVisuals()
         {
-            Visual?.Texture = Contents.Empty ? Visuals?[0] : Visuals?[1];
+            var look = CurrentLook();
+            if (Visual == null) ReportVisuals(string.Format(MissingSpriteFormat, GetPath(), ObjectId));
+            else if (TextureFor(look) is { } texture) Visual.Texture = texture;
+            else ReportVisuals(string.Format(MissingTextureFormat, GetPath(), ObjectId, look));
         }
+
+        /// <summary>The look of the current contents.</summary>
+        private ChestLook CurrentLook() => !Contents.Initialized ? ChestLook.Closed : Contents.Empty ? ChestLook.Empty : ChestLook.Open;
+
+        /// <summary>The texture set for a look; an empty chest without its own texture shows the open one.</summary>
+        private Texture2D? TextureFor(ChestLook look) => look switch
+        {
+            ChestLook.Closed => ClosedTexture,
+            ChestLook.Open => OpenTexture,
+            ChestLook.Empty => EmptyTexture ?? OpenTexture,
+            _ => null
+        };
 
         /// <summary>True when <see cref="Actions"/> offers the action with this ID enabled.</summary>
         private bool Offers(string actionId) => Actions().Any(action => action.Enabled && action.Id == actionId);
@@ -130,17 +165,27 @@ namespace LastBreath.World.Containers
                 refusal.ItemId, refusal.SlotId, refusal.Problem));
         }
 
-        /// <summary>Gives the interaction target this chest's identity; without a stable ObjectId there is none to give.</summary>
+        /// <summary>Gives the interaction target this chest's identity; a setup that leaves nothing to bind is reported and
+        /// disables the chest.</summary>
         private bool BindTarget()
         {
-            if (string.IsNullOrWhiteSpace(ObjectId))
+            if (FindTargetProblem() is { } problem)
             {
-                ReportConfiguration(string.Format(MissingObjectIdFormat, GetPath()));
+                ReportConfiguration(problem);
                 return false;
             }
 
             Target.ObjectId = TargetIdPrefix + ObjectId;
             return true;
+        }
+
+        /// <summary>Why the target cannot be bound, described for the report: no stable ObjectId, no target, or a target that is
+        /// not a direct child and so never offers the chest's actions; null when it can be bound.</summary>
+        private string? FindTargetProblem()
+        {
+            if (string.IsNullOrWhiteSpace(ObjectId)) return string.Format(MissingObjectIdFormat, GetPath());
+            if (Target == null) return string.Format(MissingTargetFormat, GetPath(), ObjectId);
+            return Target.GetParent() == this ? null : string.Format(ForeignTargetFormat, GetPath(), ObjectId, Target.Name);
         }
 
         /// <summary>The catalog definition this chest is placed with; null, and reported, when the catalog holds none.</summary>
@@ -152,10 +197,16 @@ namespace LastBreath.World.Containers
         }
 
         /// <summary>Writes an error that disables the chest to the log and the Godot console, once per node.</summary>
-        private void ReportConfiguration(string message)
+        private void ReportConfiguration(string message) => ReportOnce(ref _configurationReported, message);
+
+        /// <summary>Writes a look the chest cannot show to the log and the Godot console, once per node.</summary>
+        private void ReportVisuals(string message) => ReportOnce(ref _visualsReported, message);
+
+        /// <summary>Writes a chest problem to the log and the Godot console unless its flag says one of its kind was written.</summary>
+        private void ReportOnce(ref bool reported, string message)
         {
-            if (_configurationReported) return;
-            _configurationReported = true;
+            if (reported) return;
+            reported = true;
             Report(message);
         }
 
@@ -276,6 +327,14 @@ namespace LastBreath.World.Containers
             _definition = null;
             Contents.Restore(initialized: false, slots: [], removeAt: null);
             RefreshVisuals();
+        }
+
+        /// <summary>What the chest looks like: shut until first opened, lid up while anything is left, then empty.</summary>
+        private enum ChestLook
+        {
+            Closed,
+            Open,
+            Empty
         }
 
         private sealed class SavedChest
