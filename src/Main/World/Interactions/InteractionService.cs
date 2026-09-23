@@ -14,7 +14,6 @@ namespace LastBreath.World.Interactions
     using Core.World.Interactions;
     using Core.World.Locations;
     using Godot;
-    using Containers;
     using UI;
 
     public sealed class InteractionService(IGameServiceProvider provider)
@@ -88,11 +87,9 @@ namespace LastBreath.World.Interactions
             return await source.Execute(actionId);
         }
 
-        public InteractionResult OpenChest(ChestComponent chest)
-        {
-            if (!CanReach(chest.Target) || !chest.TryOpen()) return InteractionResult.Unavailable;
-            return ShowWindow<ChestContentsWindow>(chest.Target);
-        }
+        /// <summary>Opens a source's window bound to the reachable target as the open session: Started when it opened, Unavailable otherwise.</summary>
+        public InteractionResult OpenWindow<TWindow>(InteractionTarget target) where TWindow : InteractionWindow =>
+            CanReach(target) ? ShowWindow<TWindow>(target) : InteractionResult.Unavailable;
 
         /// <summary>Makes the session the open one: a change of session ends the current one as replaced and drops the queued
         /// command; the selection clears.</summary>
@@ -120,18 +117,13 @@ namespace LastBreath.World.Interactions
                 ? new(InteractionOutcome.Refused, reasonKey)
                 : InteractionResult.Unavailable;
 
-        /// <summary>Moves one slot, or every slot, of the open chest into the bag: Completed when anything moved, refused otherwise; the
-        /// container-full reason when capacity kept items in the chest, no reason when nothing was left or access ended.</summary>
+        /// <summary>Moves one slot, or every slot, of the open container session bound to the handle for as long as it stays the open,
+        /// reachable session; Unavailable when no such session is open or the player no longer reaches it.</summary>
         public InteractionResult Transfer(InteractionHandle handle, string? slotId)
         {
-            if (_session is not ChestContentsWindow window || window.Target is not { } target
-                || target.Handle != handle || !CanReach(target) || target.GetParent() is not ChestComponent chest)
+            if (_session is not IContainerSession container || container.Target.Handle != handle || !CanReach(container.Target))
                 return InteractionResult.Unavailable;
-            if (slotId != null && !chest.Contents.Slots.Any(x => x.Id == slotId)) return InteractionResult.Unavailable;
-            var transfer = chest.Transfer(slotId, () => _session == window && CanReach(target));
-            (_session as InteractionWindow)?.Refresh();
-            return new(transfer.Accepted > 0 ? InteractionOutcome.Completed : InteractionOutcome.Refused,
-                transfer.CapacityLimited ? InteractionReasonKeys.ContainerFull : null);
+            return container.Transfer(slotId, () => _session == container && CanReach(container.Target));
         }
 
         /// <summary>Queues a player command on the controller; without a controller the command never runs and is dropped.</summary>

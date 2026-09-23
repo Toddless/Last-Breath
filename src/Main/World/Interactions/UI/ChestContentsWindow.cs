@@ -1,12 +1,17 @@
 namespace LastBreath.World.Interactions.UI
 {
+    using System;
+    using System.Linq;
     using Core.Localization;
+    using Core.World.Containers;
     using Core.World.Interactions;
     using Godot;
     using Containers;
 
-    public partial class ChestContentsWindow : InteractionWindow
+    public partial class ChestContentsWindow : InteractionWindow, IContainerSession
     {
+        /// <summary>The chest the bound target belongs to; null for a target that is not a chest's.</summary>
+        private ChestComponent? Chest => Target.GetParent() as ChestComponent;
         public static PackedScene Initialize() => GD.Load<PackedScene>("res://World/Interactions/UI/ChestContentsWindow.tscn");
         public override void _Ready()
         {
@@ -15,7 +20,7 @@ namespace LastBreath.World.Interactions.UI
         }
         public override void Refresh()
         {
-            if (Target?.GetParent() is not ChestComponent chest) return;
+            if (Chest is not { } chest) return;
             ClearRows();
             GetNode<Label>("Frame/Content/Title").Text = Localization.Localize(chest.NameKey);
             var takeAll = GetNode<Button>("Frame/Content/TakeAll");
@@ -37,9 +42,22 @@ namespace LastBreath.World.Interactions.UI
                 Rows.AddChild(row);
             }
         }
+        /// <summary>Moves the slot, or every slot, of the chest into the bag while the check holds, then redraws the rows; Unavailable
+        /// for a target that is not a chest's or a slot the chest does not have.</summary>
+        public InteractionResult Transfer(string? slotId, Func<bool> accessible)
+        {
+            if (Chest is not { } chest || slotId != null && !chest.Contents.Slots.Any(x => x.Id == slotId))
+                return InteractionResult.Unavailable;
+            var transfer = chest.Transfer(slotId, accessible);
+            Refresh();
+            return ResultOf(transfer);
+        }
+        /// <summary>Completed when anything moved, refused otherwise; the container-full reason when capacity kept items in the chest.</summary>
+        private static InteractionResult ResultOf(ChestTransfer transfer) =>
+            new(transfer.Accepted > 0 ? InteractionOutcome.Completed : InteractionOutcome.Refused,
+                transfer.CapacityLimited ? InteractionReasonKeys.ContainerFull : null);
         private void Take(string? slotId)
         {
-            if (Target == null) return;
             _ = Messages.SendRequest<ContainerTransferRequest, InteractionResult>(new(Target.Handle, slotId));
         }
         public override void _UnhandledInput(InputEvent e)

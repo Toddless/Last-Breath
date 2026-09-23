@@ -18,6 +18,7 @@ namespace LastBreath.World.Containers
     using Core.World.Locations;
     using Godot;
     using Interactions;
+    using Interactions.UI;
     using Locations;
     using Newtonsoft.Json.Linq;
 
@@ -96,7 +97,16 @@ namespace LastBreath.World.Containers
 
         /// <summary>Opens the chest only while <see cref="Actions"/> offers Open enabled.</summary>
         public Task<InteractionResult> Execute(string actionId) => Task.FromResult(actionId == InteractionActions.Open && Offers(actionId)
-            ? _provider.GetService<InteractionService>().OpenChest(this) : InteractionResult.Unavailable);
+            ? Open() : InteractionResult.Unavailable);
+
+        /// <summary>Mints the contents of the reachable chest, then shows them in its window as the open session; Unavailable when the
+        /// player cannot reach it, the contents refuse to mint or the window does not open.</summary>
+        private InteractionResult Open()
+        {
+            var interactions = _provider.GetService<InteractionService>();
+            if (!interactions.CanReach(Target) || !TryOpen()) return InteractionResult.Unavailable;
+            return interactions.OpenWindow<ChestContentsWindow>(Target);
+        }
 
         /// <summary>Mints the authored contents on the first open; false while the chest is disabled or empty, and when its contents refuse to mint.</summary>
         public bool TryOpen()

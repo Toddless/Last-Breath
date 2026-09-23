@@ -15,7 +15,6 @@ namespace LastBreath.World.Interactions.UI
         public static PackedScene Initialize() => GD.Load<PackedScene>("res://World/Interactions/UI/InteractionMenuWindow.tscn");
         public override void Refresh()
         {
-            if (Target == null) return;
             var actions = Target.ReadActions();
             string signature = string.Join("|", actions.Select(x => $"{x.Id}:{x.Enabled}:{x.ReasonKey}"));
             if (_signature == signature) return;
