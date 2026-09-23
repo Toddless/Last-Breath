@@ -73,4 +73,24 @@ namespace Core.World.Interactions
         /// <summary>The bag is full; what did not fit stays in the container.</summary>
         public const string ContainerFull = "UI_Container_Full";
     }
+
+    /// <summary>Object IDs of interaction targets: a prefix per owner kind keeps their IDs apart within a location.</summary>
+    public static class InteractionIds
+    {
+        private const string ChestPrefix = "chest/";
+        private const string EndpointPrefix = "endpoint/";
+        private const string NpcPrefix = "npc/";
+
+        /// <summary>ID of a chest's target, from the chest's object ID; empty for a blank one.</summary>
+        public static string Chest(string? objectId) => Compose(ChestPrefix, objectId);
+
+        /// <summary>ID of a location endpoint's target, from its endpoint ID; empty for a blank one.</summary>
+        public static string Endpoint(string? endpointId) => Compose(EndpointPrefix, endpointId);
+
+        /// <summary>ID of an NPC's target, from the NPC's instance ID; empty for a blank one.</summary>
+        public static string Npc(string? instanceId) => Compose(NpcPrefix, instanceId);
+
+        /// <summary>The prefix followed by the raw ID; empty for a blank raw ID, which no target registers under.</summary>
+        private static string Compose(string prefix, string? rawId) => string.IsNullOrWhiteSpace(rawId) ? string.Empty : prefix + rawId;
+    }
 }

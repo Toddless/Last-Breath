@@ -5,6 +5,7 @@ namespace LastBreath.World.Interactions
     using System.Globalization;
     using System.Linq;
     using Core;
+    using Core.Views.UI;
     using Core.World.Interactions;
     using Godot;
     using Locations;
@@ -15,6 +16,7 @@ namespace LastBreath.World.Interactions
         private const string InvalidConfigurationFormat =
             "Interaction target '{0}' is disabled: it needs a non-empty object ID and a positive finite reach, but has ID '{1}' and reach {2}";
         private const string DuplicateActionsFormat = "Interaction target '{0}' ('{1}') disables the actions that share an ID: {2}";
+        private const string OverriddenObjectIdFormat = "Interaction target '{0}' ignores its ObjectId '{1}': its owner gives the ID '{2}'";
         private const string ActionIdSeparator = ", ";
         public const uint DetectionLayer = 1u << 15;
         [Export] public string ObjectId { get; set; } = "";
@@ -25,16 +27,21 @@ namespace LastBreath.World.Interactions
         private readonly HashSet<string> _reportedDuplicateActionIds = [];
         private bool _registered;
         private bool _configurationReported;
-        protected virtual string StableObjectId => ObjectId;
-        public virtual bool IsAvailable => true;
+        private bool _overrideReported;
+        /// <summary>Owner found when the target last entered the tree; null while it has none.</summary>
+        private IInteractionOwner? _interactionOwner;
+        /// <summary>ID the target registers under: its owner's ID while it has an owner, else its own <see cref="ObjectId"/>.</summary>
+        protected virtual string StableObjectId => _interactionOwner?.InteractionId ?? ObjectId;
+        /// <summary>Whether the target can be interacted with now: its owner's answer while it has an owner, else true.</summary>
+        public virtual bool IsAvailable => _interactionOwner?.IsInteractable ?? true;
         public InteractionHandle Handle { get; private set; }
         public Node2D Anchor => GetNodeOrNull<Node2D>("HintAnchor") ?? this;
-        /// <summary>The owner when it is a source, then every source among the descendants in tree order; a nested target keeps its own.</summary>
+        /// <summary>The parent when it is a source, then every source among the descendants in tree order; a nested target keeps its own.</summary>
         public IEnumerable<IInteractionSource> Sources
         {
             get
             {
-                if (GetParent() is IInteractionSource owner) yield return owner;
+                if (GetParent() is IInteractionSource parent) yield return parent;
                 foreach (var source in SourcesUnder(this)) yield return source;
             }
         }
@@ -55,6 +62,8 @@ namespace LastBreath.World.Interactions
 
         public override void _EnterTree()
         {
+            _interactionOwner = FindInteractionOwner();
+            ReportOverriddenObjectId();
             if (!CheckConfiguration() || LocationRoot.Find(this) is not { } root) return;
             Handle = new(root.LocationId, StableObjectId, Guid.NewGuid());
             _registered = Services.GameServiceProvider.Instance.GetService<InteractionService>().TryRegister(this);
@@ -86,6 +95,9 @@ namespace LastBreath.World.Interactions
         public IInteractionSource? FindEnabledSource(string actionId) =>
             ReadOffers().Where(x => x.Action.Enabled && x.Action.Id == actionId).Select(x => x.Source).FirstOrDefault();
 
+        /// <summary>The nearest ancestor implementing <see cref="IInteractionOwner"/>, starting at the parent; null when none does.</summary>
+        public IInteractionOwner? FindInteractionOwner() => GetParent()?.FindSelfOrAncestor<IInteractionOwner>();
+
         /// <summary>True for a non-empty stable ID and a positive finite reach; an invalid setup is reported once per node.</summary>
         private bool CheckConfiguration()
         {
@@ -94,6 +106,14 @@ namespace LastBreath.World.Interactions
             _configurationReported = true;
             Tracker.TrackError(string.Format(CultureInfo.InvariantCulture, InvalidConfigurationFormat, GetPath(), StableObjectId, Reach), this);
             return false;
+        }
+
+        /// <summary>Reports once a scene-set ObjectId that the owner's ID replaces.</summary>
+        private void ReportOverriddenObjectId()
+        {
+            if (_overrideReported || _interactionOwner == null || string.IsNullOrWhiteSpace(ObjectId)) return;
+            _overrideReported = true;
+            Tracker.TrackError(string.Format(OverriddenObjectIdFormat, GetPath(), ObjectId, _interactionOwner.InteractionId), this);
         }
 
         /// <summary>Sources among the node's descendants in tree order; the subtree of a nested target is left to that target.</summary>

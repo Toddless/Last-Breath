@@ -9,18 +9,22 @@ namespace LastBreath.World.Locations
     using Interactions;
 
     [GlobalClass]
-    public partial class LocationEndpoint : Node2D, IInteractionSource
+    public partial class LocationEndpoint : Node2D, IInteractionSource, IInteractionOwner
     {
         public const string InteractAction = InteractionActions.Interact;
         [Export] public string EndpointId { get; set; } = "";
         [Export] public float InteractionRadius { get; set; } = 180;
         public Marker2D Arrival => GetNode<Marker2D>("Arrival");
+        /// <summary>ID of the endpoint's interaction target, composed from <see cref="EndpointId"/>; empty while EndpointId is blank.</summary>
+        public string InteractionId => InteractionIds.Endpoint(EndpointId);
+        /// <summary>Always true: an endpoint that leads nowhere already offers no actions.</summary>
+        public bool IsInteractable => true;
 
+        /// <summary>Adds the interaction target, which takes its identity from this endpoint when it enters the tree.</summary>
         public override void _Ready()
         {
             var target = GD.Load<PackedScene>("res://World/Interactions/InteractionTarget.tscn").Instantiate<InteractionTarget>();
             target.Name = "InteractionTarget";
-            target.ObjectId = "endpoint/" + EndpointId;
             target.Reach = InteractionRadius;
             AddChild(target);
         }

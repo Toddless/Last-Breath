@@ -23,12 +23,13 @@ namespace LastBreath.World.Containers
     using Newtonsoft.Json.Linq;
 
     [GlobalClass]
-    public partial class ChestComponent : Node2D, ILocationStateParticipant, IInteractionSource
+    public partial class ChestComponent : Node2D, ILocationStateParticipant, IInteractionSource, IInteractionOwner
     {
-        private const string TargetIdPrefix = "chest/";
         private const string MissingObjectIdFormat = "Chest '{0}' is disabled: it needs a stable ObjectId";
         private const string MissingTargetFormat = "Chest '{0}' ('{1}') is disabled: it needs its interaction target set in the scene";
-        private const string ForeignTargetFormat = "Chest '{0}' ('{1}') is disabled: its interaction target '{2}' is not a direct child of the chest";
+        private const string ForeignTargetFormat = "Chest '{0}' ('{1}') is disabled: its interaction target '{2}' is not owned by the chest";
+        private const string UnservedTargetFormat =
+            "Chest '{0}' ('{1}') is disabled: its interaction target '{2}' is not its direct child, so it never offers the chest's actions";
         private const string UnknownDefinitionFormat = "Chest '{0}' ('{1}') is disabled: the chest catalog holds no definition '{2}'";
         private const string MintRefusedFormat = "Chest '{0}' ('{1}') is disabled: definition '{2}' cannot mint item '{3}' into position '{4}': {5}";
         private const string MissingSpriteFormat = "Chest '{0}' ('{1}') shows no state: it needs its sprite set in the scene";
@@ -43,8 +44,8 @@ namespace LastBreath.World.Containers
         [Export] public string ObjectId { get; set; } = "";
         [Export] public string DefinitionId { get; set; } = "";
 
-        /// <summary>Interaction target of this chest, set in the scene as its direct child; without it the chest reports the
-        /// setup error and stays disabled.</summary>
+        /// <summary>Interaction target of this chest, set in the scene as its direct child, so the chest both owns it and offers the
+        /// actions through it; any other setup is reported and leaves the chest disabled.</summary>
         [Export] public InteractionTarget Target { get; private set; } = null!;
 
         /// <summary>Sprite that shows the chest; the state textures share one canvas size with the chest standing on its bottom
@@ -73,16 +74,23 @@ namespace LastBreath.World.Containers
 
         public ChestContents Contents { get; } = new();
         public string NameKey => _definition?.NameKey ?? string.Empty;
+
+        /// <summary>ID of the chest's interaction target, composed from <see cref="ObjectId"/>; empty while ObjectId is blank.</summary>
+        public string InteractionId => InteractionIds.Chest(ObjectId);
+
+        /// <summary>Always true: a disabled or emptied chest already offers no actions.</summary>
+        public bool IsInteractable => true;
+
         private IWorldClock Clock => _provider.GetService<IWorldClock>();
         private InventoryItemSaveConverter Converter => new(_provider.GetService<EquipItemSaveConverter>(),
             _provider.GetService<IItemDataProvider>(), _provider.GetService<IAugmentItemMinter>());
 
-        /// <summary>Binds the interaction target to this chest's identity, resolves its definition and resumes the removal watch
-        /// of a set deadline; a setup error disables the chest.</summary>
+        /// <summary>Checks the ObjectId and the interaction target setup, resolves its definition and resumes the removal watch of a
+        /// set deadline; a setup error disables the chest.</summary>
         public override void _EnterTree()
         {
             _provider = Services.GameServiceProvider.Instance;
-            _definition = BindTarget() ? FindDefinition() : null;
+            _definition = CheckTarget() ? FindDefinition() : null;
             RefreshRemovalWatch();
         }
 
@@ -222,27 +230,23 @@ namespace LastBreath.World.Containers
                 refusal.ItemId, refusal.SlotId, refusal.Problem));
         }
 
-        /// <summary>Gives the interaction target this chest's identity; a setup that leaves nothing to bind is reported and
-        /// disables the chest.</summary>
-        private bool BindTarget()
+        /// <summary>True when the chest has a stable ObjectId, owns its interaction target and offers its actions through it; any
+        /// other setup is reported and disables the chest.</summary>
+        private bool CheckTarget()
         {
-            if (FindTargetProblem() is { } problem)
-            {
-                ReportConfiguration(problem);
-                return false;
-            }
-
-            Target.ObjectId = TargetIdPrefix + ObjectId;
-            return true;
+            if (FindTargetProblem() is not { } problem) return true;
+            ReportConfiguration(problem);
+            return false;
         }
 
-        /// <summary>Why the target cannot be bound, described for the report: no stable ObjectId, no target, or a target that is
-        /// not a direct child and so never offers the chest's actions; null when it can be bound.</summary>
+        /// <summary>Why the target cannot serve this chest, described for the report: no stable ObjectId, no target, a target that
+        /// another node owns or no node owns, or a target the chest does not offer its actions through; null when it serves.</summary>
         private string? FindTargetProblem()
         {
             if (string.IsNullOrWhiteSpace(ObjectId)) return string.Format(MissingObjectIdFormat, GetPath());
             if (Target == null) return string.Format(MissingTargetFormat, GetPath(), ObjectId);
-            return Target.GetParent() == this ? null : string.Format(ForeignTargetFormat, GetPath(), ObjectId, Target.Name);
+            if (!ReferenceEquals(Target.FindInteractionOwner(), this)) return string.Format(ForeignTargetFormat, GetPath(), ObjectId, Target.Name);
+            return Target.Sources.Contains(this) ? null : string.Format(UnservedTargetFormat, GetPath(), ObjectId, Target.Name);
         }
 
         /// <summary>The catalog definition this chest is placed with; null, and reported, when the catalog holds none.</summary>
