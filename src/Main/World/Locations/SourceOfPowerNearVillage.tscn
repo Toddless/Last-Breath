@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://cmtx4uqnb0sc6" path="res://Sandbox/DualGridDebugTiles.png" id="3_a3v5j"]
 
 [ext_resource type="Script" uid="uid://deuhar8mrxw2l" path="res://World/Locations/LocationEndpoint.cs" id="loc_endpoint"]
+[ext_resource type="PackedScene" path="res://World/Interactions/InteractionTarget.tscn" id="interaction_target"]
 
 [ext_resource type="Script" uid="uid://blen0502curku" path="res://World/Locations/LocationRoot.cs" id="loc_root"]
 
@@ -103,10 +104,11 @@ tile_set = SubResource("TileSet_fx85w")
 [node name="Stone" type="TileMapLayer" parent="TerrainRoot" unique_id=608991978]
 tile_set = SubResource("TileSet_5f5v3")
 
-[node name="Entrance" type="Node2D" parent="." unique_id=18928128]
+[node name="Entrance" type="Node2D" parent="." unique_id=18928128 node_paths=PackedStringArray("Target")]
 position = Vector2(-1630, 2027)
 script = ExtResource("loc_endpoint")
 EndpointId = "Entrance"
+Target = NodePath("InteractionTarget")
 
 [node name="Arrival" type="Marker2D" parent="Entrance" unique_id=447223375]
 position = Vector2(0, 220)
@@ -115,6 +117,9 @@ position = Vector2(0, 220)
 offset_left = -80.0
 offset_top = -50.0
 text = "E - Main World"
+
+[node name="InteractionTarget" parent="Entrance" instance=ExtResource("interaction_target")]
+Reach = 180.0
 
 [node name="StarterChest" parent="." instance=ExtResource("starter_chest")]
 position = Vector2(-1390, 2247)

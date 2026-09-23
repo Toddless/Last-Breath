@@ -25,11 +25,8 @@ namespace LastBreath.World.Containers
     [GlobalClass]
     public partial class ChestComponent : Node2D, ILocationStateParticipant, IInteractionSource, IInteractionOwner
     {
+        private const string ReportKind = "Chest";
         private const string MissingObjectIdFormat = "Chest '{0}' is disabled: it needs a stable ObjectId";
-        private const string MissingTargetFormat = "Chest '{0}' ('{1}') is disabled: it needs its interaction target set in the scene";
-        private const string ForeignTargetFormat = "Chest '{0}' ('{1}') is disabled: its interaction target '{2}' is not owned by the chest";
-        private const string UnservedTargetFormat =
-            "Chest '{0}' ('{1}') is disabled: its interaction target '{2}' is not its direct child, so it never offers the chest's actions";
         private const string UnknownDefinitionFormat = "Chest '{0}' ('{1}') is disabled: the chest catalog holds no definition '{2}'";
         private const string MintRefusedFormat = "Chest '{0}' ('{1}') is disabled: definition '{2}' cannot mint item '{3}' into position '{4}': {5}";
         private const string MissingSpriteFormat = "Chest '{0}' ('{1}') shows no state: it needs its sprite set in the scene";
@@ -241,13 +238,9 @@ namespace LastBreath.World.Containers
 
         /// <summary>Why the target cannot serve this chest, described for the report: no stable ObjectId, no target, a target that
         /// another node owns or no node owns, or a target the chest does not offer its actions through; null when it serves.</summary>
-        private string? FindTargetProblem()
-        {
-            if (string.IsNullOrWhiteSpace(ObjectId)) return string.Format(MissingObjectIdFormat, GetPath());
-            if (Target == null) return string.Format(MissingTargetFormat, GetPath(), ObjectId);
-            if (!ReferenceEquals(Target.FindInteractionOwner(), this)) return string.Format(ForeignTargetFormat, GetPath(), ObjectId, Target.Name);
-            return Target.Sources.Contains(this) ? null : string.Format(UnservedTargetFormat, GetPath(), ObjectId, Target.Name);
-        }
+        private string? FindTargetProblem() => string.IsNullOrWhiteSpace(ObjectId)
+            ? string.Format(MissingObjectIdFormat, GetPath())
+            : InteractionTargetSetup.FindProblem(this, Target, ReportKind, ObjectId);
 
         /// <summary>The catalog definition this chest is placed with; null, and reported, when the catalog holds none.</summary>
         private ChestDefinition? FindDefinition()

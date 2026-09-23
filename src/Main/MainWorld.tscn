@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://bikj5svjvfps7" path="res://World/TerrainRoot.cs" id="17_4ci2c"]
 [ext_resource type="Texture2D" uid="uid://cmtx4uqnb0sc6" path="res://Sandbox/DualGridDebugTiles.png" id="20_aqfrr"]
 [ext_resource type="Script" uid="uid://deuhar8mrxw2l" path="res://World/Locations/LocationEndpoint.cs" id="loc_endpoint"]
+[ext_resource type="PackedScene" path="res://World/Interactions/InteractionTarget.tscn" id="interaction_target"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_brush"]
 texture = ExtResource("20_aqfrr")
@@ -77,18 +78,23 @@ _respawnDelayMaxMinutes = 15.0
 _recoveryZone = false
 metadata/_custom_type_script = "uid://ctta8cas4isp7"
 
-[node name="Start" type="Node2D" parent="." unique_id=1285303473]
+[node name="Start" type="Node2D" parent="." unique_id=1285303473 node_paths=PackedStringArray("Target")]
 position = Vector2(314, -332)
 script = ExtResource("loc_endpoint")
 EndpointId = "Start"
+Target = NodePath("InteractionTarget")
 
 [node name="Arrival" type="Marker2D" parent="Start" unique_id=1291447425]
 position = Vector2(1, 0)
 
-[node name="VillageSource" type="Node2D" parent="." unique_id=1114708774]
+[node name="InteractionTarget" parent="Start" instance=ExtResource("interaction_target")]
+Reach = 180.0
+
+[node name="VillageSource" type="Node2D" parent="." unique_id=1114708774 node_paths=PackedStringArray("Target")]
 position = Vector2(292, 601)
 script = ExtResource("loc_endpoint")
 EndpointId = "VillageSource"
+Target = NodePath("InteractionTarget")
 
 [node name="Arrival" type="Marker2D" parent="VillageSource" unique_id=1670240056]
 
@@ -96,3 +102,6 @@ EndpointId = "VillageSource"
 offset_left = -120.0
 offset_top = -50.0
 text = "E - Source of Power"
+
+[node name="InteractionTarget" parent="VillageSource" instance=ExtResource("interaction_target")]
+Reach = 180.0
