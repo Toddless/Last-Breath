@@ -10,5 +10,13 @@ namespace Core.Views.UI
             foreach (var child in node.GetChildren())
                 child.QueueFree();
         }
+
+        /// <summary>The node itself when it is a <typeparamref name="T"/>, else its nearest ancestor that is; null when none is.</summary>
+        public static T? FindSelfOrAncestor<T>(this Node node) where T : class
+        {
+            for (Node? current = node; current != null; current = current.GetParent())
+                if (current is T match) return match;
+            return null;
+        }
     }
 }

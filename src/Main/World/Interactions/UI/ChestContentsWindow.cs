@@ -3,6 +3,7 @@ namespace LastBreath.World.Interactions.UI
     using System;
     using System.Linq;
     using Core.Localization;
+    using Core.Views.UI;
     using Core.World.Containers;
     using Core.World.Interactions;
     using Godot;
@@ -10,8 +11,8 @@ namespace LastBreath.World.Interactions.UI
 
     public partial class ChestContentsWindow : InteractionWindow, IContainerSession
     {
-        /// <summary>The chest the bound target belongs to; null for a target that is not a chest's.</summary>
-        private ChestComponent? Chest => Target.GetParent() as ChestComponent;
+        /// <summary>The chest the bound target belongs to, its nearest chest ancestor; null for a target outside every chest.</summary>
+        private ChestComponent? Chest => Target.FindSelfOrAncestor<ChestComponent>();
         public static PackedScene Initialize() => GD.Load<PackedScene>("res://World/Interactions/UI/ChestContentsWindow.tscn");
         public override void _Ready()
         {

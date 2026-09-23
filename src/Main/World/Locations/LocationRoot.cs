@@ -2,6 +2,7 @@ namespace LastBreath.World.Locations
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Views.UI;
     using Core.World.Locations;
     using Godot;
 
@@ -21,12 +22,8 @@ namespace LastBreath.World.Locations
             foreach (var point in Descendants().OfType<Core.Entity.IPersistentSpawnPoint>().ToList()) point.FillFresh();
         }
 
-        public static LocationRoot? Find(Node node)
-        {
-            for (Node? current = node; current != null; current = current.GetParent())
-                if (current is LocationRoot root) return root;
-            return null;
-        }
+        /// <summary>The location the node belongs to: the node itself or its nearest location ancestor; null outside every location.</summary>
+        public static LocationRoot? Find(Node node) => node.FindSelfOrAncestor<LocationRoot>();
 
         public IEnumerable<Node> Descendants() => Walk(this);
         private static IEnumerable<Node> Walk(Node node)

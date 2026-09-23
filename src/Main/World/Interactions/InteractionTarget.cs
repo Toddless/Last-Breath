@@ -29,13 +29,13 @@ namespace LastBreath.World.Interactions
         public virtual bool IsAvailable => true;
         public InteractionHandle Handle { get; private set; }
         public Node2D Anchor => GetNodeOrNull<Node2D>("HintAnchor") ?? this;
+        /// <summary>The owner when it is a source, then every source among the descendants in tree order; a nested target keeps its own.</summary>
         public IEnumerable<IInteractionSource> Sources
         {
             get
             {
-                if (GetParent() is IInteractionSource source) yield return source;
-                for (int i = 0; i < GetChildCount(); i++)
-                    if (GetChild(i) is IInteractionSource child) yield return child;
+                if (GetParent() is IInteractionSource owner) yield return owner;
+                foreach (var source in SourcesUnder(this)) yield return source;
             }
         }
         public IEnumerable<Vector2> Points
@@ -94,6 +94,20 @@ namespace LastBreath.World.Interactions
             _configurationReported = true;
             Tracker.TrackError(string.Format(CultureInfo.InvariantCulture, InvalidConfigurationFormat, GetPath(), StableObjectId, Reach), this);
             return false;
+        }
+
+        /// <summary>Sources among the node's descendants in tree order; the subtree of a nested target is left to that target.</summary>
+        private static IEnumerable<IInteractionSource> SourcesUnder(Node node)
+        {
+            for (int i = 0; i < node.GetChildCount(); i++)
+            {
+                var child = node.GetChild(i);
+                if (child is InteractionTarget) continue;
+                if (child is IInteractionSource source) yield return source;
+                // A leaf has nothing below it: skipping it spares an enumerator per leaf on every read.
+                if (child.GetChildCount() == 0) continue;
+                foreach (var descendant in SourcesUnder(child)) yield return descendant;
+            }
         }
 
         private List<ActionOffer> ReadOffers()
