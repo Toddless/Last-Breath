@@ -1,11 +1,13 @@
 namespace LastBreath.World.Interactions
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Core;
     using Core.Data;
     using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.Save;
     using Core.Services;
     using Core.Views.UI;
@@ -26,6 +28,7 @@ namespace LastBreath.World.Interactions
         public IReadOnlyList<InteractionAction> SelectedActions { get; private set; } = [];
         public InteractionTarget? SessionTarget => _session?.Target;
         private IUiElementsManager Ui => provider.GetService<IUiElementsManager>();
+        private IGameMessageBus Messages => provider.GetService<IGameMessageBus>();
 
         /// <summary>Adds a live target; a second target with the same location and object ID is reported and stays unregistered.</summary>
         public bool TryRegister(InteractionTarget target)
@@ -70,10 +73,9 @@ namespace LastBreath.World.Interactions
             if (!CanDiscover() || !TryResolve(handle, out var target) || !CanReach(target)) return Task.FromResult(InteractionResult.Unavailable);
             var actions = target.ReadActions();
             var enabled = actions.Where(x => x.Enabled).ToList();
-            if (enabled.Count == 0) return Task.FromResult(InteractionResult.Unavailable);
+            if (enabled.Count == 0) return Task.FromResult(DisabledRefusal(actions));
             if (enabled.Count == 1 && !enabled[0].ExplicitChoice) return Execute(handle, enabled[0].Id);
-            ShowWindow<InteractionMenuWindow>(target);
-            return Task.FromResult(InteractionResult.Started);
+            return Task.FromResult(ShowWindow<InteractionMenuWindow>(target));
         }
 
         public async Task<InteractionResult> Execute(InteractionHandle handle, string actionId)
@@ -89,27 +91,37 @@ namespace LastBreath.World.Interactions
         public InteractionResult OpenChest(ChestComponent chest)
         {
             if (!CanReach(chest.Target) || !chest.TryOpen()) return InteractionResult.Unavailable;
-            ShowWindow<ChestContentsWindow>(chest.Target);
-            return InteractionResult.Started;
+            return ShowWindow<ChestContentsWindow>(chest.Target);
         }
 
-        /// <summary>Makes the session the open one: a different current session ends as replaced and the selection clears.</summary>
+        /// <summary>Makes the session the open one: a change of session ends the current one as replaced and drops the queued
+        /// command; the selection clears.</summary>
         public void Begin(IInteractionSession session)
         {
-            if (_session != session) ReplaceCurrent();
+            if (_session != session) CancelSession(InteractionSessionEndCause.Replaced);
             _session = session;
             Select(null);
         }
 
-        private void ShowWindow<T>(InteractionTarget target) where T : InteractionWindow
+        /// <summary>Opens the window bound to the target as the open session: Started when it opened, Unavailable when the UI opened none.</summary>
+        private InteractionResult ShowWindow<T>(InteractionTarget target) where T : InteractionWindow
         {
             // Ended before opening: an open window of the same type would be handed back instead of a fresh one.
             ReplaceCurrent();
-            if (Ui.OpenWindow(typeof(T)) is not T window) return;
+            if (Ui.OpenWindow(typeof(T)) is not T window) return InteractionResult.Unavailable;
             window.Bind(this, target);
             Begin(window);
+            return InteractionResult.Started;
         }
 
+        /// <summary>Refusal of a target without an enabled action: the first disabled action's own reason, Unavailable when it has none.</summary>
+        private static InteractionResult DisabledRefusal(IReadOnlyList<InteractionAction> actions) =>
+            actions.FirstOrDefault(x => !x.Enabled)?.ReasonKey is { } reasonKey
+                ? new(InteractionOutcome.Refused, reasonKey)
+                : InteractionResult.Unavailable;
+
+        /// <summary>Moves one slot, or every slot, of the open chest into the bag: Completed when anything moved, refused otherwise; the
+        /// container-full reason when capacity kept items in the chest, no reason when nothing was left or access ended.</summary>
         public InteractionResult Transfer(InteractionHandle handle, string? slotId)
         {
             if (_session is not ChestContentsWindow window || window.Target is not { } target
@@ -117,10 +129,21 @@ namespace LastBreath.World.Interactions
                 return InteractionResult.Unavailable;
             if (slotId != null && !chest.Contents.Slots.Any(x => x.Id == slotId)) return InteractionResult.Unavailable;
             var transfer = chest.Transfer(slotId, () => _session == window && CanReach(target));
-            var open = _session as InteractionWindow;
-            if (transfer.CapacityLimited) open?.CapacityRefused();
-            open?.Refresh();
-            return new(transfer.Accepted > 0, transfer.CapacityLimited ? "UI_Inventory_Full" : null);
+            (_session as InteractionWindow)?.Refresh();
+            return new(transfer.Accepted > 0 ? InteractionOutcome.Completed : InteractionOutcome.Refused,
+                transfer.CapacityLimited ? InteractionReasonKeys.ContainerFull : null);
+        }
+
+        /// <summary>Queues a player command on the controller; without a controller the command never runs and is dropped.</summary>
+        public Task<InteractionResult> Submit(Func<Task<InteractionResult>> command) =>
+            Controller?.Enqueue(command) ?? Task.FromResult(InteractionResult.Dropped);
+
+        /// <summary>Gives the refusal sound and one system notification for the result of a command that ran, when it carries a reason key.</summary>
+        public void GiveFeedback(InteractionResult result)
+        {
+            if (result.ReasonKey is not { } reasonKey) return;
+            Controller?.PlayRefusal();
+            _ = Messages.PublishMessageAsync(new SendNotificationMessageMessage(reasonKey, NotificationCategory.System));
         }
 
         /// <summary>Ends the open session with the cause of its first failed check; a session no longer open is forgotten.</summary>
@@ -180,13 +203,11 @@ namespace LastBreath.World.Interactions
     public sealed class ExecuteInteractionHandler(InteractionService service) : IRequestHandler<ExecuteInteractionRequest, InteractionResult>
     {
         public Task<InteractionResult> HandleRequest(ExecuteInteractionRequest request) =>
-            service.Controller?.Enqueue(() => service.Execute(request.Target, request.ActionId))
-            ?? Task.FromResult(InteractionResult.Unavailable);
+            service.Submit(() => service.Execute(request.Target, request.ActionId));
     }
     public sealed class ContainerTransferHandler(InteractionService service) : IRequestHandler<ContainerTransferRequest, InteractionResult>
     {
         public Task<InteractionResult> HandleRequest(ContainerTransferRequest request) =>
-            service.Controller?.Enqueue(() => Task.FromResult(service.Transfer(request.Target, request.SlotId)))
-            ?? Task.FromResult(InteractionResult.Unavailable);
+            service.Submit(() => Task.FromResult(service.Transfer(request.Target, request.SlotId)));
     }
 }

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bybo1ydp4jt0i"]
 
 [ext_resource type="Script" path="res://World/Interactions/PlayerInteractionController.cs" id="interaction"]
+[ext_resource type="AudioStream" path="res://World/Interactions/UI/Refusal.wav" id="refusal"]
 
 [ext_resource type="Script" uid="uid://cd30wexv1ilxc" path="res://Player/Player.cs" id="2_ko8e3"]
 [ext_resource type="Script" uid="uid://b83aev78cw2jb" path="res://Components/AnimationsComponent.cs" id="2_p7tob"]
@@ -1315,13 +1316,18 @@ _animatedSprite2D = NodePath("../AnimatedSprite2D")
 position = Vector2(0, 73)
 shape = SubResource("CapsuleShape2D_7ir56")
 
-[node name="PlayerInteractionController" type="Area2D" parent="."]
+[node name="PlayerInteractionController" type="Area2D" parent="." node_paths=PackedStringArray("RefusalSound")]
 position = Vector2(0, 73)
 collision_layer = 0
 collision_mask = 32768
 monitorable = false
 input_pickable = false
 script = ExtResource("interaction")
+RefusalSound = NodePath("Refusal")
+
+[node name="Refusal" type="AudioStreamPlayer" parent="PlayerInteractionController"]
+stream = ExtResource("refusal")
+volume_db = -12.0
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1501129080]
 

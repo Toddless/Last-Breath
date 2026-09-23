@@ -11,7 +11,13 @@ namespace LastBreath.World.Interactions
 
     public partial class PlayerInteractionController : Area2D
     {
+        private const string FailureMessage = "Interaction failed";
+        private const string MissingRefusalSoundFormat =
+            "Interaction controller '{0}' plays no refusal sound: it needs its refusal sound player set in the scene";
         [Export] public double RefreshSeconds { get; set; } = 0.1;
+
+        /// <summary>Sound of a refused player command.</summary>
+        [Export] private AudioStreamPlayer? RefusalSound { get; set; }
         private readonly HashSet<InteractionTarget> _candidates = [];
         private InteractionService _service = null!;
         private double _elapsed;
@@ -37,6 +43,7 @@ namespace LastBreath.World.Interactions
             AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 1 } });
             AreaEntered += Entered;
             AreaExited += Exited;
+            if (RefusalSound == null) ReportMissingRefusalSound();
         }
 
         private void Entered(Area2D area)
@@ -50,8 +57,19 @@ namespace LastBreath.World.Interactions
 
         public void CancelPending()
         {
-            _pending?.Completion.TrySetResult(InteractionResult.Unavailable);
+            _pending?.Completion.TrySetResult(InteractionResult.Dropped);
             _pending = null;
+        }
+
+        /// <summary>Plays the refusal sound; without one set in the scene a refusal stays silent.</summary>
+        public void PlayRefusal() => RefusalSound?.Play();
+
+        /// <summary>Writes the missing refusal sound to the log and the Godot console.</summary>
+        private void ReportMissingRefusalSound()
+        {
+            string message = string.Format(MissingRefusalSoundFormat, GetPath());
+            Tracker.TrackError(message, this);
+            GD.PrintErr(message);
         }
 
         public override void _ExitTree()
@@ -110,22 +128,26 @@ namespace LastBreath.World.Interactions
 
         public Task<InteractionResult> Enqueue(Func<Task<InteractionResult>> run)
         {
-            if (_pending != null || _running || !IsInsideTree()) return Task.FromResult(InteractionResult.Unavailable);
+            if (_pending != null || _running || !IsInsideTree()) return Task.FromResult(InteractionResult.Dropped);
             var completion = new TaskCompletionSource<InteractionResult>();
             _pending = (run, completion);
             return completion.Task;
         }
 
+        /// <summary>Runs the command, answers its request, then gives the player the feedback its result carries.</summary>
         private async void Run((Func<Task<InteractionResult>> Run, TaskCompletionSource<InteractionResult> Completion) pending)
         {
             _running = true;
-            try { pending.Completion.TrySetResult(await pending.Run()); }
-            catch (Exception error)
+            var result = InteractionResult.Unavailable;
+            try { result = await pending.Run(); }
+            catch (Exception error) { Tracker.TrackException(FailureMessage, error); }
+            finally
             {
-                Tracker.TrackException("Interaction failed", error);
-                pending.Completion.TrySetResult(InteractionResult.Unavailable);
+                pending.Completion.TrySetResult(result);
+                _running = false;
+                _dirty = true;
             }
-            finally { _running = false; _dirty = true; }
+            _service.GiveFeedback(result);
         }
 
         public override void _UnhandledInput(InputEvent e)

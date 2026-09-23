@@ -3,7 +3,6 @@ namespace LastBreath.World.Interactions.UI
     using Core.Data;
     using Core.Localization;
     using Core.MessageBus;
-    using Core.MessageBus.Messages;
     using Core.Views.UI;
     using Core.World.Interactions;
     using Godot;
@@ -11,7 +10,6 @@ namespace LastBreath.World.Interactions.UI
     public abstract partial class InteractionWindow : Control, IWindow, IInteractionSession
     {
         private static readonly Vector2 PanelOffset = new(24, 12);
-        private AudioStreamPlayer _refusal = null!;
         private bool _ended;
         protected InteractionService? Service;
         protected IGameMessageBus Messages = null!;
@@ -36,7 +34,6 @@ namespace LastBreath.World.Interactions.UI
             CloseButton = GetNode<Button>("Frame/Content/Close");
             CloseButton.Text = Localization.Localize("UI_Close");
             CloseButton.Pressed += Close;
-            _refusal = GetNode<AudioStreamPlayer>("Refusal");
             if (LiveTarget is not { } target) return;
             // _Ready precedes the first drawn frame; placing before Refresh keeps the hide from dropping the rows' focus.
             UiPlacement.PlaceClamped(Panel, InteractionPresentation.ScreenPoint(target.Anchor), PanelOffset);
@@ -76,11 +73,6 @@ namespace LastBreath.World.Interactions.UI
                 Rows.RemoveChild(child);
                 child.QueueFree();
             }
-        }
-        public void CapacityRefused()
-        {
-            _refusal.Play();
-            _ = Messages.PublishMessageAsync(new SendNotificationMessageMessage("UI_Container_Full"));
         }
         /// <summary>Tells the service once that the session ended on the window's own terms; silent after <see cref="End"/>.</summary>
         private void ReportClosed()

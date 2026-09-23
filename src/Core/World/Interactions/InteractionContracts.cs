@@ -9,7 +9,7 @@ namespace Core.World.Interactions
     /// <summary>How an interaction request ended.</summary>
     public enum InteractionOutcome
     {
-        /// <summary>The action's effect is done when the request returns.</summary>
+        /// <summary>The action's effect is done when the request returns; when only part of it happened, a reason key says why the rest did not.</summary>
         Completed,
 
         /// <summary>The action handed over to a session or its own process that keeps running after the request.</summary>
@@ -19,20 +19,18 @@ namespace Core.World.Interactions
         Refused
     }
 
+    /// <summary>How a request ended; a reason key is what the player is told after a command that ran.</summary>
     public record InteractionResult(InteractionOutcome Outcome, string? ReasonKey = null)
     {
         public static readonly InteractionResult Completed = new(InteractionOutcome.Completed);
         public static readonly InteractionResult Started = new(InteractionOutcome.Started);
-        public static readonly InteractionResult Unavailable = new(InteractionOutcome.Refused, "UI_Interaction_Unavailable");
+        public static readonly InteractionResult Unavailable = new(InteractionOutcome.Refused, InteractionReasonKeys.Unavailable);
+
+        /// <summary>Refused without a reason: the command was dropped before it ran, so the player is told nothing.</summary>
+        public static readonly InteractionResult Dropped = new(InteractionOutcome.Refused);
 
         /// <summary>True for Completed and Started.</summary>
-        public bool Success => Outcome != InteractionOutcome.Refused;
-
-        /// <summary>Completed when the operation succeeded, refused otherwise.</summary>
-        public InteractionResult(bool success, string? reasonKey = null)
-            : this(success ? InteractionOutcome.Completed : InteractionOutcome.Refused, reasonKey)
-        {
-        }
+        public bool Success => Outcome is InteractionOutcome.Completed or InteractionOutcome.Started;
     }
     public record ExecuteInteractionRequest(InteractionHandle Target, string ActionId) : IRequest<InteractionResult>;
     public record ContainerTransferRequest(InteractionHandle Target, string? SlotId = null) : IRequest<InteractionResult>;
@@ -64,5 +62,15 @@ namespace Core.World.Interactions
         public const string Attack = "attack";
         public const string Open = "open";
         public const string Travel = "travel";
+    }
+
+    /// <summary>Localization keys of the reasons an interaction result carries.</summary>
+    public static class InteractionReasonKeys
+    {
+        /// <summary>The action cannot run now.</summary>
+        public const string Unavailable = "UI_Interaction_Unavailable";
+
+        /// <summary>The bag is full; what did not fit stays in the container.</summary>
+        public const string ContainerFull = "UI_Container_Full";
     }
 }
