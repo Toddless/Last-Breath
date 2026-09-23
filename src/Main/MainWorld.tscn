@@ -36,6 +36,9 @@ texture_region_size = Vector2i(256, 256)
 tile_size = Vector2i(256, 256)
 sources/0 = SubResource("TileSetAtlasSource_brush")
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_exit"]
+radius = 180.0
+
 [node name="MainWorld" type="Node2D" unique_id=1612394780]
 y_sort_enabled = true
 script = ExtResource("1_4xxmu")
@@ -90,6 +93,9 @@ position = Vector2(1, 0)
 [node name="InteractionTarget" parent="Start" instance=ExtResource("interaction_target")]
 Reach = 180.0
 
+[node name="DiscoveryShape" parent="Start/InteractionTarget" index="2"]
+shape = SubResource("CircleShape2D_exit")
+
 [node name="VillageSource" type="Node2D" parent="." unique_id=1114708774 node_paths=PackedStringArray("Target")]
 position = Vector2(292, 601)
 script = ExtResource("loc_endpoint")
@@ -105,3 +111,9 @@ text = "E - Source of Power"
 
 [node name="InteractionTarget" parent="VillageSource" instance=ExtResource("interaction_target")]
 Reach = 180.0
+
+[node name="DiscoveryShape" parent="VillageSource/InteractionTarget" index="2"]
+shape = SubResource("CircleShape2D_exit")
+
+[editable path="Start/InteractionTarget"]
+[editable path="VillageSource/InteractionTarget"]

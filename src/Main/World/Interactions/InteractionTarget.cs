@@ -17,17 +17,45 @@ namespace LastBreath.World.Interactions
             "Interaction target '{0}' is disabled: it needs a non-empty object ID and a positive finite reach, but has ID '{1}' and reach {2}";
         private const string DuplicateActionsFormat = "Interaction target '{0}' ('{1}') disables the actions that share an ID: {2}";
         private const string OverriddenObjectIdFormat = "Interaction target '{0}' ignores its ObjectId '{1}': its owner gives the ID '{2}'";
+        private const string MissingAnchorFormat =
+            "Interaction target '{0}' shows its hint at its own position: it needs its hint anchor set in the scene";
+        private const string InvalidDiscoveryFormat =
+            "Interaction target '{0}' is disabled: {1}; it needs a direct child CollisionShape2D with a CircleShape2D centred on it and a radius of at least {2:0.##}";
+        private const string MissingShapeProblem = "its discovery shape is not set";
+        private const string ForeignShapeProblem = "its discovery shape is not its direct child";
+        private const string DisabledShapeProblem = "its discovery shape is disabled";
+        private const string NotCircleProblem = "its discovery shape holds no CircleShape2D";
+        private const string OffCentreProblem = "its discovery circle is not centred on it";
+        private const string SmallRadiusFormat = "its discovery circle has a radius of {0:0.##}";
         private const string ActionIdSeparator = ", ";
+        /// <summary>Slack for the float rounding of global positions when the authored radius is compared with the required one.</summary>
+        private const float RadiusTolerance = 0.01f;
+        /// <summary>Floor of the scale the required radius is divided by, so a collapsed node cannot divide by zero.</summary>
+        private const float MinimumScale = 0.001f;
         public const uint DetectionLayer = 1u << 15;
         [Export] public string ObjectId { get; set; } = "";
         [Export] public float Reach { get; set; } = 150;
         [Export(PropertyHint.Layers2DPhysics)] public uint ObstacleMask { get; set; } = InteractionReach.BlockerMask;
         /// <summary>Bodies of this object that do not block access to its own interaction points.</summary>
         [Export] public Godot.Collections.Array<CollisionObject2D> OwnBodies { get; set; } = [];
+
+        /// <summary>Points the player's reach is measured to; while none is set, the target's own position stands in.</summary>
+        [Export] private Godot.Collections.Array<Marker2D> InteractionPoints { get; set; } = [];
+
+        /// <summary>Node the hint and the menu stand at; while it is not set, the target itself stands in and the gap is reported once.</summary>
+        [Export] private Node2D? HintAnchor { get; set; }
+
+        /// <summary>Circle the player's sensor finds the target by: a direct child centred on the target that covers every interaction
+        /// point plus Reach; any other setup is reported once and disables the target.</summary>
+        [Export] private CollisionShape2D? DiscoveryShape { get; set; }
+
         private readonly HashSet<string> _reportedDuplicateActionIds = [];
         private bool _registered;
         private bool _configurationReported;
         private bool _overrideReported;
+        private bool _anchorReported;
+        /// <summary>Whether the discovery shape failed its check; the target then stays unregistered whenever it enters the tree.</summary>
+        private bool _discoveryInvalid;
         /// <summary>Owner found when the target last entered the tree; null while it has none.</summary>
         private IInteractionOwner? _interactionOwner;
         /// <summary>ID the target registers under: its owner's ID while it has an owner, else its own <see cref="ObjectId"/>.</summary>
@@ -35,7 +63,8 @@ namespace LastBreath.World.Interactions
         /// <summary>Whether the target can be interacted with now: its owner's answer while it has an owner, else true.</summary>
         public virtual bool IsAvailable => _interactionOwner?.IsInteractable ?? true;
         public InteractionHandle Handle { get; private set; }
-        public Node2D Anchor => GetNodeOrNull<Node2D>("HintAnchor") ?? this;
+        /// <summary>The set hint anchor, or the target itself while none is set.</summary>
+        public Node2D Anchor => ValidOrNull(HintAnchor) ?? this;
         /// <summary>The parent when it is a source, then every source among the descendants in tree order; a nested target keeps its own.</summary>
         public IEnumerable<IInteractionSource> Sources
         {
@@ -45,14 +74,16 @@ namespace LastBreath.World.Interactions
                 foreach (var source in SourcesUnder(this)) yield return source;
             }
         }
+        /// <summary>Global positions of the set interaction points, or the target's own position while none is set.</summary>
         public IEnumerable<Vector2> Points
         {
             get
             {
                 bool found = false;
-                for (int i = 0; i < GetChildCount(); i++)
+                var points = InteractionPoints;
+                for (int i = 0; i < points.Count; i++)
                 {
-                    if (GetChild(i) is not Marker2D point || !point.Name.ToString().StartsWith("InteractionPoint", StringComparison.Ordinal)) continue;
+                    if (ValidOrNull(points[i]) is not { } point) continue;
                     found = true;
                     yield return point.GlobalPosition;
                 }
@@ -64,7 +95,7 @@ namespace LastBreath.World.Interactions
         {
             _interactionOwner = FindInteractionOwner();
             ReportOverriddenObjectId();
-            if (!CheckConfiguration() || LocationRoot.Find(this) is not { } root) return;
+            if (_discoveryInvalid || !CheckConfiguration() || LocationRoot.Find(this) is not { } root) return;
             Handle = new(root.LocationId, StableObjectId, Guid.NewGuid());
             _registered = Services.GameServiceProvider.Instance.GetService<InteractionService>().TryRegister(this);
         }
@@ -76,17 +107,11 @@ namespace LastBreath.World.Interactions
             CollisionMask = 0;
             Monitoring = false;
             InputPickable = false;
-            // Conservative discovery shape; exact reach is checked at each authored point.
-            float extent = Points.Max(p => GlobalPosition.DistanceTo(p)) + Reach;
-            float scale = Math.Max(0.001f, Math.Min(Math.Abs(GlobalScale.X), Math.Abs(GlobalScale.Y)));
-            AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = extent / scale } });
+            CheckAnchor();
+            CheckDiscovery();
         }
 
-        public override void _ExitTree()
-        {
-            if (_registered) Services.GameServiceProvider.Instance.GetService<InteractionService>().Unregister(this);
-            _registered = false;
-        }
+        public override void _ExitTree() => Unregister();
 
         /// <summary>Actions offered now: none while the target is unregistered or unavailable; actions that share an ID are left out.</summary>
         public IReadOnlyList<InteractionAction> ReadActions() => ReadOffers().ConvertAll(x => x.Action);
@@ -115,6 +140,63 @@ namespace LastBreath.World.Interactions
             _overrideReported = true;
             Tracker.TrackError(string.Format(OverriddenObjectIdFormat, GetPath(), ObjectId, _interactionOwner.InteractionId), this);
         }
+
+        /// <summary>Reports once a target without its hint anchor; the target stays enabled and shows its hint at its own position.</summary>
+        private void CheckAnchor()
+        {
+            if (_anchorReported || ValidOrNull(HintAnchor) != null) return;
+            _anchorReported = true;
+            Report(string.Format(MissingAnchorFormat, GetPath()));
+        }
+
+        /// <summary>Disables the target with one report when its discovery shape does not cover every interaction point plus Reach.</summary>
+        private void CheckDiscovery()
+        {
+            if (_discoveryInvalid) return;
+            var shape = ValidOrNull(DiscoveryShape);
+            float required = RequiredRadius(shape ?? (Node2D)this);
+            if (FindDiscoveryProblem(shape, required) is not { } problem) return;
+            _discoveryInvalid = true;
+            Report(string.Format(CultureInfo.InvariantCulture, InvalidDiscoveryFormat, GetPath(), problem, required));
+            Unregister();
+        }
+
+        /// <summary>Why the shape cannot find the player wherever the target is in reach, for the report; null when it can.</summary>
+        private string? FindDiscoveryProblem(CollisionShape2D? shape, float requiredRadius)
+        {
+            if (shape == null) return MissingShapeProblem;
+            if (shape.GetParent() != this) return ForeignShapeProblem;
+            if (shape.Disabled) return DisabledShapeProblem;
+            if (shape.Shape is not CircleShape2D circle) return NotCircleProblem;
+            if (!shape.Position.IsZeroApprox()) return OffCentreProblem;
+            return circle.Radius + RadiusTolerance < requiredRadius
+                ? string.Format(CultureInfo.InvariantCulture, SmallRadiusFormat, circle.Radius) : null;
+        }
+
+        /// <summary>Radius a circle drawn in the node's space needs to cover every interaction point plus Reach around the target.</summary>
+        private float RequiredRadius(Node2D space) => (Points.Max(point => GlobalPosition.DistanceTo(point)) + Reach) / SmallerScale(space);
+
+        /// <summary>The node's smaller absolute global scale, floored at <see cref="MinimumScale"/>.</summary>
+        private static float SmallerScale(Node2D node) =>
+            Math.Max(MinimumScale, Math.Min(Math.Abs(node.GlobalScale.X), Math.Abs(node.GlobalScale.Y)));
+
+        /// <summary>Drops the target's registration; a target that is not registered changes nothing.</summary>
+        private void Unregister()
+        {
+            if (_registered) Services.GameServiceProvider.Instance.GetService<InteractionService>().Unregister(this);
+            _registered = false;
+        }
+
+        /// <summary>Writes a setup problem of the target to the log and the Godot console.</summary>
+        private void Report(string message)
+        {
+            Tracker.TrackError(message, this);
+            GD.PrintErr(message);
+        }
+
+        /// <summary>The object while it is set and not freed; null otherwise.</summary>
+        private static T? ValidOrNull<T>(T? instance) where T : GodotObject =>
+            instance != null && GodotObject.IsInstanceValid(instance) ? instance : null;
 
         /// <summary>Sources among the node's descendants in tree order; the subtree of a nested target is left to that target.</summary>
         private static IEnumerable<IInteractionSource> SourcesUnder(Node node)

@@ -1,14 +1,23 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://World/Interactions/InteractionTarget.cs" id="script"]
 
-[node name="InteractionTarget" type="Area2D"]
+[sub_resource type="CircleShape2D" id="discovery"]
+radius = 150.0
+
+[node name="InteractionTarget" type="Area2D" node_paths=PackedStringArray("InteractionPoints", "HintAnchor", "DiscoveryShape")]
 collision_layer = 32768
 collision_mask = 0
 monitoring = false
 input_pickable = false
 script = ExtResource("script")
+InteractionPoints = [NodePath("InteractionPoint")]
+HintAnchor = NodePath("HintAnchor")
+DiscoveryShape = NodePath("DiscoveryShape")
 
 [node name="InteractionPoint" type="Marker2D" parent="."]
 
 [node name="HintAnchor" type="Marker2D" parent="."]
 position = Vector2(0, -70)
+
+[node name="DiscoveryShape" type="CollisionShape2D" parent="."]
+shape = SubResource("discovery")

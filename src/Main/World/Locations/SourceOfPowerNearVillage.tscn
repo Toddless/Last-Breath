@@ -84,6 +84,9 @@ texture_region_size = Vector2i(256, 256)
 tile_size = Vector2i(256, 256)
 sources/0 = SubResource("TileSetAtlasSource_ti1og")
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_exit"]
+radius = 180.0
+
 [node name="SourceOfPowerNearVillage" type="Node2D" unique_id=741810362]
 script = ExtResource("loc_root")
 LocationId = "SourceOfPowerNearVillage"
@@ -121,6 +124,9 @@ text = "E - Main World"
 [node name="InteractionTarget" parent="Entrance" instance=ExtResource("interaction_target")]
 Reach = 180.0
 
+[node name="DiscoveryShape" parent="Entrance/InteractionTarget" index="2"]
+shape = SubResource("CircleShape2D_exit")
+
 [node name="StarterChest" parent="." instance=ExtResource("starter_chest")]
 position = Vector2(-1390, 2247)
 ObjectId = "starter_chest"
@@ -130,3 +136,5 @@ DefinitionId = "Chest_Starter"
 energy = 0.3
 shadow_enabled = true
 height = 0.6
+
+[editable path="Entrance/InteractionTarget"]
