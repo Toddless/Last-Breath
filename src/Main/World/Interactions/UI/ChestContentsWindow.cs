@@ -2,6 +2,7 @@ namespace LastBreath.World.Interactions.UI
 {
     using System;
     using System.Linq;
+    using Core.Constants;
     using Core.Localization;
     using Core.Views.UI;
     using Core.World.Containers;
@@ -27,7 +28,7 @@ namespace LastBreath.World.Interactions.UI
             if (Chest is not { } chest || Rows == null) return;
             ClearRows();
             Title?.Text = Localization.Localize(chest.NameKey);
-            _takeAll?.Text = InteractionPresentation.Prompt(InteractionActions.TakeAll, TakeAllKey);
+            _takeAll?.Text = InteractionPresentation.Prompt(Settings.ContainerTakeAll, TakeAllKey);
             _takeAll?.Disabled = chest.Contents.Empty;
             foreach (var slot in chest.Contents.Slots)
             {
@@ -65,7 +66,7 @@ namespace LastBreath.World.Interactions.UI
         }
         public override void _UnhandledInput(InputEvent e)
         {
-            if (!e.IsActionPressed(InteractionActions.TakeAll) || e.IsEcho()) return;
+            if (!e.IsActionPressed(Settings.ContainerTakeAll) || e.IsEcho()) return;
             GetViewport().SetInputAsHandled();
             Take(null);
         }

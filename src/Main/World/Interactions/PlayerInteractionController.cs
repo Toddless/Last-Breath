@@ -5,6 +5,7 @@ namespace LastBreath.World.Interactions
     using System.Linq;
     using System.Threading.Tasks;
     using Core;
+    using Core.Constants;
     using Core.MessageBus;
     using Core.World.Interactions;
     using Godot;
@@ -174,7 +175,7 @@ namespace LastBreath.World.Interactions
 
         public override void _UnhandledInput(InputEvent e)
         {
-            if (!e.IsActionPressed(InteractionActions.Interact) || e.IsEcho() || !_service.CanDiscover() || _service.Selected is not { } target) return;
+            if (!e.IsActionPressed(Settings.Interact) || e.IsEcho() || !_service.CanDiscover() || _service.Selected is not { } target) return;
             GetViewport().SetInputAsHandled();
             var handle = target.Handle;
             _ = Enqueue(() => _service.Activate(handle));

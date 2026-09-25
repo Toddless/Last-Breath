@@ -2,6 +2,7 @@ namespace LastBreath.World.Interactions.UI
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Constants;
     using Core.Localization;
     using Core.Views.UI;
     using Core.World.Interactions;
@@ -46,8 +47,8 @@ namespace LastBreath.World.Interactions.UI
             return enabled.Count switch
             {
                 0 => Localization.Localize(actions.FirstOrDefault()?.ReasonKey ?? InteractionReasonKeys.Unavailable),
-                1 => InteractionPresentation.Prompt(InteractionActions.Interact, enabled[0].LabelKey),
-                _ => InteractionPresentation.Prompt(InteractionActions.Interact, InteractionPresentation.InteractKey),
+                1 => InteractionPresentation.Prompt(Settings.Interact, enabled[0].LabelKey),
+                _ => InteractionPresentation.Prompt(Settings.Interact, InteractionPresentation.InteractKey),
             };
         }
 
