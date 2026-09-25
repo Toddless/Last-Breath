@@ -10,14 +10,15 @@ namespace LastBreath.World.Interactions.UI
     {
         private const string UID = "uid://cxgma3niixgpr";
         private const string ActionIdMeta = "interaction_action_id";
-        private const double RefreshIntervalSeconds = 0.1;
         private string _signature = "";
-        private double _elapsed;
+        /// <summary>Cached offer the rows were built from; the menu rebuilds once its target keeps another list instance.</summary>
+        private IReadOnlyList<InteractionAction>? _shownOffer;
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
         public override void Refresh()
         {
             if (Rows == null) return;
-            var actions = Target.ReadActions();
+            var actions = Target.CachedOffer;
+            _shownOffer = actions;
             string signature = string.Join("|", actions.Select(x => $"{x.Id}:{x.Enabled}:{x.ReasonKey}"));
             if (_signature == signature) return;
             _signature = signature;
@@ -44,10 +45,7 @@ namespace LastBreath.World.Interactions.UI
         public override void _Process(double delta)
         {
             base._Process(delta);
-            _elapsed += delta;
-            if (_elapsed < RefreshIntervalSeconds) return;
-            _elapsed = 0;
-            if (!IsQueuedForDeletion()) Refresh();
+            if (!IsQueuedForDeletion() && !ReferenceEquals(Target.CachedOffer, _shownOffer)) Refresh();
         }
 
         /// <summary>Action id of the row holding keyboard focus; null when the focus is outside the rows.</summary>
