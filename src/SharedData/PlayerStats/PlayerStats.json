@@ -1,0 +1,21 @@
+{
+    "unarmed": {
+        "Health": 1000,
+        "Barrier": 100,
+        "Mana": 500,
+        "Intelligence": 5,
+        "Strength": 5,
+        "Dexterity": 5,
+        "Evade": 300,
+        "Armor": 300,
+        "Accuracy": 300,
+        "CriticalChance": 0.05,
+        "AdditionalHitChance": 0.05,
+        "BlockChance": 0.05,
+        "CriticalDamage": 1.5,
+        "MulticastChance": 0,
+        "PhysicalDamage": 100,
+        "SpellDamage": 50,
+        "MoveSpeed": 500
+    }
+}

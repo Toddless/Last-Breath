@@ -1,0 +1,158 @@
+[gd_scene format=3 uid="uid://ds0wq0f8ha2x5"]
+
+[ext_resource type="Script" uid="uid://cq2nb2bnie0iy" path="res://Addons/Battle/UIElements/MartialArtMasteryWindow.cs" id="1_j6uko"]
+[ext_resource type="PackedScene" uid="uid://bh2sn5qe8dc1r" path="res://Addons/Battle/UIElements/StanceSocketSection.tscn" id="2_section"]
+[ext_resource type="PackedScene" uid="uid://cm0ug8yh3ls6n" path="res://Addons/Battle/UIElements/AugmentTray.tscn" id="3_tray"]
+
+[node name="MartialArtMasteryWindow" type="Control" unique_id=370604200 node_paths=PackedStringArray("_sections", "_tray", "_levelLabel", "_experienceLabel", "_experienceBar", "_pointsLabel", "_waitingLabel", "_close")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_j6uko")
+_sections = [NodePath("Center/Panel/Margin/Layout/Body/Sheet/Dexterity"), NodePath("Center/Panel/Margin/Layout/Body/Sheet/Strength"), NodePath("Center/Panel/Margin/Layout/Body/Sheet/Intelligence")]
+_tray = NodePath("Center/Panel/Margin/Layout/Body/Tray")
+_levelLabel = NodePath("Center/Panel/Margin/Layout/Header/LevelLabel")
+_experienceLabel = NodePath("Center/Panel/Margin/Layout/Header/ExpLabel")
+_experienceBar = NodePath("Center/Panel/Margin/Layout/Header/ExpBar")
+_pointsLabel = NodePath("Center/Panel/Margin/Layout/Header/PointsLabel")
+_waitingLabel = NodePath("Center/Panel/Margin/Layout/Header/WaitingLabel")
+_close = NodePath("Center/Panel/Margin/Layout/Header/CloseBtn")
+
+[node name="Center" type="HBoxContainer" parent="." unique_id=1451750057]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 2
+
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=1964963954]
+custom_minimum_size = Vector2(1180, 760)
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"UmbralWindowPanel"
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=1872651953]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Layout" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=1956319835]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/Layout" unique_id=945280037]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Center/Panel/Margin/Layout/Header" unique_id=1360950575]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+text = "Martial Art Mastery"
+
+[node name="LevelLabel" type="Label" parent="Center/Panel/Margin/Layout/Header" unique_id=203250949]
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+text = "Level"
+
+[node name="ExpBar" type="ProgressBar" parent="Center/Panel/Margin/Layout/Header" unique_id=1484117948]
+custom_minimum_size = Vector2(240, 20)
+layout_mode = 2
+size_flags_vertical = 4
+show_percentage = false
+
+[node name="ExpLabel" type="Label" parent="Center/Panel/Margin/Layout/Header" unique_id=1033598155]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+
+[node name="Spacer" type="Control" parent="Center/Panel/Margin/Layout/Header" unique_id=1727400546]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="PointsLabel" type="Label" parent="Center/Panel/Margin/Layout/Header" unique_id=442153559]
+custom_minimum_size = Vector2(112, 0)
+layout_mode = 2
+tooltip_text = "Passive points still to spend"
+theme_type_variation = &"ValueLabel"
+text = "0"
+vertical_alignment = 1
+
+[node name="PointsCaption" type="Label" parent="Center/Panel/Margin/Layout/Header/PointsLabel" unique_id=1615977617]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"DimLabel"
+text = "points"
+vertical_alignment = 1
+
+[node name="WaitingLabel" type="Label" parent="Center/Panel/Margin/Layout/Header" unique_id=1606108301]
+visible = false
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+tooltip_text = "Augments left in slots no node backs any more. They can only be taken out."
+theme_type_variation = &"ValueLabel"
+text = "0"
+vertical_alignment = 1
+
+[node name="WaitingCaption" type="Label" parent="Center/Panel/Margin/Layout/Header/WaitingLabel" unique_id=804192813]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"DimLabel"
+text = "held, remove only"
+vertical_alignment = 1
+
+[node name="CloseBtn" type="Button" parent="Center/Panel/Margin/Layout/Header" unique_id=1654760888]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+focus_mode = 0
+text = "X"
+
+[node name="Body" type="HBoxContainer" parent="Center/Panel/Margin/Layout" unique_id=1221087903]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Sheet" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body" unique_id=856739838]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="Dexterity" parent="Center/Panel/Margin/Layout/Body/Sheet" unique_id=137721192 instance=ExtResource("2_section")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Strength" parent="Center/Panel/Margin/Layout/Body/Sheet" unique_id=1391486755 instance=ExtResource("2_section")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+_stance = 1
+
+[node name="Intelligence" parent="Center/Panel/Margin/Layout/Body/Sheet" unique_id=1019005424 instance=ExtResource("2_section")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+_stance = 2
+
+[node name="Tray" parent="Center/Panel/Margin/Layout/Body" unique_id=898499171 instance=ExtResource("3_tray")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 3

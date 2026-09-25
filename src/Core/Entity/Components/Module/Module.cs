@@ -1,0 +1,16 @@
+﻿namespace Core.Entity.Components.Module
+{
+    using System;
+    using Enums;
+
+    public class Module<TKey>(Func<float> value, TKey parameter) : IParameterModule<TKey>
+        where TKey : struct, Enum
+    {
+        public TKey Parameter { get; } = parameter;
+        public Priority Priority => Priority.Base;
+
+        public float GetValue() => value();
+
+        public float ApplyDecoratorsForValue(float applyToValue) => applyToValue;
+    }
+}

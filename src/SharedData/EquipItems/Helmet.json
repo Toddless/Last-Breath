@@ -1,0 +1,333 @@
+{
+    "items": [
+        {
+            "id": "Helmet_Stoneheart",
+            "equipmentPart": "Helmet",
+            "rarity": "Common",
+            "tags": [
+                "Helmet",
+                "Equipment"
+            ],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Health",
+                    "value": {
+                        "min": 80,
+                        "max": 150
+                    }
+                },
+                {
+                    "parameter": "Armor",
+                    "value": {
+                        "min": 220,
+                        "max": 380
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Helmet_Steel",
+            "equipmentPart": "Helmet",
+            "rarity": "Common",
+            "tags": [
+                "Helmet",
+                "Equipment"
+            ],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Armor",
+                    "value": {
+                        "min": 275,
+                        "max": 580
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Helmet_Vital_Core",
+            "equipmentPart": "Helmet",
+            "rarity": "Common",
+            "tags": [
+                "Helmet",
+                "Equipment"
+            ],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Health",
+                    "value": {
+                        "min": 207,
+                        "max": 432
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Helmet_Hunter",
+            "equipmentPart": "Helmet",
+            "rarity": "Common",
+            "tags": [
+                "Helmet",
+                "Equipment"
+            ],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Evade",
+                    "value": {
+                        "min": 322,
+                        "max": 608
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Helmet_Hunters_Dream",
+            "equipmentPart": "Helmet",
+            "rarity": "Common",
+            "tags": [
+                "Helmet",
+                "Equipment"
+            ],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Evade",
+                    "value": {
+                        "min": 180,
+                        "max": 320
+                    }
+                },
+                {
+                    "parameter": "Health",
+                    "value": {
+                        "min": 100,
+                        "max": 150
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Helmet_Feral_Instinct",
+            "equipmentPart": "Helmet",
+            "rarity": "Common",
+            "tags": [
+                "Helmet",
+                "Equipment"
+            ],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Barrier",
+                    "value": {
+                        "min": 120,
+                        "max": 300
+                    }
+                },
+                {
+                    "parameter": "Health",
+                    "value": {
+                        "min": 100,
+                        "max": 150
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Helmet_Archmage_Cap",
+            "equipmentPart": "Helmet",
+            "rarity": "Common",
+            "tags": [
+                "Helmet",
+                "Equipment"
+            ],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Barrier",
+                    "value": {
+                        "min": 345,
+                        "max": 651
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Helmet_Mysterious_Bastion",
+            "equipmentPart": "Helmet",
+            "rarity": "Common",
+            "tags": [
+                "Helmet",
+                "Equipment"
+            ],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Barrier",
+                    "value": {
+                        "min": 120,
+                        "max": 280
+                    }
+                },
+                {
+                    "parameter": "Armor",
+                    "value": {
+                        "min": 180,
+                        "max": 320
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Helmet_Aegis",
+            "equipmentPart": "Helmet",
+            "rarity": "Common",
+            "tags": [
+                "Helmet",
+                "Equipment"
+            ],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Barrier",
+                    "value": {
+                        "min": 120,
+                        "max": 280
+                    }
+                },
+                {
+                    "parameter": "Evade",
+                    "value": {
+                        "min": 180,
+                        "max": 320
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Helmet_Creators_Crown",
+            "equipmentPart": "Helmet",
+            "rarity": "Mythic",
+            "tags": [
+                "Helmet",
+                "Equipment"
+            ],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 420,
+                        "max": 580
+                    }
+                },
+                {
+                    "parameter": "Suppress",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 0.15,
+                        "max": 0.35
+                    }
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "CriticalDamageMitigation",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 0.2,
+                        "max": 0.35
+                    }
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.55,
+                        "max": 0.75
+                    }
+                },
+                {
+                    "parameter": "Suppress",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.45
+                    }
+                }
+            ],
+            "grants": [],
+            "basePrice": 60
+        }
+    ]
+}

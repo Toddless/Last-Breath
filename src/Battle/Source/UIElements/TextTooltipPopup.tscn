@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://cpt3b8d6rpa5c"]
+
+[ext_resource type="Script" uid="uid://cpaif32qmv1bn" path="res://Addons/Battle/UIElements/TextTooltipPopup.cs" id="1"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 20
+
+[node name="TextTooltipPopup" type="Control" unique_id=523925342 node_paths=PackedStringArray("_panel", "_title", "_info", "_description")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1")
+_panel = NodePath("Panel")
+_title = NodePath("Panel/Margin/Layout/Title")
+_info = NodePath("Panel/Margin/Layout/Info")
+_description = NodePath("Panel/Margin/Layout/Description")
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=672602998]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 0
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=1146113357]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Layout" type="VBoxContainer" parent="Panel/Margin" unique_id=848706334]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Panel/Margin/Layout" unique_id=1096022431]
+layout_mode = 2
+text = "Title"
+label_settings = SubResource("LabelSettings_title")
+
+[node name="Info" type="Label" parent="Panel/Margin/Layout" unique_id=1037182365]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Info"
+
+[node name="Description" type="RichTextLabel" parent="Panel/Margin/Layout" unique_id=1355435557]
+custom_minimum_size = Vector2(316, 40)
+layout_mode = 2
+bbcode_enabled = true
+text = "Description"
+fit_content = true

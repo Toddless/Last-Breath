@@ -1,6 +1,6 @@
 namespace LootGeneration.Internal
 {
-    using Core.Interfaces.Items;
+    using Core.Items;
 
     public record ItemStack(IItem Item)
     {

@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://dp4tbacn1mh8k"]
+
+[ext_resource type="Script" uid="uid://c7o4wtarcxuix" path="res://Addons/Battle/UIElements/AugmentTrayTile.cs" id="1_tile"]
+
+[node name="AugmentTrayTile" type="PanelContainer" node_paths=PackedStringArray("_icon", "_tier")]
+custom_minimum_size = Vector2(56, 56)
+offset_right = 56.0
+offset_bottom = 56.0
+mouse_filter = 0
+theme_type_variation = &"ItemSlotPanel"
+script = ExtResource("1_tile")
+_icon = NodePath("Content/Icon")
+_tier = NodePath("Content/Tier")
+
+[node name="Content" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Icon" type="TextureRect" parent="Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Tier" type="Label" parent="Content"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -24.0
+offset_top = -22.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme_type_variation = &"DimLabel"
+text = "1"
+horizontal_alignment = 2
+vertical_alignment = 2

@@ -5,10 +5,14 @@
     [Flags]
     public enum DamageType
     {
-        Normal = 0,
-        Pure = 1 << 0,
-        Burning = 1 << 1,
-        Poison = 1 << 2,
-        Bleed = 1 << 3,
+        Sacred = 1 << 0,
+        Blight = 1 << 1,
+        Burning = 1 << 2,
+        Poison = 1 << 3,
+        Bleed = 1 << 4,
+        Physical = 1 << 5,
+        Fire = 1 << 6,
+        Cold = 1 << 7,
+        Lightning = 1 << 8
     }
 }

@@ -1,0 +1,49 @@
+﻿namespace Core.Entity
+{
+    using System.Collections.Generic;
+    using Ai;
+
+    public interface IFightableNpc : IFightable, INpc
+    {
+        INpcModifiersComponent NpcModifiers { get; }
+
+        /// <summary>Combat AI archetype. Null = no brain: the legacy basic-attack turn.</summary>
+        IBehaviorProfile? Behavior { get; set; }
+
+        /// <summary>Combat reactions from the definition (hidden triggered casts). Default empty:
+        /// only bodies that applied a definition with reactions override it.</summary>
+        IReadOnlyList<Data.NpcData.NpcReactionConfig> Reactions => [];
+
+        /// <summary>Boss stages from the definition; the arena's stages controller reads them.
+        /// Default empty: only bodies that applied a staged definition override it.</summary>
+        IReadOnlyList<Data.NpcData.NpcStageConfig> Stages => [];
+
+        /// <summary>Index into <see cref="Stages"/> the NPC currently fights in.</summary>
+        int CurrentStageIndex => 0;
+
+        /// <summary>Applies a stage: definition-base parameters × stage multiplier plus the stage's
+        /// ability set. Default no-op keeps stage-less implementations untouched.</summary>
+        void ApplyStage(int stageIndex)
+        {
+        }
+
+        /// <summary>Battle-scoped summon (bone wolves and kin): gives no loot, no experience, no
+        /// corpse and never returns to the world. Default false: only summon-spawned bodies override.</summary>
+        bool IsSummon => false;
+
+        /// <summary>Nobody's NPC: put into the world by an authored order (a quest action, a save
+        /// restore) instead of by a spawn point, so NO point re-rolls it on load — the save file is
+        /// the only thing that can bring it back. Default false: a point's own roster overrides nothing.</summary>
+        bool IsWild => false;
+
+        /// <summary>Raised by the authored order that put this NPC into the world — a quest action, or
+        /// a save restore reading a record that was already nobody's (see <see cref="IsWild"/>).
+        /// Default no-op: implementations that never leave a spawn point stay untouched.</summary>
+        void MarkAsWild()
+        {
+        }
+
+        float RisingBonus { get; }
+        bool IsRisen { get; }
+    }
+}

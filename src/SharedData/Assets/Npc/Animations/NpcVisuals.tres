@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="NpcVisualLibrary" format=3 uid="uid://o1q0orjcm4p4"]
+
+[ext_resource type="Script" uid="uid://bkuxk2pq820dy" path="res://Addons/Battle/Presentation/NpcVisualConfig.cs" id="1_cfg"]
+[ext_resource type="Script" uid="uid://pqu2nd75843f" path="res://Addons/Battle/Presentation/NpcVisualLibrary.cs" id="2_lib"]
+[ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/Robber.tres" id="3"]
+[ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/Assasin.tres" id="4"]
+[ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/Direwolf.tres" id="5"]
+[ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/Deer.tres" id="6"]
+[ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/Wolf.tres" id="7"]
+[ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/Bear.tres" id="8"]
+[ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/BoneWolf.tres" id="9"]
+
+[sub_resource type="Resource" id="Resource_Robber"]
+script = ExtResource("1_cfg")
+NpcId = "Npc_Bandit"
+Frames = ExtResource("3")
+
+[sub_resource type="Resource" id="Resource_Assasin"]
+script = ExtResource("1_cfg")
+NpcId = "Npc_Bandit_Veteran"
+Frames = ExtResource("4")
+
+[sub_resource type="Resource" id="Resource_Direwolf"]
+script = ExtResource("1_cfg")
+NpcId = "Npc_Direwolf"
+Frames = ExtResource("5")
+
+[sub_resource type="Resource" id="Resource_Deer"]
+script = ExtResource("1_cfg")
+NpcId = "Npc_Deer"
+Frames = ExtResource("6")
+
+[sub_resource type="Resource" id="Resource_Wolf"]
+script = ExtResource("1_cfg")
+NpcId = "Npc_Wolf"
+Frames = ExtResource("7")
+
+[sub_resource type="Resource" id="Resource_Bear"]
+script = ExtResource("1_cfg")
+NpcId = "Npc_Bear"
+Frames = ExtResource("8")
+
+[sub_resource type="Resource" id="Resource_BoneWolf"]
+script = ExtResource("1_cfg")
+NpcId = "Npc_Bone_Wolf"
+Frames = ExtResource("9")
+
+[resource]
+script = ExtResource("2_lib")
+Configs = Array[ExtResource("1_cfg")]([SubResource("Resource_Robber"), SubResource("Resource_Assasin"), SubResource("Resource_Direwolf"), SubResource("Resource_Deer"), SubResource("Resource_Wolf"), SubResource("Resource_Bear"), SubResource("Resource_BoneWolf")])

@@ -1,0 +1,13 @@
+﻿namespace Core.Battle
+{
+    using System.Collections.Generic;
+    using Enums;
+    using Skills;
+
+    public interface IAttackResult
+    {
+        IAttackContext Context { get; }
+        List<ISkill> PassiveSkills { get; }
+        AttackResults Result { get; }
+    }
+}

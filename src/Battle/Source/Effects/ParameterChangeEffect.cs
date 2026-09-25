@@ -1,0 +1,84 @@
+﻿namespace Battle.Source.Effects
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Battle.Abilities;
+    using Core.Entity.Components.Decorator;
+    using Core.Enums;
+    using Core.Localization;
+
+    /// <summary>
+    /// Changes one number of the bearer for a while — most of the book's buffs and debuffs. The
+    /// effectiveness of the cast is applied here and nowhere in the descendants; a descendant whose
+    /// authored figure is a share gained or lost says so through <paramref name="shape"/>.
+    /// </summary>
+    public abstract class ParameterChangeEffect(
+        string id,
+        int duration,
+        int maxStacks,
+        EffectValue value,
+        EntityParameter parameter,
+        OperationType type,
+        Priority priority,
+        StatusEffects statusEffect = StatusEffects.None,
+        EffectValueShape shape = EffectValueShape.Plain) : Effect(id, duration, maxStacks, statusEffect)
+    {
+        private string _decoratorId = string.Empty;
+
+        public EntityParameter Parameter { get; } = parameter;
+
+        /// <summary>The figure as authored — what a <see cref="Copy"/> hands on, so it is scaled once.</summary>
+        protected EffectValue Authored { get; } = value;
+
+        /// <summary>What the parameter is actually moved by on this instance.</summary>
+        public float Value => Effective(Authored, shape);
+
+        /// <summary>The base knows everything a buff/debuff text needs: {Parameter} (localized name)
+        /// and {Value} (unit-aware display value, e.g. "+5%") on top of {Duration}/{MaxStacks}.</summary>
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values["Parameter"] = Localization.Localize(Parameter.ToString());
+                values["Value"] = Localization.FormatParameterChange(Parameter, Value, type, TextFormat.Rich);
+                return values;
+            }
+        }
+
+        public override async Task Apply(EffectApplyingContext context)
+        {
+            await base.Apply(context);
+            if (Target == null) return;
+            _decoratorId = $"{Id}_{type}";
+            int stacks = Target.Effects.GetBy(effect => effect.Id == Id).Count();
+            RebuildDecorator(stacks);
+        }
+
+        public override void Remove()
+        {
+            // Called before base.Remove(), so the current stack is still counted — hence the -1.
+            int stacks = (Target?.Effects.GetBy(effect => effect.Id == Id).Count() ?? 0) - 1;
+            RebuildDecorator(stacks);
+            base.Remove();
+        }
+
+        /// <summary>
+        /// Keeps a single decorator per effect type, recalculated for the given stack count:
+        /// Add/Subtract scale linearly (Value * stacks), Multiply/Divide exponentially (Value ^ stacks).
+        /// </summary>
+        private void RebuildDecorator(int stacks)
+        {
+            if (Target == null) return;
+            Target.Parameters.RemoveModuleDecorator(_decoratorId, Parameter);
+            if (stacks <= 0) return;
+
+            float stackedValue = type is OperationType.Multiply or OperationType.Divide
+                ? MathF.Pow(Value, stacks)
+                : Value * stacks;
+            Target.Parameters.AddModuleDecorator(new EntityParameterDecorator(_decoratorId, stackedValue, type, Parameter, priority));
+        }
+    }
+}

@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://bcq7vkx5c2o4"]
+
+[ext_resource type="Script" uid="uid://cofhduqd3oiv0" path="res://Addons/Battle/UIElements/AbilityButton.cs" id="1_qwsp7"]
+[ext_resource type="Texture2D" uid="uid://b5r10d060ur0s" path="res://Data/Shared/Assets/Art/UI/UI_AbilityButton_Background.png" id="2_htaoy"]
+[ext_resource type="Texture2D" uid="uid://cr787sauttt8p" path="res://Data/Shared/Assets/Art/UI/UI_AbilityButton_Frame.png" id="3_gb2iu"]
+[ext_resource type="Texture2D" uid="uid://deao44bjma6ab" path="res://Data/Shared/Assets/Icons/Ability_Chain_Lightning.png" id="4_gb2iu"]
+
+[node name="AbilityButton" type="MarginContainer" unique_id=215584642 node_paths=PackedStringArray("_background", "_icon", "_frame", "_number", "_cooldownLabel")]
+custom_minimum_size = Vector2(75, 75)
+offset_right = 75.0
+offset_bottom = 75.0
+script = ExtResource("1_qwsp7")
+_background = NodePath("Background")
+_icon = NodePath("Icon")
+_frame = NodePath("Frame")
+_number = NodePath("Number")
+_cooldownLabel = NodePath("Cooldown")
+
+[node name="Background" type="TextureRect" parent="." unique_id=219232674]
+modulate = Color(0.85, 0.5, 0.31, 1)
+layout_mode = 2
+texture = ExtResource("2_htaoy")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1764325252]
+layout_mode = 2
+texture = ExtResource("4_gb2iu")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Frame" type="TextureRect" parent="." unique_id=2044993500]
+modulate = Color(0.902, 0.812, 0.584, 1)
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_scale = Vector2(1.565, 1.565)
+texture = ExtResource("3_gb2iu")
+expand_mode = 1
+
+[node name="Number" type="Label" parent="." unique_id=1120811465]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_type_variation = &"SlotCountLabel"
+
+[node name="Cooldown" type="Label" parent="." unique_id=1120811466]
+visible = false
+layout_mode = 2
+theme_type_variation = &"SlotCooldownLabel"
+horizontal_alignment = 1
+vertical_alignment = 1

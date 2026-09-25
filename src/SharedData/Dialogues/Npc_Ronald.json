@@ -1,0 +1,546 @@
+{
+    "dialogues": [
+        {
+            "npcId": "Npc_Ronald",
+            "entryRules": [
+                {
+                    "priority": 30,
+                    "conditions": [
+                        {
+                            "type": "AnyOf",
+                            "conditions": [
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Fang",
+                                    "status": "ReadyToTurnIn"
+                                },
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Pack",
+                                    "status": "ReadyToTurnIn"
+                                },
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Mountain",
+                                    "status": "ReadyToTurnIn"
+                                },
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Grave",
+                                    "status": "ReadyToTurnIn"
+                                }
+                            ]
+                        }
+                    ],
+                    "node": "TrialReport"
+                },
+                {
+                    "priority": 20,
+                    "conditions": [
+                        {
+                            "type": "AnyOf",
+                            "conditions": [
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Fang",
+                                    "status": "Active"
+                                },
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Pack",
+                                    "status": "Active"
+                                },
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Mountain",
+                                    "status": "Active"
+                                },
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Grave",
+                                    "status": "Active"
+                                }
+                            ]
+                        }
+                    ],
+                    "node": "TrialWatch"
+                },
+                {
+                    "priority": 0,
+                    "conditions": [],
+                    "node": "Greeting"
+                }
+            ],
+            "nodes": [
+                {
+                    "id": "Greeting",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_Greeting_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Trade",
+                            "key": "Dlg_Ronald_Greeting_Trade",
+                            "actions": [
+                                {
+                                    "type": "StartTrade",
+                                    "traderId": "Trader_Ronald"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "AskForge",
+                            "key": "Dlg_Ronald_Greeting_AskForge",
+                            "oncePerConversation": true,
+                            "next": "AboutForge"
+                        },
+                        {
+                            "id": "AskTrials",
+                            "key": "Dlg_Ronald_Greeting_AskTrials",
+                            "visibleConditions": [
+                                {
+                                    "type": "AnyOf",
+                                    "conditions": [
+                                        {
+                                            "type": "CanAcceptQuest",
+                                            "questId": "Quest_Trial_Of_The_Fang"
+                                        },
+                                        {
+                                            "type": "CanAcceptQuest",
+                                            "questId": "Quest_Trial_Of_The_Pack"
+                                        },
+                                        {
+                                            "type": "CanAcceptQuest",
+                                            "questId": "Quest_Trial_Of_The_Mountain"
+                                        },
+                                        {
+                                            "type": "CanAcceptQuest",
+                                            "questId": "Quest_Trial_Of_The_Grave"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "next": "Trials"
+                        },
+                        {
+                            "id": "Leave",
+                            "key": "Dlg_Opt_Leave",
+                            "next": "Farewell"
+                        }
+                    ]
+                },
+                {
+                    "id": "AboutForge",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_AboutForge_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Back",
+                            "key": "Dlg_Opt_Back",
+                            "next": "Greeting"
+                        }
+                    ]
+                },
+                {
+                    "id": "Farewell",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_Farewell_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Leave",
+                            "key": "Dlg_Opt_Leave"
+                        }
+                    ]
+                },
+                {
+                    "id": "Trials",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_Trials_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "TakeFang",
+                            "key": "Dlg_Ronald_Trials_TakeFang",
+                            "visibleConditions": [
+                                {
+                                    "type": "CanAcceptQuest",
+                                    "questId": "Quest_Trial_Of_The_Fang"
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "AcceptQuest",
+                                    "questId": "Quest_Trial_Of_The_Fang"
+                                }
+                            ],
+                            "next": "TrialAccepted"
+                        },
+                        {
+                            "id": "TakePack",
+                            "key": "Dlg_Ronald_Trials_TakePack",
+                            "visibleConditions": [
+                                {
+                                    "type": "CanAcceptQuest",
+                                    "questId": "Quest_Trial_Of_The_Pack"
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "AcceptQuest",
+                                    "questId": "Quest_Trial_Of_The_Pack"
+                                }
+                            ],
+                            "next": "TrialAccepted"
+                        },
+                        {
+                            "id": "TakeMountain",
+                            "key": "Dlg_Ronald_Trials_TakeMountain",
+                            "visibleConditions": [
+                                {
+                                    "type": "CanAcceptQuest",
+                                    "questId": "Quest_Trial_Of_The_Mountain"
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "AcceptQuest",
+                                    "questId": "Quest_Trial_Of_The_Mountain"
+                                }
+                            ],
+                            "next": "TrialAccepted"
+                        },
+                        {
+                            "id": "TakeGrave",
+                            "key": "Dlg_Ronald_Trials_TakeGrave",
+                            "visibleConditions": [
+                                {
+                                    "type": "CanAcceptQuest",
+                                    "questId": "Quest_Trial_Of_The_Grave"
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "AcceptQuest",
+                                    "questId": "Quest_Trial_Of_The_Grave"
+                                }
+                            ],
+                            "next": "TrialAccepted"
+                        },
+                        {
+                            "id": "Back",
+                            "key": "Dlg_Opt_Back",
+                            "next": "Greeting"
+                        }
+                    ]
+                },
+                {
+                    "id": "TrialAccepted",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_TrialAccepted_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Leave",
+                            "key": "Dlg_Opt_Leave"
+                        }
+                    ]
+                },
+                {
+                    "id": "TrialWatch",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_TrialWatch_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "HintFang",
+                            "key": "Dlg_Opt_TrialHint",
+                            "visibleConditions": [
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Fang",
+                                    "status": "Active"
+                                }
+                            ],
+                            "next": "TrialHintFang"
+                        },
+                        {
+                            "id": "HintPack",
+                            "key": "Dlg_Opt_TrialHint",
+                            "visibleConditions": [
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Pack",
+                                    "status": "Active"
+                                }
+                            ],
+                            "next": "TrialHintPack"
+                        },
+                        {
+                            "id": "HintMountain",
+                            "key": "Dlg_Opt_TrialHint",
+                            "visibleConditions": [
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Mountain",
+                                    "status": "Active"
+                                }
+                            ],
+                            "next": "TrialHintMountain"
+                        },
+                        {
+                            "id": "HintGrave",
+                            "key": "Dlg_Opt_TrialHint",
+                            "visibleConditions": [
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Grave",
+                                    "status": "Active"
+                                }
+                            ],
+                            "next": "TrialHintGrave"
+                        },
+                        {
+                            "id": "Back",
+                            "key": "Dlg_Opt_Back",
+                            "next": "Greeting"
+                        },
+                        {
+                            "id": "Leave",
+                            "key": "Dlg_Opt_Leave"
+                        }
+                    ]
+                },
+                {
+                    "id": "TrialHintFang",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_TrialHintFang_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Back",
+                            "key": "Dlg_Opt_Back",
+                            "next": "TrialWatch"
+                        }
+                    ]
+                },
+                {
+                    "id": "TrialHintPack",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_TrialHintPack_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Back",
+                            "key": "Dlg_Opt_Back",
+                            "next": "TrialWatch"
+                        }
+                    ]
+                },
+                {
+                    "id": "TrialHintMountain",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_TrialHintMountain_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Back",
+                            "key": "Dlg_Opt_Back",
+                            "next": "TrialWatch"
+                        }
+                    ]
+                },
+                {
+                    "id": "TrialHintGrave",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_TrialHintGrave_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Back",
+                            "key": "Dlg_Opt_Back",
+                            "next": "TrialWatch"
+                        }
+                    ]
+                },
+                {
+                    "id": "TrialReport",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_TrialReport_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "TurnInFang",
+                            "key": "Dlg_Opt_TrialTurnIn",
+                            "visibleConditions": [
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Fang",
+                                    "status": "ReadyToTurnIn"
+                                }
+                            ],
+                            "enabledConditions": [
+                                {
+                                    "type": "CanTurnInQuest",
+                                    "questId": "Quest_Trial_Of_The_Fang"
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "TurnInQuest",
+                                    "questId": "Quest_Trial_Of_The_Fang"
+                                }
+                            ],
+                            "next": "TrialPraise"
+                        },
+                        {
+                            "id": "TurnInPack",
+                            "key": "Dlg_Opt_TrialTurnIn",
+                            "visibleConditions": [
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Pack",
+                                    "status": "ReadyToTurnIn"
+                                }
+                            ],
+                            "enabledConditions": [
+                                {
+                                    "type": "CanTurnInQuest",
+                                    "questId": "Quest_Trial_Of_The_Pack"
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "TurnInQuest",
+                                    "questId": "Quest_Trial_Of_The_Pack"
+                                }
+                            ],
+                            "next": "TrialPraise"
+                        },
+                        {
+                            "id": "TurnInMountain",
+                            "key": "Dlg_Opt_TrialTurnIn",
+                            "visibleConditions": [
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Mountain",
+                                    "status": "ReadyToTurnIn"
+                                }
+                            ],
+                            "enabledConditions": [
+                                {
+                                    "type": "CanTurnInQuest",
+                                    "questId": "Quest_Trial_Of_The_Mountain"
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "TurnInQuest",
+                                    "questId": "Quest_Trial_Of_The_Mountain"
+                                }
+                            ],
+                            "next": "TrialPraise"
+                        },
+                        {
+                            "id": "TurnInGrave",
+                            "key": "Dlg_Opt_TrialTurnIn",
+                            "visibleConditions": [
+                                {
+                                    "type": "QuestStatus",
+                                    "questId": "Quest_Trial_Of_The_Grave",
+                                    "status": "ReadyToTurnIn"
+                                }
+                            ],
+                            "enabledConditions": [
+                                {
+                                    "type": "CanTurnInQuest",
+                                    "questId": "Quest_Trial_Of_The_Grave"
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "type": "TurnInQuest",
+                                    "questId": "Quest_Trial_Of_The_Grave"
+                                }
+                            ],
+                            "next": "TrialPraiseLast"
+                        },
+                        {
+                            "id": "Back",
+                            "key": "Dlg_Opt_Back",
+                            "next": "Greeting"
+                        },
+                        {
+                            "id": "Leave",
+                            "key": "Dlg_Opt_Leave"
+                        }
+                    ]
+                },
+                {
+                    "id": "TrialPraise",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_TrialPraise_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Leave",
+                            "key": "Dlg_Opt_Leave"
+                        }
+                    ]
+                },
+                {
+                    "id": "TrialPraiseLast",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Ronald_TrialPraiseLast_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Leave",
+                            "key": "Dlg_Opt_Leave"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

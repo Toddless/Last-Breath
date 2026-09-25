@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bwqrh1s43klrj"]
+
+[ext_resource type="Script" uid="uid://d2y25lx5n5r70" path="res://Addons/SharedUi/TierRow.cs" id="1_tierr"]
+
+[node name="TierRow" type="HBoxContainer" unique_id=1409120534 node_paths=PackedStringArray("_number", "_text")]
+theme_override_constants/separation = 10
+script = ExtResource("1_tierr")
+_number = NodePath("Frame/Number")
+_text = NodePath("Text")
+
+[node name="Frame" type="PanelContainer" parent="." unique_id=1668220417]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 0
+theme_type_variation = &"TierFrame"
+
+[node name="Number" type="Label" parent="Frame" unique_id=1147203112]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Text" type="RichTextLabel" parent="." unique_id=1362114905]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+fit_content = true

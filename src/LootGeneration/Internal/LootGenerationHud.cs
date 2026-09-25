@@ -1,15 +1,12 @@
 namespace LootGeneration.Internal
 {
-    using temp;
-    using Godot;
     using System;
-    using Source;
-    using Core.Enums;
-    using System.Linq;
-    using System.Globalization;
-    using Core.Interfaces.Events;
     using System.Collections.Generic;
-    using Core.Interfaces.Events.GameEvents;
+    using System.Globalization;
+    using System.Linq;
+    using Core.Enums;
+    using Core.Events;
+    using Godot;
 
     internal partial class LootGenerationHud : Control
     {
@@ -40,7 +37,7 @@ namespace LootGeneration.Internal
             ConvertEnumToList<EntityType>(_entityTypeList);
             ConvertEnumToList<Rarity>(_rarityList);
             _startBattle?.Pressed += () => _eventBus?.Publish(new ExampleBattleStart(850f, 450f));
-            _endBattle?.Pressed += () => _eventBus?.Publish(new BattleEndEvent());
+            _endBattle?.Pressed += () => _eventBus?.Publish(new BattleEndEvent(BattleResults.PlayerWon));
             _createSingle?.Pressed += OnCreateSinglePressed;
             _setAsDefault?.Pressed += OnSetAsDefault;
             _random?.Pressed += () => SetRandomNpcCreation?.Invoke();

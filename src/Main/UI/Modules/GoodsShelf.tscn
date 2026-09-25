@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://bxk3q7v2tgsh5"]
+
+[ext_resource type="Script" uid="uid://dmw8n2r4yhq6c" path="res://UI/Modules/GoodsShelf.cs" id="1_gshelf"]
+[ext_resource type="PackedScene" uid="uid://buwn6bbogk42v" path="res://Addons/SharedUi/SectionHeader.tscn" id="2_shead"]
+
+[node name="GoodsShelf" type="ScrollContainer" node_paths=PackedStringArray("_consumablesHeader", "_equipmentHeader", "_specialsHeader", "_buybackHeader", "_specialsRow", "_rotationLabel", "_consumablesFlow", "_equipmentFlow", "_specialsFlow", "_buybackFlow")]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+script = ExtResource("1_gshelf")
+_consumablesHeader = NodePath("Sections/ConsumablesHeader")
+_equipmentHeader = NodePath("Sections/EquipmentHeader")
+_specialsHeader = NodePath("Sections/SpecialsRow/SpecialsHeader")
+_buybackHeader = NodePath("Sections/BuybackHeader")
+_specialsRow = NodePath("Sections/SpecialsRow")
+_rotationLabel = NodePath("Sections/SpecialsRow/Rotation")
+_consumablesFlow = NodePath("Sections/ConsumablesFlow")
+_equipmentFlow = NodePath("Sections/EquipmentFlow")
+_specialsFlow = NodePath("Sections/SpecialsFlow")
+_buybackFlow = NodePath("Sections/BuybackFlow")
+
+[node name="Sections" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="ConsumablesHeader" parent="Sections" instance=ExtResource("2_shead")]
+layout_mode = 2
+
+[node name="ConsumablesFlow" type="HFlowContainer" parent="Sections"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="EquipmentHeader" parent="Sections" instance=ExtResource("2_shead")]
+layout_mode = 2
+
+[node name="EquipmentFlow" type="HFlowContainer" parent="Sections"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="SpecialsRow" type="HBoxContainer" parent="Sections"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SpecialsHeader" parent="Sections/SpecialsRow" instance=ExtResource("2_shead")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Rotation" type="Label" parent="Sections/SpecialsRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"DimLabel"
+
+[node name="SpecialsFlow" type="HFlowContainer" parent="Sections"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="BuybackHeader" parent="Sections" instance=ExtResource("2_shead")]
+layout_mode = 2
+
+[node name="BuybackFlow" type="HFlowContainer" parent="Sections"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8

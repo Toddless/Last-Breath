@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://bqsttrk1hud4a"]
+
+[ext_resource type="Script" uid="uid://bgpiw0dn0l8wv" path="res://UI/View/QuestTracker.cs" id="1_qsttr"]
+
+[node name="QuestTracker" type="VBoxContainer" unique_id=87226520]
+custom_minimum_size = Vector2(340, 0)
+mouse_filter = 2
+theme_override_constants/separation = 4
+script = ExtResource("1_qsttr")

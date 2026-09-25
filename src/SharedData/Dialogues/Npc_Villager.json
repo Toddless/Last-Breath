@@ -1,0 +1,53 @@
+{
+    "dialogues": [
+        {
+            "npcId": "Npc_Villager",
+            "entryRules": [
+                {
+                    "priority": 0,
+                    "conditions": [],
+                    "node": "Greeting"
+                }
+            ],
+            "nodes": [
+                {
+                    "id": "Greeting",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Villager_Greeting_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "AskVillage",
+                            "key": "Dlg_Villager_Greeting_AskVillage",
+                            "oncePerConversation": true,
+                            "next": "AboutVillage"
+                        },
+                        {
+                            "id": "Leave",
+                            "key": "Dlg_Opt_Leave"
+                        }
+                    ]
+                },
+                {
+                    "id": "AboutVillage",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Villager_AboutVillage_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Back",
+                            "key": "Dlg_Opt_Back",
+                            "next": "Greeting"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,8 @@
+{
+  "healthPercentPerMinute": 0.1,
+  "manaPercentPerMinute": 0.15,
+  "barrierPercentPerMinute": 0.15,
+  "defaultZoneRadius": 150,
+  "npcRetreatHealthPercent": 0.5,
+  "npcGiveUpMinutes": 3
+}

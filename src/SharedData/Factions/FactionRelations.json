@@ -1,0 +1,58 @@
+{
+    "relations": [
+        { "from": "Dwarf", "to": "Undead", "level": "Hostility" },
+        { "from": "Dwarf", "to": "Elf", "level": "Dislike" },
+        { "from": "Dwarf", "to": "Human", "level": "Neutral" },
+
+        { "from": "Elf", "to": "Undead", "level": "Hostility" },
+        { "from": "Elf", "to": "Dwarf", "level": "Dislike" },
+        { "from": "Elf", "to": "Human", "level": "Neutral" },
+
+        { "from": "Undead", "to": "Human", "level": "Hostility" },
+        { "from": "Undead", "to": "Elf", "level": "Hostility" },
+        { "from": "Undead", "to": "Dwarf", "level": "Hostility" },
+        { "from": "Undead", "to": "Demon", "level": "Hostility" },
+
+        { "from": "Human", "to": "Undead", "level": "Hostility" },
+        { "from": "Human", "to": "Dwarf", "level": "Neutral" },
+        { "from": "Human", "to": "Elf", "level": "Neutral" },
+
+        { "from": "Demon", "to": "Dwarf", "level": "Neutral" },
+        { "from": "Demon", "to": "Elf", "level": "Neutral" },
+        { "from": "Demon", "to": "Human", "level": "Neutral" },
+        { "from": "Demon", "to": "Undead", "level": "Neutral" }
+    ],
+    "reputation": {
+        "min": -6000,
+        "max": 6000,
+        "hysteresis": 50,
+        "levels": [
+            { "level": "Hatred", "from": -6000 },
+            { "level": "Hostility", "from": -2000 },
+            { "level": "Dislike", "from": -800 },
+            { "level": "Neutral", "from": -200 },
+            { "level": "Friendly", "from": 1000 },
+            { "level": "Respect", "from": 3000 },
+            { "level": "Alliance", "from": 5000 }
+        ]
+    },
+    "personalReputation": {
+        "min": -1000,
+        "max": 1000,
+        "pointsPerShift": 300,
+        "maxShift": 2
+    },
+    "factions": [
+        { "fraction": "Elf", "hasReputation": true, "canRaid": true },
+        { "fraction": "Dwarf", "hasReputation": true, "canRaid": true },
+        { "fraction": "Human", "hasReputation": true, "canRaid": true },
+        { "fraction": "Undead", "hasReputation": true, "canRaid": true },
+        { "fraction": "Demon", "hasReputation": true, "canRaid": false },
+        { "fraction": "Animal", "hasReputation": false, "canRaid": false },
+        { "fraction": "MysticalCreature", "hasReputation": false, "canRaid": false }
+    ],
+    "playerDefaults": [
+        { "fraction": "Undead", "points": -1000 },
+        { "fraction": "Human", "points": 500 }
+    ]
+}

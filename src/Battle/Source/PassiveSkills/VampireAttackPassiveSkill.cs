@@ -1,15 +1,31 @@
-﻿namespace Battle.Source.PassiveSkills
+namespace Battle.Source.PassiveSkills
 {
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Skills;
+    using System.Collections.Generic;
+    using Core.Battle.Skills;
+    using Core.Context;
+    using Core.Entity;
+    using Core.Events;
 
-    public class VampireAttackPassiveSkill(float percentToLeach)
-        : Skill(id: "Passive_Skill_Vampier")
+    public class VampireAttackPassiveSkill(float leachPercent)
+        : Skill(id: "Passive_Skill_Vampire")
     {
-        public float PercentToLeach { get; } = percentToLeach;
 
-        public override void Attach(IEntity owner)
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(LeachPercent)] = LeachPercent
+                };
+                return field;
+            }
+        }
+
+        public float LeachPercent { get; } = leachPercent;
+
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             Owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
@@ -17,23 +33,24 @@
 
         private void OnAfterAttack(AfterAttackEvent evnt)
         {
-            float toHeal = evnt.Context.FinalDamage * PercentToLeach;
-            Owner?.Heal(toHeal);
+            if (Owner == null) return;
+            float leeched = evnt.Context.FinalDamage.Total * LeachPercent;
+            Owner.Heal(new HealContext(Owner, Owner) { Amount = leeched });
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             Owner?.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
             Owner = null;
         }
 
-        public override ISkill Copy() => new VampireAttackPassiveSkill(PercentToLeach);
+        public override ISkill Copy() => new VampireAttackPassiveSkill(LeachPercent);
 
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not VampireAttackPassiveSkill vampire) return false;
 
-            return vampire.PercentToLeach > PercentToLeach;
+            return LeachPercent > vampire.LeachPercent;
         }
     }
 }

@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://b3me1ofsbyw38"]
+
+[ext_resource type="Script" uid="uid://c4n558x64n1u0" path="res://Addons/Battle/UIElements/FlyNumbers.cs" id="1_ihq18"]
+
+[node name="FlyNumbers" type="Node2D" unique_id=2138044428 node_paths=PackedStringArray("_label")]
+script = ExtResource("1_ihq18")
+_label = NodePath("Label")
+
+[node name="Label" type="Label" parent="." unique_id=19158381]
+offset_right = 40.0
+offset_bottom = 23.0
+scale = Vector2(2, 2)

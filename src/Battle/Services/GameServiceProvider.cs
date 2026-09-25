@@ -1,42 +1,61 @@
 namespace Battle.Services
 {
-    using Godot;
-    using System;
-    using Core.Interfaces;
-    using Core.Interfaces.Events;
-    using System.Collections.Generic;
+    using Core.Ai.World;
+    using Core.Ai.World.Skirmish;
     using Core.Data;
-    using Core.Interfaces.MessageBus;
+    using Core.Data.GameData;
+    using Core.Entity;
+    using Core.Narrative.Facts;
+    using Core.Reputation;
+    using Core.Services;
+    using Core.Session;
+    using Internal.Npc;
     using Microsoft.Extensions.DependencyInjection;
+    using SharedUi;
+    using Source;
 
-    internal class GameServiceProvider : IGameServiceProvider
+    /// <summary>Project bootstrap: the shared Core provider + Battle registrations. The only place touching the static root.</summary>
+    internal static class GameServiceProvider
     {
-        private readonly ServiceProvider _serviceProvider;
-        public static GameServiceProvider Instance { get; } = new();
+        public static IGameServiceProvider Instance { get; } = CreateProvider();
 
-        private GameServiceProvider()
+        private static IGameServiceProvider CreateProvider()
         {
-            _serviceProvider = RegisterServices();
-        }
+            // The streams a cast rolls on are chosen here, next to the container that already binds the
+            // engine RNG for everything else: the sandbox runs inside Godot, so its casts and their
+            // delivery roll on the engine generator too — the domain defaults stay free of the engine
+            // for hosts without one.
+            BattleSystemModuleDependencies.UseEngineCastRandom();
+            BattleSystemModuleDependencies.UseEngineCombatRandom();
+            var provider = Core.Services.GameServiceProvider.Initialize(services => services
+                .AddBattleSystemModuleDependencies()
+                .AddGameData("res://Data/", "res://Data/Shared/")
+                // Project-private bindings: only the bootstrap may know Internal classes
+                .AddSingleton<INpcWorldSpawner, BattleNpcWorldSpawner>()
+                .AddSingleton<IBattleNpcSpawner, BattleSummonSpawner>()
+                .AddGameDataParticipant<INpcProvider, NpcProvider>()
+                .AddSingleton<INpcPopulationService, NpcPopulationService>()
+                .AddSingleton<INpcWorldRegistry, NpcWorldRegistry>()
+                .AddSingleton<INpcSkirmishService, NpcSkirmishService>()
+                .AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>()
+                .AddGameDataParticipant<IFactionRelationService, FactionRelationService>()
+                .AddGameDataParticipant<IReputationDeedProcessor, ReputationDeedProcessor>()
+                .AddSingleton<ReputationBroadcaster>()
+                .AddSingleton<IWitnessQuery, WorldWitnessQuery>()
+                .AddGameDataParticipant<IPersonalReputationService, PersonalReputationService>()
+                // World facts: the boss-gate reads them ("the twin is finally dead"); the tracker writes them.
+                .AddSingleton<IWorldFactsService, WorldFactsService>()
+                .AddSingleton<NpcFinalDeathFactTracker>()
+                // Project infrastructure (module discipline): the sandbox composes its own session
+                // reset — it no longer rides in the battle module. No save system here on purpose:
+                // saving belongs to the game project alone, the sandbox is for isolated tests.
+                .AddSessionReset());
+            provider.AddBattleUiElementsFactory();
+            provider.AddSharedUiFactories();
 
-        public T GetService<T>() => _serviceProvider.GetService<T>() ?? throw new NullReferenceException();
-        public T GetKeyedService<T>(string key) => _serviceProvider.GetKeyedService<T>(key) ?? throw new NullReferenceException();
-        public IEnumerable<T> GetServices<T>() => _serviceProvider.GetServices<T>();
-
-        private ServiceProvider RegisterServices()
-        {
-            var services = new ServiceCollection();
-            services.AddSingleton<IGameMessageBus, GameMessageBus>();
-            services.AddSingleton<RandomNumberGenerator>((_) =>
-            {
-                var instance = new RandomNumberGenerator();
-                instance.Randomize();
-                return instance;
-            });
-            services.AddSingleton<IGameEventBus, GameEventBus>();
-            services.AddSingleton<IUiElementProvider, UiElementProvider>();
-            services.AddSingleton<IEntityProvider, EntityProvider>();
-            return services.BuildServiceProvider();
+            provider.GetService<IGameDataService>().LoadAll();
+            provider.GetService<NpcFinalDeathFactTracker>(); // eager: lives on bus subscriptions only
+            return provider;
         }
     }
 }

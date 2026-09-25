@@ -1,0 +1,126 @@
+[gd_scene format=3 uid="uid://ctb7pw2knr4qd"]
+
+[ext_resource type="Script" uid="uid://bu461u045uhtr" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveWheelTopBar.cs" id="1_topbar"]
+
+[node name="PassiveWheelTopBar" type="HBoxContainer" node_paths=PackedStringArray("_title", "_pointsCaption", "_spentCaption", "_totalCaption", "_points", "_pointsDelta", "_spent", "_total", "_noPoints", "_waiting", "_price", "_summary", "_respec", "_apply", "_cancel", "_frame", "_close")]
+offset_right = 1180.0
+offset_bottom = 40.0
+theme_override_constants/separation = 10
+script = ExtResource("1_topbar")
+_title = NodePath("Title")
+_pointsCaption = NodePath("PointsCaption")
+_spentCaption = NodePath("SpentCaption")
+_totalCaption = NodePath("TotalCaption")
+_points = NodePath("Points")
+_pointsDelta = NodePath("PointsDelta")
+_spent = NodePath("Spent")
+_total = NodePath("Total")
+_noPoints = NodePath("NoPoints")
+_waiting = NodePath("Waiting")
+_price = NodePath("Price")
+_summary = NodePath("SummaryBtn")
+_respec = NodePath("RespecBtn")
+_apply = NodePath("ApplyBtn")
+_cancel = NodePath("CancelBtn")
+_frame = NodePath("FrameBtn")
+_close = NodePath("CloseBtn")
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+vertical_alignment = 1
+
+[node name="PointsCaption" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+vertical_alignment = 1
+
+[node name="Points" type="Label" parent="."]
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "0"
+vertical_alignment = 1
+
+[node name="PointsDelta" type="Label" parent="."]
+visible = false
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+vertical_alignment = 1
+
+[node name="SpentCaption" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+vertical_alignment = 1
+
+[node name="Spent" type="Label" parent="."]
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+text = "0"
+vertical_alignment = 1
+
+[node name="TotalCaption" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+vertical_alignment = 1
+
+[node name="Total" type="Label" parent="."]
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+text = "0"
+vertical_alignment = 1
+
+[node name="NoPoints" type="Label" parent="."]
+visible = false
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+vertical_alignment = 1
+
+[node name="Waiting" type="Label" parent="."]
+visible = false
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+tooltip_text = "Augments left in slots no node backs any more. They can only be taken out."
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Price" type="Label" parent="."]
+visible = false
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="RespecBtn" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+
+[node name="ApplyBtn" type="Button" parent="."]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+focus_mode = 0
+disabled = true
+
+[node name="CancelBtn" type="Button" parent="."]
+visible = false
+layout_mode = 2
+focus_mode = 0
+
+[node name="SummaryBtn" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+
+[node name="FrameBtn" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+tooltip_text = "Fit the whole tree on screen (F)"
+
+[node name="CloseBtn" type="Button" parent="."]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+focus_mode = 0

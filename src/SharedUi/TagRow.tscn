@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dcfjvgbwrdkh"]
+
+[ext_resource type="Script" uid="uid://d0kjadxy0k5uy" path="res://Addons/SharedUi/TagRow.cs" id="1_tagrw"]
+
+[node name="TagRow" type="HFlowContainer" unique_id=873120004]
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 4
+script = ExtResource("1_tagrw")

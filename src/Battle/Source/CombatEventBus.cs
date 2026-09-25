@@ -1,53 +1,35 @@
-﻿namespace Battle.Source
+namespace Battle.Source
 {
     using System;
-    using System.Linq;
-    using Core.Interfaces.Battle;
     using System.Collections.Generic;
+    using Core.Battle;
+    using Core.Events;
 
     public class CombatEventBus : ICombatEventBus
     {
-        private readonly Dictionary<Type, List<Delegate>> _handlers = new();
+        private readonly EventRegistry<ICombatEvent> _registry = new();
+        private readonly List<Action<ICombatEvent>> _catchAllHandlers = [];
 
         public void Publish<T>(T evnt)
             where T : ICombatEvent
         {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-                return;
-
-            foreach (var handler in handlers.Cast<Action<T>>().ToList())
-                handler(evnt);
+            // Catch-all runs BEFORE typed handlers so recorders capture the event before reactions cascade.
+            EventDispatch.Dispatch<ICombatEvent>(_catchAllHandlers, evnt, this);
+            _registry.Publish(evnt, this);
         }
 
-        public void Subscribe<T>(Action<T> handler)
-            where T : ICombatEvent
-        {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-            {
-                handlers = [];
-                _handlers[typeof(T)] = handlers;
-            }
+        public void Subscribe<T>(Action<T> handler) where T : ICombatEvent => _registry.Add(handler);
 
-            handlers.Add(handler);
-        }
+        public void Unsubscribe<T>(Action<T> handler) where T : ICombatEvent => _registry.Remove(handler);
 
-        public void Unsubscribe<T>(Action<T> handler)
-            where T : ICombatEvent
-        {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-            {
-                // TODO: Tracker
-                return;
-            }
+        public void SubscribeAll(Action<ICombatEvent> handler) => _catchAllHandlers.Add(handler);
 
-            handlers.Remove(handler);
-            if (handlers.Count == 0)
-                _handlers.Remove(typeof(T));
-        }
+        public void UnsubscribeAll(Action<ICombatEvent> handler) => _catchAllHandlers.Remove(handler);
 
         public void Dispose()
         {
-            _handlers.Clear();
+            _registry.Clear();
+            _catchAllHandlers.Clear();
             GC.SuppressFinalize(this);
         }
     }

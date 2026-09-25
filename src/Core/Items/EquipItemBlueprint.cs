@@ -1,0 +1,62 @@
+namespace Core.Items
+{
+    using System.Collections.Generic;
+    using Data.EquipData;
+    using Enums;
+    using Modifiers;
+
+    /// <summary>Weapon-only block of a blueprint — the base combat stats the factory needs to news up
+    /// a <see cref="WeaponItem"/>.</summary>
+    public sealed record WeaponBlueprint(
+        WeaponType WeaponType,
+        Handedness Handedness,
+        float Damage,
+        float CriticalChance,
+        float CriticalDamage);
+
+    /// <summary>One base stat of a non-weapon equip (armor's evade, a ring's health): the piece's
+    /// reason to exist, typed — NOT an implicit line. The minter rolls the range once; local lines
+    /// then amplify the rolled base (the weapon-damage convention generalized).</summary>
+    public sealed record BaseStatBlueprint(EntityParameter Parameter, ValueRange Value);
+
+    /// <summary>Parsed grant spec. Modifier lines are shared templates: the factory mints fresh
+    /// instances per grant, so one blueprint safely feeds any number of items.</summary>
+    public sealed record GrantBlueprint(
+        GrantKind Kind,
+        string Id,
+        List<IModifier> Modifiers,
+        IReadOnlyDictionary<string, float> Properties);
+
+    /// <summary>The unmaterialized recipe of one equip item: authored lines stay descriptors (value
+    /// ranges unrolled) until <see cref="IEquipItemMinter"/> mints a concrete instance. Blueprints are
+    /// the ONLY representation of equip templates — they never enter the item dictionary, so no code
+    /// path can hand out a shared "template item" by mistake.</summary>
+    public sealed record EquipItemBlueprint
+    {
+        public required string Id { get; init; }
+        public EquipmentPiece Piece { get; init; }
+
+        /// <summary>Present only when <see cref="Piece"/> is <see cref="EquipmentPiece.Weapon"/>.</summary>
+        public WeaponBlueprint? Weapon { get; init; }
+
+        public Rarity Rarity { get; init; }
+        public string[] Tags { get; init; } = [];
+
+        /// <summary>Authored base gold price; the instance's gold value is computed by ItemValuation
+        /// on top of it (rarity/sharpening/ascension). 0 = unpriced (untradable).</summary>
+        public int BasePrice { get; init; }
+
+        /// <summary>Starting level spec: fixed (Min == Max) or a range the minter rolls.</summary>
+        public LevelRangeData UpdateLevel { get; init; }
+
+        public int MaxUpdateLevel { get; init; }
+
+        /// <summary>Base stat rolls; implicits below are reserved for the SPECIAL authored lines
+        /// (context knobs, unique flavor), never for the piece's plain defensive stats.</summary>
+        public IReadOnlyList<BaseStatBlueprint> BaseStats { get; init; } = [];
+
+        public IReadOnlyList<IModifierDescriptor> Implicits { get; init; } = [];
+        public IReadOnlyList<IModifierDescriptor> Modifiers { get; init; } = [];
+        public IReadOnlyList<GrantBlueprint> Grants { get; init; } = [];
+    }
+}

@@ -1,24 +1,25 @@
 ﻿namespace Battle.Source.UIElements
 {
-    using Godot;
     using Core.Enums;
-    using Core.Interfaces.UI;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events;
+    using Core.Views.UI;
+    using Godot;
 
-    [GlobalClass]
     public partial class StanceSlot : TextureButton, IInitializable
     {
-        private const string UID = "uid://0hxs4hjfeym6";
+        private const string UID = "uid://bke05jg0bjgy1";
 
         private IBattleEventBus? _battleEventBus;
-        private Stance _stance;
+        public Stance Stance { get; private set; }
 
         public override void _Ready() => Toggled += OnToggle;
 
+        // Stance passives at this point already activated, no need to raise OnToggle
+        public void InitializeStance() => ButtonPressed = true;
+
         public void SetBattleEventBus(IBattleEventBus battleEventBus) => _battleEventBus = battleEventBus;
 
-        public void SetStance(Stance stance) => _stance = stance;
+        public void SetStance(Stance stance) => Stance = stance;
 
         public void RemoveBattleEventBus() => _battleEventBus = null;
 
@@ -26,7 +27,7 @@
 
         private void OnToggle(bool toggledOn)
         {
-            if (toggledOn) _battleEventBus?.Publish<PlayerChangesStanceEvent>(new(_stance));
+            if (toggledOn) _battleEventBus?.Publish<PlayerChangesStanceEvent>(new(Stance));
         }
     }
 }

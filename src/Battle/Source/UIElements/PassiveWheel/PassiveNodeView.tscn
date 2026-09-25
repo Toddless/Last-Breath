@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://dnx5txabkc2ef"]
+
+[ext_resource type="Script" uid="uid://bnhfp0qdqvk1o" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeView.cs" id="1_view"]
+[ext_resource type="Shader" uid="uid://cooc5lr58d26b" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodePulse.gdshader" id="2_pulse"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pulse"]
+resource_local_to_scene = true
+shader = ExtResource("2_pulse")
+shader_parameter/glow_color = Color(0.941, 0.831, 0.537, 0.85)
+shader_parameter/intensity = 1.0
+shader_parameter/falloff = 2.4
+shader_parameter/pulse_speed = 1.5
+shader_parameter/pulse_strength = 0.28
+shader_parameter/phase = 0.0
+
+[sub_resource type="Gradient" id="Gradient_ring"]
+offsets = PackedFloat32Array(0, 0.62, 0.82, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="Ring_drop"]
+gradient = SubResource("Gradient_ring")
+width = 56
+height = 56
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="PassiveNodeView" type="Node2D" node_paths=PackedStringArray("_body", "_glow", "_socketMark", "_dropMark", "_fx")]
+script = ExtResource("1_view")
+_body = NodePath("Body")
+_glow = NodePath("Glow")
+_socketMark = NodePath("SocketMark")
+_dropMark = NodePath("DropMark")
+_fx = NodePath("Fx")
+
+[node name="Glow" type="Sprite2D" parent="."]
+visible = false
+material = SubResource("ShaderMaterial_pulse")
+
+[node name="Body" type="Sprite2D" parent="."]
+
+[node name="DropMark" type="Sprite2D" parent="."]
+visible = false
+texture = SubResource("Ring_drop")
+
+[node name="SocketMark" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(9, -9)
+
+[node name="Fx" type="AnimationPlayer" parent="."]

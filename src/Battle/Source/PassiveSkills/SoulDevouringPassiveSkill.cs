@@ -1,28 +1,42 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Skills;
+    using System.Collections.Generic;
+    using Core.Battle.Skills;
+    using Core.Entity;
+    using Core.Events;
 
     public class SoulDevouringPassiveSkill(float barrierRecoveryAmount)
-        : Skill(id: "Passive_Skill_SoulDevouring")
+        : Skill(id: "Passive_Skill_Soul_Devouring")
     {
-        public float BarrierRecoveryAmount { get; } = barrierRecoveryAmount;
-
-        public override void Attach(IEntity owner)
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
         {
-            Owner = owner;
-            Owner.CombatEvents.Subscribe<AbilityActivatedEvent>(OnAbilityActivatedEvent);
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(BarrierRecoveryAmount)] = BarrierRecoveryAmount,
+                };
+                return field;
+            }
         }
 
-        private void OnAbilityActivatedEvent(AbilityActivatedEvent evnt)
+        public float BarrierRecoveryAmount { get; } = barrierRecoveryAmount;
+
+        public override void Attach(IFightable owner)
+        {
+            Owner = owner;
+            Owner.CombatEvents.Subscribe<AbilityActivationEvent>(OnAbilityActivatedEvent);
+        }
+
+        private void OnAbilityActivatedEvent(AbilityActivationEvent evnt)
         {
             Owner?.CurrentBarrier += BarrierRecoveryAmount;
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
-            Owner?.CombatEvents.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivatedEvent);
+            Owner?.CombatEvents.Unsubscribe<AbilityActivationEvent>(OnAbilityActivatedEvent);
             Owner = null;
         }
 
@@ -32,7 +46,7 @@
         {
             if (skill is not SoulDevouringPassiveSkill soul) return false;
 
-            return soul.BarrierRecoveryAmount > BarrierRecoveryAmount;
+            return BarrierRecoveryAmount > soul.BarrierRecoveryAmount;
         }
     }
 }

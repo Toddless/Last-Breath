@@ -1,25 +1,46 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
+    using Core.Battle.Skills;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
     using Core.Modifiers;
 
     public class TrappedBeastPassiveSkill : Skill
     {
         private IModifierInstance _increaseDamageModifier;
 
-        public TrappedBeastPassiveSkill(float percentHealth, float percentBonus) : base(id: "Passive_Skill_Trapped_Beast")
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
         {
-            PercentHealth = percentHealth;
-            PercentBonus = percentBonus;
-            _increaseDamageModifier = new ModifierInstance(EntityParameter.Damage, ModifierType.Increase, 0f, this);
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(HealthPercent)] = HealthPercent,
+                    [nameof(DamageBonus)] = DamageBonus,
+                };
+                return field;
+            }
         }
 
-        public float PercentHealth { get; }
-        public float PercentBonus { get; }
+        public TrappedBeastPassiveSkill(float healthPercent, float damageBonus) : base(id: "Passive_Skill_Trapped_Beast")
+        {
+            HealthPercent = healthPercent;
+            DamageBonus = damageBonus;
+            _increaseDamageModifier = new SimpleModifier(EntityParameter.PhysicalDamage, ModifierValueType.Increase, 0f, InstanceId);
+        }
 
-        public override void Attach(IEntity owner)
+        public float HealthPercent { get; }
+        public float DamageBonus { get; }
+
+        /// <summary>Strength measure for collisions: both fields drive the effect and pull in opposite
+        /// directions — a SMALLER step (<see cref="HealthPercent"/>) fires more often, a bigger
+        /// <see cref="DamageBonus"/> pays more per step. Their ratio is the damage gained per unit
+        /// of missing health.</summary>
+        private float BonusPerLostHealth => HealthPercent > 0 ? DamageBonus / HealthPercent : 0;
+
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             Owner.CurrentHealthChanged += OnCurrentHealthChanged;
@@ -29,26 +50,27 @@
         {
             if (Owner == null) return;
             float percentLost = 1 - (currentHealth / Owner.Parameters.MaxHealth);
-            int steps = (int)(percentLost / PercentBonus);
-            float bonus = 1f + steps * PercentBonus;
-            _increaseDamageModifier.Value = bonus;
-            Owner.Modifiers.UpdatePermanentModifier(_increaseDamageModifier);
+            // Steps are counted by missing-health chunks; each step adds DamageBonus as an Increase
+            // (the component already sums increases on top of 1 — no manual "1 +" here).
+            int steps = (int)(percentLost / HealthPercent);
+            _increaseDamageModifier.Value = steps * DamageBonus;
+            Owner.ParameterModifiers.UpdateModifier(_increaseDamageModifier);
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
-            Owner?.Modifiers.RemovePermanentModifier(_increaseDamageModifier);
+            Owner?.ParameterModifiers.RemoveModifier(_increaseDamageModifier);
             Owner?.CurrentHealthChanged -= OnCurrentHealthChanged;
             Owner = null;
         }
 
-        public override ISkill Copy() => new TrappedBeastPassiveSkill(PercentHealth, PercentBonus);
+        public override ISkill Copy() => new TrappedBeastPassiveSkill(HealthPercent, DamageBonus);
 
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not TrappedBeastPassiveSkill beast) return false;
 
-            return beast.PercentHealth > PercentHealth;
+            return BonusPerLostHealth > beast.BonusPerLostHealth;
         }
     }
 }

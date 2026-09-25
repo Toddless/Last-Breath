@@ -5,33 +5,53 @@
 
     public static class EnumConverterExtension
     {
-        public static EquipmentCategory ConvertEquipmentPartToCategory(this EquipmentType equipment) => equipment switch
+        /// <summary>Statuses that make the fighter skip the action phase of the turn.</summary>
+        private const StatusEffects SkipTurnStatuses = StatusEffects.Stun | StatusEffects.Freeze;
+
+        /// <summary>Which of the fighter's statuses (if any) forces the turn to be skipped.</summary>
+        public static StatusEffects GetSkipTurnCause(this StatusEffects effects) => effects & SkipTurnStatuses;
+
+        public static EquipmentCategory ConvertEquipmentPartToCategory(this EquipmentPiece equipment) => equipment switch
         {
-            EquipmentType.Body => EquipmentCategory.Armor,
-            EquipmentType.Cloak => EquipmentCategory.Armor,
-            EquipmentType.Gloves => EquipmentCategory.Armor,
-            EquipmentType.Boots => EquipmentCategory.Armor,
-            EquipmentType.Helmet => EquipmentCategory.Armor,
-            EquipmentType.Amulet or EquipmentType.Belt or EquipmentType.Ring => EquipmentCategory.Jewellery,
-            EquipmentType.Weapon => EquipmentCategory.Weapon,
+            EquipmentPiece.Body => EquipmentCategory.Armor,
+            EquipmentPiece.Cloak => EquipmentCategory.Armor,
+            EquipmentPiece.Gloves => EquipmentCategory.Armor,
+            EquipmentPiece.Boots => EquipmentCategory.Armor,
+            EquipmentPiece.Helmet => EquipmentCategory.Armor,
+            EquipmentPiece.Amulet or EquipmentPiece.Belt or EquipmentPiece.Ring or EquipmentPiece.Ring2 => EquipmentCategory.Jewellery,
+            EquipmentPiece.Weapon => EquipmentCategory.Weapon,
             _ => throw new ArgumentOutOfRangeException(nameof(equipment))
         };
 
+        /// <summary>The paperdoll has two ring SLOTS while ring items all carry the single Ring
+        /// piece: a slot key maps back to the item piece it accepts.</summary>
+        public static EquipmentPiece AcceptedItemPiece(this EquipmentPiece slot) =>
+            slot == EquipmentPiece.Ring2 ? EquipmentPiece.Ring : slot;
+
+        /// <summary>Creation-rune floor: lower enum value = better, so the roll is raised to the floor
+        /// (Math.Min over the enum value) when worse and left untouched when already better.</summary>
+        public static Rarity ApplyRarityFloor(this Rarity rolled, Rarity? minRarity) =>
+            minRarity == null ? rolled : (Rarity)Math.Min((byte)rolled, (byte)minRarity.Value);
+
+        /// <summary>Damage bucket a status ticks in. Anything without a bucket of its own falls back to
+        /// Physical: an unnamed DoT must answer to armor rather than tick as unmitigable sacred damage.</summary>
         public static DamageType GetDamageType(this StatusEffects effect) => effect switch
         {
             StatusEffects.Bleed => DamageType.Bleed,
             StatusEffects.Burning => DamageType.Burning,
             StatusEffects.Poison => DamageType.Poison,
-            _ => DamageType.Normal
+            _ => DamageType.Physical
         };
 
-        public static int ConvertRarityToItemModifierAmount(this Rarity rarity) => rarity switch
+        public static float ConvertEntityTypeToThresholdPenalty(this EntityType type) => type switch
         {
-            Rarity.Uncommon => 1,
-            Rarity.Rare => 2,
-            Rarity.Epic => 3,
-            Rarity.Legendary => 4,
-            _ => 0
+            EntityType.Regular => 0f,
+            EntityType.Special => 0.05f,
+            EntityType.Elit => 0.1f,
+            EntityType.Unique => 0.15f,
+            EntityType.Boss => 0.20f,
+            EntityType.Archon => 0.25f,
+            _ => 0f
         };
 
         public static Key GetKeyAssociatedWithNumber(this int number) => number switch

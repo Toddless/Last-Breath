@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://bd5wylwyowomd"]
+
+[ext_resource type="Script" uid="uid://cnvk83d3n3xme" path="res://UI/MainMenu.cs" id="1_cb7iu"]
+
+[node name="MainMenu" type="Control" unique_id=2097762818 node_paths=PackedStringArray("_newGameButton", "_optionsButton", "_quitButton", "_loadGameButton")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_cb7iu")
+_newGameButton = NodePath("Center/Column/Buttons/NewGameBtn")
+_optionsButton = NodePath("Center/Column/Buttons/OptionsBtn")
+_quitButton = NodePath("Center/Column/Buttons/QuitBtn")
+_loadGameButton = NodePath("Center/Column/Buttons/LoadGameBtn")
+
+[node name="Background" type="ColorRect" parent="." unique_id=962102573]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.043, 0.037, 0.031, 1)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=106461465]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Column" type="VBoxContainer" parent="Center" unique_id=1846867133]
+layout_mode = 2
+theme_override_constants/separation = 56
+
+[node name="Title" type="Label" parent="Center/Column" unique_id=2050166016]
+layout_mode = 2
+theme_type_variation = &"ScreenTitleLabel"
+text = "Last Breath"
+horizontal_alignment = 1
+
+[node name="Buttons" type="VBoxContainer" parent="Center/Column" unique_id=737394355]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 10
+
+[node name="NewGameBtn" type="Button" parent="Center/Column/Buttons" unique_id=1477017556]
+custom_minimum_size = Vector2(300, 46)
+layout_mode = 2
+focus_mode = 0
+text = "New Game"
+
+[node name="LoadGameBtn" type="Button" parent="Center/Column/Buttons" unique_id=1219089265]
+custom_minimum_size = Vector2(300, 46)
+layout_mode = 2
+focus_mode = 0
+text = "Load Game"
+
+[node name="OptionsBtn" type="Button" parent="Center/Column/Buttons" unique_id=1225572265]
+custom_minimum_size = Vector2(300, 46)
+layout_mode = 2
+focus_mode = 0
+text = "Options"
+
+[node name="QuitBtn" type="Button" parent="Center/Column/Buttons" unique_id=1127049516]
+custom_minimum_size = Vector2(300, 46)
+layout_mode = 2
+focus_mode = 0
+text = "Quit"

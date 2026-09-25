@@ -1,0 +1,93 @@
+[gd_scene format=3 uid="uid://boqqyrt0sfpve"]
+
+[ext_resource type="PackedScene" path="res://World/Interactions/UI/InteractionHint.tscn" id="interaction_hint"]
+
+[ext_resource type="Script" uid="uid://dw5w7qvskr8b4" path="res://UI/PlayerHud.cs" id="1_22o70"]
+[ext_resource type="PackedScene" uid="uid://bqsttrk1hud4a" path="res://UI/View/QuestTracker.tscn" id="2_l0x06"]
+[ext_resource type="PackedScene" uid="uid://cv5svhrugien6" path="res://Addons/Battle/UIElements/CharacterHealthBar.tscn" id="3_20ugx"]
+
+[node name="PlayerHUD" type="Control" unique_id=1086659813 node_paths=PackedStringArray("_characterBtn", "_inventoryBtn", "_questsBtn", "_craftingBtn", "_clock", "_playerBar")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_22o70")
+_characterBtn = NodePath("Margin/Buttons/Character")
+_inventoryBtn = NodePath("Margin/Buttons/Inventory")
+_questsBtn = NodePath("Margin/Buttons/Quests")
+_craftingBtn = NodePath("Margin/Buttons/Crafting")
+_clock = NodePath("Margin/VBoxContainer/Clock")
+_playerBar = NodePath("Margin/VBoxContainer/CharacterHealthBar")
+
+[node name="InteractionHint" parent="." instance=ExtResource("interaction_hint")]
+layout_mode = 0
+
+[node name="QuestTracker" parent="." unique_id=941207267 instance=ExtResource("2_l0x06")]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -320.0
+offset_bottom = -320.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=261690111]
+z_index = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin" unique_id=1647945758]
+layout_mode = 2
+
+[node name="CharacterHealthBar" parent="Margin/VBoxContainer" unique_id=788449146 instance=ExtResource("3_20ugx")]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Clock" type="Label" parent="Margin/VBoxContainer" unique_id=805301505]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_type_variation = &"DimLabel"
+text = "Clock"
+
+[node name="Buttons" type="HBoxContainer" parent="Margin" unique_id=1522956462]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_constants/separation = 6
+
+[node name="Character" type="Button" parent="Margin/Buttons" unique_id=2008808185]
+layout_mode = 2
+focus_mode = 0
+text = "Character"
+
+[node name="Inventory" type="Button" parent="Margin/Buttons" unique_id=1162984409]
+layout_mode = 2
+focus_mode = 0
+text = "Inventory"
+
+[node name="Quests" type="Button" parent="Margin/Buttons" unique_id=809972642]
+layout_mode = 2
+focus_mode = 0
+text = "Quests"
+
+[node name="Crafting" type="Button" parent="Margin/Buttons" unique_id=1633662129]
+layout_mode = 2
+focus_mode = 0
+text = "Crafting"

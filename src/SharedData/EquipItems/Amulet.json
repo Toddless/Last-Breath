@@ -1,0 +1,437 @@
+{
+    "items": [
+        {
+            "id": "Amulet_Lazurite",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Intelligence",
+                    "value": {
+                        "min": 11,
+                        "max": 17
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Garnet",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Strength",
+                    "value": {
+                        "min": 11,
+                        "max": 17
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Malachite_Medallion",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Dexterity",
+                    "value": {
+                        "min": 11,
+                        "max": 17
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Trinity",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "AllAttribute",
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Pathfinder_Sign",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Dexterity",
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    }
+                },
+                {
+                    "parameter": "Intelligence",
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Trapper_Talisman",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Dexterity",
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    }
+                },
+                {
+                    "parameter": "Strength",
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Symbol_Of_Faith",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Intelligence",
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    }
+                },
+                {
+                    "parameter": "Strength",
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Recovery_Source",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "HealthRecovery",
+                    "value": {
+                        "min": 10,
+                        "max": 25
+                    }
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "value": {
+                        "min": 5,
+                        "max": 20
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Diamond",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Mana",
+                    "value": {
+                        "min": 100,
+                        "max": 250
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Ruby",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Health",
+                    "value": {
+                        "min": 150,
+                        "max": 300
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Onyx_Medallion",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Health",
+                    "value": {
+                        "min": 50,
+                        "max": 150
+                    }
+                },
+                {
+                    "parameter": "Mana",
+                    "value": {
+                        "min": 25,
+                        "max": 125
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Goliath_Seal",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Unique",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 300,
+                        "max": 500
+                    }
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 15,
+                        "max": 25
+                    }
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.2,
+                        "max": 0.3
+                    }
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.2,
+                        "max": 0.3
+                    }
+                }
+            ],
+            "grants": [
+                {
+                    "kind": "Passive",
+                    "id": "Passive_Skill_Current_Health_Regeneration",
+                    "properties": {
+                        "percentFromCurrentHealth": 0.05
+                    }
+                }
+            ]
+        },
+        {
+            "id": "Amulet_Creators_Nature",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "basePrice": 70,
+            "rarity": "Mythic",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 300,
+                        "max": 500
+                    }
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 400,
+                        "max": 800
+                    }
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 150,
+                        "max": 280
+                    }
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "FireResistance",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.45
+                    }
+                },
+                {
+                    "parameter": "LightningResistance",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.45
+                    }
+                },
+                {
+                    "parameter": "ColdResistance",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.45
+                    }
+                }
+            ],
+            "grants": [
+                {
+                    "kind": "Passive",
+                    "id": "Passive_Skill_Creators_Nature",
+                    "properties": {
+                        "manaRecovery": 0.05,
+                        "healthRecovery": 0.05,
+                        "recoveryEfficiency": 0.35
+                    }
+                }
+            ]
+        }
+    ]
+}

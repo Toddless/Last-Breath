@@ -1,0 +1,120 @@
+[gd_scene format=3 uid="uid://cix0yesodqrxr"]
+
+[ext_resource type="Script" uid="uid://b4rx6pujdtcga" path="res://UI/TradeWindow.cs" id="1_jmo3o"]
+[ext_resource type="PackedScene" uid="uid://q1mb3d00x8m8" path="res://Addons/SharedUi/WindowHeader.tscn" id="2_whead"]
+[ext_resource type="PackedScene" uid="uid://buwn6bbogk42v" path="res://Addons/SharedUi/SectionHeader.tscn" id="3_shead"]
+[ext_resource type="PackedScene" uid="uid://bxk3q7v2tgsh5" path="res://UI/Modules/GoodsShelf.tscn" id="4_gshelf"]
+[ext_resource type="PackedScene" uid="uid://cq5m8w3nde2lp" path="res://UI/Modules/DealColumn.tscn" id="5_dealc"]
+[ext_resource type="PackedScene" uid="uid://bbaggr5idw2n0" path="res://Addons/SharedUi/BagGrid.tscn" id="6_bgrid"]
+
+[node name="TradeWindow" type="Control" node_paths=PackedStringArray("_header", "_restockLabel", "_showcaseHeader", "_dealHeader", "_bagHeader", "_goodsShelf", "_dealColumn", "_bagGrid", "_sellHint", "_goldFooter", "_restockTimer")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_jmo3o")
+_header = NodePath("Center/Panel/Margin/Layout/Header")
+_restockLabel = NodePath("Center/Panel/Margin/Layout/Header/Restock")
+_showcaseHeader = NodePath("Center/Panel/Margin/Layout/Body/ShowcasePane/ShowcaseHeader")
+_dealHeader = NodePath("Center/Panel/Margin/Layout/Body/DealPane/DealHeader")
+_bagHeader = NodePath("Center/Panel/Margin/Layout/Body/BagPane/BagHeaderRow/BagHeader")
+_goodsShelf = NodePath("Center/Panel/Margin/Layout/Body/ShowcasePane/GoodsShelf")
+_dealColumn = NodePath("Center/Panel/Margin/Layout/Body/DealPane/DealColumn")
+_bagGrid = NodePath("Center/Panel/Margin/Layout/Body/BagPane/BagGrid")
+_sellHint = NodePath("Center/Panel/Margin/Layout/Body/BagPane/BagHeaderRow/SellHint")
+_goldFooter = NodePath("Center/Panel/Margin/Layout/Body/BagPane/GoldFooter")
+_restockTimer = NodePath("RestockTimer")
+
+[node name="RestockTimer" type="Timer" parent="."]
+autostart = true
+
+[node name="Center" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(1600, 760)
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"UmbralWindowPanel"
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Layout" type="VBoxContainer" parent="Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" parent="Center/Panel/Margin/Layout" instance=ExtResource("2_whead")]
+layout_mode = 2
+
+[node name="Restock" type="Label" parent="Center/Panel/Margin/Layout/Header" index="1"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ValueLabel"
+
+[node name="Body" type="HBoxContainer" parent="Center/Panel/Margin/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="ShowcasePane" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ShowcaseHeader" parent="Center/Panel/Margin/Layout/Body/ShowcasePane" instance=ExtResource("3_shead")]
+layout_mode = 2
+
+[node name="GoodsShelf" parent="Center/Panel/Margin/Layout/Body/ShowcasePane" instance=ExtResource("4_gshelf")]
+layout_mode = 2
+
+[node name="DealPane" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DealHeader" parent="Center/Panel/Margin/Layout/Body/DealPane" instance=ExtResource("3_shead")]
+layout_mode = 2
+
+[node name="DealColumn" parent="Center/Panel/Margin/Layout/Body/DealPane" instance=ExtResource("5_dealc")]
+layout_mode = 2
+
+[node name="BagPane" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BagHeaderRow" type="HBoxContainer" parent="Center/Panel/Margin/Layout/Body/BagPane"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BagHeader" parent="Center/Panel/Margin/Layout/Body/BagPane/BagHeaderRow" instance=ExtResource("3_shead")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SellHint" type="Label" parent="Center/Panel/Margin/Layout/Body/BagPane/BagHeaderRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"DimLabel"
+
+[node name="BagGrid" parent="Center/Panel/Margin/Layout/Body/BagPane" instance=ExtResource("6_bgrid")]
+layout_mode = 2
+vertical_scroll_mode = 2
+_columns = 8
+
+[node name="GoldFooter" type="Label" parent="Center/Panel/Margin/Layout/Body/BagPane"]
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+horizontal_alignment = 2

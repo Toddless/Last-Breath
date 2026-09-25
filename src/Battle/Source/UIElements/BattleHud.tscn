@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://6d0sr4hy4gg2"]
+
+[ext_resource type="Script" uid="uid://cdpdw7f753nlg" path="res://Addons/Battle/UIElements/BattleHud.cs" id="1_qll2p"]
+[ext_resource type="PackedScene" uid="uid://cv5svhrugien6" path="res://Addons/Battle/UIElements/CharacterHealthBar.tscn" id="2_5gjf2"]
+[ext_resource type="PackedScene" uid="uid://cpnxcv1yd5d7g" path="res://Addons/Battle/UIElements/BattleLog.tscn" id="3_blog"]
+
+[node name="BattleHud" type="Control" unique_id=745766495 node_paths=PackedStringArray("_buttonsContainer", "_playerBars", "_stanceButtons", "_battleLog", "_entityBars", "_abilitySlots", "_queueContainer")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_qll2p")
+_buttonsContainer = NodePath("VBoxContainer")
+_playerBars = NodePath("CharacterHealthBar")
+_stanceButtons = NodePath("VBoxContainer/StanceSlots")
+_battleLog = NodePath("BattleLog")
+_entityBars = NodePath("HBoxContainer")
+_abilitySlots = NodePath("VBoxContainer/AbilitySlots")
+_queueContainer = NodePath("Queue")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=284745788]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -40.0
+offset_right = 20.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="StanceSlots" type="HBoxContainer" parent="VBoxContainer" unique_id=1680529311]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="AbilitySlots" type="HBoxContainer" parent="VBoxContainer" unique_id=1938591861]
+layout_mode = 2
+
+[node name="CharacterHealthBar" parent="." unique_id=2145971479 instance=ExtResource("2_5gjf2")]
+layout_mode = 0
+
+[node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=653788985]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -348.0
+offset_top = 8.0
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 1
+theme_override_constants/separation = 8
+
+[node name="BattleLog" parent="." unique_id=653788986 instance=ExtResource("3_blog")]
+layout_mode = 1
+anchors_preset = 2
+anchor_left = 0.0
+anchor_right = 0.0
+offset_top = -280.0
+offset_right = 523.0
+grow_horizontal = 1
+
+[node name="Queue" type="HBoxContainer" parent="." unique_id=1718805809]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 40.0
+grow_horizontal = 2

@@ -1,0 +1,90 @@
+[gd_scene format=3 uid="uid://b03h1pcqbp3iw"]
+
+[ext_resource type="Script" uid="uid://eavxx2vl1dkg" path="res://UI/PauseMenu.cs" id="1_dbrtl"]
+
+[node name="PauseMenu" type="Control" unique_id=1344895412 node_paths=PackedStringArray("_continueBtn", "_saveLoadBtn", "_optionsBtn", "_mainMenuBtn", "_exitBtn")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dbrtl")
+_continueBtn = NodePath("Center/Panel/Margin/Column/ContinueBtn")
+_saveLoadBtn = NodePath("Center/Panel/Margin/Column/SaveLoadBtn")
+_optionsBtn = NodePath("Center/Panel/Margin/Column/OptionsBtn")
+_mainMenuBtn = NodePath("Center/Panel/Margin/Column/MainMenuBtn")
+_exitBtn = NodePath("Center/Panel/Margin/Column/ExitBtn")
+
+[node name="Dim" type="ColorRect" parent="." unique_id=144283120]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=1251029660]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=234071876]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_type_variation = &"UmbralWindowPanel"
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=126230307]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Column" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=302360582]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Center/Panel/Margin/Column" unique_id=1591428402]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+text = "Paused"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="Center/Panel/Margin/Column" unique_id=1644225308]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+
+[node name="ContinueBtn" type="Button" parent="Center/Panel/Margin/Column" unique_id=1293430988]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+focus_mode = 0
+text = "Continue"
+
+[node name="SaveLoadBtn" type="Button" parent="Center/Panel/Margin/Column" unique_id=1885015691]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+focus_mode = 0
+text = "Save / Load"
+
+[node name="OptionsBtn" type="Button" parent="Center/Panel/Margin/Column" unique_id=1008068150]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+focus_mode = 0
+text = "Options"
+
+[node name="MainMenuBtn" type="Button" parent="Center/Panel/Margin/Column" unique_id=201077447]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+focus_mode = 0
+text = "Main Menu"
+
+[node name="ExitBtn" type="Button" parent="Center/Panel/Margin/Column" unique_id=1020633467]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+focus_mode = 0
+text = "Quit"

@@ -8,10 +8,15 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="Battle"
-config/features=PackedStringArray("4.5", "C#", "Forward Plus")
+run/main_scene="uid://bq1xb76glxis1"
+config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
 
@@ -24,6 +29,10 @@ window/stretch/mode="canvas_items"
 [dotnet]
 
 project/assembly_name="Battle"
+
+[gui]
+
+theme/custom="res://Data/Shared/Assets/UI/Theme.tres"
 
 [input]
 
@@ -62,4 +71,4 @@ ui_down={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://Source/Localization/en.po")
+locale/translations=PackedStringArray("res://Data/Shared/Localization/en.po", "res://Data/Shared/Localization/ru.po")

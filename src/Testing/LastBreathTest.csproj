@@ -1,7 +1,7 @@
 <Project Sdk="MSTest.Sdk/3.6.1">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>
@@ -20,7 +20,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Battle\Battle.csproj" />
     <ProjectReference Include="..\Crafting\Crafting.csproj" />
-    <ProjectReference Include="..\Last Breath\LastBreath.csproj" />
+    <ProjectReference Include="..\LootGeneration\LootGeneration.csproj" />
+    <ProjectReference Include="..\Tooling\LastBreath.Descriptors\LastBreath.Descriptors.csproj" />
+    <ProjectReference Include="..\Tooling\Tooling.Core\Tooling.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,6 +50,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="LootSimulation\Reports\" />
   </ItemGroup>
 
 

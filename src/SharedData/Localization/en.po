@@ -1,0 +1,5020 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en\n"
+
+# -----------------------
+# Equip items
+# -----------------------
+
+msgid "Weapon_Bloodthirsty"
+msgstr "Bloodthirsty"
+
+msgid "Weapon_Bloodthirsty_Description"
+msgstr ""
+
+msgid "Weapon_Silent_Fury"
+msgstr "Silent Fury"
+
+msgid "Weapon_Silent_Fury_Description"
+msgstr ""
+
+msgid "Amulet_Creators_Nature"
+msgstr "Creator`s Nature"
+
+msgid "Amulet_Creators_Nature_Description"
+msgstr ""
+
+msgid "Amulet_Diamond"
+msgstr "Diamond Amulet"
+
+msgid "Amulet_Diamond_Description"
+msgstr ""
+
+msgid "Amulet_Goliath_Seal"
+msgstr "Goliath's Seal"
+
+msgid "Amulet_Goliath_Seal_Description"
+msgstr ""
+
+msgid "Belt_Creators_Core"
+msgstr "Creator's Core"
+
+msgid "Belt_Creators_Core_Description"
+msgstr ""
+
+msgid "Body_Porcupine"
+msgstr "Porcupine"
+
+msgid "Body_Porcupine_Description"
+msgstr ""
+
+msgid "Body_Carapace"
+msgstr "Carapace Armor"
+
+msgid "Body_Carapace_Description"
+msgstr ""
+
+msgid "Body_Strong_Spirit"
+msgstr "Strong of Spirit"
+
+msgid "Body_Strong_Spirit_Description"
+msgstr ""
+
+msgid "Body_Creators_Vestment"
+msgstr "Creator's Vestment"
+
+msgid "Body_Creators_Vestment_Description"
+msgstr ""
+
+msgid "Boots_Talaria"
+msgstr "Talaria"
+
+msgid "Boots_Talaria_Description"
+msgstr ""
+
+msgid "Boots_Rebirth_Tread"
+msgstr "Tread of Rebirth"
+
+msgid "Boots_Rebirth_Tread_Description"
+msgstr ""
+
+msgid "Boots_Creators_Trace"
+msgstr "Creator's Trace"
+
+msgid "Boots_Creators_Trace_Description"
+msgstr "Quite worn, consisting mostly of patches. It is impossible to determine the original color."
+
+msgid "Cloak_Simple"
+msgstr "Simple Cape"
+
+msgid "Cloak_Simple_Description"
+msgstr ""
+
+msgid "Cloak_Direwolf_Hide"
+msgstr "Direwolf Hide Cloak"
+
+msgid "Cloak_Direwolf_Hide_Description"
+msgstr ""
+
+msgid "Cloak_Dark_Priest"
+msgstr "Dark Priest's Cloak"
+
+msgid "Cloak_Dark_Priest_Description"
+msgstr ""
+
+msgid "Cloak_Light_Priest"
+msgstr "Light Priest's Cloak"
+
+msgid "Cloak_Light_Priest_Description"
+msgstr ""
+
+msgid "Cloak_Eternal_Life_Shroud"
+msgstr "Shroud of Eternal Life"
+
+msgid "Cloak_Eternal_Life_Shroud_Description"
+msgstr ""
+
+msgid "Cloak_Creators_Cassock"
+msgstr "Creator's Cassock"
+
+msgid "Cloak_Creators_Cassock_Description"
+msgstr ""
+
+msgid "Gloves_Fortune_Smile"
+msgstr "Fortune's Smile"
+
+msgid "Gloves_Fortune_Smile_Description"
+msgstr ""
+
+msgid "Gloves_Titan_Hand"
+msgstr "Hand of the Titan"
+
+msgid "Gloves_Titan_Hand_Description"
+msgstr ""
+
+msgid "Gloves_Crushing_Grip"
+msgstr "Crushing Grip"
+
+msgid "Gloves_Crushing_Grip_Description"
+msgstr ""
+
+msgid "Gloves_Flawlessness"
+msgstr "Flawlessness"
+
+msgid "Gloves_Flawlessness_Description"
+msgstr ""
+
+msgid "Gloves_Creators_Hand"
+msgstr "Creator's Hand"
+
+msgid "Gloves_Creators_Hand_Description"
+msgstr "Although, can two pieces of fabric sewn together with holes for the fingers really be called gloves?"
+
+msgid "Helmet_Creators_Crown"
+msgstr "Creator's Crown"
+
+msgid "Helmet_Creators_Crown_Description"
+msgstr ""
+
+msgid "Ring_Of_Fire_Demon"
+msgstr "Fire Demon's Finger"
+
+msgid "Ring_Of_Fire_Demon_Description"
+msgstr ""
+
+msgid "Ring_Hell_Servant"
+msgstr "Seal of Hel's Servant"
+
+msgid "Ring_Hell_Servant_Description"
+msgstr ""
+
+msgid "Ring_Submittion_Mark"
+msgstr "Mark of the Resigned"
+
+msgid "Ring_Submittion_Mark_Description"
+msgstr ""
+
+msgid "Ring_of_Creators"
+msgstr "Creator's Finger"
+
+msgid "Ring_of_Creators_Description"
+msgstr "An ancient artifact that has absorbed the power of the creator himself"
+
+msgid "Weapon_Simple_Dagger"
+msgstr "Simple Dagger"
+
+msgid "Weapon_Simple_Dagger_Description"
+msgstr ""
+
+msgid "Weapon_Simple_Axe"
+msgstr "Simple Axe"
+
+msgid "Weapon_Simple_Axe_Description"
+msgstr ""
+
+msgid "Weapon_Simple_Sword"
+msgstr "Simple Sword"
+
+msgid "Weapon_Simple_Sword_Description"
+msgstr ""
+
+msgid "Weapon_Simple_Wand"
+msgstr "Simple Wand"
+
+msgid "Weapon_Simple_Wand_Description"
+msgstr ""
+
+msgid "Weapon_Righteous_Wrath"
+msgstr "Righteous Wrath"
+
+msgid "Weapon_Righteous_Wrath_Description"
+msgstr ""
+
+msgid "Weapon_All_Cutting"
+msgstr "All-Cutting"
+
+msgid "Weapon_All_Cutting_Description"
+msgstr ""
+
+msgid "Amulet_Recovery_Source"
+msgstr "Source of Recovery"
+
+msgid "Amulet_Recovery_Source_Description"
+msgstr ""
+
+msgid "Amulet_Onyx_Medallion"
+msgstr "Onyx Medallion"
+
+msgid "Amulet_Onyx_Medallion_Description"
+msgstr ""
+
+msgid "Amulet_Ruby"
+msgstr "Ruby Amulet"
+
+msgid "Amulet_Ruby_Description"
+msgstr ""
+
+msgid "Amulet_Lazurite"
+msgstr "Lazurite Amulet"
+
+msgid "Amulet_Lazurite_Description"
+msgstr ""
+
+msgid "Amulet_Garnet"
+msgstr "Garnet Amulet"
+
+msgid "Amulet_Garnet_Description"
+msgstr ""
+
+msgid "Amulet_Malachite_Medallion"
+msgstr "Malachite Medallion"
+
+msgid "Amulet_Malachite_Medallion_Description"
+msgstr ""
+
+msgid "Amulet_Trinity"
+msgstr "Amulet of Trinity"
+
+msgid "Amulet_Trinity_Description"
+msgstr ""
+
+msgid "Amulet_Pathfinder_Sign"
+msgstr "Pathfinder's Mark"
+
+msgid "Amulet_Pathfinder_Sign_Description"
+msgstr ""
+
+msgid "Amulet_Trapper_Talisman"
+msgstr "Trapper's Talisman"
+
+msgid "Amulet_Trapper_Talisman_Description"
+msgstr ""
+
+msgid "Amulet_Symbol_Of_Faith"
+msgstr "Symbol of Faith"
+
+msgid "Amulet_Symbol_Of_Faith_Description"
+msgstr ""
+
+msgid "Ring_Dwarven_Signet"
+msgstr "Dwarven Signet"
+
+msgid "Ring_Dwarven_Signet_Description"
+msgstr ""
+
+msgid "Ring_Dexterity"
+msgstr "Ring of Dexterity"
+
+msgid "Ring_Dexterity_Description"
+msgstr ""
+
+msgid "Ring_Intelligence"
+msgstr "Ring of Intelligence"
+
+msgid "Ring_Intelligence_Description"
+msgstr ""
+
+msgid "Ring_Of_Limitless_Magic"
+msgstr "Ring of Limitless Magic"
+
+msgid "Ring_Of_Limitless_Magic_Description"
+msgstr ""
+
+msgid "Ring_Minor_Barrier"
+msgstr "Minor Barrier"
+
+msgid "Ring_Minor_Barrier_Description"
+msgstr ""
+
+msgid "Ring_Archmage_Signet"
+msgstr "Archmage's Signet"
+
+msgid "Ring_Archmage_Signet_Description"
+msgstr ""
+
+msgid "Ring_of_Hunter"
+msgstr "Ring of the Hunter"
+
+msgid "Ring_of_Hunter_Description"
+msgstr ""
+
+msgid "Ring_of_Assassin"
+msgstr "Ring of the Assassin"
+
+msgid "Ring_of_Assassin_Description"
+msgstr ""
+
+msgid "Ring_of_Trickster"
+msgstr "Ring of the Trickster"
+
+msgid "Ring_of_Trickster_Description"
+msgstr ""
+
+msgid "Ring_of_Knight"
+msgstr "Ring of the Knight"
+
+msgid "Ring_of_Knight_Description"
+msgstr ""
+
+msgid "Ring_Of_Legionnaire"
+msgstr "Ring of the Legionnaire"
+
+msgid "Ring_Of_Legionnaire_Description"
+msgstr ""
+
+msgid "Ring_of_Giant"
+msgstr "Ring of the Giant"
+
+msgid "Ring_of_Giant_Description"
+msgstr ""
+
+# -----------------------
+# Equip items — Belts
+# -----------------------
+
+msgid "Belt_Leather"
+msgstr "Leather Belt"
+
+msgid "Belt_Leather_Description"
+msgstr ""
+
+msgid "Belt_Scout_Sash"
+msgstr "Scout's Sash"
+
+msgid "Belt_Scout_Sash_Description"
+msgstr ""
+
+msgid "Belt_Cloth"
+msgstr "Cloth Belt"
+
+msgid "Belt_Cloth_Description"
+msgstr ""
+
+msgid "Belt_of_Hunter"
+msgstr "Hunter's Belt"
+
+msgid "Belt_of_Hunter_Description"
+msgstr ""
+
+msgid "Belt_of_Knight"
+msgstr "Knight's Belt"
+
+msgid "Belt_of_Knight_Description"
+msgstr ""
+
+msgid "Belt_of_Inquisitor"
+msgstr "Inquisitor's Belt"
+
+msgid "Belt_of_Inquisitor_Description"
+msgstr ""
+
+msgid "Belt_Of_Life"
+msgstr "Belt of Life"
+
+msgid "Belt_Life_Flow"
+msgstr "Flow of Life"
+
+msgid "Belt_Life_Flow_Description"
+msgstr ""
+
+msgid "Belt_Mana_Flow"
+msgstr "Flow of Mana"
+
+msgid "Belt_Mana_Flow_Description"
+msgstr ""
+
+msgid "Belt_Ether_Flow"
+msgstr "Flow of Ether"
+
+msgid "Belt_Ether_Flow_Description"
+msgstr ""
+
+msgid "Body_Disaster_Herald"
+msgstr "Herald of Disaster"
+
+msgid "Body_Disaster_Herald_Description"
+msgstr ""
+
+msgid "Body_Ice_Mage"
+msgstr "Ice Mage's Armor"
+
+msgid "Body_Ice_Mage_Description"
+msgstr ""
+
+msgid "Belt_Of_Life_Description"
+msgstr ""
+
+# -----------------------
+# Equip items — Body armor
+# -----------------------
+
+msgid "Body_Stoneheart"
+msgstr "Stoneheart"
+
+msgid "Body_Stoneheart_Description"
+msgstr ""
+
+msgid "Body_Steel"
+msgstr "Steel Bastion"
+
+msgid "Body_Steel_Description"
+msgstr ""
+
+msgid "Body_Vital_Core"
+msgstr "Vital Core"
+
+msgid "Body_Vital_Core_Description"
+msgstr ""
+
+msgid "Body_Hunter_Chestplate"
+msgstr "Hunter's Chestplate"
+
+msgid "Body_Hunter_Chestplate_Description"
+msgstr ""
+
+msgid "Body_Hunters_Dream"
+msgstr "Hunter's Dream"
+
+msgid "Body_Hunters_Dream_Description"
+msgstr ""
+
+msgid "Body_Feral_Instinct"
+msgstr "Feral Instinct"
+
+msgid "Body_Feral_Instinct_Description"
+msgstr ""
+
+msgid "Body_Archmage_Mantle"
+msgstr "Archmage's Mantle"
+
+msgid "Body_Archmage_Mantle_Description"
+msgstr ""
+
+msgid "Body_Mysterious_Bastion"
+msgstr "Mysterious Bastion"
+
+msgid "Body_Mysterious_Bastion_Description"
+msgstr ""
+
+msgid "Body_Aegis"
+msgstr "Aegis"
+
+msgid "Body_Aegis_Description"
+msgstr ""
+
+# -----------------------
+# Equip items — Helmets
+# -----------------------
+
+msgid "Helmet_Stoneheart"
+msgstr "Stoneheart"
+
+msgid "Helmet_Stoneheart_Description"
+msgstr ""
+
+msgid "Helmet_Steel"
+msgstr "Steel Helmet"
+
+msgid "Helmet_Steel_Description"
+msgstr ""
+
+msgid "Helmet_Vital_Core"
+msgstr "Vital Core"
+
+msgid "Helmet_Vital_Core_Description"
+msgstr ""
+
+msgid "Helmet_Hunter"
+msgstr "Hunter's Helmet"
+
+msgid "Helmet_Hunter_Description"
+msgstr ""
+
+msgid "Helmet_Hunters_Dream"
+msgstr "Hunter's Dream"
+
+msgid "Helmet_Hunters_Dream_Description"
+msgstr ""
+
+msgid "Helmet_Feral_Instinct"
+msgstr "Feral Instinct"
+
+msgid "Helmet_Feral_Instinct_Description"
+msgstr ""
+
+msgid "Helmet_Archmage_Cap"
+msgstr "Archmage's Cap"
+
+msgid "Helmet_Archmage_Cap_Description"
+msgstr ""
+
+msgid "Helmet_Mysterious_Bastion"
+msgstr "Mysterious Bastion"
+
+msgid "Helmet_Mysterious_Bastion_Description"
+msgstr ""
+
+msgid "Helmet_Aegis"
+msgstr "Aegis"
+
+msgid "Helmet_Aegis_Description"
+msgstr ""
+
+# -----------------------
+# Equip items — Gloves
+# -----------------------
+
+msgid "Gloves_Stoneheart"
+msgstr "Stoneheart"
+
+msgid "Gloves_Stoneheart_Description"
+msgstr ""
+
+msgid "Gloves_Steel"
+msgstr "Steel Gloves"
+
+msgid "Gloves_Steel_Description"
+msgstr ""
+
+msgid "Gloves_Vital_Core"
+msgstr "Vital Core"
+
+msgid "Gloves_Vital_Core_Description"
+msgstr ""
+
+msgid "Gloves_Hunter"
+msgstr "Hunter's Gloves"
+
+msgid "Gloves_Hunter_Description"
+msgstr ""
+
+msgid "Gloves_Hunters_Dream"
+msgstr "Hunter's Dream"
+
+msgid "Gloves_Hunters_Dream_Description"
+msgstr ""
+
+msgid "Gloves_Feral_Instinct"
+msgstr "Feral Instinct"
+
+msgid "Gloves_Feral_Instinct_Description"
+msgstr ""
+
+msgid "Gloves_Archmage"
+msgstr "Archmage's Gloves"
+
+msgid "Gloves_Archmage_Description"
+msgstr ""
+
+msgid "Gloves_Mysterious_Bastion"
+msgstr "Mysterious Bastion"
+
+msgid "Gloves_Mysterious_Bastion_Description"
+msgstr ""
+
+msgid "Gloves_Aegis"
+msgstr "Aegis"
+
+msgid "Gloves_Aegis_Description"
+msgstr ""
+
+# -----------------------
+# Equip items — Boots
+# -----------------------
+
+msgid "Boots_Stone_Tread"
+msgstr "Stone Tread"
+
+msgid "Boots_Stone_Tread_Description"
+msgstr ""
+
+msgid "Boots_Steel"
+msgstr "Steel Greaves"
+
+msgid "Boots_Steel_Description"
+msgstr ""
+
+msgid "Boots_Vital_Core"
+msgstr "Vital Core"
+
+msgid "Boots_Vital_Core_Description"
+msgstr ""
+
+msgid "Boots_Hunter"
+msgstr "Hunter's Boots"
+
+msgid "Boots_Hunter_Description"
+msgstr ""
+
+msgid "Boots_Hunters_Dream"
+msgstr "Hunter's Dream"
+
+msgid "Boots_Hunters_Dream_Description"
+msgstr ""
+
+msgid "Boots_Feral_Instinct"
+msgstr "Feral Instinct"
+
+msgid "Boots_Feral_Instinct_Description"
+msgstr ""
+
+msgid "Boots_Archmage_Sandals"
+msgstr "Archmage's Sandals"
+
+msgid "Boots_Archmage_Sandals_Description"
+msgstr ""
+
+msgid "Boots_Mysterious_Bastion"
+msgstr "Mysterious Bastion"
+
+msgid "Boots_Mysterious_Bastion_Description"
+msgstr ""
+
+msgid "Boots_Aegis"
+msgstr "Aegis"
+
+msgid "Boots_Aegis_Description"
+msgstr ""
+
+# -----------------------
+# Fractions
+# -----------------------
+
+msgid "Human"
+msgstr "Human"
+
+msgid "Elf"
+msgstr "Elf"
+
+msgid "Dwarf"
+msgstr "Dwarf"
+
+msgid "Undean"
+msgstr "Undead"
+
+msgid "Animal"
+msgstr "Animal"
+
+msgid "MysticalCreature"
+msgstr "Mystical Creature"
+
+msgid "Demon"
+msgstr "Demon"
+
+# Upgrades
+# ----------------------
+
+msgid "Upgrade_Resource_Blacksmith_Rune"
+msgstr "Blacksmith Rune"
+
+msgid "Upgrade_Resource_Jeweler_Rune"
+msgstr "Jeweler`s Rune"
+
+msgid "Upgrade_Resource_Weapon_Rune"
+msgstr "Weapon`s Rune"
+
+msgid "Upgrade_Resource_Armor_Dust_Uncommon"
+msgstr "Pulverized Armor"
+
+msgid "Upgrade_Resource_Armor_Dust_Rare"
+msgstr "Pulverized Armor"
+
+msgid "Upgrade_Resource_Armor_Dust_Epic"
+msgstr "Pulverized Armor"
+
+msgid "Upgrade_Resource_Armor_Dust_Legendary"
+msgstr "Pulverized Armor"
+
+msgid "Upgrade_Resource_Jewellery_Dust_Uncommon"
+msgstr "Pulverized Jewellery"
+
+msgid "Upgrade_Resource_Jewellery_Dust_Rare"
+msgstr "Pulverized Jewellery"
+
+msgid "Upgrade_Resource_Jewellery_Dust_Epic"
+msgstr "Pulverized Jewellery"
+
+msgid "Upgrade_Resource_Jewellery_Dust_Legendary"
+msgstr "Pulverized Jewellery"
+
+msgid "Upgrade_Resource_Weapon_Dust_Uncommon"
+msgstr "Pulverized Weapon"
+
+msgid "Upgrade_Resource_Weapon_Dust_Rare"
+msgstr "Pulverized Weapon"
+
+msgid "Upgrade_Resource_Weapon_Dust_Epic"
+msgstr "Pulverized Weapon"
+
+msgid "Upgrade_Resource_Weapon_Dust_Legendary"
+msgstr "Pulverized Weapon"
+
+msgid "Upgrade_Resource_Simple_Flux"
+msgstr "Simple Flux"
+
+msgid "Upgrade_Resource_Simple_Flux_Description"
+msgstr "Increases the sharpening success chance by 3%."
+
+msgid "Upgrade_Resource_Fine_Flux"
+msgstr "Fine Flux"
+
+msgid "Upgrade_Resource_Fine_Flux_Description"
+msgstr "Increases the sharpening success chance by 6%."
+
+msgid "Upgrade_Resource_Quality_Flux"
+msgstr "Quality Flux"
+
+msgid "Upgrade_Resource_Quality_Flux_Description"
+msgstr "Increases the sharpening success chance by 9%."
+
+msgid "Upgrade_Resource_Perfect_Flux"
+msgstr "Perfect Flux"
+
+msgid "Upgrade_Resource_Perfect_Flux_Description"
+msgstr "Increases the sharpening success chance by 15%."
+
+msgid "Upgrade_Resource_Apprentice_Rune"
+msgstr "Apprentice`s Rune"
+
+msgid "Upgrade_Resource_Apprentice_Rune_Description"
+msgstr "Guarantees the created item is at least Uncommon."
+
+msgid "Upgrade_Resource_Journeyman_Rune"
+msgstr "Journeyman`s Rune"
+
+msgid "Upgrade_Resource_Journeyman_Rune_Description"
+msgstr "Guarantees the created item is at least Rare."
+
+msgid "Upgrade_Resource_Master_Rune"
+msgstr "Master`s Rune"
+
+msgid "Upgrade_Resource_Master_Rune_Description"
+msgstr "Guarantees the created item is at least Epic."
+
+msgid "Upgrade_Resource_Grandmaster_Rune"
+msgstr "Grand Master`s Rune"
+
+msgid "Upgrade_Resource_Grandmaster_Rune_Description"
+msgstr "Guarantees the created item is at least Legendary."
+
+msgid "Upgrade_Resource_Weaponsmith_Mark"
+msgstr "Weaponsmith Master`s Mark"
+
+msgid "Upgrade_Resource_Weaponsmith_Mark_Description"
+msgstr "The personal seal of a legendary weaponsmith. Ascends a fully sharpened legendary weapon: every property grows by 15% and may awaken a mythic power. The mark seals the weapon forever."
+
+msgid "Upgrade_Resource_Jeweler_Mark"
+msgstr "Jeweler Master`s Mark"
+
+msgid "Upgrade_Resource_Jeweler_Mark_Description"
+msgstr "The personal seal of a legendary jeweler. Ascends a fully sharpened legendary jewel: every property grows by 15% and may awaken a mythic power. The mark seals the jewel forever."
+
+msgid "Upgrade_Resource_Armorsmith_Mark"
+msgstr "Armorsmith Master`s Mark"
+
+msgid "Upgrade_Resource_Armorsmith_Mark_Description"
+msgstr "The personal seal of a legendary armorsmith. Ascends a fully sharpened legendary armor piece: every property grows by 15% and may awaken a mythic power. The mark seals the armor forever."
+
+# Resources
+# -----------------------
+
+msgid "Crafting_Resource_Deer_Leather"
+msgstr "Deer`s Leather"
+
+msgid "Crafting_Resource_Wild_Boar_Leather"
+msgstr "Wild Boar`s Leather"
+
+msgid "Crafting_Resource_Emerald_Gem"
+msgstr "Emerald"
+
+msgid "Crafting_Resource_Ruby_Gem"
+msgstr "Ruby"
+
+msgid "Crafting_Resource_Diamond_Gem"
+msgstr "Diamond"
+
+msgid "Crafting_Resource_Iron_Ore"
+msgstr "Iron Ore"
+
+msgid "Crafting_Resource_Gold_Ore"
+msgstr "Gold Ore"
+
+msgid "Crafting_Resource_Copper_Ore"
+msgstr "Copper Ore"
+
+msgid "Crafting_Resource_Silk_Fabric"
+msgstr "Silk"
+
+msgid "Crafting_Resource_Linen_Fabric"
+msgstr "Unbleached Linen"
+
+msgid "Crafting_Resource_Coarse_Wool_Fabric"
+msgstr "Coarse Wool"
+
+msgid "Crafting_Resource_Broadcloth_Fabric"
+msgstr "Broadcloth"
+
+msgid "Crafting_Resource_Fine_Linen_Fabric"
+msgstr "Fine Linen"
+
+msgid "Crafting_Resource_Serge_Fabric"
+msgstr "Serge"
+
+msgid "Crafting_Resource_Velvet_Fabric"
+msgstr "Velvet"
+
+msgid "Crafting_Resource_Purple_Fabric"
+msgstr "Purple Cloth"
+
+msgid "Crafting_Resource_Malachite_Gem"
+msgstr "Malachite"
+
+msgid "Crafting_Resource_Lazurite_Gem"
+msgstr "Lapis Lazuli"
+
+msgid "Crafting_Resource_Garnet_Gem"
+msgstr "Garnet"
+
+msgid "Crafting_Resource_Beryl_Gem"
+msgstr "Beryl"
+
+msgid "Crafting_Resource_Alexandrite_Gem"
+msgstr "Alexandrite"
+
+msgid "Crafting_Resource_Taaffeite_Gem"
+msgstr "Taaffeite"
+
+msgid "Crafting_Resource_Direwolf_Claw"
+msgstr "Direwolf Claw"
+
+msgid "Crafting_Resource_Essence_Accuracy"
+msgstr "Essence of Accuracy"
+
+msgid "Crafting_Resource_Essence_Critical_Chance"
+msgstr "Essence of Critical Chance"
+
+msgid "Crafting_Resource_Essence_Damage"
+msgstr "Essence of Damage"
+
+msgid "Crafting_Resource_Essence_Health"
+msgstr "Essence of Health"
+
+msgid "Crafting_Resource_Essence_Armor"
+msgstr "Essence of Armor"
+
+msgid "Crafting_Resource_Essence_Evade"
+msgstr "Essence of Evade"
+
+msgid "Crafting_Resource_Essence_Barrier"
+msgstr "Essence of Barrier"
+
+# -----------------------
+# Essences
+# -----------------------
+msgid "Crafting_Resource_Armor_Essence"
+msgstr "Essence of Defence"
+
+msgid "Crafting_Resource_Crit_Essence"
+msgstr "Essence of Death"
+
+msgid "Crafting_Resource_Damage_Essence"
+msgstr "Essence of Attack"
+
+msgid "Crafting_Resource_Life_Essence"
+msgstr "Essence of Life"
+
+msgid "Crafting_Resource_Evade_Essence"
+msgstr "Essence of Evasion"
+
+# -----------------------
+# Crafting Recipes
+# -----------------------
+
+msgid "Recipe_Test_Gloves"
+msgstr "The Creator's Gloves"
+
+msgid "Recipe_Test_Boots"
+msgstr "The Creator's Boots"
+
+msgid "Recipe_Test_Ring"
+msgstr "The Creator`s Ring"
+
+msgid "Recipe_Generic_Boots"
+msgstr "Random Boots"
+
+msgid "Recipe_Body_Four_Mods"
+msgstr "The Creator`s Armor"
+
+msgid "Recipe_Generic_Ring"
+msgstr "Random Ring"
+
+msgid "Recipe_Generic_Belt"
+msgstr "Random Belt"
+
+msgid "Recipe_Generic_Gloves"
+msgstr "Random Gloves"
+
+msgid "Recipe_Creators_Ring"
+msgstr "Creator's Finger"
+
+msgid "Recipe_Ring_Of_Fire_Demon"
+msgstr "Fire Demon's Finger"
+
+msgid "Recipe_Weapon_Simple_Sword"
+msgstr "Simple Sword"
+
+msgid "Recipe_Weapon_Simple_Dagger"
+msgstr "Simple Dagger"
+
+msgid "Recipe_Weapon_Simple_Axe"
+msgstr "Simple Axe"
+
+msgid "Recipe_Body_Steel"
+msgstr "Steel Bastion"
+
+msgid "Recipe_Body_Aegis"
+msgstr "Aegis"
+
+msgid "Recipe_Body_Iron_Bastion"
+msgstr "Iron Bastion"
+
+msgid "Recipe_Body_Hunter_Chestplate"
+msgstr "Hunter's Chestplate"
+
+msgid "Recipe_Body_Archmage_Mantle"
+msgstr "Archmage's Mantle"
+
+msgid "Recipe_Helmet_Steel"
+msgstr "Steel Helmet"
+
+msgid "Recipe_Helmet_Hunter"
+msgstr "Hunter's Helmet"
+
+msgid "Recipe_Helmet_Archmage_Cap"
+msgstr "Archmage's Cap"
+
+msgid "Recipe_Gloves_Steel"
+msgstr "Steel Gloves"
+
+msgid "Recipe_Gloves_Hunter"
+msgstr "Hunter's Gloves"
+
+msgid "Recipe_Gloves_Archmage"
+msgstr "Archmage's Gloves"
+
+msgid "Recipe_Boots_Steel"
+msgstr "Steel Boots"
+
+msgid "Recipe_Boots_Hunter"
+msgstr "Hunter's Boots"
+
+msgid "Recipe_Boots_Archmage_Sandals"
+msgstr "Archmage's Sandals"
+
+# ------------------------
+# Categories
+# ------------------------
+
+msgid "BodyArmor"
+msgstr ""
+
+msgid "Belt"
+msgstr ""
+
+msgid "Gloves"
+msgstr ""
+
+msgid "Boots"
+msgstr ""
+
+msgid "Helmet"
+msgstr ""
+
+msgid "Amulet"
+msgstr ""
+
+msgid "Cloak"
+msgstr ""
+
+msgid "Weapon"
+msgstr ""
+
+msgid "Ring"
+msgstr ""
+
+msgid "Consumable"
+msgstr ""
+
+msgid "Quest"
+msgstr ""
+
+# -----------------------
+# Texts
+# -----------------------
+
+msgid "RandomStats"
+msgstr "Random Stats"
+
+msgid "BaseStats"
+msgstr "Base Stats"
+
+msgid "GameTitle"
+msgstr "Last Breath"
+
+msgid "VideoSettings"
+msgstr "Video"
+
+msgid "ResolutionSetting"
+msgstr "Resolution"
+
+msgid "WindowModeSetting"
+msgstr "Window Mode"
+
+msgid "SoundSettings"
+msgstr "Sound"
+
+msgid "MasterVolumeSetting"
+msgstr "Master Volume"
+
+msgid "MusicVolumeSetting"
+msgstr "Music Volume"
+
+msgid "SFXVolumeSetting"
+msgstr "SFX Volume"
+
+msgid "UI_Settings"
+msgstr "UI"
+
+msgid "LanguageSetting"
+msgstr "Language"
+
+msgid "SaveLoadLabel"
+msgstr "Save/Load"
+
+# ------------------------------
+# Effects (battle)
+# ------------------------------
+
+msgid "Effect_Accuracy_Buff"
+msgstr "Steady Aim"
+
+msgid "Effect_Accuracy_Buff_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Armor_Buff"
+msgstr "Reinforced"
+
+msgid "Effect_Armor_Buff_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Armor_Reduction"
+msgstr "Sundered Armor"
+
+msgid "Effect_Armor_Reduction_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Damage_Buff"
+msgstr "Battle Spirit"
+
+msgid "Effect_Damage_Buff_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Critical_Damage_Buff"
+msgstr "Deadly Calculation"
+
+msgid "Effect_Critical_Damage_Buff_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Critical_Chance_Buff"
+msgstr "Hunter's Gaze"
+
+msgid "Effect_Critical_Chance_Buff_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Additional_Hit_Chance_Buff"
+msgstr "Flurry"
+
+msgid "Effect_Additional_Hit_Chance_Buff_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Crit_Calculation_Buff"
+msgstr "Critical Focus"
+
+msgid "Effect_Crit_Calculation_Buff_Description"
+msgstr "{Value} {Parameter}. Each critical hit extends the effect by 1 turn."
+
+msgid "Effect_Attack_Chance_Calculation_Buff"
+msgstr "Combat Focus"
+
+msgid "Effect_Attack_Chance_Calculation_Buff_Description"
+msgstr "{Value} {Parameter}. Each critical hit extends the effect by 1 turn."
+
+msgid "Effect_Crit_Damage_On_Hit_Buff"
+msgstr "Rising Ferocity"
+
+msgid "Effect_Crit_Damage_On_Hit_Buff_Description"
+msgstr "Increases critical damage by {critDamageBonus}%. Each critical hit raises it further. Lasts for {Duration|turn|turns}."
+
+msgid "Effect_Crit_Leech"
+msgstr "Critical Leech"
+
+msgid "Effect_Crit_Leech_Description"
+msgstr "Heal for {amount}% of the damage dealt by your critical hits. Effect lasts for {Duration|turn|turns}."
+
+msgid "Effect_Dark_Shroud"
+msgstr "Dark Shroud"
+
+msgid "Effect_Dark_Shroud_Description"
+msgstr "Grants {Changes} for {Duration|turn|turns}."
+
+msgid "Effect_Execution"
+msgstr "Execution"
+
+msgid "Effect_Execution_Description"
+msgstr "Your attacks execute targets below a share of their maximum health for {Duration|turn|turns}."
+
+msgid "Effect_Evade_First_Death"
+msgstr "Second Wind"
+
+msgid "Effect_Evade_First_Death_Description"
+msgstr "Once, a lethal blow is evaded and a share of maximum health is restored instead."
+
+msgid "Effect_Freeze"
+msgstr "Freeze"
+
+msgid "Effect_Freeze_Description"
+msgstr "Frozen: the target cannot act for {Duration|turn|turns}."
+
+msgid "Effect_Free_Cast"
+msgstr "Free Cast"
+
+msgid "Effect_Free_Cast_Description"
+msgstr "The next activated ability triggers no cooldown."
+
+msgid "Effect_Healing_Fury"
+msgstr "Healing Fury"
+
+msgid "Effect_Healing_Fury_Description"
+msgstr "Burn {HealthPercent}% health with each attack, then recover health from the damage you dealt when it ends."
+
+msgid "Effect_Heal_Reduction"
+msgstr "Grievous Wounds"
+
+msgid "Effect_Heal_Reduction_Description"
+msgstr "Reduces all incoming healing for {Duration|turn|turns}."
+
+msgid "Effect_Percent_Health_Regeneration"
+msgstr "Rejuvenation"
+
+msgid "Effect_Percent_Health_Regeneration_Description"
+msgstr "Regenerate a share of maximum health each turn for {Duration|turn|turns}."
+
+msgid "Effect_Incoming_Damage_Reduction"
+msgstr "Carapace"
+
+msgid "Effect_Incoming_Damage_Reduction_Description"
+msgstr "Reduces all incoming damage for {Duration|turn|turns}."
+
+msgid "Effect_Ice_Aegis"
+msgstr "Ice Aegis"
+
+msgid "Effect_Ice_Aegis_Description"
+msgstr "Grants a barrier for {Duration|turn|turns}; whatever remains of it burns away when it expires."
+
+msgid "Effect_Light_Step"
+msgstr "Light Step"
+
+msgid "Effect_Light_Step_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Mana_Regeneration"
+msgstr "Aetheric Flow"
+
+msgid "Effect_Mana_Regeneration_Description"
+msgstr "Restore a share of maximum mana each turn for {Duration|turn|turns}."
+
+msgid "Effect_Primal_Fury"
+msgstr "Primal Fury"
+
+msgid "Effect_Primal_Fury_Description"
+msgstr "Burn {HealthPercent}% health with each attack and deal greatly increased attack damage."
+
+msgid "Effect_Porcupine"
+msgstr "Porcupine"
+
+msgid "Effect_Porcupine_Description"
+msgstr "Retaliate against every attacker with {@Sacred} damage based on the hit taken and your armor, for {Duration|turn|turns}."
+
+msgid "Effect_Poison_Coating"
+msgstr "Poison Coating"
+
+msgid "Effect_Poison_Coating_Description"
+msgstr "While active, each of your attacks applies a stack of {@Poison} for {Duration|turn|turns}."
+
+msgid "Effect_Sacrifice_Charge"
+msgstr "Sacrifice"
+
+msgid "Effect_Sacrifice_Charge_Description"
+msgstr "The next activated abilities deal additional {@Sacred} damage."
+
+msgid "Effect_Shield"
+msgstr "Shield"
+
+msgid "Effect_Shield_Description"
+msgstr "A shield that absorbs {Strength} incoming damage before it shatters."
+
+msgid "Effect_Seal_Of_Silence"
+msgstr "Seal of Silence"
+
+msgid "Effect_Seal_Of_Silence_Description"
+msgstr "The sealed target cannot use any active ability for {Duration|turn|turns}."
+
+msgid "Effect_Stun"
+msgstr "Stun"
+
+msgid "Effect_Stun_Description"
+msgstr "Stunned: the target loses its action for {Duration|turn|turns}."
+
+# Descriptions for effects whose names live in the keyword-card sections
+
+msgid "Effect_Clumsiness_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Withering_Curse_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Enhance_Defense_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Crit_Mitigation_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Ice_Crit_Mitigation_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Blind_Description"
+msgstr "{Value} {Parameter} for {Duration|turn|turns}."
+
+msgid "Effect_Fragility_Description"
+msgstr "Increases critical damage taken for {Duration|turn|turns}."
+
+msgid "Effect_Weakness_Description"
+msgstr "The target's ability hits deal reduced damage for {Duration|turn|turns}."
+
+msgid "Effect_Lucky_Crit_Chance_Description"
+msgstr "Critical strikes roll their chance twice and keep the better result for {Duration|turn|turns}."
+
+msgid "Effect_Seal_Of_Oblivion_Description"
+msgstr "The sealed target's passive skills are disabled for {Duration|turn|turns}."
+
+msgid "Effect_Incineration"
+msgstr "Incineration"
+
+msgid "Effect_Incineration_Description"
+msgstr "A {@Burning} target dies when critically hit. Lasts {Duration|turn|turns}."
+
+msgid "Effect_Fury"
+msgstr "Fury"
+
+msgid "Effect_Fury_Description"
+msgstr "Burn {HealthPercent}% health with each attack."
+
+msgid "Effect_Burning_Fury"
+msgstr "Burning Fury"
+
+msgid "Effect_Burning_Fury_Description"
+msgstr "Burn {HealthPercent}% health with each attack. Apply {@Burning} dealing {BurnDamage}% burned health as damage per Turn."
+
+msgid "Effect_Damage_Over_Turn"
+msgstr "Damage over Time"
+
+msgid "Effect_Damage_Over_Turn_Description"
+msgstr "Deal {Damage} damage per Turn."
+
+msgid "Effect_Damage_Over_Turn_Bleed"
+msgstr "Bleed"
+
+msgid "Effect_Damage_Over_Turn_Bleed_Description"
+msgstr "Deal {Damage} damage as {@Bleed} per Turn."
+
+msgid "Effect_Damage_Over_Turn_Burning"
+msgstr "Burning"
+
+msgid "Effect_Damage_Over_Turn_Burning_Description"
+msgstr "Deal {Damage} damage as {@Burning} per Turn."
+
+msgid "Effect_Damage_Over_Turn_Poison"
+msgstr "Poison"
+
+msgid "Effect_Damage_Over_Turn_Poison_Description"
+msgstr "Deal {Damage} damage as {@Poison} per Turn."
+
+msgid "Effect_Life_Giving_Shade"
+msgstr "Life Giving Shade"
+
+msgid "Effect_Life_Giving_Shade_Description"
+msgstr "Increase Evade by {Evade:%}. Apply {Stacks} stacks.\n After each evade consume one stack and Regenerate {Regeneration} health."
+
+msgid "Effect_Life_Giving_Shade_Regeneration"
+msgstr "Life Giving Shade"
+
+msgid "Effect_Life_Giving_Shade_Regeneration_Description"
+msgstr "Increase Evade by {Evade:%}. Apply {Stacks} stacks.\n After each evade consume one stack and Regenerate {Regeneration} health."
+
+msgid "Effect_Regeneration"
+msgstr "Regeneration"
+
+msgid "Effect_Regeneration_Description"
+msgstr "Regenerate {Amount} health."
+
+msgid "Effect_Ares_Blessing"
+msgstr "Ares' Blessing"
+
+msgid "Effect_Ares_Blessing_Description"
+msgstr "Grants {Changes} for {Duration|turn|turns}."
+
+msgid "Effect_Frostbite"
+msgstr "Frostbite"
+
+msgid "Effect_Frostbite_Description"
+msgstr "Takes more {@Cold} damage with every stack."
+
+msgid "Effect_Frostbite_Tooltip"
+msgstr "Increases the cold damage taken."
+
+msgid "Effect_Charge"
+msgstr "Charge"
+
+msgid "Effect_Charge_Description"
+msgstr "A static mark. At {DetonationStacks} stacks it detonates with {@Lightning} damage."
+
+msgid "Effect_Charge_Tooltip"
+msgstr "Detonates with lightning damage at full stacks."
+
+msgid "Effect_Static_Armor"
+msgstr "Static Armor"
+
+msgid "Effect_Static_Armor_Description"
+msgstr "Attacks put Charge stacks on their target."
+
+msgid "Effect_Overload_Charge"
+msgstr "Overload Charge"
+
+msgid "Effect_Overload_Charge_Description"
+msgstr "The next activated ability deals increased damage."
+
+msgid "Effect_Sacred_Conversion_Charge"
+msgstr "Sacred Current"
+
+msgid "Effect_Sacred_Conversion_Charge_Description"
+msgstr "The next activated ability deals part of its damage as {@Sacred}."
+
+msgid "Effect_Next_Ability_Cooldown"
+msgstr "Chilled Mind"
+
+msgid "Effect_Next_Ability_Cooldown_Description"
+msgstr "The next activated ability starts with increased cooldown."
+
+msgid "Effect_Cold_Resistance_Shred"
+msgstr "Cold Exposure"
+
+msgid "Effect_Cold_Resistance_Shred_Description"
+msgstr "Reduces cold resistance."
+
+msgid "Effect_Seal_Of_Slowness"
+msgstr "Seal of Slowness"
+
+msgid "Effect_Seal_Of_Slowness_Description"
+msgstr "Ability activations start with increased cooldown."
+
+msgid "Effect_Seal_Of_Blood"
+msgstr "Seal of Blood"
+
+msgid "Effect_Seal_Of_Blood_Description"
+msgstr "Abilities are paid with health."
+
+msgid "Effect_Seal_Of_Spirit"
+msgstr "Seal of Spirit"
+
+msgid "Effect_Seal_Of_Spirit_Description"
+msgstr "Abilities are paid with barrier."
+
+msgid "Effect_Fatigue"
+msgstr "Fatigue"
+
+msgid "Effect_Fatigue_Description"
+msgstr "Reduces spell damage."
+
+msgid "Effect_Feebleness"
+msgstr "Feebleness"
+
+msgid "Effect_Feebleness_Description"
+msgstr "Reduces attack damage."
+
+msgid "Effect_Spell_Surge"
+msgstr "Spell Surge"
+
+msgid "Effect_Spell_Surge_Description"
+msgstr "Increases spell damage by {SpellDamage:%}."
+
+msgid "Effect_Clouded_Mind"
+msgstr "Clouded Mind"
+
+msgid "Effect_Clouded_Mind_Description"
+msgstr "Increases ability costs."
+
+msgid "Effect_Sorcery_Gift"
+msgstr "Sorcery Gift"
+
+msgid "Effect_Sorcery_Gift_Description"
+msgstr "Reduces ability costs."
+
+msgid "Effect_Mind_Drain"
+msgstr "Mind Drain"
+
+msgid "Effect_Mind_Drain_Description"
+msgstr "Reduces mana recovery."
+
+msgid "Effect_Rot"
+msgstr "Rot"
+
+msgid "Effect_Rot_Description"
+msgstr "Reduces health recovery."
+
+msgid "Effect_Weak_Regeneration"
+msgstr "Weak Regeneration"
+
+msgid "Effect_Weak_Regeneration_Description"
+msgstr "Increases health recovery."
+
+msgid "Effect_Giants_Blessing"
+msgstr "Giants' Blessing"
+
+msgid "Effect_Giants_Blessing_Description"
+msgstr "Increases maximum health."
+
+msgid "Effect_Vulnerability"
+msgstr "Vulnerability"
+
+msgid "Effect_Vulnerability_Description"
+msgstr "Reduces armor and evade."
+
+msgid "Effect_Decay"
+msgstr "Decay"
+
+msgid "Effect_Decay_Description"
+msgstr "Reduces health and mana recovery."
+
+msgid "Effect_Curse"
+msgstr "Curse"
+
+msgid "Effect_Curse_Description"
+msgstr "Ability activations cost additional {costIncrease} amount."
+
+msgid "Effect_On_Edge"
+msgstr "On the Edge"
+
+msgid "Effect_On_Edge_Description"
+msgstr "Deals more damage the lower the health."
+
+# ------------------------------
+# Context parameters
+# ------------------------------
+
+msgid "Context_Modifier_HealingEfficiency"
+msgstr "Increases healing efficiency by {value}"
+
+msgid "Context_Modifier_BleedDuration"
+msgstr "Increases bleed duration by {value}"
+
+msgid "Context_Modifier_BleedDamage"
+msgstr "Increases bleed damage by {value}"
+
+msgid "Context_Modifier_BurningStacks"
+msgstr "Applies {value} additional burning stack"
+
+msgid "Context_Modifier_BurningDamage"
+msgstr "Increases burning damage by {value}"
+
+msgid "Context_Modifier_ManaOnHit"
+msgstr "Restores {value} mana on hit"
+
+msgid "Context_Modifier_HealthOnHit"
+msgstr "Restores {value} health on hit"
+
+# Range twins for unrolled spreads: {min} is a bare number, {max} carries the unit.
+
+msgid "Context_Modifier_HealingEfficiency_Range"
+msgstr "Increases healing efficiency by {min}–{max}"
+
+msgid "Context_Modifier_BleedDuration_Range"
+msgstr "Increases bleed duration by {min}–{max}"
+
+msgid "Context_Modifier_BleedDamage_Range"
+msgstr "Increases bleed damage by {min}–{max}"
+
+msgid "Context_Modifier_BurningStacks_Range"
+msgstr "Applies {min}–{max} additional burning stacks"
+
+msgid "Context_Modifier_BurningDamage_Range"
+msgstr "Increases burning damage by {min}–{max}"
+
+msgid "Context_Modifier_PoisonDamage"
+msgstr "Increases poison damage by {value}"
+
+msgid "Context_Modifier_PoisonDamage_Range"
+msgstr "Increases poison damage by {min}–{max}"
+
+msgid "Context_Modifier_ManaOnHit_Range"
+msgstr "Restores {min}–{max} mana on hit"
+
+msgid "Context_Modifier_HealthOnHit_Range"
+msgstr "Restores {min}–{max} health on hit"
+
+# Mythic marks (2026-07-20): one template per knob; the flag line carries no {value}
+msgid "Context_Modifier_PhysicalToFire"
+msgstr "Converts {value} of physical damage to fire"
+
+msgid "Context_Modifier_PhysicalToFire_Range"
+msgstr "Converts {min}–{max} of physical damage to fire"
+
+msgid "Context_Modifier_PhysicalToCold"
+msgstr "Converts {value} of physical damage to cold"
+
+msgid "Context_Modifier_PhysicalToCold_Range"
+msgstr "Converts {min}–{max} of physical damage to cold"
+
+msgid "Context_Modifier_PhysicalToLightning"
+msgstr "Converts {value} of physical damage to lightning"
+
+msgid "Context_Modifier_PhysicalToLightning_Range"
+msgstr "Converts {min}–{max} of physical damage to lightning"
+
+msgid "Context_Modifier_AttacksIgnoreResistances"
+msgstr "Attacks ignore elemental resistances"
+
+msgid "Context_Modifier_AddedFireDamage"
+msgstr "Adds {value} of attack damage as fire"
+
+msgid "Context_Modifier_AddedFireDamage_Range"
+msgstr "Adds {min}–{max} of attack damage as fire"
+
+msgid "Context_Modifier_AddedColdDamage"
+msgstr "Adds {value} of attack damage as cold"
+
+msgid "Context_Modifier_AddedColdDamage_Range"
+msgstr "Adds {min}–{max} of attack damage as cold"
+
+msgid "Context_Modifier_AddedLightningDamage"
+msgstr "Adds {value} of attack damage as lightning"
+
+msgid "Context_Modifier_AddedLightningDamage_Range"
+msgstr "Adds {min}–{max} of attack damage as lightning"
+
+msgid "Context_Modifier_AttackSacredConversion"
+msgstr "Converts {value} of attack damage to sacred"
+
+msgid "Context_Modifier_AttackSacredConversion_Range"
+msgstr "Converts {min}–{max} of attack damage to sacred"
+
+msgid "Context_Modifier_CooldownResetChance"
+msgstr "{value} chance to reset the cooldown of an activated ability"
+
+msgid "Context_Modifier_CooldownResetChance_Range"
+msgstr "{min}–{max} chance to reset the cooldown of an activated ability"
+
+msgid "Context_Modifier_FreeCastChance"
+msgstr "{value} chance to activate an ability for free"
+
+msgid "Context_Modifier_FreeCastChance_Range"
+msgstr "{min}–{max} chance to activate an ability for free"
+
+msgid "Context_Modifier_DotDamageBonus"
+msgstr "Increases the damage of applied bleed, poison and burning by {value}"
+
+msgid "Context_Modifier_DotDamageBonus_Range"
+msgstr "Increases the damage of applied bleed, poison and burning by {min}–{max}"
+
+msgid "Context_Modifier_EffectDurationScale"
+msgstr "Increases the duration of applied effects by {value}"
+
+msgid "Context_Modifier_EffectDurationScale_Range"
+msgstr "Increases the duration of applied effects by {min}–{max}"
+
+msgid "Context_Modifier_DamageTakenReductionFromAttack"
+msgstr "Reduces damage taken from attacks by {value}"
+
+msgid "Context_Modifier_DamageTakenReductionFromAttack_Range"
+msgstr "Reduces damage taken from attacks by {min}–{max}"
+
+msgid "Context_Modifier_DamageTakenReductionFromAbility"
+msgstr "Reduces damage taken from abilities by {value}"
+
+msgid "Context_Modifier_DamageTakenReductionFromAbility_Range"
+msgstr "Reduces damage taken from abilities by {min}–{max}"
+
+msgid "Context_Modifier_DamageTakenReductionFromEffect"
+msgstr "Reduces damage taken from effects by {value}"
+
+msgid "Context_Modifier_DamageTakenReductionFromEffect_Range"
+msgstr "Reduces damage taken from effects by {min}–{max}"
+
+msgid "Context_Modifier_DamageTakenReductionFromPassive"
+msgstr "Reduces damage taken from passive skills by {value}"
+
+msgid "Context_Modifier_DamageTakenReductionFromPassive_Range"
+msgstr "Reduces damage taken from passive skills by {min}–{max}"
+
+msgid "Context_Modifier_DotDamageTakenReduction"
+msgstr "Reduces bleed, poison and burning damage taken by {value}"
+
+msgid "Context_Modifier_DotDamageTakenReduction_Range"
+msgstr "Reduces bleed, poison and burning damage taken by {min}–{max}"
+
+msgid "Context_Modifier_BurningDamageTakenReduction"
+msgstr "Reduces burning damage taken by {value}"
+
+msgid "Context_Modifier_BurningDamageTakenReduction_Range"
+msgstr "Reduces burning damage taken by {min}–{max}"
+
+msgid "Context_Modifier_PoisonDamageTakenReduction"
+msgstr "Reduces poison damage taken by {value}"
+
+msgid "Context_Modifier_PoisonDamageTakenReduction_Range"
+msgstr "Reduces poison damage taken by {min}–{max}"
+
+msgid "Context_Modifier_BleedDamageTakenReduction"
+msgstr "Reduces bleed damage taken by {value}"
+
+msgid "Context_Modifier_BleedDamageTakenReduction_Range"
+msgstr "Reduces bleed damage taken by {min}–{max}"
+
+msgid "Context_Modifier_EffectEffectivenessScale"
+msgstr "Increases the effect of everything you apply by {value}"
+
+msgid "Context_Modifier_EffectEffectivenessScale_Range"
+msgstr "Increases the effect of everything you apply by {min}–{max}"
+
+msgid "Context_Modifier_BuffEffectivenessScale"
+msgstr "Increases the effect of buffs you apply by {value}"
+
+msgid "Context_Modifier_BuffEffectivenessScale_Range"
+msgstr "Increases the effect of buffs you apply by {min}–{max}"
+
+msgid "Context_Modifier_DebuffEffectivenessScale"
+msgstr "Increases the effect of debuffs you apply by {value}"
+
+msgid "Context_Modifier_DebuffEffectivenessScale_Range"
+msgstr "Increases the effect of debuffs you apply by {min}–{max}"
+
+msgid "Context_Modifier_DamagingEffectEffectivenessScale"
+msgstr "Increases the effect of damaging effects you apply by {value}"
+
+msgid "Context_Modifier_DamagingEffectEffectivenessScale_Range"
+msgstr "Increases the effect of damaging effects you apply by {min}–{max}"
+# ------------------------------
+# Modifier templates: {value} = formatted number, {parameter} = localized parameter name
+# The flat twins name their parameter with "to" ("+15% to Bleed Damage Multiplier"): without it the
+# number and the name collide into one noun phrase. The worded twins already carry a joining word.
+# ------------------------------
+
+msgid "Modifier_Flat"
+msgstr "{value} to {parameter}"
+
+msgid "Modifier_Increase"
+msgstr "{value} increased {parameter}"
+
+msgid "Modifier_Multiplicative"
+msgstr "{value} more {parameter}"
+
+# Negative twins: a penalty is worded, not signed — {value} arrives without its minus ("25% less Health Recovery").
+
+msgid "Modifier_Increase_Negative"
+msgstr "{value} reduced {parameter}"
+
+msgid "Modifier_Multiplicative_Negative"
+msgstr "{value} less {parameter}"
+
+# Per-unit twins: the value is worth that much for every unit of {per} the carrier holds
+# ("+1% increased Physical Damage per Strength").
+
+msgid "Modifier_Flat_PerParameter"
+msgstr "{value} to {parameter} per {per}"
+
+msgid "Modifier_Increase_PerParameter"
+msgstr "{value} increased {parameter} per {per}"
+
+msgid "Modifier_Multiplicative_PerParameter"
+msgstr "{value} more {parameter} per {per}"
+
+msgid "Modifier_Increase_Negative_PerParameter"
+msgstr "{value} reduced {parameter} per {per}"
+
+msgid "Modifier_Multiplicative_Negative_PerParameter"
+msgstr "{value} less {parameter} per {per}"
+
+# Range twins for unrolled spreads: {min} carries the sign, {max} carries the unit ("+40–60% increased ...").
+
+msgid "Modifier_Flat_Range"
+msgstr "{min}–{max} to {parameter}"
+
+msgid "Modifier_Increase_Range"
+msgstr "{min}–{max} increased {parameter}"
+
+msgid "Modifier_Multiplicative_Range"
+msgstr "{min}–{max} more {parameter}"
+
+msgid "Modifier_Increase_Negative_Range"
+msgstr "{min}–{max} reduced {parameter}"
+
+msgid "Modifier_Multiplicative_Negative_Range"
+msgstr "{min}–{max} less {parameter}"
+
+# A line held up by a condition: {line} = the rendered line, {condition} = the clause below.
+
+msgid "Modifier_Conditional"
+msgstr "{line} {condition}"
+
+# ------------------------------
+# Condition clauses: keyed Condition_<id> after the Conditions catalog
+# ------------------------------
+
+msgid "Condition_Health_Below_30"
+msgstr "while below 30% health"
+
+msgid "Condition_Health_Below_50"
+msgstr "while below 50% health"
+
+msgid "Condition_Health_Above_70"
+msgstr "while above 70% health"
+
+msgid "Condition_Mana_Below_30"
+msgstr "while below 30% mana"
+
+msgid "Condition_Barrier_Below_50"
+msgstr "while your barrier is below 50%"
+
+msgid "Condition_Health_Full"
+msgstr "while at full health"
+
+msgid "Condition_Health_Wounded"
+msgstr "while wounded"
+
+msgid "Condition_Mana_Empty"
+msgstr "while out of mana"
+
+msgid "Condition_Barrier_Holds"
+msgstr "while your barrier holds"
+
+msgid "Condition_Barrier_Broken"
+msgstr "while your barrier is broken"
+
+msgid "Condition_Under_Control"
+msgstr "while controlled"
+
+msgid "Condition_Stunned_Or_Frozen"
+msgstr "while stunned or frozen"
+
+msgid "Condition_Damaged_Over_Turns"
+msgstr "while damaged over time"
+
+msgid "Condition_Clean_Of_Debuffs"
+msgstr "while free of debuffs"
+
+msgid "Condition_Shielded"
+msgstr "while shielded"
+
+msgid "Condition_Two_Debuffs_Carried"
+msgstr "while carrying two debuffs"
+
+msgid "Condition_Buffed"
+msgstr "while buffed"
+
+msgid "Condition_No_Effects_Carried"
+msgstr "while carrying no effects"
+
+msgid "Condition_Frostbite_Three_Stacks"
+msgstr "while carrying three stacks of frostbite"
+
+msgid "Condition_Stance_Dexterity"
+msgstr "while in the Dexterity stance"
+
+msgid "Condition_Stance_Strength"
+msgstr "while in the Strength stance"
+
+msgid "Condition_Stance_Intelligence"
+msgstr "while in the Intelligence stance"
+
+msgid "Condition_Target_Health_Below_30"
+msgstr "against a target below 30% health"
+
+msgid "Condition_Target_Health_Below_50"
+msgstr "against a target below 50% health"
+
+msgid "Condition_Target_Wounded"
+msgstr "against a wounded target"
+
+msgid "Condition_Target_Barrier_Below_50"
+msgstr "against a target whose barrier is below 50%"
+
+msgid "Condition_Target_Under_Control"
+msgstr "against a controlled target"
+
+msgid "Condition_Target_Bleeding"
+msgstr "against a bleeding target"
+
+msgid "Condition_Target_Poisoned"
+msgstr "against a poisoned target"
+
+msgid "Condition_Target_Burning"
+msgstr "against a burning target"
+
+msgid "Condition_Target_Damaged_Over_Turns"
+msgstr "against a target damaged over time"
+
+msgid "Condition_Target_Clean_Of_Debuffs"
+msgstr "against a target free of debuffs"
+
+msgid "Condition_Turn_First_Attack"
+msgstr "on your first attack of the turn"
+
+msgid "Condition_Turn_First_Ability"
+msgstr "on your first ability of the turn"
+
+msgid "Condition_Turn_Second_Attack_Onwards"
+msgstr "after your first attack of the turn"
+
+msgid "Condition_Turn_Undamaged"
+msgstr "while unharmed this turn"
+
+msgid "Condition_Turn_Unattacked"
+msgstr "until you are attacked this turn"
+
+msgid "Condition_Battle_Before_Turn_4"
+msgstr "during the first three turns of the fight"
+
+msgid "Condition_Battle_From_Turn_5"
+msgstr "from the fifth turn of the fight on"
+
+# ------------------------------
+# UI
+# ------------------------------
+
+msgid "UI_Save"
+msgstr "Save"
+
+msgid "UI_End_Turn"
+msgstr "End Turn"
+
+msgid "UI_Flee"
+msgstr "Flee"
+
+msgid "Stance_Dexterity"
+msgstr "Dexterity Stance"
+
+msgid "Stance_Dexterity_Description"
+msgstr "Fast and precise: attack series, poisons and evasion. Abilities of this stance scale with Dexterity."
+
+msgid "Stance_Strength"
+msgstr "Strength Stance"
+
+msgid "Stance_Strength_Description"
+msgstr "Brutal and enduring: heavy blows, self-buffs and retaliation. Abilities of this stance scale with Strength."
+
+msgid "Stance_Intelligence"
+msgstr "Intelligence Stance"
+
+msgid "Stance_Intelligence_Description"
+msgstr "Elemental mastery: multicast spells, barriers and control. Abilities of this stance scale with Intelligence."
+
+msgid "UI_Load"
+msgstr "Load"
+
+msgid "UI_Crafting_Create"
+msgstr "Create"
+
+msgid "UI_Crafting_Upgrade"
+msgstr "Upgrade"
+
+msgid "UI_Crafting_Ascend"
+msgstr "Ascend"
+
+msgid "UI_New_Game"
+msgstr "New Game"
+
+msgid "UI_Load_Game"
+msgstr "Load Game"
+
+msgid "UI_Options"
+msgstr "Options"
+
+msgid "UI_Quit"
+msgstr "Quit"
+
+msgid "UI_Continue"
+msgstr "Continue"
+
+msgid "UI_Main_Menu"
+msgstr "Main Menu"
+
+msgid "UI_Character"
+msgstr "Character"
+
+msgid "UI_Inventory"
+msgstr "Inventory"
+
+msgid "UI_Crafting"
+msgstr "Crafting"
+
+msgid "UI_Quests"
+msgstr "Quests"
+
+msgid "UI_Apply"
+msgstr "Apply"
+
+msgid "UI_Return"
+msgstr "Return"
+
+msgid "UI_Delete"
+msgstr "Delete"
+
+msgid "UI_AbilityCost"
+msgstr "Cost: {Value} {Resource}"
+
+msgid "UI_AbilityCooldown"
+msgstr "Cooldown: {Value|turn|turns}"
+
+# Ability tooltip card (Umbral scroll): captions, bare values, target wording
+msgid "UI_AbilityCostValue"
+msgstr "{Value} {Resource}"
+
+msgid "UI_AbilityCooldownValue"
+msgstr "{Value|turn|turns}"
+
+msgid "UI_AbilityTarget"
+msgstr "Target"
+
+msgid "UI_AbilityCostCaption"
+msgstr "Cost"
+
+msgid "UI_AbilityCooldownCaption"
+msgstr "Cooldown"
+
+msgid "UI_AbilityTags"
+msgstr "Tags"
+
+msgid "UI_AbilityStages"
+msgstr "Stages"
+
+msgid "UI_AbilityTargetSelf"
+msgstr "Self"
+
+msgid "UI_AbilityTargetEnemy"
+msgstr "Enemy"
+
+msgid "UI_AbilityTargetAlly"
+msgstr "Ally"
+
+msgid "UI_AbilityTargetEnemies"
+msgstr "Up to {Value} enemies"
+
+msgid "UI_AbilityTargetAllies"
+msgstr "Up to {Value} allies"
+
+msgid "UI_AbilityTargetRandomEnemy"
+msgstr "Random enemy"
+
+msgid "UI_AbilityTargetRandomAlly"
+msgstr "Random ally"
+
+msgid "UI_AbilityTargetRandomEnemies"
+msgstr "{Value} random enemies"
+
+msgid "UI_AbilityTargetRandomAllies"
+msgstr "{Value} random allies"
+
+# ------------------------------
+# Notifications
+# ------------------------------
+
+msgid "Notification_Game_Saved"
+msgstr "Game saved"
+
+msgid "Notification_Martial_Art_Mastery_Level_Up"
+msgstr "Martial Art mastery level up!"
+
+msgid "Notification_Influence_Mastery_Level_Up"
+msgstr "Influence mastery level up!"
+
+msgid "Mastery_Influence"
+msgstr "Influence"
+
+msgid "Mastery_Influence_Description"
+msgstr "How skillfully you wield words and standing: speech checks, and whether folk trust you with their troubles at all."
+
+msgid "UI_Quest_Accepted"
+msgstr "Quest accepted: {Quest}"
+
+msgid "UI_Quest_Updated"
+msgstr "Quest updated: {Quest}"
+
+msgid "UI_Quest_Ready"
+msgstr "Ready to turn in: {Quest}"
+
+msgid "UI_Quest_Completed"
+msgstr "Quest completed: {Quest}"
+
+msgid "UI_Quest_Failed"
+msgstr "Quest failed: {Quest}"
+
+msgid "UI_Quest_Ghost_Hint"
+msgstr "A cold whisper urges you to hurry... ({Quest})"
+
+msgid "Quest_Field_Of_Bones"
+msgstr "Field of Bones"
+
+msgid "Quest_Field_Of_Bones_Description"
+msgstr "A veteran wants proof of what really happened on the old battlefield. Find the place, gather what the dead left behind."
+
+msgid "UI_Dialogue_You"
+msgstr "You"
+
+msgid "UI_Char_Vitals"
+msgstr "Vitals"
+
+msgid "UI_Char_Attributes"
+msgstr "Attributes"
+
+msgid "UI_Char_Offense"
+msgstr "Offense"
+
+msgid "UI_Char_Defense"
+msgstr "Defense"
+
+msgid "UI_Char_Misc"
+msgstr "Miscellaneous"
+
+msgid "UI_Craft_PickRecipe"
+msgstr "Pick a recipe"
+
+msgid "UI_Craft_Choose"
+msgstr "Choose"
+
+msgid "UI_Craft_Additives"
+msgstr "Additives"
+
+msgid "UI_Craft_Create"
+msgstr "Craft"
+
+msgid "UI_Craft_Upgrade"
+msgstr "Upgrade"
+
+msgid "UI_Craft_Reroll"
+msgstr "Reroll modifier"
+
+msgid "UI_Craft_Ascend"
+msgstr "Ascend"
+
+msgid "UI_Craft_Recipes"
+msgstr "Recipes"
+
+msgid "UI_Craft_Result"
+msgstr "Result"
+
+msgid "UI_Craft_Modifiers"
+msgstr "Modifiers"
+
+msgid "UI_Craft_Requirements"
+msgstr "Requirements"
+
+msgid "UI_Crafting_Recraft"
+msgstr "Reroll"
+
+msgid "UI_Recipe_Learn"
+msgstr "Learn"
+
+msgid "UI_Recipe_Learned"
+msgstr "Recipe learned: {Recipe}"
+
+msgid "UI_Recipe_Already_Known"
+msgstr "{Recipe} is already known"
+
+msgid "UI_Recipe_Locked_Mastery"
+msgstr "Unlocks at crafting mastery {Level}"
+
+msgid "UI_Recipe_Locked_Scroll"
+msgstr "Requires a recipe scroll"
+
+msgid "UI_Craft_AscendWarning"
+msgstr "Ascension is irreversible: the ascended item is sealed and can never be modified again."
+
+msgid "UI_Craft_Success_Chance"
+msgstr "Success chance: {Chance:%}"
+
+msgid "UI_Craft_Mastery"
+msgstr "Crafting Mastery"
+
+msgid "UI_Mastery_Max"
+msgstr "MAX"
+
+msgid "UI_Mastery_Channel_Upgrade"
+msgstr "Upgrade success"
+
+msgid "UI_Mastery_Channel_Values"
+msgstr "Modifier values"
+
+msgid "UI_Mastery_Channel_Rarity"
+msgstr "Rarity chance"
+
+msgid "UI_Mastery_Channel_Effect"
+msgstr "Extra effect"
+
+msgid "UI_Mastery_Channel_Mythic"
+msgstr "Mythic modifier"
+
+msgid "UI_Mastery_Channel_Salvage"
+msgstr "Salvage return"
+
+msgid "UI_Craft_Forecast"
+msgstr "Craft forecast"
+
+msgid "UI_Craft_Forecast_Hint"
+msgstr "mastery included"
+
+msgid "UI_Forecast_Extra_Level"
+msgstr "Extra level on success"
+
+msgid "UI_Forecast_Min_Rarity"
+msgstr "Minimum rarity"
+
+msgid "UI_Craft_Pool"
+msgstr "Possible modifiers"
+
+msgid "UI_Craft_PickItem"
+msgstr "Pick an item"
+
+msgid "UI_Pool_Extra_Levels"
+msgstr "+{Min}–{Max} upgrade levels"
+
+msgid "UI_Pool_Counter"
+msgstr "{Count|roll|rolls}"
+
+msgid "UI_Mod_Kind_Flat"
+msgstr "+"
+
+msgid "UI_Mod_Kind_Increase"
+msgstr "+% incr."
+
+msgid "UI_Mod_Kind_Multiplicative"
+msgstr "+% more"
+
+msgid "UI_Item_Implicits"
+msgstr "Implicits"
+
+msgid "UI_Item_Modifiers"
+msgstr "Modifiers"
+
+msgid "UI_Item_Prefixes"
+msgstr "Prefixes"
+
+msgid "UI_Item_Suffixes"
+msgstr "Suffixes"
+
+msgid "UI_Item_Mythic"
+msgstr "Mythic"
+
+msgid "UI_Item_Effect"
+msgstr "Effect"
+
+msgid "UI_Inv_Sort"
+msgstr "Sort"
+
+msgid "UI_Inv_Destroy"
+msgstr "Destroy"
+
+msgid "UI_Inv_Equipment"
+msgstr "Equipment"
+
+msgid "UI_Inv_Stats"
+msgstr "Stats"
+
+msgid "UI_Inv_Search"
+msgstr "Search item..."
+
+msgid "UI_Inv_All"
+msgstr "All"
+
+msgid "UI_Inv_AllTypes"
+msgstr "All types"
+
+msgid "UI_Inv_Type_Weapon"
+msgstr "Weapon"
+
+msgid "UI_Inv_Type_Armor"
+msgstr "Armor"
+
+msgid "UI_Inv_Type_Jewellery"
+msgstr "Jewellery"
+
+msgid "UI_Inv_Type_Resources"
+msgstr "Resources"
+
+msgid "UI_Bar_Effects"
+msgstr "Effects"
+
+msgid "UI_Bar_Modifiers"
+msgstr "Modifiers"
+
+msgid "UI_Effect_Duration"
+msgstr "Lasts {Duration|turn|turns}"
+
+msgid "WeaponType_Dagger"
+msgstr "Dagger"
+
+msgid "WeaponType_Sword"
+msgstr "Sword"
+
+msgid "WeaponType_Bow"
+msgstr "Bow"
+
+msgid "WeaponType_Staff"
+msgstr "Staff"
+
+msgid "WeaponType_Axe"
+msgstr "Axe"
+
+msgid "WeaponType_Wand"
+msgstr "Wand"
+
+msgid "Handedness_OneHanded"
+msgstr "One-handed"
+
+msgid "Handedness_TwoHanded"
+msgstr "Two-handed"
+
+msgid "Category_Metal"
+msgstr "Metal"
+
+msgid "Category_Fabric"
+msgstr "Fabric"
+
+msgid "Category_Leather"
+msgstr "Leather"
+
+msgid "Category_Gem"
+msgstr "Gem"
+
+msgid "Category_Bone"
+msgstr "Bone"
+
+msgid "Category_Essence"
+msgstr "Essence"
+
+msgid "UI_Journal_Empty"
+msgstr "No quests yet. The world won't come asking — go talk to people."
+
+msgid "UI_Journal_Abandon"
+msgstr "Abandon quest"
+
+msgid "UI_Journal_Optional"
+msgstr "optional"
+
+msgid "UI_Quest_Status_Active"
+msgstr "In progress"
+
+msgid "UI_Quest_Status_ReadyToTurnIn"
+msgstr "Ready to turn in"
+
+msgid "UI_Quest_Status_Completed"
+msgstr "Completed"
+
+msgid "UI_Quest_Status_Failed"
+msgstr "Failed"
+
+msgid "UI_Quest_Status_Declined"
+msgstr "Declined"
+
+msgid "Quest_Field_Of_Bones_Stage_FindBattlefield"
+msgstr "Find the old battlefield"
+
+msgid "Quest_Field_Of_Bones_Obj_Battlefield"
+msgstr "Discover the old battlefield"
+
+msgid "Quest_Field_Of_Bones_Stage_GatherProof"
+msgstr "Gather proof from the burned ground"
+
+msgid "Quest_Field_Of_Bones_Obj_Proof"
+msgstr "Collect coal"
+
+msgid "Quest_Field_Of_Bones_Obj_Revenants"
+msgstr "Put down grave revenants"
+
+msgid "Dlg_Opt_Leave"
+msgstr "Leave."
+
+msgid "Dlg_Opt_Back"
+msgstr "About something else..."
+
+msgid "Dlg_Opt_TrialHint"
+msgstr "Remind me what I am walking into."
+
+msgid "Dlg_Opt_TrialTurnIn"
+msgstr "It is done."
+
+msgid "Npc_Bandit_Veteran"
+msgstr "Veteran"
+
+msgid "Dlg_Bandit_Veteran_Greeting_1"
+msgstr "What do you want? Speak quickly."
+
+msgid "Dlg_Bandit_Veteran_Greeting_AskWork"
+msgstr "Got any work for me?"
+
+msgid "Dlg_Bandit_Veteran_Greeting_Flatter"
+msgstr "[Flatter] Those scars... you must have seen a hundred battles."
+
+msgid "Dlg_Bandit_Veteran_FlatterGood_1"
+msgstr "Heh. A hundred and six. You've got a good eye, stranger."
+
+msgid "Dlg_Bandit_Veteran_FlatterBad_1"
+msgstr "Save the honey for someone who can't smell it. Out with it."
+
+msgid "Dlg_Bandit_Veteran_Offer_1"
+msgstr "There is an old battlefield somewhere in these lands. Nobody who went looking came back to tell where."
+
+msgid "Dlg_Bandit_Veteran_Offer_2"
+msgstr "Find it, bring me three lumps of coal from the burned ground. Then we talk payment."
+
+msgid "Dlg_Bandit_Veteran_Offer_Accept"
+msgstr "I'll find it."
+
+msgid "Dlg_Bandit_Veteran_Offer_Refuse"
+msgstr "Not interested."
+
+msgid "Dlg_Bandit_Veteran_Accepted_1"
+msgstr "Don't die out there. Or do — just not before you find the place."
+
+msgid "Dlg_Bandit_Veteran_Working_1"
+msgstr "You're still here? The battlefield won't find itself."
+
+msgid "Dlg_Bandit_Veteran_Working_GiveUp"
+msgstr "I'm done with this errand of yours."
+
+msgid "Dlg_Bandit_Veteran_HaveIt_1"
+msgstr "That look on your face... you found it, didn't you?"
+
+msgid "Dlg_Bandit_Veteran_HaveIt_TurnIn"
+msgstr "Here's your coal from the burned ground."
+
+msgid "Dlg_Bandit_Veteran_Thanks_1"
+msgstr "So it's true then. Take this — and forget you ever told me."
+
+# ------------------------------
+# Plural words (used by templates as {Name|singular|plural})
+# ------------------------------
+
+msgid "turn"
+msgid_plural "turns"
+msgstr[0] "turn"
+msgstr[1] "turns"
+
+msgid "stack"
+msgid_plural "stacks"
+msgstr[0] "stack"
+msgstr[1] "stacks"
+
+msgid "lunge"
+msgid_plural "lunges"
+msgstr[0] "lunge"
+msgstr[1] "lunges"
+
+msgid "point"
+msgid_plural "points"
+msgstr[0] "point"
+msgstr[1] "points"
+
+# ------------------------------
+# Battle log (values arrive pre-colored; templates render Plain)
+# ------------------------------
+
+msgid "Log_Turn"
+msgstr "Turn: {Name}"
+
+msgid "Log_Flee_Success"
+msgstr "You slipped away from the battle."
+
+msgid "Log_Flee_Failed"
+msgstr "Escape failed — the turn is lost."
+
+msgid "Log_AbilityUsed"
+msgstr "{Caster} uses {Ability}"
+
+msgid "Log_AbilityStage"
+msgstr "{Ability} of {Caster} surges to stage {Stage}!"
+
+msgid "Log_DamageDealt"
+msgstr "{Attacker} deal {Target}: {Damage}"
+
+msgid "Log_Death"
+msgstr "{Name} dies"
+
+msgid "Log_Heal"
+msgstr "{Name} restores {Amount} HP"
+
+msgid "Log_Evade"
+msgstr "{Target} evades {Attacker}'s attack"
+
+msgid "Log_Block"
+msgstr "{Target} blocks {Attacker}'s attack"
+
+msgid "Log_EffectApplied"
+msgstr "{Target}: {Effect}"
+
+msgid "Log_EffectAppliedFrom"
+msgstr "{Target}: {Effect} from {Caster}"
+
+msgid "Log_TurnSkipped"
+msgstr "{Name} skips the turn ({Cause})"
+
+msgid "Log_Cause_Frozen"
+msgstr "frozen"
+
+msgid "Log_Cause_Stunned"
+msgstr "stunned"
+
+msgid "Log_Crit"
+msgstr "CRIT"
+
+msgid "Log_Player"
+msgstr "Player"
+
+msgid "Log_Enemy"
+msgstr "Enemy"
+
+msgid "DamageType_Sacred"
+msgstr "Sacred"
+
+msgid "DamageType_Physical"
+msgstr "Phys."
+
+msgid "DamageType_Fire"
+msgstr "Fire"
+
+msgid "DamageType_Cold"
+msgstr "Cold"
+
+msgid "DamageType_Lightning"
+msgstr "Lightning"
+
+msgid "DamageType_Poison"
+msgstr "Poison"
+
+msgid "DamageType_Burning"
+msgstr "Burning"
+
+msgid "DamageType_Bleed"
+msgstr "Bleed"
+
+msgid "DamageType_Blight"
+msgstr "Blight"
+
+# ------------------------------
+# Parameters (EntityParameter enum — держать в синхроне)
+# ------------------------------
+
+msgid "PhysicalDamage"
+msgstr "Physical Damage"
+
+msgid "FireDamage"
+msgstr "Fire Damage"
+
+msgid "ColdDamage"
+msgstr "Cold Damage"
+
+msgid "LightningDamage"
+msgstr "Lightning Damage"
+
+msgid "Intelligence"
+msgstr "Intelligence"
+
+msgid "Dexterity"
+msgstr "Dexterity"
+
+msgid "Strength"
+msgstr "Strength"
+
+msgid "BlockChance"
+msgstr "Block Chance"
+
+msgid "CriticalChance"
+msgstr "Critical Chance"
+
+msgid "AdditionalHitChance"
+msgstr "Additional Hit Chance"
+
+msgid "MulticastChance"
+msgstr "Multicast Chance"
+
+msgid "CriticalDamage"
+msgstr "Critical Damage"
+
+msgid "ArmorPenetration"
+msgstr "Armor Penetration"
+
+msgid "Accuracy"
+msgstr "Accuracy"
+
+msgid "SpellDamage"
+msgstr "Spell Damage"
+
+msgid "Armor"
+msgstr "Armor"
+
+msgid "Evade"
+msgstr "Evade"
+
+msgid "ManaRecovery"
+msgstr "Mana Recovery"
+
+msgid "MoveSpeed"
+msgstr "Move Speed"
+
+msgid "Suppress"
+msgstr "Suppress"
+
+msgid "SuppressChance"
+msgstr "Suppress Chance"
+
+msgid "Health"
+msgstr "Health"
+
+msgid "HealthRecovery"
+msgstr "Health Recovery"
+
+msgid "BarrierRecovery"
+msgstr "Barrier Recovery"
+
+msgid "CriticalDamageMitigation"
+msgstr "Critical Damage Mitigation"
+
+msgid "FireResistance"
+msgstr "Fire Resistance"
+
+msgid "ColdResistance"
+msgstr "Cold Resistance"
+
+msgid "LightningResistance"
+msgstr "Lightning Resistance"
+
+msgid "PoisonResistance"
+msgstr "Poison Resistance"
+
+msgid "AllResistance"
+msgstr "All Resistances"
+
+msgid "FireResistancePenetration"
+msgstr "Fire Resistance Penetration"
+
+msgid "ColdResistancePenetration"
+msgstr "Cold Resistance Penetration"
+
+msgid "LightningResistancePenetration"
+msgstr "Lightning Resistance Penetration"
+
+msgid "PoisonResistancePenetration"
+msgstr "Poison Resistance Penetration"
+
+msgid "AllResistancePenetration"
+msgstr "All Resistance Penetration"
+
+msgid "FireResistanceMaximum"
+msgstr "Maximum Fire Resistance"
+
+msgid "ColdResistanceMaximum"
+msgstr "Maximum Cold Resistance"
+
+msgid "LightningResistanceMaximum"
+msgstr "Maximum Lightning Resistance"
+
+msgid "PoisonResistanceMaximum"
+msgstr "Maximum Poison Resistance"
+
+msgid "AllResistanceMaximum"
+msgstr "Maximum All Resistances"
+
+msgid "AllAttribute"
+msgstr "All Attributes"
+
+msgid "AllDefence"
+msgstr "All Defence"
+
+msgid "PoisonDamageMultiplier"
+msgstr "Poison Damage Multiplier"
+
+msgid "BurningDamageMultiplier"
+msgstr "Burning Damage Multiplier"
+
+msgid "BleedDamageMultiplier"
+msgstr "Bleed Damage Multiplier"
+
+msgid "AllDoTDamageMultiplier"
+msgstr "All Damage over Time Multiplier"
+
+msgid "AllElementalDamage"
+msgstr "All Elemental Damage"
+
+msgid "Damage"
+msgstr "All Damage"
+
+# ------------------------------
+# Ability parameters (battle UI)
+# ------------------------------
+
+msgid "Type"
+msgstr "Type:"
+
+msgid "Cost"
+msgstr "Cost:"
+
+msgid "Resource"
+msgstr "Resource:"
+
+msgid "Cooldown"
+msgstr "Cooldown:"
+
+msgid "MaxTargets"
+msgstr "Max Targets:"
+
+msgid "Mana"
+msgstr "Mana"
+
+msgid "Barrier"
+msgstr "Barrier"
+
+msgid "Target"
+msgstr "Target"
+
+msgid "Selfcast"
+msgstr "Selfcast"
+
+# ------------------------------
+# Ability names & descriptions (2026-07-07, тексты Todd)
+# ------------------------------
+
+msgid "Ability_Berserk_Fury"
+msgstr "Berserk Fury"
+
+msgid "Ability_Dark_Shroud"
+msgstr "Dark Shroud"
+
+msgid "Ability_Fireball"
+msgstr "Fireball"
+
+msgid "Ability_Fireball_Description"
+msgstr "Deal {Damage} damage to the Target."
+
+msgid "Ability_Increasing_Pressure"
+msgstr "Increasing Pressure"
+
+msgid "Ability_Mana_Devour"
+msgstr "Mana Devour"
+
+msgid "Ability_Mana_Devour_Description"
+msgstr "Consume {ConsumePercent}% from current mana.\n For each mana consumed give {SpellDamagePerMana}% increased Spell Damage."
+
+msgid "Ability_Sacrifice"
+msgstr "Sacrifice"
+
+msgid "Ability_Head_Butt"
+msgstr "Head Butt"
+
+msgid "Ability_Poison_Coating"
+msgstr "Poison Coating"
+
+msgid "Ability_Poison_Coating_Description"
+msgstr "For {Duration|turn|turns} every attack applies a {@Poison} stack. Each stack deals {PoisonMultiplier:%} of the damage dealt over {PoisonDuration|turn|turns}."
+
+msgid "Ability_Poison_Explosion"
+msgstr "Poison Explosion"
+
+msgid "Ability_Poison_Explosion_Description"
+msgstr "Consumes every {@Poison} stack on the target and deals their total damage at once. Executes the target at {ExecutionThreshold} or more stacks."
+
+msgid "Ability_Critical_Calculation"
+msgstr "Critical Calculation"
+
+msgid "Ability_Critical_Calculation_Description"
+msgstr "Grants {Stacks} stacks of increased critical chance for {Duration|turn|turns}. A critical strike extends the buff by {AdditionalDurationAmount|turn|turns}."
+
+msgid "Ability_Dark_Shroud_Description"
+msgstr "For {Duration|turn|turns} applies {Stacks} stacks of Light Step (+{LightStepValue:%} evade each). Restores {HealthRegen:%} health at the start of each turn."
+
+msgid "Ability_Jar_Of_Poison"
+msgstr "Jar of Poison"
+
+msgid "Ability_Jar_Of_Poison_Description"
+msgstr "Applies a {@Poison} stack dealing a share of {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) as damage each turn for {PoisonDuration|turn|turns}."
+
+msgid "Ability_Increasing_Pressure_Description"
+msgstr "A series of up to {Attacks} escalating attacks. Each attack deals an additional {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) base damage. Every successful hit empowers the next one by {AttackDamageStepMultiplier:%}."
+
+msgid "Ability_Series_Of_Attacks"
+msgstr "Series of Attacks"
+
+msgid "Ability_Series_Of_Attacks_Description"
+msgstr "A series of {MinAttacks}-{MaxAttacks} attacks. Each attack deals an additional {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) base damage. An evade interrupts the series."
+
+msgid "Ability_Berserk_Fury_Description"
+msgstr "Applies {@Effect_Fury} ({Duration|turn|turns}, each attack burns {FuryHealthPercent:%} of current health) and performs consecutive attacks — the chance to continue the series depends on current health: the lower it is, the lower the chance."
+
+msgid "Ability_Armageddon"
+msgstr "Armageddon"
+
+msgid "Ability_Armageddon_Description"
+msgstr "Hold the activation to charge up to three stages. Stage one consumes 5% health and deals 300 + (75% + 75%) base damage. Stage two consumes 15% health and deals 600 + (120% + 120%). Stage three consumes 30% health, deals 1000 + (180% + 180%) and additionally stuns the target for {StunDuration|turn|turns}. Without enough health, the last reached stage is activated."
+
+msgid "Ability_Double_Strike"
+msgstr "Double Strike"
+
+msgid "Ability_Double_Strike_Description"
+msgstr "Delivers two consecutive strikes. The first deals {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) base damage and reduces the target's armor on hit. The second deals {SecondDamage} + ({SecondWeaponScale:%} + {SecondSpellScale:%}) base damage and reduces the target's evade on hit."
+
+msgid "Ability_Head_Butt_Description"
+msgstr "A single lunge dealing {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) base damage, stunning the target for {StunDuration|turn|turns}."
+
+msgid "Ability_Porcupine"
+msgstr "Porcupine"
+
+msgid "Ability_Porcupine_Description"
+msgstr "For {Duration|turn|turns} returns {DamageReturn:%} of the damage dealt + {ArmorReturn:%} of your armor back to the attacker."
+
+msgid "Ability_Ares_Blessing"
+msgstr "Ares' Blessing"
+
+msgid "Ability_Ares_Blessing_Description"
+msgstr "Increases maximum health by {HealthBonus:%} and health recovery by {RecoveryBonus:%} for {Duration|turn|turns}."
+
+msgid "Ability_Sacrifice_Description"
+msgstr "Sacrifices {SacrificePercent:%} of current health. For every 100 health lost, the next activated ability gains {RatePerHundred:%} as {@Sacred} damage. Charges: {Charges}."
+
+msgid "Ability_Ice_Shards"
+msgstr "Ice Shards"
+
+msgid "Ability_Ice_Shards_Description"
+msgstr "Fires {ProjectileCount} ice shards. Each shard deals {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) damage to the target.\nActivation level 2: shard damage increases to {SecondStageDamage} + ({SecondStageWeaponDamageScale:%} + {SecondStageSpellDamageScale:%}).\nActivation level 3: shards strike every target on the battlefield.\nActivation level 4: on a critical strike the shards shatter into shrapnel, dealing {ShrapnelDamage} + ({ShrapnelWeaponDamageScale:%} + {ShrapnelSpellDamageScale:%}) damage to all enemies."
+
+msgid "Ability_Ice_Block"
+msgstr "Ice Block"
+
+msgid "Ability_Ice_Block_Description"
+msgstr "Drops a massive block of ice on the target: {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) damage and a {StunDuration|turn|turns} stun.\nActivation level 2: the stun lasts 1 more turn.\nActivation level 3: applies a stack of {@Effect_Withering_Curse}.\nActivation level 4: {ExtraBlocks} additional blocks fall on the target, each dealing {ExtraBlockDamagePercent:%} of the original block's damage."
+
+msgid "Ability_Overload"
+msgstr "Overload"
+
+msgid "Ability_Overload_Description"
+msgstr "Absorbs {ManaBurnPercent:%} of current mana. The next activated ability deals {DamagePerStep:%} more damage for every {ManaPerStep} mana absorbed.\nActivation level 2: +{StageTwoAbsorbBonus:%} mana absorbed.\nActivation level 3: the multiplier is counted per single point of mana.\nActivation level 4: restores {StageFourManaRestore:%} of maximum mana."
+
+msgid "Ability_Chain_Lightning"
+msgstr "Chain Lightning"
+
+msgid "Ability_Chain_Lightning_Description"
+msgstr "Deals {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) base damage to the target and jumps to a random enemy up to {Jumps} times. Each jump loses {DamageFalloff:%} damage.\nActivation level 2: +1 jump.\nActivation level 3: damage loss per jump is reduced by 15%.\nActivation level 4: the final jump deals double damage."
+
+msgid "Ability_Ice_Aegis"
+msgstr "Ice Aegis"
+
+msgid "Ability_Ice_Aegis_Description"
+msgstr "Grants a barrier equal to {BarrierBase} + {PerIntelligenceScale} per point of Intelligence for {Duration|turn|turns}.\nActivation level 2: additional +15 scaling per point of Intelligence.\nActivation level 3: while the barrier holds, attackers gain a stack of {@Effect_Clumsiness}.\nActivation level 4: if the barrier is destroyed before it expires, freezes every enemy on the battlefield."
+
+# ------------------------------
+# Ability upgrades — every ability
+# ------------------------------
+
+msgid "Augment_Reduce_Cost"
+msgstr "Reduce Cost"
+
+msgid "Augment_Reduce_Cost_Description"
+msgstr "-{costShare:%} cost."
+
+msgid "Augment_Reduce_Cooldown"
+msgstr "Reduce Cooldown"
+
+msgid "Augment_Reduce_Cooldown_Description"
+msgstr "-{cooldownTurns|turn|turns} cooldown."
+
+msgid "Augment_Reduce_Cooldown_Add_Cost"
+msgstr "Reduce Cooldown Add Cost"
+
+msgid "Augment_Reduce_Cooldown_Add_Cost_Description"
+msgstr "-{cooldownTurns|turn|turns} cooldown, but +{costShare:%} cost."
+
+msgid "Augment_Cost_Type_Health"
+msgstr "Cost Type Health"
+
+msgid "Augment_Cost_Type_Health_Description"
+msgstr "The cost is paid with health instead of mana."
+
+# ------------------------------
+# Ability upgrades — Intelligence stance
+# ------------------------------
+
+msgid "Augment_Additional_Crit_Damage"
+msgstr "Additional Crit Damage"
+
+msgid "Augment_Additional_Crit_Damage_Description"
+msgstr "+{amount:%} critical damage."
+
+msgid "Augment_Additional_Crit_Chance"
+msgstr "Additional Crit Chance"
+
+msgid "Augment_Additional_Crit_Chance_Description"
+msgstr "+{amount:%} critical chance."
+
+msgid "Augment_Overload_Mana_Step"
+msgstr "Mana Step"
+
+msgid "Augment_Overload_Mana_Step_Description"
+msgstr "The multiplier step is {amount} mana smaller."
+
+msgid "Augment_Random_Cooldown"
+msgstr "Random Cooldown"
+
+msgid "Augment_Random_Cooldown_Description"
+msgstr "The cast reduces the cooldown of a random ability by {amount}."
+
+msgid "Augment_Mana_Flow"
+msgstr "Mana Flow"
+
+msgid "Augment_Mana_Flow_Description"
+msgstr "Applies {@Effect_Mana_Flow} ({percentRegeneration:%} of maximum mana for {duration|turn|turns})."
+
+msgid "Augment_Overload_Stage_Four_Resets_Cooldown"
+msgstr "Stage4 Resets Cooldown"
+
+msgid "Augment_Overload_Stage_Four_Resets_Cooldown_Description"
+msgstr "Rolling activation level 4 resets this ability's cooldown."
+
+msgid "Augment_Next_Cast_Sacred"
+msgstr "Next Cast Sacred"
+
+msgid "Augment_Next_Cast_Sacred_Description"
+msgstr "The next activated ability deals {fraction:%} of its damage as {@Sacred}."
+
+msgid "Augment_Chain_Lightning_Ignore_Resistances"
+msgstr "Ignore Resistances"
+
+msgid "Augment_Chain_Lightning_Ignore_Resistances_Description"
+msgstr "{@Lightning} ignores resistances."
+
+# ------------------------------
+# Keyword reference cards  (<Id>_Tooltip = static text, no placeholders)
+# ------------------------------
+
+msgid "Effect_Blind"
+msgstr "Blindness"
+
+msgid "Effect_Blind_Tooltip"
+msgstr "Reduces the target's accuracy."
+
+msgid "Effect_Weakness"
+msgstr "Weakness"
+
+msgid "Effect_Weakness_Tooltip"
+msgstr "Reduces the damage of the target's ability hits."
+
+msgid "Effect_Enhance_Defense"
+msgstr "Enhanced Defence"
+
+msgid "Effect_Enhance_Defense_Tooltip"
+msgstr "Increases the owner's defensive parameters."
+
+msgid "Effect_Crit_Mitigation"
+msgstr "Crit Protection"
+
+msgid "Effect_Crit_Mitigation_Tooltip"
+msgstr "Reduces the critical damage the owner takes."
+
+msgid "Effect_Ice_Crit_Mitigation"
+msgstr "Icy Crit Protection"
+
+msgid "Effect_Ice_Crit_Mitigation_Tooltip"
+msgstr "Reduces the critical damage the owner takes."
+
+msgid "Effect_Lucky_Crit_Chance"
+msgstr "Lucky Crit"
+
+msgid "Effect_Lucky_Crit_Chance_Tooltip"
+msgstr "Critical strikes roll their chance twice and take the better result."
+
+msgid "Effect_Seal_Of_Oblivion"
+msgstr "Seal of Oblivion"
+
+msgid "Effect_Seal_Of_Oblivion_Tooltip"
+msgstr "Disables the sealed target's passive skills."
+
+msgid "Effect_Fragility"
+msgstr "Fragility"
+
+msgid "Effect_Fragility_Tooltip"
+msgstr "Increases critical damage taken."
+
+msgid "Effect_Mana_Flow"
+msgstr "Mana Flow"
+
+msgid "Effect_Mana_Flow_Tooltip"
+msgstr "Restores a percentage of maximum mana each turn."
+
+msgid "Effect_Fury_Tooltip"
+msgstr "Burns a portion of health with every attack."
+
+msgid "Effect_Clumsiness"
+msgstr "Clumsiness"
+
+msgid "Effect_Clumsiness_Tooltip"
+msgstr "Reduces the target's Evade."
+
+msgid "Effect_Withering_Curse"
+msgstr "Withering Curse"
+
+msgid "Effect_Withering_Curse_Tooltip"
+msgstr "Reduces maximum health."
+
+msgid "Execute_Tooltip"
+msgstr "For a standard NPC, the threshold is applied at 100% of its value. For “Archon”-type NPCs, only 15% of the original value is applied. The minimum possible health threshold is 5%."
+
+msgid "Silence_Tooltip"
+msgstr "Forbids the target to use any active ability."
+
+msgid "Incineration_Tooltip"
+msgstr "Getting an critical attack cause instant death."
+
+msgid "Burning_Tooltip"
+msgstr "Fire damage over time, dealt at the start of the turn. Reduced by fire resistance; a tick is not an attack, so attack effects that ignore resistances do not apply to it."
+
+msgid "Bleed_Tooltip"
+msgstr "Physical damage over time, dealt at the start of the turn. Reduced by armor, which the attacker's armor penetration weakens."
+
+msgid "Poison_Tooltip"
+msgstr "Poison damage over time, dealt at the start of the turn. Reduced by poison resistance; a tick is not an attack, so attack effects that ignore resistances do not apply to it."
+
+# ------------------------------
+# Damage-type keywords ({@Physical}, {@Fire}... in descriptions) and their reference cards
+# ------------------------------
+
+msgid "Physical"
+msgstr "Physical"
+
+msgid "Physical_Tooltip"
+msgstr "Plain bodily harm. Reduced by the target's armor, which the attacker's armor penetration weakens."
+
+msgid "Fire"
+msgstr "Fire"
+
+msgid "Fire_Tooltip"
+msgstr "Elemental fire damage. Reduced by fire resistance; the attacker's fire penetration pierces part of that resistance."
+
+msgid "Cold"
+msgstr "Cold"
+
+msgid "Cold_Tooltip"
+msgstr "Elemental cold damage. Reduced by cold resistance; the attacker's cold penetration pierces part of that resistance."
+
+msgid "Lightning"
+msgstr "Lightning"
+
+msgid "Lightning_Tooltip"
+msgstr "Elemental lightning damage. Reduced by lightning resistance; the attacker's lightning penetration pierces part of that resistance."
+
+msgid "Sacred"
+msgstr "Sacred"
+
+msgid "Sacred_Tooltip"
+msgstr "Holy power that ignores armor and every resistance — nothing reduces it."
+
+msgid "Blight"
+msgstr "Blight"
+
+msgid "Blight_Tooltip"
+msgstr "Corruption that gnaws at health itself — neither armor nor any resistance reduces it."
+
+msgid "Bleed"
+msgstr "Bleed"
+
+msgid "Burning"
+msgstr "Burning"
+
+msgid "Poison"
+msgstr "Poison"
+
+msgid "Lucky_Tooltip"
+msgstr "The odds are calculated twice, and the best outcome is selected."
+
+# ------------------------------
+# Ability upgrades — Dexterity stance
+# ------------------------------
+
+msgid "Augment_Poison_Attack_Series"
+msgstr "Poison On Hit"
+
+msgid "Augment_Poison_Attack_Series_Description"
+msgstr "Attacks apply a stack of {@Poison} for {poisonDuration|turn|turns}."
+
+msgid "Augment_Apply_Buff_Critical_Chance"
+msgstr "Apply Buff Critical Chance"
+
+msgid "Augment_Apply_Buff_Critical_Chance_Description"
+msgstr "After {amountAttacks} successful attacks, gain +{criticalChance:%} critical chance for {duration|turn|turns} (up to {maxStacks|stack|stacks})."
+
+msgid "Augment_Apply_Buff_Critical_Damage"
+msgstr "Apply Buff Critical Damage"
+
+msgid "Augment_Apply_Buff_Critical_Damage_Description"
+msgstr "After {amountAttacks} successful attacks, gain +{criticalDamage:%} critical damage for {duration|turn|turns} (up to {maxStacks|stack|stacks})."
+
+msgid "Augment_More_Attack_Damage"
+msgstr "More Attack Damage"
+
+msgid "Augment_More_Attack_Damage_Description"
+msgstr "+{damageMultiplier:%} attack damage."
+
+msgid "Augment_Additional_Attacks"
+msgstr "Additional Attacks"
+
+msgid "Augment_Additional_Attacks_Description"
+msgstr "+{amountAttacks} attack."
+
+msgid "Augment_Increasing_Pressure_Single_Empowered_Attack"
+msgstr "Single Empowered Attack"
+
+msgid "Augment_Increasing_Pressure_Single_Empowered_Attack_Description"
+msgstr "Replaces the series with a single empowered strike."
+
+msgid "Augment_Attack_Random_Target"
+msgstr "Attack Random Target"
+
+msgid "Augment_Attack_Random_Target_Description"
+msgstr "Attacks strike a random target ({splashDamage:%} splash)."
+
+msgid "Augment_Increasing_Pressure_Last_Attack_Always_Crit"
+msgstr "Last Attack Always Crit"
+
+msgid "Augment_Increasing_Pressure_Last_Attack_Always_Crit_Description"
+msgstr "The last attack is always critical."
+
+msgid "Augment_First_Attack_Crit_Damage"
+msgstr "First Attack Crit Damage"
+
+msgid "Augment_First_Attack_Crit_Damage_Description"
+msgstr "The first attack deals +{critDamageBonus:%} critical damage."
+
+msgid "Augment_Extend_Poison"
+msgstr "Extend Poison"
+
+msgid "Augment_Extend_Poison_Description"
+msgstr "A successful attack extends {@Poison} by {poisonDuration|turn|turns}."
+
+msgid "Augment_Additional_Projectiles"
+msgstr "Additional Projectiles"
+
+msgid "Augment_Additional_Projectiles_Description"
+msgstr "The ability fires {amount} more projectiles."
+
+msgid "Augment_Buff_Effectiveness"
+msgstr "Buff Effectiveness"
+
+msgid "Augment_Buff_Effectiveness_Description"
+msgstr "Increases the effectiveness of the buff by {effectiveness:%}."
+
+msgid "Augment_Recovery_Effectiveness"
+msgstr "Recovery Effectiveness"
+
+msgid "Augment_Recovery_Effectiveness_Description"
+msgstr "Increases the effectiveness of the recovery by {effectiveness:%}."
+
+msgid "Augment_Debuff_Effectiveness"
+msgstr "Debuff Effectiveness"
+
+msgid "Augment_Debuff_Effectiveness_Description"
+msgstr "Increases the effectiveness of the debuff by {effectiveness:%}."
+
+msgid "Augment_Increasing_Scales"
+msgstr "Increasing Scales"
+
+msgid "Augment_Increasing_Scales_Description"
+msgstr "+{weaponDamageScale:%} weapon and +{spellDamageScale:%} spell damage scaling."
+
+msgid "Augment_Poison_Duration"
+msgstr "Poison Duration"
+
+msgid "Augment_Poison_Duration_Description"
+msgstr "+{poisonDuration|turn|turns} {@Poison} duration."
+
+msgid "Augment_Dark_Shroud_Immortality"
+msgstr "Immortality"
+
+msgid "Augment_Dark_Shroud_Immortality_Description"
+msgstr "Grants Immortality for {duration|turn|turns} (an analog of Life Aegis)."
+
+msgid "Augment_Additional_Health_Regen"
+msgstr "Regeneration"
+
+msgid "Augment_Additional_Health_Regen_Description"
+msgstr "+{additionalRegen:%} health regeneration."
+
+msgid "Augment_Add_Effectiveness_Reduce_Stacks"
+msgstr "Add Effectiveness Reduce Stacks"
+
+msgid "Augment_Add_Effectiveness_Reduce_Stacks_Description"
+msgstr "+{additionalEffectiveness:%} effectiveness, but -{amountStacks|stack|stacks}."
+
+msgid "Augment_Critical_Calculation_Lucky_Crit"
+msgstr "Lucky Crit"
+
+msgid "Augment_Critical_Calculation_Lucky_Crit_Description"
+msgstr "Grants {@Effect_Lucky_Crit_Chance} for {duration|turn|turns}."
+
+msgid "Augment_Leach_On_Crit"
+msgstr "Leach On Crit"
+
+msgid "Augment_Leach_On_Crit_Description"
+msgstr "Critical strikes heal for {amount:%} of the damage dealt."
+
+msgid "Augment_Apply_Enhanced_Defence"
+msgstr "Apply Enhanced Defence"
+
+msgid "Augment_Apply_Enhanced_Defence_Description"
+msgstr "Applies {@Effect_Enhance_Defense} ({duration|turn|turns}, up to {maxStacks|stack|stacks}, {value:%})."
+
+msgid "Augment_Apply_Seal_Of_Oblivion"
+msgstr "Apply Seal Of Oblivion"
+
+msgid "Augment_Apply_Seal_Of_Oblivion_Description"
+msgstr "Applies {@Effect_Seal_Of_Oblivion} for {duration|turn|turns}."
+
+msgid "Augment_Poison_Explosion_Execute_Bosses"
+msgstr "Execute Bosses"
+
+msgid "Augment_Poison_Explosion_Execute_Bosses_Description"
+msgstr "Can execute bosses (×{stacksMultiplier} stack threshold)."
+
+msgid "Augment_Poison_Explosion_Spread_Poison"
+msgstr "Spread Poison"
+
+msgid "Augment_Poison_Explosion_Spread_Poison_Description"
+msgstr "Spreads the {@Poison} to every enemy."
+
+msgid "Augment_Reduce_Execution_Threshold"
+msgstr "Reduce Execution Threshold"
+
+msgid "Augment_Reduce_Execution_Threshold_Description"
+msgstr "-{share:%} to the execution threshold."
+
+msgid "Augment_Poison_Explosion_Transfer_Poison_On_Death"
+msgstr "Transfer Poison On Death"
+
+msgid "Augment_Poison_Explosion_Transfer_Poison_On_Death_Description"
+msgstr "On the target's death, the {@Poison} transfers to another enemy."
+
+msgid "Augment_Attacks_Reduce_Incoming_Heal"
+msgstr "Attacks Reduce Incoming Heal"
+
+msgid "Augment_Attacks_Reduce_Incoming_Heal_Description"
+msgstr "Attacks apply -{value:%} incoming healing ({maxStacks|stack|stacks}, {duration|turn|turns})."
+
+msgid "Augment_Attacks_Reduce_Armor"
+msgstr "Attacks Reduce Armor"
+
+msgid "Augment_Attacks_Reduce_Armor_Description"
+msgstr "Attacks apply -{reduceBy:%} armor (up to {maxStacks|stack|stacks}, {duration|turn|turns})."
+
+msgid "Augment_Poison_Coating_Apply_Poison_For_Each_Enemy"
+msgstr "Apply Stack For Each Enemy"
+
+msgid "Augment_Poison_Coating_Apply_Poison_For_Each_Enemy_Description"
+msgstr "Applies a {@Poison} stack for each enemy on the battlefield."
+
+# ------------------------------
+# Ability upgrades — Strength stance
+# ------------------------------
+
+msgid "Augment_Armageddon_All_Targets"
+msgstr "All Targets"
+
+msgid "Augment_Armageddon_All_Targets_Description"
+msgstr "Strikes every enemy, but +{additionalCooldown} cooldown."
+
+msgid "Augment_Armageddon_Burning"
+msgstr "Stage3 Burning"
+
+msgid "Augment_Armageddon_Burning_Description"
+msgstr "Stage 3 applies {stacks} {@Burning} {stacks|stack|stacks} (×{damageMultiplier}, {duration|turn|turns})."
+
+msgid "Augment_Porcupine_Echo"
+msgstr "Echo"
+
+msgid "Augment_Porcupine_Echo_Description"
+msgstr "{delayedPercent:%} of incoming damage is delayed for {turns|turn|turns}."
+
+msgid "Augment_Porcupine_Incoming_Damage_Reduction"
+msgstr "Incoming Reduction"
+
+msgid "Augment_Porcupine_Incoming_Damage_Reduction_Description"
+msgstr "All incoming damage -{reduce:%}."
+
+msgid "Augment_Porcupine_Crit_Mitigation"
+msgstr "Crit Mitigation"
+
+msgid "Augment_Porcupine_Crit_Mitigation_Description"
+msgstr "-{value:%} critical damage taken."
+
+msgid "Augment_Heal_On_Hit"
+msgstr "Heal On Hit"
+
+msgid "Augment_Heal_On_Hit_Description"
+msgstr "Heals for {amount:%} when hit."
+
+msgid "Augment_More_Retaliation"
+msgstr "More Armor Return"
+
+msgid "Augment_More_Retaliation_Description"
+msgstr "+{amount:%} armor return."
+
+msgid "Augment_Cooldown_Chance"
+msgstr "Cooldown Chance"
+
+msgid "Augment_Cooldown_Chance_Description"
+msgstr "{chance:%} chance to reduce the cooldown when hit."
+
+msgid "Augment_Heal_From_Empowered_Ability_Damage"
+msgstr "Heal From Damage"
+
+msgid "Augment_Heal_From_Empowered_Ability_Damage_Description"
+msgstr "Heals for {amount:%} of the next ability's damage."
+
+msgid "Augment_Incoming_Reduction"
+msgstr "Incoming Reduction"
+
+msgid "Augment_Incoming_Reduction_Description"
+msgstr "-{reduce:%} incoming damage for {duration|turn|turns}."
+
+msgid "Augment_Empowered_Ability_Free_Cast"
+msgstr "Free Cast"
+
+msgid "Augment_Empowered_Ability_Free_Cast_Description"
+msgstr "The next ability is cast without a cooldown."
+
+msgid "Augment_Berserk_Fury_Burning"
+msgstr "Burning Fury"
+
+msgid "Augment_Berserk_Fury_Burning_Description"
+msgstr "{@Effect_Fury} becomes {@Effect_Burning_Fury}: the burned health also deals damage ({burningDuration|turn|turns})."
+
+msgid "Augment_Berserk_Fury_Primal"
+msgstr "Primal Fury"
+
+msgid "Augment_Berserk_Fury_Primal_Description"
+msgstr "{@Effect_Fury} becomes Primal Fury (+{damageMultiplier:%} damage)."
+
+msgid "Augment_Berserk_Fury_Healing"
+msgstr "Healing Fury"
+
+msgid "Augment_Berserk_Fury_Healing_Description"
+msgstr "{@Effect_Fury} becomes {@Effect_Healing_Fury}: heals for {healAmount:%} of the burned health."
+
+msgid "Augment_Fury_More_Burn"
+msgstr "More Burn"
+
+msgid "Augment_Fury_More_Burn_Description"
+msgstr "Attacks burn {amount:%} more health."
+
+msgid "Augment_Fury_Less_Burn"
+msgstr "Less Burn"
+
+msgid "Augment_Fury_Less_Burn_Description"
+msgstr "Attacks burn {amount:%} less health."
+
+msgid "Augment_Health_Bonus"
+msgstr "Health Bonus"
+
+msgid "Augment_Health_Bonus_Description"
+msgstr "+{healthBonus:%} maximum health."
+
+msgid "Augment_Double_Strike_Two_Attacks_Apply_Buff"
+msgstr "Both Hits Buff"
+
+msgid "Augment_Double_Strike_Two_Attacks_Apply_Buff_Description"
+msgstr "Both attacks grant +{amount:%} damage for {duration|turn|turns}."
+
+msgid "Augment_Restore_Mana_Health_On_Hit"
+msgstr "Restore On Hit"
+
+msgid "Augment_Restore_Mana_Health_On_Hit_Description"
+msgstr "The first hit restores {healthRestore:%} health, the second {manaRestore:%} mana."
+
+msgid "Augment_Accuracy"
+msgstr "Accuracy"
+
+msgid "Augment_Accuracy_Description"
+msgstr "+{amount:%} accuracy."
+
+msgid "Augment_Extend_Stun_Add_Cost"
+msgstr "Extend Stun Add Cost"
+
+msgid "Augment_Extend_Stun_Add_Cost_Description"
+msgstr "+{stunDuration|turn|turns} stun, +{additionalCost} cost."
+
+# ------------------------------
+# Passive skills
+# ------------------------------
+
+msgid "Passive_Skill_Execute"
+msgstr "Execution"
+
+msgid "Passive_Skill_Execute_Description"
+msgstr "Instantly {@Execute} a target at {Threshold:%} health or below."
+
+msgid "Passive_Skill_Porcupine"
+msgstr "Porcupine"
+
+msgid "Passive_Skill_Porcupine_Description"
+msgstr "Returns {DamageReturn:%} of the damage dealt plus {ArmorAsDamage:%} of armor to the attacker."
+
+msgid "Passive_Skill_Servant_Hell"
+msgstr "Servant of Hell"
+
+msgid "Passive_Skill_Servant_Hell_Description"
+msgstr "Attacks have a {Chance:%} chance to send the target straight to the Abyss."
+
+msgid "Passive_Skill_Echo"
+msgstr "Transfusion"
+
+msgid "Passive_Skill_Echo_Description"
+msgstr "{DelayedDamage:%} of the damage taken is dealt after {Turns|turn|turns}."
+
+msgid "Passive_Skill_Soul_Devouring"
+msgstr "Soul Devouring"
+
+msgid "Passive_Skill_Soul_Devouring_Description"
+msgstr "Restores {BarrierRecoveryAmount:%} barrier for each ability activated."
+
+msgid "Passive_Skill_Mana_Burn"
+msgstr "Mana Burn"
+
+msgid "Passive_Skill_Mana_Burn_Description"
+msgstr "Each attack burns {PercentToBurn:%} of the target's current mana."
+
+msgid "Passive_Skill_Master_Apprentice"
+msgstr "Master`s Apprentice"
+
+msgid "Passive_Skill_Master_Apprentice_Description"
+msgstr "Increases the chance of creating higher-tier equipment by {0}%."
+
+msgid "Passive_Skill_Enhanced_Mastery"
+msgstr "Enhanced Mastery"
+
+msgid "Passive_Skill_Enhanced_Mastery_Description"
+msgstr "Increases skill level {0} by {1}."
+
+msgid "Passive_Skill_Experienced_Recycler"
+msgstr "Experienced Recycler"
+
+msgid "Passive_Skill_Experienced_Recycler_Description"
+msgstr "You gain {0}% increased resources from shattering items."
+
+msgid "Passive_Skill_Crafting_Mastery"
+msgstr "Crafting Mastery"
+
+msgid "Passive_Skill_Sword_Mastery"
+msgstr "Sword Mastery"
+
+msgid "Passive_Skill_Fishing_Mastery"
+msgstr "Fishing Mastery"
+
+msgid "Passive_Skill_Battle_Mastery"
+msgstr "Battle Mastery"
+
+msgid "Passive_Skill_Bloodthirsty"
+msgstr "Bloodthirsty"
+
+msgid "Passive_Skill_Bloodthirsty_Description"
+msgstr "Applies a {@Bleed} stack upon attacking. When {StackThreshold} stacks are reached, removes all remaining stacks from the target, deals their total remaining damage, and heals for {HealPercent:%} of that damage."
+
+msgid "Passive_Skill_Resonance"
+msgstr "Resonance"
+
+msgid "Passive_Skill_Resonance_Description"
+msgstr "Every ability used this turn grants {SpellDamagePerStack:%} spell damage and {MulticastPerStack:%} multicast chance until the end of the turn."
+
+msgid "Passive_Skill_Mana_Resonance"
+msgstr "Mana Resonance"
+
+msgid "Passive_Skill_Mana_Resonance_Description"
+msgstr "Abilities deal extra damage equal to a {Rate:%} of the mana spent this turn."
+
+msgid "Passive_Skill_Armor_Piercing"
+msgstr "Piercing"
+
+msgid "Passive_Skill_Armor_Piercing_Description"
+msgstr "Attacks ignore the target's armor."
+
+msgid "Passive_Skill_True_Strike"
+msgstr "True Strike"
+
+msgid "Passive_Skill_True_Strike_Description"
+msgstr "Attacks cannot be evaded."
+
+msgid "Passive_Skill_Soulless"
+msgstr "Soulless"
+
+msgid "Passive_Skill_Soulless_Description"
+msgstr "Attacks and ability hits bypass the target's barrier."
+
+msgid "Passive_Skill_Accelerator"
+msgstr "Accelerator"
+
+msgid "Passive_Skill_Accelerator_Description"
+msgstr "A critical strike reduces the cooldown of a random ability by {Amount}."
+
+msgid "Passive_Skill_Decomposition"
+msgstr "Decomposition"
+
+msgid "Passive_Skill_Decomposition_Description"
+msgstr "Attacks reduce the target's armor by {ReduceBy:%} per stack, up to {MaxStacks|stack|stacks}."
+
+msgid "Passive_Skill_Incineration"
+msgstr "Incineration"
+
+msgid "Passive_Skill_Incineration_Description"
+msgstr "A critical strike kills a {@Burning} target."
+
+msgid "Passive_Skill_First_Strike"
+msgstr "First Right"
+
+msgid "Passive_Skill_First_Strike_Description"
+msgstr "The first attack each turn deals additional {Bonus:%} bonus damage."
+
+msgid "Passive_Skill_Bastion"
+msgstr "Bastion"
+
+msgid "Passive_Skill_Bastion_Description"
+msgstr "Once per turn the first damage taken is reduced by {Reduce:%}."
+
+msgid "Passive_Skill_Unshackled"
+msgstr "Unshackled"
+
+msgid "Passive_Skill_Unshackled_Description"
+msgstr "Dispels the first stun received in a battle."
+
+msgid "Passive_Skill_Vampire"
+msgstr "Vampirism"
+
+msgid "Passive_Skill_Vampire_Description"
+msgstr "Recover health equal to a {LeachPercent:%} of the attack damage dealt."
+
+msgid "Passive_Skill_Counter_Attack"
+msgstr "Counter Attack"
+
+msgid "Passive_Skill_Counter_Attack_Description"
+msgstr "{Chance:%} on counter attack after an evade."
+
+msgid "Passive_Skill_Creators_Nature"
+msgstr "Creator`s Nature"
+
+msgid "Passive_Skill_Creators_Nature_Description"
+msgstr "Increase all recovery Efficiency by {RecoveryEfficiency:%}. Recover {ManaRecovery:%} mana and {HealthRecovery:%} life on damage taken."
+
+msgid "Passive_Skill_Current_Health_Regeneration"
+msgstr "Goliath`s Blood"
+
+msgid "Passive_Skill_Current_Health_Regeneration_Description"
+msgstr "Recover {PercentFromCurrentHealth:%} of the current health at the turn`s end."
+
+msgid "Passive_Skill_Regeneration"
+msgstr "Regeneration"
+
+msgid "Passive_Skill_Regeneration_Description"
+msgstr "Regenerate {PercentFromMaxHealth:%} of the maximum health at the turn`s end."
+
+msgid "Passive_Skill_Trapped_Beast"
+msgstr "Trapped Beast"
+
+msgid "Passive_Skill_Trapped_Beast_Description"
+msgstr "Increase damage by {DamageBonus:%} for each {HealthPercent:%} health lost."
+
+msgid "Passive_Skill_Silent_Fury"
+msgstr "Silent Fury"
+
+msgid "Passive_Skill_Silent_Fury_Description"
+msgstr "{SilenceSealChance:%} chance to apply {@Silence} on attack."
+
+msgid "Passive_Skill_Righteous_Wrath"
+msgstr "Silent Fury"
+
+msgid "Passive_Skill_Righteous_Wrath_Description"
+msgstr "Apply a stack of {@Burning} dealing {PercentFromDamage:%} of attack damage for {Duration|turn|turns} on attack, if target is Undead. Upon reaching {StackThreshold|stack|stacks} apply {@Incineration} for {IncinerationDuration|turn|turns}."
+
+msgid "Passive_Skill_Critical_Mana_Leech"
+msgstr "Mana leech"
+
+msgid "Passive_Skill_Critical_Mana_Leech_Description"
+msgstr "Recover {Percent:%} of mana on critical attack."
+
+msgid "Passive_Skill_Critical_Leech"
+msgstr "Health leech"
+
+msgid "Passive_Skill_Critical_Leech_Description"
+msgstr "Recover {Percent:%} of health on critical attack."
+
+msgid "Passive_Skill_Mana_Regeneration"
+msgstr "Mana Regeneration"
+
+msgid "Passive_Skill_Mana_Regeneration_Description"
+msgstr "Recover {PercentFromMaxMana:%} of maximum mana at the turn`s end."
+
+msgid "Passive_Skill_Mana_On_Attack"
+msgstr "Mana on Attack"
+
+msgid "Passive_Skill_Mana_On_Attack_Description"
+msgstr "Recover {Amount} on attack."
+
+msgid "Passive_Skill_Bleeding"
+msgstr "Bleed"
+
+msgid "Passive_Skill_Bleeding_Description"
+msgstr "Apply an stack of {@Bleed} dealing {PercentFromDamage:%} attack`s damage for {BleedDuration|turn|turns}."
+
+msgid "Passive_Skill_Burning"
+msgstr "Burn"
+
+msgid "Passive_Skill_Burning_Description"
+msgstr "Apply an stack of {@Burning} dealing {PercentFromDamage:%} attack`s damage for {BurningDuration|turn|turns}."
+
+msgid "Passive_Skill_Poisoned_Claws"
+msgstr "Poisoned Claws"
+
+msgid "Passive_Skill_Poisoned_Claws_Description"
+msgstr "Apply an stack of {@Poison} dealing {PercentFromDamage:%} attack`s damage for {PoisonDuration|turn|turns}."
+
+msgid "Passive_Skill_No_Critical_Hits"
+msgstr "Submission"
+
+msgid "Passive_Skill_No_Critical_Hits_Description"
+msgstr "You cannot deal critical damage."
+
+msgid "Passive_Skill_LuckyCriticalChance"
+msgstr "Submission"
+
+msgid "Passive_Skill_LuckyCriticalChance_Description"
+msgstr "Your critical chance is {@Lucky}."
+
+# ------------------------------
+# Factions & reputation
+# ------------------------------
+
+msgid "Fraction_Elf"
+msgstr "Elves"
+
+msgid "Fraction_Dwarf"
+msgstr "Dwarves"
+
+msgid "Fraction_Human"
+msgstr "Humans"
+
+msgid "Fraction_Undead"
+msgstr "Undead"
+
+msgid "Fraction_Demon"
+msgstr "Demons"
+
+msgid "Fraction_Animal"
+msgstr "Beasts"
+
+msgid "Fraction_MysticalCreature"
+msgstr "Mystical Creatures"
+
+msgid "RelationLevel_Hatred"
+msgstr "Hatred"
+
+msgid "RelationLevel_Hostility"
+msgstr "Hostility"
+
+msgid "RelationLevel_Dislike"
+msgstr "Dislike"
+
+msgid "RelationLevel_Neutral"
+msgstr "Neutral"
+
+msgid "RelationLevel_Friendly"
+msgstr "Friendly"
+
+msgid "RelationLevel_Respect"
+msgstr "Respect"
+
+msgid "RelationLevel_Alliance"
+msgstr "Alliance"
+
+msgid "UI_Reputation_Changed"
+msgstr "{Faction}: {Delta} reputation"
+
+msgid "UI_Standing_Changed"
+msgstr "{Faction} now regard you with {Level}"
+
+msgid "UI_Raid_Started"
+msgstr "Raid! The {Faction} are coming for you"
+
+msgid "Player"
+msgstr "Player"
+
+msgid "Crafting_Resource_Silver_Ore"
+msgstr "Silver Ore"
+
+msgid "Crafting_Resource_Mithril_Ore"
+msgstr "Mithril Ore"
+
+msgid "Crafting_Resource_Adamantite_Ore"
+msgstr "Adamantite Ore"
+
+msgid "Crafting_Resource_Sapphire_Gem"
+msgstr "Sapphire"
+
+msgid "Crafting_Resource_Pine_Wood"
+msgstr "Pine Wood"
+
+msgid "Crafting_Resource_Oak_Wood"
+msgstr "Oak Wood"
+
+msgid "Crafting_Resource_Yew_Wood"
+msgstr "Yew Wood"
+
+msgid "Crafting_Resource_Ironwood"
+msgstr "Ironwood"
+
+msgid "Crafting_Resource_Wolf_Leather"
+msgstr "Wolf Pelt"
+
+msgid "Crafting_Resource_Bear_Leather"
+msgstr "Bear Hide"
+
+msgid "Crafting_Resource_Direwolf_Leather"
+msgstr "Direwolf Pelt"
+
+msgid "Crafting_Resource_Wolf_Fang"
+msgstr "Wolf Fang"
+
+msgid "Crafting_Resource_Boar_Tusk"
+msgstr "Boar Tusk"
+
+msgid "Crafting_Resource_Bear_Claw"
+msgstr "Bear Claw"
+
+msgid "Crafting_Resource_Ancient_Fang"
+msgstr "Ancient Fang"
+
+msgid "Npc_Dummy"
+msgstr "Training Dummy"
+
+msgid "Npc_Bandit"
+msgstr "Bandit"
+
+msgid "Npc_Skeleton_Mage"
+msgstr "Skeleton Mage"
+
+msgid "Npc_Grave_Revenant"
+msgstr "Grave Revenant"
+
+msgid "Npc_Cursed_Sorcerer"
+msgstr "Cursed Sorcerer"
+
+msgid "Npc_Wolf"
+msgstr "Wolf"
+
+msgid "Npc_Boar"
+msgstr "Wild Boar"
+
+msgid "Npc_Deer"
+msgstr "Deer"
+
+msgid "Npc_Bear"
+msgstr "Bear"
+
+msgid "Npc_Direwolf"
+msgstr "Direwolf"
+
+msgid "Npc_Villager"
+msgstr "Villager"
+
+msgid "Npc_Hunter"
+msgstr "Hunter"
+
+msgid "Npc_Skeleton_Warrior"
+msgstr "Skeleton Warrior"
+
+msgid "Npc_Ghoul"
+msgstr "Ghoul"
+
+msgid "Npc_Elf_Ranger"
+msgstr "Elf Ranger"
+
+msgid "Npc_Elf_Mage"
+msgstr "Elf Mage"
+
+msgid "Npc_Dwarf_Warrior"
+msgstr "Dwarf Warrior"
+
+msgid "Npc_Dwarf_Crossbowman"
+msgstr "Dwarf Crossbowman"
+
+msgid "Npc_Imp"
+msgstr "Imp"
+
+msgid "Npc_Demon_Brute"
+msgstr "Demon Brute"
+
+msgid "Dlg_Villager_Greeting_1"
+msgstr "Haven't seen you around before, stranger. Keep your hands where I can see them — times are rough."
+
+msgid "Dlg_Villager_Greeting_AskVillage"
+msgstr "Tell me about this place."
+
+msgid "Dlg_Villager_AboutVillage_1"
+msgstr "Just a village like any other. We plow, we pray, and we burn the dead before they get back up."
+
+msgid "Dlg_Hunter_Greeting_1"
+msgstr "Quiet now. You'll scare off the game stomping around like that."
+
+msgid "Dlg_Hunter_Greeting_AskPrey"
+msgstr "What are you hunting?"
+
+msgid "Dlg_Hunter_AboutPrey_1"
+msgstr "Wolves have grown bold lately, and something bigger prowls the woods at night. If you find a den — steer clear of it."
+
+msgid "Dlg_Elf_Ranger_Greeting_1"
+msgstr "These woods are under our watch, traveler. Walk the path and touch nothing that grows."
+
+msgid "Dlg_Elf_Mage_Greeting_1"
+msgstr "Curious... the weave bends strangely around you. Move along, before I start asking questions."
+
+msgid "Dlg_Dwarf_Warrior_Greeting_1"
+msgstr "Out of the way, longlegs. Unless you carry ale or ore to trade, we have nothing to talk about."
+
+msgid "Dlg_Dwarf_Crossbowman_Greeting_1"
+msgstr "That's far enough. State your business or keep walking."
+
+msgid "Npc_Boss_Digri"
+msgstr "Digri"
+
+msgid "Npc_Boss_Zigri"
+msgstr "Zigri"
+
+msgid "Ability_Twin_Assist_Attack"
+msgstr "Twin's Wrath"
+
+msgid "Ability_Twin_Assist_Attack_Description"
+msgstr "The twin comes to his brother's aid, striking every enemy and setting them ablaze for {BurnDuration|turn|turns}."
+
+msgid "Ability_Twin_Assist_Shield"
+msgstr "Twin's Ward"
+
+msgid "Ability_Twin_Assist_Shield_Description"
+msgstr "The twin shields his brother with a {ShieldStrength} strength ward that restores {HealthRegenPercent:%} of maximum health at each turn's end while it holds."
+
+msgid "Npc_Boss_Rat_King"
+msgstr "Rat King"
+
+msgid "Effect_Damage_Immunity"
+msgstr "Damage Immunity"
+
+msgid "Effect_Damage_Immunity_Description"
+msgstr "Immune to all damage."
+
+msgid "Npc_Boss_Bone_Pack_Leader"
+msgstr "Bone Pack Leader"
+
+msgid "Npc_Bone_Wolf"
+msgstr "Bone Wolf"
+
+msgid "Ability_Summon_Bone_Wolves"
+msgstr "Call of the Bone Pack"
+
+msgid "Ability_Summon_Bone_Wolves_Description"
+msgstr "Calls bone wolves to the summoner's side, keeping the pack at {WolvesPerCast}. Each wolf inherits {StatShare:%} of the summoner's current stats."
+
+# -----------------------
+# Loot on the ground
+# -----------------------
+
+msgid "Loot_Inventory_Full"
+msgstr "Inventory is full!"
+
+msgid "Rarity_Common"
+msgstr "Common"
+
+msgid "Rarity_Uncommon"
+msgstr "Uncommon"
+
+msgid "Rarity_Rare"
+msgstr "Rare"
+
+msgid "Rarity_Epic"
+msgstr "Epic"
+
+msgid "Rarity_Legendary"
+msgstr "Legendary"
+
+msgid "Rarity_Mythic"
+msgstr "Mythic"
+
+msgid "Rarity_Unique"
+msgstr "Unique"
+
+# -----------------------
+# Npc Modifiers
+# -----------------------
+
+msgid "Npc_Modifier_Scale_Double_Health"
+msgstr "Giant"
+
+msgid "Npc_Modifier_Scale_Double_Health_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Scale_Double_Damage"
+msgstr "Berserk"
+
+msgid "Npc_Modifier_Scale_Double_Damage_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Scale_Double_Defence"
+msgstr "Unbreakable"
+
+msgid "Npc_Modifier_Scale_Double_Defence_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Scale_Double_Health_Recovery"
+msgstr "Regenerating"
+
+msgid "Npc_Modifier_Scale_Double_Health_Recovery_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Tier_Upgrade_To_Maximum"
+msgstr "Royal"
+
+msgid "Npc_Modifier_Tier_Upgrade_To_Maximum_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Tier_Upgrade_By_Two"
+msgstr "Wealthy"
+
+msgid "Npc_Modifier_Tier_Upgrade_By_Two_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Tier_Upgrade_By_One"
+msgstr "Prosperous"
+
+msgid "Npc_Modifier_Tier_Upgrade_By_One_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Guaranteed_Items_Crafting_Resource"
+msgstr "Breadwinner"
+
+msgid "Npc_Modifier_Guaranteed_Items_Crafting_Resource_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Guaranteed_Items_Crafting_Upgrade"
+msgstr "Craftsman"
+
+msgid "Npc_Modifier_Guaranteed_Items_Crafting_Upgrade_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Guaranteed_Items_Equip"
+msgstr "The Soul Collector"
+
+msgid "Npc_Modifier_Guaranteed_Items_Equip_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Guaranteed_Items_Essence"
+msgstr "Goblin"
+
+msgid "Npc_Modifier_Guaranteed_Items_Essence_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Tier_Multiplier_Huge"
+msgstr "Fortune's Smile"
+
+msgid "Npc_Modifier_Tier_Multiplier_Huge_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Tier_Multiplier_Big"
+msgstr "Impressive"
+
+msgid "Npc_Modifier_Tier_Multiplier_Big_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Tier_Multiplier_Mid"
+msgstr "The Gift"
+
+msgid "Npc_Modifier_Tier_Multiplier_Mid_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Tier_Multiplier_Small"
+msgstr "Minor"
+
+msgid "Npc_Modifier_Tier_Multiplier_Small_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Item_Effect_Execution"
+msgstr "Executioner"
+
+msgid "Npc_Modifier_Item_Effect_Execution_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Item_Effect_Vampire"
+msgstr "Vampire"
+
+msgid "Npc_Modifier_Item_Effect_Vampire_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Item_Effect_Poisoned_Claw"
+msgstr "Poisoned"
+
+msgid "Npc_Modifier_Item_Effect_Poisoned_Claw_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Item_Effect_Burning"
+msgstr "Burning"
+
+msgid "Npc_Modifier_Item_Effect_Burning_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Rarity_Upgrade_Huge"
+msgstr "Precious"
+
+msgid "Npc_Modifier_Rarity_Upgrade_Huge_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Rarity_Upgrade_Big"
+msgstr "A Storyteller for the Ages"
+
+msgid "Npc_Modifier_Rarity_Upgrade_Big_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Rarity_Upgrade_Mid"
+msgstr "Who Found the Curiosity"
+
+msgid "Npc_Modifier_Rarity_Upgrade_Mid_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Rarity_Upgrade_Small"
+msgstr "A Little Miracle"
+
+msgid "Npc_Modifier_Rarity_Upgrade_Small_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Min_Rarity_Legend"
+msgstr "Who Saw the Legend"
+
+msgid "Npc_Modifier_Min_Rarity_Legend_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Min_Rarity_Epic"
+msgstr "A Witness to Greatness"
+
+msgid "Npc_Modifier_Min_Rarity_Epic_Description"
+msgstr ""
+
+msgid "Npc_Modifier_Min_Rarity_Rare"
+msgstr "One Who Touched the Secret"
+
+msgid "Npc_Modifier_Min_Rarity_Rare_Description"
+msgstr ""
+
+msgid "Effect_Stage_Guard"
+msgstr "Stage Guard"
+
+msgid "Effect_Stage_Guard_Description"
+msgstr "A pending transformation shields this creature from lethal blows: damage cannot push it below the transition threshold."
+
+# ------------------------------
+# Intelligence stance: new abilities
+# ------------------------------
+
+msgid "Ability_Deep_Freeze"
+msgstr "Deep Freeze"
+
+msgid "Ability_Deep_Freeze_Description"
+msgstr "Deals {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) {@Cold} damage, freezes the target for {FreezeDuration|turn|turns} and applies a stack of {@Effect_Frostbite} for {FrostbiteDuration|turn|turns}.\nActivation level 2: reduces the target's cold resistance by {ColdResistanceShred:%}.\nActivation level 3: reduces the target's healing by {HealReductionValue:%}.\nActivation level 4: freezes every enemy on the battlefield."
+
+msgid "Ability_Discharge"
+msgstr "Discharge"
+
+msgid "Ability_Discharge_Description"
+msgstr "Consumes the caster's entire barrier and strikes with {@Lightning}: absorbed barrier × {BarrierMultiplier} + {SpellDamageScale:%} spell damage.\nActivation level 2: the multiplier is increased by {StageTwoMultiplierBonus}.\nActivation level 3: restores {StageThreeBarrierRestore:%} of the damage dealt as barrier.\nActivation level 4: the damage becomes {@Sacred}."
+
+msgid "Ability_Static_Armor"
+msgstr "Static Armor"
+
+msgid "Ability_Static_Armor_Description"
+msgstr "For {Duration|turn|turns} your attacks put a stack of {@Effect_Charge} on their target; at {RequiredStacks} stacks the charge detonates for {DetonationDamage} + ({DetonationWeaponScale:%} + {DetonationSpellScale:%}) {@Lightning} damage.\nActivation level 2: restores {StageTwoBarrierRestore:%} of detonation damage as barrier.\nActivation level 3: the detonation hits an additional target for {StageThreeSplashDamage:%} of its damage.\nActivation level 4: taking a hit puts a Charge stack on the attacker."
+
+# Ice Block upgrades
+
+msgid "Augment_Stage_Four_Damage"
+msgstr "Extra Block Damage"
+
+msgid "Augment_Stage_Four_Damage_Description"
+msgstr "+{amount:%} damage of the extra blocks."
+
+msgid "Augment_Reset_Chance"
+msgstr "Reset Chance"
+
+msgid "Augment_Reset_Chance_Description"
+msgstr "{chance:%} chance to reset the cooldown."
+
+msgid "Augment_Ice_Block_Random_Extra_Blocks"
+msgstr "Random Extra Blocks"
+
+msgid "Augment_Ice_Block_Random_Extra_Blocks_Description"
+msgstr "The extra blocks crash down on random enemies."
+
+msgid "Augment_Ice_Block_Consume_Stun_Deal_Double_Damage"
+msgstr "Consume Stun"
+
+msgid "Augment_Ice_Block_Consume_Stun_Deal_Double_Damage_Description"
+msgstr "Consumes the target's stun and deals ×{damageMultiplier} damage."
+
+# Deep Freeze upgrades
+
+msgid "Augment_Deep_Freeze_Spread"
+msgstr "Spread Freeze"
+
+msgid "Augment_Deep_Freeze_Spread_Description"
+msgstr "{chance:%} chance to also freeze a random enemy."
+
+msgid "Augment_Deep_Freeze_Control_Extend_Effects"
+msgstr "Extend Effects"
+
+msgid "Augment_Deep_Freeze_Control_Extend_Effects_Description"
+msgstr "Extends every effect on the target by 1 turn."
+
+msgid "Augment_Deep_Freeze_Increase_Ability_Cooldown"
+msgstr "Enemy Cooldown"
+
+msgid "Augment_Deep_Freeze_Increase_Ability_Cooldown_Description"
+msgstr "The target's next activated ability starts with +{amount} cooldown."
+
+msgid "Augment_Reduce_All_Cooldowns"
+msgstr "Reduce All Cooldowns"
+
+msgid "Augment_Reduce_All_Cooldowns_Description"
+msgstr "The cast reduces the cooldown of all your abilities by {amount}."
+
+msgid "Augment_Deep_Freeze_Execute_Frozen_On_Hit"
+msgstr "Execute"
+
+msgid "Augment_Deep_Freeze_Execute_Frozen_On_Hit_Description"
+msgstr "Executes the target below {threshold:%} health."
+
+# Discharge upgrades
+
+msgid "Augment_Discharge_Hits_Ignore_Resistances"
+msgstr "Ignore Resistances"
+
+msgid "Augment_Discharge_Hits_Ignore_Resistances_Description"
+msgstr "The strike ignores the target's resistances."
+
+msgid "Augment_Discharge_Consume_Mana"
+msgstr "Consume Mana"
+
+msgid "Augment_Discharge_Consume_Mana_Description"
+msgstr "Consumes mana instead of barrier."
+
+# Static Armor upgrades
+
+msgid "Augment_Cost_Barrier"
+msgstr "Cost Barrier"
+
+msgid "Augment_Cost_Barrier_Description"
+msgstr "The ability consumes barrier instead of mana."
+
+# Ice Shards / Ice Aegis new upgrades
+
+msgid "Augment_Ice_Shards_Multicast"
+msgstr "Multicast"
+
+msgid "Augment_Ice_Shards_Multicast_Description"
+msgstr "+{amount:%} multicast chance for this ability."
+
+msgid "Augment_Ice_Shards_Critical_Hit_Ignores_Cold_Res"
+msgstr "Crit Ignores Cold Res"
+
+msgid "Augment_Ice_Shards_Critical_Hit_Ignores_Cold_Res_Description"
+msgstr "Critical shards ignore the target's cold resistance."
+
+msgid "Augment_Ice_Aegis_Shield_Reflect_Damage"
+msgstr "Reflect"
+
+msgid "Augment_Ice_Aegis_Shield_Reflect_Damage_Description"
+msgstr "The shield reflects {amount:%} of absorbed damage as {@Cold}."
+
+msgid "Augment_Ice_Aegis_Turn_End_Heal_Under_Shield"
+msgstr "Turn End Heal"
+
+msgid "Augment_Ice_Aegis_Turn_End_Heal_Under_Shield_Description"
+msgstr "While the shield holds, restores {amount:%} of maximum health at the end of each turn."
+
+msgid "Augment_Ice_Aegis_Crit_Mitigation_Under_Shield"
+msgstr "Crit Mitigation"
+
+msgid "Augment_Ice_Aegis_Crit_Mitigation_Under_Shield_Description"
+msgstr "Critical damage taken is reduced by {value:%} while the shield holds."
+
+# ------------------------------
+# New effects
+# ------------------------------
+
+msgid "Item_Gold"
+msgstr "Gold"
+
+msgid "Item_Gold_Description"
+msgstr "Coins of the realm. They never take up bag space - picking a pile up fills your purse."
+
+msgid "Trader_Human_Merchant"
+msgstr "Wandering Merchant"
+
+msgid "UI_Trade_Stock"
+msgstr "Goods"
+
+msgid "UI_Trade_Buyback"
+msgstr "Buyback"
+
+msgid "UI_Trade_Buy"
+msgstr "Buy"
+
+msgid "UI_Trade_Price"
+msgstr "{Amount} g"
+
+msgid "UI_Trade_Gold"
+msgstr "Gold: {Amount}"
+
+msgid "UI_Trade_SellQuote"
+msgstr "Sells for {Amount} g"
+
+msgid "UI_Trade_Showcase"
+msgstr "Showcase"
+
+msgid "UI_Trade_Deal"
+msgstr "Deal"
+
+msgid "UI_Trade_Consumables"
+msgstr "Consumables"
+
+msgid "UI_Trade_Equipment"
+msgstr "Equipment"
+
+msgid "UI_Trade_Specials"
+msgstr "Special deliveries"
+
+msgid "UI_Trade_Rotation"
+msgstr "Rotation {Time}"
+
+msgid "UI_Trade_Restock"
+msgstr "New stock in {Time}"
+
+msgid "UI_Trade_PickHint"
+msgstr "Pick goods on the showcase - or one of your own items to sell"
+
+msgid "UI_Trade_DirectionHint"
+msgstr "The chosen item sets the deal's direction"
+
+msgid "UI_Trade_ClickToSell"
+msgstr "click an item to sell it"
+
+msgid "UI_Trade_GoldSuffix"
+msgstr "{Amount} GOLD"
+
+msgid "UI_Trade_Sell"
+msgstr "Sell"
+
+msgid "UI_Trade_Total"
+msgstr "Total: {Amount} g"
+
+msgid "UI_Trade_NotEnoughGold"
+msgstr "Not enough gold"
+
+msgid "UI_Trade_NoPrice"
+msgstr "The trader has no price for this"
+
+msgid "Npc_Human_Merchant"
+msgstr "Wandering Merchant"
+
+msgid "Dlg_Human_Merchant_Greeting_1"
+msgstr "Ah, a customer with a pulse. Rare thing on this road. Take a look - everything is honestly priced, more or less."
+
+msgid "Dlg_Human_Merchant_Greeting_Trade"
+msgstr "Show me your goods."
+
+msgid "UI_Inspect_Modifiers"
+msgstr "Modifiers"
+
+msgid "UI_Inspect_Effects"
+msgstr "Effects"
+
+msgid "UI_Inventory_Full"
+msgstr "Backpack is full — {Item} is lost"
+
+msgid "UI_Inventory_Missing_Items"
+msgstr "Not enough {Item}"
+
+msgid "UI_Exhaustion"
+msgstr "Exhaustion ×{Stacks} — every ability costs +{Surcharge:%}"
+
+# -----------------------
+# Passive tree
+# -----------------------
+
+msgid "UI_PassiveTree_Title"
+msgstr "Passive tree"
+
+msgid "UI_PassiveTree_Points_Caption"
+msgstr "Points"
+
+msgid "UI_PassiveTree_Spent_Caption"
+msgstr "spent"
+
+msgid "UI_PassiveTree_Total_Caption"
+msgstr "of"
+
+msgid "UI_PassiveTree_Points_Delta_Take"
+msgstr "(-{count})"
+
+msgid "UI_PassiveTree_Points_Delta_Refund"
+msgstr "(+{count})"
+
+msgid "UI_PassiveTree_NoPoints"
+msgstr "No points granted yet"
+
+msgid "UI_PassiveTree_AugmentsWaiting"
+msgstr "{count} augments waiting in closed slots"
+
+msgid "UI_PassiveTree_Apply_Take"
+msgstr "Take {count} · {points} pts"
+
+msgid "UI_PassiveTree_Apply_Refund"
+msgstr "Return {count} · {gold} gold"
+
+msgid "UI_PassiveTree_Apply_Empty"
+msgstr "Nothing planned"
+
+msgid "UI_PassiveTree_Cancel"
+msgstr "Drop plan"
+
+msgid "UI_PassiveTree_Respec_Mode"
+msgstr "Return nodes"
+
+msgid "UI_PassiveTree_Summary_Toggle"
+msgstr "Totals"
+
+msgid "UI_PassiveTree_Frame"
+msgstr "Fit (F)"
+
+msgid "UI_PassiveTree_Close"
+msgstr "X"
+
+msgid "UI_PassiveTree_ModeCleared"
+msgstr "The plan was dropped: a mode holds one kind of mark"
+
+msgid "UI_PassiveTree_RefundNeedsButton"
+msgstr "A return is applied with the button, not with a click"
+
+msgid "UI_PassiveTree_UnmarkedAlso"
+msgstr "{count} more marks went with it"
+
+msgid "UI_PassiveTree_NotEnoughGold"
+msgstr "Not enough gold"
+
+msgid "UI_PassiveTree_RespecDone"
+msgstr "The nodes are back"
+
+msgid "UI_PassiveTree_RefundTail"
+msgstr "Returns {count} nodes"
+
+msgid "UI_PassiveTree_RefundPrice"
+msgstr "{gold} gold"
+
+msgid "UI_PassiveTree_StrandedAugments"
+msgstr "{count} augments would stay in closed slots"
+
+msgid "UI_PassiveTree_Slot_Owner"
+msgstr "Opens a tier {tier} slot of {name}"
+
+msgid "UI_PassiveTree_Socket_NotOpened"
+msgstr "That node is not bought yet, so it opens no slot"
+
+msgid "UI_PassiveTree_Socket_PlannedRefund"
+msgstr "That slot is planned to close — the augment would be stuck in it"
+
+msgid "UI_PassiveTree_Summary_Title"
+msgstr "What the tree gives"
+
+msgid "UI_PassiveTree_Summary_Empty"
+msgstr "Nothing taken yet"
+
+msgid "UI_PassiveTree_Summary_Planned"
+msgstr "Plan: {count} nodes"
+
+msgid "UI_PassiveTree_Summary_Conditional"
+msgstr "{count} conditional lines are not counted"
+
+msgid "UI_PassiveTree_Summary_Scaled"
+msgstr "{count} per-parameter lines are not counted"
+
+msgid "UI_PassiveTree_Summary_Unlocks"
+msgstr "Abilities"
+
+msgid "UI_PassiveTree_Summary_Parameters"
+msgstr "Parameters"
+
+msgid "UI_PassiveTree_Summary_Knobs"
+msgstr "Combat rules"
+
+msgid "UI_PassiveTree_Summary_Keystones"
+msgstr "Keystones"
+
+msgid "UI_PassiveTree_Summary_Col_Flat"
+msgstr "Flat"
+
+msgid "UI_PassiveTree_Summary_Col_Increase"
+msgstr "Increased"
+
+msgid "UI_PassiveTree_Summary_Col_More"
+msgstr "More"
+
+msgid "UI_PassiveTree_Close_Title"
+msgstr "The plan is not applied"
+
+msgid "UI_PassiveTree_Close_Take"
+msgstr "Not applied: take {count} nodes for {points} points"
+
+msgid "UI_PassiveTree_Close_Refund"
+msgstr "Not applied: return {count} nodes for {gold} gold"
+
+msgid "UI_PassiveTree_Close_Apply"
+msgstr "Apply"
+
+msgid "UI_PassiveTree_Close_Discard"
+msgstr "Drop the plan"
+
+msgid "UI_PassiveTree_Close_Stay"
+msgstr "Stay"
+
+msgid "UI_PassiveTree_Kind_Small"
+msgstr "Small node"
+
+msgid "UI_PassiveTree_Kind_Notable"
+msgstr "Notable"
+
+msgid "UI_PassiveTree_Kind_Keystone"
+msgstr "Keystone"
+
+msgid "UI_PassiveTree_Kind_AbilityUnlock"
+msgstr "Ability"
+
+msgid "UI_PassiveTree_Kind_SocketTier2"
+msgstr "Augment slot, tier 2"
+
+msgid "UI_PassiveTree_Kind_SocketTier3"
+msgstr "Augment slot, tier 3"
+
+msgid "UI_PassiveTree_Kind_Start"
+msgstr "Stance seed"
+
+msgid "UI_PassiveTree_Refused_UnknownNode"
+msgstr "No such node"
+
+msgid "UI_PassiveTree_Refused_AlreadyTaken"
+msgstr "Already taken"
+
+msgid "UI_PassiveTree_Refused_NotTaken"
+msgstr "Not taken"
+
+msgid "UI_PassiveTree_Refused_Granted"
+msgstr "Granted with the character"
+
+msgid "UI_PassiveTree_Refused_NotEnoughPoints"
+msgstr "Not enough points"
+
+msgid "UI_PassiveTree_Refused_NotConnected"
+msgstr "Nothing taken reaches it yet"
+
+msgid "UI_PassiveTree_Refused_WouldOrphan"
+msgstr "It holds up the branch behind it"
+
+msgid "UI_PassiveTree_Refused_Unlinked"
+msgstr "It is wired to nothing at all"
+
+msgid "UI_PassiveTree_Refund_UnknownNode"
+msgstr "No such node"
+
+msgid "UI_PassiveTree_Refund_AlreadyTaken"
+msgstr "Already taken"
+
+msgid "UI_PassiveTree_Refund_NotTaken"
+msgstr "You do not hold it"
+
+msgid "UI_PassiveTree_Refund_Granted"
+msgstr "Granted with the character and never given back"
+
+msgid "UI_PassiveTree_Refund_NotEnoughPoints"
+msgstr "Not enough points"
+
+msgid "UI_PassiveTree_Refund_NotConnected"
+msgstr "Nothing reaches it"
+
+msgid "UI_PassiveTree_Refund_WouldOrphan"
+msgstr "It holds up the branch behind it"
+
+# -----------------------
+# Augments
+# -----------------------
+
+msgid "UI_Augment_Refused_AugmentNotHeld"
+msgstr "You are not carrying that augment"
+
+msgid "UI_Augment_Refused_NoSuchSocket"
+msgstr "There is no such slot"
+
+msgid "UI_Augment_Refused_SocketClosed"
+msgstr "The slot is closed — it can only be emptied"
+
+msgid "UI_Augment_Refused_SocketOccupied"
+msgstr "The slot is already taken"
+
+msgid "UI_Augment_Refused_TierAboveSocket"
+msgstr "The augment is of a higher tier than the slot"
+
+msgid "UI_Augment_Refused_BoundToAnotherAbility"
+msgstr "The augment belongs to another ability"
+
+msgid "UI_Augment_Refused_NoSharedTag"
+msgstr "The ability has nothing this augment works on"
+
+msgid "UI_Augment_Refused_ExclusionGroupTaken"
+msgstr "Another augment of that group is already on this ability"
+
+msgid "UI_Augment_Refused_ContradictoryDeclaration"
+msgstr "The augment record contradicts itself"
+
+msgid "UI_Augment_Refused_UnknownRecord"
+msgstr "No record declares that augment"
+
+msgid "UI_Augment_Extract_NothingToExtract"
+msgstr "The slot is empty"
+
+msgid "UI_Augment_Extract_NoBagRoom"
+msgstr "No room in the backpack"
+
+msgid "UI_Augment_Extract_CannotBeHeld"
+msgstr "That augment cannot be carried"
+
+msgid "UI_Augment_Tier"
+msgstr "Tier {Value}"
+
+msgid "UI_Augment_Fits"
+msgstr "Fits: {Name}"
+
+msgid "UI_Augment_Fits_Any"
+msgstr "Fits: any ability"
+
+msgid "UI_Augment_Pick_Title"
+msgstr "Augments that fit"
+
+msgid "UI_Augment_Pick_Nothing"
+msgstr "You carry nothing this slot would take"
+
+msgid "UI_Augment_Dormant"
+msgstr "Asleep: everything it gives is already given, stronger, elsewhere on this ability — and its cost and cooldown are still charged in full"
+
+msgid "UI_Augment_Partly"
+msgstr "Partly asleep: some of what it gives is already given, stronger, elsewhere on this ability — and its cost and cooldown are still charged in full"
+
+msgid "Npc_Ronald"
+msgstr "Ronald the Smith"
+
+msgid "Dlg_Ronald_Greeting_1"
+msgstr "Mind the sparks. You need steel, or you need talking to? Either way, say it plain."
+
+msgid "Dlg_Ronald_Greeting_Trade"
+msgstr "What metal have you got?"
+
+msgid "Dlg_Ronald_Greeting_AskForge"
+msgstr "You were not always a smith."
+
+msgid "Dlg_Ronald_AboutForge_1"
+msgstr "No. I carried a spear before I carried a hammer. The forge feeds the village; the spear only fed the crows."
+
+msgid "Dlg_Ronald_Farewell_1"
+msgstr "Go on, then. Keep your edge oiled and your back to a wall."
+
+# ------------------------------
+# Trials of the Strong (Ronald)
+# ------------------------------
+
+msgid "Quest_Trial_Of_The_Fang"
+msgstr "Trial of the Fang"
+
+msgid "Quest_Trial_Of_The_Fang_Description"
+msgstr "Ronald has set out the first of his trials. A wolf waits on the flat ground past the forge — the smallest thing he could find that still bites back. Put it down and come back to him."
+
+msgid "Quest_Trial_Of_The_Fang_Stage_Hunt"
+msgstr "Put the wolf down"
+
+msgid "Quest_Trial_Of_The_Fang_Obj_Kill"
+msgstr "Kill the wolf on the trial ground"
+
+msgid "Quest_Trial_Of_The_Pack"
+msgstr "Trial of the Pack"
+
+msgid "Quest_Trial_Of_The_Pack_Description"
+msgstr "The second trial. A direwolf — bigger than the last one, quicker than it looks, and it hunts thinking. Ronald wants to see whether you can finish what you start."
+
+msgid "Quest_Trial_Of_The_Pack_Stage_Hunt"
+msgstr "Put the direwolf down"
+
+msgid "Quest_Trial_Of_The_Pack_Obj_Kill"
+msgstr "Kill the direwolf on the trial ground"
+
+msgid "Quest_Trial_Of_The_Mountain"
+msgstr "Trial of the Mountain"
+
+msgid "Quest_Trial_Of_The_Mountain_Description"
+msgstr "The third trial. A bear: slow, enormous, and it takes a great deal of killing. Ronald says there is no clever way past it — only through."
+
+msgid "Quest_Trial_Of_The_Mountain_Stage_Hunt"
+msgstr "Put the bear down"
+
+msgid "Quest_Trial_Of_The_Mountain_Obj_Kill"
+msgstr "Kill the bear on the trial ground"
+
+msgid "Quest_Trial_Of_The_Grave"
+msgstr "Trial of the Grave"
+
+msgid "Quest_Trial_Of_The_Grave_Description"
+msgstr "The fourth trial. Ronald has arranged something the graves gave back — old, patient, and far past anything the forest sends. He calls it the last lesson he has to give."
+
+msgid "Quest_Trial_Of_The_Grave_Stage_Hunt"
+msgstr "Put the revenant down"
+
+msgid "Quest_Trial_Of_The_Grave_Obj_Kill"
+msgstr "Kill the grave revenant on the trial ground"
+
+msgid "Ornament_Tier_1"
+msgstr "Lesser Ornament"
+
+msgid "Ornament_Tier_1_Description"
+msgstr "Grants an ability one more tier 1 socket. An ability wears one ornament at a time; move it freely."
+
+msgid "Ornament_Tier_2"
+msgstr "Greater Ornament"
+
+msgid "Ornament_Tier_2_Description"
+msgstr "Grants an ability one more tier 2 socket. An ability wears one ornament at a time; move it freely."
+
+msgid "Ornament_Tier_3"
+msgstr "Sovereign Ornament"
+
+msgid "Ornament_Tier_3_Description"
+msgstr "Grants an ability one more tier 3 socket. An ability wears one ornament at a time; move it freely."
+
+msgid "Dlg_Ronald_Greeting_AskTrials"
+msgstr "I want a real test. Have you got one?"
+
+msgid "Dlg_Ronald_Trials_1"
+msgstr "Trials, then. I keep a patch of flat ground past the forge, and I put something worth beating on it. Beat it, and I will show you what I saw while you fought. That is the whole arrangement."
+
+msgid "Dlg_Ronald_Trials_TakeFang"
+msgstr "Start me small. What is first?"
+
+msgid "Dlg_Ronald_Trials_TakePack"
+msgstr "I am ready for the second."
+
+msgid "Dlg_Ronald_Trials_TakeMountain"
+msgstr "Give me the third."
+
+msgid "Dlg_Ronald_Trials_TakeGrave"
+msgstr "Whatever is left. Set it loose."
+
+msgid "Dlg_Ronald_TrialAccepted_1"
+msgstr "It is waiting past the forge, out where the fence gives up. Take your time walking. Take none once you are there."
+
+msgid "Dlg_Ronald_TrialWatch_1"
+msgstr "Still on my side of the fence, I see. The ground has not moved."
+
+msgid "Dlg_Ronald_TrialHintFang_1"
+msgstr "A wolf, and not a big one. Past the forge, out where the fence gives up and the trees start. Mind its footing, not its teeth."
+
+msgid "Dlg_Ronald_TrialHintPack_1"
+msgstr "A direwolf. Bigger than the last, and it picks its moment instead of just charging. Same ground past the forge. Do not let it pick the moment for you."
+
+msgid "Dlg_Ronald_TrialHintMountain_1"
+msgstr "A bear. It will not dodge and there is a great deal of it to get through. Same ground past the forge. Go through it, or do not go at all."
+
+msgid "Dlg_Ronald_TrialHintGrave_1"
+msgstr "Something the graves gave back — older than this village and in no hurry at all. Past the forge, same as always. It thinks, so do not give it time to."
+
+msgid "Dlg_Ronald_TrialReport_1"
+msgstr "You walked back. That is already more than some manage. Say it."
+
+msgid "Dlg_Ronald_TrialPraise_1"
+msgstr "Good. You held ground where I would have expected you to give it. Breathe, then come find me — there is a harder one waiting."
+
+msgid "Dlg_Ronald_TrialPraiseLast_1"
+msgstr "Done, and done well. That is the end of what I can set in front of you. Whatever comes next, you will be the one choosing it."
+
+
+msgid "Augment_Weapon_Scale"
+msgstr "Weapon Scaling"
+
+msgid "Augment_Weapon_Scale_Description"
+msgstr "+{weaponDamageScale:%} weapon damage scaling."
+
+msgid "Augment_Spell_Scale"
+msgstr "Spell Scaling"
+
+msgid "Augment_Spell_Scale_Description"
+msgstr "+{spellDamageScale:%} spell damage scaling."
+
+msgid "Augment_Increasing_Scales_Add_Cooldown"
+msgstr "Heavy Scaling"
+
+msgid "Augment_Increasing_Scales_Add_Cooldown_Description"
+msgstr "+{weaponDamageScale:%} weapon and +{spellDamageScale:%} spell damage scaling, but {cooldownTurns|turn|turns} longer cooldown."
+
+msgid "Augment_Increasing_Scales_Add_Cost"
+msgstr "Costly Scaling"
+
+msgid "Augment_Increasing_Scales_Add_Cost_Description"
+msgstr "+{weaponDamageScale:%} weapon and +{spellDamageScale:%} spell damage scaling, but +{costShare:%} activation cost."
+
+msgid "Augment_Reduce_Cooldown_And_Cost"
+msgstr "Efficiency"
+
+msgid "Augment_Reduce_Cooldown_And_Cost_Description"
+msgstr "-{cooldownTurns|turn|turns} cooldown and -{costShare:%} activation cost."
+
+msgid "Augment_Reduce_Cost_Add_Cooldown"
+msgstr "Thrift"
+
+msgid "Augment_Reduce_Cost_Add_Cooldown_Description"
+msgstr "-{costShare:%} activation cost, but {cooldownTurns|turn|turns} longer cooldown."
+
+msgid "Augment_Additional_Stacks"
+msgstr "Additional Stacks"
+
+msgid "Augment_Additional_Stacks_Description"
+msgstr "+{amount} stacks of the buffs and debuffs this ability applies."
+
+msgid "Augment_Additional_Charges"
+msgstr "Additional Charges"
+
+msgid "Augment_Additional_Charges_Description"
+msgstr "+{amount} charges."
+
+msgid "Augment_Consume_Effectiveness"
+msgstr "Absorption Effectiveness"
+
+msgid "Augment_Consume_Effectiveness_Description"
+msgstr "+{amount:%} to what the consumed resource is worth."
+
+msgid "Augment_Bleeding_Attack_Series"
+msgstr "Bleeding Attack Series"
+
+msgid "Augment_Bleeding_Attack_Series_Description"
+msgstr "Every attack of the ability applies {@Effect_Damage_Over_Turn_Bleed}."
+
+msgid "Augment_Burning_Attack_Series"
+msgstr "Burning Attack Series"
+
+msgid "Augment_Burning_Attack_Series_Description"
+msgstr "Every attack of the ability applies {@Effect_Damage_Over_Turn_Burning}."
+
+msgid "Augment_Critical_Calculation_Mythic"
+msgstr "Mythic Calculation"
+
+msgid "Augment_Critical_Calculation_Mythic_Description"
+msgstr "While the Calculation holds, every critical hit gives one more turn to each of your buffs."
+
+msgid "Effect_Mythic_Calculation"
+msgstr "Mythic Calculation"
+
+msgid "Effect_Mythic_Calculation_Description"
+msgstr "Every critical hit extends each of the bearer's buffs by {Duration|turn|turns}."
+
+msgid "Augment_Applied_Duration"
+msgstr "Lasting Effects"
+
+msgid "Augment_Applied_Duration_Description"
+msgstr "Everything this ability applies lasts {turns|turn|turns} longer."
+
+msgid "Augment_Applied_Effectiveness"
+msgstr "Applied Effectiveness"
+
+msgid "Augment_Applied_Effectiveness_Description"
+msgstr "+{effectiveness:%} effectiveness of everything this ability applies."
+
+msgid "Augment_Attacks_Cannot_Be_Evaded"
+msgstr "Inescapable Attacks"
+
+msgid "Augment_Attacks_Cannot_Be_Evaded_Description"
+msgstr "The ability's attacks cannot be evaded."
+
+msgid "Augment_Apply_Buff"
+msgstr "Borrowed Blessing"
+
+msgid "Augment_Apply_Buff_Description"
+msgstr "The ability grants its caster a stack of {effect}."
+
+msgid "Augment_Apply_Debuff"
+msgstr "Borrowed Curse"
+
+msgid "Augment_Apply_Debuff_Description"
+msgstr "Every touch of the ability applies a stack of {effect} to what it touched."
+
+# ------------------------------
+# Combat tags — the compatibility axis of the augment system. One key per member of the
+# vocabulary; the audit test holds that invariant.
+# ------------------------------
+
+msgid "Tag_attack"
+msgstr "Attack"
+
+msgid "Tag_spell"
+msgstr "Spell"
+
+msgid "Tag_series"
+msgstr "Series"
+
+msgid "Tag_buff"
+msgstr "Buff"
+
+msgid "Tag_poison"
+msgstr "Poison"
+
+msgid "Tag_projectile"
+msgstr "Projectile"
+
+msgid "Tag_cold"
+msgstr "Cold"
+
+msgid "Tag_lightning"
+msgstr "Lightning"
+
+msgid "Tag_fire"
+msgstr "Fire"
+
+msgid "Tag_stun"
+msgstr "Stun"
+
+msgid "Tag_freeze"
+msgstr "Freeze"
+
+msgid "Tag_critical"
+msgstr "Critical"
+
+msgid "Tag_barrier"
+msgstr "Barrier"
+
+msgid "Tag_mana"
+msgstr "Mana"
+
+msgid "Tag_health"
+msgstr "Health"
+
+msgid "Tag_evasion"
+msgstr "Evasion"
+
+msgid "Tag_execute"
+msgstr "Execute"
+
+msgid "Tag_retaliation"
+msgstr "Retaliation"
+
+msgid "Tag_empowered"
+msgstr "Empowered"
+
+msgid "Tag_shield"
+msgstr "Shield"
+
+msgid "Tag_summon"
+msgstr "Summon"
+
+msgid "Tag_npc"
+msgstr "Monster"
+
+msgid "Tag_accuracy"
+msgstr "Accuracy"
+
+msgid "Tag_armor"
+msgstr "Armor"
+
+msgid "Tag_bleed"
+msgstr "Bleed"
+
+msgid "Tag_burn"
+msgstr "Burn"
+
+msgid "Tag_charge"
+msgstr "Charge"
+
+msgid "Tag_control"
+msgstr "Control"
+
+msgid "Tag_cooldown"
+msgstr "Cooldown"
+
+msgid "Tag_cost"
+msgstr "Cost"
+
+msgid "Tag_curse"
+msgstr "Curse"
+
+msgid "Tag_damage"
+msgstr "Damage"
+
+msgid "Tag_debuff"
+msgstr "Debuff"
+
+msgid "Tag_defence"
+msgstr "Defence"
+
+msgid "Tag_effect"
+msgstr "Effect"
+
+msgid "Tag_evadable"
+msgstr "Evadable"
+
+msgid "Tag_heal"
+msgstr "Heal"
+
+msgid "Tag_hit"
+msgstr "Hit"
+
+msgid "Tag_leech"
+msgstr "Leech"
+
+msgid "Tag_recovery"
+msgstr "Recovery"
+
+msgid "Tag_restore"
+msgstr "Restore"
+
+msgid "Tag_scale"
+msgstr "Scaling"
+
+msgid "Tag_splash"
+msgstr "Splash"
+
+msgid "Tag_spread"
+msgstr "Spread"
+
+msgid "Tag_target"
+msgstr "Targeting"
+
+msgid "Tag_thorn"
+msgstr "Thorns"
+
+msgid "Tag_activation"
+msgstr "Activation"
+
+msgid "Tag_elemental"
+msgstr "Elemental"
+
+msgid "Tag_physical"
+msgstr "Physical"
+
+msgid "Tag_sacred"
+msgstr "Sacred"
+
+msgid "Tag_consume"
+msgstr "Consume"
+
+msgid "Tag_fury"
+msgstr "Fury"
+
+msgid "Tag_stage"
+msgstr "Stage"
+
+# ------------------------------
+# Keystone passives — the conversions and the bargains
+# ------------------------------
+
+msgid "Passive_Skill_Iron_Will"
+msgstr "Iron Will"
+
+msgid "Passive_Skill_Iron_Will_Description"
+msgstr "All of your Evade becomes Armor. Your Evade is reduced to nothing."
+
+msgid "Passive_Skill_Wind_Of_Freedom"
+msgstr "Wind of Freedom"
+
+msgid "Passive_Skill_Wind_Of_Freedom_Description"
+msgstr "All of your Armor becomes Evade. Your Armor is reduced to nothing."
+
+msgid "Passive_Skill_Agnostic"
+msgstr "Agnostic"
+
+msgid "Passive_Skill_Agnostic_Description"
+msgstr "All of your Mana becomes Health, one for one. Abilities are paid for with Health and cost {CostScale:%} more."
+
+msgid "Passive_Skill_Stoicism"
+msgstr "Stoicism"
+
+msgid "Passive_Skill_Stoicism_Description"
+msgstr "Immune to control. You cannot evade attacks."
+
+msgid "Passive_Skill_Vicious_Bite"
+msgstr "Vicious Bite"
+
+msgid "Passive_Skill_Vicious_Bite_Description"
+msgstr "+{PerOvercap:%} to Poison Damage Multiplier per point of Poison Resistance above the cap. {ResistanceCut:%} less Poison Resistance."
+
+msgid "Passive_Skill_Gift_Of_Nature"
+msgstr "Gift of Nature"
+
+msgid "Passive_Skill_Gift_Of_Nature_Description"
+msgstr "{ElementalBonus:%} more All Elemental Damage. Attacks deal no {@Physical} Damage."
+
+msgid "Passive_Skill_Strength_Of_Spirit"
+msgstr "Strength of Spirit"
+
+msgid "Passive_Skill_Strength_Of_Spirit_Description"
+msgstr "{Chance:%} chance to restore {PercentOfMaxMana:%} of maximum Mana when struck. {RecoveryCut:%} less Mana Recovery."
+
+msgid "Passive_Skill_Elemental_Fury"
+msgstr "Elemental Fury"
+
+msgid "Passive_Skill_Elemental_Fury_Description"
+msgstr "Attacks penetrate each Elemental Resistance by whatever you carry above its cap. {ResistanceCut:%} less All Resistances."
+
+msgid "Passive_Skill_Trinity"
+msgstr "Trinity"
+
+msgid "Passive_Skill_Trinity_Description"
+msgstr "Attacks deal 100% of their {@Physical} Damage as {@Cold}, {@Fire} and {@Lightning}."
+
+msgid "UI_Close"
+msgstr "Close"
+
+msgid "UI_Interaction_Interact"
+msgstr "Interact"
+
+msgid "UI_Interaction_Open"
+msgstr "Open"
+
+msgid "UI_Interaction_Travel"
+msgstr "Travel"
+
+msgid "UI_Interaction_Unavailable"
+msgstr "Unavailable"
+
+msgid "UI_Container_TakeAll"
+msgstr "Take all"
+
+msgid "UI_Container_Full"
+msgstr "Inventory full. Remaining items stay in the chest."
+
+msgid "Chest_Starter"
+msgstr "Starting equipment"
+
+msgid "UI_Interaction_Talk"
+msgstr "Talk"
+
+msgid "UI_Interaction_Attack"
+msgstr "Attack"
+
+msgid "UI_Interaction_NoDialogue"
+msgstr "Nothing to say right now"
+
+msgid "UI_Interaction_Unbound"
+msgstr "Unbound"

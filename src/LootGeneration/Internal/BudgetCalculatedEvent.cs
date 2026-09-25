@@ -1,6 +1,6 @@
 namespace LootGeneration.Internal
 {
-    using Core.Interfaces.Events;
+    using Core.Events;
 
     internal record BudgetCalculatedEvent(float Budget) : IGameEvent;
 }

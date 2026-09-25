@@ -1,0 +1,89 @@
+namespace Core.Modifiers
+{
+    using System.Collections.Generic;
+    using Enums;
+    using Interfaces;
+
+    /// <summary>Immutable, engine-free description of one rollable modifier line. Lives in resource/pool data;
+    /// a <see cref="IModifierMaterializer"/> turns it into a fresh instance at apply time (rolling the value
+    /// range), so a pool entry can never mutate a shared template. Aggregate ("all X") lines need no special
+    /// kind — they are a <see cref="ParameterDescriptor"/> on an aggregate <see cref="EntityParameter"/>.
+    /// NameKey is a naming hook (affixed item names) — parsed and carried, not consumed yet.</summary>
+    public interface IModifierDescriptor : IWeightable
+    {
+        /// <summary>Which slot family this entry competes for. None only on authored item lines —
+        /// rollable pool entries are parsed strictly and never carry None.</summary>
+        AffixKind Affix { get; }
+
+        /// <summary>Restricts the entry to one equipment category (a resource's byCategory section:
+        /// the same ore gives armor to a cuirass and damage to a blade). Null = serves any category.
+        /// Enforced at pool assembly (<c>ForCategory</c>), not at parse.</summary>
+        EquipmentCategory? OnlyFor { get; }
+
+        /// <summary>Catalog id of the predicate the line is held up by, or null when it always counts.
+        /// The id alone travels in data: a predicate holds the state of ONE owner, so it is built when the
+        /// entry is materialized into a line and never shared by the pool. It is also part of what makes
+        /// two entries the same line (see <see cref="LineIdentity"/>) — "+10% armor" and "+10% armor while
+        /// wounded" compete for different slots.
+        /// <para>Every kind carries it, including the kinds that cannot honour it (a grant, an operation, a
+        /// pipeline knob): the id is what the one gate — <c>LineConditions.WhyCannotBeHeldUp</c> — reads to
+        /// refuse such an entry out loud instead of letting it through with its gate quietly removed.</para></summary>
+        string? Condition { get; }
+    }
+
+    public sealed record ParameterDescriptor(EntityParameter Parameter, ModifierValueType ValueType, ValueRange Value, ModifierScope Scope) : IModifierDescriptor
+    {
+        public float Weight { get; set; }
+        public AffixKind Affix { get; init; }
+        public string? NameKey { get; init; }
+        public EquipmentCategory? OnlyFor { get; init; }
+        public string? Condition { get; init; }
+    }
+
+    public sealed record ContextDescriptor(ContextParameter Parameter, ModifierValueType ValueType, ValueRange Value) : IModifierDescriptor
+    {
+        public float Weight { get; set; }
+        public AffixKind Affix { get; init; }
+        public string? NameKey { get; init; }
+        public EquipmentCategory? OnlyFor { get; init; }
+        public string? Condition { get; init; }
+    }
+
+    // TODO:
+    // Это ДОЛЖНО быть строчкой в предмете, разница с обычным модификатором в том, что она применяется к предмету
+    /// <summary>Mythic-pool entry "+Min..Max sharpening levels" — an operation on the item, not a line.
+    /// Only the ascension gift path applies it; the materializer refuses it loudly, so a stray entry in
+    /// a regular roll pool is a no-op with an error, never a silent mis-line.</summary>
+    public sealed record UpgradeLevelsDescriptor(int Min, int Max) : IModifierDescriptor
+    {
+        public float Weight { get; set; }
+        public AffixKind Affix { get; init; }
+        public string? NameKey { get; init; }
+        public EquipmentCategory? OnlyFor { get; init; }
+        public string? Condition { get; init; }
+    }
+
+    /// <summary>Rollable grant: behaviour no stat line can express ("ignores the first damage taken each turn")
+    /// enters a pool as the passive/effect it really is. The materializer mints it through the one grant factory
+    /// and drops it in the sink's grant bucket — it is NOT a line, so it never occupies an affix slot on reroll
+    /// and carries no <see cref="ModifierKey"/>.</summary>
+    public sealed record GrantDescriptor(GrantKind Kind, string GrantId, IReadOnlyDictionary<string, float> Properties) : IModifierDescriptor
+    {
+        public float Weight { get; set; }
+        public AffixKind Affix { get; init; }
+        public string? NameKey { get; init; }
+        public EquipmentCategory? OnlyFor { get; init; }
+        public string? Condition { get; init; }
+    }
+
+    /// <summary>A weighted bundle rolled as one unit at creation; flattened to its atomic parts for reroll (1-for-1).
+    /// Affix lives on the root only — parts inherit it when materialized or flattened.</summary>
+    public sealed record CompositeDescriptor(IReadOnlyList<IModifierDescriptor> Parts) : IModifierDescriptor
+    {
+        public float Weight { get; set; }
+        public AffixKind Affix { get; init; }
+        public string? NameKey { get; init; }
+        public EquipmentCategory? OnlyFor { get; init; }
+        public string? Condition { get; init; }
+    }
+}

@@ -1,0 +1,1302 @@
+{
+    "npcs": [
+        {
+            "id": "Npc_Dummy",
+            "fraction": "Undead",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 1,
+            "levelScaling": 0.01,
+            "abilityCount": 0,
+            "baseParameters": {
+                "Health": 900000000,
+                "Barrier": 0,
+                "Mana": 0,
+                "Strength": 5,
+                "Dexterity": 5,
+                "Intelligence": 5,
+                "Armor": 2000,
+                "CriticalChance": 0,
+                "AdditionalHitChance": 0,
+                "CriticalDamage": 0,
+                "PhysicalDamage": 1,
+                "SpellDamage": 1,
+                "Accuracy": 0,
+                "Evade": 2000,
+                "LightningResistance": 0.25,
+                "ColdResistance": 0.25,
+                "FireResistance": 0.25
+            },
+            "world": {
+                "visionRadius": 0,
+                "hearingRadius": 0,
+                "leashRadius": 0,
+                "moveSpeed": 0,
+                "chaseSpeedMultiplier": 1,
+                "hostileToPlayer": true,
+                "activity": "Idle",
+                "wanderRadius": 220
+            },
+            "lifecycle": {
+                "resurrectMinSeconds": 20,
+                "resurrectMaxSeconds": 90,
+                "maxStrengthBonus": 1
+            }
+        },
+        {
+            "id": "Npc_Bandit",
+            "fraction": "Human",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Dexterity",
+                "Strength"
+            ],
+            "levelMin": 1,
+            "levelScaling": 0.03,
+            "baseParameters": {
+                "Health": 900,
+                "Barrier": 0,
+                "Mana": 250,
+                "Strength": 3,
+                "Dexterity": 4,
+                "Intelligence": 1,
+                "Armor": 450,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.1,
+                "CriticalDamage": 1.5,
+                "PhysicalDamage": 120,
+                "SpellDamage": 40,
+                "Accuracy": 300,
+                "Evade": 750
+            },
+            "world": {
+                "visionRadius": 320,
+                "hearingRadius": 650,
+                "leashRadius": 900,
+                "moveSpeed": 110,
+                "chaseSpeedMultiplier": 1.6,
+                "hostileToPlayer": true,
+                "activity": "Wander",
+                "wanderRadius": 220,
+                "schedule": [
+                    {
+                        "from": "06:00",
+                        "to": "22:00",
+                        "activity": "Wander",
+                        "wanderRadius": 220
+                    },
+                    {
+                        "from": "22:00",
+                        "to": "06:00",
+                        "activity": "Idle"
+                    }
+                ]
+            },
+            "lifecycle": {
+                "resurrectMinSeconds": 20,
+                "resurrectMaxSeconds": 90,
+                "maxStrengthBonus": 1
+            }
+        },
+        {
+            "id": "Npc_Bandit_Veteran",
+            "fraction": "Human",
+            "entityType": "Elit",
+            "aiIntellect": "Tactical",
+            "stances": [
+                "Dexterity",
+                "Strength"
+            ],
+            "levelMin": 10,
+            "levelScaling": 0.05,
+            "baseParameters": {
+                "Health": 1600,
+                "Barrier": 300,
+                "Mana": 400,
+                "Strength": 6,
+                "Dexterity": 7,
+                "Intelligence": 2,
+                "Armor": 1200,
+                "CriticalChance": 0.25,
+                "AdditionalHitChance": 0.2,
+                "CriticalDamage": 1.6,
+                "PhysicalDamage": 220,
+                "SpellDamage": 60,
+                "Accuracy": 550,
+                "Evade": 1600
+            },
+            "world": {
+                "visionRadius": 700,
+                "hearingRadius": 800,
+                "leashRadius": 2000,
+                "moveSpeed": 130,
+                "chaseSpeedMultiplier": 1.7,
+                "searchSeconds": 8,
+                "hostileToPlayer": true,
+                "activity": "Patrol"
+            },
+            "interaction": {
+                "canTalk": true
+            }
+        },
+        {
+            "id": "Npc_Skeleton_Mage",
+            "fraction": "Undead",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Intelligence"
+            ],
+            "levelMin": 3,
+            "levelScaling": 0.04,
+            "baseParameters": {
+                "Health": 200,
+                "Barrier": 100,
+                "Mana": 500,
+                "Strength": 1,
+                "Dexterity": 2,
+                "Intelligence": 6,
+                "Armor": 350,
+                "CriticalChance": 0.1,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 1.5,
+                "PhysicalDamage": 80,
+                "SpellDamage": 200,
+                "Accuracy": 350,
+                "Evade": 675
+            },
+            "world": {
+                "visionRadius": 280,
+                "hearingRadius": 500,
+                "leashRadius": 700,
+                "moveSpeed": 80,
+                "chaseSpeedMultiplier": 1.4,
+                "suspiciousSeconds": 6,
+                "activity": "Idle",
+                "wanderRadius": 180,
+                "schedule": [
+                    {
+                        "from": "22:00",
+                        "to": "06:00",
+                        "activity": "Wander",
+                        "wanderRadius": 400
+                    },
+                    {
+                        "from": "06:00",
+                        "to": "22:00",
+                        "activity": "Idle"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "Npc_Grave_Revenant",
+            "fraction": "Undead",
+            "entityType": "Unique",
+            "aiIntellect": "Mastermind",
+            "stances": [
+                "Intelligence",
+                "Strength"
+            ],
+            "levelMin": 25,
+            "levelScaling": 0.06,
+            "baseParameters": {
+                "Health": 2800,
+                "Barrier": 800,
+                "Mana": 700,
+                "Strength": 9,
+                "Dexterity": 5,
+                "Intelligence": 12,
+                "Armor": 1200,
+                "CriticalChance": 0.3,
+                "AdditionalHitChance": 0.25,
+                "CriticalDamage": 1.8,
+                "PhysicalDamage": 300,
+                "SpellDamage": 380,
+                "Accuracy": 800,
+                "Evade": 1400
+            },
+            "world": {
+                "visionRadius": 500,
+                "hearingRadius": 1000,
+                "leashRadius": 1500,
+                "moveSpeed": 140,
+                "chaseSpeedMultiplier": 1.8,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        },
+        {
+            "id": "Npc_Cursed_Sorcerer",
+            "fraction": "Undead",
+            "entityType": "Archon",
+            "aiIntellect": "Mastermind",
+            "stances": [
+                "Intelligence",
+                "Strength"
+            ],
+            "levelMin": 45,
+            "levelScaling": 0.03,
+            "abilityCount": 7,
+            "baseParameters": {
+                "Health": 10000,
+                "Barrier": 1500,
+                "Mana": 3000,
+                "Strength": 20,
+                "Dexterity": 15,
+                "Intelligence": 45,
+                "Armor": 4500,
+                "CriticalChance": 0.6,
+                "AdditionalHitChance": 0.4,
+                "CriticalDamage": 2,
+                "PhysicalDamage": 600,
+                "SpellDamage": 1200,
+                "Accuracy": 4300,
+                "Evade": 3300
+            },
+            "world": {
+                "visionRadius": 500,
+                "hearingRadius": 1000,
+                "leashRadius": 1500,
+                "moveSpeed": 140,
+                "chaseSpeedMultiplier": 1.8,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        },
+        {
+            "id": "Npc_Wolf",
+            "fraction": "Animal",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 1,
+            "levelScaling": 0.04,
+            "baseParameters": {
+                "Health": 700,
+                "Barrier": 0,
+                "Mana": 100,
+                "Strength": 2,
+                "Dexterity": 5,
+                "Intelligence": 1,
+                "Armor": 175,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.15,
+                "CriticalDamage": 1.5,
+                "PhysicalDamage": 110,
+                "SpellDamage": 0,
+                "Accuracy": 350,
+                "Evade": 725
+            },
+            "world": {
+                "visionRadius": 380,
+                "hearingRadius": 700,
+                "leashRadius": 800,
+                "moveSpeed": 140,
+                "chaseSpeedMultiplier": 1.8,
+                "hostileToPlayer": true,
+                "activity": "Wander",
+                "wanderRadius": 300
+            }
+        },
+        {
+            "id": "Npc_Boar",
+            "fraction": "Animal",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 1,
+            "levelScaling": 0.04,
+            "baseParameters": {
+                "Health": 1100,
+                "Barrier": 0,
+                "Mana": 100,
+                "Strength": 5,
+                "Dexterity": 2,
+                "Intelligence": 1,
+                "Armor": 725,
+                "CriticalChance": 0.1,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 1.6,
+                "PhysicalDamage": 130,
+                "SpellDamage": 0,
+                "Accuracy": 250,
+                "Evade": 400
+            },
+            "world": {
+                "visionRadius": 250,
+                "hearingRadius": 500,
+                "leashRadius": 600,
+                "moveSpeed": 110,
+                "chaseSpeedMultiplier": 1.7,
+                "hostileToPlayer": true,
+                "activity": "Wander",
+                "wanderRadius": 200
+            }
+        },
+        {
+            "id": "Npc_Deer",
+            "fraction": "Animal",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 1,
+            "levelScaling": 0.03,
+            "baseParameters": {
+                "Health": 500,
+                "Barrier": 0,
+                "Mana": 100,
+                "Strength": 1,
+                "Dexterity": 4,
+                "Intelligence": 1,
+                "Armor": 65,
+                "CriticalChance": 0.05,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 1.3,
+                "PhysicalDamage": 40,
+                "SpellDamage": 0,
+                "Accuracy": 200,
+                "Evade": 750
+            },
+            "world": {
+                "visionRadius": 400,
+                "hearingRadius": 800,
+                "leashRadius": 1200,
+                "moveSpeed": 160,
+                "chaseSpeedMultiplier": 1.8,
+                "aggressive": false,
+                "activity": "Wander",
+                "wanderRadius": 350
+            }
+        },
+        {
+            "id": "Npc_Bear",
+            "fraction": "Animal",
+            "entityType": "Elit",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 8,
+            "levelScaling": 0.05,
+            "baseParameters": {
+                "Health": 2400,
+                "Barrier": 0,
+                "Mana": 150,
+                "Strength": 8,
+                "Dexterity": 3,
+                "Intelligence": 1,
+                "Armor": 1700,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.1,
+                "CriticalDamage": 1.7,
+                "PhysicalDamage": 260,
+                "SpellDamage": 0,
+                "Accuracy": 450,
+                "Evade": 625
+            },
+            "world": {
+                "visionRadius": 320,
+                "hearingRadius": 600,
+                "leashRadius": 700,
+                "moveSpeed": 120,
+                "chaseSpeedMultiplier": 1.6,
+                "hostileToPlayer": true,
+                "activity": "Wander",
+                "wanderRadius": 250
+            }
+        },
+        {
+            "id": "Npc_Direwolf",
+            "fraction": "Animal",
+            "entityType": "Special",
+            "aiIntellect": "Tactical",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 5,
+            "levelScaling": 0.05,
+            "baseParameters": {
+                "Health": 1300,
+                "Barrier": 0,
+                "Mana": 150,
+                "Strength": 3,
+                "Dexterity": 7,
+                "Intelligence": 2,
+                "Armor": 325,
+                "CriticalChance": 0.25,
+                "AdditionalHitChance": 0.2,
+                "CriticalDamage": 1.7,
+                "PhysicalDamage": 180,
+                "SpellDamage": 0,
+                "Accuracy": 500,
+                "Evade": 1100
+            },
+            "world": {
+                "visionRadius": 450,
+                "hearingRadius": 850,
+                "leashRadius": 1000,
+                "moveSpeed": 150,
+                "chaseSpeedMultiplier": 1.9,
+                "hostileToPlayer": true,
+                "activity": "Idle",
+                "wanderRadius": 400,
+                "schedule": [
+                    {
+                        "from": "22:00",
+                        "to": "06:00",
+                        "activity": "Hunt"
+                    },
+                    {
+                        "from": "06:00",
+                        "to": "22:00",
+                        "activity": "Rest"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "Npc_Villager",
+            "fraction": "Human",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 1,
+            "levelScaling": 0.03,
+            "baseParameters": {
+                "Health": 600,
+                "Barrier": 0,
+                "Mana": 150,
+                "Strength": 2,
+                "Dexterity": 2,
+                "Intelligence": 1,
+                "Armor": 300,
+                "CriticalChance": 0.05,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 1.3,
+                "PhysicalDamage": 60,
+                "SpellDamage": 0,
+                "Accuracy": 200,
+                "Evade": 750
+            },
+            "world": {
+                "visionRadius": 300,
+                "hearingRadius": 600,
+                "leashRadius": 700,
+                "moveSpeed": 100,
+                "chaseSpeedMultiplier": 1.5,
+                "aggressive": false,
+                "activity": "Wander",
+                "wanderRadius": 200,
+                "schedule": [
+                    {
+                        "from": "06:00",
+                        "to": "18:00",
+                        "activity": "Harvest",
+                        "point": "OreVein"
+                    },
+                    {
+                        "from": "18:00",
+                        "to": "22:00",
+                        "activity": "Rest",
+                        "point": "Campfire"
+                    },
+                    {
+                        "from": "22:00",
+                        "to": "06:00",
+                        "activity": "Sleep",
+                        "point": "Tent"
+                    }
+                ]
+            },
+            "interaction": {
+                "canTalk": true
+            }
+        },
+        {
+            "id": "Npc_Hunter",
+            "fraction": "Human",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 3,
+            "levelScaling": 0.04,
+            "baseParameters": {
+                "Health": 850,
+                "Barrier": 0,
+                "Mana": 200,
+                "Strength": 3,
+                "Dexterity": 5,
+                "Intelligence": 1,
+                "Armor": 275,
+                "CriticalChance": 0.2,
+                "AdditionalHitChance": 0.1,
+                "CriticalDamage": 1.5,
+                "PhysicalDamage": 130,
+                "SpellDamage": 0,
+                "Accuracy": 450,
+                "Evade": 675
+            },
+            "world": {
+                "visionRadius": 400,
+                "hearingRadius": 750,
+                "leashRadius": 1000,
+                "moveSpeed": 120,
+                "chaseSpeedMultiplier": 1.6,
+                "activity": "Patrol",
+                "schedule": [
+                    {
+                        "from": "06:00",
+                        "to": "20:00",
+                        "activity": "Patrol"
+                    },
+                    {
+                        "from": "20:00",
+                        "to": "06:00",
+                        "activity": "Idle"
+                    }
+                ]
+            },
+            "interaction": {
+                "canTalk": true
+            }
+        },
+        {
+            "id": "Npc_Skeleton_Warrior",
+            "fraction": "Undead",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 2,
+            "levelScaling": 0.04,
+            "baseParameters": {
+                "Health": 700,
+                "Barrier": 0,
+                "Mana": 200,
+                "Strength": 4,
+                "Dexterity": 2,
+                "Intelligence": 1,
+                "Armor": 700,
+                "CriticalChance": 0.1,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 1.5,
+                "PhysicalDamage": 130,
+                "SpellDamage": 0,
+                "Accuracy": 300,
+                "Evade": 425
+            },
+            "world": {
+                "visionRadius": 280,
+                "hearingRadius": 550,
+                "leashRadius": 700,
+                "moveSpeed": 85,
+                "chaseSpeedMultiplier": 1.5,
+                "activity": "Idle",
+                "wanderRadius": 200,
+                "schedule": [
+                    {
+                        "from": "22:00",
+                        "to": "06:00",
+                        "activity": "Wander",
+                        "wanderRadius": 350
+                    },
+                    {
+                        "from": "06:00",
+                        "to": "22:00",
+                        "activity": "Idle"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "Npc_Ghoul",
+            "fraction": "Undead",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 4,
+            "levelScaling": 0.05,
+            "baseParameters": {
+                "Health": 900,
+                "Barrier": 0,
+                "Mana": 200,
+                "Strength": 3,
+                "Dexterity": 6,
+                "Intelligence": 1,
+                "Armor": 175,
+                "CriticalChance": 0.2,
+                "AdditionalHitChance": 0.15,
+                "CriticalDamage": 1.6,
+                "PhysicalDamage": 150,
+                "SpellDamage": 0,
+                "Accuracy": 400,
+                "Evade": 625
+            },
+            "world": {
+                "visionRadius": 350,
+                "hearingRadius": 700,
+                "leashRadius": 900,
+                "moveSpeed": 130,
+                "chaseSpeedMultiplier": 1.8,
+                "activity": "Idle",
+                "schedule": [
+                    {
+                        "from": "20:00",
+                        "to": "06:00",
+                        "activity": "Hunt"
+                    },
+                    {
+                        "from": "06:00",
+                        "to": "20:00",
+                        "activity": "Idle"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "Npc_Elf_Ranger",
+            "fraction": "Elf",
+            "entityType": "Regular",
+            "aiIntellect": "Tactical",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 5,
+            "levelScaling": 0.05,
+            "baseParameters": {
+                "Health": 800,
+                "Barrier": 100,
+                "Mana": 350,
+                "Strength": 2,
+                "Dexterity": 7,
+                "Intelligence": 3,
+                "Armor": 175,
+                "CriticalChance": 0.25,
+                "AdditionalHitChance": 0.15,
+                "CriticalDamage": 1.6,
+                "PhysicalDamage": 160,
+                "SpellDamage": 60,
+                "Accuracy": 600,
+                "Evade": 600
+            },
+            "world": {
+                "visionRadius": 450,
+                "hearingRadius": 850,
+                "leashRadius": 1100,
+                "moveSpeed": 130,
+                "chaseSpeedMultiplier": 1.7,
+                "activity": "Patrol"
+            },
+            "interaction": {
+                "canTalk": true
+            }
+        },
+        {
+            "id": "Npc_Elf_Mage",
+            "fraction": "Elf",
+            "entityType": "Special",
+            "aiIntellect": "Tactical",
+            "stances": [
+                "Intelligence"
+            ],
+            "levelMin": 8,
+            "levelScaling": 0.05,
+            "baseParameters": {
+                "Health": 500,
+                "Barrier": 400,
+                "Mana": 800,
+                "Strength": 1,
+                "Dexterity": 3,
+                "Intelligence": 8,
+                "Armor": 275,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 1.5,
+                "PhysicalDamage": 70,
+                "SpellDamage": 280,
+                "Accuracy": 450,
+                "Evade": 950
+            },
+            "world": {
+                "visionRadius": 400,
+                "hearingRadius": 800,
+                "leashRadius": 900,
+                "moveSpeed": 110,
+                "chaseSpeedMultiplier": 1.5,
+                "activity": "Idle",
+                "wanderRadius": 250
+            },
+            "interaction": {
+                "canTalk": true
+            }
+        },
+        {
+            "id": "Npc_Dwarf_Warrior",
+            "fraction": "Dwarf",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 5,
+            "levelScaling": 0.05,
+            "baseParameters": {
+                "Health": 1300,
+                "Barrier": 0,
+                "Mana": 250,
+                "Strength": 6,
+                "Dexterity": 2,
+                "Intelligence": 1,
+                "Armor": 600,
+                "CriticalChance": 0.1,
+                "AdditionalHitChance": 0.1,
+                "CriticalDamage": 1.6,
+                "PhysicalDamage": 170,
+                "SpellDamage": 0,
+                "Accuracy": 400,
+                "Evade": 125
+            },
+            "world": {
+                "visionRadius": 320,
+                "hearingRadius": 650,
+                "leashRadius": 800,
+                "moveSpeed": 95,
+                "chaseSpeedMultiplier": 1.5,
+                "activity": "Patrol"
+            },
+            "interaction": {
+                "canTalk": true
+            }
+        },
+        {
+            "id": "Npc_Dwarf_Crossbowman",
+            "fraction": "Dwarf",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 5,
+            "levelScaling": 0.05,
+            "baseParameters": {
+                "Health": 900,
+                "Barrier": 0,
+                "Mana": 250,
+                "Strength": 4,
+                "Dexterity": 5,
+                "Intelligence": 1,
+                "Armor": 600,
+                "CriticalChance": 0.2,
+                "AdditionalHitChance": 0.1,
+                "CriticalDamage": 1.6,
+                "PhysicalDamage": 190,
+                "SpellDamage": 0,
+                "Accuracy": 550,
+                "Evade": 500
+            },
+            "world": {
+                "visionRadius": 380,
+                "hearingRadius": 700,
+                "leashRadius": 850,
+                "moveSpeed": 95,
+                "chaseSpeedMultiplier": 1.5,
+                "activity": "Idle",
+                "wanderRadius": 200
+            },
+            "interaction": {
+                "canTalk": true
+            }
+        },
+        {
+            "id": "Npc_Imp",
+            "fraction": "Demon",
+            "entityType": "Regular",
+            "aiIntellect": "Tactical",
+            "stances": [
+                "Intelligence"
+            ],
+            "levelMin": 6,
+            "levelScaling": 0.05,
+            "baseParameters": {
+                "Health": 600,
+                "Barrier": 300,
+                "Mana": 600,
+                "Strength": 1,
+                "Dexterity": 4,
+                "Intelligence": 6,
+                "Armor": 175,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.1,
+                "CriticalDamage": 1.5,
+                "PhysicalDamage": 60,
+                "SpellDamage": 240,
+                "Accuracy": 400,
+                "Evade": 575
+            },
+            "world": {
+                "visionRadius": 380,
+                "hearingRadius": 750,
+                "leashRadius": 900,
+                "moveSpeed": 135,
+                "chaseSpeedMultiplier": 1.7,
+                "activity": "Wander",
+                "wanderRadius": 350
+            }
+        },
+        {
+            "id": "Npc_Demon_Brute",
+            "fraction": "Demon",
+            "entityType": "Elit",
+            "aiIntellect": "Tactical",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 12,
+            "levelScaling": 0.06,
+            "baseParameters": {
+                "Health": 2800,
+                "Barrier": 200,
+                "Mana": 400,
+                "Strength": 10,
+                "Dexterity": 3,
+                "Intelligence": 3,
+                "Armor": 1400,
+                "CriticalChance": 0.2,
+                "AdditionalHitChance": 0.15,
+                "CriticalDamage": 1.8,
+                "PhysicalDamage": 320,
+                "SpellDamage": 100,
+                "Accuracy": 650,
+                "Evade": 550
+            },
+            "world": {
+                "visionRadius": 420,
+                "hearingRadius": 800,
+                "leashRadius": 1000,
+                "moveSpeed": 115,
+                "chaseSpeedMultiplier": 1.6,
+                "activity": "Idle",
+                "wanderRadius": 300
+            }
+        },
+        {
+            "id": "Npc_Boss_Digri",
+            "fraction": "Undead",
+            "entityType": "Boss",
+            "rarity": "Unique",
+            "authored": {
+                "modifierCount": 7
+            },
+            "aiIntellect": "Mastermind",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 30,
+            "levelMax": 30,
+            "levelScaling": 0.06,
+            "fleeHealthThreshold": 0,
+            "abilities": [
+                "Ability_Dark_Shroud",
+                "Ability_Increasing_Pressure"
+            ],
+            "reactions": [
+                {
+                    "abilityId": "Ability_Twin_Assist_Attack",
+                    "trigger": "DamagedByAttack",
+                    "chance": 0.15,
+                    "maxPerTurn": 3,
+                    "blockedByFinalDeathOf": "Npc_Boss_Zigri"
+                }
+            ],
+            "baseParameters": {
+                "Health": 10000,
+                "Barrier": 1000,
+                "Mana": 1200,
+                "Strength": 15,
+                "Dexterity": 35,
+                "Intelligence": 10,
+                "Armor": 2500,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.35,
+                "CriticalDamage": 2,
+                "PhysicalDamage": 500,
+                "SpellDamage": 300,
+                "Accuracy": 4200,
+                "Evade": 5600
+            },
+            "world": {
+                "visionRadius": 450,
+                "hearingRadius": 900,
+                "leashRadius": 1200,
+                "moveSpeed": 130,
+                "chaseSpeedMultiplier": 1.7,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        },
+        {
+            "id": "Npc_Boss_Zigri",
+            "fraction": "Undead",
+            "entityType": "Boss",
+            "rarity": "Unique",
+            "authored": {
+                "modifierCount": 7
+            },
+            "aiIntellect": "Mastermind",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 30,
+            "levelMax": 30,
+            "levelScaling": 0.06,
+            "fleeHealthThreshold": 0,
+            "abilities": [
+                "Ability_Ares_Blessing",
+                "Ability_Double_Strike"
+            ],
+            "reactions": [
+                {
+                    "abilityId": "Ability_Twin_Assist_Shield",
+                    "trigger": "DamagedByAttack",
+                    "chance": 0.15,
+                    "maxPerTurn": 3,
+                    "blockedByFinalDeathOf": "Npc_Boss_Digri"
+                }
+            ],
+            "baseParameters": {
+                "Health": 10000,
+                "Barrier": 2000,
+                "Mana": 1200,
+                "Strength": 35,
+                "Dexterity": 20,
+                "Intelligence": 15,
+                "Armor": 4000,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 2.8,
+                "PhysicalDamage": 500,
+                "SpellDamage": 300,
+                "Accuracy": 2300,
+                "Evade": 1600
+            },
+            "world": {
+                "visionRadius": 450,
+                "hearingRadius": 900,
+                "leashRadius": 1200,
+                "moveSpeed": 110,
+                "chaseSpeedMultiplier": 1.6,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        },
+        {
+            "id": "Npc_Boss_Rat_King",
+            "fraction": "Animal",
+            "entityType": "Archon",
+            "rarity": "Mythic",
+            "authored": {
+                "modifierCount": 8
+            },
+            "aiIntellect": "Mastermind",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 15,
+            "levelMax": 15,
+            "levelScaling": 0.06,
+            "fleeHealthThreshold": 0,
+            "stages": [
+                {
+                    "parameterMultiplier": 0.15,
+                    "abilities": [],
+                    "attackEffects": [
+                        {
+                            "effect": "Poison",
+                            "chance": 0.35,
+                            "damagePercent": 0.75,
+                            "duration": 3,
+                            "maxStacks": 999
+                        }
+                    ],
+                    "nextStageAtHealthPercent": 0.35
+                },
+                {
+                    "parameterMultiplier": 1,
+                    "abilities": [
+                        "Ability_Increasing_Pressure",
+                        "Ability_Poison_Explosion"
+                    ],
+                    "attackEffects": [
+                        {
+                            "effect": "Poison",
+                            "chance": 1,
+                            "damagePercent": 0.75,
+                            "duration": 3,
+                            "maxStacks": 999
+                        },
+                        {
+                            "effect": "WitheringCurse",
+                            "chance": 0.15,
+                            "damagePercent": 0.15,
+                            "duration": 3,
+                            "maxStacks": 3
+                        }
+                    ],
+                    "rageAtHealthPercent": 0.3,
+                    "rageBonus": 0.25
+                }
+            ],
+            "baseParameters": {
+                "Health": 5000,
+                "Barrier": 500,
+                "Mana": 1200,
+                "Strength": 8,
+                "Dexterity": 15,
+                "Intelligence": 5,
+                "Armor": 1500,
+                "CriticalChance": 0.1,
+                "AdditionalHitChance": 0.3,
+                "CriticalDamage": 1.9,
+                "PhysicalDamage": 200,
+                "SpellDamage": 100,
+                "Accuracy": 700,
+                "Evade": 4100
+            },
+            "world": {
+                "visionRadius": 450,
+                "hearingRadius": 900,
+                "leashRadius": 1200,
+                "moveSpeed": 120,
+                "chaseSpeedMultiplier": 1.7,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        },
+        {
+            "id": "Npc_Boss_Bone_Pack_Leader",
+            "fraction": "Undead",
+            "entityType": "Boss",
+            "rarity": "Unique",
+            "authored": {
+                "modifierCount": 7
+            },
+            "aiIntellect": "Mastermind",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 10,
+            "levelMax": 10,
+            "levelScaling": 0.06,
+            "fleeHealthThreshold": 0,
+            "abilities": [
+                "Ability_Critical_Calculation",
+                "Ability_Summon_Bone_Wolves"
+            ],
+            "passives": [
+                {
+                    "id": "Passive_Skill_Bleeding",
+                    "properties": {
+                        "percentFromDamage": 1.2,
+                        "duration": 3,
+                        "maxStacks": 999
+                    }
+                }
+            ],
+            "abilityBehaviors": [
+                {
+                    "id": "Ability_Summon_Bone_Wolves",
+                    "weight": 1.2,
+                    "role": "Utility"
+                }
+            ],
+            "baseParameters": {
+                "Health": 3000,
+                "Barrier": 200,
+                "Mana": 500,
+                "Strength": 5,
+                "Dexterity": 25,
+                "Intelligence": 10,
+                "Armor": 775,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.35,
+                "CriticalDamage": 2,
+                "PhysicalDamage": 200,
+                "SpellDamage": 50,
+                "Accuracy": 700,
+                "Evade": 3900
+            },
+            "world": {
+                "visionRadius": 450,
+                "hearingRadius": 900,
+                "leashRadius": 1200,
+                "moveSpeed": 125,
+                "chaseSpeedMultiplier": 1.7,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        },
+        {
+            "id": "Npc_Bone_Wolf",
+            "fraction": "Undead",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 1,
+            "levelMax": 1,
+            "levelScaling": 0,
+            "baseParameters": {
+                "Health": 500,
+                "Barrier": 0,
+                "Mana": 100,
+                "Strength": 2,
+                "Dexterity": 6,
+                "Intelligence": 1,
+                "Armor": 150,
+                "CriticalChance": 0.1,
+                "AdditionalHitChance": 0.1,
+                "CriticalDamage": 1.5,
+                "PhysicalDamage": 50,
+                "SpellDamage": 15,
+                "Accuracy": 175,
+                "Evade": 800
+            }
+        },
+        {
+            "id": "Npc_Human_Merchant",
+            "fraction": "Human",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 5,
+            "levelMax": 8,
+            "levelScaling": 0,
+            "baseParameters": {
+                "Health": 900,
+                "Barrier": 100,
+                "Mana": 200,
+                "Strength": 5,
+                "Dexterity": 3,
+                "Intelligence": 3,
+                "Armor": 650,
+                "CriticalChance": 0.05,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 1.5,
+                "PhysicalDamage": 120,
+                "SpellDamage": 40,
+                "Accuracy": 350,
+                "Evade": 800
+            },
+            "world": {
+                "visionRadius": 350,
+                "hearingRadius": 500,
+                "leashRadius": 400,
+                "moveSpeed": 90,
+                "chaseSpeedMultiplier": 1.2,
+                "searchSeconds": 4,
+                "activity": "Idle"
+            },
+            "interaction": {
+                "canTalk": true
+            }
+        },
+        {
+            "id": "Npc_Ronald",
+            "fraction": "Human",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Strength"
+            ],
+            "levelScaling": 0,
+            "abilityCount": 1,
+            "baseParameters": {
+                "Health": 1200,
+                "Barrier": 0,
+                "Mana": 200,
+                "Strength": 7,
+                "Dexterity": 3,
+                "Intelligence": 2,
+                "Armor": 800,
+                "CriticalChance": 0.1,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 1.5,
+                "PhysicalDamage": 150,
+                "SpellDamage": 0,
+                "Accuracy": 400,
+                "Evade": 475
+            },
+            "world": {
+                "visionRadius": 320,
+                "hearingRadius": 600,
+                "leashRadius": 500,
+                "moveSpeed": 95,
+                "chaseSpeedMultiplier": 1.4,
+                "aggressive": false,
+                "activity": "Work",
+                "wanderRadius": 150,
+                "schedule": [
+                    {
+                        "from": "06:00",
+                        "to": "14:00",
+                        "activity": "Work",
+                        "point": "Forge"
+                    },
+                    {
+                        "from": "14:00",
+                        "to": "20:00",
+                        "activity": "Work",
+                        "point": "TradeStall"
+                    },
+                    {
+                        "from": "20:00",
+                        "to": "23:00",
+                        "activity": "Rest",
+                        "point": "Campfire"
+                    },
+                    {
+                        "from": "23:00",
+                        "to": "06:00",
+                        "activity": "Sleep",
+                        "point": "Tent"
+                    }
+                ]
+            },
+            "lifecycle": {
+                "kind": "Villager",
+                "recoverMinSeconds": 120,
+                "recoverMaxSeconds": 300
+            },
+            "interaction": {
+                "canTalk": true
+            },
+            "authored": {
+                "stance": "Strength",
+                "level": 8,
+                "rarity": "Uncommon",
+                "modifierCount": 0
+            }
+        }
+    ]
+}

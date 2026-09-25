@@ -1,13 +1,12 @@
 namespace LootGeneration.Source
 {
-    using Internal;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Entity;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Core.Entity;
 
     public interface ILootGenerationService
     {
         void ChangeLootConfiguration(ILootConfiguration configuration);
-        Task<List<ItemStack>> GenerateItemsAsync(IEntity diedEntity);
+        Task<List<ItemStack>> GenerateItemsAsync(IFightable diedEntity);
     }
 }

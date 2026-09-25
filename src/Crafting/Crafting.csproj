@@ -1,25 +1,21 @@
-﻿<Project Sdk="Godot.NET.Sdk/4.5.0">
+﻿<Project Sdk="Godot.NET.Sdk/4.7.0">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <Nullable>enable</Nullable>
     <Configurations>Debug;ExportDebug;ExportRelease;Release</Configurations>
-    <LangVersion>14</LangVersion>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Utilities\Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="Godot.SourceGenerators" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="GodotSharp" />
-  </ItemGroup>
-  <ItemGroup>
+    <PackageReference Update="Godot.SourceGenerators" Version="4.7.0" />
+    <PackageReference Update="GodotSharp" Version="4.7.0" />
     <PackageReference Update="GodotSharpEditor" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Internal\Data\" />
     <Folder Include="Source\UIElements\Styles\" />
   </ItemGroup>
   <ItemGroup>

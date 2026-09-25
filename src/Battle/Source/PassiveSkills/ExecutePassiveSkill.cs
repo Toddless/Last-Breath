@@ -1,38 +1,70 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Skills;
+    using System.Collections.Generic;
+    using Core.Battle.Skills;
+    using Core.Entity;
+    using Core.Enums;
+    using Core.Events;
+    using Godot;
 
-    public class ExecutePassiveSkill( float percentToKill)
+    public class ExecutePassiveSkill(float threshold = 0.3f)
         : Skill(id: "Passive_Skill_Execute")
     {
-        public float PercentToKill { get; } = percentToKill;
+        private const float MinPossibleThreshold = 0.05f;
 
-        public override void Attach(IEntity owner)
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?> { [nameof(Threshold)] = Threshold };
+                return field;
+            }
+        }
+
+        public float Threshold { get; } = threshold;
+
+        public override void Attach(IFightable owner)
         {
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
         private void OnAfterAttack(AfterAttackEvent evnt)
         {
+            if (evnt.Context.Result is not AttackResults.Succeed) return;
             var context = evnt.Context;
-
-            float healthLeftInPercent = context.Target.CurrentHealth / context.Target.Parameters.MaxHealth;
-            if (healthLeftInPercent <= PercentToKill) context.Target.Kill();
+            if (CanExecute(context.Target)) context.Target.Kill();
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
-        public override ISkill Copy() => new ExecutePassiveSkill( PercentToKill);
+        public override ISkill Copy() => new ExecutePassiveSkill(Threshold);
 
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not ExecutePassiveSkill execute) return false;
-            return execute.PercentToKill > PercentToKill;
+            return Threshold > execute.Threshold;
         }
+
+        private bool CanExecute(IFightable fightable)
+        {
+            if (fightable is IFightableNpc npc)
+                return npc.CurrentHealth / npc.Parameters.MaxHealth <= GetThreshold(npc.EntityType);
+            return fightable.CurrentHealth / fightable.Parameters.MaxHealth <= Threshold;
+        }
+
+        private float GetThreshold(EntityType type) => type switch
+        {
+            EntityType.Regular => Threshold,
+            EntityType.Special => Mathf.Max(MinPossibleThreshold, Threshold * 0.9f),
+            EntityType.Elit => Mathf.Max(MinPossibleThreshold, Threshold * 0.7f),
+            EntityType.Unique => Mathf.Max(MinPossibleThreshold, Threshold * 0.5f),
+            EntityType.Boss => Mathf.Max(MinPossibleThreshold, Threshold * 0.35f),
+            EntityType.Archon => Mathf.Max(MinPossibleThreshold, Threshold * 0.15f),
+            _ => Threshold,
+        };
     }
 }

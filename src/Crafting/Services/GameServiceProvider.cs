@@ -1,91 +1,49 @@
-﻿namespace Crafting.Services
+namespace Crafting.Services
 {
-    using Godot;
-    using Source;
-    using System;
-    using Core.Results;
-    using Source.EventHandlers;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Events;
-    using TestResources.Inventory;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Inventory;
-    using System.Collections.Generic;
     using Core.Data;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
-    using Core.Modifiers;
+    using Core.Data.GameData;
+    using Core.Inventory;
+    using Core.Modifiers.Conditions;
+    using Core.Services;
+    using Core.Views.UI;
+    using Internal;
+    using Internal.Inventory;
     using Microsoft.Extensions.DependencyInjection;
-    using Source.RequestHandlers;
+    using SharedUi;
+    using Source;
 
-    internal class GameServiceProvider : IGameServiceProvider
+    /// <summary>Project bootstrap: the shared Core provider + Crafting registrations. The only place touching the static root.</summary>
+    internal static class GameServiceProvider
     {
-        private readonly ServiceProvider _serviceProvider;
+        public static IGameServiceProvider Instance { get; } = CreateProvider();
 
-        public static GameServiceProvider Instance
+        private static IGameServiceProvider CreateProvider()
         {
-            get
-            {
-                if (field != null) return field;
-
-                field = new GameServiceProvider();
-                return field;
-            }
+            var provider = Core.Services.GameServiceProvider.Initialize(RegisterProjectServices);
+            provider.AddCraftingWindowFactories();
+            provider.AddSharedUiFactories();
+            RegisterProjectWindows(provider);
+            provider.GetService<IGameDataService>().LoadAll();
+            return provider;
         }
 
-        private GameServiceProvider()
+        private static void RegisterProjectServices(IServiceCollection services)
         {
-            _serviceProvider = RegisterServices();
-        }
-
-        public T GetService<T>() => _serviceProvider.GetService<T>() ?? throw new NullReferenceException();
-        public T GetKeyedService<T>(string key) => _serviceProvider.GetKeyedService<T>(key) ?? throw new NullReferenceException();
-
-        public IEnumerable<T> GetServices<T>() => _serviceProvider.GetServices<T>();
-
-        private ServiceProvider RegisterServices()
-        {
-            var services = new ServiceCollection();
-            services.AddSingleton<IGameMessageBus, GameMessageBus>();
-            services.AddSingleton<IItemUpgrader, ItemUpgrader>();
-            services.AddSingleton<IItemCreator, ItemCreator>();
-            services.AddSingleton<IUiElementProvider, UIElementProvider>();
-            services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
+            services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
+            services.AddSingleton<IDataParser, DataParser>();
             services.AddSingleton<IInventory, Inventory>();
-            services.AddSingleton<IItemDataProvider, ItemDataProvider>(_ =>
-            {
-                var instance = new ItemDataProvider("res://TestResources/RecipeAndResources/");
-                instance.LoadData();
-                return instance;
-            });
-            services.AddSingleton(_ =>
-            {
-                var instance = new RandomNumberGenerator();
-                instance.Randomize();
-                return instance;
-            });
-            services.AddSingleton<ICraftingMastery, CraftingMastery>();
+            services.AddSingleton<IItemCreationService, ItemCreationService>();
+            services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>();
+            services.AddConditionCatalog();
+            services.AddCraftingSystemModuleDependencies();
+            services.AddGameData("res://Internal/Data/", "res://Internal/Data/Shared/");
+        }
 
-            services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemRequestHandler>();
-
-            services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemUpgradeCostRequestHandler>();
-            services.AddTransient<IRequestHandler<GetTotalItemAmountRequest, Dictionary<string, int>>, GetTotalItemAmountRequestHandler>();
-            services.AddTransient<IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>, OpenCraftingItemsWindowRequestHandler>();
-            services.AddTransient<IRequestHandler<UpgradeEquipItemRequest, ItemUpgradeResult>, UpgradeEquipItemRequestHandler>();
-            services.AddTransient<IRequestHandler<GetEquipItemRecraftModifierCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemRecraftModifierCostRequestHandler>();
-            services.AddTransient<IRequestHandler<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>, RecraftEquipItemModifierRequestHandler>();
-
-            services.AddSingleton<IEventHandler<DestroyItemEvent>, DestroyItemEventHandler>();
-            services.AddSingleton<IEventHandler<GainCraftingExpirienceEvent>, GainCraftingExperienceEventHandler>();
-            services.AddSingleton<IEventHandler<SendNotificationMessageEvent>, SendNotificationMessageEventHandler>();
-            services.AddSingleton<IEventHandler<ShowInventorySlotButtonsTooltipEvent>, ShowTooltipEventHandler>();
-            services.AddSingleton<IEventHandler<ShowInventoryItemEvent>, ShowInventoryItemEventHandler>();
-            services.AddSingleton<IEventHandler<ConsumeResourcesInInventoryEvent>, ConsumeResourcesWithinInventoryEventHandler>();
-            services.AddSingleton<IEventHandler<ClearUiElementsEvent>, ClearUiElementsEventHandler>();
-            services.AddSingleton<IEventHandler<ItemCreatedEvent>, ItemCreatedEventHandler>();
-            services.AddSingleton<IEventHandler<OpenCraftingWindowEvent>, OpenCraftingWindowEventHandler>();
-
-            return services.BuildServiceProvider();
+        /// <summary>Windows living in Internal are project-private and can't be registered by the shared module extension.</summary>
+        private static void RegisterProjectWindows(IGameServiceProvider provider)
+        {
+            var uiElements = provider.GetService<IUiElementsManager>();
+            uiElements.RegisterWindowFactory(typeof(InventoryWindow), () => InventoryWindow.Initialize().Instantiate<InventoryWindow>());
         }
     }
 }

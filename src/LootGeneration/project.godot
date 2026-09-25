@@ -8,11 +8,15 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="LootGeneration"
 run/main_scene="uid://ba46y8ipgiqun"
-config/features=PackedStringArray("4.5", "C#", "Forward Plus")
+config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 
 [display]
 
@@ -22,3 +26,11 @@ window/size/viewport_height=920
 [dotnet]
 
 project/assembly_name="LootGeneration"
+
+[gui]
+
+theme/custom="res://Data/Shared/Assets/UI/Theme.tres"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://Data/Shared/Localization/en.po", "res://Data/Shared/Localization/ru.po")

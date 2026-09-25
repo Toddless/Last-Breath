@@ -1,0 +1,42 @@
+{
+  "maxLevel": 50,
+  "baseExp": 50,
+  "expFactor": 1.8,
+  "bonuses": {
+    "upgradeChance": 2,
+    "createdValues": 1.5,
+    "rarerItem": 1.5,
+    "extraEffect": 1.5,
+    "mythicModifier": 1,
+    "resourceReturn": 1.5
+  },
+  "baseResourceReturn": 0.3,
+  "ascensionLevelGate": 1,
+  "ascensionStatBonus": 0.15,
+  "mythicGiftBaseChance": 0.15,
+  "extraEffectBaseChance": 0.25,
+  "rarityWeights": {
+    "Legendary": 1,
+    "Epic": 10,
+    "Rare": 24,
+    "Uncommon": 65
+  },
+  "expRewards": {
+    "byRarity": {
+      "Common": 10,
+      "Uncommon": 10,
+      "Rare": 20,
+      "Epic": 30,
+      "Legendary": 40,
+      "Unique": 40,
+      "Mythic": 40
+    },
+    "modeFactors": {
+      "Create": 1,
+      "Upgrade": 0.3,
+      "Recraft": 0.3,
+      "Ascend": 1,
+      "Shatter": 0.5
+    }
+  }
+}

@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://dk3fp7ag2wr5h"]
+
+[ext_resource type="Script" uid="uid://c3hrycu0mnbdp" path="res://Addons/Battle/UIElements/AbilitySocketPanel.cs" id="1_panel"]
+[ext_resource type="PackedScene" uid="uid://cx8hj2lm5ta0d" path="res://Addons/Battle/UIElements/AbilitySocketRow.tscn" id="2_row"]
+
+[node name="AbilitySocketPanel" type="VBoxContainer" node_paths=PackedStringArray("_rows", "_empty", "_reason")]
+offset_right = 560.0
+offset_bottom = 240.0
+theme_override_constants/separation = 6
+script = ExtResource("1_panel")
+_rows = NodePath("Scroll/Rows")
+_empty = NodePath("Empty")
+_reason = NodePath("Reason")
+_rowScene = ExtResource("2_row")
+
+[node name="Empty" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Nothing here yet."
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Rows" type="VBoxContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Reason" type="Label" parent="."]
+visible = false
+layout_mode = 2
+theme_type_variation = &"DimLabel"

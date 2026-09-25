@@ -1,0 +1,84 @@
+namespace Core.Ai.World
+{
+    using System.Collections.Generic;
+
+    public enum WorldActivityType : byte
+    {
+        Idle,
+        Wander,
+        Patrol,
+        Rest,
+        Sleep,
+        Hunt,
+        Harvest,
+        Work
+    }
+
+    /// <summary>World behavior tuning of one NPC (the "world" section of Npc.json).</summary>
+    public class WorldBrainConfig
+    {
+        public float VisionRadius { get; init; } = 350f;
+        public float HearingRadius { get; init; } = 600f;
+
+        /// <summary>Max distance from home the chase may reach before the NPC gives up.</summary>
+        public float LeashRadius { get; init; } = 900f;
+
+        public float MoveSpeed { get; init; } = 120f;
+        public float ChaseSpeedMultiplier { get; init; } = 1.6f;
+
+        /// <summary>How long the NPC inspects a noise point before calming down.</summary>
+        public float SuspiciousSeconds { get; init; } = 4f;
+
+        /// <summary>How long the NPC lingers around the last known target position.</summary>
+        public float SearchSeconds { get; init; } = 5f;
+
+        /// <summary>No re-aggression right after a battle — gives the player room to disengage.</summary>
+        public float PostBattleGraceSeconds { get; init; } = 5f;
+
+        /// <summary>False = never chases (city dwellers): investigates noises but does not attack.</summary>
+        public bool Aggressive { get; init; } = true;
+
+        /// <summary>
+        /// Personal override: treats the player as an enemy regardless of the faction standing
+        /// (bandits, beasts). Without it hostility comes from IFactionRelationService.
+        /// </summary>
+        public bool HostileToPlayer { get; init; }
+
+        /// <summary>How far a non-aggressive NPC runs per flee leg (away from the threat).</summary>
+        public float FleeDistance { get; init; } = 400f;
+
+        /// <summary>Keeps fleeing this long after the threat was last seen/heard, then calms down.</summary>
+        public float FleeSeconds { get; init; } = 5f;
+
+        public WorldActivityType Activity { get; init; } = WorldActivityType.Idle;
+
+        /// <summary>Sleeping senses: vision/hearing radii are scaled down while the Sleep pose holds.</summary>
+        public float SleepVisionMultiplier { get; init; } = 0.3f;
+
+        public float SleepHearingMultiplier { get; init; } = 0.6f;
+
+        /// <summary>Wander destinations are rolled within this radius around home.</summary>
+        public float WanderRadius { get; init; } = 250f;
+
+        /// <summary>Pause at a reached wander/patrol point before picking the next one.</summary>
+        public float ActivityPauseSeconds { get; init; } = 2f;
+
+        /// <summary>
+        /// Daily routine (the "schedule" section): time windows switching the Calm activity.
+        /// Empty = the single <see cref="Activity"/> runs all day. Gaps fall back to it too.
+        /// </summary>
+        public IReadOnlyList<ScheduleSlotConfig> Schedule { get; init; } = [];
+
+        /// <summary>
+        /// Duration-driven routine (the "routine" section): timed steps cycled in order — the
+        /// alternative to clock windows. Non-empty routine wins over the schedule.
+        /// </summary>
+        public IReadOnlyList<RoutineStepConfig> Routine { get; init; } = [];
+    }
+
+    /// <summary>One schedule window in minutes of day (wrap through midnight allowed).</summary>
+    public record ScheduleSlotConfig(int FromMinuteOfDay, int ToMinuteOfDay, WorldActivityType Activity, float? WanderRadius = null, string? PointTag = null);
+
+    /// <summary>One routine step: the activity runs for the budget of game minutes, then the cycle advances.</summary>
+    public record RoutineStepConfig(WorldActivityType Activity, float Minutes, float? WanderRadius = null, string? PointTag = null);
+}

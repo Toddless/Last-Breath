@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bqf3n2vhs4x1m"]
+
+[ext_resource type="Script" uid="uid://cw8yknd2q5r0v" path="res://UI/Modules/FilterBar.cs" id="1_fbar"]
+
+[node name="FilterBar" type="HBoxContainer" node_paths=PackedStringArray("_search", "_chips", "_typeFilter")]
+theme_override_constants/separation = 8
+script = ExtResource("1_fbar")
+_search = NodePath("Search")
+_chips = NodePath("Chips")
+_typeFilter = NodePath("TypeFilter")
+
+[node name="Search" type="LineEdit" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Search..."
+clear_button_enabled = true
+
+[node name="Chips" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TypeFilter" type="OptionButton" parent="."]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+focus_mode = 0

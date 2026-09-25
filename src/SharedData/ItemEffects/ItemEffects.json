@@ -1,0 +1,205 @@
+{
+    "effects": [
+        {
+            "id": "Passive_Skill_Regeneration",
+            "kind": "Passive",
+            "weight": 100,
+            "properties": {
+                "percent": 0.05
+            }
+        },
+        {
+            "id": "Passive_Skill_Mana_Regeneration",
+            "kind": "Passive",
+            "weight": 100,
+            "properties": {
+                "percent": 0.05
+            }
+        },
+        {
+            "id": "Passive_Skill_Critical_Leech",
+            "kind": "Passive",
+            "weight": 80,
+            "properties": {
+                "percent": 0.10
+            }
+        },
+        {
+            "id": "Passive_Skill_Critical_Mana_Leech",
+            "kind": "Passive",
+            "weight": 80,
+            "properties": {
+                "percent": 0.10
+            }
+        },
+        {
+            "id": "Passive_Skill_Mana_On_Attack",
+            "kind": "Passive",
+            "weight": 80,
+            "properties": {
+                "amount": 50
+            }
+        },
+        {
+            "id": "Passive_Skill_Bleeding",
+            "kind": "Passive",
+            "weight": 60,
+            "properties": {
+                "percentFromDamage": 1.2,
+                "duration": 3,
+                "maxStacks": 999
+            }
+        },
+        {
+            "id": "Passive_Skill_Burning",
+            "kind": "Passive",
+            "weight": 60,
+            "properties": {
+                "percentFromDamage": 0.80,
+                "duration": 3,
+                "maxStacks": 999
+            }
+        },
+        {
+            "id": "Passive_Skill_Poisoned_Claws",
+            "kind": "Passive",
+            "weight": 60,
+            "properties": {
+                "percentFromDamage": 0.75,
+                "duration": 3
+            }
+        },
+        {
+            "id": "Passive_Skill_Vampire",
+            "kind": "Passive",
+            "weight": 60,
+            "properties": {
+                "percent": 0.15
+            }
+        },
+        {
+            "id": "Passive_Skill_Execute",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "threshold": 0.3
+            }
+        },
+        {
+            "id": "Passive_Skill_Accelerator",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "amount": 1
+            }
+        },
+        {
+            "id": "Passive_Skill_Armor_Piercing",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {}
+        },
+        {
+            "id": "Passive_Skill_Bastion",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "reduce": 0.35
+            }
+        },
+        {
+            "id": "Passive_Skill_Counter_Attack",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "chance": 0.5
+            }
+        },
+        {
+            "id": "Passive_Skill_Decomposition",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "duration": 3,
+                "reduceBy": 0.05,
+                "maxStacks": 5
+            }
+        },
+        {
+            "id": "Passive_Skill_Echo",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "delayedDamagePercent": 0.3,
+                "turns": 3
+            }
+        },
+        {
+            "id": "Passive_Skill_First_Strike",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "bonus": 0.45
+            }
+        },
+        {
+            "id": "Passive_Skill_LuckyCriticalChance",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {}
+        },
+        {
+            "id": "Passive_Skill_Mana_Burn",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "percentToBurn": 0.05
+            }
+        },
+        {
+            "id": "Passive_Skill_Mana_Resonance",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "rate": 0.15
+            }
+        },
+        {
+            "id": "Passive_Skill_Porcupine",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "damagePercent": 0.3,
+                "armorPercent": 0.25
+            }
+        },
+        {
+            "id": "Passive_Skill_Regeneration",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "percent": 0.05
+            }
+        },
+        {
+            "id": "Passive_Skill_Soul_Devouring",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {
+                "barrierRecoveryAmount": 0.1
+            }
+        },
+        {
+            "id": "Passive_Skill_Soulless",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {}
+        },
+        {
+            "id": "Passive_Skill_True_Strike",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": {}
+        }
+    ]
+}

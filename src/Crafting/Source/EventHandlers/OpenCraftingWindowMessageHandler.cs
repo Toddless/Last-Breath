@@ -1,0 +1,33 @@
+namespace Crafting.Source.EventHandlers
+{
+    using System.Threading.Tasks;
+    using Core.Enums;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.MessageBus;
+    using Core.MessageBus.Messages;
+    using Core.Views.UI;
+    using UIElements;
+
+    public class OpenCraftingWindowMessageHandler(
+        IUiElementsManager uiElementsManager,
+        IInventory inventory)
+        : IMessageHandler<OpenCraftingWindowMessage>
+    {
+        public Task HandleMessageAsync(OpenCraftingWindowMessage message)
+        {
+            if (!message.IsItem || string.IsNullOrWhiteSpace(message.Id))
+            {
+                uiElementsManager.ToggleWindow(typeof(CraftingWindow));
+                return Task.CompletedTask;
+            }
+
+            // Null = crafting is not available in the current context (battle etc.) — silent no-op.
+            if (uiElementsManager.OpenWindow(typeof(CraftingWindow)) is not CraftingWindow window) return Task.CompletedTask;
+            var item = inventory.GetItem<IEquipItem>(message.Id);
+            if (item != null && message.CraftingMode is CraftingMode.Upgrade or CraftingMode.Recraft or CraftingMode.Ascend)
+                window.SetItem(item, message.CraftingMode);
+            return Task.CompletedTask;
+        }
+    }
+}

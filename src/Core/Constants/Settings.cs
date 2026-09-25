@@ -21,5 +21,9 @@
         public const string Map = "ui_map";
         public const string Dev = "ui_dev";
         public const string Dialog = "ui_dialog";
+        public const string Mastery = "ui_mastery";
+        public const string PassivesTree = "ui_passive_tree";
+        /// <summary>Hold-to-reveal roll spreads in item tooltips (default Сtrl).</summary>
+        public const string RevealRanges = "ui_reveal_ranges";
     }
 }

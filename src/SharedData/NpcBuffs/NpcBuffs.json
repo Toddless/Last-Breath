@@ -1,0 +1,182 @@
+{
+    "buffs": [
+        {
+            "id": "Npc_Buff_Double_Health",
+            "modifiers": [
+                { "parameter": "Health", "type": "Increase", "value": 1.0 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Double_Damage",
+            "modifiers": [
+                { "parameter": "PhysicalDamage", "type": "Increase", "value": 1.0 },
+                { "parameter": "SpellDamage", "type": "Increase", "value": 1.0 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Double_Defence",
+            "modifiers": [
+                { "parameter": "Armor", "type": "Increase", "value": 1.0 },
+                { "parameter": "Evade", "type": "Increase", "value": 0.5 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Double_Health_Recovery",
+            "modifiers": [
+                { "parameter": "HealthRecovery", "type": "Increase", "value": 1.0 }
+            ]
+        },
+
+        {
+            "id": "Npc_Buff_Tier_Upgrade_To_Maximum",
+            "modifiers": [
+                { "parameter": "CriticalChance", "type": "Increase", "value": 0.15 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Tier_Upgrade_By_Two",
+            "modifiers": [
+                { "parameter": "CriticalChance", "type": "Increase", "value": 0.10 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Tier_Upgrade_By_One",
+            "modifiers": [
+                { "parameter": "CriticalChance", "type": "Increase", "value": 0.05 }
+            ]
+        },
+
+        {
+            "id": "Npc_Buff_Guaranteed_Items_Crafting_Resource",
+            "modifiers": [
+                { "parameter": "Armor", "type": "Increase", "value": 0.15 },
+                { "parameter": "Evade", "type": "Increase", "value": 0.15 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Guaranteed_Items_Crafting_Upgrade",
+            "modifiers": [
+                { "parameter": "Health", "type": "Increase", "value": 0.15 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Guaranteed_Items_Equip",
+            "modifiers": [
+                { "parameter": "PhysicalDamage", "type": "Increase", "value": 0.15 },
+                { "parameter": "SpellDamage", "type": "Increase", "value": 0.15 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Guaranteed_Items_Essence",
+            "modifiers": [
+                { "parameter": "Barrier", "type": "Increase", "value": 0.15 }
+            ]
+        },
+
+        {
+            "id": "Npc_Buff_Tier_Multiplier_Huge",
+            "modifiers": [
+                { "parameter": "AdditionalHitChance", "type": "Increase", "value": 0.15 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Tier_Multiplier_Big",
+            "modifiers": [
+                { "parameter": "AdditionalHitChance", "type": "Increase", "value": 0.10 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Tier_Multiplier_Mid",
+            "modifiers": [
+                { "parameter": "AdditionalHitChance", "type": "Increase", "value": 0.07 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Tier_Multiplier_Small",
+            "modifiers": [
+                { "parameter": "AdditionalHitChance", "type": "Increase", "value": 0.04 }
+            ]
+        },
+
+        {
+            "id": "Npc_Buff_Item_Effect_Execution",
+            "modifiers": [],
+            "grants": [
+                { "kind": "Passive", "id": "Passive_Skill_Execute", "properties": { "threshold": 0.3 } }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Item_Effect_Vampire",
+            "modifiers": [],
+            "grants": [
+                { "kind": "Passive", "id": "Passive_Skill_Vampire", "properties": { "percent": 0.15 } }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Item_Effect_Poisoned_Claw",
+            "modifiers": [],
+            "grants": [
+                {
+                    "kind": "Passive",
+                    "id": "Passive_Skill_Poisoned_Claws",
+                    "properties": { "percentFromDamage": 0.75, "duration": 3 }
+                }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Item_Effect_Burning",
+            "modifiers": [],
+            "grants": [
+                {
+                    "kind": "Passive",
+                    "id": "Passive_Skill_Burning",
+                    "properties": { "percentFromDamage": 0.80, "duration": 3, "maxStacks": 999 }
+                }
+            ]
+        },
+
+        {
+            "id": "Npc_Buff_Rarity_Upgrade_Huge",
+            "modifiers": [
+                { "parameter": "AllResistance", "type": "Increase", "value": 0.15 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Rarity_Upgrade_Big",
+            "modifiers": [
+                { "parameter": "AllResistance", "type": "Increase", "value": 0.10 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Rarity_Upgrade_Mid",
+            "modifiers": [
+                { "parameter": "AllResistance", "type": "Increase", "value": 0.06 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Rarity_Upgrade_Small",
+            "modifiers": [
+                { "parameter": "AllResistance", "type": "Increase", "value": 0.03 }
+            ]
+        },
+
+        {
+            "id": "Npc_Buff_Min_Rarity_Legend",
+            "modifiers": [
+                { "parameter": "AllAttribute", "type": "Increase", "value": 0.15 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Min_Rarity_Epic",
+            "modifiers": [
+                { "parameter": "AllAttribute", "type": "Increase", "value": 0.09 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Min_Rarity_Rare",
+            "modifiers": [
+                { "parameter": "AllAttribute", "type": "Increase", "value": 0.03 }
+            ]
+        }
+    ]
+}

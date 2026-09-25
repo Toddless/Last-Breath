@@ -1,0 +1,136 @@
+namespace Battle.Source.Abilities.IceShards
+{
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Context;
+    using Core.Data;
+    using Core.Data.AbilityData;
+    using Core.Entity;
+    using Core.Enums;
+
+    /// <summary>
+    /// Intelligence stance. Fires shards of ice at the target; activation stages are cumulative:
+    /// 2 — empowered shards, 3 — shards hit every enemy, 4 — critical shards burst into shrapnel.
+    /// All numbers live in <see cref="Parameters"/> modules, so upgrades are plain decorators.
+    /// </summary>
+    public class IceShards(AbilityBaseData data) : MulticastAbility<VolleyCastPlan>(data)
+    {
+        public float Damage => this[AbilityParameter.Damage];
+        public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
+        public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
+
+        /// <summary>Augment point: critical shards skip the target's cold resistance.</summary>
+        public bool CritIgnoresColdResistance { get; set; }
+
+        private const int EmpoweredShardsStage = 2;
+        private const int AllTargetsStage = 3;
+        private const int ShrapnelBurstStage = 4;
+
+        public static class Parameters
+        {
+            public const string ShrapnelDamage = nameof(ShrapnelDamage);
+            public const string ShrapnelWeaponDamageScale = nameof(ShrapnelWeaponDamageScale);
+            public const string ShrapnelSpellDamageScale = nameof(ShrapnelSpellDamageScale);
+            public const string SecondStageDamage = nameof(SecondStageDamage);
+            public const string SecondStageWeaponDamageScale = nameof(SecondStageWeaponDamageScale);
+            public const string SecondStageSpellDamageScale = nameof(SecondStageSpellDamageScale);
+        }
+
+        public int ProjectileCount => (int)this[AbilityParameter.ProjectileCount];
+
+        protected override void RegisterBaseParameters(AbilityParameterSet parameters)
+        {
+            base.RegisterBaseParameters(parameters);
+            RegisterDamageParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.ProjectileCount, 3);
+            parameters.RegisterDefault(Parameters.ShrapnelDamage, 30f);
+            parameters.RegisterDefault(Parameters.ShrapnelWeaponDamageScale, 0.05f);
+            parameters.RegisterDefault(Parameters.ShrapnelSpellDamageScale, 0.35f);
+            parameters.RegisterDefault(Parameters.SecondStageDamage, 100f);
+            parameters.RegisterDefault(Parameters.SecondStageWeaponDamageScale, 0.25f);
+            parameters.RegisterDefault(Parameters.SecondStageSpellDamageScale, 1.15f);
+            parameters.DeclareScales(Parameters.ShrapnelWeaponDamageScale, Parameters.ShrapnelSpellDamageScale);
+            parameters.DeclareScales(Parameters.SecondStageWeaponDamageScale, Parameters.SecondStageSpellDamageScale);
+        }
+
+        public override IAbility Copy() => CopyUpgradesTo(new IceShards(Data) { CritIgnoresColdResistance = CritIgnoresColdResistance });
+
+        protected override VolleyCastPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field) =>
+            new()
+            {
+                ProjectilesCount = ProjectileCount,
+                Damage = Damage,
+                WeaponDamageScale = WeaponDamageScale,
+                SpellDamageScale = SpellDamageScale,
+                DamageType = DamageType.Cold,
+                Targets = targets,
+                CritIgnoresResistances = CritIgnoresColdResistance
+            };
+
+        protected override void ApplyStage(int stage, VolleyCastPlan plan, IFightable owner, IBattleField field)
+        {
+            switch (stage)
+            {
+                case EmpoweredShardsStage:
+                    plan.Damage = this[Parameters.SecondStageDamage];
+                    plan.WeaponDamageScale = this[Parameters.SecondStageWeaponDamageScale];
+                    plan.SpellDamageScale = this[Parameters.SecondStageSpellDamageScale];
+                    break;
+                case AllTargetsStage:
+                    plan.Targets = field.GetEnemies(owner).ToList();
+                    break;
+                case ShrapnelBurstStage:
+                    plan.OnHitRiders.Add(hit => _ = DealShrapnelBurst(hit, owner, field));
+                    break;
+            }
+        }
+
+        /// <summary>Every landed shard is a full impact: plan riders (shrapnel) AND the ability's
+        /// impact riders (fragility, buff-granted riders) fire per shard per target.</summary>
+        protected override async Task ExecutePlan(VolleyCastPlan plan, IFightable owner, IBattleField field)
+        {
+            for (int projectile = 0; projectile < plan.ProjectilesCount; projectile++)
+            {
+                foreach (IFightable target in plan.Targets.Where(t => t.IsAlive).ToList())
+                {
+                    var hit = await DealPlanDamage(plan, owner, target);
+                    foreach (var rider in plan.OnHitRiders)
+                        rider(hit);
+                    await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage)
+                    {
+                        Source = this,
+                        Kind = ImpactKind.Projectile
+                    });
+                }
+            }
+        }
+
+        /// <summary>Stage 4: a critical shard bursts, damaging every enemy on the field. Each victim is
+        /// an impact of its own (fragility/rider effects apply) but a SPLASH one — the burst exists only
+        /// because a shard already landed, so it must not be counted as another shard; bursts never spawn
+        /// further bursts.</summary>
+        private async Task DealShrapnelBurst(ProjectileHit hit, IFightable owner, IBattleField field)
+        {
+            if (!hit.IsCritical) return;
+
+            float damage = this[Parameters.ShrapnelDamage]
+                           + owner.Parameters.PhysicalDamage * this[Parameters.ShrapnelWeaponDamageScale]
+                           + owner.Parameters.SpellDamage * this[Parameters.ShrapnelSpellDamageScale];
+
+            foreach (IFightable enemy in field.GetEnemies(owner))
+            {
+                var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, CastId = CastId };
+                context.Add(DamageType.Cold, damage);
+                await enemy.TakeDamage(context);
+                await ApplyImpactRiders(new AbilityImpact(owner, enemy, field, Succeeded: true, IsCritical: false, DamageSnapshot.From(context))
+                {
+                    Source = this,
+                    Kind = ImpactKind.Splash
+                });
+            }
+        }
+    }
+}

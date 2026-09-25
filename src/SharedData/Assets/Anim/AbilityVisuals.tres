@@ -1,0 +1,203 @@
+[gd_resource type="Resource" script_class="AbilityVisualLibrary" format=3 uid="uid://bh87hiqb74wbh"]
+
+[ext_resource type="Script" uid="uid://boch4m6i7q2ob" path="res://Addons/Battle/Presentation/AbilityVisualConfig.cs" id="1_cfg"]
+[ext_resource type="Script" uid="uid://8bj6cfgq0817" path="res://Addons/Battle/Presentation/AbilityVisualLibrary.cs" id="2_lib"]
+[ext_resource type="SpriteFrames" uid="uid://bwh6ukljuub2w" path="res://Data/Shared/Assets/Anim/VfxFrames.tres" id="3_frames"]
+
+[sub_resource type="Resource" id="Resource_e7d13"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Armageddon"
+Delivery = 3
+CastClip = "Ability_Armageddon"
+ImpactClip = "Ability_Armageddon_Impact"
+Scale = 2.2
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_51yah"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Ares_Blessing"
+Delivery = 4
+CastClip = "Ability_Ares_Blessing"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_h4frm"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Berserk_Fury"
+CastClip = "Ability_Berserk_Fury"
+ImpactClip = "Ability_Berserkk_Fury_Impact"
+MeleeApproach = true
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_07b7h"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Chain_Lightning"
+Delivery = 3
+CastClip = "Ability_Chain_Lightning"
+TravelClip = "Ability_Chain_Lightning_Projectile"
+ImpactClip = "Ability_Chain_Lightning_Impact"
+CastOverArena = true
+CastScale = 3.0
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_owypo"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Critical_Calculation"
+Delivery = 4
+CastClip = "Ability_Critical_Calculation"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_x17su"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Dark_Shroud"
+Delivery = 4
+CastClip = "Ability_Dark_Shroud"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_uq0r6"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Double_Strike"
+CastClip = "Ability_Double_Strike"
+ImpactClip = "Ability_Double_Strike_Impact"
+MeleeApproach = true
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_ay3os"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Fireball"
+Delivery = 1
+CastClip = "Ability_Fireball"
+TravelClip = "Ability_Fireball_Projectile"
+ImpactClip = "Ability_Fireball_Impact"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_y4wtc"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Head_Butt"
+CastClip = "Ability_Head_Butt"
+ImpactClip = "Ability_Head_Butt_Impact"
+MeleeApproach = true
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_kkt3r"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Ice_Aegis"
+Delivery = 4
+CastClip = "Ability_Ice_Aegis"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_s6stb"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Ice_Block"
+Delivery = 3
+CastClip = "Ability_Ice_Block"
+TravelClip = "Ability_Ice_Block_Projectile"
+ImpactClip = "Ability_Ice_Block_Impact"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_r5w8j"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Ice_Shards"
+Delivery = 1
+CastClip = "Ability_Ice_Shards"
+TravelClip = "Ability_Ice_Shards_Projectile"
+ImpactClip = "Ability_Ice_Shards_Impact"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_k1pnu"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Increasing_Pressure"
+CastClip = "Ability_Increasing_Pressure"
+ImpactClip = "Ability_Increasing_Pressure_Impact"
+MeleeApproach = true
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_vn3yq"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Jar_Of_Poison"
+Delivery = 1
+CastClip = "Ability_Jar_Of_Poison"
+TravelClip = "Ability_Jar_Of_Poison_Projectile"
+ImpactClip = "Ability_Jar_Of_Poison_Impact"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_acydb"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Overload"
+Delivery = 4
+CastClip = "Ability_Overload"
+TravelClip = "Ability_Overload_Aura"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_7wg0j"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Poison_Coating"
+Delivery = 4
+CastClip = "Ability_Poison_Coating"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_e5upl"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Mana_Devour"
+Delivery = 3
+CastClip = "Ability_Mana_Devour"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_qhn0n"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Poison_Explosion"
+Delivery = 3
+CastClip = "Ability_Poison_Explosion"
+ImpactClip = "Ability_Poison_Explosion_Impact"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_mdtx3"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Porcupine"
+Delivery = 4
+CastClip = "Ability_Porcupine"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_2ifwd"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Sacrifice"
+Delivery = 4
+CastClip = "Ability_Sacrifice"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_secfd"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Series_Of_Attacks"
+CastClip = "Ability_Series_Of_Attacks"
+ImpactClip = "Ability_Series_Of_Attacks_Impact"
+MeleeApproach = true
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_dpfrz"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Deep_Freeze"
+Delivery = 3
+CastClip = "Ability_Deep_Freeze"
+ImpactClip = "Ability_Deep_Freeze_Impact"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_dschg"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Discharge"
+Delivery = 1
+CastClip = "Ability_Discharge"
+TravelClip = "Ability_Discharge_Projectile"
+ImpactClip = "Ability_Discharge_Impact"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[sub_resource type="Resource" id="Resource_starm"]
+script = ExtResource("1_cfg")
+AbilityId = "Ability_Static_Armor"
+Delivery = 4
+CastClip = "Ability_Static_Armor"
+ImpactClip = "Ability_Static_Armor_Impact"
+metadata/_custom_type_script = "uid://boch4m6i7q2ob"
+
+[resource]
+script = ExtResource("2_lib")
+Frames = ExtResource("3_frames")
+Configs = Array[ExtResource("1_cfg")]([SubResource("Resource_e7d13"), SubResource("Resource_51yah"), SubResource("Resource_h4frm"), SubResource("Resource_07b7h"), SubResource("Resource_owypo"), SubResource("Resource_x17su"), SubResource("Resource_uq0r6"), SubResource("Resource_ay3os"), SubResource("Resource_y4wtc"), SubResource("Resource_kkt3r"), SubResource("Resource_s6stb"), SubResource("Resource_r5w8j"), SubResource("Resource_k1pnu"), SubResource("Resource_vn3yq"), SubResource("Resource_acydb"), SubResource("Resource_7wg0j"), SubResource("Resource_e5upl"), SubResource("Resource_qhn0n"), SubResource("Resource_mdtx3"), SubResource("Resource_2ifwd"), SubResource("Resource_secfd"), SubResource("Resource_dpfrz"), SubResource("Resource_dschg"), SubResource("Resource_starm")])

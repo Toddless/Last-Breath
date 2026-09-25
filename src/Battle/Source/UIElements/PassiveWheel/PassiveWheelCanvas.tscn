@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://cqv8m04rt6nd3"]
+
+[ext_resource type="Script" uid="uid://cwkkn655fkv8b" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveWheelCanvas.cs" id="1_canvas"]
+[ext_resource type="Script" uid="uid://bydqibgb11sb7" path="res://Addons/Battle/UIElements/PassiveWheel/WheelBackdropLayer.cs" id="2_backdrop"]
+[ext_resource type="Script" uid="uid://db44epcayfdvm" path="res://Addons/Battle/UIElements/PassiveWheel/WheelEdgeLayer.cs" id="3_edges"]
+[ext_resource type="Script" uid="uid://bvbgx6qr2hqqk" path="res://Addons/Battle/UIElements/PassiveWheel/WheelFieldLayer.cs" id="4_field"]
+[ext_resource type="Resource" uid="uid://clcr03qqjtk6e" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeVisuals.tres" id="4_ghf8w"]
+[ext_resource type="Script" uid="uid://do1bejy3kj6rc" path="res://Addons/Battle/UIElements/PassiveWheel/WheelCursorLayer.cs" id="5_cursor"]
+[ext_resource type="Resource" uid="uid://ctm2vd7hnxs4b" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveWheelStyle.tres" id="6_style"]
+[ext_resource type="PackedScene" uid="uid://dnx5txabkc2ef" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveNodeView.tscn" id="7_nodeview"]
+[ext_resource type="Script" uid="uid://if3rgm6cnvmw" path="res://Addons/Battle/UIElements/PassiveWheel/WheelSocketLayer.cs" id="8_sockets"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_void"]
+bg_color = Color(0.043, 0.035, 0.024, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.227, 0.188, 0.125, 1)
+
+[node name="PassiveWheelCanvas" type="Control" unique_id=457260580 node_paths=PackedStringArray("_rig", "_backdrop", "_idleEdges", "_takenEdges", "_field", "_route", "_rim", "_socketRings", "_nodeViews", "_effects")]
+custom_minimum_size = Vector2(640, 480)
+clip_contents = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_canvas")
+_rig = NodePath("Rig")
+_backdrop = NodePath("Rig/Backdrop")
+_idleEdges = NodePath("Rig/IdleEdges")
+_takenEdges = NodePath("Rig/TakenEdges")
+_field = NodePath("Rig/Field")
+_route = NodePath("Rig/Route")
+_rim = NodePath("Rig/Rim")
+_socketRings = NodePath("Rig/SocketRings")
+_nodeViews = NodePath("Rig/NodeViews")
+_effects = NodePath("Rig/Effects")
+_nodeViewScene = ExtResource("7_nodeview")
+_style = ExtResource("6_style")
+_visualLibrary = ExtResource("4_ghf8w")
+
+[node name="Void" type="Panel" parent="." unique_id=261292348]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_void")
+
+[node name="Rig" type="Node2D" parent="." unique_id=771453355]
+
+[node name="Backdrop" type="Node2D" parent="Rig" unique_id=445104659]
+script = ExtResource("2_backdrop")
+_style = ExtResource("6_style")
+
+[node name="IdleEdges" type="Node2D" parent="Rig" unique_id=733810537]
+script = ExtResource("3_edges")
+_style = ExtResource("6_style")
+
+[node name="TakenEdges" type="Node2D" parent="Rig" unique_id=2083550857]
+script = ExtResource("3_edges")
+_role = 1
+_style = ExtResource("6_style")
+
+[node name="Field" type="Node2D" parent="Rig" unique_id=470312573]
+script = ExtResource("4_field")
+_style = ExtResource("6_style")
+
+[node name="Route" type="Node2D" parent="Rig" unique_id=973325552]
+script = ExtResource("5_cursor")
+_style = ExtResource("6_style")
+
+[node name="SocketRings" type="Node2D" parent="Rig" unique_id=597765213]
+script = ExtResource("8_sockets")
+_style = ExtResource("6_style")
+
+[node name="NodeViews" type="Node2D" parent="Rig" unique_id=992998744]
+
+[node name="Rim" type="Node2D" parent="Rig" unique_id=170675959]
+script = ExtResource("5_cursor")
+_role = 1
+_style = ExtResource("6_style")
+
+[node name="Effects" type="Node2D" parent="Rig" unique_id=396137632]

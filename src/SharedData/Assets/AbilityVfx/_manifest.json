@@ -1,0 +1,97 @@
+{
+ "Ability_Ice_Block": {
+  "cast": 26,
+  "projectile": 18,
+  "impact": 26
+ },
+ "Ability_Jar_Of_Poison": {
+  "cast": 26,
+  "projectile": 18,
+  "impact": 26
+ },
+ "Ability_Fireball": {
+  "cast": 26,
+  "projectile": 18,
+  "impact": 26
+ },
+ "Ability_Chain_Lightning": {
+  "cast": 26,
+  "projectile": 18,
+  "impact": 30
+ },
+ "Ability_Overload": {
+  "cast": 26,
+  "aura": 26
+ },
+ "Ability_Deep_Freeze": {
+  "cast": 26,
+  "impact": 26
+ },
+ "Ability_Discharge": {
+  "cast": 26,
+  "projectile": 18,
+  "impact": 26
+ },
+ "Ability_Static_Armor": {
+  "cast": 26,
+  "impact": 26
+ },
+ "Ability_Armageddon": {
+  "cast": 26,
+  "impact": 26
+ },
+ "Ability_Poison_Explosion": {
+  "cast": 26,
+  "impact": 26
+ },
+ "Ability_Dark_Shroud": {
+  "cast": 30
+ },
+ "Ability_Poison_Coating": {
+  "cast": 30
+ },
+ "Ability_Ice_Aegis": {
+  "cast": 30
+ },
+ "Ability_Mana_Devour": {
+  "cast": 24
+ },
+ "Ability_Critical_Calculation": {
+  "cast": 26
+ },
+ "Ability_Ares_Blessing": {
+  "cast": 26
+ },
+ "Ability_Sacrifice": {
+  "cast": 24
+ },
+ "Ability_Series_Of_Attacks": {
+  "cast": 26,
+  "impact": 11
+ },
+ "Ability_Increasing_Pressure": {
+  "cast": 26,
+  "impact": 14
+ },
+ "Ability_Berserk_Fury": {
+  "cast": 26,
+  "impact": 24
+ },
+ "Ability_Double_Strike": {
+  "cast": 26,
+  "impact": 14
+ },
+ "Ability_Head_Butt": {
+  "cast": 26,
+  "impact": 11
+ },
+ "Ability_Ice_Shards": {
+  "cast": 7,
+  "projectile": 4,
+  "impact": 8,
+  "impact_crit": 8
+ },
+ "Ability_Porcupine": {
+  "cast": 26
+ }
+}

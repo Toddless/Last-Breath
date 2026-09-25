@@ -1,0 +1,213 @@
+{
+    "items": [
+        {
+            "id": "Cloak_Simple",
+            "equipmentPart": "Cloak",
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Evade",
+                    "value": {
+                        "min": 220,
+                        "max": 400
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Cloak_Direwolf_Hide",
+            "equipmentPart": "Cloak",
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Evade",
+                    "value": {
+                        "min": 380,
+                        "max": 700
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Cloak_Dark_Priest",
+            "equipmentPart": "Cloak",
+            "rarity": "Unique",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 45,
+                        "max": 100
+                    }
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 45,
+                        "max": 100
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Cloak_Light_Priest",
+            "equipmentPart": "Cloak",
+            "rarity": "Unique",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 45,
+                        "max": 100
+                    }
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 45,
+                        "max": 100
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Cloak_Eternal_Life_Shroud",
+            "equipmentPart": "Cloak",
+            "rarity": "Unique",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 30,
+                        "max": 70
+                    }
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 30,
+                        "max": 70
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 60
+        },
+        {
+            "id": "Cloak_Creators_Cassock",
+            "equipmentPart": "Cloak",
+            "rarity": "Mythic",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 180,
+                        "max": 320
+                    }
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 280,
+                        "max": 440
+                    }
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.75,
+                        "max": 1.2
+                    },
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.75,
+                        "max": 1.2
+                    },
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.35
+                    }
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.35
+                    }
+                }
+            ],
+            "grants": [],
+            "basePrice": 60
+        }
+    ]
+}

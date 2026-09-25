@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://bstp4qa8w1e6h"]
+
+[ext_resource type="Script" uid="uid://cs2panef7k3dm" path="res://UI/Modules/StatsPane.cs" id="1_spane"]
+
+[node name="StatsPane" type="VBoxContainer" node_paths=PackedStringArray("_header", "_stats", "_fireResist", "_coldResist", "_lightningResist", "_poisonResist")]
+theme_override_constants/separation = 8
+script = ExtResource("1_spane")
+_header = NodePath("StatsHeader")
+_stats = NodePath("Stats")
+_fireResist = NodePath("Resists/FireChip/FireResist")
+_coldResist = NodePath("Resists/ColdChip/ColdResist")
+_lightningResist = NodePath("Resists/LightningChip/LightningResist")
+_poisonResist = NodePath("Resists/PoisonChip/PoisonResist")
+
+[node name="StatsHeader" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Stats"
+
+[node name="Stats" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Resists" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="FireChip" type="PanelContainer" parent="Resists"]
+layout_mode = 2
+
+[node name="FireResist" type="Label" parent="Resists/FireChip"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+
+[node name="ColdChip" type="PanelContainer" parent="Resists"]
+layout_mode = 2
+
+[node name="ColdResist" type="Label" parent="Resists/ColdChip"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+
+[node name="LightningChip" type="PanelContainer" parent="Resists"]
+layout_mode = 2
+
+[node name="LightningResist" type="Label" parent="Resists/LightningChip"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+
+[node name="PoisonChip" type="PanelContainer" parent="Resists"]
+layout_mode = 2
+
+[node name="PoisonResist" type="Label" parent="Resists/PoisonChip"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"

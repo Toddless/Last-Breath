@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://dh4wepgj3g1sw"]
+
+[ext_resource type="Script" uid="uid://4jpi11uj83ct" path="res://Addons/SharedUi/TagPlate.cs" id="1_tagpl"]
+
+[node name="TagPlate" type="PanelContainer" unique_id=1993640487 node_paths=PackedStringArray("_label")]
+theme_type_variation = &"TagPlate"
+script = ExtResource("1_tagpl")
+_label = NodePath("Label")
+
+[node name="Label" type="Label" parent="." unique_id=430041392]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11

@@ -19,7 +19,7 @@
         /// </summary>
         Freeze = 1 << 2,
         /// <summary>
-        /// Lower chance for additional attack
+        /// Lower chance for successful attack
         /// </summary>
         Blind = 1 << 3,
         /// <summary>
@@ -29,7 +29,7 @@
         /// <summary>
         /// Damage overturn
         /// </summary>
-        Poison = 1 << 5,     // all of this have different base damage, duration and amount of stacks
+        Poison = 1 << 5,
         /// <summary>
         /// Damage overturn
         /// </summary>
@@ -54,6 +54,9 @@
         /// Random target choosing
         /// </summary>
         Confused = 1 << 11,
+        /// <summary>
+        /// Attacks alies if presented
+        /// </summary>
         Charmed = 1 << 12,
         /// <summary>
         /// Target cannot be selected

@@ -1,0 +1,32 @@
+{
+	"parameters": [
+		{ "parameter": "CriticalChance", "unit": "Percent" },
+		{ "parameter": "CriticalDamage", "unit": "Percent" },
+		{ "parameter": "AdditionalHitChance", "unit": "Percent" },
+		{ "parameter": "ArmorPenetration", "unit": "Percent" },
+		{ "parameter": "BlockChance", "unit": "Percent" },
+		{ "parameter": "MulticastChance", "unit": "Percent" },
+		{ "parameter": "Suppress", "unit": "Percent" },
+		{ "parameter": "SuppressChance", "unit": "Percent" },
+		{ "parameter": "CriticalDamageMitigation", "unit": "Percent" },
+		{ "parameter": "PoisonDamageMultiplier", "unit": "Percent" },
+		{ "parameter": "BurningDamageMultiplier", "unit": "Percent" },
+		{ "parameter": "BleedDamageMultiplier", "unit": "Percent" },
+		{ "parameter": "AllDoTDamageMultiplier", "unit": "Percent" },
+		{ "parameter": "FireResistance", "unit": "Percent" },
+		{ "parameter": "ColdResistance", "unit": "Percent" },
+		{ "parameter": "LightningResistance", "unit": "Percent" },
+		{ "parameter": "PoisonResistance", "unit": "Percent" },
+		{ "parameter": "AllResistance", "unit": "Percent" },
+		{ "parameter": "FireResistancePenetration", "unit": "Percent" },
+		{ "parameter": "ColdResistancePenetration", "unit": "Percent" },
+		{ "parameter": "LightningResistancePenetration", "unit": "Percent" },
+		{ "parameter": "PoisonResistancePenetration", "unit": "Percent" },
+		{ "parameter": "AllResistancePenetration", "unit": "Percent" },
+		{ "parameter": "FireResistanceMaximum", "unit": "Percent" },
+		{ "parameter": "ColdResistanceMaximum", "unit": "Percent" },
+		{ "parameter": "LightningResistanceMaximum", "unit": "Percent" },
+		{ "parameter": "PoisonResistanceMaximum", "unit": "Percent" },
+		{ "parameter": "AllResistanceMaximum", "unit": "Percent" }
+	]
+}

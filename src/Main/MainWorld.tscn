@@ -1,0 +1,119 @@
+[gd_scene format=4 uid="uid://geser04o26s5"]
+
+[ext_resource type="Script" uid="uid://ceaqsxdscqa37" path="res://MainWorld.cs" id="1_4xxmu"]
+[ext_resource type="Script" uid="uid://by0f8rrg2jn6v" path="res://Npc/NpcWorldDirector.cs" id="2_1etib"]
+[ext_resource type="PackedScene" uid="uid://bybo1ydp4jt0i" path="res://Player/Player.tscn" id="2_x0tsy"]
+[ext_resource type="Script" uid="uid://o4isflqmdcvu" path="res://World/SaveDirector.cs" id="6_x4wt1"]
+[ext_resource type="Script" uid="uid://bvkmjwos0jl80" path="res://World/DayNightTint.cs" id="7_y0rla"]
+[ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://World/NpcSpawnPoint.cs" id="9_hv00y"]
+[ext_resource type="Resource" uid="uid://30auv84x7a2l" path="res://World/ForestTerrains.tres" id="12_7ir56"]
+[ext_resource type="Script" uid="uid://bikj5svjvfps7" path="res://World/TerrainRoot.cs" id="17_4ci2c"]
+[ext_resource type="Texture2D" uid="uid://cmtx4uqnb0sc6" path="res://Sandbox/DualGridDebugTiles.png" id="20_aqfrr"]
+[ext_resource type="Script" uid="uid://deuhar8mrxw2l" path="res://World/Locations/LocationEndpoint.cs" id="loc_endpoint"]
+[ext_resource type="PackedScene" path="res://World/Interactions/InteractionTarget.tscn" id="interaction_target"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_brush"]
+texture = ExtResource("20_aqfrr")
+texture_region_size = Vector2i(256, 256)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_brush"]
+tile_size = Vector2i(256, 256)
+sources/0 = SubResource("TileSetAtlasSource_brush")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_exit"]
+radius = 180.0
+
+[node name="MainWorld" type="Node2D" unique_id=1612394780]
+y_sort_enabled = true
+script = ExtResource("1_4xxmu")
+
+[node name="NpcWorldDirector" type="Node" parent="." unique_id=1033587405]
+script = ExtResource("2_1etib")
+metadata/_custom_type_script = "uid://by0f8rrg2jn6v"
+
+[node name="SaveDirector" type="Node" parent="." unique_id=1422095378]
+script = ExtResource("6_x4wt1")
+metadata/_custom_type_script = "uid://o4isflqmdcvu"
+
+[node name="DayNightTint" type="CanvasModulate" parent="." unique_id=1148565666]
+script = ExtResource("7_y0rla")
+metadata/_custom_type_script = "uid://bvkmjwos0jl80"
+
+[node name="Player" parent="." unique_id=33183499 instance=ExtResource("2_x0tsy")]
+position = Vector2(1, 0)
+
+[node name="TerrainRoot" type="Node2D" parent="." unique_id=1475404791]
+z_index = -1
+script = ExtResource("17_4ci2c")
+_config = ExtResource("12_7ir56")
+metadata/_custom_type_script = "uid://bikj5svjvfps7"
+
+[node name="Dirt" type="TileMapLayer" parent="TerrainRoot" unique_id=1550282958]
+modulate = Color(1, 1, 1, 0.078431375)
+z_index = 1
+tile_map_data = PackedByteArray("AAACAAAAAAADAAMAAAADAAAAAAADAAMAAAAEAAAAAAADAAMAAAAFAAAAAAADAAMAAAAGAAAAAAADAAMAAAAGAAEAAAADAAMAAAAGAAIAAAADAAMAAAAFAAIAAAADAAMAAAAEAAIAAAADAAMAAAADAAIAAAADAAMAAAACAAEAAAADAAMAAAADAAEAAAADAAMAAAAEAAEAAAADAAMAAAACAAIAAAADAAMAAAABAAIAAAADAAMAAAAFAAEAAAADAAMAAAACAAMAAAADAAMAAAADAAMAAAADAAMAAAAEAAMAAAADAAMAAAAFAAMAAAADAAMAAAAGAAMAAAADAAMAAAAHAAMAAAADAAMAAAAHAAIAAAADAAMAAAAHAAEAAAADAAMAAAAHAAAAAAADAAMAAAAHAP//AAADAAMAAAAGAP//AAADAAMAAAAFAP//AAADAAMAAAAEAP//AAADAAMAAAADAP//AAADAAMAAAACAP//AAADAAMAAAD3//v/AAADAAMAAAD3//z/AAADAAMAAAD3//3/AAADAAMAAAD3//7/AAADAAMAAAD3////AAADAAMAAAD3/wAAAAADAAMAAAD3/wEAAAADAAMAAAD3/wIAAAADAAMAAAD3/wMAAAADAAMAAAD3/wQAAAADAAMAAAD3/wUAAAADAAMAAAD3/wYAAAADAAMAAAD3/wcAAAADAAMAAAD4//v/AAADAAMAAAD4//z/AAADAAMAAAD4//3/AAADAAMAAAD4//7/AAADAAMAAAD4////AAADAAMAAAD4/wAAAAADAAMAAAD4/wEAAAADAAMAAAD4/wIAAAADAAMAAAD4/wMAAAADAAMAAAD4/wQAAAADAAMAAAD4/wUAAAADAAMAAAD4/wYAAAADAAMAAAD4/wcAAAADAAMAAAD5//v/AAADAAMAAAD5//z/AAADAAMAAAD5//3/AAADAAMAAAD5//7/AAADAAMAAAD5////AAADAAMAAAD5/wAAAAADAAMAAAD5/wEAAAADAAMAAAD5/wIAAAADAAMAAAD5/wMAAAADAAMAAAD5/wQAAAADAAMAAAD5/wUAAAADAAMAAAD5/wYAAAADAAMAAAD5/wcAAAADAAMAAAD6//v/AAADAAMAAAD6//z/AAADAAMAAAD6//3/AAADAAMAAAD6//7/AAADAAMAAAD6////AAADAAMAAAD6/wAAAAADAAMAAAD6/wEAAAADAAMAAAD6/wIAAAADAAMAAAD6/wMAAAADAAMAAAD6/wQAAAADAAMAAAD6/wUAAAADAAMAAAD6/wYAAAADAAMAAAD6/wcAAAADAAMAAAD7//v/AAADAAMAAAD7//z/AAADAAMAAAD7//3/AAADAAMAAAD7//7/AAADAAMAAAD7////AAADAAMAAAD7/wAAAAADAAMAAAD7/wEAAAADAAMAAAD7/wIAAAADAAMAAAD7/wMAAAADAAMAAAD7/wQAAAADAAMAAAD7/wUAAAADAAMAAAD7/wYAAAADAAMAAAD7/wcAAAADAAMAAAD8//v/AAADAAMAAAD8//z/AAADAAMAAAD8//3/AAADAAMAAAD8//7/AAADAAMAAAD8////AAADAAMAAAD8/wAAAAADAAMAAAD8/wEAAAADAAMAAAD8/wIAAAADAAMAAAD8/wMAAAADAAMAAAD8/wQAAAADAAMAAAD8/wUAAAADAAMAAAD8/wYAAAADAAMAAAD8/wcAAAADAAMAAAD9//v/AAADAAMAAAD9//z/AAADAAMAAAD9//3/AAADAAMAAAD9//7/AAADAAMAAAD9////AAADAAMAAAD9/wAAAAADAAMAAAD9/wEAAAADAAMAAAD9/wIAAAADAAMAAAD9/wMAAAADAAMAAAD9/wQAAAADAAMAAAD9/wUAAAADAAMAAAD9/wYAAAADAAMAAAD9/wcAAAADAAMAAAD+//v/AAADAAMAAAD+//z/AAADAAMAAAD+//3/AAADAAMAAAD+//7/AAADAAMAAAD+////AAADAAMAAAD+/wAAAAADAAMAAAD+/wEAAAADAAMAAAD+/wIAAAADAAMAAAD+/wMAAAADAAMAAAD+/wQAAAADAAMAAAD+/wUAAAADAAMAAAD+/wYAAAADAAMAAAD+/wcAAAADAAMAAAD///v/AAADAAMAAAD///z/AAADAAMAAAD///3/AAADAAMAAAD///7/AAADAAMAAAD/////AAADAAMAAAD//wAAAAADAAMAAAD//wEAAAADAAMAAAD//wIAAAADAAMAAAD//wMAAAADAAMAAAD//wQAAAADAAMAAAD//wUAAAADAAMAAAD//wYAAAADAAMAAAD//wcAAAADAAMAAAAAAPv/AAADAAMAAAAAAPz/AAADAAMAAAAAAP3/AAADAAMAAAAAAP7/AAADAAMAAAAAAP//AAADAAMAAAAAAAAAAAADAAMAAAAAAAEAAAADAAMAAAAAAAIAAAADAAMAAAAAAAMAAAADAAMAAAAAAAQAAAADAAMAAAAAAAUAAAADAAMAAAAAAAYAAAADAAMAAAAAAAcAAAADAAMAAAABAPv/AAADAAMAAAABAPz/AAADAAMAAAABAP3/AAADAAMAAAABAP7/AAADAAMAAAABAP//AAADAAMAAAABAAAAAAADAAMAAAABAAEAAAADAAMAAAABAAMAAAADAAMAAAABAAQAAAADAAMAAAABAAUAAAADAAMAAAABAAYAAAADAAMAAAABAAcAAAADAAMAAAACAPv/AAADAAMAAAACAPz/AAADAAMAAAACAP3/AAADAAMAAAACAP7/AAADAAMAAAACAAQAAAADAAMAAAACAAUAAAADAAMAAAACAAYAAAADAAMAAAACAAcAAAADAAMAAAADAPv/AAADAAMAAAADAPz/AAADAAMAAAADAP3/AAADAAMAAAADAP7/AAADAAMAAAADAAQAAAADAAMAAAADAAUAAAADAAMAAAADAAYAAAADAAMAAAADAAcAAAADAAMAAAAEAPv/AAADAAMAAAAEAPz/AAADAAMAAAAEAP3/AAADAAMAAAAEAP7/AAADAAMAAAAEAAQAAAADAAMAAAAEAAUAAAADAAMAAAAEAAYAAAADAAMAAAAEAAcAAAADAAMAAAAFAPv/AAADAAMAAAAFAPz/AAADAAMAAAAFAP3/AAADAAMAAAAFAP7/AAADAAMAAAAFAAQAAAADAAMAAAAFAAUAAAADAAMAAAAFAAYAAAADAAMAAAAFAAcAAAADAAMAAAAGAPv/AAADAAMAAAAGAPz/AAADAAMAAAAGAP3/AAADAAMAAAAGAP7/AAADAAMAAAAGAAQAAAADAAMAAAAGAAUAAAADAAMAAAAGAAYAAAADAAMAAAAGAAcAAAADAAMAAAAHAPv/AAADAAMAAAAHAPz/AAADAAMAAAAHAP3/AAADAAMAAAAHAP7/AAADAAMAAAAHAAQAAAADAAMAAAAHAAUAAAADAAMAAAAHAAYAAAADAAMAAAAHAAcAAAADAAMAAAAIAPv/AAADAAMAAAAIAPz/AAADAAMAAAAIAP3/AAADAAMAAAAIAP7/AAADAAMAAAAIAP//AAADAAMAAAAIAAAAAAADAAMAAAAIAAEAAAADAAMAAAAIAAIAAAADAAMAAAAIAAMAAAADAAMAAAAIAAQAAAADAAMAAAAIAAUAAAADAAMAAAAIAAYAAAADAAMAAAAIAAcAAAADAAMAAAAJAPv/AAADAAMAAAAJAPz/AAADAAMAAAAJAP3/AAADAAMAAAAJAP7/AAADAAMAAAAJAP//AAADAAMAAAAJAAAAAAADAAMAAAAJAAEAAAADAAMAAAAJAAIAAAADAAMAAAAJAAMAAAADAAMAAAAJAAQAAAADAAMAAAAJAAUAAAADAAMAAAAJAAYAAAADAAMAAAAJAAcAAAADAAMAAAALAAUAAAADAAMAAAAMAAMAAAADAAMAAAANAAMAAAADAAMAAAANAAIAAAADAAMAAAANAAQAAAADAAMAAAAOAAMAAAADAAMAAAAQAAAAAAADAAMAAAARAP//AAADAAMAAAASAAAAAAADAAMAAAASAAEAAAADAAMAAAAQAAEAAAADAAMAAAARAAIAAAADAAMAAAAQAP//AAADAAMAAAASAP//AAADAAMAAAASAAIAAAADAAMAAAAQAAIAAAADAAMAAAATAAAAAAADAAMAAAAPAAIAAAADAAMAAAAQAAMAAAADAAMAAAA=")
+tile_set = SubResource("TileSet_brush")
+
+[node name="NpcSpawnPoint" type="Node2D" parent="." unique_id=1770220157]
+position = Vector2(1112, -253)
+script = ExtResource("9_hv00y")
+_npcIds = PackedStringArray("Npc_Wolf")
+_maxCount = 1
+_spawnRadius = 50.0
+_respawnDelayMinMinutes = 5.0
+_respawnDelayMaxMinutes = 15.0
+_recoveryZone = false
+metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="Start" type="Node2D" parent="." unique_id=1285303473 node_paths=PackedStringArray("Target")]
+position = Vector2(314, -332)
+script = ExtResource("loc_endpoint")
+EndpointId = "Start"
+Target = NodePath("InteractionTarget")
+
+[node name="Arrival" type="Marker2D" parent="Start" unique_id=1291447425]
+position = Vector2(1, 0)
+
+[node name="InteractionTarget" parent="Start" instance=ExtResource("interaction_target")]
+Reach = 180.0
+
+[node name="DiscoveryShape" parent="Start/InteractionTarget" index="2"]
+shape = SubResource("CircleShape2D_exit")
+
+[node name="VillageSource" type="Node2D" parent="." unique_id=1114708774 node_paths=PackedStringArray("Target")]
+position = Vector2(292, 601)
+script = ExtResource("loc_endpoint")
+EndpointId = "VillageSource"
+Target = NodePath("InteractionTarget")
+
+[node name="Arrival" type="Marker2D" parent="VillageSource" unique_id=1670240056]
+
+[node name="Label" type="Label" parent="VillageSource" unique_id=200626887]
+offset_left = -120.0
+offset_top = -50.0
+text = "E - Source of Power"
+
+[node name="InteractionTarget" parent="VillageSource" instance=ExtResource("interaction_target")]
+Reach = 180.0
+
+[node name="DiscoveryShape" parent="VillageSource/InteractionTarget" index="2"]
+shape = SubResource("CircleShape2D_exit")
+
+[editable path="Start/InteractionTarget"]
+[editable path="VillageSource/InteractionTarget"]

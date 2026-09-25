@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://dsr6knc4mfp8t"]
+
+[ext_resource type="Script" uid="uid://btpau3gldyu7y" path="res://Addons/Battle/UIElements/PassiveWheel/PassiveSummaryRow.cs" id="1_row"]
+
+[node name="PassiveSummaryRow" type="HBoxContainer" node_paths=PackedStringArray("_name", "_flat", "_increase", "_more", "_total", "_delta")]
+offset_right = 520.0
+offset_bottom = 22.0
+theme_override_constants/separation = 8
+script = ExtResource("1_row")
+_name = NodePath("Name")
+_flat = NodePath("Flat")
+_increase = NodePath("Increase")
+_more = NodePath("More")
+_total = NodePath("Total")
+_delta = NodePath("Delta")
+
+[node name="Name" type="Label" parent="."]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+clip_text = true
+
+[node name="Flat" type="Label" parent="."]
+custom_minimum_size = Vector2(74, 0)
+layout_mode = 2
+horizontal_alignment = 2
+
+[node name="Increase" type="Label" parent="."]
+custom_minimum_size = Vector2(74, 0)
+layout_mode = 2
+horizontal_alignment = 2
+
+[node name="More" type="Label" parent="."]
+custom_minimum_size = Vector2(74, 0)
+layout_mode = 2
+horizontal_alignment = 2
+
+[node name="Total" type="Label" parent="."]
+custom_minimum_size = Vector2(84, 0)
+layout_mode = 2
+horizontal_alignment = 2
+
+[node name="Delta" type="Label" parent="."]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+horizontal_alignment = 2

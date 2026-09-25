@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://doiml7uon25sr"]
+
+[ext_resource type="Texture2D" uid="uid://cmtx4uqnb0sc6" path="res://Sandbox/DualGridDebugTiles.png" id="1_brush"]
+[ext_resource type="Script" uid="uid://deuhuhvh4ndwd" path="res://World/DualGridTerrainLayer.cs" id="2_layer"]
+[ext_resource type="Texture2D" uid="uid://cv5vrghhd2aje" path="res://Data/Shared/Assets/Tiles/Forest_GrassToTallGrass_Transitions.png" id="3_art"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_brush"]
+texture = ExtResource("1_brush")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_brush"]
+tile_size = Vector2i(128, 128)
+sources/0 = SubResource("TileSetAtlasSource_brush")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_art"]
+texture = ExtResource("3_art")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_art"]
+tile_size = Vector2i(128, 128)
+sources/0 = SubResource("TileSetAtlasSource_art")
+
+[node name="ForestTallGrass" type="Node2D" unique_id=2131946956 node_paths=PackedStringArray("_world", "_display")]
+script = ExtResource("2_layer")
+_world = NodePath("WorldLayer")
+_display = NodePath("DisplayLayer")
+_worldAtlasCoords = Vector2i(3, 3)
+metadata/_custom_type_script = "uid://deuhuhvh4ndwd"
+
+[node name="WorldLayer" type="TileMapLayer" parent="." unique_id=1591932740]
+modulate = Color(1, 1, 1, 0.4)
+z_index = 1
+tile_set = SubResource("TileSet_brush")
+
+[node name="DisplayLayer" type="TileMapLayer" parent="." unique_id=607904510]
+position = Vector2(-64, -64)
+tile_set = SubResource("TileSet_art")

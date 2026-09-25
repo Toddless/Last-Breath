@@ -1,23 +1,35 @@
 namespace LootGeneration.Source
 {
-    using Godot;
-    using System;
-    using Utilities;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Data.LootTable;
-    using System.Threading.Tasks;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core.Data;
+    using Core.Data.GameData;
+    using Core.Data.LootTable;
+    using Core.Enums;
 
-    public class LootTableProvider : ILootTableProvider
+    public class LootTableProvider(IDataParser dataParser) : ILootTableProvider, IGameDataParticipant
     {
-        private const string DataPath = "res://Data/LootTables/";
-        private Dictionary<Fractions, List<LootTableTierData>> _fractionTables = [];
-        private Dictionary<EntityType, List<LootTableTierData>> _entityTypeTables = [];
-        private Dictionary<string, List<LootTableTierData>> _individualTables = [];
-        private List<LootTableTierData> _basicTable = [];
+        private readonly Dictionary<Fractions, List<LootTableTierData>> _fractionTables = [];
+        private readonly Dictionary<EntityType, List<LootTableTierData>> _entityTypeTables = [];
+        private readonly Dictionary<string, List<LootTableTierData>> _individualTables = [];
+        private readonly List<LootTableTierData> _basicTable = [];
+
+        public IReadOnlyList<string> Catalogs => [DataCatalog.LootTables];
 
         public List<LootTableTierData> BasicTable => _basicTable.ToList();
+
+        public void Apply(string catalog, GameDataFile file)
+        {
+            var parsed = dataParser.ParseLootTables(file.Json);
+
+            _basicTable.AddRange(parsed.BasicTable);
+            foreach ((Fractions key, var tiers) in parsed.FractionTables)
+                _fractionTables.TryAdd(key, tiers);
+            foreach ((EntityType key, var tiers) in parsed.EntityTypeTables)
+                _entityTypeTables.TryAdd(key, tiers);
+            foreach ((string key, var tiers) in parsed.IndividualTables)
+                _individualTables.TryAdd(key, tiers);
+        }
 
         public List<LootTableTierData> GetLootTable<TKey>(TKey key)
         {
@@ -31,21 +43,5 @@ namespace LootGeneration.Source
 
             return table != null ? table.ToList() : [];
         }
-
-        public async void LoadData()
-        {
-            try
-            {
-                await DataLoader.LoadDataFromJson(DataPath, async s => await ParseTables(s));
-            }
-            catch (Exception exception)
-            {
-                GD.Print($"Failed to load loot table data from {DataPath}: {exception.Message}, {exception.StackTrace}");
-                Tracker.TrackException($"Failed to load loot table data", exception, this);
-            }
-        }
-
-        private async Task ParseTables(string jsonContent) =>
-            await DataParser.ParseLootTables(jsonContent, ref _fractionTables, ref _entityTypeTables, ref _individualTables, ref _basicTable);
     }
 }

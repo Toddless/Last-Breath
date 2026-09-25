@@ -1,0 +1,16 @@
+﻿namespace Core.Entity.Components
+{
+    using System;
+    using Enums;
+
+    public interface IDamageComponent
+    {
+        float AdditionalHit { get; }
+        float CriticalChance { get; }
+        float CriticalDamage { get; }
+        float Damage { get; }
+        float SpellDamage { get; }
+
+        event Action<EntityParameter, float> ParameterChanged;
+    }
+}

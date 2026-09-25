@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The game's half of the authoring tool's adapter: the descriptors that say what the game's
+       catalogs look like. It knows both sides so that neither game nor tool has to know the other. -->
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>LastBreath.Descriptors</RootNamespace>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Core.csproj" />
+    <ProjectReference Include="..\Tooling.Core\Tooling.Core.csproj" />
+  </ItemGroup>
+</Project>

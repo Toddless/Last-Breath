@@ -1,0 +1,88 @@
+namespace Battle.Source.PassiveSkills
+{
+    using System.Collections.Generic;
+    using System.Linq;
+    using Core.Battle.Abilities;
+    using Core.Battle.Skills;
+    using Core.Context;
+    using Core.Entity;
+    using Core.Enums;
+    using Core.Events;
+    using Effects;
+
+    /// <summary>Item-grant passive (Bloodthirsty): when the target reaches the stack threshold,
+    /// all remaining bleed stacks are consumed, their leftover damage lands at once
+    /// and the owner is healed for a share of it.</summary>
+    public class BloodthirstyPassiveSkill(int stackThreshold, float healPercent)
+        : Skill(id: "Passive_Skill_Bloodthirsty")
+    {
+        /// <summary>Turns the wound the passive opens bleeds for. The grant record names the threshold
+        /// and the share healed and nothing else, so this one figure is the passive's own; what a tick
+        /// of that bleed carries is the canon's.</summary>
+        private const int BleedDuration = 3;
+
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(StackThreshold)] = StackThreshold,
+                    [nameof(HealPercent)] = HealPercent,
+                };
+                return field;
+            }
+        }
+
+
+        public int StackThreshold { get; } = stackThreshold;
+        public float HealPercent { get; } = healPercent;
+
+        public override void Attach(IFightable owner)
+        {
+            Owner = owner;
+            Owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
+        }
+
+        public override void Detach(IFightable owner)
+        {
+            Owner?.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
+            Owner = null;
+        }
+
+        public override ISkill Copy() => new BloodthirstyPassiveSkill(StackThreshold, HealPercent);
+
+        public override bool IsStronger(ISkill skill)
+        {
+            if (skill is not BloodthirstyPassiveSkill other) return false;
+            return HealPercent > other.HealPercent;
+        }
+
+        private void OnAfterAttack(AfterAttackEvent evt)
+        {
+            if (Owner == null || evt.Context.Result is not AttackResults.Succeed) return;
+            var target = evt.Context.Target;
+            // The passive owns how long the wound bleeds; what a tick carries is balanced in the canon.
+            // A registry that refuses the row lays nothing, and the count below still detonates what stands.
+            IEffect? bleedEffect = DamageOverTurnEffect.FromCanon(BleedDuration, StatusEffects.Bleed);
+            _ = bleedEffect?.Apply(new EffectApplyingContext { Source = InstanceId, Caster = Owner, Damage = evt.Context.FinalDamage, Target = target });
+
+            var bleeds = target.Effects
+                .GetBy(effect => (effect.Status & StatusEffects.Bleed) != 0)
+                .OfType<DamageOverTurnEffect>()
+                .ToList();
+            if (bleeds.Count < StackThreshold) return;
+
+            // A stack with duration D still has D+1 ticks ahead (the tick fires before the countdown)
+            float total = bleeds.Sum(bleed => bleed.DamagePerTick * (bleed.Duration + 1));
+            foreach (var bleed in bleeds) bleed.Remove();
+
+            var damage = new DamageContext { Source = Owner, Cause = DamageCause.Passive };
+            damage.Add(DamageType.Bleed, total);
+            _ = target.TakeDamage(damage);
+
+            Owner.Heal(new HealContext(Owner, Owner) { Amount = total * HealPercent, Cause = RecoveryCause.Leech });
+        }
+    }
+}

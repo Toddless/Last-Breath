@@ -1,0 +1,114 @@
+namespace Core.PassiveTree
+{
+    using System.Collections.Generic;
+    using Newtonsoft.Json;
+
+    /// <summary>On-disk shape of a tree: Newtonsoft records, explicit <c>JsonProperty</c> names, camelCase
+    /// keys, enums as strings. Property order here is key order in the file — reordering re-diffs every file.</summary>
+    public sealed class PassiveTreeDto
+    {
+        [JsonProperty("version")] public int Version { get; set; } = PassiveTreeFormat.Version;
+
+        [JsonProperty("budget")] public int Budget { get; set; } = PassiveTreeDocument.DefaultBudget;
+
+        /// <summary>How far apart the layout is drawn. Absent means the authored default (what a
+        /// pre-field file meant), so the writer omits the key at that value rather than say "unchanged".</summary>
+        [JsonProperty("spread", NullValueHandling = NullValueHandling.Ignore)]
+        public float? Spread { get; set; }
+
+        [JsonProperty("nodes")] public List<PassiveNodeDto> Nodes { get; set; } = [];
+
+        [JsonProperty("edges")] public List<PassiveEdgeDto> Edges { get; set; } = [];
+    }
+
+    public sealed class PassiveNodeDto
+    {
+        [JsonProperty("id")] public string Id { get; set; } = string.Empty;
+
+        [JsonProperty("kind")] public string Kind { get; set; } = string.Empty;
+
+        [JsonProperty("stance", NullValueHandling = NullValueHandling.Ignore)]
+        public string? Stance { get; set; }
+
+        [JsonProperty("hybridStance", NullValueHandling = NullValueHandling.Ignore)]
+        public string? HybridStance { get; set; }
+
+        [JsonProperty("x")] public float X { get; set; }
+
+        [JsonProperty("y")] public float Y { get; set; }
+
+        [JsonProperty("title", NullValueHandling = NullValueHandling.Ignore)]
+        public string? Title { get; set; }
+
+        [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
+        public string? Description { get; set; }
+
+        [JsonProperty("abilityId", NullValueHandling = NullValueHandling.Ignore)]
+        public string? AbilityId { get; set; }
+
+        /// <summary>Passive skill the node grants instead of lines. Absent on a node that speaks in lines,
+        /// which is every node written before the key existed.</summary>
+        [JsonProperty("passiveId", NullValueHandling = NullValueHandling.Ignore)]
+        public string? PassiveId { get; set; }
+
+        /// <summary>Numbers the passive is tuned by. Kept in authored order rather than sorted: these are
+        /// hand-balanced figures, and reordering them would re-diff a file nobody edited.</summary>
+        [JsonProperty("properties", NullValueHandling = NullValueHandling.Ignore)]
+        public Dictionary<string, float>? Properties { get; set; }
+
+        [JsonProperty("modifiers", NullValueHandling = NullValueHandling.Ignore)]
+        public List<ModifierLineDto>? Modifiers { get; set; }
+
+        [JsonProperty("contextModifiers", NullValueHandling = NullValueHandling.Ignore)]
+        public List<ContextModifierLineDto>? ContextModifiers { get; set; }
+    }
+
+    public sealed class ModifierLineDto
+    {
+        [JsonProperty("parameter")] public string Parameter { get; set; } = string.Empty;
+
+        [JsonProperty("valueType")] public string ValueType { get; set; } = string.Empty;
+
+        [JsonProperty("value")] public float Value { get; set; }
+
+        /// <summary>Names the carrier parameter the value is counted per unit of. Absent on an ordinary
+        /// line, so the key is written only where the author meant a scale.</summary>
+        [JsonProperty("perParameter", NullValueHandling = NullValueHandling.Ignore)]
+        public string? PerParameter { get; set; }
+
+        [JsonProperty("condition", NullValueHandling = NullValueHandling.Ignore)]
+        public string? Condition { get; set; }
+
+        /// <summary>Names the composite the record belongs to. Absent on a line that stands alone, so the
+        /// key is written only where the author joined records into one sentence.</summary>
+        [JsonProperty("groupId", NullValueHandling = NullValueHandling.Ignore)]
+        public string? GroupId { get; set; }
+    }
+
+    /// <summary>The context line's own record. A flag writes no <c>value</c> at all — the number is not
+    /// authored, so writing one back would invite an author to edit it.</summary>
+    public sealed class ContextModifierLineDto
+    {
+        [JsonProperty("parameter")] public string Parameter { get; set; } = string.Empty;
+
+        [JsonProperty("valueType")] public string ValueType { get; set; } = string.Empty;
+
+        [JsonProperty("value", NullValueHandling = NullValueHandling.Ignore)]
+        public float? Value { get; set; }
+
+        [JsonProperty("condition", NullValueHandling = NullValueHandling.Ignore)]
+        public string? Condition { get; set; }
+
+        /// <summary>The composite stamp, shared with the parametric channel — a line may be spelled by
+        /// records from both.</summary>
+        [JsonProperty("groupId", NullValueHandling = NullValueHandling.Ignore)]
+        public string? GroupId { get; set; }
+    }
+
+    public sealed class PassiveEdgeDto
+    {
+        [JsonProperty("from")] public string From { get; set; } = string.Empty;
+
+        [JsonProperty("to")] public string To { get; set; } = string.Empty;
+    }
+}

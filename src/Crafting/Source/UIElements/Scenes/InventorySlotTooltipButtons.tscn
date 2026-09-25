@@ -1,42 +1,57 @@
-[gd_scene load_steps=2 format=3 uid="uid://dor0kden4oc1j"]
+[gd_scene format=3 uid="uid://dor0kden4oc1j"]
 
-[ext_resource type="Script" uid="uid://dqs7ogrp31liw" path="res://Addons/Crafting/Source/UIElements/InventorySlotTooltipButtons.cs" id="1_3hkcc"]
+[ext_resource type="Script" uid="uid://csshnkve8sglv" path="res://Addons/Crafting/UIElements/InventorySlotTooltipButtons.cs" id="1_3hkcc"]
 
-[node name="InventorySlotTooltipButtons" type="Control" node_paths=PackedStringArray("_equip", "_update", "_destroy", "_favorite")]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 142.0
-offset_bottom = 63.0
+[node name="InventorySlotTooltipButtons" type="MarginContainer" unique_id=531659697 node_paths=PackedStringArray("_equip", "_update", "_recraft", "_ascend", "_destroy", "_favorite", "_use")]
+offset_right = 398.0
+offset_bottom = 69.0
 script = ExtResource("1_3hkcc")
 _equip = NodePath("GridContainer/Equip")
 _update = NodePath("GridContainer/Update")
+_recraft = NodePath("GridContainer/Recraft")
+_ascend = NodePath("GridContainer/Ascend")
 _destroy = NodePath("GridContainer/Destroy")
 _favorite = NodePath("GridContainer/Favorite")
+_use = NodePath("GridContainer/Use")
 
-[node name="GridContainer" type="GridContainer" parent="."]
-layout_mode = 0
-offset_right = 142.0
-offset_bottom = 63.0
+[node name="GridContainer" type="GridContainer" parent="." unique_id=1420976068]
+layout_mode = 2
 theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
-columns = 2
+columns = 5
 
-[node name="Update" type="Button" parent="GridContainer"]
+[node name="Update" type="Button" parent="GridContainer" unique_id=193912106]
 layout_mode = 2
 focus_mode = 0
 text = "Update"
 
-[node name="Equip" type="Button" parent="GridContainer"]
+[node name="Recraft" type="Button" parent="GridContainer" unique_id=1428435501]
+layout_mode = 2
+focus_mode = 0
+text = "Reroll"
+
+[node name="Ascend" type="Button" parent="GridContainer" unique_id=447973771]
+layout_mode = 2
+focus_mode = 0
+text = "Ascend"
+
+[node name="Equip" type="Button" parent="GridContainer" unique_id=756576195]
 layout_mode = 2
 focus_mode = 0
 text = "Equip"
 
-[node name="Favorite" type="Button" parent="GridContainer"]
+[node name="Favorite" type="Button" parent="GridContainer" unique_id=1299090212]
 layout_mode = 2
 focus_mode = 0
 text = "Favorite"
 
-[node name="Destroy" type="Button" parent="GridContainer"]
+[node name="Destroy" type="Button" parent="GridContainer" unique_id=1589139455]
 layout_mode = 2
 focus_mode = 0
 text = "Destroy"
+
+[node name="Use" type="Button" parent="GridContainer" unique_id=1712834056]
+layout_mode = 2
+focus_mode = 0
+visible = false
+text = "Use"

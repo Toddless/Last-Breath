@@ -1,0 +1,138 @@
+[gd_scene format=3 uid="uid://byx7g1b2wlwfl"]
+
+[ext_resource type="Script" uid="uid://bi6bbowdumghk" path="res://Inventory/InventoryWindow.cs" id="1_plih6"]
+[ext_resource type="PackedScene" uid="uid://bd7pallqm2c8u" path="res://UI/Modules/PaperDoll.tscn" id="2_pdoll"]
+[ext_resource type="PackedScene" uid="uid://bstp4qa8w1e6h" path="res://UI/Modules/StatsPane.tscn" id="3_spane"]
+[ext_resource type="PackedScene" uid="uid://bqf3n2vhs4x1m" path="res://UI/Modules/FilterBar.tscn" id="4_fbar"]
+[ext_resource type="PackedScene" uid="uid://bbaggr5idw2n0" path="res://Addons/SharedUi/BagGrid.tscn" id="5_bgrid"]
+
+[node name="InventoryWindow" type="Control" unique_id=1634708058 node_paths=PackedStringArray("_craftingButton", "_allStatsButton", "_sortButton", "_destroyButton", "_title", "_paperDoll", "_statsPane", "_filterBar", "_bagGrid")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_plih6")
+_craftingButton = NodePath("Center/MarginContainer/Panel/Margin/Layout/Header/CraftingButton")
+_allStatsButton = NodePath("Center/MarginContainer/Panel/Margin/Layout/Header/AllStatsButton")
+_sortButton = NodePath("Center/MarginContainer/Panel/Margin/Layout/Header/Sort")
+_destroyButton = NodePath("Center/MarginContainer/Panel/Margin/Layout/Header/Destroy")
+_title = NodePath("Center/MarginContainer/Panel/Margin/Layout/Header/Title")
+_paperDoll = NodePath("Center/MarginContainer/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/PaperDoll")
+_statsPane = NodePath("Center/MarginContainer/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout/StatsPane")
+_filterBar = NodePath("Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/FilterBar")
+_bagGrid = NodePath("Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/BagGrid")
+
+[node name="Center" type="HBoxContainer" parent="." unique_id=864763390]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Center" unique_id=1403195432]
+layout_mode = 2
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="Panel" type="PanelContainer" parent="Center/MarginContainer" unique_id=918931418]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_type_variation = &"UmbralWindowPanel"
+
+[node name="Margin" type="MarginContainer" parent="Center/MarginContainer/Panel" unique_id=569449233]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Layout" type="VBoxContainer" parent="Center/MarginContainer/Panel/Margin" unique_id=1722664350]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Center/MarginContainer/Panel/Margin/Layout" unique_id=856215298]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Center/MarginContainer/Panel/Margin/Layout/Header" unique_id=46031814]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"HeaderLabel"
+text = "Inventory"
+
+[node name="Sort" type="Button" parent="Center/MarginContainer/Panel/Margin/Layout/Header" unique_id=1398686911]
+layout_mode = 2
+focus_mode = 0
+text = "Sort"
+
+[node name="Destroy" type="Button" parent="Center/MarginContainer/Panel/Margin/Layout/Header" unique_id=1224959357]
+layout_mode = 2
+focus_mode = 0
+text = "Destroy"
+
+[node name="AllStatsButton" type="Button" parent="Center/MarginContainer/Panel/Margin/Layout/Header" unique_id=1521213087]
+layout_mode = 2
+focus_mode = 0
+text = "Stats"
+
+[node name="CraftingButton" type="Button" parent="Center/MarginContainer/Panel/Margin/Layout/Header" unique_id=1439366351]
+layout_mode = 2
+focus_mode = 0
+text = "Crafting"
+
+[node name="Body" type="HBoxContainer" parent="Center/MarginContainer/Panel/Margin/Layout" unique_id=657387487]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="LeftPane" type="PanelContainer" parent="Center/MarginContainer/Panel/Margin/Layout/Body" unique_id=382916336]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+
+[node name="LeftMargin" type="MarginContainer" parent="Center/MarginContainer/Panel/Margin/Layout/Body/LeftPane" unique_id=37174432]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="LeftLayout" type="VBoxContainer" parent="Center/MarginContainer/Panel/Margin/Layout/Body/LeftPane/LeftMargin" unique_id=889558013]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PaperDoll" parent="Center/MarginContainer/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" unique_id=736591541 instance=ExtResource("2_pdoll")]
+layout_mode = 2
+
+[node name="StatsPane" parent="Center/MarginContainer/Panel/Margin/Layout/Body/LeftPane/LeftMargin/LeftLayout" unique_id=1472003894 instance=ExtResource("3_spane")]
+layout_mode = 2
+
+[node name="RightPane" type="PanelContainer" parent="Center/MarginContainer/Panel/Margin/Layout/Body" unique_id=1406827386]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.6
+
+[node name="RightMargin" type="MarginContainer" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane" unique_id=30254361]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="RightLayout" type="VBoxContainer" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin" unique_id=1239800084]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="FilterBar" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=954939396 instance=ExtResource("4_fbar")]
+layout_mode = 2
+
+[node name="BagGrid" parent="Center/MarginContainer/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=927184330 instance=ExtResource("5_bgrid")]
+layout_mode = 2

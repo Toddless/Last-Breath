@@ -1,0 +1,236 @@
+{
+    "effects": [
+        {
+            "id": "Effect_Fury",
+            "power": "Strong",
+            "properties": { "duration": 3, "maxStacks": 1, "healthPercent": 0.05 }
+        },
+        {
+            "id": "Effect_Burning_Fury",
+            "power": "Strong",
+            "properties": { "duration": 3, "maxStacks": 1, "healthPercent": 0.05, "burnDamage": 0.75, "burningDuration": 3, "burningMaxStacks": 999 }
+        },
+        {
+            "id": "Effect_Primal_Fury",
+            "power": "Strong",
+            "properties": { "duration": 3, "maxStacks": 1, "healthPercent": 0.05, "damageMultiplier": 0.35 }
+        },
+        {
+            "id": "Effect_Healing_Fury",
+            "power": "Strong",
+            "properties": { "duration": 3, "maxStacks": 1, "healthPercent": 0.05, "healAmount": 0.15 }
+        },
+        {
+            "id": "Effect_Seal_Of_Slowness",
+            "power": "Absolute",
+            "properties": { "duration": 3, "maxStacks": 1, "amount": 1 }
+        },
+        {
+            "id": "Effect_Seal_Of_Silence",
+            "power": "Absolute",
+            "properties": { "duration": 3, "maxStacks": 1 }
+        },
+        {
+            "id": "Effect_Seal_Of_Oblivion",
+            "power": "Absolute",
+            "properties": { "duration": 3, "maxStacks": 1 }
+        },
+        {
+            "id": "Effect_Seal_Of_Blood",
+            "power": "Absolute",
+            "properties": { "duration": 3, "maxStacks": 1 }
+        },
+        {
+            "id": "Effect_Seal_Of_Spirit",
+            "power": "Absolute",
+            "properties": { "duration": 3, "maxStacks": 1 }
+        },
+        {
+            "id": "Effect_Damage_Over_Turn_Burning",
+            "properties": { "duration": 3, "maxStacks": 999, "percentFromDamage": 0.45 }
+        },
+        {
+            "id": "Effect_Damage_Over_Turn_Poison",
+            "properties": { "duration": 4, "maxStacks": 999, "percentFromDamage": 0.35 }
+        },
+        {
+            "id": "Effect_Damage_Over_Turn_Bleed",
+            "properties": { "duration": 3, "maxStacks": 999, "percentFromDamage": 0.8 }
+        },
+        {
+            "id": "Effect_Charge",
+            "properties": { "duration": 3, "maxStacks": 3 }
+        },
+        {
+            "id": "Effect_Evade_First_Death",
+            "power": "Strong",
+            "properties": { "duration": 3, "maxStacks": 1, "percentHealthToRecover": 0.35 }
+        },
+        {
+            "id": "Effect_Fragility",
+            "power": "Strong",
+            "properties": { "duration": 3, "maxStacks": 3, "critDamageAmp": 0.35 }
+        },
+        {
+            "id": "Effect_Armor_Reduction",
+            "properties": { "duration": 3, "maxStacks": 5, "reduceBy": 0.15 }
+        },
+        {
+            "id": "Effect_Clumsiness",
+            "properties": { "duration": 3, "maxStacks": 5, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Light_Step",
+            "properties": { "duration": 3, "maxStacks": 5, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Weakness",
+            "properties": { "duration": 3, "maxStacks": 5, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Fatigue",
+            "properties": { "duration": 3, "maxStacks": 5, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Armor_Buff",
+            "properties": { "duration": 3, "maxStacks": 5, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Feebleness",
+            "properties": { "duration": 3, "maxStacks": 5, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Clouded_Mind",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.25 }
+        },
+        {
+            "id": "Effect_Sorcery_Gift",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.25 }
+        },
+        {
+            "id": "Effect_Spell_Surge",
+            "properties": { "duration": 3, "maxStacks": 5, "value": 0.25 }
+        },
+        {
+            "id": "Effect_Mind_Drain",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Mana_Flow",
+            "properties": { "duration": 3, "maxStacks": 3, "percentRegeneration": 0.15 }
+        },
+        {
+            "id": "Effect_Rot",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Weak_Regeneration",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Percent_Health_Regeneration",
+            "properties": { "duration": 3, "maxStacks": 1, "percentRegeneration": 0.25 }
+        },
+        {
+            "id": "Effect_Giants_Blessing",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Withering_Curse",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Curse",
+            "power": "Strong",
+            "properties": { "duration": 1, "maxStacks": 1, "costIncrease": 150 }
+        },
+        {
+            "id": "Effect_Regeneration",
+            "properties": { "duration": 3, "maxStacks": 3, "amount": 0.05 }
+        },
+        {
+            "id": "Effect_Mana_Regeneration",
+            "properties": { "duration": 3, "maxStacks": 3, "percentRegeneration": 0.05 }
+        },
+        {
+            "id": "Effect_Vulnerability",
+            "properties": { "duration": 3, "maxStacks": 5, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Decay",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Critical_Chance_Buff",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Crit_Calculation_Buff",
+            "properties": { "duration": 3, "maxStacks": 5, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Accuracy_Buff",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Critical_Damage_Buff",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.25 }
+        },
+        {
+            "id": "Effect_Heal_Reduction",
+            "power": "Strong",
+            "properties": { "duration": 3, "maxStacks": 2, "reduceBy": 0.45 }
+        },
+        {
+            "id": "Effect_Blind",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.25 }
+        },
+        {
+            "id": "Effect_Enhance_Defense",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.15 }
+        },
+        {
+            "id": "Effect_Crit_Mitigation",
+            "properties": { "duration": 3, "maxStacks": 1, "value": 0.8 }
+        },
+        {
+            "id": "Effect_Ice_Crit_Mitigation",
+            "properties": { "duration": 3, "maxStacks": 1, "value": 0.5 }
+        },
+        {
+            "id": "Effect_Frostbite",
+            "power": "Strong",
+            "properties": { "duration": 3, "maxStacks": 8, "coldDamageAmp": 0.15 }
+        },
+        {
+            "id": "Effect_Lucky_Crit_Chance",
+            "power": "Strong",
+            "properties": { "duration": 3, "maxStacks": 1 }
+        },
+        {
+            "id": "Effect_Mythic_Calculation",
+            "power": "Strong",
+            "properties": { "duration": 3, "maxStacks": 1 }
+        },
+        {
+            "id": "Effect_Damage_Buff",
+            "properties": { "duration": 3, "maxStacks": 3, "value": 0.25 }
+        },
+        {
+            "id": "Effect_Incoming_Damage_Reduction",
+            "properties": { "duration": 3, "maxStacks": 2, "reduce": 0.15 }
+        },
+        {
+            "id": "Effect_Execution",
+            "properties": { "duration": 3, "maxStacks": 1, "percentage": 0.3 }
+        },
+        {
+            "id": "Effect_Life_Giving_Shade",
+            "properties": { "duration": 3, "activations": 1, "lifeToRecover": 0.35 }
+        },
+        {
+            "id": "Effect_Next_Ability_Cooldown",
+            "properties": { "duration": 3, "amount": 3 }
+        }
+    ]
+}

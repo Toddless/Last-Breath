@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://bq1xb76glxis1"]
+
+[ext_resource type="Script" uid="uid://1c56nl8pf7j2" path="res://Internal/Main.cs" id="1_lv1mp"]
+[ext_resource type="PackedScene" uid="uid://cruh58rlrfg2e" path="res://Internal/MainWorld.tscn" id="2_hwo8b"]
+[ext_resource type="Script" uid="uid://b57jx4dyeio78" path="res://Internal/UiLayerManager.cs" id="3_4pd56"]
+
+[node name="Main" type="Node2D" unique_id=1300162763 node_paths=PackedStringArray("_mainWorld", "_layerManager")]
+script = ExtResource("1_lv1mp")
+_mainWorld = NodePath("MainWorld")
+_layerManager = NodePath("LayerManager")
+
+[node name="MainWorld" parent="." unique_id=945794615 instance=ExtResource("2_hwo8b")]
+
+[node name="LayerManager" type="Node" parent="." unique_id=168124133 node_paths=PackedStringArray("_mainLayer", "_windowLayer", "_overlayLayer", "_bottomRightRegion")]
+script = ExtResource("3_4pd56")
+_mainLayer = NodePath("HudLayer")
+_windowLayer = NodePath("WindowLayer")
+_overlayLayer = NodePath("OverlayLayer")
+_bottomRightRegion = NodePath("OverlayLayer/VBoxContainer")
+
+[node name="HudLayer" type="CanvasLayer" parent="LayerManager" unique_id=821723647]
+
+[node name="WindowLayer" type="CanvasLayer" parent="LayerManager" unique_id=1605729262]
+
+[node name="OverlayLayer" type="CanvasLayer" parent="LayerManager" unique_id=1190445978]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LayerManager/OverlayLayer" unique_id=2068471719]
+custom_minimum_size = Vector2(300, 0)
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+alignment = 2

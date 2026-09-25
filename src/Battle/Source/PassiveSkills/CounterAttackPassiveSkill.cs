@@ -1,19 +1,32 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using System;
-    using TestData;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
-    using Core.Interfaces.Events.GameEvents;
+    using System.Collections.Generic;
+    using Core;
+    using Core.Battle.Skills;
+    using Core.Entity;
+    using Core.Events;
 
     public class CounterAttackPassiveSkill(float chance = 0.5f) : Skill(id: "Passive_Skill_Counter_Attack")
     {
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(Chance)] = Chance
+                };
+                return field;
+            }
+        }
+
         public float Chance { get; } = chance;
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
-            // Срабатываение пассивки происходит когда ЦЕЛЬ увернулась. Однако данная пассивка должна срабатывать когда уворачивается ВЛАДЕЛЕЦ
             Owner.CombatEvents.Subscribe<AttackEvadedEvent>(OnAttackEvaded);
         }
 
@@ -23,9 +36,8 @@
             {
                 ArgumentNullException.ThrowIfNull(Owner);
                 if (evnt.Context.Target.InstanceId != Owner.InstanceId) return;
-                if (evnt.Context.Rnd.RandFloat() <= Chance) return;
-                var context = new AttackContext(Owner, evnt.Context.Attacker, Owner.GetDamage(), new RndGodot(), evnt.Context.AttackContextScheduler);
-                context.Schedule();
+                if (!ChanceRoll.Roll(Chance, evnt.Context.Rnd)) return;
+                evnt.Context.CreateReaction(Owner, evnt.Context.Attacker, Owner.GetDamage()).Schedule();
             }
             catch (Exception e)
             {
@@ -33,7 +45,7 @@
             }
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             owner.CombatEvents.Unsubscribe<AttackEvadedEvent>(OnAttackEvaded);
             Owner = null;
@@ -44,7 +56,7 @@
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not CounterAttackPassiveSkill counter) return false;
-            return counter.Chance > Chance;
+            return Chance > counter.Chance;
         }
     }
 }

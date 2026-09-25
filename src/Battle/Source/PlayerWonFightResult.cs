@@ -1,6 +1,6 @@
 ﻿namespace Battle.Source
 {
-    using Core.Interfaces.Battle;
+    using Core.Battle;
 
     public class PlayerWonFightResult: IFightResults
     {

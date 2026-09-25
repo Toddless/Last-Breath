@@ -1,58 +1,47 @@
-﻿namespace Battle.Source
+namespace Battle.Source
 {
-    using Core.Interfaces.Entity;
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Entity;
 
     public class QueueScheduler
     {
-        private readonly List<IEntity> _entities = [];
-        private readonly LinkedList<IEntity> _queue = [];
+        private Queue<IFightable> FighterQueue { get; } = new();
 
-        public void AddMembers<T>(IEnumerable<T> entities)
-            where T : IEntity, IFightable
+        /// <summary>Fastest first: dexterity decides who acts before whom.</summary>
+        public List<IFightable> AddFighters(List<IFightable> fighters)
         {
-            // TODO: Add to UI
-            var fighters = entities.ToList();
+            var orderedFighters = fighters
+                .Where(fighter => fighter.IsAlive)
+                .OrderByDescending(fighter => fighter.Dexterity.Total)
+                .ToList();
+            foreach (var fighter in orderedFighters)
+                FighterQueue.Enqueue(fighter);
 
-            foreach (var entity in fighters)
-                //entity.Dead += OnEntityDead;
-
-            _entities.AddRange(entities as IEnumerable<IEntity> ?? []);
-            DecideQueueOrder(fighters);
+            return orderedFighters;
         }
 
-        public void AddMember<T>(T entity)
-            where T : IEntity, IFightable
+        /// <summary>Starts the next round when the current one is exhausted. Returns the new round
+        /// order for the UI, or an empty list when nothing was refilled (fewer than two fighters
+        /// left — the arena resolves the outcome, not the queue).</summary>
+        public List<IFightable> RefillIfEmpty(List<IFightable> fighters)
         {
-            // TODO: Add to UI
-         //   entity.Dead += OnEntityDead;
-            _entities.Add(entity);
-            _queue.AddLast(entity);
+            if (FighterQueue.Count > 0) return [];
+            if (fighters.Count < 2) return [];
+
+            return AddFighters(fighters);
         }
 
-        public T? GetNext<T>()
-            where T : IEntity, IFightable
+        public bool TryGetNextFighter(out IFightable? fighter)
         {
-            var nextTurn = _queue.First?.Value;
-            _queue.RemoveFirst();
-            if (nextTurn != null)
-                _queue.AddLast(nextTurn);
-            return (T?)nextTurn;
-        }
+            if (FighterQueue.Count == 0)
+            {
+                fighter = null;
+                return false;
+            }
 
-        private void DecideQueueOrder<T>(IEnumerable<T> entities)
-            where T : IEntity, IFightable
-        {
-            foreach (var entity in entities)
-                _queue.AddLast(entity);
-        }
-
-        private void OnEntityDead(IEntity entity)
-        {
-            // TODO: Remove from ui
-           // entity.Dead -= OnEntityDead;
-            _queue.Remove(entity);
+            fighter = FighterQueue.Dequeue();
+            return true;
         }
     }
 }

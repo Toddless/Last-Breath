@@ -1,0 +1,50 @@
+{
+    "quests": [
+        {
+            "id": "Quest_Trial_Of_The_Grave",
+            "giverNpcId": "Npc_Ronald",
+            "faction": "Human",
+            "tier": 4,
+            "turnInNpcIds": [ "Npc_Ronald" ],
+            "declinePolicy": "Cooldown",
+            "declineCooldownHours": 24,
+            "canFail": false,
+            "timeLimitHours": 0,
+            "acceptConditions": [
+                { "type": "QuestStatus", "questId": "Quest_Trial_Of_The_Mountain", "status": "Completed" }
+            ],
+            "stages": [
+                {
+                    "id": "Hunt",
+                    "onEnter": [
+                        {
+                            "type": "SpawnNpc",
+                            "npcId": "Npc_Grave_Revenant",
+                            "pointId": "Trial_Grounds",
+                            "modifiers": [
+                                "Npc_Modifier_Scale_Double_Health",
+                                "Npc_Modifier_Scale_Double_Damage",
+                                "Npc_Modifier_Item_Effect_Vampire"
+                            ]
+                        }
+                    ],
+                    "objectives": [
+                        {
+                            "id": "Kill",
+                            "counter": { "key": "Kill_Count:Npc_Grave_Revenant", "amount": 1, "retroactive": false }
+                        }
+                    ]
+                }
+            ],
+            "rewards": {
+                "influenceExp": 0,
+                "items": [
+                    { "itemId": "Ornament_Tier_3", "amount": 1 }
+                ],
+                "actions": [
+                    { "type": "GrantTreePoints", "amount": 6 }
+                ]
+            }
+        }
+    ]
+}

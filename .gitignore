@@ -1,7 +1,9 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
-*.uid
+./temp
+.claude/
+.codex/
 
 # User-specific files
 *.rsuser
@@ -142,3 +144,5 @@ paket-files/
 /src/LootGeneration/Test/
 /src/Battle/TestData/
 /src/LootGeneration/temp/
+# Editor state, not game data: holds one machine's absolute tree path
+/src/PassiveTreeEditor/editor-settings.json

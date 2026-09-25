@@ -1,0 +1,31 @@
+{
+    "dialogues": [
+        {
+            "npcId": "Npc_Dwarf_Warrior",
+            "entryRules": [
+                {
+                    "priority": 0,
+                    "conditions": [],
+                    "node": "Greeting"
+                }
+            ],
+            "nodes": [
+                {
+                    "id": "Greeting",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Dwarf_Warrior_Greeting_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Leave",
+                            "key": "Dlg_Opt_Leave"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

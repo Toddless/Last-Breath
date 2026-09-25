@@ -1,0 +1,1073 @@
+namespace PassiveTreeEditor.Source.View
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using Core.PassiveTree;
+    using Core.PassiveTree.View;
+    using Editing;
+    using Editing.History;
+    using Godot;
+    using Simulation;
+
+    /// <summary>
+    /// The tree surface: draws the graph in immediate mode and owns navigation, picking and editing
+    /// gestures. Both drawing and hit-testing go through the document's spatial grid, so their cost
+    /// follows what is on screen rather than how big the tree is.
+    /// <para>Every coordinate on the way in or out passes through <see cref="CanvasTransform"/>: what is
+    /// drawn, what is clicked and what is written back into a node all read the same pair of
+    /// multipliers, so the picture and the pick can never drift apart.</para>
+    /// </summary>
+    public partial class TreeCanvas : Control
+    {
+        /// <summary>Document-space slack added to the visible box: covers the largest node radius plus a
+        /// grid cell, so a node being dragged never blinks out at the edge.</summary>
+        private const float CullMargin = 220f;
+
+        /// <summary>Total margin left around the tree when the whole of it is framed.</summary>
+        private const float FramePadding = 160f;
+
+        /// <summary>Where the origin sits before a tree is loaded — the first frame replaces it.</summary>
+        private const float InitialPanX = 700f;
+        private const float InitialPanY = 450f;
+
+        /// <summary>Turns a square's half-extent into the circumradius its polygon vertices sit on.</summary>
+        private const float SquareCircumradius = 1.41421356f;
+
+        private const float PickScreenSlack = 6f;
+
+        /// <summary>How small a node may get on screen before it stops shrinking. Shared with picking
+        /// through <see cref="NodeGeometry"/>, so the dot that is still visible is still clickable.</summary>
+        private const float MinNodeScreenRadius = 1.5f;
+
+        private const float FineSnap = 1f;
+        private const float CoarseSnap = 25f;
+
+        /// <summary>Zoom a jump to a node lands at when the view was further out than this: node radii
+        /// are authored against this scale, so at 1 a small node is its drawn size. Unaffected by the
+        /// layout spread, which changes what is between nodes and not how big they are.</summary>
+        private const float FocusZoom = 1f;
+
+        /// <summary>Zoom, pan and layout spread in one place, and the only arithmetic that turns a
+        /// document coordinate into a pixel.</summary>
+        private readonly CanvasTransform _view = new();
+
+        /// <summary>Node sizes and the rule for what a click landed on, shared with the game.</summary>
+        private readonly NodeGeometry _geometry = new(AuthoredRadii(), MinNodeScreenRadius, PickScreenSlack);
+
+        private readonly List<PassiveNode> _drawCandidates = [];
+        private readonly List<PassiveNode> _pickCandidates = [];
+        private readonly HashSet<string> _selected = new(StringComparer.Ordinal);
+
+        /// <summary>Where each dragged node sat when the gesture started — what the undo step is made
+        /// of, so it is kept in plain numbers the rule that reads it can be written against.</summary>
+        private readonly Dictionary<string, NodePoint> _dragOrigins = new(StringComparer.Ordinal);
+
+        /// <summary>Last node created of each class — the pattern a new node of that class copies
+        /// when nothing is selected to continue from.</summary>
+        private readonly Dictionary<PassiveNodeKind, PassiveNode> _lastCreated = new();
+
+        /// <summary>Every change the canvas makes goes through here rather than into the document, so
+        /// that laying out a tree is a thing that can be taken back.</summary>
+        private TreeEditor _editor = null!;
+
+        private AllocationState _allocation = new();
+        private HashSet<string> _frontier = new(StringComparer.Ordinal);
+        private List<string> _path = [];
+        private HashSet<string> _pathSet = new(StringComparer.Ordinal);
+
+        private PopupMenu _kindMenu = null!;
+        private PassiveNodeKind? _lastKind;
+        private Vector2 _pendingCreateDocument;
+        private EditorMode _mode = EditorMode.Select;
+        private string? _hovered;
+        private string? _linkFrom;
+        private bool _panning;
+        private bool _draggingNodes;
+        private bool _boxSelecting;
+        private bool _dragMoved;
+        private Vector2 _dragStartDocument;
+        private Vector2 _boxStartDocument;
+        private Vector2 _boxEndDocument;
+
+        public event Action? SelectionChanged;
+
+        public event Action? DocumentChanged;
+
+        public event Action? AllocationChanged;
+
+        public event Action<string>? StatusChanged;
+
+        /// <summary>The node under the cursor, or null when the cursor left every node.</summary>
+        public event Action<PassiveNode?>? HoveredChanged;
+
+        /// <summary>The layout spread settled on a new value — raised for the keys, so the control in
+        /// the toolbar shows what the keys did.</summary>
+        public event Action<float>? SpreadChanged;
+
+        public EditorMode Mode
+        {
+            get => _mode;
+            set
+            {
+                _mode = value;
+                ClearPathPreview();
+            }
+        }
+
+        /// <summary>The wheel's rings and sectors from the draft, drawn behind the tree as layout
+        /// guides. They are geometry to aim at, never something nodes snap to.</summary>
+        public bool ShowGuides { get; set; } = true;
+
+        /// <summary>
+        /// How far apart the layout is pulled. It multiplies distances only — a node keeps the size it
+        /// was authored at — so raising it opens the gaps a dense wheel hides its edges in, which no
+        /// amount of zooming can do. The tree file never sees it: this is a property of the view, and
+        /// the coordinates in the document stay exactly as their author typed them.
+        /// <para>The middle of the view is the fixed point, so the tree opens up around what is being
+        /// looked at instead of sliding off screen.</para>
+        /// </summary>
+        public float LayoutSpread
+        {
+            get => _view.Spread;
+            set
+            {
+                if (!_view.SetSpread(value, Size.X * 0.5f, Size.Y * 0.5f)) return;
+
+                SpreadChanged?.Invoke(_view.Spread);
+                QueueRedraw();
+            }
+        }
+
+        public PassiveTreeDocument Document => _editor.Document;
+
+        public AllocationState Allocation => _allocation;
+
+        public IReadOnlyCollection<string> Selection => _selected;
+
+        public PassiveNode? SingleSelection =>
+            _selected.Count == 1 ? Document.Find(FirstSelected()) : null;
+
+        /// <summary>The selected nodes in the order the document holds them, which is the order the file
+        /// was written in. Read off the document rather than out of the selection set: a hash set has no
+        /// order at all, and a group panel whose rows moved between rebuilds would be unusable.</summary>
+        public List<PassiveNode> SelectedNodes()
+        {
+            List<PassiveNode> nodes = [];
+            foreach (PassiveNode node in Document.Nodes)
+                if (_selected.Contains(node.Id))
+                    nodes.Add(node);
+
+            return nodes;
+        }
+
+        public override void _Ready()
+        {
+            FocusMode = FocusModeEnum.All;
+            MouseFilter = MouseFilterEnum.Stop;
+            ClipContents = true;
+
+            _view.SetPan(InitialPanX, InitialPanY);
+
+            _kindMenu = new PopupMenu();
+            _kindMenu.IdPressed += id => CreateNode((PassiveNodeKind)id, _pendingCreateDocument);
+            AddChild(_kindMenu);
+
+            MouseExited += ClearHover;
+        }
+
+        private void ClearHover()
+        {
+            if (_hovered is null) return;
+
+            _hovered = null;
+            UpdatePathPreview();
+            HoveredChanged?.Invoke(null);
+            QueueRedraw();
+        }
+
+        /// <summary>The one wiring step: the canvas edits through the editor and reads the document off
+        /// it, so the two can never be looking at different trees.</summary>
+        public void Initialize(TreeEditor editor) => _editor = editor;
+
+        /// <summary>Another tree became the one on screen. Everything pointing into the previous
+        /// document — selection, hover, the half-drawn link — is dropped rather than re-matched.</summary>
+        public void DocumentReplaced(AllocationState allocation)
+        {
+            _allocation = allocation;
+            _selected.Clear();
+            _linkFrom = null;
+            ClearHover();
+            ClearPathPreview();
+            RefreshFrontier();
+            SelectionChanged?.Invoke();
+            QueueRedraw();
+        }
+
+        /// <summary>Brings the selection back in line with the tree after a step through the history:
+        /// a node the step took away stops being selected, and a node the step gave another id stays
+        /// selected under it. The rule itself is <see cref="SelectionSync"/>; what happens here is the
+        /// redraw and telling the panels.</summary>
+        public void SyncSelection(IdSwap? rename)
+        {
+            SelectionSync.Follow(_selected, Document, rename);
+            ClearHover();
+            SelectionChanged?.Invoke();
+            QueueRedraw();
+        }
+
+        public void RefreshFrontier()
+        {
+            _frontier = _allocation.Frontier(Document, Document.Budget);
+            QueueRedraw();
+        }
+
+        public void SelectOnly(string id)
+        {
+            _selected.Clear();
+            if (Document.Contains(id)) _selected.Add(id);
+            SelectionChanged?.Invoke();
+            QueueRedraw();
+        }
+
+        /// <summary>
+        /// Puts one node in the middle of the view and selects it — where a search hit and a check
+        /// finding both land. The zoom is only ever raised, never lowered: arriving from the whole-tree
+        /// view onto a small node two pixels across is not arriving anywhere, while a jump that pulls
+        /// the view further out would throw away a close-up the author was working in.
+        /// </summary>
+        public bool FocusNode(string id)
+        {
+            PassiveNode? node = Document.Find(id);
+            if (node is null) return false;
+
+            _view.RaiseZoomTo(FocusZoom);
+            _view.CenterOn(node.X, node.Y, Size.X, Size.Y);
+
+            SelectOnly(id);
+            return true;
+        }
+
+        /// <summary>Fits the whole tree on screen at the spread it is being read at — the spread is not
+        /// touched, so framing shows the layout the author opened up rather than silently closing it
+        /// again. Also the recovery hatch when panning has taken the view far from the content.</summary>
+        public void FrameAll()
+        {
+            if (Document.Nodes.Count == 0)
+            {
+                _view.ResetZoom(Size.X, Size.Y);
+                QueueRedraw();
+                return;
+            }
+
+            float minX = float.MaxValue, minY = float.MaxValue, maxX = float.MinValue, maxY = float.MinValue;
+            foreach (PassiveNode node in Document.Nodes)
+            {
+                minX = MathF.Min(minX, node.X);
+                minY = MathF.Min(minY, node.Y);
+                maxX = MathF.Max(maxX, node.X);
+                maxY = MathF.Max(maxY, node.Y);
+            }
+
+            _view.Fit(minX, minY, maxX, maxY, Size.X, Size.Y, FramePadding);
+            QueueRedraw();
+        }
+
+        private Vector2 ToScreen(float documentX, float documentY) =>
+            new(_view.ScreenX(documentX), _view.ScreenY(documentY));
+
+        private Vector2 ToDocument(Vector2 screen) =>
+            new(_view.DocumentX(screen.X), _view.DocumentY(screen.Y));
+
+        private string FirstSelected()
+        {
+            foreach (string id in _selected) return id;
+            return string.Empty;
+        }
+
+        // ── drawing ────────────────────────────────────────────────────────────────────────────
+
+        public override void _Draw()
+        {
+            DrawRect(new Rect2(Vector2.Zero, Size), CanvasStyle.Void);
+            if (ShowGuides) DrawGuides();
+
+            Vector2 topLeft = ToDocument(Vector2.Zero);
+            Vector2 bottomRight = ToDocument(Size);
+            float minX = topLeft.X - CullMargin;
+            float minY = topLeft.Y - CullMargin;
+            float maxX = bottomRight.X + CullMargin;
+            float maxY = bottomRight.Y + CullMargin;
+
+            DrawEdges(minX, minY, maxX, maxY);
+            DrawPendingLink();
+            DrawNodes(minX, minY, maxX, maxY);
+            DrawSelectionBox();
+        }
+
+        /// <summary>The wheel behind the tree: six 60° sectors, the four ring radii and the core glow.
+        /// Pure decoration for the eye and a target for the hand — it never touches node data.
+        /// <para>Its radii are distances between the core and the nodes, so they follow the layout
+        /// spread exactly as the nodes do. A ring that kept its size while the tree opened up would
+        /// leave every node it names off it.</para></summary>
+        private void DrawGuides()
+        {
+            Vector2 origin = ToScreen(0f, 0f);
+
+            DrawSectors(origin);
+
+            foreach (float ring in CanvasStyle.RingRadii) DrawDashedRing(origin, ring * _view.PositionScale);
+
+            DrawCoreGlow(origin);
+
+            if (_view.Zoom >= CanvasStyle.LabelZoomThreshold) DrawGuideLabels(origin);
+        }
+
+        private void DrawSectors(Vector2 origin)
+        {
+            const int segments = 14;
+            float radius = CanvasStyle.SectorRadius * _view.PositionScale;
+            if (radius < 8f) return;
+
+            foreach ((float angle, Color color, string _) in CanvasStyle.Sectors)
+            {
+                var points = new Vector2[segments + 2];
+                points[0] = origin;
+
+                for (int step = 0; step <= segments; step++)
+                {
+                    float degrees = angle - CanvasStyle.SectorHalfAngle
+                                    + 2f * CanvasStyle.SectorHalfAngle * step / segments;
+                    float radians = Mathf.DegToRad(degrees);
+                    points[step + 1] = origin + new Vector2(MathF.Cos(radians), MathF.Sin(radians)) * radius;
+                }
+
+                DrawColoredPolygon(points, new Color(color, 0.07f));
+            }
+        }
+
+        /// <summary>Godot draws solid arcs, so the mockup's dashed rings are every other segment of a
+        /// coarse circle — cheap and visually identical at these radii.</summary>
+        private void DrawDashedRing(Vector2 origin, float radius)
+        {
+            if (radius < 6f) return;
+
+            const int segments = 144;
+            for (int step = 0; step < segments; step += 2)
+            {
+                float from = Mathf.Tau * step / segments;
+                float to = Mathf.Tau * (step + 1) / segments;
+                DrawArc(origin, radius, from, to, 2, CanvasStyle.RingLine, 1f, true);
+            }
+        }
+
+        /// <summary>Stand-in for the mockup's radial gradient: a few nested discs of falling alpha.</summary>
+        private void DrawCoreGlow(Vector2 origin)
+        {
+            const int layers = 7;
+            float radius = CanvasStyle.CoreGlowRadius * _view.PositionScale;
+            if (radius < 4f) return;
+
+            for (int layer = layers; layer > 0; layer--)
+            {
+                float factor = (float)layer / layers;
+                DrawCircle(origin, radius * factor, new Color(CanvasStyle.CoreGlow, 0.10f * (1f - factor) + 0.04f));
+            }
+        }
+
+        private void DrawGuideLabels(Vector2 origin)
+        {
+            Font font = GetThemeDefaultFont();
+            int fontSize = LabelSize();
+
+            for (int ring = 0; ring < CanvasStyle.RingRadii.Length; ring++)
+            {
+                float radius = CanvasStyle.RingRadii[ring] * _view.PositionScale;
+                DrawString(font, new Vector2(origin.X + 6f, origin.Y - radius + fontSize * 0.4f), $"R{ring}",
+                    HorizontalAlignment.Left, -1f, fontSize, CanvasStyle.RingLabel);
+            }
+
+            float labelRadius = (CanvasStyle.SectorRadius + 28f) * _view.PositionScale;
+            foreach ((float angle, Color color, string label) in CanvasStyle.Sectors)
+            {
+                float radians = Mathf.DegToRad(angle);
+                Vector2 at = origin + new Vector2(MathF.Cos(radians), MathF.Sin(radians)) * labelRadius;
+                DrawString(font, new Vector2(at.X - 120f, at.Y), label,
+                    HorizontalAlignment.Center, 240f, fontSize, new Color(color, 0.85f));
+            }
+        }
+
+        private int LabelSize() => (int)Mathf.Clamp(13f * _view.Zoom, 9f, 20f);
+
+        private void DrawEdges(float minX, float minY, float maxX, float maxY)
+        {
+            float idleWidth = MathF.Max(1f, 1.6f * _view.Zoom);
+            float liveWidth = MathF.Max(1.5f, 3f * _view.Zoom);
+
+            foreach (NodeLink link in Document.Links)
+            {
+                PassiveNode? first = Document.Find(link.A);
+                PassiveNode? second = Document.Find(link.B);
+                if (first is null || second is null) continue;
+
+                // Segment bounding box against the visible box — enough to skip everything off-screen
+                // without building a second index for edges.
+                if (MathF.Max(first.X, second.X) < minX || MathF.Min(first.X, second.X) > maxX) continue;
+                if (MathF.Max(first.Y, second.Y) < minY || MathF.Min(first.Y, second.Y) > maxY) continue;
+
+                Vector2 from = ToScreen(first.X, first.Y);
+                Vector2 to = ToScreen(second.X, second.Y);
+
+                bool firstTaken = _allocation.IsTaken(first.Id);
+                bool secondTaken = _allocation.IsTaken(second.Id);
+
+                // An edge belongs to the previewed route when it is the step that reaches a path node.
+                if (_pathSet.Contains(first.Id) && (_pathSet.Contains(second.Id) || secondTaken)
+                    || _pathSet.Contains(second.Id) && firstTaken)
+                {
+                    DrawDashedLine(from, to, CanvasStyle.EdgePath, liveWidth, MathF.Max(3f, 7f * _view.Zoom));
+                    continue;
+                }
+
+                if (firstTaken && secondTaken)
+                {
+                    DrawLine(from, to, new Color(CanvasStyle.NodeColor(first), 0.8f), liveWidth);
+                    continue;
+                }
+
+                DrawLine(from, to, CanvasStyle.EdgeIdle, idleWidth);
+            }
+        }
+
+        private void DrawPendingLink()
+        {
+            if (_linkFrom is null) return;
+
+            PassiveNode? from = Document.Find(_linkFrom);
+            if (from is null) return;
+
+            DrawDashedLine(ToScreen(from.X, from.Y), GetLocalMousePosition(), CanvasStyle.Gold1,
+                MathF.Max(1.5f, 2f * _view.Zoom), 8f);
+        }
+
+        private void DrawNodes(float minX, float minY, float maxX, float maxY)
+        {
+            _drawCandidates.Clear();
+            Document.Index.Query(minX, minY, maxX, maxY, _drawCandidates);
+
+            bool showLabels = _view.Zoom >= CanvasStyle.LabelZoomThreshold;
+            Font font = GetThemeDefaultFont();
+            int fontSize = LabelSize();
+
+            foreach (PassiveNode node in _drawCandidates)
+            {
+                NodeVisual visual = CanvasStyle.Visual(node.Kind);
+                Vector2 center = ToScreen(node.X, node.Y);
+
+                // Size follows the zoom alone: spreading the layout moves nodes apart, it does not
+                // grow them, and that is the whole difference between this handle and zooming out.
+                float radius = _geometry.ScreenRadius(node.Kind, _view.Zoom);
+
+                bool taken = _allocation.IsTaken(node.Id);
+                NodeState state = taken ? NodeState.Taken
+                    : _pathSet.Contains(node.Id) ? NodeState.OnPath
+                    : NodeState.Idle;
+
+                Color accent = CanvasStyle.NodeColor(node);
+                NodeLook look = CanvasStyle.Look(node.Kind, accent, state);
+
+                bool hovered = _hovered == node.Id;
+                Color outline = hovered ? CanvasStyle.Gold1 : look.Outline;
+
+                DrawNodeShape(visual.Shape, center, radius, look.Fill, outline, look.OutlineWidth * MathF.Max(0.6f, _view.Zoom));
+
+                // The frontier ring is editor-only feedback: it says "this one is legal next".
+                if (Mode == EditorMode.Simulate && !taken && state == NodeState.Idle && _frontier.Contains(node.Id))
+                    DrawArc(center, radius + 3f * _view.Zoom, 0f, Mathf.Tau, 24, new Color(CanvasStyle.Gold2, 0.7f),
+                        MathF.Max(1f, 1.2f * _view.Zoom), true);
+
+                if (_selected.Contains(node.Id))
+                    DrawArc(center, radius + 5f * _view.Zoom, 0f, Mathf.Tau, 28, CanvasStyle.SelectionStroke,
+                        MathF.Max(1.5f, 2f * _view.Zoom), true);
+
+                if (!showLabels || !visual.Labelled) continue;
+
+                string text = CanvasStyle.ShortLabel(node);
+                if (text.Length == 0) continue;
+
+                Color textColor = node.Kind == PassiveNodeKind.Keystone
+                    ? taken ? CanvasStyle.Gold1 : CanvasStyle.Gold3
+                    : taken ? CanvasStyle.Ink1 : CanvasStyle.Ink3;
+
+                DrawString(font, new Vector2(center.X - 130f, center.Y + radius + fontSize + 2f), text,
+                    HorizontalAlignment.Center, 260f, fontSize, textColor);
+            }
+        }
+
+        /// <summary>The mockup's shapes, drawn from the shape alone: which class wears which is the
+        /// visual table's business, so a new class that reuses a shape costs nothing here.</summary>
+        private void DrawNodeShape(NodeShape shape, Vector2 center, float radius, Color fill, Color outline, float outlineWidth)
+        {
+            float width = MathF.Max(1f, outlineWidth);
+
+            switch (shape)
+            {
+                case NodeShape.Hexagon:
+                    DrawPolygonShape(center, radius, 6, 0f, fill, outline, width);
+                    break;
+                case NodeShape.RotatedHexagon:
+                    DrawPolygonShape(center, radius, 6, Mathf.DegToRad(CanvasStyle.KeystoneRotationDegrees), fill, outline, width);
+                    break;
+                case NodeShape.Square:
+                    // Half-extent to circumradius: an upright square through four polygon vertices.
+                    DrawPolygonShape(center, radius * SquareCircumradius, 4, Mathf.Tau / 8f, fill, outline, width);
+                    break;
+                case NodeShape.Diamond:
+                    DrawPolygonShape(center, radius * SquareCircumradius, 4, 0f, fill, outline, width);
+                    break;
+                case NodeShape.Circle:
+                default:
+                    DrawCircle(center, radius, fill);
+                    DrawArc(center, radius, 0f, Mathf.Tau, 28, outline, width, true);
+                    break;
+            }
+        }
+
+        private void DrawPolygonShape(Vector2 center, float radius, int sides, float rotation, Color fill, Color outline, float outlineWidth)
+        {
+            var points = new Vector2[sides];
+            for (int index = 0; index < sides; index++)
+            {
+                float angle = rotation + Mathf.Tau * index / sides;
+                points[index] = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius;
+            }
+
+            DrawColoredPolygon(points, fill);
+
+            var closed = new Vector2[sides + 1];
+            points.CopyTo(closed, 0);
+            closed[sides] = points[0];
+            DrawPolyline(closed, outline, outlineWidth);
+        }
+
+        private void DrawSelectionBox()
+        {
+            if (!_boxSelecting) return;
+
+            Vector2 first = ToScreen(_boxStartDocument.X, _boxStartDocument.Y);
+            Vector2 second = ToScreen(_boxEndDocument.X, _boxEndDocument.Y);
+            var box = new Rect2(
+                MathF.Min(first.X, second.X),
+                MathF.Min(first.Y, second.Y),
+                MathF.Abs(second.X - first.X),
+                MathF.Abs(second.Y - first.Y));
+
+            DrawRect(box, CanvasStyle.BoxSelect);
+            DrawRect(box, CanvasStyle.BoxSelectBorder, false, 1f);
+        }
+
+        // ── input ──────────────────────────────────────────────────────────────────────────────
+
+        public override void _GuiInput(InputEvent @event)
+        {
+            switch (@event)
+            {
+                case InputEventMouseButton button:
+                    HandleMouseButton(button);
+                    break;
+                case InputEventMouseMotion motion:
+                    HandleMouseMotion(motion);
+                    break;
+                case InputEventKey { Pressed: true } key:
+                    HandleKey(key);
+                    break;
+            }
+        }
+
+        private void HandleMouseButton(InputEventMouseButton button)
+        {
+            if (button.Pressed && button.ButtonIndex is MouseButton.WheelUp or MouseButton.WheelDown)
+            {
+                Zoom(button.ButtonIndex == MouseButton.WheelUp
+                    ? CanvasTransform.ZoomStep
+                    : 1f / CanvasTransform.ZoomStep, button.Position);
+
+                AcceptEvent();
+                return;
+            }
+
+            if (button.ButtonIndex is MouseButton.Middle or MouseButton.Right)
+            {
+                if (button.Pressed && _linkFrom is not null && button.ButtonIndex == MouseButton.Right)
+                {
+                    _linkFrom = null;
+                    QueueRedraw();
+                }
+
+                _panning = button.Pressed;
+                AcceptEvent();
+                return;
+            }
+
+            if (button.ButtonIndex != MouseButton.Left) return;
+
+            GrabFocus();
+
+            if (button.Pressed) OnLeftPressed(button);
+            else OnLeftReleased();
+
+            AcceptEvent();
+        }
+
+        private void OnLeftPressed(InputEventMouseButton button)
+        {
+            Vector2 document = ToDocument(button.Position);
+            PassiveNode? node = NodeAt(button.Position);
+
+            switch (Mode)
+            {
+                case EditorMode.Add:
+                    // Shift skips the picker and repeats the last class: laying a run of small nodes
+                    // is one click each again, while the picker stays the way a class is chosen.
+                    if (button.ShiftPressed && _lastKind is not null) CreateNode(_lastKind.Value, document);
+                    else ShowKindMenu(document);
+                    return;
+
+                case EditorMode.Link:
+                    if (node is not null) HandleLinkClick(node);
+                    return;
+
+                case EditorMode.Simulate:
+                    if (node is not null) ToggleAllocation(node, button.CtrlPressed);
+                    return;
+
+                case EditorMode.Select:
+                default:
+                    BeginSelectGesture(node, document, button);
+                    return;
+            }
+        }
+
+        private void BeginSelectGesture(PassiveNode? node, Vector2 document, InputEventMouseButton button)
+        {
+            bool additive = button.ShiftPressed || button.CtrlPressed;
+
+            if (node is null)
+            {
+                if (!additive) _selected.Clear();
+                _boxSelecting = true;
+                _boxStartDocument = document;
+                _boxEndDocument = document;
+                SelectionChanged?.Invoke();
+                QueueRedraw();
+                return;
+            }
+
+            if (additive)
+            {
+                if (!_selected.Add(node.Id)) _selected.Remove(node.Id);
+            }
+            else if (!_selected.Contains(node.Id))
+            {
+                _selected.Clear();
+                _selected.Add(node.Id);
+            }
+
+            _draggingNodes = true;
+            _dragMoved = false;
+            _dragStartDocument = document;
+            _dragOrigins.Clear();
+            foreach (string id in _selected)
+            {
+                PassiveNode? selected = Document.Find(id);
+                if (selected is not null) _dragOrigins[id] = new NodePoint(selected.X, selected.Y);
+            }
+
+            SelectionChanged?.Invoke();
+            QueueRedraw();
+        }
+
+        private void OnLeftReleased()
+        {
+            if (_boxSelecting)
+            {
+                ApplyBoxSelection();
+                _boxSelecting = false;
+                SelectionChanged?.Invoke();
+            }
+
+            if (_draggingNodes)
+            {
+                _draggingNodes = false;
+                if (_dragMoved) CommitDrag();
+            }
+
+            QueueRedraw();
+        }
+
+        /// <summary>Files the drag that just ended as one step. Which nodes it actually moved is
+        /// <see cref="NodeMoves"/>' answer, not this node's — the drag itself belongs to the canvas,
+        /// the step that takes it back belongs to the stack.</summary>
+        private void CommitDrag()
+        {
+            List<NodeMove> moves = NodeMoves.Since(Document, _dragOrigins);
+
+            Document.Reindex();
+            if (moves.Count == 0) return;
+
+            _editor.MoveNodes(moves);
+            DocumentChanged?.Invoke();
+        }
+
+        private void HandleMouseMotion(InputEventMouseMotion motion)
+        {
+            if (_panning)
+            {
+                _view.MovePan(motion.Relative.X, motion.Relative.Y);
+                QueueRedraw();
+                return;
+            }
+
+            if (_draggingNodes)
+            {
+                DragSelection(ToDocument(motion.Position), motion.CtrlPressed);
+                return;
+            }
+
+            if (_boxSelecting)
+            {
+                _boxEndDocument = ToDocument(motion.Position);
+                QueueRedraw();
+                return;
+            }
+
+            PassiveNode? under = NodeAt(motion.Position);
+            if (under?.Id != _hovered)
+            {
+                _hovered = under?.Id;
+                UpdatePathPreview();
+                HoveredChanged?.Invoke(under);
+                QueueRedraw();
+            }
+            else if (_linkFrom is not null)
+            {
+                QueueRedraw();
+            }
+        }
+
+        /// <summary>
+        /// In Simulate mode, hovering an unallocated node shows the cheapest route to it. It answers
+        /// the question the designer actually asks of a wheel — "what does reaching this cost me" —
+        /// without spending anything.
+        /// </summary>
+        private void UpdatePathPreview()
+        {
+            List<string> path = Mode == EditorMode.Simulate && _hovered is not null
+                ? _allocation.PathTo(Document, _hovered)
+                : [];
+
+            if (path.Count == _path.Count && path.Count == 0) return;
+
+            _path = path;
+            _pathSet = new HashSet<string>(path, StringComparer.Ordinal);
+
+            if (path.Count > 0)
+                StatusChanged?.Invoke($"{_hovered}: {path.Count} point(s) from here — ctrl+click takes the whole path");
+        }
+
+        private void ClearPathPreview()
+        {
+            if (_path.Count == 0) return;
+
+            _path = [];
+            _pathSet.Clear();
+        }
+
+        private void HandleKey(InputEventKey key)
+        {
+            switch (key.Keycode)
+            {
+                case Key.Delete:
+                    DeleteSelection();
+                    break;
+                case Key.Escape:
+                    _linkFrom = null;
+                    _selected.Clear();
+                    SelectionChanged?.Invoke();
+                    QueueRedraw();
+                    break;
+                // Bare F frames the tree; with Ctrl it is the search shortcut, which belongs to the
+                // whole tool and is answered above the canvas.
+                case Key.F when !key.CtrlPressed:
+                    FrameAll();
+                    break;
+                // The brackets sit next to each other and mean "wider" and "tighter" — and being plain
+                // keys of the canvas they cannot fire while a title is being typed in the inspector.
+                case Key.Bracketright:
+                    NudgeSpread(1);
+                    break;
+                case Key.Bracketleft:
+                    NudgeSpread(-1);
+                    break;
+            }
+        }
+
+        /// <summary>One step of the layout spread, reported in the status line: the handle moves nothing
+        /// the eye can measure against, so the number is how its owner knows where it stands.</summary>
+        private void NudgeSpread(int steps)
+        {
+            LayoutSpread = _view.Spread + steps * CanvasTransform.SpreadStep;
+            StatusChanged?.Invoke($"layout spread ×{_view.Spread.ToString("0.##", CultureInfo.InvariantCulture)}");
+        }
+
+        private void Zoom(float factor, Vector2 pivotScreen)
+        {
+            _view.ZoomBy(factor, pivotScreen.X, pivotScreen.Y);
+            QueueRedraw();
+        }
+
+        /// <summary>
+        /// Moves the captured nodes to where the cursor is, in the document's own coordinates. The
+        /// delta arrives already divided by the spread — both ends of it came through
+        /// <see cref="ToDocument"/> — so a node dropped at a spread of four lands under the cursor and
+        /// not four times further out, and the snap grid keeps meaning 25 units of the file.
+        /// </summary>
+        private void DragSelection(Vector2 document, bool coarse)
+        {
+            Vector2 delta = document - _dragStartDocument;
+            float snap = coarse ? CoarseSnap : FineSnap;
+
+            foreach (KeyValuePair<string, NodePoint> origin in _dragOrigins)
+            {
+                PassiveNode? node = Document.Find(origin.Key);
+                if (node is null) continue;
+
+                node.X = MathF.Round((origin.Value.X + delta.X) / snap) * snap;
+                node.Y = MathF.Round((origin.Value.Y + delta.Y) / snap) * snap;
+            }
+
+            _dragMoved = true;
+            QueueRedraw();
+        }
+
+        private void ApplyBoxSelection()
+        {
+            float minX = MathF.Min(_boxStartDocument.X, _boxEndDocument.X);
+            float maxX = MathF.Max(_boxStartDocument.X, _boxEndDocument.X);
+            float minY = MathF.Min(_boxStartDocument.Y, _boxEndDocument.Y);
+            float maxY = MathF.Max(_boxStartDocument.Y, _boxEndDocument.Y);
+
+            _pickCandidates.Clear();
+            Document.Index.Query(minX, minY, maxX, maxY, _pickCandidates);
+
+            foreach (PassiveNode node in _pickCandidates)
+                if (node.X >= minX && node.X <= maxX && node.Y >= minY && node.Y <= maxY)
+                    _selected.Add(node.Id);
+        }
+
+        /// <summary>
+        /// The node under a point on screen — the shared rule, so the tool and the game cannot disagree
+        /// about what was clicked. Measuring in screen pixels is the whole point: at any layout spread a
+        /// node covers exactly the pixels it is painted on, so the click lands where it was aimed, and
+        /// the nearest centre wins where two shapes overlap.
+        /// </summary>
+        private PassiveNode? NodeAt(Vector2 screen) => _geometry.At(Document, _view, screen.X, screen.Y);
+
+        /// <summary>The authored radii the tool draws with, handed to the shared geometry: the look is
+        /// the tool's own, the sizes behind it are the game's.</summary>
+        private static Dictionary<PassiveNodeKind, float> AuthoredRadii()
+        {
+            var radii = new Dictionary<PassiveNodeKind, float>();
+            foreach (PassiveNodeKind kind in Enum.GetValues<PassiveNodeKind>())
+                radii[kind] = CanvasStyle.Visual(kind).Radius;
+
+            return radii;
+        }
+
+        /// <summary>The class picker, opened at the cursor by a click in Add mode. Each entry shows
+        /// the id the node would get, so the naming series is visible before committing to it.</summary>
+        private void ShowKindMenu(Vector2 document)
+        {
+            _pendingCreateDocument = document;
+            _kindMenu.Clear();
+
+            foreach (PassiveNodeKind kind in Enum.GetValues<PassiveNodeKind>())
+            {
+                PassiveNode? template = TemplateFor(kind);
+                string label = template is null
+                    ? $"{kind}   {Document.NextId(kind)}"
+                    : $"{kind}   {Document.NextIdFrom(template.Id)}";
+
+                _kindMenu.AddItem(label, (int)kind);
+            }
+
+            _kindMenu.ResetSize();
+            _kindMenu.PopupOnParent(new Rect2I((Vector2I)GetGlobalMousePosition(), Vector2I.Zero));
+        }
+
+        /// <summary>
+        /// The node a new one of this class copies from: whatever is selected if it matches the class
+        /// — "continue from this one" — otherwise the last node of that class created here. A node
+        /// that has since been deleted stops being a template.
+        /// </summary>
+        private PassiveNode? TemplateFor(PassiveNodeKind kind)
+        {
+            if (_selected.Count == 1)
+            {
+                PassiveNode? selected = Document.Find(FirstSelected());
+                if (selected is not null && selected.Kind == kind) return selected;
+            }
+
+            if (_lastCreated.TryGetValue(kind, out PassiveNode? last) && Document.Contains(last.Id)) return last;
+
+            // Nothing created this session — a freshly loaded tree. Fall back to the last node of the
+            // class in the document so naming series survive a reload instead of restarting at _1.
+            PassiveNode? fallback = null;
+            foreach (PassiveNode node in Document.Nodes)
+                if (node.Kind == kind)
+                    fallback = node;
+
+            return fallback;
+        }
+
+        private void CreateNode(PassiveNodeKind kind, Vector2 document)
+        {
+            PassiveNode? selected = _selected.Count == 1 ? Document.Find(FirstSelected()) : null;
+            PassiveNode? template = TemplateFor(kind);
+
+            var node = new PassiveNode
+            {
+                Kind = kind,
+                X = MathF.Round(document.X),
+                Y = MathF.Round(document.Y)
+            };
+
+            if (template is not null)
+            {
+                // A cluster is a run of near-identical nodes, so the payload rides along and the id
+                // continues the series. Editing the template first is what makes the run cheap.
+                node.Id = Document.NextIdFrom(template.Id);
+                node.Stance = template.Stance;
+                node.HybridStance = template.HybridStance;
+
+                // What identifies one particular node does not ride along. An ability reference is
+                // unique per node, and an inherited one points at the wrong ability without looking
+                // wrong — Check can report an empty field, it cannot report a plausible lie.
+                if (!NodeKindRules.For(kind).RequiresAbility)
+                {
+                    node.Title = template.Title;
+                    node.Description = template.Description;
+
+                    foreach (ModifierLine line in template.Modifiers) node.Modifiers.Add(line.Copy());
+                    foreach (ContextModifierLine line in template.ContextModifiers) node.ContextModifiers.Add(line.Copy());
+                }
+            }
+            else
+            {
+                node.Id = Document.NextId(kind);
+                // No pattern for this class yet — still inherit the ray being worked on.
+                node.Stance = selected?.Stance;
+                node.HybridStance = selected?.HybridStance;
+
+                for (int line = 0; line < NodeKindRules.For(kind).MinModifiers; line++)
+                    node.Modifiers.Add(new ModifierLine());
+            }
+
+            // Chaining: with exactly one node selected the fresh node links to it, so a run of nodes
+            // is laid out by repeated clicks instead of switching to Link mode after every one. The
+            // node and that edge are one step: one click made them, one step back unmakes them.
+            if (!_editor.CreateNode(node, selected)) return;
+
+            _lastCreated[kind] = node;
+            _lastKind = kind;
+            _selected.Clear();
+            _selected.Add(node.Id);
+
+            SelectionChanged?.Invoke();
+            DocumentChanged?.Invoke();
+            StatusChanged?.Invoke(template is null ? $"added {node.Id}" : $"added {node.Id} from {template.Id}");
+            QueueRedraw();
+        }
+
+        private void HandleLinkClick(PassiveNode node)
+        {
+            if (_linkFrom is null)
+            {
+                _linkFrom = node.Id;
+                StatusChanged?.Invoke($"linking from {node.Id} — click the other end, right click to cancel");
+                QueueRedraw();
+                return;
+            }
+
+            if (_linkFrom == node.Id)
+            {
+                _linkFrom = null;
+                QueueRedraw();
+                return;
+            }
+
+            string from = _linkFrom;
+            _linkFrom = null;
+
+            PassiveNode? first = Document.Find(from);
+            if (first is null) return;
+
+            bool link = !Document.AreLinked(from, node.Id);
+            if (!_editor.SetLink(first, node, link)) return;
+
+            StatusChanged?.Invoke(link ? $"linked {from} — {node.Id}" : $"unlinked {from} — {node.Id}");
+            DocumentChanged?.Invoke();
+            QueueRedraw();
+        }
+
+        private void ToggleAllocation(PassiveNode node, bool takeWholePath)
+        {
+            if (_allocation.IsTaken(node.Id))
+            {
+                if (_allocation.Refund(Document, node.Id)) StatusChanged?.Invoke($"refunded {node.Id}");
+                else StatusChanged?.Invoke($"{node.Id} cannot be refunded — something further out depends on it");
+            }
+            else if (takeWholePath && _path.Count > 0)
+            {
+                if (_allocation.TakePath(Document, _path, Document.Budget))
+                    StatusChanged?.Invoke($"took {_path.Count} node(s) up to {node.Id}");
+                else
+                    StatusChanged?.Invoke($"the path to {node.Id} needs {_path.Count} point(s), {Document.Budget - _allocation.Spent} left");
+            }
+            else if (_allocation.Take(Document, node.Id, Document.Budget))
+            {
+                StatusChanged?.Invoke($"took {node.Id}");
+            }
+            else if (_allocation.Spent >= Document.Budget)
+            {
+                StatusChanged?.Invoke($"out of points ({_allocation.Spent}/{Document.Budget})");
+            }
+            else
+            {
+                StatusChanged?.Invoke($"{node.Id} is not adjacent to anything taken");
+            }
+
+            ClearPathPreview();
+            UpdatePathPreview();
+            RefreshFrontier();
+            AllocationChanged?.Invoke();
+        }
+
+        private void DeleteSelection()
+        {
+            if (_selected.Count == 0) return;
+
+            int removed = _editor.DeleteNodes([.. _selected]);
+
+            _selected.Clear();
+            ClearHover();
+            _allocation.Resync(Document);
+            RefreshFrontier();
+            SelectionChanged?.Invoke();
+            DocumentChanged?.Invoke();
+            AllocationChanged?.Invoke();
+            StatusChanged?.Invoke($"deleted {removed} node(s)");
+            QueueRedraw();
+        }
+    }
+}

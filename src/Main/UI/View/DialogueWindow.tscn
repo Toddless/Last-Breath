@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://bdlg4qst1awnd"]
+
+[ext_resource type="Script" uid="uid://cvbdyy412rtsu" path="res://UI/View/DialogueWindow.cs" id="1_dlgwn"]
+
+[node name="DialogueWindow" type="PanelContainer" unique_id=1568728262 node_paths=PackedStringArray("_log", "_options")]
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.55
+anchor_right = 0.8
+anchor_bottom = 0.97
+grow_horizontal = 2
+grow_vertical = 0
+theme_type_variation = &"UmbralWindowPanel"
+script = ExtResource("1_dlgwn")
+_log = NodePath("Margin/VBox/Log")
+_options = NodePath("Margin/VBox/Options")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1196394343]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=577250981]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Log" type="RichTextLabel" parent="Margin/VBox" unique_id=1424436111]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+bbcode_enabled = true
+scroll_following = true
+
+[node name="Options" type="VBoxContainer" parent="Margin/VBox" unique_id=1352591378]
+layout_mode = 2

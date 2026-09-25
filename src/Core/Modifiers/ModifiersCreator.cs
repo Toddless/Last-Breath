@@ -1,18 +1,21 @@
-﻿namespace Core.Modifiers
+namespace Core.Modifiers
 {
-    using Enums;
     using System.Collections.Generic;
+    using Enums;
 
     public abstract class ModifiersCreator
     {
-        public static List<IModifierInstance> CreateModifierInstances(List<IModifier> stats, object source)
+        public static List<IModifierInstance> CreateModifierInstances(List<IModifier> stats, string source)
         {
             List<IModifierInstance> modifiers = [];
-            stats.ForEach(mod => modifiers.Add(CreateModifierInstance(mod.EntityParameter, mod.ModifierType, mod.BaseValue, source)));
+            stats.ForEach(mod => modifiers.Add(CreateModifierInstance(mod.EntityParameter, mod.ModifierValueType, mod.BaseValue, source)));
             return modifiers;
         }
 
-        public static IModifierInstance CreateModifierInstance(EntityParameter entityParameter, ModifierType modifierType, float value, object source, int priority = 10)
-            => new ModifierInstance(entityParameter, modifierType, value, source, priority);
+        // NOTE: the last argument is stored as the instance Weight. On-item lines never re-enter a weighted
+        // roll, so it is irrelevant there. For reroll-pool fodder use CopyForPool, which keeps the real weight.
+        public static IModifierInstance CreateModifierInstance(EntityParameter entityParameter, ModifierValueType modifierValueType, float value, string source, int priority = 10)
+            => new SimpleModifier(entityParameter, modifierValueType, value, source, priority);
+
     }
 }

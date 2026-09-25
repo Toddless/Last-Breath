@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://bqstjrn1wnd4a"]
+
+[ext_resource type="Script" uid="uid://du5sfrtbbcc3q" path="res://UI/View/QuestJournalWindow.cs" id="1_qstjr"]
+
+[node name="QuestJournalWindow" type="Control" unique_id=1898115200 node_paths=PackedStringArray("_questList", "_title", "_details", "_abandonButton")]
+layout_mode = 3
+anchor_left = 0.5
+anchor_top = 0.15
+anchor_right = 1.0
+anchor_bottom = 0.85
+offset_left = -16.0
+offset_right = -16.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("1_qstjr")
+_questList = NodePath("Panel/Margin/HBox/Quests")
+_title = NodePath("Panel/Margin/HBox/Details/Title")
+_details = NodePath("Panel/Margin/HBox/Details/Body")
+_abandonButton = NodePath("Panel/Margin/HBox/Details/Abandon")
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=1798986954]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"UmbralWindowPanel"
+
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=966532530]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="HBox" type="HBoxContainer" parent="Panel/Margin" unique_id=1113087378]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Quests" type="ItemList" parent="Panel/Margin/HBox" unique_id=1715870740]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Details" type="VBoxContainer" parent="Panel/Margin/HBox" unique_id=940828382]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Panel/Margin/HBox/Details" unique_id=1805600201]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+
+[node name="Body" type="RichTextLabel" parent="Panel/Margin/HBox/Details" unique_id=560004060]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+bbcode_enabled = true
+
+[node name="Abandon" type="Button" parent="Panel/Margin/HBox/Details" unique_id=1409661686]
+layout_mode = 2
+size_flags_horizontal = 0

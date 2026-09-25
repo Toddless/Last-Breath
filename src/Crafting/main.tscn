@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://eaexvneinsqy"]
+
+[ext_resource type="Script" uid="uid://d2i5gjmpw2mhg" path="res://temp/Layers/Main.cs" id="1_0xm2m"]
+[ext_resource type="Script" uid="uid://dk0ywb5brpx8g" path="res://temp/Layers/UILayerManager.cs" id="2_h2yge"]
+
+[node name="Main" type="Node2D" node_paths=PackedStringArray("_uiLayerManager")]
+script = ExtResource("1_0xm2m")
+_uiLayerManager = NodePath("UIManager")
+
+[node name="UIManager" type="Node" parent="." node_paths=PackedStringArray("_mainLayer", "_windowLayer", "_notificationLayer")]
+script = ExtResource("2_h2yge")
+_mainLayer = NodePath("MainLayer")
+_windowLayer = NodePath("WindowLayer")
+_notificationLayer = NodePath("NotificationLayer")
+
+[node name="MainLayer" type="CanvasLayer" parent="UIManager"]
+
+[node name="WindowLayer" type="CanvasLayer" parent="UIManager"]
+
+[node name="NotificationLayer" type="CanvasLayer" parent="UIManager"]

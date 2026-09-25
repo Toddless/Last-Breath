@@ -1,0 +1,152 @@
+﻿namespace Battle.Source.Abilities
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Core;
+    using Core.Battle.Abilities;
+    using Core.Data.AbilityData;
+    using Core.Enums;
+
+    /// <summary>
+    /// How an ability is built from what its data declares, and how a copy of an augment becomes the
+    /// upgrade it installs. Neither the ability records nor the augment records are read here — both
+    /// are asked of <see cref="IAbilityAugmentCatalog"/>, which every composition holds, while the
+    /// factories and the numeric table that turn a record into something castable are this module's
+    /// own. The catalog is asked at the moment of the question: it is filled by the same load that
+    /// composes this registry, and reading it up front would freeze an empty one.
+    ///
+    /// An ability is created bare. What it wears is not a property of the ability but of the sockets
+    /// its owner has filled, so the arrangement is put on by <see cref="IAbilityAugmentBinder"/> and
+    /// never handed over at construction.
+    /// </summary>
+    public partial class AbilityProvider(IAbilityAugmentCatalog augments, Func<IEffectProvider?>? effects = null)
+        : IAbilityProvider, IAugmentLaidEffects
+    {
+        /// <summary>Resolved lazily: a sandbox without an effect registry still builds every other
+        /// augment, and a behaviour that needs one refuses out loud instead of throwing.</summary>
+        private readonly Func<IEffectProvider?> _effects = effects ?? (static () => null);
+
+        public IReadOnlyCollection<string> KnownAbilityIds => augments.AbilityIds;
+
+        /// <summary>Every augment this build knows how to make an upgrade of — the augments a factory
+        /// is written for and the augments the parameter table describes, which are two halves of one
+        /// registry and never name the same id twice. A record the data declares and this collection
+        /// does not name is a record that parses, is minted, is seated and then does nothing at all.</summary>
+        public IReadOnlyCollection<string> BuildableAugmentIds =>
+        [
+            .. AbilityUpgrades.Keys,
+            .. _parameterAugments.Keys,
+            // Records that carry their own behaviour need no line of code naming them.
+            .. augments.All.Where(record => !string.IsNullOrWhiteSpace(record.Behaviour)).Select(record => record.Id)
+        ];
+
+        /// <summary>
+        /// The parameters a record moves, by the same rule the effect registry publishes the keys a
+        /// factory reads: a ledger that has to GUESS what a record touches guesses wrong. Asked from the
+        /// outside it answered only "which abilities does this fit", which is a different question —
+        /// every ability a record fits declares parameters the record never moves.
+        /// <para>Both halves of the registry answer: the numeric table says which key each of its rows
+        /// stands on, and a factory registration declares its keys beside itself. A factory used to be
+        /// silent here, which made every ledger of shared keys blind to that half and left its rows to
+        /// be written by hand. Still empty for a record answered by a declared behaviour, and for the
+        /// factories whose work is a rider or a flag rather than a key — there the silence is the
+        /// honest answer rather than a gap.</para>
+        /// </summary>
+        public IReadOnlyCollection<string> ParametersMovedBy(string augmentId) =>
+            [.. TableMoves(augmentId).Concat(FactoryMoves(augmentId)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
+
+        /// <summary>
+        /// The effect a record lays when its own declaration is silent about one — read off the very
+        /// registration that builds it, which is where a typed factory names its effect. The same answer
+        /// serves the augment seated in a socket and the copy lying in the bag, so a card whose figures
+        /// are balanced in the canon prints them wherever the player is looking at it.
+        /// <para>Empty for every other record, the ones naming their effect in data included: there the
+        /// record is the word and this would be a second one, free to disagree with it.</para>
+        /// </summary>
+        public string LaidEffectOf(string augmentId) =>
+            AbilityUpgrades.TryGetValue(augmentId, out AugmentFactory factory) ? factory.LaidEffectId : string.Empty;
+
+        /// <summary>The keys the numeric table has this record standing on.</summary>
+        private IEnumerable<string> TableMoves(string augmentId) =>
+            _parameterAugments.TryGetValue(augmentId, out AugmentParameterMove[]? moves)
+                ? moves.Select(move => move.Parameter)
+                : [];
+
+        /// <summary>The keys the record's own factory declares it moves.</summary>
+        private IEnumerable<string> FactoryMoves(string augmentId) =>
+            AbilityUpgrades.TryGetValue(augmentId, out AugmentFactory factory) ? factory.MovedParameters : [];
+
+        public IAbility CreateAbility(string abilityId) => GetFactory(abilityId).Invoke(GetBaseData(abilityId));
+
+        /// <summary>The stance an ability belongs to — the ability book partitions by it on Learn.</summary>
+        public Stance GetAbilityStance(string abilityId) => GetBaseData(abilityId).Stance;
+
+        /// <summary>Internal-cast-only ability (boss reactions): never learnable, never shown in trees.</summary>
+        public bool IsHidden(string abilityId) => GetBaseData(abilityId).Hidden;
+
+        /// <summary>The record the catalog holds for the id — asked now rather than kept, so an empty
+        /// catalog is a catalog not loaded YET and not a registry frozen around one.</summary>
+        private AbilityBaseData GetBaseData(string abilityId) =>
+            augments.FindAbility(abilityId)
+            ?? throw new KeyNotFoundException($"No base data loaded for ability '{abilityId}'");
+
+        private Func<AbilityBaseData, IAbility> GetFactory(string abilityId) =>
+            _abilityFactories.GetValueOrDefault(abilityId)
+            ?? throw new KeyNotFoundException($"No factory registered for ability '{abilityId}'");
+
+        /// <summary>
+        /// The upgrade one COPY of an augment installs. The copy's numbers go in ahead of the record's
+        /// own, so the behaviour installed and the description printed are built from the same
+        /// dictionary: a player reading a tooltip of the augment in his slot reads what that copy
+        /// rolled, and not the average the record declares.
+        /// Null for a copy of a record the catalog does not hold — nothing says what to build.
+        /// </summary>
+        public IAugment? CreateUpgrade(AugmentInstance instance)
+        {
+            AbilityAugmentData? record = augments.Find(instance.AugmentId);
+            if (record != null) return CreateUpgrade(instance.Applied(record));
+
+            Tracker.TrackNotFound($"Augment record '{instance.AugmentId}'", this);
+            return null;
+        }
+
+        /// <summary>The upgrade an augment record installs, built from that record alone — the augment
+        /// as the data declares it, before any copy of it is minted. Null for an id neither half of the
+        /// registry answers: the record parses and is mintable, and this is where that silence is
+        /// reported.</summary>
+        public IAugment? CreateUpgrade(AbilityAugmentData data)
+        {
+            IAugment? upgrade = Build(data);
+            if (upgrade == null)
+            {
+                Tracker.TrackNotFound($"Upgrade factory '{data.Id}'", this);
+                return null;
+            }
+
+            // Placeholder = json property name, plus the canon of what the record lays: a record laying an
+            // effect may not restate its figures, so its own dictionary is empty and the canon is where
+            // every number on its line comes from. What it lays is asked of this registry as well as of
+            // the record — a factory names its effect in code, and the card may not be blind to that.
+            upgrade.DescriptionValues = AugmentDescription.Values(data, _effects(), this);
+            return upgrade;
+        }
+
+        /// <summary>The three halves of the registry, asked in order: a record that DECLARES a behaviour
+        /// is built from its own data, an augment reaching into the members of an ability has a factory
+        /// written for it, and one that only moves numbers is a row of the parameter table.</summary>
+        private IAugment? Build(AbilityAugmentData data)
+        {
+            // Not a priority: a record with both a behaviour and a factory is a duplicate id, which the
+            // uniqueness of BuildableAugmentIds already refuses loudly. The sets do not overlap.
+            if (!string.IsNullOrWhiteSpace(data.Behaviour)) return CreateBehaviour(data);
+
+            if (AbilityUpgrades.TryGetValue(data.Id, out AugmentFactory factory)) return factory.Build(data);
+
+            return _parameterAugments.TryGetValue(data.Id, out AugmentParameterMove[]? moves)
+                ? new AugmentParameterSet(data.Id, data.Tags, data.Tier,
+                    [.. moves.Select(move => (move.Parameter, move.Operation, move.AmountIn(data.UpgradeProperties)))])
+                : null;
+        }
+    }
+}

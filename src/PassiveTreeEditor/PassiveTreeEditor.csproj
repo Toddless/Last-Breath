@@ -1,0 +1,30 @@
+<Project Sdk="Godot.NET.Sdk/4.7.0">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;ExportDebug;ExportRelease;Release</Configurations>
+    <LangVersion>preview</LangVersion>
+    <!-- The exported build ships a whole .NET runtime; trimming it drops the framework assemblies
+         nothing here calls (83 MB to 34). Partial mode is not a preference: a Godot game assembly is a
+         library, and full mode wants an entry point to trace from (IL1034). It also trims only what is
+         marked trimmable — the framework — so this tool, Core and Newtonsoft come out whole and
+         reflection over the data DTOs keeps working. -->
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <!-- Trimming otherwise writes this switch off, and the engine reaches the managed side exactly
+         that way: hostfxr hands it a delegate into the assembly. Off, the delegate never arrives. -->
+    <_EnableConsumingManagedCodeFromNativeHosting>true</_EnableConsumingManagedCodeFromNativeHosting>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="Godot.SourceGenerators" Version="4.7.0" />
+    <PackageReference Update="GodotSharp" Version="4.7.0" />
+    <PackageReference Update="GodotSharpEditor" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://bf64pfcqaqrge"]
+
+[ext_resource type="Script" uid="uid://dadp2vrghl234" path="res://Addons/Crafting/UIElements/Modules/ForecastPanel.cs" id="1_fcast"]
+
+[node name="ForecastPanel" type="PanelContainer" node_paths=PackedStringArray("_header", "_hint", "_rows")]
+visible = false
+script = ExtResource("1_fcast")
+_header = NodePath("ForecastMargin/ForecastLayout/ForecastHeaderRow/ForecastHeader")
+_hint = NodePath("ForecastMargin/ForecastLayout/ForecastHeaderRow/ForecastHint")
+_rows = NodePath("ForecastMargin/ForecastLayout/ForecastRows")
+
+[node name="ForecastMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="ForecastLayout" type="VBoxContainer" parent="ForecastMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ForecastHeaderRow" type="HBoxContainer" parent="ForecastMargin/ForecastLayout"]
+layout_mode = 2
+
+[node name="ForecastHeader" type="Label" parent="ForecastMargin/ForecastLayout/ForecastHeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SectionLabel"
+
+[node name="ForecastHint" type="Label" parent="ForecastMargin/ForecastLayout/ForecastHeaderRow"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 11
+
+[node name="ForecastRows" type="VBoxContainer" parent="ForecastMargin/ForecastLayout"]
+layout_mode = 2
+theme_override_constants/separation = 5

@@ -1,0 +1,27 @@
+{
+    "tierPrices": [600, 200, 50, 3],
+    "baseTierChances": [0.004, 0.006, 0.3, 0.6],
+    "baseRarityChances": [0.003, 0.15, 0.27, 0.55],
+    "levelCoefficient": 0.35,
+    "equipItemEffectChance": 0.15,
+    "itemModifierMultiplier": 0.10,
+    "maxItemsPerKill": 25,
+    "goldPerBudgetUnit": 4,
+    "maxGoldPerKill": 300,
+    "baseBudget": {
+        "Regular": 6,
+        "Special": 14,
+        "Elit": 28,
+        "Unique": 68,
+        "Boss": 100,
+        "Archon": 180
+    },
+    "rarityMultipliers": {
+        "Uncommon": 1,
+        "Rare": 1.15,
+        "Epic": 1.3,
+        "Legendary": 1.45,
+        "Unique": 2,
+        "Mythic": 4
+    }
+}

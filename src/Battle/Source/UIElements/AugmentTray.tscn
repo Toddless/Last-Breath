@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://cm0ug8yh3ls6n"]
+
+[ext_resource type="Script" uid="uid://bbk73xd44eaya" path="res://Addons/Battle/UIElements/AugmentTray.cs" id="1_tray"]
+[ext_resource type="PackedScene" uid="uid://dp4tbacn1mh8k" path="res://Addons/Battle/UIElements/AugmentTrayTile.tscn" id="2_tile"]
+
+[node name="AugmentTray" type="Control" node_paths=PackedStringArray("_grid", "_trayEmpty")]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_tray")
+_grid = NodePath("Panel/Margin/Layout/Scroll/Grid")
+_trayEmpty = NodePath("Panel/Margin/Layout/TrayEmpty")
+_tileScene = ExtResource("2_tile")
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Layout" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="Label" parent="Panel/Margin/Layout"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+text = "Augments"
+
+[node name="TrayEmpty" type="Label" parent="Panel/Margin/Layout"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "No augments carried."
+
+[node name="Scroll" type="ScrollContainer" parent="Panel/Margin/Layout"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Grid" type="GridContainer" parent="Panel/Margin/Layout/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 4

@@ -1,0 +1,53 @@
+{
+    "dialogues": [
+        {
+            "npcId": "Npc_Hunter",
+            "entryRules": [
+                {
+                    "priority": 0,
+                    "conditions": [],
+                    "node": "Greeting"
+                }
+            ],
+            "nodes": [
+                {
+                    "id": "Greeting",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Hunter_Greeting_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "AskPrey",
+                            "key": "Dlg_Hunter_Greeting_AskPrey",
+                            "oncePerConversation": true,
+                            "next": "AboutPrey"
+                        },
+                        {
+                            "id": "Leave",
+                            "key": "Dlg_Opt_Leave"
+                        }
+                    ]
+                },
+                {
+                    "id": "AboutPrey",
+                    "lines": [
+                        {
+                            "speaker": "Npc",
+                            "key": "Dlg_Hunter_AboutPrey_1"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "id": "Back",
+                            "key": "Dlg_Opt_Back",
+                            "next": "Greeting"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

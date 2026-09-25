@@ -1,0 +1,8 @@
+{
+    "lieGameHours": 3,
+    "reviveHealthPercent": 0.15,
+    "reviveManaPercent": 0.15,
+    "deadTimeScale": 6,
+    "burnChance": 0.1,
+    "burnRadius": 200
+}

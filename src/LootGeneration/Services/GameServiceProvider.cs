@@ -1,55 +1,48 @@
 namespace LootGeneration.Services
 {
-    using Godot;
-    using System;
-    using Source;
-    using Internal;
     using Core.Data;
-    using Core.Interfaces.Events;
-    using System.Collections.Generic;
-    using Core.Interfaces;
-    using Core.Interfaces.MessageBus;
+    using Core.Data.GameData;
+    using Core.Modifiers.Conditions;
+    using Core.Services;
+    using Internal;
     using Microsoft.Extensions.DependencyInjection;
-    using temp;
+    using Source;
 
-    internal class GameServiceProvider : IGameServiceProvider
+    /// <summary>Project bootstrap: the shared Core provider + LootGeneration registrations. The only place touching the static root.</summary>
+    internal static class GameServiceProvider
     {
-        private readonly ServiceProvider _serviceProvider;
-        public static GameServiceProvider Instance { get; } = new();
+        public static IGameServiceProvider Instance { get; } = CreateProvider();
 
-        private GameServiceProvider()
+        private static IGameServiceProvider CreateProvider()
         {
-            _serviceProvider = RegisterServices();
+            var provider = Core.Services.GameServiceProvider.Initialize(RegisterProjectServices);
+            provider.GetService<IGameDataService>().LoadAll();
+            return provider;
         }
 
-        public T GetService<T>() => _serviceProvider.GetService<T>() ?? throw new NullReferenceException();
-        public T GetKeyedService<T>(string key) => _serviceProvider.GetKeyedService<T>(key) ?? throw new NullReferenceException();
-        public IEnumerable<T> GetServices<T>() => _serviceProvider.GetServices<T>();
-
-        private ServiceProvider RegisterServices()
+        private static void RegisterProjectServices(IServiceCollection services)
         {
-            var services = new ServiceCollection();
-            services.AddSingleton<IGameMessageBus, GameMessageBus>(_ =>
-            {
-                var instance = new GameMessageBus(this);
-                return instance;
-            });
-            services.AddSingleton<IGameEventBus, GameEventBus>();
-            services.AddSingleton<IItemDataProvider, ItemDataProvider>(_ =>
-            {
-                var instance = new ItemDataProvider();
-                instance.LoadData();
-                return instance;
-            });
-            services.AddSingleton<RandomNumberGenerator>(_ =>
-            {
-                var rnd = new RandomNumberGenerator();
-                rnd.Randomize();
-                return rnd;
-            });
+            services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
+            services.AddSingleton<IDataParser, DataParser>();
+            services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>();
+            services.AddConditionCatalog();
+            // LootGeneration has no crafting module: the minting seam registers here directly
+            // (mirrors CraftingSystemModuleDependencies).
+            services.AddSingleton<Core.Modifiers.IModifierMaterializer, Core.Modifiers.ModifierMaterializer>();
+            services.AddSingleton<IEquipBlueprintProvider>(provider => provider.GetRequiredService<IItemDataProvider>());
+            // Sandbox has no skill/effect registries: null accessors mint inert grants (display works).
+            services.AddSingleton<Core.Items.Grants.IGrantFactory>(sp => new Core.Items.Grants.GrantFactory(
+                sp.GetService<Core.Battle.Skills.ISkillProvider>,
+                sp.GetService<Core.Battle.Abilities.IEffectProvider>,
+                sp.GetService<Core.Events.IGameEventBus>));
+            services.AddSingleton<Core.Items.IEquipItemMinter, Core.Items.EquipItemMinter>();
+            services.AddSingleton<Core.Items.IItemMinter, Core.Items.ItemMinter>();
+            services.AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>();
+            // The ItemEffects catalog feeds the drop's bonus-grant roll (payload travels with the entry).
+            services.AddGameDataParticipant<Core.Crafting.ICraftingEffectProvider, Core.Crafting.CraftingEffectProvider>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddLootGenerationServices();
-            return services.BuildServiceProvider();
+            services.AddGameData("res://Data/", "res://Data/Shared/");
         }
     }
 }

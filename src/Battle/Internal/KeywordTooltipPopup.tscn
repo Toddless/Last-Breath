@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://cuo3kxds4641b"]
+
+[ext_resource type="Script" uid="uid://ceq25sy33euyh" path="res://Internal/KeywordTooltipPopup.cs" id="1"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 20
+
+[node name="KeywordTooltipPopup" type="Control" unique_id=1408833873 node_paths=PackedStringArray("_panel", "_title", "_description", "_closeButton")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1")
+_panel = NodePath("Panel")
+_title = NodePath("Panel/Margin/Layout/Header/Title")
+_description = NodePath("Panel/Margin/Layout/Description")
+_closeButton = NodePath("Panel/Margin/Layout/Header/CloseBtn")
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=460697744]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=432155779]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Layout" type="VBoxContainer" parent="Panel/Margin" unique_id=168058136]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="Panel/Margin/Layout" unique_id=1605932314]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Panel/Margin/Layout/Header" unique_id=266967756]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Keyword"
+label_settings = SubResource("LabelSettings_title")
+
+[node name="CloseBtn" type="Button" parent="Panel/Margin/Layout/Header" unique_id=198064625]
+layout_mode = 2
+text = "✕"
+flat = true
+
+[node name="Description" type="RichTextLabel" parent="Panel/Margin/Layout" unique_id=320070152]
+custom_minimum_size = Vector2(296, 40)
+layout_mode = 2
+bbcode_enabled = true
+text = "Description"
+fit_content = true

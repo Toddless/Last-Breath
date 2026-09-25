@@ -1,135 +1,338 @@
 ﻿namespace Battle.Source.UIElements
 {
-    using Godot;
     using System;
-    using Utilities;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Interfaces.UI;
-    using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Constants;
     using Core.Data;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Entity;
+    using Core.Entity.Components;
+    using Core.Enums;
+    using Core.Events;
+    using Core.Views.UI;
+    using Godot;
 
-    public partial class BattleHud : Control, IInitializable, IRequireServices
+    public partial class BattleHud : Control, IHud
     {
-        private const string UID = "uid://2w3t3maumkh6";
+        private const string UID = "uid://6d0sr4hy4gg2";
+        private const string ExhaustionKey = "UI_Exhaustion";
+        private static readonly Color s_queueCurrentColor = new(1f, 1f, 1f);
+        private static readonly Color s_queueWaitingColor = new(1f, 1f, 1f, 0.45f);
         private IBattleEventBus? _battleEventBus;
-        private IUiElementProvider? _uiElementProvider;
-        private Dictionary<string, CharacterBar> _characterBars = [];
-        private Dictionary<string, QueueSlot> _queueSlots = [];
-        private AbilitySlot[] _abilitySlotsInstances = new AbilitySlot[9];
-        [Export] private Button? _returnButton;
+        private IUiElementsManager? _uiElementProvider;
+        private Dictionary<string, NpcBattleBar> _characterBars = [];
+
+        // Over-head bars: HUD children projected over the fighters'
+        // MODELS every frame — they follow melee approaches and camera zoom for free.
+        private readonly Dictionary<string, Node2D> _barBodies = [];
+        private Control? _npcBarsOverlay;
+        private const float BarOverheadOffset = 96f;
+        private readonly Dictionary<string, Label> _queueLabels = [];
+        private AbilityButton[] _abilitySlotsInstances = new AbilityButton[BattleConstants.AbilitySlotsPerStance];
+        private static readonly float[] s_playbackSpeeds = [1f, 2f, 3f];
+        private IAbilityBookComponent? _abilityBook;
+        private Button? _endTurnButton, _fleeButton, _speedButton;
+        private Label? _exhaustionReadout;
+        private int _speedIndex;
+        private bool _isPlayerTurn, _isPresenting, _isSelectingTargets;
         [Export] private VBoxContainer? _buttonsContainer;
         [Export] private CharacterBar? _playerBars;
-        [Export] private HBoxContainer? _stanceButtons, _abilityButtons;
-        [Export] private GridContainer? _entityBars;
-        [Export] private HBoxContainer? _queue;
+        [Export] private HBoxContainer? _stanceButtons;
+        [Export] private BattleLog? _battleLog;
+        [Export] private VBoxContainer? _entityBars;
         [Export] private HBoxContainer? _abilitySlots;
-
-        //TODO: Remove entity bars (health, mana) from this interface???
+        [Export] private HBoxContainer? _queueContainer;
 
         public override void _Ready()
         {
-            for (int i = 0; i < 9; i++)
+            try
             {
-                var slot = AbilitySlot.Initialize().Instantiate<AbilitySlot>();
-                slot.SetNumber(i + 1);
-                _abilitySlots?.AddChild(slot);
-                _abilitySlotsInstances[i] = slot;
+                for (int i = 0; i < BattleConstants.AbilitySlotsPerStance; i++)
+                {
+                    var slot = AbilityButton.Initialize().Instantiate<AbilityButton>();
+                    slot.SetNumber(i + 1);
+                    _abilitySlots?.AddChild(slot);
+                    _abilitySlotsInstances[i] = slot;
+                    HoverTooltip.Attach(slot, () => ShowAbilityTooltip(slot));
+                }
+
+                var buttonGroup = new ButtonGroup { AllowUnpress = false };
+
+                foreach (Stance stance in Enum.GetValues<Stance>())
+                {
+                    var slot = StanceSlot.Initialize().Instantiate<StanceSlot>();
+                    slot.SetStance(stance);
+                    slot.ButtonGroup = buttonGroup;
+                    _stanceButtons?.AddChild(slot);
+                    HoverTooltip.Attach(slot, () => ShowStanceTooltip(slot.Stance));
+                }
+
+                CreateTurnButtons();
+                CreateExhaustionReadout();
             }
-
-            var buttonGroup = new ButtonGroup { AllowUnpress = false };
-
-            for (int i = 0; i < 3; i++)
+            catch (Exception ex)
             {
-                var slot = StanceSlot.Initialize().Instantiate<StanceSlot>();
-                slot.SetStance((Stance)i);
-                slot.ButtonGroup = buttonGroup;
-                _stanceButtons?.AddChild(slot);
+                GD.Print($"Failed to initialize: {ex.Message}, {ex.StackTrace}");
             }
+        }
+
+        /// <summary>Grey-UI placeholders built in code into the existing turn-buttons container
+        /// (it already shows only on the player's turn).</summary>
+        private void CreateTurnButtons()
+        {
+            _endTurnButton = new Button { Text = Core.Localization.Localization.Localize("UI_End_Turn") };
+            _endTurnButton.Pressed += () => _battleEventBus?.Publish(new PlayerEndTurnRequestedEvent());
+            _endTurnButton.FocusMode = FocusModeEnum.None;
+            _buttonsContainer?.AddChild(_endTurnButton);
+
+            _fleeButton = new Button { Text = Core.Localization.Localization.Localize("UI_Flee") };
+            _fleeButton.Pressed += () => _battleEventBus?.Publish(new PlayerFleeAttemptEvent());
+            _fleeButton.FocusMode = FocusModeEnum.None;
+            _buttonsContainer?.AddChild(_fleeButton);
+
+            _speedButton = new Button { Text = SpeedLabel(s_playbackSpeeds[_speedIndex]) };
+            _speedButton.Pressed += CyclePlaybackSpeed;
+            _speedButton.FocusMode = FocusModeEnum.None;
+            _buttonsContainer?.AddChild(_speedButton);
+        }
+
+        /// <summary>
+        /// The exhaustion line, built into the turn-buttons container directly above the ability
+        /// row — the row it makes more expensive. It states the stack count and the surcharge those
+        /// stacks put on every cast, and stays hidden while there are none.
+        /// </summary>
+        private void CreateExhaustionReadout()
+        {
+            _exhaustionReadout = new Label
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                ThemeTypeVariation = "DimLabel",
+            };
+            _buttonsContainer?.AddChild(_exhaustionReadout);
+            if (_abilitySlots?.GetParent() == _buttonsContainer)
+                _buttonsContainer?.MoveChild(_exhaustionReadout, _abilitySlots.GetIndex());
+            ShowExhaustion(0, 0f);
+        }
+
+        private void CyclePlaybackSpeed()
+        {
+            _speedIndex = (_speedIndex + 1) % s_playbackSpeeds.Length;
+            float speed = s_playbackSpeeds[_speedIndex];
+            if (_speedButton != null) _speedButton.Text = SpeedLabel(speed);
+            _battleEventBus?.Publish(new PlaybackSpeedChangedEvent(speed));
+        }
+
+        private static string SpeedLabel(float speed) => $"×{speed:0}";
+
+        /// <summary>The ability card of the cast under the cursor, on the card's own popup — assembled
+        /// from the LIVE instance the button holds, augments and all, through the same card the socket
+        /// sheet and the passive wheel print. The icon is the very texture the button draws.</summary>
+        private IPopup? ShowAbilityTooltip(AbilityButton slot)
+        {
+            if (slot.CurrentAbility is not { } ability) return null;
+            var popup = _uiElementProvider?.ShowPopup(typeof(AbilityTooltipPopup)) as AbilityTooltipPopup;
+            popup?.Show(AbilityText.Card(ability, AbilityTargetText.LineOf(ability.Targeting)), ability.Icon);
+            return popup;
+        }
+
+        private IPopup? ShowStanceTooltip(Stance stance)
+        {
+            var popup = _uiElementProvider?.ShowPopup(typeof(TextTooltipPopup)) as TextTooltipPopup;
+            popup?.Show(
+                Core.Localization.Localization.Localize($"Stance_{stance}"),
+                null,
+                Core.Localization.Localization.Localize($"Stance_{stance}_Description"));
+            return popup;
         }
 
         public override void _ExitTree()
         {
-            _battleEventBus = null;
+            if (_abilityBook != null) _abilityBook.ActiveAbilitiesChanged -= RefreshAbilitySlots;
+            _abilityBook = null;
+            DetachEventBus();
             _characterBars.Clear();
-            _queueSlots.Clear();
+            _barBodies.Clear();
+            _queueLabels.Clear();
             _playerBars?.ClearEffects();
             foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
                 stanceSlot.RemoveBattleEventBus();
-            foreach (Node child in _queue?.GetChildren() ?? [])
-                child.QueueFree();
-            foreach (var node in _entityBars?.GetChildren() ?? [])
-                node.QueueFree();
+            _entityBars?.QueueFreeChildren();
         }
 
-        public void SetupEventBus(IBattleEventBus battleEventBus)
+        public async Task SetupEventBus(IBattleEventBus battleEventBus)
         {
+            if (!IsNodeReady()) await ToSignal(this, Node.SignalName.Ready);
+            DetachEventBus(); // a hud reused for the next battle must not stay on the previous bus
             _battleEventBus = battleEventBus;
-            _battleEventBus.Subscribe<PlayerManaChangesEvent>(OnPlayerManaChanges);
+            // Bar values are replay-driven: the BattleDirector republishes these events at the
+            // moment the corresponding beat is shown, and the Vitals snapshot carries the numbers.
+            _battleEventBus.Subscribe<DamageTakenEvent>(OnDamageTakenReplayed);
+            _battleEventBus.Subscribe<EntityHealedEvent>(OnHealedReplayed);
+            _battleEventBus.Subscribe<AbilityActivatedEvent>(OnAbilityActivatedReplayed);
+            _battleEventBus.Subscribe<ExhaustionChangedEvent>(OnExhaustionChangedReplayed);
+            ShowExhaustion(0, 0f); // the readout belongs to one battle and starts it at zero
+
+            // Max values change rarely (effects/level-ups) and stay live until a restore pipeline exists.
+            // TODO:
+            // Упростить эвент до "EntityVitalsChanges"?.
             _battleEventBus.Subscribe<PlayerMaxManaChangesEvent>(OnPlayerMaxManaChanges);
-            _battleEventBus.Subscribe<PlayerHealthChangesEvent>(OnPlayerHealthChanges);
             _battleEventBus.Subscribe<PlayerMaxHealthChanges>(OnPlayerMaxHealthChanges);
-
-            _battleEventBus.Subscribe<EntityHealthChangesEvent>(OnEntityHealthChanges);
             _battleEventBus.Subscribe<EntityMaxHealthChangesEvent>(OnEntityMaxHealthChanges);
-            _battleEventBus.Subscribe<EntityManaChangesEvent>(OnEntityManaChanges);
             _battleEventBus.Subscribe<EntityMaxManaChangesEvent>(OnEntityMaxManaChanges);
+            _battleEventBus.Subscribe<EffectsChangedEvent>(OnEffectsChanged);
 
-            _battleEventBus.Subscribe<EffectAddedEvent>(OnEffectAdded);
-            _battleEventBus.Subscribe<EffectRemovedEvent>(OnEffectRemoved);
-
-            _battleEventBus.Subscribe<BattleQueueDefinedEvent>(OnQueueDefined);
             _battleEventBus.Subscribe<TurnStartEvent>(OnTurnStart);
             _battleEventBus.Subscribe<TurnEndEvent>(OnTurnEnd);
-            _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnPlayerChanceStance);
+            _battleEventBus.Subscribe<PresentationStateChangedEvent>(OnPresentationStateChanged);
+            _battleEventBus.Subscribe<BattleQueueDefinedEvent>(OnQueueDefined);
+            // Stances are locked while an ability waits for its targets: switching mid-selection
+            // would swap the ability bar under the pending cast.
+            _battleEventBus.Subscribe<PlayerSelectingTargetForAbilityEvent>(OnTargetSelectionStarted);
+            _battleEventBus.Subscribe<TargetSelectionResolvedEvent>(OnTargetSelectionResolved);
 
-            foreach (AbilitySlot slot in _abilitySlotsInstances)
+            foreach (AbilityButton slot in _abilitySlotsInstances)
                 slot.SetBattleEventBus(_battleEventBus);
             foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
                 stanceSlot.SetBattleEventBus(_battleEventBus);
+            _battleLog?.SetBattleEventBus(_battleEventBus);
         }
 
-        private void OnPlayerChanceStance(PlayerChangesStanceEvent obj)
+        /// <summary>Symmetric to <see cref="SetupEventBus"/>: a bus outliving this node (teardown
+        /// without a battle end) must not keep handlers on a removed hud.</summary>
+        private void DetachEventBus()
         {
-            var player = Player.Instance;
-            if (player == null) return;
-            var skills = player.CurrentStance?.ObtainedAbilities ?? [];
-            for (int i = 0; i < skills.Count; i++)
-                _abilitySlotsInstances[i].SetAbility(skills[i]);
+            if (_battleEventBus == null) return;
+            _battleEventBus.Unsubscribe<DamageTakenEvent>(OnDamageTakenReplayed);
+            _battleEventBus.Unsubscribe<EntityHealedEvent>(OnHealedReplayed);
+            _battleEventBus.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivatedReplayed);
+            _battleEventBus.Unsubscribe<ExhaustionChangedEvent>(OnExhaustionChangedReplayed);
+            _battleEventBus.Unsubscribe<PlayerMaxManaChangesEvent>(OnPlayerMaxManaChanges);
+            _battleEventBus.Unsubscribe<PlayerMaxHealthChanges>(OnPlayerMaxHealthChanges);
+            _battleEventBus.Unsubscribe<EntityMaxHealthChangesEvent>(OnEntityMaxHealthChanges);
+            _battleEventBus.Unsubscribe<EntityMaxManaChangesEvent>(OnEntityMaxManaChanges);
+            _battleEventBus.Unsubscribe<EffectsChangedEvent>(OnEffectsChanged);
+            _battleEventBus.Unsubscribe<TurnStartEvent>(OnTurnStart);
+            _battleEventBus.Unsubscribe<TurnEndEvent>(OnTurnEnd);
+            _battleEventBus.Unsubscribe<PresentationStateChangedEvent>(OnPresentationStateChanged);
+            _battleEventBus.Unsubscribe<BattleQueueDefinedEvent>(OnQueueDefined);
+            _battleEventBus.Unsubscribe<PlayerSelectingTargetForAbilityEvent>(OnTargetSelectionStarted);
+            _battleEventBus.Unsubscribe<TargetSelectionResolvedEvent>(OnTargetSelectionResolved);
+            _battleEventBus = null;
         }
 
-        public void CreateEntityBarsWithInitialValues(string id, float maxHealth, float maxMana, float currentHealth, float currentMana)
+        public void SetAbilityBook(IAbilityBookComponent abilityBook)
         {
-            if (_uiElementProvider == null) return;
-            var bar = _uiElementProvider.Create<CharacterBar>();
-            bar.SetInitialValues(maxMana, currentMana, maxHealth, currentHealth);
-            bar.FlipH = true;
-            _characterBars.Add(id, bar);
-            _entityBars?.AddChild(bar);
+            _abilityBook = abilityBook;
+            _abilityBook.ActiveAbilitiesChanged += RefreshAbilitySlots;
+            RefreshAbilitySlots();
         }
 
-        public void SetPlayerInitialValues(float maxHealth, float maxMana, float health, float mana)
+        /// <summary>Maps the book's slot layout of the current stance 1:1 onto the HUD buttons.</summary>
+        private void RefreshAbilitySlots()
         {
-            _playerBars?.SetInitialValues(maxMana, mana, maxHealth, health);
+            var slots = _abilityBook?.ActiveSlots;
+            for (int i = 0; i < _abilitySlotsInstances.Length; i++)
+            {
+                var ability = slots != null && i < slots.Count ? slots[i] : null;
+                if (ability != null) _abilitySlotsInstances[i].SetAbility(ability);
+                else _abilitySlotsInstances[i].ClearAbility();
+            }
+        }
+
+        /// <summary>The mini bar reads the entity once at creation (identity + initial vitals);
+        /// everything after arrives as replayed snapshots. The bar lives on the projection overlay
+        /// and is glued over the fighter's model in _Process; hover opens the detailed card.</summary>
+        public void CreateEntityBarsWithInitialValues(IFightable entity)
+        {
+            var bar = new NpcBattleBar();
+            _characterBars.Add(entity.InstanceId, bar);
+            EnsureBarsOverlay().AddChild(bar);
+            if (entity is Node2D body) _barBodies[entity.InstanceId] = body;
+
+            bar.SetInitialValues(entity.Parameters.MaxMana, entity.CurrentMana, entity.Parameters.MaxHealth, entity.CurrentHealth,
+                entity.Parameters.MaxBarrier, entity.CurrentBarrier);
+            bar.SetIdentity(entity.DisplayName, entity is INpc npc ? Core.Localization.Localization.Localize($"Fraction_{npc.Fraction}") : null);
+            bar.SetModifiers((entity as IFightableNpc)?.NpcModifiers.AllModifiers ?? []);
+            if (entity is IFightableNpc fightableNpc) bar.SetLevel(fightableNpc.Level);
+
+            HoverTooltip.Attach(bar, () => ShowInspectCard(bar));
+        }
+
+        /// <summary>
+        /// The counterpart of <see cref="CreateEntityBarsWithInitialValues"/>: the fighter's body has
+        /// left the battle for good (a dissolved summon) and both the bar and the cached body
+        /// reference go with it. Ownership, not a symptom patch: the per-frame check in
+        /// <see cref="_Process"/> is defence in depth only — a body freed under a still-cached
+        /// reference has been seen passing IsInstanceValid, and the projection then reads a dangling
+        /// native pointer. Freeing the bar also lets its hover tooltip die with it (the handle
+        /// listens to the bar's TreeExiting).
+        /// </summary>
+        public void RemoveEntityBars(string instanceId)
+        {
+            _barBodies.Remove(instanceId);
+            if (_characterBars.Remove(instanceId, out var bar) && IsInstanceValid(bar)) bar.QueueFree();
+        }
+
+        /// <summary>Full-rect transparent host under the HUD panels: bars position themselves
+        /// absolutely, so the host must be a plain Control, never a container.</summary>
+        private Control EnsureBarsOverlay()
+        {
+            if (_npcBarsOverlay != null) return _npcBarsOverlay;
+            _npcBarsOverlay = new Control { MouseFilter = MouseFilterEnum.Ignore };
+            _npcBarsOverlay.SetAnchorsPreset(LayoutPreset.FullRect);
+            AddChild(_npcBarsOverlay);
+            MoveChild(_npcBarsOverlay, 0); // behind the HUD panels, above the arena view
+            return _npcBarsOverlay;
+        }
+
+        /// <summary>Defence in depth, not the lifetime owner: a body that leaves the battle for good
+        /// is dropped from both dictionaries at that moment (<see cref="RemoveEntityBars"/>), so this
+        /// loop never projects onto a freed node. The guard stays for the in-between frames — a body
+        /// briefly out of the tree while it reparents (spot → arena on death, arena → world at the end).</summary>
+        public override void _Process(double delta)
+        {
+            foreach ((string id, var bar) in _characterBars)
+            {
+                if (!_barBodies.TryGetValue(id, out var body) || !IsInstanceValid(body) || !body.IsInsideTree())
+                {
+                    bar.Visible = false;
+                    continue;
+                }
+
+                // Canvas transform already carries the arena camera (position + zoom).
+                var screen = body.GetGlobalTransformWithCanvas().Origin;
+                bar.Visible = true;
+                bar.Position = screen - new Vector2(bar.Size.X / 2f, BarOverheadOffset);
+            }
+        }
+
+        private IPopup? ShowInspectCard(NpcBattleBar bar)
+        {
+            if (_uiElementProvider?.ShowPopup(typeof(NpcInspectPopup)) is not NpcInspectPopup popup) return null;
+            popup.ShowFor(bar);
+            return popup;
+        }
+
+        public void SetPlayerStance(Stance stance) => _stanceButtons?.GetChildren().Cast<StanceSlot>().FirstOrDefault(slot => slot.Stance == stance)?.InitializeStance();
+
+        public void SetPlayerInitialValues(IFightable player)
+        {
+            _playerBars?.SetInitialValues(player.Parameters.MaxMana, player.CurrentMana, player.Parameters.MaxHealth, player.CurrentHealth,
+                player.Parameters.MaxBarrier, player.CurrentBarrier);
+            _playerBars?.SetIdentity(player.DisplayName, null);
         }
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            try
-            {
-                _uiElementProvider = provider.GetService<IUiElementProvider>();
-            }
-            catch (Exception ex)
-            {
-                Tracker.TrackError("Failed to inject services.", ex);
-            }
+            _uiElementProvider = provider.GetService<IUiElementsManager>();
         }
+
+        public void Remove() => GetParent().RemoveChild(this);
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private CharacterBar? GetCharacterBar(string id) => _characterBars.GetValueOrDefault(id);
+        private NpcBattleBar? GetCharacterBar(string id) => _characterBars.GetValueOrDefault(id);
 
         private void OnPlayerMaxManaChanges(PlayerMaxManaChangesEvent obj)
         {
@@ -141,24 +344,53 @@
             _playerBars?.UpdateMaxHealth(obj.Value);
         }
 
-        private void OnPlayerHealthChanges(PlayerHealthChangesEvent obj)
+        private void OnDamageTakenReplayed(DamageTakenEvent evnt) => UpdateVitals(evnt.Target, evnt.Vitals);
+
+        private void OnHealedReplayed(EntityHealedEvent evnt) => UpdateVitals(evnt.Healed, evnt.Vitals);
+
+        private void OnAbilityActivatedReplayed(AbilityActivatedEvent evnt) => UpdateVitals(evnt.Caster, evnt.Vitals);
+
+        /// <summary>Only the player's own count is on screen: the readout sits in his action column.</summary>
+        private void OnExhaustionChangedReplayed(ExhaustionChangedEvent evnt)
         {
-            _playerBars?.UpdateHealth(obj.Value);
+            if (evnt.Fighter is IPlayer) ShowExhaustion(evnt.Stacks, evnt.Surcharge);
         }
 
-        private void OnPlayerManaChanges(PlayerManaChangesEvent obj)
+        /// <summary>Both numbers come from the replayed snapshot: how many stacks are on the player
+        /// and what fraction they add to every ability cost. No stacks — no line.</summary>
+        private void ShowExhaustion(int stacks, float surcharge)
         {
-            _playerBars?.UpdateMana(obj.Value);
+            if (_exhaustionReadout == null) return;
+            _exhaustionReadout.Visible = stacks > 0;
+            if (stacks == 0) return;
+
+            _exhaustionReadout.Text = Core.Localization.Localization.Render(ExhaustionKey,
+                new Dictionary<string, object?> { ["Stacks"] = stacks, ["Surcharge"] = surcharge });
         }
 
-        private void OnEntityManaChanges(EntityManaChangesEvent obj)
+        /// <summary>Bars always show the snapshot, never live state — live state is "from the future" during replay.</summary>
+        private void UpdateVitals(IFightable entity, VitalsSnapshot vitals)
         {
-            GetCharacterBar(obj.Entity.InstanceId)?.UpdateMana(obj.Value);
-        }
+            if (entity is IPlayer)
+            {
+                _playerBars?.UpdateHealth(vitals.Health);
+                _playerBars?.UpdateMaxHealth(vitals.MaxHealth);
+                _playerBars?.UpdateMana(vitals.Mana);
+                _playerBars?.UpdateMaxMana(vitals.MaxMana);
+                _playerBars?.UpdateBarrier(vitals.Barrier, vitals.MaxBarrier);
+                if (vitals.IsDead) _playerBars?.SetDead();
+                return;
+            }
 
-        private void OnEntityHealthChanges(EntityHealthChangesEvent obj)
-        {
-            GetCharacterBar(obj.Entity.InstanceId)?.UpdateHealth(obj.Value);
+            var bar = GetCharacterBar(entity.InstanceId);
+            if (bar == null) return;
+
+            bar.UpdateHealth(vitals.Health);
+            bar.UpdateMaxHealth(vitals.MaxHealth);
+            bar.UpdateMana(vitals.Mana);
+            bar.UpdateMaxMana(vitals.MaxMana);
+            bar.UpdateBarrier(vitals.Barrier, vitals.MaxBarrier);
+            if (vitals.IsDead) bar.SetDead();
         }
 
         private void OnEntityMaxManaChanges(EntityMaxManaChangesEvent obj)
@@ -171,52 +403,82 @@
             GetCharacterBar(obj.Entity.InstanceId)?.UpdateMaxHealth(obj.Value);
         }
 
-        private void OnEffectRemoved(EffectRemovedEvent obj)
+        private void OnEffectsChanged(EffectsChangedEvent obj)
         {
-            var target = obj.Target;
-            var effect = obj.Effect;
-
-            if (target is Player) _playerBars?.RemoveEffect(effect);
-            else GetCharacterBar(target.InstanceId)?.RemoveEffect(effect);
+            if (obj.Target is IPlayer) _playerBars?.SetEffects(obj.Effects);
+            else GetCharacterBar(obj.Target.InstanceId)?.SetEffects(obj.Effects);
         }
 
-        private void OnEffectAdded(EffectAddedEvent obj)
+        /// <summary>Round order as grey labels: the acting fighter is lit, the rest are dimmed.</summary>
+        private void OnQueueDefined(BattleQueueDefinedEvent obj)
         {
-            var target = obj.Target;
-            var effect = obj.Effect;
+            if (_queueContainer == null) return;
+            _queueLabels.Clear();
+            _queueContainer.QueueFreeChildren();
 
-            if (target is Player) _playerBars?.AddEffect(effect);
-            else GetCharacterBar(target.InstanceId)?.AddEffect(effect);
+            foreach (var fighter in obj.Entities)
+            {
+                var label = new Label { Text = fighter.DisplayName, Modulate = s_queueWaitingColor };
+                _queueContainer.AddChild(label);
+                _queueLabels[fighter.InstanceId] = label;
+            }
         }
 
-        private void OnTurnEnd(TurnEndEvent obj)
+        private void HighlightQueue(IFightable current)
         {
-            var entity = obj.CompletedTurn;
-            _queueSlots.TryGetValue(entity.InstanceId, out QueueSlot? slot);
-            if (slot != null) _queue?.CallDeferred(Node.MethodName.RemoveChild, slot);
+            foreach (var (id, label) in _queueLabels)
+                label.Modulate = current.IsSame(id) ? s_queueCurrentColor : s_queueWaitingColor;
         }
 
         private void OnTurnStart(TurnStartEvent obj)
         {
-            if (obj.StartedTurn is Player) _buttonsContainer?.Show();
+            _isPlayerTurn = obj.StartedTurn is IPlayer;
+            if (_isPlayerTurn) _buttonsContainer?.Show();
             else _buttonsContainer?.Hide();
+
+            HighlightQueue(obj.StartedTurn);
+            ApplyInputWindow();
         }
 
-        private void OnQueueDefined(BattleQueueDefinedEvent obj)
+        private void OnTurnEnd(TurnEndEvent obj)
         {
-            if (_uiElementProvider == null) return;
-            var queue = obj.Entities;
-            foreach (var entity in queue)
-            {
-                if (!_queueSlots.TryGetValue(entity.InstanceId, out QueueSlot? slot))
-                {
-                    slot = _uiElementProvider.Create<QueueSlot>();
-                    if (entity.Icon != null) slot.SetIcon(entity.Icon);
-                    _queueSlots.Add(entity.InstanceId, slot);
-                }
+            _isPlayerTurn = false;
+            ApplyInputWindow();
+        }
 
-                _queue?.CallDeferred(Node.MethodName.AddChild, slot);
-            }
+        private void OnPresentationStateChanged(PresentationStateChangedEvent evnt)
+        {
+            _isPresenting = evnt.IsPlaying;
+            ApplyInputWindow();
+        }
+
+        /// <summary>
+        /// The player input window: clicks and hotkeys work only during the player's turn
+        /// while nothing is being animated. Slots stay visible (tooltips keep working),
+        /// only activation input is blocked. A stunned player never gets an open window:
+        /// his TurnStart and TurnEnd resolve within one synchronous logic run.
+        /// </summary>
+        private void OnTargetSelectionStarted(PlayerSelectingTargetForAbilityEvent evnt)
+        {
+            _isSelectingTargets = true;
+            ApplyInputWindow();
+        }
+
+        private void OnTargetSelectionResolved(TargetSelectionResolvedEvent evnt)
+        {
+            _isSelectingTargets = false;
+            ApplyInputWindow();
+        }
+
+        private void ApplyInputWindow()
+        {
+            bool open = _isPlayerTurn && !_isPresenting;
+            foreach (AbilityButton slot in _abilitySlotsInstances)
+                slot.SetInputEnabled(open);
+            foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
+                stanceSlot.Disabled = !open || _isSelectingTargets; // no stance swap mid-selection
+            _endTurnButton?.Disabled = !open;
+            _fleeButton?.Disabled = !open;
         }
     }
 }

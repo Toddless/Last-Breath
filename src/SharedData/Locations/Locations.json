@@ -1,0 +1,38 @@
+{
+  "start": {
+    "locationId": "MainWorld",
+    "endpointId": "Start"
+  },
+  "locations": [
+    {
+      "id": "MainWorld",
+      "scene": "res://MainWorld.tscn"
+    },
+    {
+      "id": "SourceOfPowerNearVillage",
+      "scene": "res://World/Locations/SourceOfPowerNearVillage.tscn"
+    }
+  ],
+  "connections": [
+    {
+      "from": {
+        "locationId": "MainWorld",
+        "endpointId": "VillageSource"
+      },
+      "to": {
+        "locationId": "SourceOfPowerNearVillage",
+        "endpointId": "Entrance"
+      }
+    },
+    {
+      "from": {
+        "locationId": "SourceOfPowerNearVillage",
+        "endpointId": "Entrance"
+      },
+      "to": {
+        "locationId": "MainWorld",
+        "endpointId": "VillageSource"
+      }
+    }
+  ]
+}

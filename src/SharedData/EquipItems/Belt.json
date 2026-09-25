@@ -1,0 +1,334 @@
+{
+    "items": [
+        {
+            "id": "Belt_Leather",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Strength",
+                    "value": {
+                        "min": 5,
+                        "max": 15
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 50
+        },
+        {
+            "id": "Belt_Scout_Sash",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Dexterity",
+                    "value": {
+                        "min": 5,
+                        "max": 15
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 50
+        },
+        {
+            "id": "Belt_Cloth",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Intelligence",
+                    "value": {
+                        "min": 5,
+                        "max": 15
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 50
+        },
+        {
+            "id": "Belt_of_Hunter",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Evade",
+                    "value": {
+                        "min": 100,
+                        "max": 250
+                    }
+                },
+                {
+                    "parameter": "Armor",
+                    "value": {
+                        "min": 100,
+                        "max": 250
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 50
+        },
+        {
+            "id": "Belt_of_Knight",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Armor",
+                    "value": {
+                        "min": 200,
+                        "max": 370
+                    }
+                },
+                {
+                    "parameter": "BlockChance",
+                    "value": {
+                        "min": 0.01,
+                        "max": 0.05
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 50
+        },
+        {
+            "id": "Belt_of_Inquisitor",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Barrier",
+                    "value": {
+                        "min": 120,
+                        "max": 200
+                    }
+                },
+                {
+                    "parameter": "Mana",
+                    "value": {
+                        "min": 75,
+                        "max": 155
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 50
+        },
+        {
+            "id": "Belt_Of_Life",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "baseStats": [
+                {
+                    "parameter": "Health",
+                    "value": {
+                        "min": 150,
+                        "max": 270
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [],
+            "basePrice": 50
+        },
+        {
+            "id": "Belt_Life_Flow",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Unique",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 200,
+                        "max": 350
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [
+                {
+                    "id": "Passive_Skill_Regeneration",
+                    "kind": "Passive",
+                    "properties": {
+                        "percent": 0.05
+                    }
+                }
+            ],
+            "basePrice": 50
+        },
+        {
+            "id": "Belt_Mana_Flow",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Unique",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 170,
+                        "max": 250
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [
+                {
+                    "id": "Passive_Skill_Mana_Regeneration",
+                    "kind": "Passive",
+                    "properties": {
+                        "percent": 0.05
+                    }
+                }
+            ],
+            "basePrice": 50
+        },
+        {
+            "id": "Belt_Ether_Flow",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Unique",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 25,
+                        "max": 55
+                    }
+                }
+            ],
+            "modifiers": [],
+            "grants": [
+                {
+                    "id": "Passive_Skill_Mana_To_Barrier",
+                    "kind": "Passive",
+                    "properties": {
+                        "percent": 0.15
+                    }
+                }
+            ],
+            "basePrice": 50
+        },
+        {
+            "id": "Belt_Creators_Core",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Mythic",
+            "tags": [],
+            "updateLevel": {
+                "min": 0,
+                "max": 0
+            },
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 555,
+                        "max": 777
+                    }
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 333,
+                        "max": 444
+                    }
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "AllResistance",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.22,
+                        "max": 0.33
+                    }
+                }
+            ],
+            "grants": [],
+            "basePrice": 50
+        }
+    ]
+}

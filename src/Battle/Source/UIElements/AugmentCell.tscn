@@ -1,0 +1,136 @@
+[gd_scene format=3 uid="uid://bt5rv8kd1ye3q"]
+
+[ext_resource type="Script" uid="uid://bpfdq820pvg6v" path="res://Addons/Battle/UIElements/AugmentCell.cs" id="1_cell"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_highlight"]
+bg_color = Color(1, 1, 1, 0.11)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="Gradient" id="Gradient_mark"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_mark"]
+gradient = SubResource("Gradient_mark")
+
+[node name="AugmentCell" type="PanelContainer" node_paths=PackedStringArray("_empty", "_icon", "_tier", "_sealedMark", "_dormantMark", "_highlight")]
+custom_minimum_size = Vector2(56, 56)
+offset_right = 56.0
+offset_bottom = 56.0
+mouse_filter = 0
+theme_type_variation = &"ItemSlotPanel"
+script = ExtResource("1_cell")
+_empty = NodePath("Content/Empty")
+_icon = NodePath("Content/Icon")
+_tier = NodePath("Content/Tier")
+_sealedMark = NodePath("Content/SealedMark")
+_dormantMark = NodePath("Content/DormantMark")
+_highlight = NodePath("Content/Highlight")
+
+[node name="Content" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Empty" type="Control" parent="Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Plus" type="Label" parent="Content/Empty"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"DimLabel"
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SealedMark" type="TextureRect" parent="Content"]
+modulate = Color(0.85, 0.65, 0.25, 0.9)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -4.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+texture = SubResource("GradientTexture1D_mark")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="DormantMark" type="TextureRect" parent="Content"]
+visible = false
+modulate = Color(0.38, 0.48, 0.64, 0.9)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -10.0
+offset_bottom = 10.0
+grow_horizontal = 0
+mouse_filter = 2
+texture = SubResource("GradientTexture1D_mark")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Tier" type="Label" parent="Content"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -24.0
+offset_top = -22.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme_type_variation = &"DimLabel"
+text = "1"
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Highlight" type="Control" parent="Content"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Frame" type="Panel" parent="Content/Highlight"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_highlight")

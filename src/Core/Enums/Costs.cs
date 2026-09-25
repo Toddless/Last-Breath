@@ -3,7 +3,7 @@
     using System;
 
     [Flags]
-    public enum Costs
+    public enum Costs : byte
     {
         Mana = 1 << 0,
         Health = 1 << 1,

@@ -1,0 +1,2 @@
+# Build output of export.ps1: binary, pck, managed assemblies and the link to SharedData.
+Export/

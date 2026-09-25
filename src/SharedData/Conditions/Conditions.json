@@ -1,0 +1,249 @@
+{
+    "conditions": [
+        {
+            "id": "Health_Below_30",
+            "type": "ResourceThreshold",
+            "resource": "Health",
+            "value": 0.3
+        },
+        {
+            "id": "Health_Below_50",
+            "type": "ResourceThreshold",
+            "resource": "Health",
+            "value": 0.5,
+            "negate": false
+        },
+        {
+            "id": "Health_Above_70",
+            "type": "ResourceThreshold",
+            "resource": "Health",
+            "value": 0.7,
+            "negate": true
+        },
+        {
+            "id": "Mana_Below_30",
+            "type": "ResourceThreshold",
+            "resource": "Mana",
+            "value": 0.3
+        },
+        {
+            "id": "Barrier_Below_50",
+            "type": "ResourceThreshold",
+            "resource": "Barrier",
+            "value": 0.5
+        },
+        {
+            "id": "Health_Full",
+            "type": "ResourceState",
+            "resource": "Health",
+            "state": "Full"
+        },
+        {
+            "id": "Health_Wounded",
+            "type": "ResourceState",
+            "resource": "Health",
+            "state": "Full",
+            "negate": true
+        },
+        {
+            "id": "Mana_Empty",
+            "type": "ResourceState",
+            "resource": "Mana",
+            "state": "Empty"
+        },
+        {
+            "id": "Barrier_Holds",
+            "type": "ResourceState",
+            "resource": "Barrier",
+            "state": "Empty",
+            "negate": true
+        },
+        {
+            "id": "Barrier_Broken",
+            "type": "ResourceState",
+            "resource": "Barrier",
+            "state": "Empty"
+        },
+        {
+            "id": "Under_Control",
+            "type": "Status",
+            "statuses": [
+                "Control"
+            ]
+        },
+        {
+            "id": "Stunned_Or_Frozen",
+            "type": "Status",
+            "statuses": [
+                "Stun",
+                "Freeze"
+            ]
+        },
+        {
+            "id": "Damaged_Over_Turns",
+            "type": "Status",
+            "statuses": [
+                "DamageOverTime"
+            ]
+        },
+        {
+            "id": "Clean_Of_Debuffs",
+            "type": "Status",
+            "statuses": [
+                "Debuff"
+            ],
+            "negate": true
+        },
+        {
+            "id": "Shielded",
+            "type": "Effect",
+            "scope": "Shield"
+        },
+        {
+            "id": "Two_Debuffs_Carried",
+            "type": "Effect",
+            "scope": "Debuff",
+            "count": 2
+        },
+        {
+            "id": "Buffed",
+            "type": "Effect",
+            "scope": "Buff"
+        },
+        {
+            "id": "No_Effects_Carried",
+            "type": "Effect",
+            "scope": "Any",
+            "negate": true
+        },
+        {
+            "id": "Frostbite_Three_Stacks",
+            "type": "Effect",
+            "scope": "Stacks",
+            "effectId": "Effect_Frostbite",
+            "count": 3
+        },
+        {
+            "id": "Stance_Dexterity",
+            "type": "Stance",
+            "stance": "Dexterity"
+        },
+        {
+            "id": "Stance_Strength",
+            "type": "Stance",
+            "stance": "Strength"
+        },
+        {
+            "id": "Stance_Intelligence",
+            "type": "Stance",
+            "stance": "Intelligence"
+        },
+        {
+            "id": "Target_Health_Below_30",
+            "type": "TargetResourceThreshold",
+            "resource": "Health",
+            "value": 0.3
+        },
+        {
+            "id": "Target_Health_Below_50",
+            "type": "TargetResourceThreshold",
+            "resource": "Health",
+            "value": 0.5
+        },
+        {
+            "id": "Target_Wounded",
+            "type": "TargetResourceThreshold",
+            "resource": "Health",
+            "value": 1.0
+        },
+        {
+            "id": "Target_Barrier_Below_50",
+            "type": "TargetResourceThreshold",
+            "resource": "Barrier",
+            "value": 0.5
+        },
+        {
+            "id": "Target_Under_Control",
+            "type": "TargetStatus",
+            "statuses": [
+                "Control"
+            ]
+        },
+        {
+            "id": "Target_Bleeding",
+            "type": "TargetStatus",
+            "statuses": [
+                "Bleed"
+            ]
+        },
+        {
+            "id": "Target_Poisoned",
+            "type": "TargetStatus",
+            "statuses": [
+                "Poison"
+            ]
+        },
+        {
+            "id": "Target_Burning",
+            "type": "TargetStatus",
+            "statuses": [
+                "Burning"
+            ]
+        },
+        {
+            "id": "Target_Damaged_Over_Turns",
+            "type": "TargetStatus",
+            "statuses": [
+                "DamageOverTime"
+            ]
+        },
+        {
+            "id": "Target_Clean_Of_Debuffs",
+            "type": "TargetStatus",
+            "statuses": [
+                "Debuff"
+            ],
+            "negate": true
+        },
+        {
+            "id": "Turn_First_Attack",
+            "type": "TurnAction",
+            "action": "Attack",
+            "negate": true
+        },
+        {
+            "id": "Turn_First_Ability",
+            "type": "TurnAction",
+            "action": "Ability",
+            "negate": true
+        },
+        {
+            "id": "Turn_Undamaged",
+            "type": "TurnAction",
+            "action": "DamageTaken",
+            "negate": true
+        },
+        {
+            "id": "Turn_Unattacked",
+            "type": "TurnAction",
+            "action": "AttackReceived",
+            "negate": true
+        },
+        {
+            "id": "Turn_Second_Attack_Onwards",
+            "type": "TurnAction",
+            "action": "Attack"
+        },
+        {
+            "id": "Battle_Before_Turn_4",
+            "type": "BattleTurn",
+            "turn": 4
+        },
+        {
+            "id": "Battle_From_Turn_5",
+            "type": "BattleTurn",
+            "turn": 5,
+            "negate": true
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://ddgpqikbjmb7a"]
+
+[ext_resource type="Script" uid="uid://sgs1p6v3d640" path="res://Npc/NpcAttackActionSource.cs" id="attack"]
+[ext_resource type="Script" uid="uid://bqc3et70qq3ua" path="res://Npc/DialogueActor.cs" id="talk"]
+[ext_resource type="Script" uid="uid://qhiumt5elkpx" path="res://Npc/NpcInteractionTarget.cs" id="target"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
+radius = 242.0
+
+[node name="InteractionTarget" type="Area2D" unique_id=1918141922 node_paths=PackedStringArray("InteractionPoints", "HintAnchor", "DiscoveryShape")]
+collision_layer = 32768
+collision_mask = 0
+input_pickable = false
+monitoring = false
+script = ExtResource("target")
+InteractionPoints = [NodePath("InteractionPoint")]
+HintAnchor = NodePath("HintAnchor")
+DiscoveryShape = NodePath("CollisionShape2D")
+
+[node name="InteractionPoint" type="Marker2D" parent="." unique_id=358546018]
+position = Vector2(0, 92)
+
+[node name="HintAnchor" type="Marker2D" parent="." unique_id=1553874808]
+position = Vector2(0, -70)
+
+[node name="DialogueActor" type="Node" parent="." unique_id=1651524601]
+script = ExtResource("talk")
+
+[node name="Attack" type="Node" parent="." unique_id=931412987]
+script = ExtResource("attack")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=458267555]
+shape = SubResource("CircleShape2D_fx85w")

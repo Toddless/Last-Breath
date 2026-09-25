@@ -1,151 +1,299 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Godot;
     using System;
-    using Module;
-    using Utilities;
-    using Decorators;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Components;
     using System.Collections.Generic;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Components.Module;
-    using Core.Interfaces.Components.Decorator;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Data;
+    using Core.Data.AbilityData;
+    using Core.Entity;
+    using Core.Entity.Components;
+    using Core.Enums;
+    using Core.Events;
+    using Core.Localization;
+    using Godot;
+    using Targeting;
 
-    public abstract class Ability(
-        string id,
-        string[] tags,
-        int cooldown,
-        int costValue,
-        float maxTargets,
-        List<IEffect> effects,
-        List<IEffect> casterEffects,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        IStanceMastery? mastery = null,
-        Costs costType = Costs.Mana,
-        AbilityType abilityType = AbilityType.Target) : IAbility
+    public abstract class Ability(AbilityBaseData data) : IAbility
     {
-        protected IEntity? Owner;
-        protected readonly IStanceMastery? Mastery = mastery;
+        // Rolls for cast mutators that fire by chance (item lines like "X% chance the cast is free").
+        // One shared, time-seeded generator instead of a fresh one per activation, built lazily on the
+        // first real cast — a preview never materializes it.
+        private static IRandomNumberGenerator? s_castRnd;
+        private readonly Dictionary<string, IAugment> _installedUpgrades = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, IActivationRider> _activationRiders = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, IImpactRider> _impactRiders = new(StringComparer.Ordinal);
+        private static IRandomNumberGenerator CastRnd => s_castRnd ??= CastRandomSource();
 
-        protected IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> ModuleManager
+        protected IFightable? Owner;
+
+        /// <summary>The data record the ability was built from — the single source of base values;
+        /// <see cref="Copy"/> rebuilds fresh instances from it.</summary>
+        protected AbilityBaseData Data { get; } = data;
+
+        /// <summary>
+        /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
+        /// Damage-dealing descendants stamp it onto their DamageContexts so the BattleDirector
+        /// can play the whole cast as one chord.
+        /// </summary>
+        protected string CastId { get; private set; } = string.Empty;
+
+        /// <summary>The single parameter store: base values registered by the ability, decorated by upgrades.</summary>
+        protected AbilityParameterSet Params
         {
             get
             {
                 if (field != null) return field;
-
-                field = CreateModuleManager();
-                field.ModuleChanges += OnModuleChanges;
+                field = new AbilityParameterSet();
+                RegisterBaseParameters(field);
+                field.ParameterChanged += OnParameterChangedInternal;
                 return field;
             }
         }
 
-        protected float this[AbilityParameter parameter] => ModuleManager.GetModule(parameter).GetValue();
+        /// <summary>
+        /// Named values for the description template: placeholder = parameter key ({Cooldown},
+        /// {Damage}, {StunDuration}...). Every registered parameter is exposed, decorated values —
+        /// upgrades change the text automatically; percent-fractions are rescaled by the template.
+        /// </summary>
+        protected virtual Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = new Dictionary<string, object?>();
+                foreach (string key in Params.Keys)
+                    values[key] = Params[key];
+                values.Remove(AbilityParameter.CostType); // enum stored as float — meaningless as a number
+                return values;
+            }
+        }
 
-        public string Id { get; } = id;
+        /// <summary>
+        /// Builds the generator every cast rolls on. The seat starts on <see cref="DefaultCastRandom"/>,
+        /// which touches nothing native: the engine generator is a native object, and constructing one
+        /// where Godot is not running kills the whole process (0xC0000005) past the reach of any catch.
+        /// Which implementation the running game rolls on is a composition decision — the bootstrap puts
+        /// <see cref="EngineCastRandom"/> here, so a cast rolls on the engine RNG like the rest of combat.
+        /// A new source also drops the stream currently in use, so the swap holds however much has
+        /// already been cast.
+        /// </summary>
+        public static Func<IRandomNumberGenerator> CastRandomSource
+        {
+            get;
+            set
+            {
+                field = value;
+                s_castRnd = null;
+            }
+        } = DefaultCastRandom;
+
+        public float this[string parameter] => Params[parameter];
+
+        public float Effectiveness => Params.ValueOr(AbilityParameter.Effectiveness, 1f);
+
+        public float ValueOr(string parameter, float fallback) => Params.ValueOr(parameter, fallback);
+
+        public bool Declares(string parameter) => Params.Declares(parameter);
+
+        public IReadOnlyCollection<string> AppliedDurations => Params.AppliedDurations;
+
+        public IReadOnlyCollection<string> WeaponScales => Params.WeaponScales;
+
+        public IReadOnlyCollection<string> SpellScales => Params.SpellScales;
+
+        public IReadOnlyCollection<string> Family(string parameter) => Params.Family(parameter);
+
+        /// <summary>Who this cast is, for everything it leaves behind on somebody. The instance id is
+        /// the half that makes it MINE rather than merely this ability's: two fighters carrying the same
+        /// ability carry two instances of it.</summary>
+        public AbilityTrace Trace => new(Id, CastId, InstanceId);
+
+        public Costs CostType => (Costs)this[AbilityParameter.CostType];
+        public Stance Stance { get; set; } = data.Stance;
+        public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
+        public IReadOnlyDictionary<string, IActivationRider> ActivationRiders => _activationRiders;
+        public IReadOnlyDictionary<string, IImpactRider> ImpactRiders => _impactRiders;
+        public IReadOnlyDictionary<string, IAugment> InstalledUpgrades => _installedUpgrades;
+
+        public ITargetingStrategy Targeting { get; set; } = TargetingStrategyFactory.From(data);
+        public int CostValue => (int)this[AbilityParameter.CostValue];
+        public string Id { get; } = data.Id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
+        public string[] Tags { get; } = data.Tags;
+        public float Cooldown => this[AbilityParameter.Cooldown];
+        public string Description => FormatDescription();
+        public string DisplayName => Localization.Localize(Id);
+        public int CooldownLeft
+        {
+            get;
+            set
+            {
+                if (field == value) return;
+                field = value;
+                CooldownLeftChanges?.Invoke(this, CooldownLeft);
+            }
+        }
 
-        public string[] Tags { get; } = tags;
-        public float SpendAbilityPoints { get; set; }
 
         public Texture2D? Icon
         {
             get
             {
                 if (field != null) return field;
-                field = ResourceLoader.Load<Texture2D>($"res://Source/Abilities/{Id}.png");
+                // Change path to the actual assets
+                field = ResourceLoader.Load<Texture2D>($"res://Data/Shared/Assets/Icons/{Id}.png");
                 return field;
             }
         }
 
-        public int CooldownLeft { get; private set; }
 
-        public int CostValue => (int)this[AbilityParameter.CostValue];
-
-        public Costs CostType => (Costs)this[AbilityParameter.CostType];
-        public AbilityType AbilityType { get; } = abilityType;
-
-        public List<IConditionalModifier> ConditionalModifiers { get; } = [];
-        public List<IEffect> Effects { get; set; } = effects;
-        public List<IEffect> CasterEffects { get; } = casterEffects;
-        public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; } = upgrades;
-
-        public float MaxTargets => this[AbilityParameter.Target];
-        public float Cooldown => this[AbilityParameter.Cooldown];
-        public string Description => FormatDescription();
-        public string DisplayName => Localization.Localize(Id);
-
-        public event Action<AbilityParameter>? OnParameterChanged;
+        public event Action<string>? OnParameterChanged;
         public event Action<IAbility, int>? CooldownLeftChanges;
         public event Action<IAbility, bool>? AbilityResourceChanges;
 
-        public virtual async Task Activate(List<IEntity> targets)
+        /// <summary>
+        /// The arrangement is taken down and put up whole rather than compared entry by entry: the
+        /// values an upgrade lays on are decorators, so removing and re-applying the same set leaves the
+        /// same numbers standing, and the alternative would be telling one seated copy from another by
+        /// its id — which is precisely what two copies of one record have in common.
+        /// Cheap enough for that: nothing in a fight rebinds, the passes come from a taken node, a
+        /// seated augment, a load or a new playthrough.
+        /// </summary>
+        public void InstallUpgrades(IReadOnlyDictionary<string, IAugment> bySocket)
+        {
+            foreach (IAugment worn in _installedUpgrades.Values) worn.Remove(this);
+            _installedUpgrades.Clear();
+
+            foreach ((string socketId, IAugment upgrade) in bySocket)
+            {
+                upgrade.Apply(this);
+                _installedUpgrades[socketId] = upgrade;
+            }
+        }
+
+        public virtual async Task Execute(List<IFightable> targets, IBattleField field)
         {
             if (Owner == null) return;
-
-            var context = new EffectApplyingContext { Caster = Owner, Source = Id };
-            foreach (IEntity target in targets)
+            CastId = Guid.NewGuid().ToString();
+            // Single gate for every activation path (UI, hotkey, future AI). Events cannot veto, so the check lives here.
+            if (IsOwnerParalyzed)
             {
-                context.Target = target;
-                ApplyTargetEffects(context);
+                Owner.CombatEvents.Publish<AbilityActivationRejectedEvent>(new(this));
+                return;
             }
 
-            ApplyCasterEffects(context);
-            StartCooldown();
-            ConsumeResource();
-            await Owner.Animations.PlayAnimationAsync(Id);
-        }
+            var context = BuildActivationContext(targets, field);
+            ApplyActivationMutators(context);
 
-        public void AddParameterUpgrade<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
-            where T : struct, Enum
-        {
-            if (decorator is not AbilityParameterDecorator moduleDecorator) return;
-            ModuleManager.AddDecorator(moduleDecorator);
-        }
+            StartCooldown(context.Cooldown);
+            ConsumeResource(context);
 
-        public void RemoveParameterUpgrade<T>(string id, T key)
-            where T : struct, Enum
-        {
-            if (key is not AbilityParameter abilityParameter) return;
-            ModuleManager.RemoveDecorator(id, abilityParameter);
-        }
-
-        public void AddCondition(IConditionalModifier modifier) => ConditionalModifiers.Add(modifier);
-        public void RemoveCondition(string id) => ConditionalModifiers.RemoveAll(c => c.Id == id);
-        public void ClearConditions() => ConditionalModifiers.Clear();
-
-        public void AddEffect(IEffect effect, bool targetEffect = true)
-        {
-            if (targetEffect) Effects.Add(effect);
-            else CasterEffects.Add(effect);
-        }
-
-        public void RemoveEffect(string id, bool targetEffect = true)
-        {
-            if (targetEffect)
+            try
             {
-                var exist = Effects.FirstOrDefault(c => c.Id == id);
-                if (exist != null) RemoveFromList(Effects, exist);
+                // The announcement that OPENS the cast window is guarded too: it is delivered to one
+                // subscriber after another, and a charge that armed itself on it has already attached a
+                // modifier to the caster by the time a later subscriber throws.
+                Owner.CombatEvents.Publish<AbilityActivatedEvent>(new(this, Owner, VitalsSnapshot.From(Owner), CastId));
+                await ExecuteInternal(targets, Owner, field);
+                foreach (var rider in ActivationRiders.Values.ToList())
+                    await rider.Apply(context);
             }
-            else
+            finally
             {
-                var exist = CasterEffects.FirstOrDefault(c => c.Id == id);
-                if (exist != null) RemoveFromList(CasterEffects, exist);
+                // Single end-of-cast channel: charges, chord playback and the tally of actions the owner
+                // spent this turn all close on this event, so the cast is announced finished however it
+                // ends — including a throw inside the opening announcement itself. A cast that ends
+                // without it leaves the charge attached to the caster for good, the turn short of the
+                // action it spent, and every line written for the first action of a turn on for the rest.
+                Owner.CombatEvents.Publish<AbilityExecutedEvent>(new(this, Owner, CastId));
             }
         }
 
-        public virtual void SetOwner(IEntity owner)
+        /// <summary>The generator the running game rolls its casts on: the engine RNG, time-seeded.
+        /// The return type names the implementation on purpose — the production choice stays readable
+        /// (and assertable) without constructing the native object.</summary>
+        public static GodotRandomNumberGenerator EngineCastRandom()
+        {
+            var rnd = new RandomNumberGenerator();
+            rnd.Randomize();
+            return new GodotRandomNumberGenerator(rnd);
+        }
+
+        /// <summary>The generator a cast rolls on until a composition says otherwise: pure C#, time-seeded
+        /// and free of the engine, so a host that never boots Godot survives a cast instead of dying on
+        /// the first one.</summary>
+        public static DefaultRandomNumberGenerator DefaultCastRandom() => new();
+
+        /// <summary>Delivery implementations (internal loops and execution strategies) call this on every
+        /// impact so per-impact riders fire for each touched target.</summary>
+        public async Task ApplyImpactRiders(AbilityImpact impact)
+        {
+            foreach (var rider in ImpactRiders.Values.ToList())
+                await rider.Apply(impact);
+        }
+
+        /// <summary>
+        /// How much of the augment in that socket is running. Its numbers are weighed against their
+        /// rivals; its RIDERS are counted as running whatever the numbers did, because a rider has no
+        /// rival to lose to — nothing on the ability can put one out of work, so an augment with a live
+        /// rider is never wholly asleep (owner's word, 2026-08-19). A record that is nothing but a rider
+        /// is therefore always working, and one whose number lost while its rider fires is Partly.
+        /// </summary>
+        public AugmentActivity ActivityOf(string socketAddress)
+        {
+            if (!_installedUpgrades.TryGetValue(socketAddress, out IAugment? worn)) return AugmentActivity.Working;
+
+            (int seated, int running) = Params.MovesOf(worn.Id);
+            int riders = RidersOf(worn.InstanceId);
+            seated += riders;
+            running += riders;
+
+            if (seated == 0 || running == seated) return AugmentActivity.Working;
+            return running == 0 ? AugmentActivity.Dormant : AugmentActivity.Partly;
+        }
+
+        /// <summary>Seats a rider under a name of the caller's choosing. Whoever installs it owns that
+        /// name and is the one who takes it off again — the ability itself never guesses at it.</summary>
+        public void AddImpactRider(string key, IImpactRider rider) => _impactRiders.TryAdd(key, rider);
+
+        /// <summary>Takes the rider off and tells it to let go of whatever it hooked. The one road out,
+        /// so a rider holding a subscription cannot be dropped without being told.</summary>
+        public void RemoveImpactRider(string key)
+        {
+            if (_impactRiders.Remove(key, out IImpactRider? rider)) rider.Detach();
+        }
+
+        public void AddActivationRider(string key, IActivationRider rider) => _activationRiders.TryAdd(key, rider);
+
+        public void RemoveActivationRider(string key)
+        {
+            if (_activationRiders.Remove(key, out IActivationRider? rider)) rider.Detach();
+        }
+
+        /// <summary>How many riders that copy has on this ability, of either kind.</summary>
+        private int RidersOf(string augmentInstanceId) =>
+            _impactRiders.Keys.Count(key => RiderKeys.BelongTo(key, augmentInstanceId))
+            + _activationRiders.Keys.Count(key => RiderKeys.BelongTo(key, augmentInstanceId));
+
+        public void AddParameterDecorator(AbilityParameterDecorator decorator) => Params.AddDecorator(decorator);
+
+        public void RemoveParameterDecorator(string decoratorId, string parameter) => Params.RemoveDecorator(decoratorId, parameter);
+
+        public bool TryRegisterParameter(string parameter, float value) => Params.TryRegister(parameter, value);
+
+        public void UnregisterParameter(string parameter) => Params.Unregister(parameter);
+
+        public virtual void SetOwner(IFightable owner)
         {
             Owner = owner;
             Owner.CurrentHealthChanged += OnResourceChanges;
             Owner.CurrentBarrierChanged += OnResourceChanges;
             Owner.CurrentManaChanged += OnResourceChanges;
             Owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnd);
+            Owner.CombatEvents.Subscribe<StatusEffectAppliedEvent>(OnOwnerStatusApplied);
+            Owner.CombatEvents.Subscribe<StatusEffectRemovedEvent>(OnOwnerStatusRemoved);
         }
 
         public void RemoveOwner()
@@ -155,98 +303,143 @@
             Owner.CurrentHealthChanged -= OnResourceChanges;
             Owner.CurrentBarrierChanged -= OnResourceChanges;
             Owner.CombatEvents.Unsubscribe<TurnEndEvent>(OnTurnEnd);
+            Owner.CombatEvents.Unsubscribe<StatusEffectAppliedEvent>(OnOwnerStatusApplied);
+            Owner.CombatEvents.Unsubscribe<StatusEffectRemovedEvent>(OnOwnerStatusRemoved);
             Owner = null;
         }
-
 
         public virtual bool IsEnoughResource()
         {
             if (Owner == null) return false;
-            return CostType switch
+            var context = PreviewActivation();
+            return context.CostType switch
             {
-                Costs.Mana => Owner.CurrentMana >= CostValue,
-                Costs.Health => Owner.CurrentHealth >= CostValue,
-                Costs.Barrier => Owner.CurrentBarrier >= CostValue,
+                Costs.Mana => Owner.CurrentMana >= context.Cost,
+                Costs.Health => Owner.CurrentHealth >= context.Cost,
+                Costs.Barrier => Owner.CurrentBarrier >= context.Cost,
                 _ => false
             };
         }
+
+        public virtual bool CanActivate() => IsEnoughResource() && CooldownLeft == 0 && !IsOwnerParalyzed;
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
 
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
 
-        protected void ConsumeResource() => Owner?.ConsumeResource(CostType, CostValue);
+        public abstract IAbility Copy();
 
-        protected void StartCooldown()
-        {
-            CooldownLeft = (int)Cooldown;
-            CooldownLeftChanges?.Invoke(this, CooldownLeft);
-        }
+        /// <summary>The context every effect this cast lays is applied with — one factory so no delivery
+        /// has to know about <see cref="EffectApplyingContext.Effectiveness"/>. Sites carrying more write
+        /// <c>Laying(target) with { Damage = … }</c>.</summary>
+        protected EffectApplyingContext Laying(IFightable target) =>
+            new() { Caster = Owner!, Target = target, Source = InstanceId, Effectiveness = Effectiveness, Trace = Trace };
 
+        protected void ConsumeResource(IAbilityActivationContext context) => Owner?.ConsumeResource(context.CostType, context.Cost);
 
-        protected void ApplyTargetEffects(EffectApplyingContext context)
-        {
-            foreach (var clone in Effects.Select(effect => effect.Clone()))
-                clone.Apply(context);
-        }
+        protected abstract Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field);
 
-        protected void ApplyCasterEffects(EffectApplyingContext context)
-        {
-            if (Owner == null) return;
-            context.Target = Owner;
-            foreach (var clone in CasterEffects.Select(effect => effect.Clone()))
-                clone.Apply(context);
-        }
+        protected void StartCooldown(float cd) => CooldownLeft = (int)cd;
 
-        protected float ApplyConditionalModifiers(EffectApplyingContext context, AbilityParameter parameter, float baseValue)
-        {
-            float additiveBonus = 0f;
-            float increasedBonus = 1f;
-            float multiplyBonus = 1f;
+        protected string FormatDescription() => Localization.RenderDescription(Id, DescriptionValues, TextFormat.Rich);
 
-            foreach (IConditionalModifier conditionalModifier in ConditionalModifiers)
-            {
-                if (conditionalModifier.Parameter != parameter) continue;
-                (float Value, ModifierType Type)? result = conditionalModifier.GetValue(context);
-                if (result == null) continue;
-
-                switch (result.Value.Type)
-                {
-                    case ModifierType.Flat:
-                        additiveBonus += result.Value.Value;
-                        break;
-                    case ModifierType.Increase:
-                        increasedBonus += result.Value.Value;
-                        break;
-                    case ModifierType.Multiplicative:
-                        multiplyBonus += result.Value.Value;
-                        break;
-                }
-            }
-
-            return ((baseValue + additiveBonus) * increasedBonus) * multiplyBonus;
-        }
-
-        protected virtual string FormatDescription() => Localization.LocalizeDescriptionFormated(Id);
-
-        protected virtual void OnTurnEnd(TurnEndEvent obj)
+        protected void OnTurnEnd(TurnEndEvent obj)
         {
             if (CooldownLeft == 0) return;
             CooldownLeft--;
-            CooldownLeftChanges?.Invoke(this, CooldownLeft);
         }
 
-        private IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> CreateModuleManager() =>
-            new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator>(new Dictionary<AbilityParameter, IParameterModule<AbilityParameter>>
-            {
-                [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
-                [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
-                [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType),
-                [AbilityParameter.Target] = new Module<AbilityParameter>(() => maxTargets, AbilityParameter.Target)
-            });
+        /// <summary>
+        /// Registers the ability's base parameter values: the common keys plus EVERYTHING from the
+        /// data's abilityProperties (json camelCase → PascalCase key). Descendants only add
+        /// <see cref="AbilityParameterSet.RegisterDefault"/> fallbacks for keys the data may omit.
+        /// </summary>
+        protected virtual void RegisterBaseParameters(AbilityParameterSet parameters)
+        {
+            parameters.Register(AbilityParameter.Cooldown, Data.Cooldown);
+            parameters.Register(AbilityParameter.CostValue, Data.CostValue);
+            parameters.Register(AbilityParameter.CostType, (float)Data.CostsType);
+            foreach (var (key, value) in Data.AbilityProperties)
+                parameters.Register(ToParameterKey(key), value);
+        }
 
-        private void RemoveFromList(List<IEffect> listEffects, IEffect effect) => listEffects.Remove(effect);
-        private void OnModuleChanges(AbilityParameter key) => OnParameterChanged?.Invoke(key);
-        private void OnResourceChanges(float obj) => AbilityResourceChanges?.Invoke(this, IsEnoughResource());
+        /// <summary>Damage keys from the data fields — for every damage-dealing ability regardless of family.</summary>
+        protected void RegisterDamageParameters(AbilityParameterSet parameters)
+        {
+            parameters.Register(AbilityParameter.Damage, Data.Damage);
+            parameters.Register(AbilityParameter.WeaponDamageScale, Data.WeaponDamageScale);
+            parameters.Register(AbilityParameter.SpellDamageScale, Data.SpellDamageScale);
+        }
+
+        /// <summary>Crit keys of an ability that rolls a crit of its own — declared by whoever stamps them
+        /// on the touches it deals (<see cref="AbilityAttackRolls"/>), never by an ability that cannot crit.</summary>
+        protected void RegisterCriticalParameters(AbilityParameterSet parameters)
+        {
+            parameters.RegisterDefault(AbilityParameter.CriticalChanceBonus, 0f);
+            parameters.RegisterDefault(AbilityParameter.CriticalDamageBonus, 0f);
+        }
+
+        /// <summary>Shared tail of every Copy(): a fresh instance from the same data, wearing the same
+        /// augments in the same slots. The upgrades are copied one by one and applied to the copy — a
+        /// shared instance would leak applied state (Learned, decorators) between the two, and the
+        /// original's decorators would come off whenever the copy's arrangement was rebuilt.</summary>
+        protected IAbility CopyUpgradesTo(Ability copy)
+        {
+            copy.InstallUpgrades(_installedUpgrades.ToDictionary(
+                worn => worn.Key,
+                worn => worn.Value.Copy(),
+                StringComparer.Ordinal));
+            return copy;
+        }
+
+        /// <summary>
+        /// Effective activation numbers for availability checks and UI: the real cast mutator
+        /// pipeline over a preview context (see <see cref="IAbilityActivationContext.IsPreview"/> —
+        /// chance-based and self-consuming mutators stay inert, nothing is paid).
+        /// </summary>
+        protected IAbilityActivationContext PreviewActivation()
+        {
+            // No battle field exists outside a cast; the IsPreview contract keeps mutators off it.
+            var context = BuildActivationContext([], field: null!, isPreview: true);
+            ApplyActivationMutators(context);
+            return context;
+        }
+
+        private AbilityActivationContext BuildActivationContext(List<IFightable> targets, IBattleField field, bool isPreview = false) => new()
+        {
+            Ability = this,
+            Caster = Owner!,
+            Field = field,
+            // Preview never rolls (IsPreview contract), so the generator is never even built for it.
+            Rnd = isPreview ? null! : CastRnd,
+            Targets = targets,
+            IsPreview = isPreview,
+            Cost = CostValue,
+            CostType = CostType,
+            Cooldown = Cooldown
+        };
+
+        // Cast mutators run before anything is paid: ability-scoped first, then entity-scoped (items/effects)
+        private void ApplyActivationMutators(AbilityActivationContext context)
+        {
+            ActivationEffect.Values.ToList().ForEach(mod => mod.Apply(context));
+            Owner?.ModifierHandler.Apply(context);
+        }
+
+
+
+        private static string ToParameterKey(string jsonKey) => char.ToUpperInvariant(jsonKey[0]) + jsonKey[1..];
+
+        private bool IsOwnerParalyzed => Owner != null && (Owner.StatusEffects & StatusEffects.Paralysis) != 0;
+
+        private void OnParameterChangedInternal(string parameter) => OnParameterChanged?.Invoke(parameter);
+
+        private void OnResourceChanges(float obj) => NotifyAvailabilityChanged();
+
+        private void OnOwnerStatusApplied(StatusEffectAppliedEvent evt) => NotifyAvailabilityChanged();
+
+        private void OnOwnerStatusRemoved(StatusEffectRemovedEvent evt) => NotifyAvailabilityChanged();
+
+        private void NotifyAvailabilityChanged() => AbilityResourceChanges?.Invoke(this, CanActivate());
     }
 }

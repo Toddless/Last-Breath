@@ -1,7 +1,7 @@
 namespace LootGeneration.Internal
 {
     using System.Collections.Generic;
-    using Core.Interfaces.Events;
+    using Core.Events;
 
     public record ItemTierChosenEvent(Dictionary<int, int> ChosenTiersAmount): IGameEvent;
 }
