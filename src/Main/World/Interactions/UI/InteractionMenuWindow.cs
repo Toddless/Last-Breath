@@ -10,7 +10,6 @@ namespace LastBreath.World.Interactions.UI
     {
         private const string UID = "uid://cxgma3niixgpr";
         private const string ActionIdMeta = "interaction_action_id";
-        private const string TitleKey = "UI_Interaction_Interact";
         private const double RefreshIntervalSeconds = 0.1;
         private string _signature = "";
         private double _elapsed;
@@ -27,7 +26,7 @@ namespace LastBreath.World.Interactions.UI
             // The console, the bag filter and this menu share one root window: a rebuild must leave a typing player alone.
             bool typing = Core.World.Spaces.SpatialAccess.HasTextFocus(this);
             ClearRows();
-            Title?.Text = Localization.Localize(TitleKey);
+            Title?.Text = Localization.Localize(InteractionPresentation.InteractKey);
             var rows = new List<(InteractionAction Action, Button Row)>(actions.Count);
             foreach (var action in actions)
             {

@@ -27,7 +27,7 @@ namespace LastBreath.World.Interactions.UI
             if (Chest is not { } chest || Rows == null) return;
             ClearRows();
             Title?.Text = Localization.Localize(chest.NameKey);
-            _takeAll?.Text = $"{InteractionPresentation.Binding(InteractionActions.TakeAll)} · {Localization.Localize(TakeAllKey)}";
+            _takeAll?.Text = InteractionPresentation.Prompt(InteractionActions.TakeAll, TakeAllKey);
             _takeAll?.Disabled = chest.Contents.Empty;
             foreach (var slot in chest.Contents.Slots)
             {

@@ -9,11 +9,10 @@ namespace LastBreath.World.Interactions.UI
     public partial class InteractionHint : PanelContainer
     {
         private InteractionService _service = null!;
-        private Label _label = null!;
+        [Export] private Label? _label;
         public override void _Ready()
         {
             _service = Services.GameServiceProvider.Instance.GetService<InteractionService>();
-            _label = GetNode<Label>("Label");
             MouseFilter = MouseFilterEnum.Ignore;
             Hide();
         }
@@ -24,10 +23,10 @@ namespace LastBreath.World.Interactions.UI
             { Hide(); return; }
             var actions = _service.SelectedActions;
             var enabled = actions.Where(x => x.Enabled).ToList();
-            string key = enabled.Count == 1 ? enabled[0].LabelKey : "UI_Interaction_Interact";
-            _label.Text = enabled.Count > 0
-                ? $"{InteractionPresentation.Binding(InteractionActions.Interact)} · {Localization.Localize(key)}"
-                : Localization.Localize(actions.FirstOrDefault()?.ReasonKey ?? "UI_Interaction_Unavailable");
+            string key = enabled.Count == 1 ? enabled[0].LabelKey : InteractionPresentation.InteractKey;
+            _label?.Text = enabled.Count > 0
+                ? InteractionPresentation.Prompt(InteractionActions.Interact, key)
+                : Localization.Localize(actions.FirstOrDefault()?.ReasonKey ?? InteractionReasonKeys.Unavailable);
             Place(InteractionPresentation.ScreenPoint(target.Anchor) - new Vector2(Size.X / 2, Size.Y));
         }
 

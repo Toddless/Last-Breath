@@ -10,6 +10,12 @@ namespace LastBreath.World.Interactions.UI
         /// <summary>Localization key shown in place of a key when an action has no usable input bound.</summary>
         private const string UnboundKey = "UI_Interaction_Unbound";
 
+        /// <summary>Stands between the bound key and the label of a prompt.</summary>
+        private const string PromptSeparator = " · ";
+
+        /// <summary>Localization key of the Interact label: the prompt of several enabled actions and the menu's title.</summary>
+        public const string InteractKey = "UI_Interaction_Interact";
+
         /// <summary>Whether the display server exposes keyboard layouts; physical keys resolve to layout labels only where it does.</summary>
         private static bool HasKeyboardLayouts => DisplayServer.KeyboardGetLayoutCount() > 0;
 
@@ -22,8 +28,11 @@ namespace LastBreath.World.Interactions.UI
             return container.GetGlobalTransformWithCanvas() * (point * scale);
         }
 
+        /// <summary>What the player reads to run an action: its bound input, then the localized label.</summary>
+        public static string Prompt(string action, string labelKey) => $"{Binding(action)}{PromptSeparator}{Localization.Localize(labelKey)}";
+
         /// <summary>The first input bound to the action as the player reads it; an action with nothing to show reads as unbound.</summary>
-        public static string Binding(string action)
+        private static string Binding(string action)
         {
             string text = InputMap.ActionGetEvents(action).FirstOrDefault() switch
             {
