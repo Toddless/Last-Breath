@@ -1,5 +1,25 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bach43uthyem6"]
 
-[node name="Action" type="Button"]
+[ext_resource type="Script" path="res://World/Interactions/UI/InteractionActionRow.cs" id="script"]
+
+[node name="Action" type="Button" node_paths=PackedStringArray("_reason")]
 custom_minimum_size = Vector2(0, 42)
 alignment = 0
+script = ExtResource("script")
+_reason = NodePath("Reason")
+
+[node name="Reason" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_right = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"DimLabel"
+horizontal_alignment = 2
+vertical_alignment = 1
+text_overrun_behavior = 3
