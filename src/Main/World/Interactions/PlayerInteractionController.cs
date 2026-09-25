@@ -22,6 +22,8 @@ namespace LastBreath.World.Interactions
         private InteractionService _service = null!;
         private double _elapsed;
         private bool _dirty = true;
+        /// <summary>Whether discovery ran at the last refresh; a refresh that finds it running again drops every candidate's cached offer.</summary>
+        private bool _discovering;
         private (Func<Task<InteractionResult>> Run, TaskCompletionSource<InteractionResult> Completion)? _pending;
         private bool _running;
         public Node2D Player => (Node2D)GetParent();
@@ -48,7 +50,7 @@ namespace LastBreath.World.Interactions
 
         private void Entered(Area2D area)
         {
-            if (area is InteractionTarget target) { _candidates.Add(target); _dirty = true; }
+            if (area is InteractionTarget target) { _candidates.Add(target); target.InvalidateOffer(); _dirty = true; }
         }
         private void Exited(Area2D area)
         {
@@ -99,20 +101,23 @@ namespace LastBreath.World.Interactions
             }
         }
 
+        /// <summary>Picks the target from the candidates' cached offers and their reach: an enabled one first, then the nearest, then the
+        /// stable tie-break.</summary>
         private void RefreshSelection()
         {
             EvaluationCount++;
-            if (!_service.CanDiscover()) { _service.Select(null); return; }
+            if (!TrackDiscovery()) { _service.Select(null); return; }
             InteractionTarget? best = null;
             float bestDistance = float.PositiveInfinity;
             bool bestEnabled = false;
             foreach (var target in _candidates.ToArray())
             {
                 if (!GodotObject.IsInstanceValid(target) || !target.IsInsideTree()) { _candidates.Remove(target); continue; }
+                // Before reach: the reach check skips an unavailable target, so only this read drops its stale cached offer.
+                var actions = target.CachedOffer;
+                if (actions.Count == 0) continue;
                 float distance = InteractionReach.DistanceSquared(Player, target);
                 if (!float.IsFinite(distance)) continue;
-                var actions = target.ReadActions();
-                if (actions.Count == 0) continue;
                 bool enabled = actions.Any(x => x.Enabled);
                 if (best != null && (bestEnabled && !enabled || bestEnabled == enabled && distance > bestDistance)) continue;
                 if (best != null && bestEnabled == enabled && distance == bestDistance)
@@ -126,6 +131,21 @@ namespace LastBreath.World.Interactions
             _service.Select(best);
         }
 
+        /// <summary>Whether discovery runs now; when it runs again after a pause, every candidate's cached offer is dropped.</summary>
+        private bool TrackDiscovery()
+        {
+            bool discovering = _service.CanDiscover();
+            if (discovering && !_discovering) InvalidateOffers();
+            _discovering = discovering;
+            return discovering;
+        }
+
+        /// <summary>Drops every candidate's cached offer, so the next refresh reads their sources again.</summary>
+        private void InvalidateOffers()
+        {
+            foreach (var target in _candidates) target.InvalidateOffer();
+        }
+
         public Task<InteractionResult> Enqueue(Func<Task<InteractionResult>> run)
         {
             if (_pending != null || _running || !IsInsideTree()) return Task.FromResult(InteractionResult.Dropped);
@@ -134,7 +154,8 @@ namespace LastBreath.World.Interactions
             return completion.Task;
         }
 
-        /// <summary>Runs the command, answers its request, then gives the player the feedback its result carries.</summary>
+        /// <summary>Runs the command, answers its request, then gives the player the feedback its result carries; whatever the command
+        /// changed is read again from every candidate.</summary>
         private async void Run((Func<Task<InteractionResult>> Run, TaskCompletionSource<InteractionResult> Completion) pending)
         {
             _running = true;
@@ -145,6 +166,7 @@ namespace LastBreath.World.Interactions
             {
                 pending.Completion.TrySetResult(result);
                 _running = false;
+                InvalidateOffers();
                 _dirty = true;
             }
             _service.GiveFeedback(result);
