@@ -11,22 +11,24 @@ namespace LastBreath.World.Interactions.UI
 
     public partial class ChestContentsWindow : InteractionWindow, IContainerSession
     {
+        private const string UID = "uid://dfyvofbp38pam";
+        private const string TakeAllKey = "UI_Container_TakeAll";
+        [Export] private Button? _takeAll;
         /// <summary>The chest the bound target belongs to, its nearest chest ancestor; null for a target outside every chest.</summary>
         private ChestComponent? Chest => Target.FindSelfOrAncestor<ChestComponent>();
-        public static PackedScene Initialize() => GD.Load<PackedScene>("res://World/Interactions/UI/ChestContentsWindow.tscn");
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
         public override void _Ready()
         {
             base._Ready();
-            GetNode<Button>("Frame/Content/TakeAll").Pressed += () => Take(null);
+            _takeAll?.Pressed += () => Take(null);
         }
         public override void Refresh()
         {
-            if (Chest is not { } chest) return;
+            if (Chest is not { } chest || Rows == null) return;
             ClearRows();
-            GetNode<Label>("Frame/Content/Title").Text = Localization.Localize(chest.NameKey);
-            var takeAll = GetNode<Button>("Frame/Content/TakeAll");
-            takeAll.Text = $"{InteractionPresentation.Binding(InteractionActions.TakeAll)} · {Localization.Localize("UI_Container_TakeAll")}";
-            takeAll.Disabled = chest.Contents.Empty;
+            Title?.Text = Localization.Localize(chest.NameKey);
+            _takeAll?.Text = $"{InteractionPresentation.Binding(InteractionActions.TakeAll)} · {Localization.Localize(TakeAllKey)}";
+            _takeAll?.Disabled = chest.Contents.Empty;
             foreach (var slot in chest.Contents.Slots)
             {
                 var row = GD.Load<PackedScene>("res://World/Interactions/UI/ChestItemRow.tscn").Instantiate<Control>();

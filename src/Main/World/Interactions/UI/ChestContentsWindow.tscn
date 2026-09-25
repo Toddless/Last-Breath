@@ -1,25 +1,25 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dfyvofbp38pam"]
 
 [ext_resource type="Script" path="res://World/Interactions/UI/ChestContentsWindow.cs" id="script"]
 [ext_resource type="PackedScene" path="res://World/Interactions/UI/InteractionFrame.tscn" id="frame"]
-[ext_resource type="AudioStream" path="res://World/Interactions/UI/Refusal.wav" id="sound"]
 
-[node name="ChestContentsWindow" type="Control"]
+[node name="ChestContentsWindow" type="Control" node_paths=PackedStringArray("_takeAll", "Rows", "Panel", "CloseButton", "Title")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("script")
+_takeAll = NodePath("Frame/Content/TakeAll")
+Rows = NodePath("Frame/Content/Rows")
+Panel = NodePath("Frame")
+CloseButton = NodePath("Frame/Content/Close")
+Title = NodePath("Frame/Content/Title")
 
 [node name="Frame" parent="." instance=ExtResource("frame")]
 layout_mode = 0
 
 [node name="TakeAll" parent="Frame/Content" index="2"]
 visible = true
-
-[node name="Refusal" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("sound")
-volume_db = -12.0
 
 [editable path="Frame"]
