@@ -28,7 +28,7 @@ namespace LastBreath.World.Interactions.UI
         public bool IsOpen => GodotObject.IsInstanceValid(this) && !IsQueuedForDeletion();
         public bool BlocksMovement => true;
 
-        public void InjectServices(IGameServiceProvider provider) => Messages = provider.GetService<IGameMessageBus>();
+        public virtual void InjectServices(IGameServiceProvider provider) => Messages = provider.GetService<IGameMessageBus>();
         public override void _Ready()
         {
             CloseButton?.Text = Localization.Localize(CloseKey);

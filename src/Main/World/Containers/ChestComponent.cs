@@ -72,6 +72,9 @@ namespace LastBreath.World.Containers
         public ChestContents Contents { get; } = new();
         public string NameKey => _definition?.NameKey ?? string.Empty;
 
+        /// <summary>Cells the chest's definition gives it; zero while the chest has no definition.</summary>
+        public int Capacity => _definition?.Capacity ?? 0;
+
         /// <summary>ID of the chest's interaction target, composed from <see cref="ObjectId"/>; empty while ObjectId is blank.</summary>
         public string InteractionId => InteractionIds.Chest(ObjectId);
 

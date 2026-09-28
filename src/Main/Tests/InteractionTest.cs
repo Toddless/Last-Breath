@@ -8,6 +8,7 @@ namespace LastBreath.Tests
     using Core.Enums;
     using Core.Inventory;
     using Core.Items;
+    using Core.Localization;
     using Core.MessageBus;
     using Core.Save;
     using Core.Services;
@@ -15,8 +16,11 @@ namespace LastBreath.Tests
     using Core.World.Containers;
     using Core.World.Interactions;
     using Core.World.Locations;
+    using Crafting.Source.UIElements;
     using Godot;
+    using Inventory;
     using Newtonsoft.Json.Linq;
+    using UI;
     using World.Containers;
     using World.Interactions;
     using World.Interactions.UI;
@@ -24,6 +28,10 @@ namespace LastBreath.Tests
 
     public partial class InteractionTest : Node
     {
+        private const string CellsPath = "Frame/Content/Rows/Cells";
+        private const string TooltipTitlePath = "Panel/Body/Margin/Layout/Header/HeaderInfo/Title";
+        // Longer than the hover tooltip's opening delay.
+        private const double TooltipWaitSeconds = 0.6;
         // Player body center below the chest point, within reach; walls stand in the gap between the chest body and the player's capsule.
         private static readonly Vector2 s_playerBodyFromChest = new(0, 140);
         private static readonly Vector2 s_wallFromChest = new(0, 45);
@@ -55,6 +63,53 @@ namespace LastBreath.Tests
                 if (FindWindow<T>(root.GetChild(i)) is { } found) return found;
             return null;
         }
+
+        /// <summary>Points the mouse at the control's center and waits past the hover tooltip's delay.</summary>
+        private async Task Hover(Control target)
+        {
+            var point = target.GetGlobalRect().GetCenter();
+            GetTree().Root.PushInput(new InputEventMouseMotion { Position = point, GlobalPosition = point }, true);
+            await ToSignal(GetTree().CreateTimer(TooltipWaitSeconds), SceneTreeTimer.SignalName.Timeout);
+            await Ticks(1);
+        }
+
+        /// <summary>Presses and releases the key that pins and unpins a hover tooltip.</summary>
+        private async Task PressPin()
+        {
+            GetTree().Root.PushInput(new InputEventKey { Keycode = Key.Alt, Pressed = true }, true);
+            await Ticks(1);
+            GetTree().Root.PushInput(new InputEventKey { Keycode = Key.Alt, Pressed = false }, true);
+            await Ticks(1);
+        }
+
+        private async Task RightClick(Control target, bool ctrl = false)
+        {
+            var click = target.GetGlobalRect().GetCenter();
+            GetTree().Root.PushInput(new InputEventMouseButton
+            {
+                Position = click, GlobalPosition = click, ButtonIndex = MouseButton.Right, Pressed = true, CtrlPressed = ctrl
+            }, true);
+            await Ticks();
+            GetTree().Root.PushInput(new InputEventMouseButton
+            {
+                Position = click, GlobalPosition = click, ButtonIndex = MouseButton.Right, Pressed = false, CtrlPressed = ctrl
+            }, true);
+        }
+
+        private static GridContainer CellsOf(Node main) => FindWindow<ChestContentsWindow>(main)!.GetNode<GridContainer>(CellsPath);
+
+        /// <summary>Every slot has a cell, cell i shows slot i's item and amount while the slot holds one, and every other cell is empty.</summary>
+        private static bool ShowsSlots(GridContainer cells, ChestComponent chest) =>
+            cells.GetChildCount() >= chest.Contents.Slots.Count
+            && cells.GetChildren().Cast<InventorySlot>().Select((cell, index) => (Cell: cell, Slot: chest.Contents.Slots.ElementAtOrDefault(index)))
+                .All(x => x.Slot is { Amount: > 0, Item: { } item }
+                    ? x.Cell.CurrentItem?.InstanceId == item.InstanceId && x.Cell.Quantity == x.Slot.Amount
+                    : x.Cell.CurrentItem == null);
+
+        /// <summary>The cell wears its item's look: the item's icon and the frame tinted with its rarity.</summary>
+        private static bool WearsLook(InventorySlot cell, IItem item) =>
+            cell.GetNode<TextureRect>("Icon").Texture == item.Icon
+            && cell.GetNode<TextureRect>("Frame").Modulate == Color.FromHtml(TextPalette.RarityColor(item.Rarity));
 
         public override async void _Ready()
         {
@@ -140,13 +195,64 @@ namespace LastBreath.Tests
                 var initial = chest.CaptureLocationState();
                 var window = FindWindow<ChestContentsWindow>(main)!;
                 Check(window != null, "Container UI is instantiated from its scene.");
-                var row = window!.GetNode<Control>("Frame/Content/Rows").GetChild<Control>(0);
-                var click = row.GetGlobalRect().GetCenter();
+                var definition = provider.GetService<ChestCatalog>().Find(chest.DefinitionId)!;
+                var cells = window!.GetNode<GridContainer>(CellsPath);
+                Check(definition.Capacity == 20 && cells.GetChildCount() == definition.Capacity, "The starter chest window shows its twenty cells.");
+                Check(chest.Contents.Slots.Select(x => x.Id).SequenceEqual(definition.Contents.Items.Select(x => x.SlotId)) && ShowsSlots(cells, chest),
+                    "The authored positions fill the first cells in authored order and the other cells stay empty.");
+                Check(chest.Contents.Slots.Select((slot, index) => WearsLook(cells.GetChild<InventorySlot>(index), slot.Item!)).All(x => x),
+                    "A filled cell wears its item's icon and rarity frame.");
+
+                await Hover(cells.GetChild<Control>(0));
+                var tooltip = FindWindow<ItemTooltipPopup>(main);
+                Check(tooltip != null && tooltip.GetNode<Label>(TooltipTitlePath).Text.StartsWith(chest.Contents.Slots[0].Item!.DisplayName),
+                    "Hovering a filled cell shows the item tooltip of its item.");
+                await PressPin();
+                Check(tooltip!.IsPinned && !tooltip.GetChildren().OfType<InventorySlotTooltipButtons>().Any(),
+                    "A pinned tooltip of a chest item offers no bag-only actions.");
+                await PressPin();
+                await Hover(cells.GetChild<Control>(definition.Capacity - 1));
+                Check(FindWindow<ItemTooltipPopup>(main) == null, "Hovering an empty cell shows no tooltip.");
+
+                var payload = new Godot.Collections.Dictionary
+                {
+                    [Core.Inventory.DragPayload.Item] = chest.Contents.Slots[0].Item!.Id,
+                    [Core.Inventory.DragPayload.Instance] = chest.Contents.Slots[0].Item!.InstanceId,
+                    [Core.Inventory.DragPayload.Quantity] = 1,
+                    [Core.Inventory.DragPayload.MaxStackSize] = 1,
+                    [Core.Inventory.DragPayload.Source] = cells.GetChild<Node>(0).GetPath()
+                };
+                var filled = cells.GetChild<InventorySlot>(0);
+                Check(filled._GetDragData(Vector2.Zero).VariantType == Variant.Type.Nil && !filled._CanDropData(Vector2.Zero, payload)
+                    && !cells.GetChild<InventorySlot>(definition.Capacity - 1)._CanDropData(Vector2.Zero, payload),
+                    "A chest cell neither starts a drag nor takes a drop.");
+                var bagView = new GridContainer();
+                provider.GetService<ISlotLender>().AttachSlots(bagView);
+                Check(bagView.GetChild<Slot>(0)._CanDropData(Vector2.Zero, payload), "A bag slot still takes a drop.");
+                provider.GetService<ISlotLender>().DetachSlots();
+                bagView.Free();
+
+                var shownCells = cells.GetChildren().ToArray();
+                var takenCell = cells.GetChild<InventorySlot>(2);
                 bag.Clear();
-                GetTree().Root.PushInput(new InputEventMouseButton { Position = click, GlobalPosition = click, ButtonIndex = MouseButton.Right, Pressed = true }, true);
-                await Ticks();
-                GetTree().Root.PushInput(new InputEventMouseButton { Position = click, GlobalPosition = click, ButtonIndex = MouseButton.Right, Pressed = false }, true);
-                Check(chest.Contents.Slots[0].Amount == 0 && bag.GetContents().Sum(x => x.Amount) == 1, "Right-click transfers the clicked item through root UI input.");
+                await RightClick(takenCell);
+                Check(chest.Contents.Slots[2].Amount == 0 && bag.GetContents().Sum(x => x.Amount) == 1, "Right-click transfers the clicked item through root UI input.");
+                Check(cells.GetChildren().SequenceEqual(shownCells) && takenCell.CurrentItem == null && ShowsSlots(cells, chest),
+                    "The emptied slot leaves its own cell empty and every other cell as it was.");
+                await RightClick(cells.GetChild<Control>(3), ctrl: true);
+                Check(chest.Contents.Slots[3].Amount == 0 && bag.GetContents().Sum(x => x.Amount) == 2 && ShowsSlots(cells, chest),
+                    "A right-click held with a modifier takes the cell's item too.");
+                window.Refresh();
+                Check(cells.GetChildren().SequenceEqual(shownCells) && ShowsSlots(cells, chest), "A repeated refresh reuses the cells.");
+                // Control for the chest tooltip above: the same item, now held by the bag, grows the bag-only actions once pinned.
+                var bagTooltip = (ItemTooltipPopup)ui.ShowPopup(typeof(ItemTooltipPopup));
+                bagTooltip.ShowItem(chest.Contents.Slots[2].Item!);
+                // The overlay layer adds a popup at the end of the frame; the pin key reaches it only once it is in the tree.
+                await Ticks(1);
+                await PressPin();
+                Check(bagTooltip.IsPinned && bagTooltip.GetChildren().OfType<InventorySlotTooltipButtons>().Any(),
+                    "The item taken into the bag grows the bag-only actions once pinned.");
+                await PressPin();
                 // Restore the original fixture for the independent partial-capacity scenario.
                 bag.Clear();
                 chest.RestoreLocationState(initial);
@@ -155,9 +261,30 @@ namespace LastBreath.Tests
                 await Press(Key.E);
                 Check(JToken.DeepEquals(initial, chest.CaptureLocationState()), "Reopening preserves equipment rolls.");
 
+                // A saved state may hold more slots than the capacity: every slot still gets its own cell.
+                var resource = provider.GetService<IItemDataProvider>().GetAllResources().First(x => x.MaxStackSize > 10);
+                var crowded = (JObject)initial.DeepClone();
+                var crowdedSlots = (JArray)crowded["Slots"]!;
+                while (crowdedSlots.Count < definition.Capacity) crowdedSlots.Add(JObject.FromObject(new { Id = $"empty{crowdedSlots.Count}", Amount = 0 }));
+                crowdedSlots.Add(JObject.FromObject(new
+                {
+                    Id = "beyond", Amount = 2,
+                    Item = new Core.Data.SaveData.InventoryItemSaveData { ResourceId = resource.Id, Amount = 2 }
+                }));
+                chest.RestoreLocationState(crowded);
+                interaction.CancelSession();
+                await Ticks();
+                await Press(Key.E);
+                cells = CellsOf(main);
+                Check(cells.GetChildCount() == definition.Capacity + 1 && ShowsSlots(cells, chest),
+                    "A chest holding more slots than its capacity shows every slot in its own cell.");
+                chest.RestoreLocationState(initial);
+                interaction.CancelSession();
+                await Ticks();
+                await Press(Key.E);
+
                 // Fill all bag slots while leaving room for exactly three units in an existing stack.
                 bag.Clear();
-                var resource = provider.GetService<IItemDataProvider>().GetAllResources().First(x => x.MaxStackSize > 10);
                 Check(bag.TryAddItem(resource, bag.InventoryCapacity * resource.MaxStackSize), "Fill the real bag.");
                 bag.RemoveItemById(resource.Id, 3);
                 var saved = (JObject)chest.CaptureLocationState();
@@ -178,6 +305,7 @@ namespace LastBreath.Tests
                 Check(observedRemaining == 7, "Inventory callbacks observe the committed chest remainder.");
                 Check(chest.Contents.Slots.Take(5).All(x => x.Amount == 1) && chest.Contents.Slots.Last().Amount == 7,
                     "Take All continues after refused equipment and partially transfers the later stack.");
+                Check(ShowsSlots(CellsOf(main), chest), "Take All redraws every slot in its own cell, the partial stack showing what is left.");
                 Check(chest.Contents.RemoveAtMinutes == null, "A nonempty chest has no disappearance deadline.");
                 var pending = bus.SendRequest<ContainerTransferRequest, InteractionResult>(new(chest.Target.Handle));
                 interaction.CancelSession();

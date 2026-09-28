@@ -3,21 +3,28 @@
 [ext_resource type="Script" path="res://World/Interactions/UI/ChestContentsWindow.cs" id="script"]
 [ext_resource type="PackedScene" path="res://World/Interactions/UI/InteractionFrame.tscn" id="frame"]
 
-[node name="ChestContentsWindow" type="Control" node_paths=PackedStringArray("_takeAll", "Rows", "Panel", "CloseButton", "Title")]
+[node name="ChestContentsWindow" type="Control" node_paths=PackedStringArray("_cells", "_takeAll", "Panel", "CloseButton", "Title")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("script")
+_cells = NodePath("Frame/Content/Rows/Cells")
 _takeAll = NodePath("Frame/Content/TakeAll")
-Rows = NodePath("Frame/Content/Rows")
 Panel = NodePath("Frame")
 CloseButton = NodePath("Frame/Content/Close")
 Title = NodePath("Frame/Content/Title")
 
 [node name="Frame" parent="." instance=ExtResource("frame")]
 layout_mode = 0
+
+[node name="Cells" type="GridContainer" parent="Frame/Content/Rows"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 5
 
 [node name="TakeAll" parent="Frame/Content" index="2"]
 visible = true
