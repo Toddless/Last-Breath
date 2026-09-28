@@ -2,6 +2,7 @@ namespace Core.World.Containers
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using Data;
     using Data.ChestData;
@@ -29,9 +30,12 @@ namespace Core.World.Containers
 
     public record ChestContentsDefinition(ChestContentsMode Mode, IReadOnlyList<AuthoredChestItem> Items);
 
+    /// <summary>A chest record the catalog believed. <see cref="Capacity"/> counts its cells, and the authored
+    /// positions always fit in them.</summary>
     public record ChestDefinition(
         string Id,
         string NameKey,
+        int Capacity,
         double EmptyRemovalDelayMinutes,
         ChestAccess Access,
         ChestContentsDefinition Contents);
@@ -53,6 +57,10 @@ namespace Core.World.Containers
         private const string FieldProblemFormat = "'{0}' {1}.";
 
         private const string UnreadableRecordFormat = "the record cannot be read as a chest: {0}";
+
+        private const string NoCellsReason = "must be a positive count of cells";
+
+        private const string TooFewCellsFormat = "is {0}, too few cells for the {1} authored positions";
 
         /// <summary>Leaves every value as written until its own record is read: a date-shaped string stays a string.</summary>
         private static readonly JsonSerializerSettings RecordListSettings = new() { DateParseHandling = DateParseHandling.None };
@@ -107,6 +115,7 @@ namespace Core.World.Containers
         {
             if (ReadText(record?.Id, UnnamedChest, file, ChestFields.Id) is not { } id) return null;
             if (ReadText(record?.NameKey, id, file, ChestFields.NameKey) is not { } nameKey) return null;
+            if (ReadCapacity(record?.Capacity, id, file) is not { } capacity) return null;
             if (record?.EmptyRemovalDelayMinutes is not { } delay || !double.IsFinite(delay) || delay < 0)
             {
                 Report(id, file, ChestFields.Delay, "must be a finite, non-negative number of game minutes");
@@ -115,8 +124,30 @@ namespace Core.World.Containers
 
             if (ReadAccess(record.Access, id, file) is not { } access) return null;
             if (ReadContents(record.Contents, id, file) is not { } contents) return null;
+            if (!HasCellForEveryPosition(contents, capacity, id, file)) return null;
 
-            return new ChestDefinition(id, nameKey, delay, access, contents);
+            return new ChestDefinition(id, nameKey, capacity, delay, access, contents);
+        }
+
+        /// <summary>The cells the record writes; null, and reported, when it writes none or fewer than one. A fraction
+        /// never reaches here: the conversion refuses it as a value the field cannot hold.</summary>
+        private static int? ReadCapacity(int? value, string id, string file)
+        {
+            if (value is > 0) return value;
+
+            Report(id, file, ChestFields.Capacity, NoCellsReason);
+            return null;
+        }
+
+        /// <summary>True when every authored position has a cell of its own; otherwise the shortfall is reported
+        /// against the capacity.</summary>
+        private static bool HasCellForEveryPosition(ChestContentsDefinition contents, int capacity, string id, string file)
+        {
+            if (contents.Items.Count <= capacity) return true;
+
+            Report(id, file, ChestFields.Capacity,
+                string.Format(CultureInfo.InvariantCulture, TooFewCellsFormat, capacity, contents.Items.Count));
+            return false;
         }
 
         private static ChestAccess? ReadAccess(ChestAccessData? data, string id, string file) =>

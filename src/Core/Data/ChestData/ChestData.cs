@@ -18,6 +18,8 @@ namespace Core.Data.ChestData
 
         public const string NameKey = "nameKey";
 
+        public const string Capacity = "capacity";
+
         public const string Delay = "emptyRemovalDelayMinutes";
 
         public const string Access = "access";
@@ -52,6 +54,9 @@ namespace Core.Data.ChestData
         /// <summary>Key the chest is named under. Written out rather than derived from the id: what a
         /// container is called is the author's line, and two chests may stand under one name.</summary>
         [JsonProperty(ChestFields.NameKey)][LocalizedKey] public required string? NameKey { get; init; }
+
+        /// <summary>Cells the chest has; every authored position takes one of them.</summary>
+        [JsonProperty(ChestFields.Capacity)] public required int? Capacity { get; init; }
 
         /// <summary>Game minutes an emptied chest stays in the world before it is taken out of it.</summary>
         [JsonProperty(ChestFields.Delay)] public required double? EmptyRemovalDelayMinutes { get; init; }
