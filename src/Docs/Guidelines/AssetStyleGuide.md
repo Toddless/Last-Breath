@@ -18,3 +18,7 @@ stylized comic book dark fantasy character, full body game sprite, bold expressi
 4. **Раскладка**: статичные фейсинги пакуются в `SpriteFrames` однокадровыми клипами `Idle_Down/Up/Left` (Right = FlipH от Left в твин-компоненте, #210), запись NPC — в `SharedData/Assets/Npc/Animations/NpcVisuals.tres`.
 
 Ракурсов на NPC — три: Front (Down), Back (Up), Left. Ростер и приоритеты (A: демо-сцена, B: базовые враги/жители, C: фракционные, D: звери/боссы) — в отчёте лор-разведки сессии 2026-08-26.
+
+## Связанные документы
+
+- [Карта документации LastBreath](../README.md)

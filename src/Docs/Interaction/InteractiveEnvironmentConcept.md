@@ -234,8 +234,13 @@ Transfer as much of a stack as the inventory can accept. The remaining quantity 
 | Каковы параметры визуальных эффектов и взаимодействия? | Клавиши, дистанции, область растворения, длительности и свет подбираются при проектировании и проверке прототипа. |
 | Какие расширения входят в ближайший этап? | Типы и замки сундуков, действия NPC, цветы, растворение, ветер и погода относительно подтверждённого первого участка. |
 
-Исходные ответы и история уточнений сохранены в заметке [[Интерактивное окружение — обсуждение решений]]. Актуальные согласованные правила собраны в этом документе.
+Исходные ответы и история уточнений сохранены в заметке [Интерактивное окружение — обсуждение решений](InteractiveEnvironmentDecisions.md). Актуальные согласованные правила собраны в этом документе.
 
 ## Shared Interaction Design Status
 
 InteractionArchitecture.md contains the #264 scene and system proposal, including target selection, shared action availability, UI sessions, dialogue/travel migration, and starter-chest persistence. Its review defaults remain proposals until accepted; the unlocked starter chest and partial-stack transfers are confirmed.
+
+## Связанные документы
+
+- [Описание существующей системы](CurrentSystem.md)
+- [Карта документации LastBreath](../README.md)

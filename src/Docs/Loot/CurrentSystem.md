@@ -1,0 +1,31 @@
+# Генерация лута
+
+Статус: описание существующей реализации. Основа и границы статической сверки — [в отчёте](../Guidelines/SystemDocumentationAudit.md).
+
+## Устройство и поведение
+
+- Пайплайн: `EntityDiedEvent` → `LootGenerationService.GenerateItemsAsync` (только `IFightableNpc`) → таблица через `GetLootTableRequest` → `SpendBudget` → `IItemCreationService` → `List<ItemStack>` → `LootOrchestrator` (презентация). Кэши (`_tableCache`/`_diedEntities`) чистятся по `BattleEndEvent`.
+- **Бюджет** = `baseBudget(EntityType) × (1 + lvlCoef × f(Level)) × rarityMult(Rarity) × (1 + Σ difficulty модификаторов)`; f = √Level (Regular…Unique) или ln(Level+1) (Boss/Archon). Больше difficulty у NPC = больше и лучше лут — ядро мотивации игрока «кормить» NPC модификаторами.
+- **Тиры** 0..3: 0 — лучший и самый дорогой. **Rarity**: меньше = лучше (Legendary=0 … Common=4); Unique=10/Mythic=11 — фиксированные шаблонные редкости, генерация их НЕ перекатывает (эксклюзивы, лежат в тире 0 по 420–650).
+- `SpendBudget`: ролл тира по шансам (модификаторы двигают шансы через `Calculations.CalculateChances` с нормализацией и перетоком из низших тиров) → доступность тира по **минимальной фактической цене предмета** (не по конфигному прайсу) → недоступный тир падает в ближайший худший → предмет равномерно из доступных по цене. **Тир-апгрейд = бесплатный свап ПОСЛЕ покупки** (ролл платит цену исходного тира, difficulty модификатора уже оплатила разницу). Кап `maxItemsPerKill`; излишек бюджета конвертируется в качество (свап самого дешёвого выбранного на предмет лучшего тира) → потолок ценности ≈ кап × средняя цена t0. Guaranteed-предметы бесплатны и идут ПОВЕРХ капа. Холостые роллы ограничены (100) — пустые таблицы не вешают цикл. **Золото (2026-07-24)**: ФИНАЛЬНЫЙ остаток (после качества-свапа) чеканится в кучку `GoldItem` (`ICurrencyItem`, Core/Items): `goldPerBudgetUnit` (4) × остаток, кламп `maxGoldPerKill` (300, анти-джекпот: без него перекормленный архонт чеканил 46к при закупе торговца ~500). Кучка едет обычным дроп-каналом (`ItemOnGround`), подбор кладёт в КОШЕЛЁК мимо сумки; сим-метрика Gold/kill в отчёте, инвариант `GoldDrop_RespectsCapAndPaysWeakKills` (кап держится + слабые киллы платят). Лут-у.е. ≠ золото — курс только в этой точке.
+- **Статы предметов**: множитель `1 + itemModifierMultiplier × Σ difficulty`; масштаб ЛИНЕЙНЫЙ для всех типов модификаторов (flat/inc/multi в данных — дельты, суммируются на базу 1). Пул-шаблоны предметов никогда не мутируются — только свежие экземпляры (`ModifiersCreator`), композиты разворачиваются со скейлом каждой части.
+- Конфиг: `SharedData/LootConfiguration/LootConfiguration.json` (каталог `LootConfiguration` → `LootConfigurationProvider` = `ILootConfiguration`). Таблицы: `SharedData/LootTables` — секции general(basic)/fractions/types/individual, объединяются юнионом по номеру тира (поиск по полю `tier`, не по индексу).
+- NPC-модификаторы: `SharedData/NpcModifiers/NpcModifiers.json` → DTO `Core/Data/NpcModifiersData` (маппинг `JsonProperty` ↔ json уже один раз молча умирал — `tierUpgradeChance`; сим-тест держит пол доли тира 0). `ScaleModifier` усиливает остальные модификаторы NPC. **Форма файла (2026-09-05)**: семь СЕКЦИЙ корня (`scale`/`tierUpgrade`/`guaranteedItems`/`tierMultiplier`/`itemEffects`/`rarityUpgrade`/`minRarity`), ключ секции = вид модификатора (решает DTO записей и становится `Group`, внутри которого считается уникальность); порядок ключей записи = порядок свойств DTO (файл каноничен, `isUnique` объявлен в наследнике там, где его пишет секция). Каталог описан для инструмента — `NpcModifiersCatalogDescriptor`. **`uniqueScope` живёт в `NpcSpawnRolls.json`** (карта секция→`Group`/`Id`) вместе с лестницами «сколько слотов заполнится»: `NpcModifierProvider` читает ДВА каталога, спавн-роллы первыми.
+- Гранты предметов: `IGrantFactory` (Core/Items/Grants) — единственная точка создания (kind: modifier/passive/effect); провайдеры конкретики (реестры `PassiveSkillProvider`/`EffectProvider` в Battle/Source) резолвятся лениво из DI, песочницы без них чеканят инертные гранты. Effect-грант ре-аплаится на каждый `BattleInitializedEvent` (эффекты чистятся в конце боя).
+- Лут-канал грантов (2026-07-19): экип-дроп роллит бонус-грант из каталога `SharedData/ItemEffects/ItemEffects.json`. NPC с `ItemEffectsModifier` (секция itemEffects в NpcModifiers.json) даёт ГАРАНТИРОВАННЫЙ грант на каждый экип-предмет килла (пул = сигнатурные id NPC, вес из каталога); обычный килл роллит `equipItemEffectChance` (конфиг, 0.15) по всему каталогу. Unique/Mythic не трогаются; ролл ПОСЛЕ аффикс-строк. Каталог — общий `CraftingEffectProvider` (Core/Crafting) с крафт-каналом 4; id без записи в каталоге = Tracker + отказ (payload обязателен). Хардкодный `IItemEffectProvider` удалён.
+- НЕ доведено (сознательно отложено): `AdditionalItemsModifier` не зарегистрирован в `NpcModifiersFactory`.
+- **Симуляция** (`src/Testing/LootSimulation`): настоящий пайплайн без Godot — `FileSystemDataSource` + `DefaultRandomNumberGenerator(seed)`, NPC — Moq-стаб. Быстрые инварианты в обычном прогоне тестов; полный Monte-Carlo отчёт — ТОЛЬКО за опт-ином `LOOT_SIMULATION_REPORT=1 dotnet test` → `LootSimulation/Reports/LootSimulationReport.md` (обычный прогон канонический отчёт НЕ трогает; `--filter` на MSTest.Sdk не работает — не использовать). Отчёт детерминирован побайтово (шапка = сид+сценарии, даты нет). Баланс лута меняем ТОЛЬКО с перегоном отчёта.
+- Вне Godot-рантайма нативные вызовы (`ProjectSettings`, `ResourceLoader`, `GD.*`) = фатальный 0xC0000005, try/catch НЕ спасает: Tracker обезврежен через `TrackerBootstrap.LogPathOverride` ([ModuleInitializer] в тестах), `EquipItem.Icon` лениво грузит текстуру — не трогать в копированиях/логике.
+
+## Проверенные точки реализации
+
+Пути относительно `src` LastBreath: `LootGeneration/Source/LootGenerationService.cs`, `Core/Entity/NpcModifiers/NpcModifiersFactory.cs`, `Core/Crafting/CraftingEffectProvider.cs`.
+
+## Связанные документы
+
+- [Существующая система крафта](../Crafting/CurrentSystem.md)
+- [Экипировка и гранты предметов](../Items/CurrentSystem.md)
+- [AI, создание и жизненный цикл NPC](../AI/CurrentSystem.md)
+- [Торговля и кошелёк](../Trade/CurrentSystem.md)
+- [Загрузка игровых данных](../GameData/CurrentSystem.md)
+- [Карта документации](../README.md)
