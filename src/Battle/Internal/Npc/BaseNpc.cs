@@ -165,6 +165,7 @@ namespace Battle.Internal.Npc
 
         // TakeDamage owns the event order (damage beat first, death after) — see its comment.
         private bool _suppressDeathNotify;
+
         // Who landed the last hit: the killer reported with the death (reputation, kill facts, loot).
         // Cleared by a world defeat and by a debug kill — neither has anyone to blame.
         private IFightable? _lastDamageSource;
@@ -243,16 +244,16 @@ namespace Battle.Internal.Npc
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
-            _playerAccessor = GameServiceProvider.Instance.GetService<IPlayerAccessor>();
-            _factionRelations = GameServiceProvider.Instance.GetService<IFactionRelationService>();
-            _npcRegistry = GameServiceProvider.Instance.GetService<INpcWorldRegistry>();
-            _skirmishService = GameServiceProvider.Instance.GetService<INpcSkirmishService>();
-            _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
-            _smartPoints = GameServiceProvider.Instance.GetService<ISmartPointRegistry>();
-            _worldFacts = GameServiceProvider.Instance.GetService<IWorldFactsService>();
-            _recoveryConfig = GameServiceProvider.Instance.GetService<IRecoveryConfigProvider>();
-            _recovery = GameServiceProvider.Instance.GetService<IRestRecoveryService>();
+            _gameEventBus = provider.GetService<IGameEventBus>();
+            _playerAccessor = provider.GetService<IPlayerAccessor>();
+            _factionRelations = provider.GetService<IFactionRelationService>();
+            _npcRegistry = provider.GetService<INpcWorldRegistry>();
+            _skirmishService = provider.GetService<INpcSkirmishService>();
+            _worldClock = provider.GetService<IWorldClock>();
+            _smartPoints = provider.GetService<ISmartPointRegistry>();
+            _worldFacts = provider.GetService<IWorldFactsService>();
+            _recoveryConfig = provider.GetService<IRecoveryConfigProvider>();
+            _recovery = provider.GetService<IRestRecoveryService>();
             _npcRegistry.Register(this);
             _recovery?.RegisterParticipant(this, () => GlobalPosition);
             _gameEventBus.Subscribe<WorldStimulusEvent>(OnWorldStimulus);
@@ -361,7 +362,7 @@ namespace Battle.Internal.Npc
         /// collision is refitted to the new silhouette (a deer is not shaped like the placeholder).</summary>
         private void ApplyVisual(string npcId, IGameServiceProvider provider)
         {
-            var config = provider.GetService<INpcVisualProvider>()?.GetVisual(npcId);
+            var config = provider.GetService<INpcVisualProvider>().GetVisual(npcId);
             if (config?.Frames == null) return;
             _animationsComponent?.ApplyVisual(config.Frames, config.Scale);
             NpcCollisionFitter.Fit(this, _interactionArea); // after ApplyVisual: reads the sprite's final scale

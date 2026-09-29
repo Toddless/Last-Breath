@@ -1,5 +1,6 @@
 namespace LastBreath.Components
 {
+    using System;
     using System.Threading.Tasks;
     using Core.Entity.Components;
     using Godot;
@@ -14,7 +15,7 @@ namespace LastBreath.Components
         /// reported as a short beat instead of a division by zero.</summary>
         private const float UnplayableClipSeconds = 0.5f;
 
-        [Export] protected AnimatedSprite2D? _animatedSprite2D;
+        [Export] protected AnimatedSprite2D? AnimatedSprite2D;
 
         /// <summary>
         /// The sprite while it is still a LIVE engine object. Freeing a node leaves its C# wrapper
@@ -23,7 +24,16 @@ namespace LastBreath.Components
         /// access violation, not a catchable exception. Every native touch of the sprite in both
         /// animators goes through here, so the whole contour has one life check instead of none.
         /// </summary>
-        protected AnimatedSprite2D? Sprite => IsInstanceValid(_animatedSprite2D) ? _animatedSprite2D : null;
+        public AnimatedSprite2D Sprite
+        {
+            get
+            {
+                if (AnimatedSprite2D != null) return AnimatedSprite2D;
+                AnimatedSprite2D = new AnimatedSprite2D();
+                AnimatedSprite2D.SpriteFrames = new SpriteFrames();
+                return AnimatedSprite2D;
+            }
+        }
 
         public abstract Task PlayAnimationAsync(string animation, float speedScale = 1f);
 
@@ -44,14 +54,14 @@ namespace LastBreath.Components
 
             string current = sprite.GetAnimation();
             sprite.SpriteFrames = frames;
-            if (scale != 1f) sprite.Scale *= scale;
+            if (Math.Abs(scale - 1f) > 0.0001f) sprite.Scale *= scale;
 
             string shown = frames.HasAnimation(current) ? current : TweenAnimationRules.ClipFor(TweenFacing.Down);
             if (frames.HasAnimation(shown)) sprite.Play(shown);
         }
 
         /// <summary>Wiring for an animator built in code; a scene fills the export instead.</summary>
-        public void UseSprite(AnimatedSprite2D? sprite) => _animatedSprite2D = sprite;
+        public void UseSprite(AnimatedSprite2D sprite) => AnimatedSprite2D = sprite;
 
         /// <summary>Length of an authored clip, frames over playback speed.</summary>
         protected static float GetClipDuration(SpriteFrames frames, string animation)
@@ -61,7 +71,7 @@ namespace LastBreath.Components
 
             float totalFrames = 0;
             for (int i = 0; i < frames.GetFrameCount(animation); i++)
-                totalFrames += (float)frames.GetFrameDuration(animation, i);
+                totalFrames += frames.GetFrameDuration(animation, i);
             return totalFrames / speed;
         }
     }

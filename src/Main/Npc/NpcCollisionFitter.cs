@@ -32,9 +32,9 @@ namespace LastBreath.Npc
         /// resource (the visual library shares one resource per NPC kind).</summary>
         private static readonly Dictionary<ulong, SilhouetteRect> s_silhouettes = new();
 
-        public static void Fit(CharacterBody2D npc, Area2D? interactionArea)
+        public static void Fit(BaseNpc npc, Area2D? interactionArea)
         {
-            if (FindChildOfType<AnimatedSprite2D>(npc) is not { } sprite)
+            if (npc.Animations.Sprite is not { } sprite)
             {
                 ReportMissing("AnimatedSprite2D of npc", npc);
                 return;
@@ -152,16 +152,6 @@ namespace LastBreath.Npc
             foreach (var child in parent.GetChildren())
             {
                 if (child is CollisionShape2D { Shape: TShape } node) return node;
-            }
-
-            return null;
-        }
-
-        private static T? FindChildOfType<T>(Node parent) where T : Node
-        {
-            foreach (var child in parent.GetChildren())
-            {
-                if (child is T match) return match;
             }
 
             return null;

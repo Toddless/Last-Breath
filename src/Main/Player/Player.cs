@@ -5,6 +5,7 @@ namespace LastBreath.Player
     using System.Linq;
     using System.Threading.Tasks;
     using Battle.Source;
+    using Battle.Source.Presentation;
     using Components;
     using Core;
     using Core.Ai.World;
@@ -59,8 +60,10 @@ namespace LastBreath.Player
         private readonly Dictionary<Stance, IStance> _stances = [];
         private readonly RandomNumberGenerator _rnd = new();
         private readonly DamageResolutionChain _damageChain = DamageResolutionChain.CreateDefault();
+
         private Direction _direction;
-        [Export] private AnimationsComponentBase? _animationsComponent;
+
+        // [Export] private AnimationsComponentBase? _animationsComponent;
         [Export] private Area2D? _interactionArea;
         [Export] private Camera2D? _camera;
         [Export] private PlayerInteractionController? _interactionController;
@@ -83,7 +86,7 @@ namespace LastBreath.Player
         public PlayerLifecycle? Lifecycle { get; private set; }
 
         // Base id doubles as the localization key (see DisplayName); a never-assigned Id was null everywhere.
-        public string Id { get; } = "Player";
+        public string Id => "Player";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
         public Texture2D? Icon { get; }
@@ -93,7 +96,7 @@ namespace LastBreath.Player
         // Never-assigned auto-property left the battle log with nameless player entries.
         public string DisplayName => Core.Localization.Localization.Localize("Player");
         public string[] Tags { get; } = [];
-        public IAnimationsComponent Animations => _animationsComponent;
+        public IAnimationsComponent Animations { get; } = new TweenAnimationsComponent();
         public IEntityParametersComponent Parameters { get; private set; }
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
         public IModifierHandlerComponent ModifierHandler { get; private set; }
@@ -184,17 +187,18 @@ namespace LastBreath.Player
 
         public override void _Ready()
         {
+            var provider = GameServiceProvider.Instance;
             _rnd.Randomize();
             if (_camera is { Enabled: true }) _camera.MakeCurrent();
-            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
+            _gameEventBus = provider.GetService<IGameEventBus>();
             // Optional service (fail-open): drives the movement gate in _PhysicsProcess.
-            _uiElements = GameServiceProvider.Instance.GetServices<IUiElementsManager>().FirstOrDefault();
-            _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
-            _lifecycleConfigProvider = GameServiceProvider.Instance.GetService<IPlayerLifecycleConfigProvider>();
+            _uiElements = provider.GetServices<IUiElementsManager>().FirstOrDefault();
+            _worldClock = provider.GetService<IWorldClock>();
+            _lifecycleConfigProvider = provider.GetService<IPlayerLifecycleConfigProvider>();
             // The unarmed baseline is content (SharedData/PlayerStats), shared with the passive-tree tool.
-            _playerStats = GameServiceProvider.Instance.GetService<IPlayerStatsProvider>();
+            _playerStats = provider.GetService<IPlayerStatsProvider>();
             // Rest at a campfire: the recovery zones heal any registered non-fighting participant.
-            _restRecovery = GameServiceProvider.Instance.GetService<IRestRecoveryService>();
+            _restRecovery = provider.GetService<IRestRecoveryService>();
             _restRecovery?.RegisterParticipant(this, () => GlobalPosition);
             Parameters = new EntityParametersComponent();
             ParameterModifiers = new ParameterModifiersComponent();
@@ -204,7 +208,7 @@ namespace LastBreath.Player
             // The tree reaches the fighter through the same channel as the gear — a registered source,
             // never lines written onto the entity, so a respec cannot leave a contribution behind.
             // Optional service: a project without the tree (the battle sandbox) gets no contribution.
-            _passiveTree = GameServiceProvider.Instance.GetServices<IPassiveTreeService>().FirstOrDefault();
+            _passiveTree = provider.GetServices<IPassiveTreeService>().FirstOrDefault();
             if (_passiveTree != null) ParameterModifiers.RegisterSource(_passiveTree.ParameterSource);
             Equipment.EquipmentChanged += OnEquipmentChanged;
             Effects = new EffectsComponent(this);
@@ -240,7 +244,7 @@ namespace LastBreath.Player
             // fighter right away — the ability book and the parameter component among them. Registering
             // before the components exist made the signal useless: every handler bailed on a null field,
             // so a second scene in the same process (menu → new game) left the book empty.
-            GameServiceProvider.Instance.GetService<IPlayerAccessor>().Set(this);
+            provider.GetService<IPlayerAccessor>().Set(this);
         }
 
         // The recovery service outlives scene reloads — a stale position delegate on a freed node
@@ -507,13 +511,8 @@ namespace LastBreath.Player
                 {
                     Animations.PlayAnimation($"Idle_{_direction}");
                     CanMove = false;
-
                 })
-                .OnExit(() =>
-                {
-                    CanMove = true;
-
-                })
+                .OnExit(() => { CanMove = true; })
                 .Permit(Trigger.Idle, State.Idle)
                 .Permit(Trigger.Die, State.Dead)
                 // A duplicate battle-start signal must degrade to a no-op: throwing here used to

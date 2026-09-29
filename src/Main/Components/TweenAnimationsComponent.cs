@@ -207,7 +207,7 @@ namespace LastBreath.Components
         private TweenAnimationStep WithStateArt(TweenAnimationStep step)
         {
             if (TweenAnimationRules.StateClipFor(step.Kind) is not { } clip) return step;
-            if (Sprite?.SpriteFrames is not { } frames) return step;
+            if (Sprite.SpriteFrames is not { } frames) return step;
 
             bool drawn = frames.HasAnimation(clip);
             return TweenAnimationRules.WithStateArt(step, drawn, drawn ? frames.GetFrameCount(clip) : 0);
