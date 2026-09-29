@@ -224,7 +224,7 @@ namespace LastBreath.World.Interactions
 
         /// <summary>The object while it is set and not freed; null otherwise.</summary>
         private static T? ValidOrNull<T>(T? instance) where T : GodotObject =>
-            instance != null && GodotObject.IsInstanceValid(instance) ? instance : null;
+            instance != null && IsInstanceValid(instance) ? instance : null;
 
         /// <summary>Sources among the node's descendants in tree order; the subtree of a nested target is left to that target.</summary>
         private static IEnumerable<IInteractionSource> SourcesUnder(Node node)

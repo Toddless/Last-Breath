@@ -10,6 +10,7 @@ namespace Core.Narrative.Quests
     using Facts;
     using Influence;
     using Inventory;
+    using Items;
     using MessageBus;
     using MessageBus.Messages;
     using Save;
@@ -29,8 +30,8 @@ namespace Core.Narrative.Quests
         private readonly IQuestProvider _quests;
         private readonly IWorldFactsService _facts;
         private readonly IInventory _inventory;
-        private readonly Items.IItemMinter _items;
-        private readonly Items.IUniqueItemQuery _uniqueItems;
+        private readonly IItemMinter _items;
+        private readonly IUniqueItemQuery _uniqueItems;
         private readonly IInfluenceMastery _influence;
         private readonly IWorldClock _clock;
         private readonly INpcWorldRegistry _registry;
@@ -41,7 +42,7 @@ namespace Core.Narrative.Quests
         private bool _dirty;
 
         public QuestLogService(IQuestProvider quests, IWorldFactsService facts, IInventory inventory,
-            Items.IItemMinter items, Items.IUniqueItemQuery uniqueItems, IInfluenceMastery influence, IWorldClock clock,
+            IItemMinter items, IUniqueItemQuery uniqueItems, IInfluenceMastery influence, IWorldClock clock,
             INpcWorldRegistry registry, IGameEventBus events, IGameMessageBus messages, ILoadScope loadScope)
         {
             _quests = quests;

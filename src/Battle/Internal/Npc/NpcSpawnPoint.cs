@@ -8,6 +8,7 @@ namespace Battle.Internal.Npc
     using Core.Data;
     using Core.Data.SaveData;
     using Core.Entity;
+    using Core.Enums;
     using Core.Events;
     using Source;
     using Core.Services;
@@ -59,7 +60,7 @@ namespace Battle.Internal.Npc
         private readonly HashSet<string> _ownedInstanceIds = [];
         private readonly List<double> _pendingDueMinutes = [];
         private readonly RandomNumberGenerator _rnd = new();
-        private IGameServiceProvider _gameServiceProvider;
+        private readonly IGameServiceProvider _gameServiceProvider = GameServiceProvider.Instance;
         private INpcProvider? _provider;
         private IGameEventBus? _gameEventBus;
         private INpcPopulationService? _population;
@@ -71,7 +72,7 @@ namespace Battle.Internal.Npc
         private double _fallbackMinutes;
 
         /// <summary>Faction of the first known id — a point houses one faction; null until the data loads.</summary>
-        private Core.Enums.Fractions? Fraction => field ??= ResolveFraction();
+        private Fractions? Fraction => field ??= ResolveFraction();
 
         public string PointId => string.IsNullOrEmpty(_pointId) ? GetPath().ToString() : _pointId;
 
@@ -82,7 +83,6 @@ namespace Battle.Internal.Npc
         public override void _Ready()
         {
             _rnd.Randomize();
-            _gameServiceProvider = GameServiceProvider.Instance;
             _provider = _gameServiceProvider.GetService<INpcProvider>();
             _gameEventBus = _gameServiceProvider.GetService<IGameEventBus>();
             _population = _gameServiceProvider.GetService<INpcPopulationService>();
@@ -108,6 +108,8 @@ namespace Battle.Internal.Npc
             _gameEventBus?.Unsubscribe<NpcFactionChangedEvent>(OnFactionChanged);
         }
 
+        // TODO:
+        // Часы стреляют два эвента (HoursPasses, MinutesPassed), вместо логики в процессе перевести на эти эвенты
         public override void _Process(double delta)
         {
             if (_worldClock == null) _fallbackMinutes += delta;
@@ -128,12 +130,7 @@ namespace Battle.Internal.Npc
             }
         }
 
-        public SpawnPointSaveData CaptureState() => new()
-        {
-            Id = PointId,
-            Alive = _ownedInstanceIds.Count,
-            PendingDueMinutes = [.. _pendingDueMinutes],
-        };
+        public SpawnPointSaveData CaptureState() => new() { Id = PointId, Alive = _ownedInstanceIds.Count, PendingDueMinutes = [.. _pendingDueMinutes], };
 
         /// <summary>Restore path: exactly the captured alive count returns (identities re-roll)
         /// and the respawn timers resume in game time.</summary>
@@ -221,7 +218,7 @@ namespace Battle.Internal.Npc
             _ => 1f, // no clock (sandbox): the plain roll
         };
 
-        private Core.Enums.Fractions? ResolveFraction()
+        private Fractions? ResolveFraction()
         {
             if (_provider == null) return null;
 

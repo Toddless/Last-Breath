@@ -287,7 +287,7 @@ namespace LastBreath.World.Containers
                 Slots = Contents.Slots.Select(x => new SavedSlot
                 {
                     Id = x.Id, Amount = x.Amount,
-                    Item = x.Amount > 0 && x.Item != null ? converter.ToData(x.Item, x.Amount) : null
+                    Item = x is { Amount: > 0, Item: not null } ? converter.ToData(x.Item, x.Amount) : null
                 }).ToList()
             });
         }

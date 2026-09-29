@@ -2,6 +2,7 @@ namespace Core.Data.NpcData
 {
     using System.Collections.Generic;
     using Ai;
+    using Ai.World;
     using Battle.Abilities;
     using Entity;
     using Enums;
@@ -52,18 +53,18 @@ namespace Core.Data.NpcData
         public BehaviorProfile? Behavior { get; init; }
 
         /// <summary>World-mode brain tuning; null = the NPC stands still like before.</summary>
-        public Ai.World.WorldBrainConfig? World { get; init; }
+        public WorldBrainConfig? World { get; init; }
 
         /// <summary>Which post-defeat cycle to build; the config of the other kind is inert, never null,
         /// so the wiring switches on this and hands over a config without a null check of its own.</summary>
         public NpcLifecycleKind LifecycleKind { get; init; }
 
         /// <summary>Numbers of the UNDEAD cycle (resurrection/burning). Always present — defaults if not authored.</summary>
-        public required Ai.World.NpcLifecycleConfig Lifecycle { get; init; }
+        public required NpcLifecycleConfig Lifecycle { get; init; }
 
         /// <summary>Numbers of the VILLAGER cycle (recovery timer). Always present — defaults if not
         /// authored; read only when <see cref="LifecycleKind"/> is <see cref="NpcLifecycleKind.Villager"/>.</summary>
-        public Ai.World.VillagerLifecycleConfig VillagerLifecycle { get; init; } = new();
+        public VillagerLifecycleConfig VillagerLifecycle { get; init; } = new();
 
         /// <summary>Species capability, not state: whether this kind of NPC converses at all.</summary>
         public bool CanTalk { get; init; }

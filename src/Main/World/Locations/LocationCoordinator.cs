@@ -15,6 +15,7 @@ namespace LastBreath.World.Locations
     using Core.Save;
     using Core.Save.Participants;
     using Core.Services;
+    using Core.Views.UI;
     using Core.World.Locations;
     using Godot;
     using LootGeneration.Source;
@@ -155,7 +156,7 @@ namespace LastBreath.World.Locations
         {
             if (_host == null || IsTransitioning) return TravelResult.Busy;
             if (_provider.GetService<IPlayerAccessor>().Player is not { IsAlive: true, IsFighting: false }
-                || _provider.GetService<Core.Views.UI.IUiElementsManager>().HasMovementBlockingWindow) return TravelResult.Unavailable;
+                || _provider.GetService<IUiElementsManager>().HasMovementBlockingWindow) return TravelResult.Unavailable;
             if (request.SourceLocationId != ActiveLocationId) return TravelResult.InvalidConnection;
             var source = _loaded[ActiveLocationId];
             var endpoint = source.Root.Descendants().OfType<LocationEndpoint>().SingleOrDefault(x => x.EndpointId == request.EndpointId);
@@ -173,7 +174,6 @@ namespace LastBreath.World.Locations
                 if (_host == null || !GodotObject.IsInstanceValid(Player)
                     || _provider.GetService<IPlayerAccessor>().Player is not { IsAlive: true, IsFighting: false }) return TravelResult.Unavailable;
                 destination = Prepare(address.LocationId);
-                var arrival = destination.Root.Endpoint(address.EndpointId).Arrival;
                 if (created && _snapshots.TryGetValue(address.LocationId, out var saved))
                 {
                     using (_provider.GetService<LoadScope>().Begin()) _state.Restore(destination.Root, saved);

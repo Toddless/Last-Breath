@@ -13,7 +13,9 @@ namespace LastBreath.World.Interactions.UI
         private string _signature = "";
         /// <summary>Cached offer the rows were built from; the menu rebuilds once its target keeps another list instance.</summary>
         private IReadOnlyList<InteractionAction>? _shownOffer;
+
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
         public override void Refresh()
         {
             if (Rows == null) return;
@@ -39,6 +41,7 @@ namespace LastBreath.World.Interactions.UI
             }
             if (!typing) FocusCandidate(rows, focusedActionId, closeFocused)?.GrabFocus();
         }
+
         public override void _Process(double delta)
         {
             base._Process(delta);

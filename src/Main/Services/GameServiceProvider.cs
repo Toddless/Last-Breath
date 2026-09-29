@@ -2,7 +2,6 @@ namespace LastBreath.Services
 {
     using Battle.Source;
     using Battle.Source.RequestHandlers;
-    using Core.Ai.World;
     using Core.Ai.World.Raids;
     using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
@@ -35,6 +34,8 @@ namespace LastBreath.Services
     using Core.Trade;
     using Core.Views;
     using Core.Views.UI;
+    using Core.World.Interactions;
+    using Core.World.Locations;
     using Crafting.Source;
     using Inventory;
     using LootGeneration.Source;
@@ -43,7 +44,8 @@ namespace LastBreath.Services
     using SharedUi;
     using Trade;
     using UI;
-    using World;
+    using World.Interactions;
+    using World.Interactions.UI;
     using Bag = Inventory.Inventory;
 
     /// <summary>Project bootstrap: the shared Core provider + Main registrations. The only place touching the static root.</summary>
@@ -110,12 +112,12 @@ namespace LastBreath.Services
             services.AddSingleton<IBattleNpcSpawner, BattleSummonSpawner>();
             services.AddSingleton<IRaidSpawnRegistry, RaidSpawnRegistry>();
             services.AddGameDataParticipant<IRaidService, RaidService>();
-            services.AddSingleton<Core.World.Locations.LocationCatalog>();
-            services.AddSingleton<IGameDataParticipant>(sp => sp.GetRequiredService<Core.World.Locations.LocationCatalog>());
+            services.AddSingleton<LocationCatalog>();
+            services.AddSingleton<IGameDataParticipant>(sp => sp.GetRequiredService<LocationCatalog>());
             services.AddSingleton<World.Locations.LocationCoordinator>();
-            services.AddSingleton<Core.World.Locations.ILocationTravelService>(sp => sp.GetRequiredService<World.Locations.LocationCoordinator>());
-            services.AddSingleton<Core.World.Locations.ILocationSaveCoordinator>(sp => sp.GetRequiredService<World.Locations.LocationCoordinator>());
-            services.AddTransient<IRequestHandler<Core.World.Locations.TravelRequest, Core.World.Locations.TravelResult>, Core.World.Locations.TravelRequestHandler>();
+            services.AddSingleton<ILocationTravelService>(sp => sp.GetRequiredService<World.Locations.LocationCoordinator>());
+            services.AddSingleton<ILocationSaveCoordinator>(sp => sp.GetRequiredService<World.Locations.LocationCoordinator>());
+            services.AddTransient<IRequestHandler<TravelRequest, TravelResult>, TravelRequestHandler>();
             services.AddSingleton<ISaveGameService, SaveGameService>();
             // Project infrastructure (module discipline): the save stack and session reset are
             // composed by the PROJECT, not by the battle module.
@@ -124,11 +126,11 @@ namespace LastBreath.Services
             services.AddGameData("res://Data/", "res://Data/Shared/");
             // The bag registers once; its Core seams (contents, slot lending, click reports) all
             // resolve to the same instance, so windows never name the concrete service.
-            services.AddSingleton<World.Interactions.InteractionService>();
+            services.AddSingleton<InteractionService>();
             services.AddSingleton<Core.World.Containers.ChestCatalog>();
             services.AddSingleton<IGameDataParticipant>(sp => sp.GetRequiredService<Core.World.Containers.ChestCatalog>());
-            services.AddTransient<IRequestHandler<Core.World.Interactions.ExecuteInteractionRequest, Core.World.Interactions.InteractionResult>, World.Interactions.ExecuteInteractionHandler>();
-            services.AddTransient<IRequestHandler<Core.World.Interactions.ContainerTransferRequest, Core.World.Interactions.InteractionResult>, World.Interactions.ContainerTransferHandler>();
+            services.AddTransient<IRequestHandler<ExecuteInteractionRequest,InteractionResult>, ExecuteInteractionHandler>();
+            services.AddTransient<IRequestHandler<ContainerTransferRequest, InteractionResult>, ContainerTransferHandler>();
             services.AddSingleton<Bag>();
             services.AddSingleton<IInventoryTransfer>(sp => sp.GetRequiredService<Bag>());
             services.AddSingleton<IInventory>(sp => sp.GetRequiredService<Bag>());
@@ -252,8 +254,8 @@ namespace LastBreath.Services
             uiElements.RegisterHudFactory(typeof(PlayerHud), () => PlayerHud.Initialize().Instantiate<PlayerHud>());
             // The availability map (design, Todd 2026-07-11): battle allows only the read-only
             // CharacterWindow; a dialogue allows nothing else; a forbidden open is a silent no-op.
-            uiElements.RegisterWindowFactory(typeof(World.Interactions.UI.InteractionMenuWindow), () => World.Interactions.UI.InteractionMenuWindow.Initialize().Instantiate<World.Interactions.UI.InteractionMenuWindow>(), UiContext.World);
-            uiElements.RegisterWindowFactory(typeof(World.Interactions.UI.ChestContentsWindow), () => World.Interactions.UI.ChestContentsWindow.Initialize().Instantiate<World.Interactions.UI.ChestContentsWindow>(), UiContext.World);
+            uiElements.RegisterWindowFactory(typeof(InteractionMenuWindow), () => InteractionMenuWindow.Initialize().Instantiate<InteractionMenuWindow>(), UiContext.World);
+            uiElements.RegisterWindowFactory(typeof(ChestContentsWindow), () => ChestContentsWindow.Initialize().Instantiate<ChestContentsWindow>(), UiContext.World);
             uiElements.RegisterWindowFactory(typeof(InventoryWindow), () => InventoryWindow.Initialize().Instantiate<InventoryWindow>(), UiContext.World);
             uiElements.RegisterWindowFactory(typeof(DialogueWindow), () => DialogueWindow.Initialize().Instantiate<DialogueWindow>(), UiContext.World | UiContext.Dialogue);
             uiElements.RegisterWindowFactory(typeof(QuestJournalWindow), () => QuestJournalWindow.Initialize().Instantiate<QuestJournalWindow>(), UiContext.World);
@@ -268,7 +270,7 @@ namespace LastBreath.Services
             uiElements.RegisterPopupFactory(typeof(ItemTooltipPopup), () => ItemTooltipPopup.Initialize().Instantiate<ItemTooltipPopup>());
             // The same card under its Core contract: modules that cannot name the Main class
             // (the crafting equip picker) open the framed item tooltip through the interface.
-            uiElements.RegisterPopupFactory(typeof(Core.Views.IItemTooltipPopup), () => ItemTooltipPopup.Initialize().Instantiate<ItemTooltipPopup>());
+            uiElements.RegisterPopupFactory(typeof(IItemTooltipPopup), () => ItemTooltipPopup.Initialize().Instantiate<ItemTooltipPopup>());
             provider.AddCraftingWindowFactories();
             provider.AddBattleUiElementsFactory();
             provider.AddSharedUiFactories();
