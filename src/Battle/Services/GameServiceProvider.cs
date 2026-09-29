@@ -1,6 +1,5 @@
 namespace Battle.Services
 {
-    using Core.Ai.World;
     using Core.Ai.World.Skirmish;
     using Core.Data;
     using Core.Data.GameData;
@@ -43,8 +42,6 @@ namespace Battle.Services
                 .AddSingleton<ReputationBroadcaster>()
                 .AddSingleton<IWitnessQuery, WorldWitnessQuery>()
                 .AddGameDataParticipant<IPersonalReputationService, PersonalReputationService>()
-                // World facts: the boss-gate reads them ("the twin is finally dead"); the tracker writes them.
-                .AddSingleton<IWorldFactsService, WorldFactsService>()
                 .AddSingleton<NpcFinalDeathFactTracker>()
                 // Project infrastructure (module discipline): the sandbox composes its own session
                 // reset — it no longer rides in the battle module. No save system here on purpose:
