@@ -2,7 +2,6 @@ namespace LastBreath.World.Interactions.UI
 {
     using System.Linq;
     using Core.Localization;
-    using Core.World.Interactions;
     using Godot;
 
     internal static class InteractionPresentation

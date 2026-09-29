@@ -8,12 +8,10 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
-    using Core.Data.GameData;
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
     using Core.Services;
-    using Microsoft.Extensions.DependencyInjection;
     using Moq;
     using CriticalCalculationCast = Battle.Source.Abilities.CriticalCalculation.CriticalCalculation;
 

@@ -2,7 +2,6 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
-    using Core.Data;
     using Core.Data.GameData;
     using Core.Enums;
     using Core.Items;

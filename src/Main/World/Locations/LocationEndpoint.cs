@@ -65,13 +65,12 @@ namespace LastBreath.World.Locations
         /// no node owns, or a target the endpoint does not offer its actions through; null when it serves.</summary>
         private string? FindTargetProblem() => InteractionTargetSetup.FindProblem(this, Target, ReportKind, EndpointId);
 
-        /// <summary>Writes an error that disables the endpoint to the log and the Godot console, once per node.</summary>
+        /// <summary>Writes an error that disables the endpoint to the log, once per node.</summary>
         private void ReportConfiguration(string message)
         {
             if (_configurationReported) return;
             _configurationReported = true;
             Tracker.TrackError(message, this);
-            GD.PrintErr(message);
         }
     }
 }

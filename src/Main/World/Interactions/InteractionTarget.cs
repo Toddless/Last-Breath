@@ -164,7 +164,7 @@ namespace LastBreath.World.Interactions
         {
             if (_anchorReported || ValidOrNull(HintAnchor) != null) return;
             _anchorReported = true;
-            Report(string.Format(MissingAnchorFormat, GetPath()));
+            Tracker.TrackError(string.Format(MissingAnchorFormat, GetPath()), this);
         }
 
         /// <summary>Disables the target with one report when its discovery shape does not cover every interaction point plus Reach.</summary>
@@ -175,7 +175,7 @@ namespace LastBreath.World.Interactions
             float required = RequiredRadius(shape ?? (Node2D)this);
             if (FindDiscoveryProblem(shape, required) is not { } problem) return;
             _discoveryInvalid = true;
-            Report(string.Format(CultureInfo.InvariantCulture, InvalidDiscoveryFormat, GetPath(), problem, required));
+            Tracker.TrackError(string.Format(CultureInfo.InvariantCulture, InvalidDiscoveryFormat, GetPath(), problem, required), this);
             Unregister();
         }
 
@@ -213,13 +213,6 @@ namespace LastBreath.World.Interactions
             if (_registered) Services.GameServiceProvider.Instance.GetService<InteractionService>().Unregister(this);
             _registered = false;
             InvalidateOffer();
-        }
-
-        /// <summary>Writes a setup problem of the target to the log and the Godot console.</summary>
-        private void Report(string message)
-        {
-            Tracker.TrackError(message, this);
-            GD.PrintErr(message);
         }
 
         /// <summary>The object while it is set and not freed; null otherwise.</summary>

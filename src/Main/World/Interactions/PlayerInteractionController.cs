@@ -6,7 +6,6 @@ namespace LastBreath.World.Interactions
     using System.Threading.Tasks;
     using Core;
     using Core.Constants;
-    using Core.MessageBus;
     using Core.World.Interactions;
     using Godot;
 
@@ -67,13 +66,8 @@ namespace LastBreath.World.Interactions
         /// <summary>Plays the refusal sound; without one set in the scene a refusal stays silent.</summary>
         public void PlayRefusal() => RefusalSound?.Play();
 
-        /// <summary>Writes the missing refusal sound to the log and the Godot console.</summary>
-        private void ReportMissingRefusalSound()
-        {
-            string message = string.Format(MissingRefusalSoundFormat, GetPath());
-            Tracker.TrackError(message, this);
-            GD.PrintErr(message);
-        }
+        /// <summary>Writes the missing refusal sound to the log.</summary>
+        private void ReportMissingRefusalSound() => Tracker.TrackError(string.Format(MissingRefusalSoundFormat, GetPath()), this);
 
         public override void _ExitTree()
         {

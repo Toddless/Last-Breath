@@ -9,7 +9,6 @@ namespace LastBreathTest.WorldTesting
     using Core.Entity;
     using Core.Entity.Components;
     using Core.Enums;
-    using Core.Events;
     using Core.Services;
     using Core.Reputation;
     using Godot;

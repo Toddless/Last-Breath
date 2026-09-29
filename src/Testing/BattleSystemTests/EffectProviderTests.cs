@@ -1,6 +1,5 @@
 namespace LastBreathTest.BattleSystemTests
 {
-    using Battle.Source;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data.GameData;

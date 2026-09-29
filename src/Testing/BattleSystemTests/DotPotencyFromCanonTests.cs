@@ -2,7 +2,6 @@ namespace LastBreathTest.BattleSystemTests
 {
     using System.Linq;
     using System.Threading.Tasks;
-    using Battle.Source;
     using Battle.Source.Abilities.Riders;
     using Battle.Source.Effects;
     using Battle.Source.PassiveSkills;
@@ -16,7 +15,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Enums;
     using Core.Events;
     using Core.Services;
-    using Microsoft.Extensions.DependencyInjection;
     using Moq;
     using Newtonsoft.Json;
     using JarOfPoisonCast = Battle.Source.Abilities.JarOfPoison.JarOfPoison;

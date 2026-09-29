@@ -20,7 +20,6 @@ namespace LastBreath.World.Locations
     using Godot;
     using LootGeneration.Source;
     using Newtonsoft.Json.Linq;
-    using Npc;
 
     public sealed class LocationCoordinator(LocationCatalog catalog) : ILocationTravelService, ILocationSaveCoordinator, ISaveParticipant
     {

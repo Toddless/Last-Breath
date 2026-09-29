@@ -391,10 +391,6 @@ namespace LastBreath.World
 
         private Node2D PropContainer() => _propContainer ?? GetParent() as Node2D ?? this;
 
-        private void Fail(string message)
-        {
-            Tracker.TrackError(message, this);
-            GD.PrintErr(message);
-        }
+        private void Fail(string message) => Tracker.TrackError(message, this);
     }
 }

@@ -6,7 +6,6 @@ namespace LastBreath.Tests
     using Core.Ai.World.Time;
     using Core.Data;
     using Core.Entity;
-    using Core.Items;
     using Core.Save;
     using Core.Services;
     using Core.World.Locations;

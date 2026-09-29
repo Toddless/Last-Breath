@@ -1,14 +1,11 @@
 namespace LastBreathTest.BattleSystemTests
 {
-    using Battle.Source;
     using Battle.Source.Abilities;
     using Battle.Source.Abilities.StaticArmor;
     using Battle.Source.Effects;
     using Core.Battle.Abilities;
     using Core.Data.AbilityData;
-    using Core.Data.GameData;
     using Core.Services;
-    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// How many stacks of an effect a cast may lay. The number used to be whatever the ability handed the
