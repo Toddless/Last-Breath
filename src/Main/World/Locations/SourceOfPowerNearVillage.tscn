@@ -1,15 +1,12 @@
 [gd_scene format=4 uid="uid://k0u8803mwxw2"]
 
-[ext_resource type="PackedScene" path="res://World/Containers/Chest.tscn" id="starter_chest"]
-
 [ext_resource type="Script" uid="uid://bikj5svjvfps7" path="res://World/TerrainRoot.cs" id="1_os638"]
 [ext_resource type="Resource" uid="uid://b2eys61tsxc43" path="res://World/Terrains/SourceOfPowerNearVillage/TilesTerrain.tres" id="2_g0j45"]
 [ext_resource type="Texture2D" uid="uid://cmtx4uqnb0sc6" path="res://Sandbox/DualGridDebugTiles.png" id="3_a3v5j"]
-
-[ext_resource type="Script" uid="uid://deuhar8mrxw2l" path="res://World/Locations/LocationEndpoint.cs" id="loc_endpoint"]
 [ext_resource type="PackedScene" path="res://World/Interactions/InteractionTarget.tscn" id="interaction_target"]
-
+[ext_resource type="Script" uid="uid://deuhar8mrxw2l" path="res://World/Locations/LocationEndpoint.cs" id="loc_endpoint"]
 [ext_resource type="Script" uid="uid://blen0502curku" path="res://World/Locations/LocationRoot.cs" id="loc_root"]
+[ext_resource type="PackedScene" uid="uid://d4ke0my3shbsa" path="res://World/Containers/Chest.tscn" id="starter_chest"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_iqrg2"]
 texture = ExtResource("3_a3v5j")
@@ -121,18 +118,19 @@ offset_left = -80.0
 offset_top = -50.0
 text = "E - Main World"
 
-[node name="InteractionTarget" parent="Entrance" instance=ExtResource("interaction_target")]
+[node name="InteractionTarget" parent="Entrance" unique_id=2029707565 instance=ExtResource("interaction_target")]
 Reach = 180.0
 
 [node name="DiscoveryShape" parent="Entrance/InteractionTarget" index="2"]
 shape = SubResource("CircleShape2D_exit")
 
-[node name="StarterChest" parent="." instance=ExtResource("starter_chest")]
+[node name="StarterChest" parent="." unique_id=950615318 instance=ExtResource("starter_chest")]
 position = Vector2(-1390, 2247)
 ObjectId = "starter_chest"
 DefinitionId = "Chest_Starter"
 
 [node name="DirectionalLight2D" type="DirectionalLight2D" parent="." unique_id=713152095]
+visible = false
 energy = 0.3
 shadow_enabled = true
 height = 0.6
