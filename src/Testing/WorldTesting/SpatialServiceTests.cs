@@ -46,26 +46,29 @@ namespace LastBreathTest.WorldTesting
         [TestMethod]
         public void RecoveryZonesDoNotHealAnotherSpace()
         {
+            const float maxHealth = 100f;
+            const float wounded = 50f;
+            const float healthRate = 0.1f;
             var spatial = new TestSpatialQuery();
             var config = new Mock<IRecoveryConfigProvider>();
-            config.SetupGet(c => c.Config).Returns(new RecoveryConfig());
+            config.SetupGet(c => c.Config).Returns(new RecoveryConfig { HealthPercentPerMinute = healthRate });
             var recovery = new RestRecoveryService(config.Object, spatial: spatial);
             var parameters = new Mock<IEntityParametersComponent>();
-            parameters.SetupGet(p => p.MaxHealth).Returns(100);
+            parameters.SetupGet(p => p.MaxHealth).Returns(maxHealth);
             var fighter = new Mock<IFightable>();
             fighter.SetupGet(p => p.IsAlive).Returns(true);
             fighter.SetupGet(p => p.Parameters).Returns(parameters.Object);
-            fighter.SetupProperty(p => p.CurrentHealth, 50f);
+            fighter.SetupProperty(p => p.CurrentHealth, wounded);
             var zone = new object();
             spatial.Set(zone, 2);
             recovery.RegisterZone(zone, () => Vector2.Zero, 100);
             recovery.RegisterParticipant(fighter.Object, () => Vector2.Zero);
             recovery.Tick(1);
             recovery.Tick(1);
-            Assert.AreEqual(50f, fighter.Object.CurrentHealth);
+            Assert.AreEqual(wounded, fighter.Object.CurrentHealth);
             spatial.Set(zone, 1);
-            recovery.Tick(1);
-            Assert.AreEqual(60f, fighter.Object.CurrentHealth);
+            recovery.Tick(1); // no clock: one real second stands for one game minute
+            Assert.AreEqual(wounded + maxHealth * healthRate, fighter.Object.CurrentHealth, 0.01f);
         }
 
         [TestMethod]

@@ -14,22 +14,27 @@ namespace LastBreathTest.BattleSystemTests
         private const float MaxMana = 500f;
         private const float MaxBarrier = 400f;
 
+        // Rates the service heals at in these tests: one per channel, so a channel reading another's rate shows.
+        private const float HealthRate = 0.1f;
+        private const float ManaRate = 0.2f;
+        private const float BarrierRate = 0.25f;
+
         [TestMethod]
         public void HealsAllThreeChannelsPerGameMinuteInsideAZone()
         {
+            const int minutes = 2;
             var (service, clock) = CreateService();
             var entity = CreateEntity(health: 500f, mana: 100f, barrier: 0f);
             service.RegisterZone(this, () => Vector2.Zero, radius: 100f);
             service.RegisterParticipant(entity.Object, () => new Vector2(50, 0));
 
-            service.Tick(0.1f);         // baseline snapshot
-            clock.MinuteOfDay = 2;      // two game minutes pass
+            service.Tick(0.1f);           // baseline snapshot
+            clock.MinuteOfDay = minutes;  // that many game minutes pass
             service.Tick(0.1f);
 
-            // 10%/min health, 15%/min mana and barrier (config defaults) over 2 minutes.
-            Assert.AreEqual(500f + MaxHealth * 0.1f * 2, entity.Object.CurrentHealth, 0.01f);
-            Assert.AreEqual(100f + MaxMana * 0.15f * 2, entity.Object.CurrentMana, 0.01f);
-            Assert.AreEqual(0f + MaxBarrier * 0.15f * 2, entity.Object.CurrentBarrier, 0.01f);
+            Assert.AreEqual(500f + MaxHealth * HealthRate * minutes, entity.Object.CurrentHealth, 0.01f);
+            Assert.AreEqual(100f + MaxMana * ManaRate * minutes, entity.Object.CurrentMana, 0.01f);
+            Assert.AreEqual(0f + MaxBarrier * BarrierRate * minutes, entity.Object.CurrentBarrier, 0.01f);
         }
 
         [TestMethod]
@@ -115,7 +120,12 @@ namespace LastBreathTest.BattleSystemTests
         {
             var clock = new SettableClock();
             var config = new Mock<IRecoveryConfigProvider>();
-            config.SetupGet(c => c.Config).Returns(new RecoveryConfig());
+            config.SetupGet(c => c.Config).Returns(new RecoveryConfig
+            {
+                HealthPercentPerMinute = HealthRate,
+                ManaPercentPerMinute = ManaRate,
+                BarrierPercentPerMinute = BarrierRate,
+            });
             return (new RestRecoveryService(config.Object, clock, new LastBreathTest.WorldTesting.TestSpatialQuery()), clock);
         }
 

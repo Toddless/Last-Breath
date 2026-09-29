@@ -10,6 +10,12 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class WorldActivitiesTests
     {
+        // The recovery gate's settings in these tests; the health shares below are read off the threshold.
+        private const float RetreatThreshold = 0.5f;
+        private const float GiveUpMinutes = 2f;
+        private const float BelowThreshold = RetreatThreshold / 2f;
+        private const float AboveThreshold = (RetreatThreshold + 1f) / 2f; // past the threshold, short of full
+
         // ---- CycleActivity + TimedTask ----
 
         [TestMethod]
@@ -83,16 +89,16 @@ namespace LastBreathTest.BattleSystemTests
         {
             var brain = CreateBrain(out var agent);
             var inner = new RecordingTask();
-            var gate = new RecoveryGateActivity(inner, new WorldActivityContext { Recovery = new RecoveryConfig() });
+            var gate = CreateGate(inner);
 
             gate.Enter(brain);
             Assert.AreEqual(1, inner.Entered);
 
-            agent.HealthPercent = 0.3f; // below the 0.5 retreat threshold
+            agent.HealthPercent = BelowThreshold;
             gate.Tick(brain, 0.1f);
             Assert.AreEqual(1, inner.Exited, "the routine is abandoned for recovery");
 
-            agent.HealthPercent = 0.8f; // the zone heals — rising, no stall
+            agent.HealthPercent = AboveThreshold; // the zone heals — rising, no stall
             gate.Tick(brain, 0.1f);
             Assert.AreEqual(1, inner.Entered, "still recovering below full");
 
@@ -106,22 +112,21 @@ namespace LastBreathTest.BattleSystemTests
         {
             var brain = CreateBrain(out var agent);
             var inner = new RecordingTask();
-            var config = new RecoveryConfig { NpcGiveUpMinutes = 2f };
-            var gate = new RecoveryGateActivity(inner, new WorldActivityContext { Recovery = config });
+            var gate = CreateGate(inner);
 
             gate.Enter(brain);
-            agent.HealthPercent = 0.3f;
+            agent.HealthPercent = BelowThreshold;
             gate.Tick(brain, 0.1f); // recovery starts
 
-            gate.Tick(brain, 3f); // standing at home, health flat past the give-up budget
+            gate.Tick(brain, GiveUpMinutes + 1f); // standing at home, health flat past the give-up budget
             Assert.AreEqual(2, inner.Entered, "no zone at home: the NPC gives up and resumes the routine");
 
             gate.Tick(brain, 0.1f);
             Assert.AreEqual(2, inner.Entered, "still below the threshold but gave up — no retry loop");
 
-            agent.HealthPercent = 0.9f; // healed by other means: the gate re-arms
+            agent.HealthPercent = AboveThreshold; // healed by other means: the gate re-arms
             gate.Tick(brain, 0.1f);
-            agent.HealthPercent = 0.3f;
+            agent.HealthPercent = BelowThreshold;
             gate.Tick(brain, 0.1f);
             Assert.AreEqual(2, inner.Exited, "re-armed gate retreats again");
         }
@@ -131,10 +136,10 @@ namespace LastBreathTest.BattleSystemTests
         {
             var brain = CreateBrain(out var agent);
             var inner = new RecordingTask();
-            var gate = new RecoveryGateActivity(inner, new WorldActivityContext { Recovery = new RecoveryConfig() });
+            var gate = CreateGate(inner);
 
             gate.Enter(brain);
-            agent.HealthPercent = 0.3f;
+            agent.HealthPercent = BelowThreshold;
             gate.Tick(brain, 0.1f); // recovering
 
             gate.Exit(brain);  // dragged into a battle
@@ -154,6 +159,12 @@ namespace LastBreathTest.BattleSystemTests
             agent = new MutableAgent();
             return new WorldBrain(agent, new WorldBrainConfig { Aggressive = false }, new DefaultRandomNumberGenerator(seed: 1));
         }
+
+        private static RecoveryGateActivity CreateGate(IWorldActivity inner) =>
+            new(inner, new WorldActivityContext
+            {
+                Recovery = new RecoveryConfig { NpcRetreatHealthPercent = RetreatThreshold, NpcGiveUpMinutes = GiveUpMinutes },
+            });
 
         private class RecordingTask : IWorldTask
         {
