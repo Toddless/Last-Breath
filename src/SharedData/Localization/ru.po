@@ -4417,6 +4417,12 @@ msgstr ""
 msgid "Quest_Trial_Of_The_Pack_Description"
 msgstr ""
 
+msgid "Main_Quest_Awakening"
+msgstr "Пробуждение"
+
+msgid "Main_Quest_Awakening_Description"
+msgstr ""
+
 msgid "Quest_Trial_Of_The_Pack_Stage_Hunt"
 msgstr ""
 

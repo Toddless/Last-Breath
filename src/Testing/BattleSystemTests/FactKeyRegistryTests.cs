@@ -174,7 +174,7 @@ namespace LastBreathTest.BattleSystemTests
                      {
                          FactKeys.KillCountHead,
                          $"{FactKeys.KillCountHead}{FactKeys.Separator}",
-                         $"{FactKeys.ItemEquippedAnyKey}{FactKeys.Separator}Extra"
+                         $"{FactKeys.ItemEquippedAnyHead}{FactKeys.Separator}Extra"
                      })
             {
                 FactKeyEntry key = Key(registry, written);

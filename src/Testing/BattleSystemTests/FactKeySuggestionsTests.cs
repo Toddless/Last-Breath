@@ -116,7 +116,7 @@ namespace LastBreathTest.BattleSystemTests
             [
                 .. FactKeyDeclarations.All.Select(declaration => declaration.Template),
                 .. Words(s_facts.Matching(string.Empty)),
-                string.Empty, WolfKey, FactKeys.KillCountHead, FactKeys.ItemEquippedAnyKey,
+                string.Empty, WolfKey, FactKeys.KillCountHead, FactKeys.ItemEquippedAnyHead,
                 "<npcId>", "Kill_Count:<", "Kill_Count:>", "Kill_Count:<npcId", "Kill_Count:npcId>"
             ];
 
