@@ -54,38 +54,35 @@ dotnet test src\Tooling\Tooling.Tests
 при клонировании: `.\restore-links.ps1` в корне репозитория ставит его на место (список ссылок
 скрипт берёт из git, отдельной записи для этого проекта не нужно).
 
-## Экспорт
+## Export
 
-Пресет `Windows Desktop` лежит в `export_presets.cfg` рядом с `project.godot`.
-
-- из редактора: **Project → Export…** → пресет `Windows Desktop` → **Export Project…** (путь уже
-  проставлен, менять его не надо);
-- из командной строки:
+From the repository root, run:
 
 ```powershell
-godot --headless --path src\Tooling\DataEditor --export-release "Windows Desktop"
+./src/Tooling/export.ps1 -Project DataEditor
 ```
 
-Результат — `build\tools\DataEditor\DataEditor.exe` рядом с `.pck` и папкой сборок .NET (`build/` в
-корне репозитория, в git не едет). Папку экспорта Godot не создаёт: если её нет, сделать один раз
-`mkdir build\tools\DataEditor`.
+Omit `-Project` to export both editors. Use `-Godot <path>` or `GODOT` to select another Godot
+4.7 mono executable. The script builds `ExportRelease`, creates the destination and `.gdignore`,
+and exports the `Windows Desktop` preset with `--export-release`.
 
-Данные в `.pck` не пакуются: инструмент читает и пишет каталоги на диске. В сборку едут только тема
-интерфейса (`Data/Shared/Assets/UI`) и `.po` (`Data/Shared/Localization`) — всё остальное под
-`Data/Shared` отсечено `exclude_filter`.
+Output: `src/Tooling/DataEditor/Export/DataEditor.exe` and `DataEditor.pck`.
+The PCK contains the managed assemblies and .NET runtime, as in PassiveTreeEditor; keep it beside
+the EXE. No loose `data_DataEditor_windows_x86_64` directory is required. Export output is ignored
+by Git and by Godot's project scanner. Export logs are kept in the same directory.
 
-Корень данных для exe (в порядке проверки):
+`Export/Data/Shared` is a relative symbolic link to `src/SharedData`. Windows Developer Mode or
+an elevated shell is required to create it. The exported editor changes the repository's actual
+catalogs. When distributing the editor outside this checkout, provide a real `Data/Shared` folder
+beside it or pass `--data <path>`; the repository link is not a portable copy of the catalogs.
 
-1. `--data <путь>` — например `DataEditor.exe --data D:\...\LastBreath\src\SharedData`; путь берётся
-   как написан. Аргумент читается и после `--` (`DataEditor.exe -- --data <путь>`), и без него;
-2. папка `Data/Shared` рядом с exe — если инструмент раздают отдельной копией с данными внутри;
-3. ближайший `src/SharedData` вверх по дереву от exe — так exe из `build/tools/DataEditor/` находит
-   данные репозитория (три шага вверх до корня репо), и это рабочий сценарий для запуска из папки
-   репозитория.
+After the first scripted export, exporting from Godot also uses `Export/DataEditor.exe`.
+Clear **Export With Debug**: only the release template is installed on the current workstation.
+The script always selects Release. Presets use Godot's installed templates without absolute paths.
 
-Ни один из трёх не нашёлся — инструмент открывается и говорит диалогом `Data root not found`, называя
-путь, в который он смотрел, и что с этим делать.
-
+Data root lookup remains: explicit `--data`, then `Data/Shared` beside the EXE, then the nearest
+repository `src/SharedData`. A missing root is reported in the application. JSON catalogs remain
+external; the PCK contains the UI resources and localization required to display the editor.
 ## Что показывается
 
 - **Слева** — каталоги, для которых у игры есть описатель. Их пока меньше, чем каталогов данных;
