@@ -2,15 +2,15 @@ namespace Core.Ai.World.Recovery
 {
     using System;
     using System.Collections.Generic;
+    using Core.World.Spaces;
     using Entity;
     using Godot;
     using Time;
 
-    public class RestRecoveryService(IRecoveryConfigProvider configProvider, IWorldClock? clock = null, Core.World.Spaces.ISpatialQuery? spatial = null) : IRestRecoveryService
+    public class RestRecoveryService(IRecoveryConfigProvider configProvider, IWorldClock? clock = null, ISpatialQuery? spatial = null) : IRestRecoveryService
     {
-        private readonly Core.World.Spaces.ISpatialQuery _spatial = spatial ?? Core.World.Spaces.NativeSpatialQuery.Instance;
+        private readonly ISpatialQuery _spatial = spatial ?? NativeSpatialQuery.Instance;
         private readonly record struct Zone(object Owner, Func<Vector2> Position, float Radius, Func<IFightable, bool>? CanRest);
-
         private readonly record struct Participant(IFightable Entity, Func<Vector2> Position);
 
         private readonly List<Zone> _zones = [];
@@ -18,6 +18,8 @@ namespace Core.Ai.World.Recovery
         private double _lastAbsoluteMinute = -1;
         private double _fallbackMinutes;
 
+        // TODO:
+        // Now Minutes уже несколько раз повторялся в коде в нескольких местах. Вынести в статичный метод
         /// <summary>Now in absolute game minutes; without a clock (sandbox scenes) one real second
         /// approximates one game minute — the spawn points' convention.</summary>
         private double NowMinutes => clock != null ? clock.Day * 1440 + clock.MinuteOfDay : _fallbackMinutes;
@@ -30,14 +32,20 @@ namespace Core.Ai.World.Recovery
 
         public void UnregisterZone(object owner) => _zones.RemoveAll(zone => ReferenceEquals(zone.Owner, owner));
 
+        // TODO:
+        // регистрировать участников только в момент входа в зону
         public void RegisterParticipant(IFightable entity, Func<Vector2> position)
         {
             UnregisterParticipant(entity);
             _participants.Add(new Participant(entity, position));
         }
 
+        // TODO:
+        // удалять участников только в момент выхода из зоны
         public void UnregisterParticipant(IFightable entity) => _participants.RemoveAll(p => ReferenceEquals(p.Entity, entity));
 
+        // TODO:
+        // Перевести восстановление ресурсов с тиков каждый кадр на минуты WorldClock.
         public void Tick(float realDelta)
         {
             if (clock == null) _fallbackMinutes += realDelta;
@@ -59,7 +67,7 @@ namespace Core.Ai.World.Recovery
 
         public void Reconcile(IFightable entity, Vector2 position, float minutes)
         {
-            if (minutes > 0 && entity.IsAlive && !entity.IsFighting && InsideAnyZone(entity, position)) Restore(entity, minutes);
+            if (minutes > 0 && entity is { IsAlive: true, IsFighting: false } && InsideAnyZone(entity, position)) Restore(entity, minutes);
         }
 
         private bool InsideAnyZone(IFightable entity, Vector2 position)
