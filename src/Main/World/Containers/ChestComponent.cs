@@ -72,6 +72,9 @@ namespace LastBreath.World.Containers
         public ChestContents Contents { get; } = new();
         public string NameKey => _definition?.NameKey ?? string.Empty;
 
+        /// <summary>Cells the chest's definition gives it; zero while the chest has no definition.</summary>
+        public int Capacity => _definition?.Capacity ?? 0;
+
         /// <summary>ID of the chest's interaction target, composed from <see cref="ObjectId"/>; empty while ObjectId is blank.</summary>
         public string InteractionId => InteractionIds.Chest(ObjectId);
 
@@ -250,13 +253,13 @@ namespace LastBreath.World.Containers
             return null;
         }
 
-        /// <summary>Writes an error that disables the chest to the log and the Godot console, once per node.</summary>
+        /// <summary>Writes an error that disables the chest to the log, once per node.</summary>
         private void ReportConfiguration(string message) => ReportOnce(ref _configurationReported, message);
 
-        /// <summary>Writes a look the chest cannot show to the log and the Godot console, once per node.</summary>
+        /// <summary>Writes a look the chest cannot show to the log, once per node.</summary>
         private void ReportVisuals(string message) => ReportOnce(ref _visualsReported, message);
 
-        /// <summary>Writes a chest problem to the log and the Godot console unless its flag says one of its kind was written.</summary>
+        /// <summary>Writes a chest problem to the log unless its flag says one of its kind was written.</summary>
         private void ReportOnce(ref bool reported, string message)
         {
             if (reported) return;
@@ -264,12 +267,8 @@ namespace LastBreath.World.Containers
             Report(message);
         }
 
-        /// <summary>Writes a chest problem to the log and the Godot console.</summary>
-        private void Report(string message)
-        {
-            Tracker.TrackError(message, this);
-            GD.PrintErr(message);
-        }
+        /// <summary>Writes a chest problem to the log.</summary>
+        private void Report(string message) => Tracker.TrackError(message, this);
 
         /// <summary>The contents as the save writes them; a saved state this chest could not read goes back exactly as it came.</summary>
         public JToken CaptureLocationState()
@@ -284,7 +283,7 @@ namespace LastBreath.World.Containers
                 Slots = Contents.Slots.Select(x => new SavedSlot
                 {
                     Id = x.Id, Amount = x.Amount,
-                    Item = x.Amount > 0 && x.Item != null ? converter.ToData(x.Item, x.Amount) : null
+                    Item = x is { Amount: > 0, Item: not null } ? converter.ToData(x.Item, x.Amount) : null
                 }).ToList()
             });
         }
@@ -366,7 +365,7 @@ namespace LastBreath.World.Containers
         /// <summary>Names a failure by its exception type and message.</summary>
         private static string Describe(Exception exception) => string.Format(FailureFormat, exception.GetType().Name, exception.Message);
 
-        /// <summary>Writes every finding of a restore to the log and the Godot console, one entry each.</summary>
+        /// <summary>Writes every finding of a restore to the log, one entry each.</summary>
         private void ReportFindings(ChestStateRepairResult repair)
         {
             string format = repair.State == null ? UnreadStateKeptFormat : StateRepairedFormat;

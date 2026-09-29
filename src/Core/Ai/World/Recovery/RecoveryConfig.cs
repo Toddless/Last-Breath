@@ -10,15 +10,15 @@ namespace Core.Ai.World.Recovery
     /// written field for field would let a field reach one of them and not the other.</remarks>
     public class RecoveryConfig
     {
-        [JsonProperty("healthPercentPerMinute")] public float HealthPercentPerMinute { get; init; } = 0.1f;
-        [JsonProperty("manaPercentPerMinute")] public float ManaPercentPerMinute { get; init; } = 0.15f;
-        [JsonProperty("barrierPercentPerMinute")] public float BarrierPercentPerMinute { get; init; } = 0.15f;
+        [JsonProperty("healthPercentPerMinute")] public float HealthPercentPerMinute { get; init; } = 0.03f;
+        [JsonProperty("manaPercentPerMinute")] public float ManaPercentPerMinute { get; init; } = 0.03f;
+        [JsonProperty("barrierPercentPerMinute")] public float BarrierPercentPerMinute { get; init; } = 0.03f;
 
         /// <summary>Zone radius used when the registering node does not supply its own (campfire).</summary>
         [JsonProperty("defaultZoneRadius")] public float DefaultZoneRadius { get; init; } = 150f;
 
         /// <summary>NPC abandons its routine and heads home to rest below this health share.</summary>
-        [JsonProperty("npcRetreatHealthPercent")] public float NpcRetreatHealthPercent { get; init; } = 0.5f;
+        [JsonProperty("npcRetreatHealthPercent")] public float NpcRetreatHealthPercent { get; init; } = 0.3f;
 
         /// <summary>Resting at home without any health gain for this many game minutes = give up
         /// (no recovery zone there — wild risen NPCs live with their wounds).</summary>

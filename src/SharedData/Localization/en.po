@@ -4559,6 +4559,12 @@ msgstr "Trial of the Pack"
 msgid "Quest_Trial_Of_The_Pack_Description"
 msgstr "The second trial. A direwolf — bigger than the last one, quicker than it looks, and it hunts thinking. Ronald wants to see whether you can finish what you start."
 
+msgid "Main_Quest_Awakening"
+msgstr "Awakening"
+
+msgid "Main_Quest_Awakening_Description"
+msgstr ""
+
 msgid "Quest_Trial_Of_The_Pack_Stage_Hunt"
 msgstr "Put the direwolf down"
 

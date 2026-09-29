@@ -19,16 +19,16 @@ namespace LastBreath.World.Interactions.UI
         [Export] protected Button? CloseButton;
         [Export] protected Label? Title;
         /// <summary>The bound target while it is alive in the scene tree; null otherwise.</summary>
-        private InteractionTarget? LiveTarget => Target != null && GodotObject.IsInstanceValid(Target) && Target.IsInsideTree() ? Target : null;
+        private InteractionTarget? LiveTarget => IsInstanceValid(Target) && Target.IsInsideTree() ? Target : null;
         /// <summary>Target this window is bound to by <see cref="Bind"/>.</summary>
         public InteractionTarget Target { get; private set; } = null!;
         /// <summary>The window is the session's own UI.</summary>
-        IWindow? IInteractionSession.Window => this;
+        IWindow IInteractionSession.Window => this;
         /// <summary>Open while the node is valid and not queued for deletion.</summary>
-        public bool IsOpen => GodotObject.IsInstanceValid(this) && !IsQueuedForDeletion();
+        public bool IsOpen => IsInstanceValid(this) && !IsQueuedForDeletion();
         public bool BlocksMovement => true;
 
-        public void InjectServices(IGameServiceProvider provider) => Messages = provider.GetService<IGameMessageBus>();
+        public virtual void InjectServices(IGameServiceProvider provider) => Messages = provider.GetService<IGameMessageBus>();
         public override void _Ready()
         {
             CloseButton?.Text = Localization.Localize(CloseKey);

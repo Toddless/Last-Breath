@@ -4243,6 +4243,8 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(0, schema.LocalizedSuffixes.Count,
                 "a chest is named by the key it writes for itself, and nothing is worded off its id");
             Assert.AreEqual(ChestsCatalogDescriptor.FileName, schema.Placement.FileFor(_ => null));
+            Assert.AreEqual(FieldKind.Integer, Field(schema.Sections[0].Record, ChestFields.Capacity).Kind,
+                $"'{ChestFields.Capacity}' is offered as something other than the whole count of cells the reader takes");
 
             CollectionAssert.AreEqual(
                 Array.Empty<string>(),
@@ -4314,7 +4316,7 @@ namespace LastBreathTest.BattleSystemTests
 
             (RecordSchema Record, string[] Demanded)[] demands =
             [
-                (chest, [ChestFields.Id, ChestFields.NameKey, ChestFields.Delay, ChestFields.Access, ChestFields.Contents]),
+                (chest, [ChestFields.Id, ChestFields.NameKey, ChestFields.Capacity, ChestFields.Delay, ChestFields.Access, ChestFields.Contents]),
                 (Nested(chest, ChestFields.Access), [ChestFields.Mode]),
                 (contents, [ChestFields.Mode, ChestFields.Items]),
                 (Nested(contents, ChestFields.Items), [ChestFields.SlotId, ChestFields.ItemId, ChestFields.Amount, ChestFields.Rarity])

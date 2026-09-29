@@ -1,0 +1,68 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://mkeot0dkhksr"]
+
+[ext_resource type="Texture2D" uid="uid://bd30noys5k2hp" path="res://Data/Shared/Assets/Player/Animation/Dying/Dying_000.png" id="1_rh58o"]
+[ext_resource type="Texture2D" uid="uid://cvvkuepd6sjdt" path="res://Data/Shared/Assets/Player/Animation/Right - Attacking/Right - Attacking_000.png" id="2_1ycgq"]
+[ext_resource type="Texture2D" uid="uid://bjsqnw24sfc10" path="res://Data/Shared/Assets/Player/Animation/Right - Hurt/Right - Hurt_000.png" id="3_sx424"]
+[ext_resource type="Texture2D" uid="uid://dg25hgv2y652v" path="res://Data/Shared/Assets/Player/Animation/Front - Idle/Front - Idle_000.png" id="4_mymyg"]
+[ext_resource type="Texture2D" uid="uid://csgee0okr6ftm" path="res://Data/Shared/Assets/Player/Animation/Left - Idle/Left - Idle_000.png" id="5_n0gdx"]
+[ext_resource type="Texture2D" uid="uid://b5dgjrbud6eqe" path="res://Data/Shared/Assets/Player/Animation/Right - Idle/Right - Idle_000.png" id="6_o7nre"]
+[ext_resource type="Texture2D" uid="uid://6vi461qjsmm0" path="res://Data/Shared/Assets/Player/Animation/Back - Idle/Back - Idle_000.png" id="7_leqws"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_rh58o")
+}],
+"loop": 1,
+"name": &"Dead",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_1ycgq")
+}],
+"loop": 1,
+"name": &"Fight_Attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_sx424")
+}],
+"loop": 1,
+"name": &"Fight_Hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_mymyg")
+}],
+"loop": 1,
+"name": &"Idle_Down",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_n0gdx")
+}],
+"loop": 1,
+"name": &"Idle_Left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_o7nre")
+}],
+"loop": 1,
+"name": &"Idle_Right",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_leqws")
+}],
+"loop": 1,
+"name": &"Idle_Up",
+"speed": 5.0
+}]

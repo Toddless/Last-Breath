@@ -37,3 +37,7 @@ managed assemblies and start from an unrelated working directory without `--data
 Both SharedData links resolve to the repository catalogs. NarrativeEditor reported no startup
 errors. DataEditor's headless check logged a popup-position error while displaying catalog
 validation notes; this is separate from export and managed runtime initialization.
+
+## Связанные документы
+
+- [Карта документации LastBreath](../README.md)

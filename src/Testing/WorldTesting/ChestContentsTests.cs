@@ -337,8 +337,9 @@ namespace LastBreathTest.WorldTesting
         private static readonly AuthoredChestItem Ore = new("second", "ore", 10, Rarity.Common);
         private static readonly AuthoredChestItem Gem = new("third", "gem", 1, Rarity.Rare);
 
+        /// <summary>A chest just big enough for its positions, as the catalog would believe one.</summary>
         private static ChestDefinition Definition(params AuthoredChestItem[] positions) =>
-            new("test", "test", 5, new(ChestAccessMode.Unlocked), new(ChestContentsMode.Authored, positions));
+            new("test", "test", positions.Length, 5, new(ChestAccessMode.Unlocked), new(ChestContentsMode.Authored, positions));
 
         private sealed record Request(string Id, int SignatureEffects, Rarity Rarity, float EquipEffectChance,
             float ModifierMultiplier, Rarity? FixedRarity);
@@ -510,6 +511,15 @@ namespace LastBreathTest.WorldTesting
         private const string ItemsPath = ChestFields.Contents + "." + ChestFields.Items;
         private const string FirstAmountPath = ItemsPath + "[0]." + ChestFields.Amount;
 
+        /// <summary>The cells the shipped starter chest is authored with.</summary>
+        private const int StarterCells = 20;
+
+        /// <summary>The cells of every record composed here: more than any of them has positions.</summary>
+        private const int Cells = 10;
+
+        /// <summary>The positions a sound record writes.</summary>
+        private const int SoundPositions = 2;
+
         /// <summary>The shipped chest, read through the real load path so the file's shape is held to
         /// what the participant expects of it.</summary>
         [TestMethod]
@@ -526,6 +536,7 @@ namespace LastBreathTest.WorldTesting
             var starter = catalog.Find(StarterChest);
             Assert.IsNotNull(starter, "the shipped catalog no longer holds the starter chest");
             Assert.AreEqual(StarterChest, starter.NameKey);
+            Assert.AreEqual(StarterCells, starter.Capacity);
             Assert.AreEqual(5d, starter.EmptyRemovalDelayMinutes);
             Assert.AreEqual(ChestAccessMode.Unlocked, starter.Access.Mode);
             Assert.AreEqual(ChestContentsMode.Authored, starter.Contents.Mode);
@@ -569,6 +580,28 @@ namespace LastBreathTest.WorldTesting
             [
                 "Chest_NameKeyAsObject", "Chest_AccessAsText", "Chest_ItemsAsObject",
                 "Chest_AmountAsText", "Chest_FractionalAmount", "Chest_DelayAsText"
+            ])
+                Assert.IsNull(catalog.Find(skipped), skipped);
+        }
+
+        /// <summary>A capacity left out, not a whole number, none, less than none, or fewer cells than the
+        /// positions costs its own record only; positions filling every cell are sound.</summary>
+        [TestMethod]
+        public void CapacityThatCannotHoldThePositionsCostsOnlyItsRecord()
+        {
+            ChestCatalog catalog = new();
+
+            catalog.Apply(DataCatalog.Chests, new GameDataFile(TestFile, CapacityCatalogJson));
+
+            Assert.AreEqual(Cells, catalog.Find("Chest_First")?.Capacity);
+            Assert.AreEqual(Cells, catalog.Find("Chest_Last")?.Capacity);
+            var filled = catalog.Find("Chest_EveryCellFilled");
+            Assert.AreEqual(SoundPositions, filled?.Capacity);
+            Assert.AreEqual(SoundPositions, filled?.Contents.Items.Count);
+            foreach (string skipped in (string[])
+            [
+                "Chest_NoCapacity", "Chest_CapacityAsText", "Chest_FractionalCapacity",
+                "Chest_ZeroCapacity", "Chest_NegativeCapacity", "Chest_MorePositionsThanCells"
             ])
                 Assert.IsNull(catalog.Find(skipped), skipped);
         }
@@ -632,7 +665,7 @@ namespace LastBreathTest.WorldTesting
         /// <summary>A record every rule accepts, with two positions.</summary>
         private static JObject Sound(string id) => JObject.FromObject(new
         {
-            id, nameKey = id, emptyRemovalDelayMinutes = 5,
+            id, nameKey = id, capacity = Cells, emptyRemovalDelayMinutes = 5,
             access = new { mode = "Unlocked" },
             contents = Contents("Authored", Position("first"), Position("second"))
         });
@@ -644,6 +677,29 @@ namespace LastBreathTest.WorldTesting
             (record.SelectToken(path) ?? throw new ArgumentException($"a sound record has no '{path}'", nameof(path))).Replace(value);
             return record;
         }
+
+        /// <summary>A sound record with its field <paramref name="field"/> left out.</summary>
+        private static JObject Without(string id, string field)
+        {
+            var record = Sound(id);
+            if (!record.Remove(field)) throw new ArgumentException($"a sound record has no '{field}'", nameof(field));
+            return record;
+        }
+
+        /// <summary>Two sound records around every capacity the reader refuses, and one whose positions fill every
+        /// cell. Each record is composed from a sound one and differs from it in the capacity alone.</summary>
+        private static string CapacityCatalogJson => JsonConvert.SerializeObject(new JToken[]
+        {
+            Sound("Chest_First"),
+            Without("Chest_NoCapacity", ChestFields.Capacity),
+            Mistyped("Chest_CapacityAsText", ChestFields.Capacity, "many"),
+            Mistyped("Chest_FractionalCapacity", ChestFields.Capacity, 2.5),
+            Mistyped("Chest_ZeroCapacity", ChestFields.Capacity, 0),
+            Mistyped("Chest_NegativeCapacity", ChestFields.Capacity, -1),
+            Mistyped("Chest_MorePositionsThanCells", ChestFields.Capacity, SoundPositions - 1),
+            Mistyped("Chest_EveryCellFilled", ChestFields.Capacity, SoundPositions),
+            Sound("Chest_Last")
+        });
 
         /// <summary>One file carrying every kind of value a field cannot hold between two sound records,
         /// plus a record whose id is not text and one that is not a record at all.</summary>
@@ -666,34 +722,34 @@ namespace LastBreathTest.WorldTesting
         /// sound one in exactly the field it is named after.</summary>
         private static string BrokenCatalogJson => JsonConvert.SerializeObject(new object[]
         {
-            new { id = "Chest_Sound", nameKey = "Chest_Sound", emptyRemovalDelayMinutes = 5,
+            new { id = "Chest_Sound", nameKey = "Chest_Sound", capacity = Cells, emptyRemovalDelayMinutes = 5,
                 access = new { mode = "Unlocked" },
                 contents = Contents("Authored", Position("first"), Position("second")) },
-            new { id = "Chest_UnknownAccessMode", nameKey = "x", emptyRemovalDelayMinutes = 5,
+            new { id = "Chest_UnknownAccessMode", nameKey = "x", capacity = Cells, emptyRemovalDelayMinutes = 5,
                 access = new { mode = "Picklocked" },
                 contents = Contents("Authored", Position("first")) },
-            new { id = "Chest_UnknownContentsMode", nameKey = "x", emptyRemovalDelayMinutes = 5,
+            new { id = "Chest_UnknownContentsMode", nameKey = "x", capacity = Cells, emptyRemovalDelayMinutes = 5,
                 access = new { mode = "Unlocked" },
                 contents = Contents("Random", Position("first")) },
-            new { id = "Chest_RarityAsFlags", nameKey = "x", emptyRemovalDelayMinutes = 5,
+            new { id = "Chest_RarityAsFlags", nameKey = "x", capacity = Cells, emptyRemovalDelayMinutes = 5,
                 access = new { mode = "Unlocked" },
                 contents = Contents("Authored", Position("first", rarity: "Uncommon, Common")) },
-            new { id = "Chest_NoDelay", nameKey = "x",
+            new { id = "Chest_NoDelay", nameKey = "x", capacity = Cells,
                 access = new { mode = "Unlocked" },
                 contents = Contents("Authored", Position("first")) },
-            new { id = "Chest_EmptyItemId", nameKey = "x", emptyRemovalDelayMinutes = 5,
+            new { id = "Chest_EmptyItemId", nameKey = "x", capacity = Cells, emptyRemovalDelayMinutes = 5,
                 access = new { mode = "Unlocked" },
                 contents = Contents("Authored", Position("first", itemId: "")) },
-            new { id = "Chest_RepeatedSlot", nameKey = "x", emptyRemovalDelayMinutes = 5,
+            new { id = "Chest_RepeatedSlot", nameKey = "x", capacity = Cells, emptyRemovalDelayMinutes = 5,
                 access = new { mode = "Unlocked" },
                 contents = Contents("Authored", Position("same"), Position("same", itemId: "Helmet_Stoneheart")) },
-            new { id = "Chest_NoPositions", nameKey = "x", emptyRemovalDelayMinutes = 5,
+            new { id = "Chest_NoPositions", nameKey = "x", capacity = Cells, emptyRemovalDelayMinutes = 5,
                 access = new { mode = "Unlocked" },
                 contents = Contents("Authored") },
-            new { id = "Chest_Sound", nameKey = "Chest_Impostor", emptyRemovalDelayMinutes = 5,
+            new { id = "Chest_Sound", nameKey = "Chest_Impostor", capacity = Cells, emptyRemovalDelayMinutes = 5,
                 access = new { mode = "Unlocked" },
                 contents = Contents("Authored", Position("stolen", itemId: "Helmet_Stoneheart")) },
-            new { id = "Chest_Last", nameKey = "Chest_Last", emptyRemovalDelayMinutes = 5,
+            new { id = "Chest_Last", nameKey = "Chest_Last", capacity = Cells, emptyRemovalDelayMinutes = 5,
                 access = new { mode = "Unlocked" },
                 contents = Contents("Authored", Position("first")) }
         });

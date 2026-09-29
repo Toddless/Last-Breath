@@ -24,6 +24,7 @@ namespace LastBreath.World.Interactions
         private IInteractionSession? _session;
         public PlayerInteractionController? Controller { get; set; }
         public InteractionTarget? Selected { get; private set; }
+        /// <summary>Cached offer of the selected target as of its selection; the hint shows it.</summary>
         public IReadOnlyList<InteractionAction> SelectedActions { get; private set; } = [];
         public InteractionTarget? SessionTarget => _session?.Target;
         private IUiElementsManager Ui => provider.GetService<IUiElementsManager>();
@@ -44,10 +45,11 @@ namespace LastBreath.World.Interactions
             if (_session?.Target == target) CancelSession(InteractionSessionEndCause.TargetLost);
             if (Selected == target) Select(null);
         }
+        /// <summary>Makes the target the one E and the hint address, keeping its cached offer for the hint; null clears the selection.</summary>
         public void Select(InteractionTarget? target)
         {
             Selected = target;
-            SelectedActions = target?.ReadActions() ?? [];
+            SelectedActions = target?.CachedOffer ?? [];
         }
 
         /// <summary>Target selection and E input; text focus suppresses them without closing an open session.</summary>

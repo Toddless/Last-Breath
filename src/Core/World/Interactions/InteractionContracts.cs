@@ -54,10 +54,9 @@ namespace Core.World.Interactions
         Cancelled
     }
 
+    /// <summary>IDs of the actions interaction sources offer.</summary>
     public static class InteractionActions
     {
-        public const string Interact = "interact";
-        public const string TakeAll = "container_take_all";
         public const string Talk = "talk";
         public const string Attack = "attack";
         public const string Open = "open";

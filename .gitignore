@@ -146,3 +146,8 @@ paket-files/
 /src/LootGeneration/temp/
 # Editor state, not game data: holds one machine's absolute tree path
 /src/PassiveTreeEditor/editor-settings.json
+
+# Generated tooling exports and export diagnostics
+/src/Tooling/DataEditor/Export/
+/src/Tooling/NarrativeEditor/Export/
+/build/export-diagnostics-*/

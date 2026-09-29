@@ -1,5 +1,5 @@
 > [!note] Статус
-> Рабочая заметка к концепту [[Интерактивное окружение]]. Рабочие варианты и ответы фиксируют текущие уточнения концепта. Неотвеченные вопросы и предлагаемые критерии остаются предметом обсуждения.
+> Рабочая заметка к концепту [Интерактивное окружение](InteractiveEnvironmentConcept.md). Рабочие варианты и ответы фиксируют текущие уточнения концепта. Неотвеченные вопросы и предлагаемые критерии остаются предметом обсуждения.
 
 ## Обзор
 
@@ -94,3 +94,8 @@
 | Transfer the part of a stack that fits. | Free space in existing stacks should remain usable even when the requested quantity cannot fit in full. | A container transfer needs the actual accepted quantity; its remainder stays in the original slot. Existing all-or-nothing inventory operations retain their contracts. |
 
 InteractionArchitecture.md records the #264 technical proposal and acceptance checks. The explicit-selection rule for a lone destructive action, blocking movement while interaction windows are open, and the initial Take All binding are review defaults, not previously approved gameplay rules.
+
+## Связанные документы
+
+- [Описание существующей системы](CurrentSystem.md)
+- [Карта документации LastBreath](../README.md)

@@ -78,7 +78,7 @@ namespace LastBreath.Components
             }
 
             LiveTweens?.Suspend();
-            Sprite?.Play(animation);
+            Sprite.Play(animation);
         }
 
         public override bool HasClip(string animation) => HasRealClip(animation) || TweenAnimationRules.Handles(animation);
@@ -98,7 +98,7 @@ namespace LastBreath.Components
         /// The frame count is asked for only when the clip exists — the engine complains otherwise.</summary>
         private bool HasRealClip(string animation)
         {
-            if (Sprite?.SpriteFrames is not { } frames) return false;
+            if (Sprite.SpriteFrames is not { } frames) return false;
 
             bool authored = frames.HasAnimation(animation);
             return TweenAnimationRules.IsAuthoredMotion(authored, authored ? frames.GetFrameCount(animation) : 0);

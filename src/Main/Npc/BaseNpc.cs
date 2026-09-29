@@ -32,6 +32,7 @@ namespace LastBreath.Npc
     using Core.Narrative.Facts;
     using Core.Reputation;
     using Core.Services;
+    using Core.World.Locations;
     using Core.World.Spaces;
     using Godot;
     using Player;
@@ -72,7 +73,7 @@ namespace LastBreath.Npc
         private IWorldClock? _worldClock;
         private IWorldBrain? _brain;
         private INpcLifecycle? _lifecycle;
-        private Core.World.Locations.ILocationTravelService? _locations;
+        private ILocationTravelService? _locations;
         private ISmartPointRegistry? _smartPoints;
         private IWorldFactsService? _worldFacts;
         private IRecoveryConfigProvider? _recoveryConfig;
@@ -86,7 +87,6 @@ namespace LastBreath.Npc
         private string _lastMoveAnimation = string.Empty;
 
         private readonly RandomNumberGenerator _rnd = new();
-        [Export] private AnimationsComponentBase? _animationsComponent;
 
         /// <summary>The fighter's own roll stream behind the domain contract: defensive rolls
         /// (suppression) burn it instead of an anonymous generator built for a single hit.</summary>
@@ -100,7 +100,17 @@ namespace LastBreath.Npc
         public string DisplayName => Localization.Localize(Id);
         public IEntityParametersComponent Parameters { get; private set; }
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
-        public IAnimationsComponent Animations => _animationsComponent;
+
+        public IAnimationsComponent Animations
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new TweenAnimationsComponent();
+                return field;
+            }
+        }
+
         public IModifierHandlerComponent ModifierHandler { get; private set; }
         public IAbilityBookComponent AbilityBook { get; private set; }
         public IEntityAttribute Dexterity { get; private set; }
@@ -241,18 +251,18 @@ namespace LastBreath.Npc
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _locations = provider.TryGet<Core.World.Locations.ILocationTravelService>();
-            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
-            _playerAccessor = GameServiceProvider.Instance.GetService<IPlayerAccessor>();
-            _factionRelations = GameServiceProvider.Instance.GetService<IFactionRelationService>();
-            _personalReputation = GameServiceProvider.Instance.GetService<IPersonalReputationService>();
-            _npcRegistry = GameServiceProvider.Instance.GetService<INpcWorldRegistry>();
-            _skirmishService = GameServiceProvider.Instance.GetService<INpcSkirmishService>();
-            _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
-            _smartPoints = GameServiceProvider.Instance.GetService<ISmartPointRegistry>();
-            _worldFacts = GameServiceProvider.Instance.GetService<IWorldFactsService>();
-            _recoveryConfig = GameServiceProvider.Instance.GetService<IRecoveryConfigProvider>();
-            _recovery = GameServiceProvider.Instance.GetService<IRestRecoveryService>();
+            _locations = provider.TryGet<ILocationTravelService>();
+            _gameEventBus = provider.GetService<IGameEventBus>();
+            _playerAccessor = provider.GetService<IPlayerAccessor>();
+            _factionRelations = provider.GetService<IFactionRelationService>();
+            _personalReputation = provider.GetService<IPersonalReputationService>();
+            _npcRegistry = provider.GetService<INpcWorldRegistry>();
+            _skirmishService = provider.GetService<INpcSkirmishService>();
+            _worldClock = provider.GetService<IWorldClock>();
+            _smartPoints = provider.GetService<ISmartPointRegistry>();
+            _worldFacts = provider.GetService<IWorldFactsService>();
+            _recoveryConfig = provider.GetService<IRecoveryConfigProvider>();
+            _recovery = provider.GetService<IRestRecoveryService>();
             _npcRegistry?.Register(this);
             _recovery?.RegisterParticipant(this, () => GlobalPosition);
             _gameEventBus?.Subscribe<WorldStimulusEvent>(OnWorldStimulus);
@@ -361,9 +371,10 @@ namespace LastBreath.Npc
         /// collision is refitted to the new silhouette (a deer is not shaped like the placeholder).</summary>
         private void ApplyVisual(string npcId, IGameServiceProvider provider)
         {
-            var config = provider.GetService<INpcVisualProvider>()?.GetVisual(npcId);
+            var config = provider.GetService<INpcVisualProvider>().GetVisual(npcId);
             if (config?.Frames == null) return;
-            _animationsComponent?.ApplyVisual(config.Frames, config.Scale);
+            Animations.ApplyVisual(config.Frames, config.Scale);
+            AddChild(Animations.Sprite);
             NpcCollisionFitter.Fit(this, _interactionArea); // after ApplyVisual: reads the sprite's final scale
         }
 
@@ -807,7 +818,7 @@ namespace LastBreath.Npc
         /// <summary>Shared admission for contact and an explicit player attack.</summary>
         public bool CanStartBattleWith(IPlayer player) =>
             IsInsideTree() && !IsQueuedForDeletion() && IsAlive && !IsFighting
-            && player is Node2D body && GodotObject.IsInstanceValid(body) && body.IsInsideTree()
+            && player is Node2D body && IsInstanceValid(body) && body.IsInsideTree()
             && player.IsAlive && !player.IsFighting && _gameEventBus != null
             && _locations?.IsTransitioning != true && NativeSpatialQuery.Instance.SharesSpace(this, player);
 
@@ -822,7 +833,7 @@ namespace LastBreath.Npc
                 {
                     fighters.AddRange(Group.GetEntitiesInGroup<IFightable>()
                         .Where(member => member != this && member.IsAlive && !member.IsFighting
-                            && NativeSpatialQuery.Instance.SharesSpace(this, member)));
+                                         && NativeSpatialQuery.Instance.SharesSpace(this, member)));
                     // BattleContext claims only admitted participants; unrelated squadmates keep their state.
                 }
 

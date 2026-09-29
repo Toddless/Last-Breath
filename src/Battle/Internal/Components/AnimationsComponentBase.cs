@@ -23,7 +23,15 @@ namespace Battle.Internal.Components
         /// access violation, not a catchable exception. Every native touch of the sprite in both
         /// animators goes through here, so the whole contour has one life check instead of none.
         /// </summary>
-        protected AnimatedSprite2D? Sprite => IsInstanceValid(_animatedSprite2D) ? _animatedSprite2D : null;
+        public AnimatedSprite2D Sprite
+        {
+            get
+            {
+                if (_animatedSprite2D != null) return _animatedSprite2D;
+                _animatedSprite2D = new AnimatedSprite2D();
+                return _animatedSprite2D;
+            }
+        }
 
         public abstract Task PlayAnimationAsync(string animation, float speedScale = 1f);
 

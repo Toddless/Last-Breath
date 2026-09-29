@@ -5,6 +5,7 @@ namespace Core.Entity.Components
 
     public interface IAnimationsComponent
     {
+        AnimatedSprite2D Sprite { get; }
         Task PlayAnimationAsync(string animation, float speedScale = 1f);
         void PlayAnimation(string animation);
         float GetClipSeconds(string animation);

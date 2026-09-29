@@ -58,6 +58,12 @@ namespace LastBreath.World.Interactions
         private bool _discoveryInvalid;
         /// <summary>Owner found when the target last entered the tree; null while it has none.</summary>
         private IInteractionOwner? _interactionOwner;
+        /// <summary>Actions the sources gave at the last read; null until the next read after <see cref="InvalidateOffer"/>.</summary>
+        private IReadOnlyList<InteractionAction>? _offer;
+        /// <summary>Positions <see cref="ReadPoints"/> writes, reused by every read: one slot per point slot plus the target's own position.</summary>
+        private Vector2[] _pointPositions = [];
+        /// <summary>Registered and available: only such a target offers actions.</summary>
+        private bool CanOffer => _registered && IsAvailable;
         /// <summary>ID the target registers under: its owner's ID while it has an owner, else its own <see cref="ObjectId"/>.</summary>
         protected virtual string StableObjectId => _interactionOwner?.InteractionId ?? ObjectId;
         /// <summary>Whether the target can be interacted with now: its owner's answer while it has an owner, else true.</summary>
@@ -74,20 +80,15 @@ namespace LastBreath.World.Interactions
                 foreach (var source in SourcesUnder(this)) yield return source;
             }
         }
-        /// <summary>Global positions of the set interaction points, or the target's own position while none is set.</summary>
-        public IEnumerable<Vector2> Points
+        /// <summary>Actions kept from the last read of the sources, read again on first use after <see cref="InvalidateOffer"/>; none while
+        /// the target is unregistered or unavailable, which also drops the kept ones.</summary>
+        public IReadOnlyList<InteractionAction> CachedOffer
         {
             get
             {
-                bool found = false;
-                var points = InteractionPoints;
-                for (int i = 0; i < points.Count; i++)
-                {
-                    if (ValidOrNull(points[i]) is not { } point) continue;
-                    found = true;
-                    yield return point.GlobalPosition;
-                }
-                if (!found) yield return GlobalPosition;
+                if (!CanOffer) InvalidateOffer();
+                else if (_offer == null) ReadOffers();
+                return _offer ?? [];
             }
         }
 
@@ -113,8 +114,25 @@ namespace LastBreath.World.Interactions
 
         public override void _ExitTree() => Unregister();
 
-        /// <summary>Actions offered now: none while the target is unregistered or unavailable; actions that share an ID are left out.</summary>
+        /// <summary>Actions offered now, read from the sources and kept as <see cref="CachedOffer"/>: none while the target is unregistered or
+        /// unavailable; actions that share an ID are left out.</summary>
         public IReadOnlyList<InteractionAction> ReadActions() => ReadOffers().ConvertAll(x => x.Action);
+
+        /// <summary>Drops the kept offer, so the next use of <see cref="CachedOffer"/> reads the sources again.</summary>
+        public void InvalidateOffer() => _offer = null;
+
+        /// <summary>Global positions of the set interaction points, or the target's own position while none is set; the next read overwrites them.</summary>
+        public ReadOnlySpan<Vector2> ReadPoints()
+        {
+            var points = InteractionPoints;
+            int slots = points.Count;
+            if (_pointPositions.Length <= slots) _pointPositions = new Vector2[slots + 1];
+            int count = 0;
+            for (int i = 0; i < slots; i++)
+                if (ValidOrNull(points[i]) is { } point) _pointPositions[count++] = point.GlobalPosition;
+            if (count == 0) _pointPositions[count++] = GlobalPosition;
+            return _pointPositions.AsSpan(0, count);
+        }
 
         /// <summary>Source of the enabled action with this ID among the offered actions; null when <see cref="ReadActions"/> does not offer it.</summary>
         public IInteractionSource? FindEnabledSource(string actionId) =>
@@ -146,7 +164,7 @@ namespace LastBreath.World.Interactions
         {
             if (_anchorReported || ValidOrNull(HintAnchor) != null) return;
             _anchorReported = true;
-            Report(string.Format(MissingAnchorFormat, GetPath()));
+            Tracker.TrackError(string.Format(MissingAnchorFormat, GetPath()), this);
         }
 
         /// <summary>Disables the target with one report when its discovery shape does not cover every interaction point plus Reach.</summary>
@@ -157,7 +175,7 @@ namespace LastBreath.World.Interactions
             float required = RequiredRadius(shape ?? (Node2D)this);
             if (FindDiscoveryProblem(shape, required) is not { } problem) return;
             _discoveryInvalid = true;
-            Report(string.Format(CultureInfo.InvariantCulture, InvalidDiscoveryFormat, GetPath(), problem, required));
+            Tracker.TrackError(string.Format(CultureInfo.InvariantCulture, InvalidDiscoveryFormat, GetPath(), problem, required), this);
             Unregister();
         }
 
@@ -174,29 +192,32 @@ namespace LastBreath.World.Interactions
         }
 
         /// <summary>Radius a circle drawn in the node's space needs to cover every interaction point plus Reach around the target.</summary>
-        private float RequiredRadius(Node2D space) => (Points.Max(point => GlobalPosition.DistanceTo(point)) + Reach) / SmallerScale(space);
+        private float RequiredRadius(Node2D space) => (FarthestPointDistance() + Reach) / SmallerScale(space);
+
+        /// <summary>Distance from the target to its farthest interaction point.</summary>
+        private float FarthestPointDistance()
+        {
+            var origin = GlobalPosition;
+            float farthest = 0;
+            foreach (var point in ReadPoints()) farthest = Math.Max(farthest, origin.DistanceTo(point));
+            return farthest;
+        }
 
         /// <summary>The node's smaller absolute global scale, floored at <see cref="MinimumScale"/>.</summary>
         private static float SmallerScale(Node2D node) =>
             Math.Max(MinimumScale, Math.Min(Math.Abs(node.GlobalScale.X), Math.Abs(node.GlobalScale.Y)));
 
-        /// <summary>Drops the target's registration; a target that is not registered changes nothing.</summary>
+        /// <summary>Drops the target's registration, if any, and its kept offer.</summary>
         private void Unregister()
         {
             if (_registered) Services.GameServiceProvider.Instance.GetService<InteractionService>().Unregister(this);
             _registered = false;
-        }
-
-        /// <summary>Writes a setup problem of the target to the log and the Godot console.</summary>
-        private void Report(string message)
-        {
-            Tracker.TrackError(message, this);
-            GD.PrintErr(message);
+            InvalidateOffer();
         }
 
         /// <summary>The object while it is set and not freed; null otherwise.</summary>
         private static T? ValidOrNull<T>(T? instance) where T : GodotObject =>
-            instance != null && GodotObject.IsInstanceValid(instance) ? instance : null;
+            instance != null && IsInstanceValid(instance) ? instance : null;
 
         /// <summary>Sources among the node's descendants in tree order; the subtree of a nested target is left to that target.</summary>
         private static IEnumerable<IInteractionSource> SourcesUnder(Node node)
@@ -212,9 +233,22 @@ namespace LastBreath.World.Interactions
             }
         }
 
+        /// <summary>Offers read from the sources now, whose actions become the kept offer; none, and nothing kept, while the target cannot offer.</summary>
         private List<ActionOffer> ReadOffers()
         {
-            if (!_registered || !IsAvailable) return [];
+            if (!CanOffer)
+            {
+                InvalidateOffer();
+                return [];
+            }
+            var offers = CollectOffers();
+            _offer = offers.ConvertAll(x => x.Action);
+            return offers;
+        }
+
+        /// <summary>Offers of every source; actions that share an ID are reported and left out.</summary>
+        private List<ActionOffer> CollectOffers()
+        {
             var offers = Sources.SelectMany(source => source.Actions().Select(action => new ActionOffer(source, action))).ToList();
             var duplicates = DuplicateActionIds(offers);
             if (duplicates.Count == 0) return offers;

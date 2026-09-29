@@ -174,7 +174,7 @@ namespace Core.Narrative.Facts
             },
             new()
             {
-                Template = Family(FactKeys.ItemEquippedAnyKey),
+                Template = Family(FactKeys.ItemEquippedAnyHead),
                 Writers = [Code(nameof(EquipFactTracker))]
             },
         ];

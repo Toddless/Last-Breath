@@ -284,3 +284,8 @@ Each stage includes its regression checks. No separate rewrite of combat resolut
 Main owns persistent world, optional side location, and transient battle hosts. Locations use explicit connections and durable state; side locations unload after exploration travel and reconcile elapsed game time on return. NPCs remain within their exploration location. A single player arena connects to its origin through BattleSiteMarker.
 
 The proposed runtime uses separate physical worlds plus explicit spatial identity. Physical separation prevents accidental contacts; spatial identity makes global-service queries correct. The trade-off is coordinated migration of placement, input, registries, drops, and save restoration, rather than isolated guards in individual NPC methods.
+
+## Связанные документы
+
+- [Описание существующей системы](CurrentSystem.md)
+- [Карта документации LastBreath](../README.md)

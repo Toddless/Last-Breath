@@ -1,6 +1,5 @@
 namespace LastBreathTest.BattleSystemTests
 {
-    using System.Collections;
     using Core.Data.GameData;
     using Core.Narrative;
     using LastBreath.Descriptors;

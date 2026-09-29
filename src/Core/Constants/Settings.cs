@@ -25,5 +25,9 @@
         public const string PassivesTree = "ui_passive_tree";
         /// <summary>Hold-to-reveal roll spreads in item tooltips (default Сtrl).</summary>
         public const string RevealRanges = "ui_reveal_ranges";
+        /// <summary>Activates the selected world target: runs its one action or opens its action menu (default E).</summary>
+        public const string Interact = "interact";
+        /// <summary>Takes everything that fits from the chest in the open chest window (default R).</summary>
+        public const string ContainerTakeAll = "container_take_all";
     }
 }

@@ -3,21 +3,24 @@ namespace LastBreath.World.Interactions.UI
     using System.Collections.Generic;
     using System.Linq;
     using Core.Localization;
+    using Core.Views.UI;
     using Core.World.Interactions;
     using Godot;
 
     public partial class InteractionMenuWindow : InteractionWindow
     {
         private const string UID = "uid://cxgma3niixgpr";
-        private const string ActionIdMeta = "interaction_action_id";
-        private const double RefreshIntervalSeconds = 0.1;
         private string _signature = "";
-        private double _elapsed;
+        /// <summary>Cached offer the rows were built from; the menu rebuilds once its target keeps another list instance.</summary>
+        private IReadOnlyList<InteractionAction>? _shownOffer;
+
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
         public override void Refresh()
         {
             if (Rows == null) return;
-            var actions = Target.ReadActions();
+            var actions = Target.CachedOffer;
+            _shownOffer = actions;
             string signature = string.Join("|", actions.Select(x => $"{x.Id}:{x.Enabled}:{x.ReasonKey}"));
             if (_signature == signature) return;
             _signature = signature;
@@ -30,30 +33,29 @@ namespace LastBreath.World.Interactions.UI
             var rows = new List<(InteractionAction Action, Button Row)>(actions.Count);
             foreach (var action in actions)
             {
-                var row = GD.Load<PackedScene>("res://World/Interactions/UI/InteractionActionRow.tscn").Instantiate<Button>();
-                row.SetMeta(ActionIdMeta, action.Id);
-                row.Text = Localization.Localize(action.LabelKey);
-                row.Disabled = !action.Enabled;
-                row.TooltipText = action.ReasonKey == null ? "" : Localization.Localize(action.ReasonKey);
-                row.Pressed += () => _ = Messages.SendRequest<ExecuteInteractionRequest, InteractionResult>(new(Target.Handle, action.Id));
+                var row = InteractionActionRow.Initialize().Instantiate<InteractionActionRow>();
+                row.SetAction(action);
+                row.ActionPressed += ExecuteAction;
                 Rows.AddChild(row);
                 rows.Add((action, row));
             }
             if (!typing) FocusCandidate(rows, focusedActionId, closeFocused)?.GrabFocus();
         }
+
         public override void _Process(double delta)
         {
             base._Process(delta);
-            _elapsed += delta;
-            if (_elapsed < RefreshIntervalSeconds) return;
-            _elapsed = 0;
-            if (!IsQueuedForDeletion()) Refresh();
+            if (!IsQueuedForDeletion() && !ReferenceEquals(Target.CachedOffer, _shownOffer)) Refresh();
         }
 
-        /// <summary>Action id of the row holding keyboard focus; null when the focus is outside the rows.</summary>
+        /// <summary>Sends the pressed row's action to the bound target.</summary>
+        private void ExecuteAction(string actionId) =>
+            _ = Messages.SendRequest<ExecuteInteractionRequest, InteractionResult>(new(Target.Handle, actionId));
+
+        /// <summary>Action id of the row holding keyboard focus on itself or on a control inside it; null when the focus is outside the rows.</summary>
         private string? FocusedActionId() =>
-            GetViewport()?.GuiGetFocusOwner() is { } owner && owner.GetParent() == Rows && owner.HasMeta(ActionIdMeta)
-                ? owner.GetMeta(ActionIdMeta).AsString()
+            GetViewport()?.GuiGetFocusOwner()?.FindSelfOrAncestor<InteractionActionRow>() is { } row && row.GetParent() == Rows
+                ? row.ActionId
                 : null;
 
         /// <summary>Focus after a rebuild: where the player left it (Close, or the same action while it stays enabled), else the

@@ -40,6 +40,9 @@
             }
         }
 
+        /// <summary>Whether the slot starts drags and takes drops; on by default, off for a slot that only shows items another owner keeps.</summary>
+        public bool DragAndDropEnabled { get; set; } = true;
+
         public event Action<string>? ItemDeleted;
 
         /// <summary>The empty look is code-driven (neutral frame tint, no background), and the
@@ -54,7 +57,7 @@
 
         public override Variant _GetDragData(Vector2 atPosition)
         {
-            if (CurrentItem == null) return new Variant();
+            if (!DragAndDropEnabled || CurrentItem == null) return new Variant();
 
             var payload = new Dictionary
             {
@@ -81,7 +84,7 @@
 
         public override bool _CanDropData(Vector2 atPosition, Variant data)
         {
-            if (data.VariantType != Variant.Type.Dictionary) return false;
+            if (!DragAndDropEnabled || data.VariantType != Variant.Type.Dictionary) return false;
             var payload = data.AsGodotDictionary();
             return payload.ContainsKey(DragPayload.Item) || payload.ContainsKey(DragPayload.EquipmentPiece);
         }

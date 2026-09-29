@@ -33,6 +33,8 @@ namespace Crafting.Source.ItemUse
                 return;
             }
 
+            // TODO:
+            // Данный вызов удалит весь стак рецептов вместо одного.
             inventory.RemoveItemByInstanceId(recipe.InstanceId);
             Notify("UI_Recipe_Learned", recipe.Id);
         }

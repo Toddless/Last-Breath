@@ -14,7 +14,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Narrative.Facts;
     using Core.Narrative.Influence;
     using Core.Narrative.Quests;
-    using Core.Reputation;
     using Core.Services;
     using LastBreath.Descriptors;
     using Moq;

@@ -1,6 +1,5 @@
 namespace Core.Narrative.Facts
 {
-    using System.Collections.Generic;
     using System.Linq;
     using Enums;
 
@@ -37,7 +36,9 @@ namespace Core.Narrative.Facts
 
         /// <summary>A family of one: the key IS the head, because "wearing anything at all" has no record
         /// to be about.</summary>
-        public const string ItemEquippedAnyKey = "Item_Equipped_Any";
+        public const string ItemEquippedAnyHead = "Item_Equipped_Any";
+
+        public const string ItemUsedHead = "Item_Used";
 
         public static string LocationDiscovered(string locationId) => Key(LocationDiscoveredHead, locationId);
 
@@ -74,7 +75,9 @@ namespace Core.Narrative.Facts
 
         /// <summary>How many pieces of gear the player has ever put on — raised beside the slot's own
         /// flag, so "equip something" is one key instead of a clause over every slot.</summary>
-        public static string ItemEquippedAny() => Key(ItemEquippedAnyKey);
+        public static string ItemEquippedAny() => Key(ItemEquippedAnyHead);
+
+        public static string ItemUsed(string itemId) => Key(ItemUsedHead, itemId);
 
         /// <summary>One key, written the one way every key of every family is written.</summary>
         private static string Key(string head, params string[] parts) =>
