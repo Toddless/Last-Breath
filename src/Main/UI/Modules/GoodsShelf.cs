@@ -32,7 +32,7 @@ namespace LastBreath.UI.Modules
         private const string SpecialsKey = "UI_Trade_Specials";
         private const string BuybackKey = "UI_Trade_Buyback";
 
-        private const int BuybackSockets = 12;
+        private const int BuybackSockets = 15;
 
         [Export] private SectionHeader? _consumablesHeader, _equipmentHeader, _specialsHeader, _buybackHeader;
         [Export] private Control? _specialsRow;
