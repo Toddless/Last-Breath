@@ -3,7 +3,7 @@
         "id": "Chest_Starter",
         "nameKey": "Chest_Starter",
         "capacity": 20,
-        "emptyRemovalDelayMinutes": 5,
+        "emptyRemovalDelayMinutes": 25,
         "access": {
             "mode": "Unlocked"
         },
