@@ -32,12 +32,6 @@ namespace LastBreath.World.Interactions
         private const float RadiusTolerance = 0.01f;
         /// <summary>Floor of the scale the required radius is divided by, so a collapsed node cannot divide by zero.</summary>
         private const float MinimumScale = 0.001f;
-        public const uint DetectionLayer = 1u << 15;
-        [Export] public string ObjectId { get; set; } = "";
-        [Export] public float Reach { get; set; } = 150;
-        [Export(PropertyHint.Layers2DPhysics)] public uint ObstacleMask { get; set; } = InteractionReach.BlockerMask;
-        /// <summary>Bodies of this object that do not block access to its own interaction points.</summary>
-        [Export] public Godot.Collections.Array<CollisionObject2D> OwnBodies { get; set; } = [];
 
         /// <summary>Points the player's reach is measured to; while none is set, the target's own position stands in.</summary>
         [Export] private Godot.Collections.Array<Marker2D> InteractionPoints { get; set; } = [];
@@ -66,6 +60,14 @@ namespace LastBreath.World.Interactions
         private bool CanOffer => _registered && IsAvailable;
         /// <summary>ID the target registers under: its owner's ID while it has an owner, else its own <see cref="ObjectId"/>.</summary>
         protected virtual string StableObjectId => _interactionOwner?.InteractionId ?? ObjectId;
+
+        public const uint DetectionLayer = 1u << 15;
+        [Export] public string ObjectId { get; set; } = "";
+        [Export] public float Reach { get; set; } = 150;
+        [Export(PropertyHint.Layers2DPhysics)] public uint ObstacleMask { get; set; } = InteractionReach.BlockerMask;
+        /// <summary>Bodies of this object that do not block access to its own interaction points.</summary>
+        [Export] public Godot.Collections.Array<CollisionObject2D> OwnBodies { get; set; } = [];
+
         /// <summary>Whether the target can be interacted with now: its owner's answer while it has an owner, else true.</summary>
         public virtual bool IsAvailable => _interactionOwner?.IsInteractable ?? true;
         public InteractionHandle Handle { get; private set; }

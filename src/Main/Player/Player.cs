@@ -24,6 +24,7 @@ namespace LastBreath.Player
     using Core.PassiveTree.Allocation;
     using Core.Services;
     using Core.Views.UI;
+    using Core.World.Spaces;
     using Godot;
     using Stateless;
     using World.Interactions;
@@ -107,16 +108,14 @@ namespace LastBreath.Player
         public ICombatEventBus CombatEvents { get; private set; }
         public IStance? CurrentStance { get; private set; }
         public ITargetChooser? TargetChooser { get; set; }
-        public bool IsFighting { get; set; }
-        public bool IsAlive => CurrentHealth > 0;
         public IEffectsComponent Effects { get; private set; }
         public IParameterModifiersComponent ParameterModifiers { get; private set; }
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; } = true;
-
+        public bool IsFighting { get; set; }
+        public bool IsAlive => CurrentHealth > 0;
         public Fractions Fractions { get; } = Fractions.Human;
-
         public string PlayerName { get; private set; } = "Toddless";
 
         /// <summary>The interaction controller sits at the body's collision center; without it the node origin is used.</summary>
@@ -272,6 +271,7 @@ namespace LastBreath.Player
             base.Dispose(disposing);
         }
 
+
         public override void _PhysicsProcess(double delta)
         {
             if (!IsAlive)
@@ -280,11 +280,15 @@ namespace LastBreath.Player
                 return;
             }
 
-            if (!CanMove || !Core.World.Spaces.SpatialAccess.CanReceiveInput(this)) return;
+            if (!CanMove || !SpatialAccess.CanReceiveInput(this)) return;
+
+
             // Blocking windows (dialogue, trade) freeze walking: movement is polled here, so
             // without this gate the player strolls away mid-conversation. The windows declare
             // IWindow.BlocksMovement; the player only asks the manager. Fail-open — a project
             // without the manager (sandboxes) isn't gated.
+            // TODO:
+            // перевести на события
             if (_uiElements?.HasMovementBlockingWindow == true)
             {
                 Velocity = Vector2.Zero;
@@ -293,7 +297,7 @@ namespace LastBreath.Player
 
             // Typing is not walking: WASD is polled, so a focused text field (debug console,
             // future chat) would otherwise drive the character while the user types.
-            if (Core.World.Spaces.SpatialAccess.HasTextFocus(this))
+            if (SpatialAccess.HasTextFocus(this))
             {
                 Velocity = Vector2.Zero;
                 return;

@@ -68,7 +68,6 @@ namespace Battle.Internal.Tools
             {
                 foreach (var stat in stats)
                 {
-                    if (stat == null) continue;
                     var modifier = ModifiersCreator.CreateModifierInstance(stat.Parameter, stat.ValueType, stat.Value, ModifierSource);
                     npc.ParameterModifiers.AddModifier(modifier);
                 }

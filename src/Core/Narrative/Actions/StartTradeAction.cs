@@ -27,13 +27,10 @@ namespace Core.Narrative.Actions
         public INarrativeAction? Create(JObject json, INarrativeActionParser parser)
         {
             string traderId = json.Value<string>(TraderIdKey) ?? string.Empty;
-            if (traderId.Length == 0)
-            {
-                Tracker.TrackError($"{TypeName} action: {TraderIdKey} is missing");
-                return null;
-            }
+            if (traderId.Length != 0) return new StartTradeAction(messageBus, traderId);
 
-            return new StartTradeAction(messageBus, traderId);
+            Tracker.TrackError($"{TypeName} action: {TraderIdKey} is missing");
+            return null;
         }
     }
 }
