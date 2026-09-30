@@ -38,8 +38,6 @@ namespace Core.Narrative.Facts
         /// to be about.</summary>
         public const string ItemEquippedAnyHead = "Item_Equipped_Any";
 
-        public const string ItemUsedHead = "Item_Used";
-
         public static string LocationDiscovered(string locationId) => Key(LocationDiscoveredHead, locationId);
 
         /// <summary>Player kills of an NPC definition (counted per npc data id, not per instance).</summary>
@@ -76,8 +74,6 @@ namespace Core.Narrative.Facts
         /// <summary>How many pieces of gear the player has ever put on — raised beside the slot's own
         /// flag, so "equip something" is one key instead of a clause over every slot.</summary>
         public static string ItemEquippedAny() => Key(ItemEquippedAnyHead);
-
-        public static string ItemUsed(string itemId) => Key(ItemUsedHead, itemId);
 
         /// <summary>One key, written the one way every key of every family is written.</summary>
         private static string Key(string head, params string[] parts) =>
