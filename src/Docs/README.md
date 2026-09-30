@@ -14,7 +14,7 @@
 | Система | Существующая реализация | Проектирование и расширения |
 | --- | --- | --- |
 | Abilities | [Активные способности](Abilities/CurrentSystem.md) | — |
-| AI | [AI, создание и жизненный цикл NPC](AI/CurrentSystem.md) | — |
+| AI | [AI, создание и жизненный цикл NPC](AI/CurrentSystem.md) | [Группы NPC, оповещения и подкрепления — проект архитектуры](AI/EntityGroupsArchitecture.md) |
 | Augments | [Аугменты, сокеты и орнаменты](Augments/CurrentSystem.md) | — |
 | Combat | [Боевой урон и события](Combat/CurrentSystem.md); [Воспроизведение боя, анимации и VFX](Combat/Presentation.md) | [Расширение боевой системы — проект архитектуры](Combat/CombatExpansionArchitecture.md); [Расширение боевой системы](Combat/CombatExpansionConcept.md); [Расширение боевой системы — обсуждение решений](Combat/CombatExpansionDecisions.md) |
 | Crafting | [Существующая система крафта](Crafting/CurrentSystem.md) | [Расширение крафта — теги модификаторов](Crafting/CraftingTagsConcept.md); [Расширение крафта — обсуждение решений](Crafting/CraftingTagsDecisions.md) |

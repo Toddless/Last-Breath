@@ -11,10 +11,14 @@
             "id": "ec4f7b37f8b95571",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "Loot/CurrentSystem.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "CurrentSystem"
             }
           }
         ]
@@ -186,6 +190,10 @@
   },
   "active": "ec4f7b37f8b95571",
   "lastOpenFiles": [
+    "AI/EntityGroupsArchitecture.md",
+    "Items/sednGJu5n",
+    "sedVzhqn1",
+    "DualGrid/DualGridTileset.md.tmp.30480.e10e82412d18",
     "CLAUDE.md",
     "Items/UsableItemsArchitecture.md",
     "Interaction/InteractionArchitecture.md",
