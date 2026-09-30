@@ -5,6 +5,7 @@ namespace LastBreath.World.Locations
     using System.Linq;
     using System.Threading.Tasks;
     using Core;
+    using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
     using Core.Data;
     using Core.Data.SaveData;
@@ -20,29 +21,29 @@ namespace LastBreath.World.Locations
     using Godot;
     using LootGeneration.Source;
     using Newtonsoft.Json.Linq;
+    using Player;
 
-    public sealed class LocationCoordinator(LocationCatalog catalog) : ILocationTravelService, ILocationSaveCoordinator, ISaveParticipant
+    // TODO:
+    // переделать по новой по всем правилам проекта
+    public sealed class LocationCoordinator(LocationCatalog catalog, IGameServiceProvider provider, IPlayerAccessor playerAccessor, IWorldClock clock)
+        : ILocationTravelService, ILocationSaveCoordinator, ISaveParticipant
     {
         private readonly Dictionary<string, LocationView> _loaded = [];
         private readonly Dictionary<string, LocationSnapshot> _snapshots = [];
         private Main? _host;
-        private IGameServiceProvider _provider = null!;
         private LocationStateAdapter _state = null!;
         private SaveFile? _loadingFile;
+        public LocationRoot? Loaded(string id) => _loaded.GetValueOrDefault(id)?.Root;
         public string ActiveLocationId { get; private set; } = LocationCatalog.MainWorldId;
         public bool IsTransitioning { get; private set; }
         public string SectionId => "locations";
         public bool RequiredForLoad => true;
         public int Version => 1;
         public int RestoreOrder => Core.Save.RestoreOrder.SpawnPoints + 1;
-        private IWorldClock Clock => _provider.GetService<IWorldClock>();
-        private CharacterBody2D Player => (CharacterBody2D)_provider.GetService<IPlayerAccessor>().Player!;
-        public LocationRoot? Loaded(string id) => _loaded.GetValueOrDefault(id)?.Root;
 
-        public void Attach(Main host, MainWorld world, IGameServiceProvider provider)
+        public void Attach(Main host, MainWorld world)
         {
             _host = host;
-            _provider = provider;
             _state = new LocationStateAdapter(provider);
             _loaded.Clear();
             _snapshots.Clear();
@@ -55,12 +56,9 @@ namespace LastBreath.World.Locations
             if (provider.GetService<ISaveGameService>().HasPendingLoad) return;
             ActivateFresh(world);
             if (catalog.Data.Start.LocationId == world.LocationId) PlaceAt(world.Endpoint(catalog.Data.Start.EndpointId));
-            if (catalog.Data.Start.LocationId != world.LocationId)
-            {
-                IsTransitioning = true;
-                viewport.GuiDisableInput = true;
-                Callable.From(StartInConfiguredLocation).CallDeferred();
-            }
+            IsTransitioning = true;
+            viewport.GuiDisableInput = true;
+            Callable.From(StartInConfiguredLocation).CallDeferred();
         }
 
         private void StartInConfiguredLocation()
@@ -72,13 +70,17 @@ namespace LastBreath.World.Locations
                 PlaceAt(view.Root.Endpoint(catalog.Data.Start.EndpointId));
                 Present(view.Root.LocationId);
             }
-            finally { IsTransitioning = false; Present(ActiveLocationId); }
+            finally
+            {
+                IsTransitioning = false;
+                Present(ActiveLocationId);
+            }
         }
 
         public void Detach()
         {
             if (_host != null && GodotObject.IsInstanceValid(_host)) _host.GetTree().Root.SizeChanged -= Resize;
-            _provider.GetService<IGameEventBus>().Unsubscribe<NpcFinalDeathEvent>(OnDormantNpcRemoved);
+            provider.GetService<IGameEventBus>().Unsubscribe<NpcFinalDeathEvent>(OnDormantNpcRemoved);
             _host = null;
             _loaded.Clear();
             _snapshots.Clear();
@@ -109,7 +111,10 @@ namespace LastBreath.World.Locations
                     foreach (var address in addresses.Where(x => x.LocationId == definition.Id))
                         _ = root.Endpoint(address.EndpointId).Arrival;
                 }
-                finally { temporary?.Free(); }
+                finally
+                {
+                    temporary?.Free();
+                }
             }
         }
 
@@ -120,13 +125,15 @@ namespace LastBreath.World.Locations
             if (node is LocationRoot root && root.LocationId == id)
             {
                 // Scene-local players support F6 previews; a managed session transfers its existing player.
-                foreach (var preview in root.Descendants().OfType<Core.Entity.IPlayer>().OfType<Node>().ToList())
+                foreach (var preview in root.Descendants().OfType<IPlayer>().OfType<Node>().ToList())
                 {
                     preview.GetParent().RemoveChild(preview);
                     preview.Free();
                 }
+
                 return root;
             }
+
             node.Free();
             throw new InvalidOperationException($"Scene must have a LocationRoot with ID {id}.");
         }
@@ -141,7 +148,11 @@ namespace LastBreath.World.Locations
                 _loaded.Add(id, view);
                 return view;
             }
-            catch { root.Free(); throw; }
+            catch
+            {
+                root.Free();
+                throw;
+            }
         }
 
         private Task SafeBoundary()
@@ -154,40 +165,44 @@ namespace LastBreath.World.Locations
         public async Task<TravelResult> TravelAsync(TravelRequest request)
         {
             if (_host == null || IsTransitioning) return TravelResult.Busy;
-            if (_provider.GetService<IPlayerAccessor>().Player is not { IsAlive: true, IsFighting: false }
-                || _provider.GetService<IUiElementsManager>().HasMovementBlockingWindow) return TravelResult.Unavailable;
+            var accessor = playerAccessor.Player;
+            if (accessor is not Player { IsAlive: true, IsFighting: false } player
+                || provider.GetService<IUiElementsManager>().HasMovementBlockingWindow) return TravelResult.Unavailable;
             if (request.SourceLocationId != ActiveLocationId) return TravelResult.InvalidConnection;
             var source = _loaded[ActiveLocationId];
             var endpoint = source.Root.Descendants().OfType<LocationEndpoint>().SingleOrDefault(x => x.EndpointId == request.EndpointId);
             if (endpoint == null || catalog.Destination(new(request.SourceLocationId, request.EndpointId)) is not { } address)
                 return TravelResult.InvalidConnection;
-            if (!endpoint.InReach(Player)) return TravelResult.OutOfReach;
+            if (!endpoint.InReach(player)) return TravelResult.OutOfReach;
             IsTransitioning = true;
             source.Viewport.GuiDisableInput = true;
-            Player.Velocity = Vector2.Zero;
+            player.Velocity = Vector2.Zero;
             LocationView? destination = null;
             bool created = !_loaded.ContainsKey(address.LocationId);
             try
             {
                 await SafeBoundary();
-                if (_host == null || !GodotObject.IsInstanceValid(Player)
-                    || _provider.GetService<IPlayerAccessor>().Player is not { IsAlive: true, IsFighting: false }) return TravelResult.Unavailable;
+                if (_host == null || !GodotObject.IsInstanceValid(player)
+                                  || provider.GetService<IPlayerAccessor>().Player is not { IsAlive: true, IsFighting: false }) return TravelResult.Unavailable;
                 destination = Prepare(address.LocationId);
                 if (created && _snapshots.TryGetValue(address.LocationId, out var saved))
                 {
-                    using (_provider.GetService<LoadScope>().Begin()) _state.Restore(destination.Root, saved);
+                    using (provider.GetService<LoadScope>().Begin()) _state.Restore(destination.Root, saved);
                 }
+
                 // Capture at the same boundary that stops the abandoned scene.
                 LocationSnapshot? leaving = source.Root.LocationId == LocationCatalog.MainWorldId || source == destination
-                    ? null : _state.Capture(source.Root, Clock.TotalMinutes);
+                    ? null
+                    : _state.Capture(source.Root, clock.TotalMinutes);
                 if (created)
                 {
                     destination.Root.IsPreparing = false;
                     if (_snapshots.TryGetValue(address.LocationId, out var snapshot))
-                        _state.Reconcile(destination.Root, snapshot.ElapsedMinutes(Clock.TotalMinutes));
+                        _state.Reconcile(destination.Root, snapshot.ElapsedMinutes(clock.TotalMinutes));
                     else _state.FillFresh(destination.Root);
                     destination.Root.ProcessMode = Node.ProcessModeEnum.Inherit;
                 }
+
                 PlaceAt(destination.Root.Endpoint(address.EndpointId));
                 Present(address.LocationId);
                 if (created) _snapshots.Remove(address.LocationId);
@@ -196,8 +211,16 @@ namespace LastBreath.World.Locations
                     _snapshots[source.Root.LocationId] = leaving;
                     Unload(source.Root.LocationId);
                 }
-                try { await _provider.GetService<IGameMessageBus>().PublishMessageAsync(new LocationChangedMessage(ActiveLocationId)); }
-                catch (Exception e) { Tracker.TrackException("Location changed notification failed after commit", e); }
+
+                try
+                {
+                    await provider.GetService<IGameMessageBus>().PublishMessageAsync(new LocationChangedMessage(ActiveLocationId));
+                }
+                catch (Exception e)
+                {
+                    Tracker.TrackException("Location changed notification failed after commit", e);
+                }
+
                 return TravelResult.Completed;
             }
             catch (Exception e)
@@ -216,7 +239,12 @@ namespace LastBreath.World.Locations
         private void PlaceAt(LocationEndpoint endpoint)
         {
             var root = LocationRoot.Find(endpoint)!;
-            var player = Player;
+            if (playerAccessor.Player is not Player player)
+            {
+                Tracker.TrackNull($"Player is not set", this);
+                return;
+            }
+
             player.Reparent(root, false);
             player.Position = root.ToLocal(endpoint.Arrival.GlobalPosition);
             player.Rotation = endpoint.Arrival.GlobalRotation - root.GlobalRotation;
@@ -229,7 +257,7 @@ namespace LastBreath.World.Locations
         {
             ActiveLocationId = id;
             foreach (var pair in _loaded) pair.Value.Present(pair.Key == id);
-            _provider.GetService<ILootOrchestrator>().SetFloorToSpawnItems(_loaded[id].Root);
+            provider.GetService<ILootOrchestrator>().SetFloorToSpawnItems(_loaded[id].Root);
         }
 
         private void ActivateFresh(LocationRoot root)
@@ -253,8 +281,8 @@ namespace LastBreath.World.Locations
         private void OnDormantNpcRemoved(NpcFinalDeathEvent e)
         {
             foreach (var snapshot in _snapshots.Values)
-                foreach (var npc in snapshot.State["npcs"]!.Children().Where(x => (string?)x["InstanceId"] == e.InstanceId).ToList())
-                    npc.Remove();
+            foreach (var npc in snapshot.State["npcs"]!.Children().Where(x => (string?)x["InstanceId"] == e.InstanceId).ToList())
+                npc.Remove();
         }
 
         private void Resize()
@@ -266,7 +294,7 @@ namespace LastBreath.World.Locations
         public JToken Capture()
         {
             var states = new Dictionary<string, LocationSnapshot>(_snapshots);
-            foreach (var pair in _loaded) states[pair.Key] = _state.Capture(pair.Value.Root, Clock.TotalMinutes);
+            foreach (var pair in _loaded) states[pair.Key] = _state.Capture(pair.Value.Root, clock.TotalMinutes);
             return JToken.FromObject(new LocationSaveData { Locations = states });
         }
 
@@ -276,17 +304,23 @@ namespace LastBreath.World.Locations
             _loadingFile = file;
             foreach (var view in _loaded.Values) view.Viewport.GuiDisableInput = true;
             var placement = file.Sections.TryGetValue("playerPlacement", out var p)
-                ? p.Data.ToObject<PlayerPlacementSaveData>() ?? new() : new PlayerPlacementSaveData();
+                ? p.Data.ToObject<PlayerPlacementSaveData>() ?? new()
+                : new PlayerPlacementSaveData();
             if (file.Sections.TryGetValue(SectionId, out var section))
             {
                 if (section.Version != Version) throw new InvalidOperationException("Unsupported locations section.");
                 var saved = section.Data.ToObject<LocationSaveData>() ?? throw new InvalidOperationException("Missing location data.");
                 if (!saved.Locations.ContainsKey(LocationCatalog.MainWorldId) || !saved.Locations.ContainsKey(placement.LocationId))
                     throw new InvalidOperationException("Saved placement has no location snapshot.");
-                foreach (var pair in saved.Locations) { catalog.Get(pair.Key); LocationStateAdapter.Validate(pair.Value); }
+                foreach (var pair in saved.Locations)
+                {
+                    catalog.Get(pair.Key);
+                    LocationStateAdapter.Validate(pair.Value);
+                }
             }
             else if (placement.LocationId != LocationCatalog.MainWorldId)
                 throw new InvalidOperationException("Legacy saves must place the player in MainWorld.");
+
             await SafeBoundary();
             Prepare(placement.LocationId);
         }
@@ -299,14 +333,15 @@ namespace LastBreath.World.Locations
             {
                 _snapshots[pair.Key] = pair.Value;
                 int count = ((JArray)pair.Value.State["npcs"]!).Count;
-                for (int i = 0; i < count; i++) _provider.GetService<INpcPopulationService>().ReserveOutsideLimit();
+                for (int i = 0; i < count; i++) provider.GetService<INpcPopulationService>().ReserveOutsideLimit();
             }
+
             foreach (var pair in _loaded)
             {
                 var snapshot = _snapshots[pair.Key];
                 _state.Restore(pair.Value.Root, snapshot);
                 pair.Value.Root.IsPreparing = false;
-                _state.Reconcile(pair.Value.Root, snapshot.ElapsedMinutes(Clock.TotalMinutes));
+                _state.Reconcile(pair.Value.Root, snapshot.ElapsedMinutes(clock.TotalMinutes));
                 _snapshots.Remove(pair.Key);
             }
         }
@@ -315,19 +350,20 @@ namespace LastBreath.World.Locations
         {
             // Legacy sections have MainWorld coordinates and no side-location ownership.
             var world = _loaded[LocationCatalog.MainWorldId].Root;
-            var npc = new NpcWorldSaveParticipant(_provider.GetService<Core.Ai.World.Skirmish.INpcWorldRegistry>(),
-                _provider.GetService<INpcProvider>(), _provider.GetService<INpcModifierProvider>(),
-                _provider.GetService<INpcPopulationService>(), _provider.GetService<INpcWorldSpawner>());
-            var points = new SpawnPointsSaveParticipant(_provider.GetService<ISpawnPointRegistry>());
+            var npc = new NpcWorldSaveParticipant(provider.GetService<INpcWorldRegistry>(),
+                provider.GetService<INpcProvider>(), provider.GetService<INpcModifierProvider>(),
+                provider.GetService<INpcPopulationService>(), provider.GetService<INpcWorldSpawner>());
+            var points = new SpawnPointsSaveParticipant(provider.GetService<ISpawnPointRegistry>());
             if (_loadingFile?.Sections.TryGetValue("spawnPoints", out var legacyPoints) == true)
             {
-                foreach (var point in _provider.GetService<ISpawnPointRegistry>().All)
+                foreach (var point in provider.GetService<ISpawnPointRegistry>().All)
                 foreach (var record in (legacyPoints.Data["Points"] ?? legacyPoints.Data["points"])?.Children() ?? [])
                     if (((string?)(record["Id"] ?? record["id"]))?.EndsWith("/" + point.PointId, StringComparison.Ordinal) == true)
                         record["Id"] = point.PointId;
             }
-            var ground = new GroundItemsSaveParticipant(_provider.GetService<IGroundItemStore>(), _provider.GetService<IItemDataProvider>(),
-                _provider.GetService<EquipItemSaveConverter>(), _provider.GetService<IAugmentItemMinter>());
+
+            var ground = new GroundItemsSaveParticipant(provider.GetService<IGroundItemStore>(), provider.GetService<IItemDataProvider>(),
+                provider.GetService<EquipItemSaveConverter>(), provider.GetService<IAugmentItemMinter>());
             foreach (ISaveParticipant participant in new ISaveParticipant[] { npc, points, ground })
                 if (_loadingFile?.Sections.TryGetValue(participant.SectionId, out var section) == true) participant.Restore(section.Data, section.Version);
                 else participant.RestoreWithoutSection();
@@ -336,20 +372,24 @@ namespace LastBreath.World.Locations
 
         public PlayerPlacementSaveData CapturePlacement()
         {
+            var player = playerAccessor.Player as Player;
+            ArgumentNullException.ThrowIfNull(player);
             var root = _loaded[ActiveLocationId].Root;
-            var position = root.ToLocal(Player.GlobalPosition);
-            return new() { LocationId = ActiveLocationId, X = position.X, Y = position.Y, Rotation = Player.GlobalRotation - root.GlobalRotation };
+            var position = root.ToLocal(player.GlobalPosition);
+            return new() { LocationId = ActiveLocationId, X = position.X, Y = position.Y, Rotation = player.GlobalRotation - root.GlobalRotation };
         }
 
         public void RestorePlacement(PlayerPlacementSaveData data)
         {
             if (!float.IsFinite(data.X) || !float.IsFinite(data.Y) || !float.IsFinite(data.Rotation))
                 throw new InvalidOperationException("Invalid saved player placement.");
+            var player = playerAccessor.Player as Player;
+            ArgumentNullException.ThrowIfNull(player);
             var root = _loaded[data.LocationId].Root;
-            Player.Reparent(root, false);
-            Player.Position = new Vector2(data.X, data.Y);
-            Player.Rotation = data.Rotation;
-            Player.Velocity = Vector2.Zero;
+            player.Reparent(root, false);
+            player.Position = new Vector2(data.X, data.Y);
+            player.Rotation = data.Rotation;
+            player.Velocity = Vector2.Zero;
             Present(data.LocationId);
         }
 
@@ -358,7 +398,12 @@ namespace LastBreath.World.Locations
             _loadingFile = null;
             if (!success) return;
             IsTransitioning = false;
-            foreach (var view in _loaded.Values) { view.Root.IsPreparing = false; view.Root.ProcessMode = Node.ProcessModeEnum.Inherit; }
+            foreach (var view in _loaded.Values)
+            {
+                view.Root.IsPreparing = false;
+                view.Root.ProcessMode = Node.ProcessModeEnum.Inherit;
+            }
+
             Present(ActiveLocationId);
         }
     }
