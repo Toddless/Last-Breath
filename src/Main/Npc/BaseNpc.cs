@@ -819,7 +819,7 @@ namespace LastBreath.Npc
         public bool CanStartBattleWith(IPlayer player) =>
             IsInsideTree() && !IsQueuedForDeletion() && IsAlive && !IsFighting
             && player is Node2D body && IsInstanceValid(body) && body.IsInsideTree()
-            && player.IsAlive && !player.IsFighting && _gameEventBus != null
+            && player is { IsAlive: true, IsFighting: false } && _gameEventBus != null
             && _locations?.IsTransitioning != true && NativeSpatialQuery.Instance.SharesSpace(this, player);
 
         /// <summary>Starts the existing world battle pipeline, including group admission and origin noise.</summary>

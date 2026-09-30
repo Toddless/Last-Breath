@@ -21,6 +21,7 @@
 
 ## Связанные документы
 
+- [Группы NPC, оповещения и подкрепления — проект архитектуры](EntityGroupsArchitecture.md)
 - [Боевой урон и события](../Combat/CurrentSystem.md)
 - [Локации, пространства боя и снимки мира](../Locations/CurrentSystem.md)
 - [Общее взаимодействие, сундуки и NPC](../Interaction/CurrentSystem.md)

@@ -22,8 +22,7 @@ namespace LastBreath.Trade
         public Task<int> HandleRequest(BuyItemRequest request)
         {
             var trader = traderService.GetTrader(request.TraderId);
-            var offer = traderService.GetStock(request.TraderId)
-                .FirstOrDefault(entry => entry.OfferId == request.OfferId);
+            var offer = traderService.GetStock(request.TraderId).FirstOrDefault(entry => entry.OfferId == request.OfferId);
             if (trader == null || offer == null || request.Amount < 1 || request.Amount > offer.Remaining) return Task.FromResult(0);
 
             int unitPrice = offer.IsBuyback ? offer.BuybackUnitPrice : pricing.BuyPrice(offer.Item, trader.Fraction);
@@ -31,13 +30,10 @@ namespace LastBreath.Trade
             if (unitPrice <= 0 || !wallet.TrySpend(total)) return Task.FromResult(0);
 
             var item = traderService.TakeMany(request.TraderId, request.OfferId, request.Amount);
-            if (item == null || !inventory.TryAddItem(item, request.Amount))
-            {
-                wallet.Add(total); // shelf raced empty or the bag is full: the purchase never happened
-                return Task.FromResult(0);
-            }
+            if (item != null && inventory.TryAddItem(item, request.Amount)) return Task.FromResult(total);
 
-            return Task.FromResult(total);
+            wallet.Add(total); // shelf raced empty or the bag is full: the purchase never happened
+            return Task.FromResult(0);
         }
     }
 }

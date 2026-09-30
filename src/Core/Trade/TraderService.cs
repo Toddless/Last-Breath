@@ -67,7 +67,7 @@ namespace Core.Trade
         IWorldClock? clock = null,
         IRandomNumberGenerator? rnd = null) : ITraderService, ISessionResettable
     {
-        private const int BuybackCapacity = 12;
+        private const int BuybackCapacity = 15;
         private const float Tolerance = 0.001f;
         private const double GameMinutesPerDay = 1440;
 

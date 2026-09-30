@@ -46,6 +46,7 @@ namespace LastBreath.Services
     using UI;
     using World.Interactions;
     using World.Interactions.UI;
+    using World.Locations;
     using Bag = Inventory.Inventory;
 
     /// <summary>Project bootstrap: the shared Core provider + Main registrations. The only place touching the static root.</summary>
@@ -114,9 +115,9 @@ namespace LastBreath.Services
             services.AddGameDataParticipant<IRaidService, RaidService>();
             services.AddSingleton<LocationCatalog>();
             services.AddSingleton<IGameDataParticipant>(sp => sp.GetRequiredService<LocationCatalog>());
-            services.AddSingleton<World.Locations.LocationCoordinator>();
-            services.AddSingleton<ILocationTravelService>(sp => sp.GetRequiredService<World.Locations.LocationCoordinator>());
-            services.AddSingleton<ILocationSaveCoordinator>(sp => sp.GetRequiredService<World.Locations.LocationCoordinator>());
+            services.AddSingleton<LocationCoordinator>();
+            services.AddSingleton<ILocationTravelService>(sp => sp.GetRequiredService<LocationCoordinator>());
+            services.AddSingleton<ILocationSaveCoordinator>(sp => sp.GetRequiredService<LocationCoordinator>());
             services.AddTransient<IRequestHandler<TravelRequest, TravelResult>, TravelRequestHandler>();
             services.AddSingleton<ISaveGameService, SaveGameService>();
             // Project infrastructure (module discipline): the save stack and session reset are
@@ -245,7 +246,7 @@ namespace LastBreath.Services
             // the loot module spills it on, so the section that keeps it is registered here.
             saveManager.Unregister("npcWorld");
             saveManager.Unregister("spawnPoints");
-            saveManager.Register(provider.GetService<World.Locations.LocationCoordinator>());
+            saveManager.Register(provider.GetService<LocationCoordinator>());
         }
 
         private static void RegisterUiFactories(IGameServiceProvider provider)

@@ -28,7 +28,6 @@
             entity.Group = this;
         }
 
-
         public void NotifyAllInGroup(GroupNotification notification)
         {
             switch (notification)

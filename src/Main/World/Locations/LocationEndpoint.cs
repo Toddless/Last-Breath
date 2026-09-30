@@ -13,15 +13,15 @@ namespace LastBreath.World.Locations
     public partial class LocationEndpoint : Node2D, IInteractionSource, IInteractionOwner
     {
         private const string ReportKind = "Endpoint";
+        /// <summary>Whether the last check found the target set up; a disabled endpoint offers no actions and reaches no one.</summary>
+        private bool _configured;
+        private bool _configurationReported;
         [Export] public string EndpointId { get; set; } = "";
 
         /// <summary>Interaction target of this endpoint, set in the scene as its direct child, so the endpoint both owns it and offers
         /// the actions through it; the target's reach is the travel reach. Any other setup is reported and leaves the endpoint disabled.</summary>
         [Export] public InteractionTarget Target { get; private set; } = null!;
 
-        /// <summary>Whether the last check found the target set up; a disabled endpoint offers no actions and reaches no one.</summary>
-        private bool _configured;
-        private bool _configurationReported;
         public Marker2D Arrival => GetNode<Marker2D>("Arrival");
         /// <summary>ID of the endpoint's interaction target, composed from <see cref="EndpointId"/>; empty while EndpointId is blank.</summary>
         public string InteractionId => InteractionIds.Endpoint(EndpointId);

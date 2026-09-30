@@ -1,6 +1,7 @@
 namespace Core.Trade
 {
     using System;
+    using System.Linq;
     using Enums;
     using Items;
     using Reputation;
@@ -21,8 +22,7 @@ namespace Core.Trade
         public int BuyPrice(IItem item, Fractions traderFaction)
         {
             int value = valuation.Value(item);
-            if (value <= 0) return 0;
-            return Math.Max(1, (int)MathF.Round(value * (1f + PricePerk(traderFaction))));
+            return value <= 0 ? 0 : Math.Max(1, (int)MathF.Round(value * (1f + PricePerk(traderFaction))));
         }
 
         /// <summary>0 = the trader refuses (unpriced item).</summary>
@@ -36,12 +36,7 @@ namespace Core.Trade
 
         private float PricePerk(Fractions faction)
         {
-            if (perks == null) return 0f;
-            float total = 0f;
-            foreach (var perk in perks.GetPerks(faction))
-                if (perk.Id == PricePerkId)
-                    total += perk.Value;
-            return total;
+            return perks == null ? 0f : perks.GetPerks(faction).Where(perk => perk.Id == PricePerkId).Sum(perk => perk.Value);
         }
     }
 }

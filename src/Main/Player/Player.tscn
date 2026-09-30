@@ -60,4 +60,4 @@ metadata/_custom_type_script = "uid://cgr6cwjjq0d03"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1902925310]
 sprite_frames = ExtResource("5_8g4oa")
-animation = &"Idle_Down"
+animation = &"Idle_Left"

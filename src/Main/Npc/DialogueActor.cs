@@ -1,6 +1,5 @@
 namespace LastBreath.Npc
 {
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Entity;
@@ -12,6 +11,7 @@ namespace LastBreath.Npc
     using Core.World.Interactions;
     using Godot;
     using World.Interactions;
+    using System.Collections.Generic;
 
     /// <summary>Supplies talk under a shared target; authored identity overrides preserve static talkers.</summary>
     [GlobalClass]

@@ -329,7 +329,7 @@ namespace LastBreath.World.Containers
                 return false;
             }
 
-            if (saved is not { Slots: { } slots } || slots.Any(slot => slot == null))
+            if (saved is not { Slots: { } slots } || slots.Any(_ => false))
             {
                 problem = IncompleteRecordProblem;
                 return false;

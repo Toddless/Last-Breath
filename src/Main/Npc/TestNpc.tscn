@@ -4,27 +4,15 @@
 [ext_resource type="Script" uid="uid://cgr6cwjjq0d03" path="res://Components/TweenAnimationsComponent.cs" id="3_7hrb6"]
 [ext_resource type="PackedScene" uid="uid://ddgpqikbjmb7a" path="res://Npc/NpcInteractionTarget.tscn" id="10_r5eee"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8osjy"]
-radius = 35.0
-height = 239.69
-
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0trnf"]
 radius = 37.4
 height = 136.39
 
 [node name="TestNpc" type="CharacterBody2D" unique_id=283522954 node_paths=PackedStringArray("_interactionArea")]
 script = ExtResource("1_xnmur")
-_interactionArea = NodePath("Area2D")
-
-[node name="Area2D" type="Area2D" parent="." unique_id=1573985267]
-position = Vector2(0, 101)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=93244490]
-position = Vector2(0, -57)
-shape = SubResource("CapsuleShape2D_8osjy")
+_interactionArea = NodePath("")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=177793197]
-position = Vector2(0, 92)
 shape = SubResource("CapsuleShape2D_0trnf")
 
 [node name="InteractionTarget" parent="." unique_id=773623934 node_paths=PackedStringArray("OwnBodies") instance=ExtResource("10_r5eee")]

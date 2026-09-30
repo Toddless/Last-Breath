@@ -3,6 +3,9 @@
 [ext_resource type="Script" uid="uid://bikj5svjvfps7" path="res://World/TerrainRoot.cs" id="1_os638"]
 [ext_resource type="Resource" uid="uid://b2eys61tsxc43" path="res://World/Terrains/SourceOfPowerNearVillage/TilesTerrain.tres" id="2_g0j45"]
 [ext_resource type="Texture2D" uid="uid://cmtx4uqnb0sc6" path="res://Sandbox/DualGridDebugTiles.png" id="3_a3v5j"]
+[ext_resource type="Texture2D" uid="uid://dwi2pcq18t642" path="res://Data/Shared/Assets/World/Containers/Chest/Chest_Closed.png" id="8_tuqs0"]
+[ext_resource type="Texture2D" uid="uid://crpoayjpr3665" path="res://Data/Shared/Assets/World/Containers/Chest/Chest_OpenFull.png" id="9_2opkd"]
+[ext_resource type="Texture2D" uid="uid://dabs0dmdqefp4" path="res://Data/Shared/Assets/World/Containers/Chest/Chest_OpenEmpty.png" id="10_5oiwh"]
 [ext_resource type="PackedScene" path="res://World/Interactions/InteractionTarget.tscn" id="interaction_target"]
 [ext_resource type="Script" uid="uid://deuhar8mrxw2l" path="res://World/Locations/LocationEndpoint.cs" id="loc_endpoint"]
 [ext_resource type="Script" uid="uid://blen0502curku" path="res://World/Locations/LocationRoot.cs" id="loc_root"]
@@ -128,6 +131,9 @@ shape = SubResource("CircleShape2D_exit")
 position = Vector2(-1390, 2247)
 ObjectId = "starter_chest"
 DefinitionId = "Chest_Starter"
+ClosedTexture = ExtResource("8_tuqs0")
+OpenTexture = ExtResource("9_2opkd")
+EmptyTexture = ExtResource("10_5oiwh")
 
 [node name="DirectionalLight2D" type="DirectionalLight2D" parent="." unique_id=713152095]
 visible = false

@@ -118,9 +118,9 @@ shape = SubResource("CircleShape2D_exit")
 [node name="Ronald" type="Node2D" parent="." unique_id=1399867637]
 position = Vector2(-464, 301)
 script = ExtResource("9_hv00y")
+_npcIds = PackedStringArray("Npc_Ronald")
 _maxCount = 1
 _spawnRadius = 50.0
-_spawnOnReady = false
 _recoveryZone = false
 metadata/_custom_type_script = "uid://ctta8cas4isp7"
 
