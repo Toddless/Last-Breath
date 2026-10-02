@@ -49,7 +49,6 @@ namespace Battle.Services
                 .AddSessionReset());
             provider.AddBattleUiElementsFactory();
             provider.AddSharedUiFactories();
-
             provider.GetService<IGameDataService>().LoadAll();
             provider.GetService<NpcFinalDeathFactTracker>(); // eager: lives on bus subscriptions only
             return provider;

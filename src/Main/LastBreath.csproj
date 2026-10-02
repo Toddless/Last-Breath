@@ -27,4 +27,7 @@
     <PackageReference Update="GodotSharp" Version="4.7.0" />
     <PackageReference Update="GodotSharpEditor" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Localization\" />
+  </ItemGroup>
 </Project>

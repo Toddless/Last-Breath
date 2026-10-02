@@ -226,6 +226,8 @@ namespace Battle.Internal.Npc
             _ => 1f, // no clock (sandbox): the plain roll
         };
 
+        // TODO:
+        // расширить API проавайдера нпс. Вместо создания определения нпс для получения содержимого определенного поля создать get метод или выдать readonly копию даты.
         private Fractions? ResolveFraction()
         {
             if (_provider == null) return null;
