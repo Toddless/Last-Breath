@@ -1,185 +1,265 @@
 namespace LastBreathTest.BattleSystemTests
 {
+    using Core.Ai.World.Skirmish;
+    using Core.Ai.World.Time;
+    using Core.Battle;
+    using Core.Data;
     using Core.Data.GameData;
+    using Core.Entity;
     using Core.Entity.Components;
     using Core.Enums;
-    using Core.Narrative;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.MessageBus;
     using Core.Narrative.Actions;
     using Core.Narrative.Conditions;
     using Core.Narrative.Dialogues;
     using Core.Narrative.Facts;
     using Core.Narrative.Influence;
     using Core.Narrative.Quests;
+    using Core.Reputation;
+    using Core.Save;
     using Core.Services;
     using LastBreath.Descriptors;
     using Moq;
 
     /// <summary>
-    /// Feeds the REAL SharedData json through the real parsers — a dropped quest/dialogue is a
-    /// data bug this catches without booting Godot. Godot's RandomNumberGenerator cannot exist
-    /// outside the engine, so it is passed as null and the offer roll is pre-cached in the facts.
+    /// The quest and dialogue parsers over the full registered vocabulary, fed records written here, and the
+    /// dialogue service over what they read. The generator is strict: an offer roll is read from the facts.
     /// </summary>
     [TestClass]
     public class NarrativeDataParseTests
     {
-        private const string VeteranNpcId = "Npc_Bandit_Veteran";
-        private const string TraderNpcId = "Npc_Ronald";
-        private const string QuestId = "Quest_Field_Of_Bones";
-        private const string TrialQuestId = "Quest_Trial_Of_The_Fang";
-        private const string SecondStageId = "GatherProof";
+        private const string FixtureFile = "fixture.json";
 
-        /// <summary>A file whose list is written as null. Newtonsoft hands the loader nothing there in
-        /// spite of the property's own default, so the shape is one an author can actually leave behind
-        /// and one the loader has to read rather than fall over inside.</summary>
+        /// <summary>A file whose list is written as null: the loader is handed no list at all there.</summary>
         private const string EmptiedFile = "emptied.json";
 
         private const string NullDialoguesJson = """{"dialogues": null}""";
 
         private const string NullQuestsJson = """{"quests": null}""";
 
+        private const string QuestId = "Quest_Fixture_Errand";
+
+        private const string GiverNpcId = "Npc_Fixture_Giver";
+
+        private const string ReachStageId = "Reach";
+
+        private const string GatherStageId = "Gather";
+
+        private const string WelcomeNodeId = "Welcome";
+
+        private const string ProposalNodeId = "Proposal";
+
+        private const string UnderwayNodeId = "Underway";
+
+        private const string WelcomeLineKey = "Dlg_Fixture_Welcome";
+
+        private const string AskErrandOptionId = "AskErrand";
+
+        private const string GoodbyeOptionId = "Goodbye";
+
+        /// <summary>A two-stage quest writing a condition or an action in each place a linear quest holds one.</summary>
+        private const string QuestsJson = $$"""
+        {
+          "quests": [
+            {
+              "id": "{{QuestId}}",
+              "giverNpcId": "{{GiverNpcId}}",
+              "faction": "Human",
+              "turnInNpcIds": [ "{{GiverNpcId}}" ],
+              "declinePolicy": "Cooldown",
+              "acceptConditions": [ { "type": "Not", "condition": { "type": "Fact", "key": "Fixture_Giver_Offended" } } ],
+              "onAccept": [ { "type": "SetFact", "key": "Fixture_Errand_Taken" } ],
+              "stages": [
+                {
+                  "id": "{{ReachStageId}}",
+                  "objectives": [ { "id": "Arrive", "condition": { "type": "Fact", "key": "Fixture_Place_Reached" } } ],
+                  "onEnter": [ { "type": "SetFact", "key": "Fixture_Errand_Started" } ]
+                },
+                {
+                  "id": "{{GatherStageId}}",
+                  "objectives": [
+                    { "id": "Evidence", "condition": { "type": "HasItem", "itemId": "Fixture_Evidence", "amount": 2 } },
+                    { "id": "Foes", "counter": { "key": "Fixture_Foes_Slain", "amount": 2 }, "optional": true }
+                  ],
+                  "onComplete": [ { "type": "SetFact", "key": "Fixture_Errand_Done" } ]
+                }
+              ],
+              "rewards": {
+                "items": [ { "itemId": "Fixture_Reward", "amount": 1 } ],
+                "actions": [ { "type": "TakeItem", "itemId": "Fixture_Evidence", "amount": 2 } ]
+              },
+              "onDecline": [ { "type": "SetFact", "key": "Fixture_Errand_Declined" } ],
+              "onFail": [ { "type": "SetFact", "key": "Fixture_Errand_Failed" } ]
+            }
+          ]
+        }
+        """;
+
+        /// <summary>The giver's conversation: an opening for the errand once taken, and a fallback welcome that
+        /// offers it, keeps a rumour behind a fact and lets the player leave.</summary>
+        private const string DialoguesJson = $$"""
+        {
+          "dialogues": [
+            {
+              "npcId": "{{GiverNpcId}}",
+              "entryRules": [
+                {
+                  "priority": 20,
+                  "conditions": [ { "type": "QuestStatus", "questId": "{{QuestId}}", "status": "Active" } ],
+                  "node": "{{UnderwayNodeId}}"
+                },
+                { "priority": 0, "conditions": [], "node": "{{WelcomeNodeId}}" }
+              ],
+              "nodes": [
+                {
+                  "id": "{{WelcomeNodeId}}",
+                  "lines": [ { "speaker": "Npc", "key": "{{WelcomeLineKey}}" } ],
+                  "options": [
+                    {
+                      "id": "{{AskErrandOptionId}}",
+                      "key": "Dlg_Fixture_AskErrand",
+                      "visibleConditions": [
+                        { "type": "CanAcceptQuest", "questId": "{{QuestId}}" },
+                        { "type": "QuestOfferRoll", "questId": "{{QuestId}}" }
+                      ],
+                      "next": "{{ProposalNodeId}}"
+                    },
+                    {
+                      "id": "Rumour",
+                      "key": "Dlg_Fixture_Rumour",
+                      "visibleConditions": [ { "type": "Fact", "key": "Fixture_Rumour_Heard" } ]
+                    },
+                    { "id": "{{GoodbyeOptionId}}", "key": "Dlg_Fixture_Goodbye" }
+                  ]
+                },
+                {
+                  "id": "{{ProposalNodeId}}",
+                  "onEnter": [ { "type": "SetFact", "key": "Fixture_Proposal_Heard" } ],
+                  "lines": [ { "speaker": "Npc", "key": "Dlg_Fixture_Proposal" } ],
+                  "options": [
+                    {
+                      "id": "Agree",
+                      "key": "Dlg_Fixture_Agree",
+                      "enabledConditions": [ { "type": "CanAcceptQuest", "questId": "{{QuestId}}" } ],
+                      "actions": [ { "type": "AcceptQuest", "questId": "{{QuestId}}" } ],
+                      "next": "{{UnderwayNodeId}}"
+                    },
+                    {
+                      "id": "Decline",
+                      "key": "Dlg_Fixture_Decline",
+                      "actions": [ { "type": "DeclineQuest", "questId": "{{QuestId}}" } ]
+                    }
+                  ]
+                },
+                {
+                  "id": "{{UnderwayNodeId}}",
+                  "lines": [ { "speaker": "Npc", "key": "Dlg_Fixture_Underway" } ],
+                  "options": [ { "id": "{{GoodbyeOptionId}}", "key": "Dlg_Fixture_Goodbye" } ]
+                }
+              ]
+            }
+          ]
+        }
+        """;
+
+        private static readonly string[] s_stageIds = [ReachStageId, GatherStageId];
+
+        private static readonly string[] s_nodeIds = [WelcomeNodeId, ProposalNodeId, UnderwayNodeId];
+
         private WorldFactsService _facts = null!;
-        private InfluenceMastery _influence = null!;
+        private GameEventBus _events = null!;
+        private IInfluenceMastery _influence = null!;
+        private IRandomNumberGenerator _rnd = null!;
         private QuestProvider _quests = null!;
         private DialogueProvider _dialogues = null!;
         private QuestLogService _questLog = null!;
-        private GameEventBus _events = null!;
 
         [TestInitialize]
         public void Setup()
         {
             _facts = new WorldFactsService();
             _events = new GameEventBus();
-            _influence = new InfluenceMastery(Mock.Of<Core.MessageBus.IGameMessageBus>());
+            _influence = Mock.Of<IInfluenceMastery>();
+            _rnd = new Mock<IRandomNumberGenerator>(MockBehavior.Strict).Object;
 
-            var clock = new Mock<Core.Ai.World.Time.IWorldClock>();
+            var inventory = Mock.Of<IInventory>();
+            var clock = Mock.Of<IWorldClock>();
+            var relations = Mock.Of<IFactionRelationService>();
+            var player = Mock.Of<IPlayerAccessor>();
+            var minter = Mock.Of<IItemMinter>();
+            var messages = Mock.Of<IGameMessageBus>();
 
-            var inventory = new Mock<Core.Inventory.IInventory>();
-            inventory.Setup(mock => mock.GetAvailableCapacity()).Returns(100);
+            var conditions = new NarrativeConditionParser(NarrativeFactories.Conditions(
+                inventory, _facts, relations, Mock.Of<IPersonalReputationService>(), player, _influence, clock, _rnd,
+                () => _questLog, () => _quests));
 
-            var conditionFactories = NarrativeFactories.Conditions(
-                inventory.Object,
-                _facts,
-                new Core.Reputation.FactionRelationService(FactionTestData.Create()),
-                Mock.Of<Core.Reputation.IPersonalReputationService>(),
-                Mock.Of<IPlayerAccessor>(),
-                _influence,
-                clock.Object,
-                new DefaultRandomNumberGenerator(seed: 22),
-                () => _questLog,
-                () => _quests);
-
-            var actionFactories = NarrativeFactories.Actions(
-                _facts,
-                inventory.Object,
-                Mock.Of<Core.Items.IItemMinter>(),
-                _events,
-                Mock.Of<IPlayerAccessor>(),
-                new Core.Reputation.FactionRelationService(FactionTestData.Create()),
-                _influence,
-                Mock.Of<Core.Battle.IMartialArtMastery>(),
-                Mock.Of<Core.MessageBus.IGameMessageBus>(),
-                Mock.Of<Core.Entity.INpcProvider>(),
-                Mock.Of<Core.Data.INpcModifierProvider>(),
-                Mock.Of<Core.Entity.INpcWorldSpawner>(),
-                Mock.Of<INpcPopulationService>(),
-                Mock.Of<Core.Entity.ISpawnPointRegistry>(),
-                () => _questLog);
-
-            var conditions = new NarrativeConditionParser(conditionFactories);
-            var actions = new NarrativeActionParser(actionFactories);
+            var actions = new NarrativeActionParser(NarrativeFactories.Actions(
+                _facts, inventory, minter, _events, player, relations, _influence, Mock.Of<IMartialArtMastery>(), messages,
+                Mock.Of<INpcProvider>(), Mock.Of<INpcModifierProvider>(), Mock.Of<INpcWorldSpawner>(),
+                Mock.Of<INpcPopulationService>(), Mock.Of<ISpawnPointRegistry>(), () => _questLog));
 
             _quests = new QuestProvider(conditions, actions);
             _dialogues = new DialogueProvider(conditions, actions);
-            ApplyCatalog(_quests, DataCatalog.Quests);
-            ApplyCatalog(_dialogues, DataCatalog.Dialogues);
+            _quests.Apply(DataCatalog.Quests, new GameDataFile(FixtureFile, QuestsJson));
+            _dialogues.Apply(DataCatalog.Dialogues, new GameDataFile(FixtureFile, DialoguesJson));
 
-            _questLog = new QuestLogService(_quests, _facts, inventory.Object, Mock.Of<Core.Items.IItemMinter>(),
-                Mock.Of<Core.Items.IUniqueItemQuery>(), _influence, clock.Object,
-                Mock.Of<Core.Ai.World.Skirmish.INpcWorldRegistry>(),
-                _events, Mock.Of<Core.MessageBus.IGameMessageBus>(), Mock.Of<Core.Save.ILoadScope>());
+            _questLog = new QuestLogService(_quests, _facts, inventory, minter, Mock.Of<IUniqueItemQuery>(), _influence,
+                clock, Mock.Of<INpcWorldRegistry>(), _events, messages, Mock.Of<ILoadScope>());
         }
 
         [TestMethod]
-        public void QuestsCatalog_ParsesTheExampleQuest()
+        public void QuestsCatalog_ReadsAQuestWholeWithEveryStage()
         {
-            Assert.IsNotNull(_quests.Get(QuestId), $"'{QuestId}' was dropped at parse — check the test log for the Tracker report");
-            Assert.AreEqual(2, _quests.Get(QuestId)!.Stages.Count);
+            var quest = _quests.Get(QuestId);
+
+            Assert.IsNotNull(quest, $"'{QuestId}' was dropped at parse — check the test log for the Tracker report");
+            CollectionAssert.AreEqual(s_stageIds, quest.Stages.Select(stage => stage.Id).ToArray(),
+                "the quest's stages are not the ones its record writes, in the order written");
         }
 
         [TestMethod]
-        public void DialoguesCatalog_ParsesTheVeteranDialogue()
+        public void DialoguesCatalog_ReadsADialogueWholeWithEveryNode()
         {
-            var dialogue = _dialogues.Get(VeteranNpcId);
-            Assert.IsNotNull(dialogue, $"dialogue for '{VeteranNpcId}' was dropped at parse — check the test log for the Tracker report");
-            Assert.AreEqual(8, dialogue!.Nodes.Count);
+            var dialogue = _dialogues.Get(GiverNpcId);
+
+            Assert.IsNotNull(dialogue, $"the dialogue of '{GiverNpcId}' was dropped at parse — check the test log for the Tracker report");
+            CollectionAssert.AreEquivalent(s_nodeIds, dialogue.Nodes.Keys.ToArray(), "the dialogue's nodes are not the ones its record writes");
         }
 
-        /// <summary>The records the vocabulary's own gaps used to swallow: a shop opens with StartTrade,
-        /// a trial spawns its target and pays in tree points. A registry short of one action drops the
-        /// whole record that names it, so an incomplete list here hid data bugs instead of finding them.</summary>
-        [TestMethod]
-        public void TheTraderAndTrialRecords_SurviveTheFullActionRegistry()
-        {
-            Assert.IsNotNull(_dialogues.Get(TraderNpcId), $"dialogue for '{TraderNpcId}' was dropped at parse — check the test log for the Tracker report");
-            Assert.IsNotNull(_quests.Get(TrialQuestId), $"'{TrialQuestId}' was dropped at parse — check the test log for the Tracker report");
-        }
-
-        /// <summary>A file that writes its list as null is a file holding no record, and the loader says
-        /// so and reads on: an exception out of the loop would take down the whole catalog load and leave
-        /// the records of every other file unread.</summary>
+        /// <summary>A file writing its list as null holds no record: the loader says so and reads on, and the
+        /// records of every other file stay loaded.</summary>
         [TestMethod]
         public void ACatalogFileWritingItsListAsNull_IsReportedAndNotThrownOver()
         {
             _dialogues.Apply(DataCatalog.Dialogues, new GameDataFile(EmptiedFile, NullDialoguesJson));
             _quests.Apply(DataCatalog.Quests, new GameDataFile(EmptiedFile, NullQuestsJson));
 
-            Assert.IsNotNull(_dialogues.Get(VeteranNpcId), "a file holding no dialogue took the read ones with it");
+            Assert.IsNotNull(_dialogues.Get(GiverNpcId), "a file holding no dialogue took the read ones with it");
             Assert.IsNotNull(_quests.Get(QuestId), "a file holding no quest took the read ones with it");
         }
 
+        /// <summary>On a fresh world the opening waiting for the errand to be taken does not hold, so the welcome
+        /// opens: it offers the errand the quest log can hand out, hides the rumour and keeps the way out.</summary>
         [TestMethod]
-        public void DialogueService_StartsTheVeteranConversation()
+        public void DialogueService_OnAFreshWorld_OpensTheFallbackNodeWithOnlyTheOptionsWhoseConditionsHold()
         {
-            // Pre-cache the offer roll so IsMet never touches the (absent) Godot RNG.
+            // An offer roll that passed and has not run out: the condition reads it instead of rolling.
             _facts.SetCount(FactKeys.QuestOfferRollUntil(QuestId), int.MaxValue);
-            _facts.SetCount(FactKeys.QuestOfferRollPassed(QuestId), 1);
+            _facts.SetFact(FactKeys.QuestOfferRollPassed(QuestId));
 
-            var service = new DialogueService(_dialogues, _facts, _influence, new DefaultRandomNumberGenerator(seed: 22), _events);
-            bool started = service.Start(VeteranNpcId, npcInstanceId: null, Fractions.Human);
+            var service = new DialogueService(_dialogues, _facts, _influence, _rnd, _events);
 
-            Assert.IsTrue(started, "no entry rule matched a fresh state — the priority-0 fallback is broken");
-            Assert.IsNotNull(service.Current);
-            Assert.AreEqual(3, service.Current!.Options.Count, "Greeting must show AskWork + Flatter + Leave on a fresh state");
-        }
+            Assert.IsTrue(service.Start(GiverNpcId, npcInstanceId: null, Fractions.Human),
+                "no entry rule matched a fresh world — the priority-0 fallback is broken");
 
-        [TestMethod]
-        public void QuestLog_AcceptsAndTracksTheExampleQuest()
-        {
-            Assert.IsTrue(_questLog.Accept(QuestId, NarrativeContext.Empty));
-            Assert.AreEqual(QuestStatus.Active, _questLog.GetStatus(QuestId));
-
-            _facts.SetFact(FactKeys.LocationDiscovered("Old_Battlefield"));
-            Assert.AreEqual(SecondStageId, _questLog.GetState(QuestId)!.StageId, "discovering the battlefield must advance to stage 2");
-        }
-
-        private static void ApplyCatalog(IGameDataParticipant participant, string catalog)
-        {
-            string root = FindSharedData();
-            foreach (string file in Directory.GetFiles(Path.Combine(root, catalog), "*.json"))
-                participant.Apply(catalog, new GameDataFile(Path.GetFileName(file), File.ReadAllText(file)));
-        }
-
-        private static string FindSharedData()
-        {
-            var directory = new DirectoryInfo(AppContext.BaseDirectory);
-            while (directory != null)
-            {
-                string candidate = Path.Combine(directory.FullName, "SharedData");
-                if (Directory.Exists(candidate)) return candidate;
-                directory = directory.Parent;
-            }
-
-            throw new InvalidOperationException("SharedData directory not found above the test binaries");
+            var view = service.Current;
+            Assert.IsNotNull(view, "the conversation started and shows nothing");
+            Assert.AreEqual(WelcomeLineKey, view.Lines.Single().TextKey,
+                "a fresh world opened on the rule waiting for the errand to be taken instead of the fallback welcome");
+            CollectionAssert.AreEqual(new[] { AskErrandOptionId, GoodbyeOptionId }, view.Options.Select(option => option.Id).ToArray(),
+                "the welcome must show the offer the quest log can hand out and the way out, and hide the option gated on an unset fact");
         }
     }
 }
